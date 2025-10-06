@@ -18,9 +18,11 @@ Antworte im JSON-Format mit:
     {"thought":"...", "tool":"name-oder-null", "input":{...}}
   ],
   "final_answer": "..."
-}`;
+}
+Hinweise:
+- Wenn du per http_get JSON erhältst, nutze "json_pick", um konkrete Felder (z. B. "stargazers_count") zu extrahieren.
+- Gib im "final_answer" den gewonnenen Wert kurz und prägnant aus (z. B. "Stars: 123456").`;
 
-  // Nur system/user-Nachrichten in den Prompt geben (typ-sicher)
   const coreHistory: Array<{ role: 'system' | 'user'; content: string }> = history
     .filter((m) => m.role === 'system' || m.role === 'user')
     .map((m) => ({ role: m.role as 'system' | 'user', content: m.content }));
