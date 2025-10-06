@@ -1,20 +1,26 @@
-export type ToolInput = Record<string, any>;
+export type ToolInput = Record<string, unknown>;
 
 export interface Tool {
   name: string;
   description: string;
-  schema?: object;
-  run: (input: ToolInput) => Promise<any>;
+  schema?: object; // optional: zod/json-schema
+  run: (input: ToolInput) => Promise<unknown>;
 }
 
 export interface Step {
   thought: string;
   tool?: string | null;
-  input?: ToolInput;
+  // ToolInput plus optionale Felder, die der Planner anhängt
+  input?: ToolInput & {
+    __tool_output?: unknown;
+    __tool_error?: string;
+  };
 }
 
 export interface AgentMessage {
-  role: "system" | "user" | "assistant" | "tool";
+  role: 'system' | 'user' | 'assistant' | 'tool';
   name?: string;
   content: string;
 }
+
+

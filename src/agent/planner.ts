@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+
 import type { Step, AgentMessage } from '../types.js';
 import { toolByName, toolCatalogForSystem } from './tools.js';
 
@@ -19,11 +20,16 @@ Antworte im JSON-Format mit:
   "final_answer": "..."
 }`;
 
-  const messages: Array<{ role: 'system' | 'user'; content: string }> = [
+  // Nur system/user-Nachrichten in den Prompt geben (typ-sicher)
+  const coreHistory: Array<{ role: 'system' | 'user'; content: string }> = history
+    .filter((m) => m.role === 'system' || m.role === 'user')
+    .map((m) => ({ role: m.role as 'system' | 'user', content: m.content }));
+
+  const messages = [
     { role: 'system', content: system },
-    ...history.filter((m) => m.role !== 'assistant' && m.role !== 'tool') as any,
-    { role: 'user', content: 'Starte die Bearbeitung des Ziels.' },
-  ];
+    ...coreHistory,
+    { role: 'user', content: 'Starte die Bearbeitung des Ziels.' }
+  ] as const;
 
   const model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
 
@@ -31,18 +37,25 @@ Antworte im JSON-Format mit:
     model,
     temperature: 0.2,
     response_format: { type: 'json_object' },
-    messages,
+    messages
   });
 
   const content = completion.choices[0]?.message?.content ?? '{}';
   let parsed: { steps?: Step[]; final_answer?: string };
-  try { parsed = JSON.parse(content); } catch { parsed = {}; }
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    parsed = {};
+  }
 
   const steps: Step[] = parsed.steps ?? [];
   const executed: Step[] = [];
 
   for (const s of steps) {
-    if (!s.tool) { executed.push(s); continue; }
+    if (!s.tool) {
+      executed.push(s);
+      continue;
+    }
     const tool = toolByName(s.tool);
     if (!tool) {
       executed.push({ ...s, thought: s.thought + ' (Unbekanntes Tool)' });
@@ -50,9 +63,17 @@ Antworte im JSON-Format mit:
     }
     try {
       const output = await tool.run(s.input ?? {});
-      executed.push({ ...s, input: { ...(s.input ?? {}), __tool_output: output } });
-    } catch (e: any) {
-      executed.push({ ...s, input: { ...(s.input ?? {}), __tool_error: String(e?.message || e) } });
+      executed.push({
+        ...s,
+        input: { ...(s.input ?? {}), __tool_output: output }
+      });
+    } catch (e: unknown) {
+      const msg =
+        e instanceof Error ? e.message : typeof e === 'string' ? e : 'Unknown error';
+      executed.push({
+        ...s,
+        input: { ...(s.input ?? {}), __tool_error: String(msg) }
+      });
     }
   }
 
