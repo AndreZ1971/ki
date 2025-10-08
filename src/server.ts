@@ -2,9 +2,11 @@ import 'dotenv/config';
 import Fastify from 'fastify';
 import fastifyRawBody from 'fastify-raw-body';
 import crypto from 'node:crypto';
+
 import { Memory } from './agent/memory.js';
 import { planAndAct } from './agent/planner.js';
 import { logger } from './logger.js';
+
 
 const app = Fastify({
   logger: { level: process.env.LOG_LEVEL || 'info' },

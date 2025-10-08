@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { AxiosInstance } from "axios";
+
 import type { Tool } from "../types.js";
 
 /**

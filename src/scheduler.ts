@@ -1,7 +1,8 @@
 import 'dotenv/config';
 import cron from 'node-cron';
-import { planAndAct } from './agent/planner.js';
+
 import { Memory } from './agent/memory.js';
+import { planAndAct } from './agent/planner.js';
 import { logger } from './logger.js';
 
 let lastIso = new Date(Date.now() - 10 * 60 * 1000).toISOString(); // Start: -10min
