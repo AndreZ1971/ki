@@ -2,6 +2,7 @@ import axios, { isAxiosError } from 'axios';
 
 import { wooTools } from '../tools/woo.js';
 import type { Tool } from '../types.js';
+import { wpTools } from '../tools/wp.js';
 
 
 export const timeTool: Tool = {
@@ -128,11 +129,13 @@ export const jsonPickTool: Tool = {
   },
 };
 
+
 export const tools: Tool[] = [
   timeTool,
   httpGetTool,
   jsonPickTool,
-  ...wooTools, // WooCommerce-Tools integrieren
+  ...wooTools,
+  ...wpTools, // ← WordPress-Upload-Tool
 ];
 
 export function toolByName(name: string): Tool | undefined {
