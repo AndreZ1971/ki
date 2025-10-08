@@ -1,10 +1,9 @@
+// src/agent/tools.ts
 import axios, { isAxiosError } from 'axios';
 
 import { wooTools } from '../tools/woo.js';
 import { wpTools } from '../tools/wp.js';
 import type { Tool } from '../types.js';
-
-
 
 export const timeTool: Tool = {
   name: 'time_now',
@@ -33,24 +32,34 @@ function extractHttpStatus(e: unknown): number | undefined {
 
 function extractHttpMessage(e: unknown): string {
   if (isAxiosError(e)) {
-    const d = e.response?.data;
+    const d = e.response?.data as unknown;
     const msgFromData =
-      isRecord(d) && typeof d.message === 'string' ? (d.message as string) : undefined;
+      isRecord(d) && typeof d.message === 'string' ? d.message : undefined;
     return msgFromData ?? e.message;
   }
   if (e instanceof Error) return e.message;
   return String(e);
 }
 
+function wpRestFallback(url: string): string | null {
+  // /wp-json -> /index.php?rest_route=/
+  const m = url.match(/\/wp-json\/?$/i);
+  if (!m) return null;
+  return url.replace(/\/wp-json\/?$/i, '/index.php?rest_route=/');
+}
+
 export const httpGetTool: Tool = {
   name: 'http_get',
-  description: 'HTTP GET (JSON erwartet). Input: { url: string, headers?: Record<string,string> }',
+  description:
+    'HTTP GET (JSON erwartet). Input: { url: string, headers?: Record<string,string>, timeout_ms?: number }',
   async run(input) {
-    const { url, headers } = input as {
+    const { url, headers, timeout_ms } = input as {
       url: string;
       headers?: Record<string, string>;
+      timeout_ms?: number;
     };
 
+    const isGh = /(^|\/\/)api\.github\.com/i.test(url);
     const token = process.env.GITHUB_TOKEN?.trim();
     const looksLikeGhToken =
       !!token &&
@@ -62,42 +71,60 @@ export const httpGetTool: Tool = {
 
     const baseHeaders: Record<string, string> = {
       'user-agent': 'ki-agent',
-      accept: 'application/vnd.github+json',
-      'x-github-api-version': '2022-11-28',
+      ...(isGh
+        ? {
+            accept: 'application/vnd.github+json',
+            'x-github-api-version': '2022-11-28',
+          }
+        : {
+            accept: 'application/json, text/plain, */*',
+          }),
       ...(headers ?? {}),
     };
 
-    const fetchOnce = async (useAuth: boolean) =>
-      axios.get(url, {
-        timeout: 10000,
+    const defaultTimeout = timeout_ms ?? (isGh ? 10000 : 30000);
+
+    const fetchOnce = async (useAuth: boolean, tmo: number, targetUrl: string) =>
+      axios.get(targetUrl, {
+        timeout: tmo,
         headers: {
           ...baseHeaders,
-          ...(useAuth && looksLikeGhToken ? { Authorization: `Bearer ${token}` } : {}),
+          ...(useAuth && isGh && looksLikeGhToken ? { Authorization: `Bearer ${token}` } : {}),
         },
+        // axios folgt Redirects standardmäßig; nichts weiter nötig
       });
 
     try {
-      if (looksLikeGhToken) {
-        try {
-          const res = await fetchOnce(true);
-          return { status: res.status, data: res.data as unknown as JSONValue, authed: true as const };
-        } catch (err: unknown) {
-          const status = extractHttpStatus(err);
-          if (status === 401 || status === 403) {
-            const res = await fetchOnce(false);
-            return {
-              status: res.status,
-              data: res.data as unknown as JSONValue,
-              authed: false as const,
-              fallback: true as const,
-            };
-          }
-          throw err;
-        }
-      }
+      // 1) Primärversuch
+      try {
+        const res = await fetchOnce(true, defaultTimeout, url);
+        return { status: res.status, data: res.data as unknown as JSONValue, authed: isGh && looksLikeGhToken ? true : false };
+      } catch (err: unknown) {
+        // GitHub: bei 401/403 ohne Auth fallbacken
+        const status = extractHttpStatus(err);
+        const code = isAxiosError(err) ? err.code : undefined;
 
-      const res = await fetchOnce(false);
-      return { status: res.status, data: res.data as unknown as JSONValue, authed: false as const };
+        const isTimeout = code === 'ECONNABORTED' || status === undefined; // Timeout oder kein Status
+        const isGhAuthIssue = isGh && (status === 401 || status === 403);
+
+        // 2) Bei GH-Auth-Issue: ohne Auth erneut probieren
+        if (isGhAuthIssue) {
+          const res = await fetchOnce(false, defaultTimeout, url);
+          return { status: res.status, data: res.data as unknown as JSONValue, authed: false as const, fallback: true as const };
+        }
+
+        // 3) Bei Timeout + WP: auf /index.php?rest_route=/ ausweichen
+        if (isTimeout) {
+          const alt = wpRestFallback(url);
+          if (alt) {
+            const res = await fetchOnce(false, defaultTimeout, alt);
+            return { status: res.status, data: res.data as unknown as JSONValue, fallback: 'wp_rest_route' as const };
+          }
+        }
+
+        // sonst Originalfehler hochreichen
+        throw err;
+      }
     } catch (err: unknown) {
       const status = extractHttpStatus(err);
       const msg = extractHttpMessage(err);
@@ -120,7 +147,8 @@ function getByPath(obj: unknown, path: string): JSONValue | undefined {
 
 export const jsonPickTool: Tool = {
   name: 'json_pick',
-  description: 'Extrahiert einen Wert aus JSON per einfachem Dot-Path. Input: { json: unknown, path: string }',
+  description:
+    'Extrahiert einen Wert aus JSON per einfachem Dot-Path. Input: { json: unknown, path: string }',
   async run(input) {
     const { json, path } = input as { json: unknown; path: string };
     const value = getByPath(json, path);
@@ -130,13 +158,12 @@ export const jsonPickTool: Tool = {
   },
 };
 
-
 export const tools: Tool[] = [
   timeTool,
   httpGetTool,
   jsonPickTool,
-  ...wooTools,
-  ...wpTools, // ← WordPress-Upload-Tool
+  ...wooTools, // WooCommerce-Tools
+  ...wpTools,  // WordPress-Upload-Tool
 ];
 
 export function toolByName(name: string): Tool | undefined {
