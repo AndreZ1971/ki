@@ -1,5 +1,5 @@
-import axios from 'axios';
-
+import axios, { isAxiosError } from 'axios';
+import { wooTools } from '../tools/woo.js';
 import type { Tool } from '../types.js';
 
 export const timeTool: Tool = {
@@ -10,41 +10,43 @@ export const timeTool: Tool = {
   },
 };
 
+type JSONValue =
+  | string
+  | number
+  | boolean
+  | null
+  | { [k: string]: JSONValue }
+  | JSONValue[];
+
 function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null;
 }
 
 function extractHttpStatus(e: unknown): number | undefined {
-  if (isRecord(e) && isRecord(e.response)) {
-    const s = e.response.status;
-    return typeof s === 'number' ? s : undefined;
-  }
+  if (isAxiosError(e)) return e.response?.status;
   return undefined;
 }
 
 function extractHttpMessage(e: unknown): string {
-  if (isRecord(e)) {
-    const resp = e.response;
-    if (isRecord(resp)) {
-      const data = resp.data;
-      if (isRecord(data) && typeof data.message === 'string') return data.message;
-    }
-    if (typeof e.message === 'string') return e.message;
+  if (isAxiosError(e)) {
+    const d = e.response?.data;
+    const msgFromData =
+      isRecord(d) && typeof d.message === 'string' ? (d.message as string) : undefined;
+    return msgFromData ?? e.message;
   }
+  if (e instanceof Error) return e.message;
   return String(e);
 }
 
 export const httpGetTool: Tool = {
   name: 'http_get',
-  description:
-    'HTTP GET (JSON erwartet). Input: { url: string, headers?: Record<string,string> }',
+  description: 'HTTP GET (JSON erwartet). Input: { url: string, headers?: Record<string,string> }',
   async run(input) {
     const { url, headers } = input as {
       url: string;
       headers?: Record<string, string>;
     };
 
-    // GitHub-Token nur verwenden, wenn es plausibel aussieht
     const token = process.env.GITHUB_TOKEN?.trim();
     const looksLikeGhToken =
       !!token &&
@@ -71,24 +73,27 @@ export const httpGetTool: Tool = {
       });
 
     try {
-      // 1) Mit Auth (wenn plausibel) → bei 401/403 automatisch ohne Auth erneut
       if (looksLikeGhToken) {
         try {
           const res = await fetchOnce(true);
-          return { status: res.status, data: res.data, authed: true as const };
+          return { status: res.status, data: res.data as unknown as JSONValue, authed: true as const };
         } catch (err: unknown) {
           const status = extractHttpStatus(err);
           if (status === 401 || status === 403) {
             const res = await fetchOnce(false);
-            return { status: res.status, data: res.data, authed: false as const, fallback: true as const };
+            return {
+              status: res.status,
+              data: res.data as unknown as JSONValue,
+              authed: false as const,
+              fallback: true as const,
+            };
           }
           throw err;
         }
       }
 
-      // 2) Ohne Auth
       const res = await fetchOnce(false);
-      return { status: res.status, data: res.data, authed: false as const };
+      return { status: res.status, data: res.data as unknown as JSONValue, authed: false as const };
     } catch (err: unknown) {
       const status = extractHttpStatus(err);
       const msg = extractHttpMessage(err);
@@ -97,32 +102,36 @@ export const httpGetTool: Tool = {
   },
 };
 
-/** Sichere JSON-Pfad-Navigation mit Dot-Path (z. B. "stargazers_count" oder "owner.login"). */
-function getByPath(obj: unknown, path: string): unknown {
+/** Sichere JSON-Pfad-Navigation mit Dot-Path */
+function getByPath(obj: unknown, path: string): JSONValue | undefined {
   if (!path) return undefined;
   const parts = path.split('.');
   let cur: unknown = obj;
   for (const key of parts) {
     if (!isRecord(cur) || !(key in cur)) return undefined;
-    cur = cur[key];
+    cur = (cur as Record<string, unknown>)[key];
   }
-  return cur;
+  return cur as JSONValue | undefined;
 }
 
 export const jsonPickTool: Tool = {
   name: 'json_pick',
-  description:
-    'Extrahiert einen Wert aus JSON per einfachem Dot-Path. Input: { json: unknown, path: string }',
+  description: 'Extrahiert einen Wert aus JSON per einfachem Dot-Path. Input: { json: unknown, path: string }',
   async run(input) {
     const { json, path } = input as { json: unknown; path: string };
     const value = getByPath(json, path);
     return value === undefined
-      ? { ok: false, reason: 'path not found', value: null }
-      : { ok: true, value };
+      ? { ok: false, reason: 'path not found', value: null as JSONValue | null }
+      : { ok: true, value: value as JSONValue };
   },
 };
 
-export const tools: Tool[] = [timeTool, httpGetTool, jsonPickTool];
+export const tools: Tool[] = [
+  timeTool,
+  httpGetTool,
+  jsonPickTool,
+  ...wooTools, // WooCommerce-Tools integrieren
+];
 
 export function toolByName(name: string): Tool | undefined {
   return tools.find((t) => t.name === name);

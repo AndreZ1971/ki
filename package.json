@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "tsx src/index.ts",
     "api": "tsx src/server.ts",
+    "jobs": "tsx src/scheduler.ts",
     "build": "tsc",
     "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -20,6 +21,8 @@
     "better-sqlite3": "^12.4.1",
     "dotenv": "^17.2.3",
     "fastify": "^5.6.1",
+    "fastify-raw-body": "^5.0.0",
+    "node-cron": "^4.2.1",
     "openai": "^6.1.0",
     "pino": "^10.0.0",
     "zod": "^4.1.12"
