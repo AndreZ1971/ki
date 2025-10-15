@@ -1,22 +1,17 @@
-/* eslint-env node */
-/* global module, __dirname */
-
+// ecosystem.config.cjs
 module.exports = {
   apps: [
     {
       name: 'ki-api',
-      script: 'npm',
-      args: 'run api',
-      cwd: __dirname,
+      script: './dist/server.js',
+      interpreter: 'node',
       env: { NODE_ENV: 'production' }
     },
     {
       name: 'ki-jobs',
-      script: 'npm',
-      args: 'run jobs',
-      cwd: __dirname,
+      script: './dist/agent/jobs/index.js',
+      interpreter: 'node',
       env: { NODE_ENV: 'production' }
     }
   ]
 };
-

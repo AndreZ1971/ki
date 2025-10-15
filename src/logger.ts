@@ -1,17 +1,18 @@
-import pino from 'pino';
+import pino, { type TransportSingleOptions } from "pino";
 
-function makeTransport() {
-  // Nur in Non-Prod und nur wenn pino-pretty installiert ist
-  if (process.env.NODE_ENV === 'production') return undefined;
-  try {
-    // pino v10 erwartet target-Name; vorhanden, wenn Paket installiert ist
-    return { target: 'pino-pretty', options: { colorize: true } } as const;
-  } catch {
-    return undefined;
+function makeTransport(): TransportSingleOptions | undefined {
+  if (process.env.NODE_ENV === "development") {
+    return {
+      target: "pino-pretty",
+      options: { colorize: true },
+    };
   }
+  return undefined;
 }
 
+const transport = makeTransport();
+
 export const logger = pino({
-  level: process.env.LOG_LEVEL || 'info',
-  transport: makeTransport(),
+  level: process.env.LOG_LEVEL || "info",
+  ...(transport ? { transport } : {}), // nur setzen, wenn vorhanden
 });

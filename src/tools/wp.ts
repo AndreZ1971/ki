@@ -1,8 +1,12 @@
-import axios, { isAxiosError } from 'axios';
+// src/tools/wp.ts
+import axios, { isAxiosError } from "axios";
+import type { AxiosRequestConfig } from "axios";
 import FormData from 'form-data';
-
 import type { Tool } from '../types.js';
 
+/* ---------------------------------------------------
+ * Helpers
+ * --------------------------------------------------- */
 
 function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null;
@@ -32,15 +36,107 @@ function axiosErrorToMessage(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
 }
 
+function sanitizeFilename(name: string): string {
+  // sehr konservativ: nur Buchstaben, Zahlen, .-_ erlauben
+  const cleaned = name.normalize('NFKD').replace(/[^\w.\-]+/g, '_');
+  // minimaler Fallback
+  return cleaned || `upload_${Date.now()}`;
+}
+
+function buildUrl(path: string, query?: Record<string, unknown>): string {
+  const base = wpBase();
+  const cleanPath = path.replace(/^\/+/, '');
+  const url = new URL(`${base}/wp-json/${cleanPath}`);
+  if (query && isRecord(query)) {
+    for (const [k, v] of Object.entries(query)) {
+      if (v === undefined || v === null) continue;
+      url.searchParams.set(k, String(v));
+    }
+  }
+  return url.toString();
+}
+
+/* ---------------------------------------------------
+ * Tool: wp_get
+ * --------------------------------------------------- */
 /**
- * Tool: wp_media_upload
+ * Input: { path: string; query?: Record<string, unknown> }
+ * Output: { status: number; data: unknown }
+ */
+const wpGet: Tool = {
+  name: 'wp_get',
+  description:
+    'Generic GET gegen die WP-REST-API. Input: { path:"wp/v2/... (ohne führenden /wp-json)", query? } → { status, data }',
+  async run(input) {
+    const { path, query } = input as { path: string; query?: Record<string, unknown> };
+    if (!path) throw new Error('wp_get: missing path');
+
+    try {
+      const res = await axios.get(buildUrl(path, query), {
+        timeout: 25000,
+        headers: { Authorization: wpAuthHeader() },
+      });
+      return { status: res.status, data: res.data };
+    } catch (err) {
+      throw new Error(`wp_get failed: ${axiosErrorToMessage(err)}`);
+    }
+  },
+};
+
+/* ---------------------------------------------------
+ * Tool: wp_post
+ * --------------------------------------------------- */
+/**
+ * Input: { method:'POST'|'PUT'|'PATCH'|'DELETE', path:string, body?:unknown, query?:Record<string,unknown> }
+ * Output: { status:number; data:unknown }
+ */
+const wpPost: Tool = {
+  name: 'wp_post',
+  description:
+    'Generic POST/PUT/PATCH/DELETE gegen die WP-REST-API. Input: { method, path:"wp/v2/...", body?, query? } → { status, data }',
+  async run(input) {
+    const { method, path, body, query } = input as {
+      method: 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+      path: string;
+      body?: unknown;
+      query?: Record<string, unknown>;
+    };
+
+    if (!method || !path) throw new Error('wp_post: missing method/path');
+    const upper = method.toUpperCase() as typeof method;
+
+    try {
+      const cfg: AxiosRequestConfig = {
+        timeout: 30000,
+        headers: {
+          Authorization: wpAuthHeader(),
+          'Content-Type': 'application/json',
+        },
+      };
+      const url = buildUrl(path, query);
+      const res =
+        upper === 'DELETE'
+          ? await axios.delete(url, cfg)
+          : await axios.request({ url, method: upper, data: body ?? {}, ...cfg });
+
+      return { status: res.status, data: res.data };
+    } catch (err) {
+      throw new Error(`wp_post failed: ${axiosErrorToMessage(err)}`);
+    }
+  },
+};
+
+/* ---------------------------------------------------
+ * Tool: wp_media_upload (Base64)
+ * --------------------------------------------------- */
+/**
  * Input: { filename: string; mime: string; data_base64: string; title?: string; alt?: string; description?: string }
  * Output: { id?: number; source_url?: string; status: number }
  */
 const wpMediaUpload: Tool = {
   name: 'wp_media_upload',
   description:
-    'Lädt eine Datei in die WordPress-Mediathek hoch (wp/v2/media). Input: { filename, mime, data_base64, title?, alt?, description? } → { id, source_url }',
+    'Lädt eine Datei (Base64) in die WordPress-Mediathek hoch (wp/v2/media). Input: { filename, mime, data_base64, title?, alt?, description? } → { id, source_url, status }',
   async run(input) {
     const { filename, mime, data_base64, title, alt, description } = input as {
       filename: string;
@@ -55,17 +151,18 @@ const wpMediaUpload: Tool = {
       throw new Error('wp_media_upload: missing filename/mime/data_base64');
     }
 
+    const name = sanitizeFilename(filename);
     const binary = Buffer.from(data_base64, 'base64');
     const form = new FormData();
-    form.append('file', binary, { filename, contentType: mime });
+    form.append('file', binary, { filename: name, contentType: mime });
 
     try {
       const upload = await axios.post(`${wpBase()}/wp-json/wp/v2/media`, form, {
-        timeout: 30000,
+        timeout: 60000,
         headers: {
           ...form.getHeaders(),
           Authorization: wpAuthHeader(),
-          'Content-Disposition': `attachment; filename="${filename}"`,
+          'Content-Disposition': `attachment; filename="${name}"`,
         },
         maxContentLength: Infinity,
         maxBodyLength: Infinity,
@@ -76,7 +173,6 @@ const wpMediaUpload: Tool = {
       const source_url =
         isRecord(data) && typeof data.source_url === 'string' ? (data.source_url as string) : undefined;
 
-      // Optional: Metadaten nachtragen
       if (id && (title || alt || description)) {
         await axios.post(
           `${wpBase()}/wp-json/wp/v2/media/${id}`,
@@ -85,7 +181,10 @@ const wpMediaUpload: Tool = {
             ...(alt ? { alt_text: alt } : {}),
             ...(description ? { caption: description, description } : {}),
           },
-          { headers: { Authorization: wpAuthHeader() } }
+          {
+            timeout: 15000,
+            headers: { Authorization: wpAuthHeader() },
+          }
         );
       }
 
@@ -96,4 +195,128 @@ const wpMediaUpload: Tool = {
   },
 };
 
-export const wpTools: Tool[] = [wpMediaUpload];
+/* ---------------------------------------------------
+ * Tool: wp_media_upload_from_url
+ * --------------------------------------------------- */
+/**
+ * Input: { file_url: string; filename?: string; mime?: string; title?: string; alt?: string; description?: string }
+ * Output: { id?: number; source_url?: string; status:number }
+ */
+const wpMediaUploadFromUrl: Tool = {
+  name: 'wp_media_upload_from_url',
+  description:
+    'Lädt eine Datei von einer externen URL in die WP-Mediathek. Input: { file_url, filename?, mime?, title?, alt?, description? } → { id, source_url, status }',
+  async run(input) {
+    const { file_url, filename, mime, title, alt, description } = input as {
+      file_url: string;
+      filename?: string;
+      mime?: string;
+      title?: string;
+      alt?: string;
+      description?: string;
+    };
+
+    if (!file_url) throw new Error('wp_media_upload_from_url: missing file_url');
+
+    try {
+      // Datei holen
+      const dl = await axios.get<ArrayBuffer>(file_url, {
+        responseType: 'arraybuffer',
+        timeout: 60000,
+      });
+
+      const urlName = filename || new URL(file_url).pathname.split('/').pop() || `download_${Date.now()}`;
+      const name = sanitizeFilename(urlName);
+      const contentType = mime || (dl.headers['content-type'] as string) || 'application/octet-stream';
+
+      // wie bei Base64-Upload
+      const form = new FormData();
+      form.append('file', Buffer.from(dl.data), { filename: name, contentType });
+
+      const upload = await axios.post(`${wpBase()}/wp-json/wp/v2/media`, form, {
+        timeout: 60000,
+        headers: {
+          ...form.getHeaders(),
+          Authorization: wpAuthHeader(),
+          'Content-Disposition': `attachment; filename="${name}"`,
+        },
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
+      });
+
+      const data = upload.data as unknown;
+      const id = isRecord(data) && typeof data.id === 'number' ? data.id : undefined;
+      const source_url =
+        isRecord(data) && typeof data.source_url === 'string' ? (data.source_url as string) : undefined;
+
+      if (id && (title || alt || description)) {
+        await axios.post(
+          `${wpBase()}/wp-json/wp/v2/media/${id}`,
+          {
+            ...(title ? { title } : {}),
+            ...(alt ? { alt_text: alt } : {}),
+            ...(description ? { caption: description, description } : {}),
+          },
+          {
+            timeout: 15000,
+            headers: { Authorization: wpAuthHeader() },
+          }
+        );
+      }
+
+      return { id, source_url, status: upload.status };
+    } catch (err) {
+      throw new Error(`wp_media_upload_from_url failed: ${axiosErrorToMessage(err)}`);
+    }
+  },
+};
+
+/* ---------------------------------------------------
+ * Tool: wp_set_media_meta
+ * --------------------------------------------------- */
+/**
+ * Input: { id:number; title?:string; alt?:string; caption?:string; description?:string }
+ * Output: { status:number; data:unknown }
+ */
+const wpSetMediaMeta: Tool = {
+  name: 'wp_set_media_meta',
+  description:
+    'Aktualisiert Metadaten eines Media-Objekts. Input: { id, title?, alt?, caption?, description? } → { status, data }',
+  async run(input) {
+    const { id, title, alt, caption, description } = input as {
+      id: number;
+      title?: string;
+      alt?: string;
+      caption?: string;
+      description?: string;
+    };
+    if (!id) throw new Error('wp_set_media_meta: missing id');
+
+    try {
+      const res = await axios.post(
+        `${wpBase()}/wp-json/wp/v2/media/${id}`,
+        {
+          ...(title ? { title } : {}),
+          ...(alt ? { alt_text: alt } : {}),
+          ...(caption ? { caption } : {}),
+          ...(description ? { description } : {}),
+        },
+        {
+          timeout: 20000,
+          headers: { Authorization: wpAuthHeader() },
+        }
+      );
+      return { status: res.status, data: res.data };
+    } catch (err) {
+      throw new Error(`wp_set_media_meta failed: ${axiosErrorToMessage(err)}`);
+    }
+  },
+};
+
+/* ---------------------------------------------------
+ * Export
+ * --------------------------------------------------- */
+
+export const wpTools: Tool[] = [wpGet, wpPost, wpMediaUpload, wpMediaUploadFromUrl, wpSetMediaMeta];
+export { wpGet, wpPost, wpMediaUpload, wpMediaUploadFromUrl, wpSetMediaMeta };
+
