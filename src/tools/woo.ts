@@ -275,3 +275,6 @@ export const wooTools: Tool[] = [
   wooFindCategoryId,
   wooCreateFreebie,
 ];
+
+// Zusätzlich: Named Exports, damit `import { wooPost } from "../../tools/woo"` funktioniert
+export { wooGet, wooPost };

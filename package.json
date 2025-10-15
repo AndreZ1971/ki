@@ -8,6 +8,7 @@
     "dev": "tsx src/index.ts",
     "api": "tsx src/server.ts",
     "jobs": "tsx src/scheduler.ts",
+    "create:freebie": "tsx src/agent/jobs/runCreateFreebie.ts",
     "build": "tsc",
     "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1",
