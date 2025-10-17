@@ -7,6 +7,7 @@
 import axios from "axios";
 import fs from "node:fs/promises";
 import path from "node:path";
+
 import { wpMediaUpload } from "../../tools/wp";
 
 // =======================
@@ -83,11 +84,13 @@ function wcApiBase() {
   if (!ck || !cs) throw new Error("ENV WC_CONSUMER_KEY / WC_CONSUMER_SECRET fehlen.");
   return { url, ck, cs };
 }
-
+ 
 async function wooRequest<T = any>(
   method: "GET" | "POST" | "DELETE" | "PUT" | "PATCH",
   path: string,
+   
   data?: any,
+   
   params?: Record<string, any>
 ) {
   const { url, ck, cs } = wcApiBase();
@@ -168,6 +171,7 @@ export async function createDownloadFreebie(opts: CreateFreebieOpts) {
   }
 
   // 3) Produkt-Payload zusammenbauen
+   
   const payload: any = {
     name,
     slug: slug ? makeSlug(slug) : makeSlug(name),
@@ -197,6 +201,7 @@ export async function createDownloadFreebie(opts: CreateFreebieOpts) {
   }
 
   // 4) Produkt anlegen
+   
   const product = await wooRequest<any>("POST", "/products", payload);
 
   return product;

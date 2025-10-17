@@ -2,6 +2,9 @@
 import 'dotenv/config';
 import { logger } from '../../logger';
 
+ 
+
+
 // ⚙️ Konfiguration über ENV
 const JOB_NAME = process.env.JOB?.trim() || 'createFreebie';      // z.B. createFreebie
 const MODE = (process.env.JOB_MODE?.trim() || 'once').toLowerCase(); // 'once' | 'interval'
