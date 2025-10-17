@@ -1,51 +1,66 @@
 // src/tools/wp.ts
+
+// 1) Node-Builtins
+
+// 2) Externe Pakete
 import axios, { isAxiosError } from "axios";
 import type { AxiosRequestConfig } from "axios";
-import FormData from 'form-data';
-import type { Tool } from '../types.js';
+import FormData from "form-data";
+import http from "node:http";
+import https from "node:https";
+
+// 3) Lokale Dateien
+import type { Tool } from "../types.js";
+
+ 
 
 /* ---------------------------------------------------
  * Helpers
  * --------------------------------------------------- */
 
 function isRecord(v: unknown): v is Record<string, unknown> {
-  return typeof v === 'object' && v !== null;
+  return typeof v === "object" && v !== null;
 }
 
 function wpBase(): string {
-  const url = process.env.WP_URL?.replace(/\/+$/, '') || '';
-  if (!url) throw new Error('WP_URL missing in .env');
+  const url = process.env.WP_URL?.replace(/\/+$/, "") || "";
+  if (!url) throw new Error("WP_URL missing in .env");
   return url;
 }
 
+// Akzeptiert WP_USERNAME ODER WP_USER (Fallback für ältere .env)
 function wpAuthHeader(): string {
-  const user = process.env.WP_USER;
+  const user = process.env.WP_USERNAME || process.env.WP_USER;
   const pass = process.env.WP_APP_PASSWORD;
-  if (!user || !pass) throw new Error('WP_USER / WP_APP_PASSWORD missing in .env');
-  return 'Basic ' + Buffer.from(`${user}:${pass}`).toString('base64');
+  if (!user || !pass)
+    throw new Error("WP_USERNAME/WP_USER oder WP_APP_PASSWORD fehlen in .env");
+  return "Basic " + Buffer.from(`${user}:${pass}`).toString("base64");
 }
+
+// Keep-Alive Agents (einmal erstellen)
+const KEEP_ALIVE_HTTP = new http.Agent({ keepAlive: true });
+const KEEP_ALIVE_HTTPS = new https.Agent({ keepAlive: true });
 
 function axiosErrorToMessage(err: unknown): string {
   if (isAxiosError(err)) {
     const status = err.response?.status;
     const data = err.response?.data as unknown;
     let msg: string | undefined;
-    if (isRecord(data) && typeof data.message === 'string') msg = data.message;
-    return `${status ?? 'no-status'}: ${msg ?? err.message ?? 'Axios error'}`;
+    if (isRecord(data) && typeof (data as any).message === "string") msg = (data as any).message;
+    return `${status ?? "no-status"}: ${msg ?? err.message ?? "Axios error"}`;
   }
   return err instanceof Error ? err.message : String(err);
 }
 
 function sanitizeFilename(name: string): string {
   // sehr konservativ: nur Buchstaben, Zahlen, .-_ erlauben
-  const cleaned = name.normalize('NFKD').replace(/[^\w.\-]+/g, '_');
-  // minimaler Fallback
+  const cleaned = name.normalize("NFKD").replace(/[^\w.-]+/g, "_");
   return cleaned || `upload_${Date.now()}`;
 }
 
 function buildUrl(path: string, query?: Record<string, unknown>): string {
   const base = wpBase();
-  const cleanPath = path.replace(/^\/+/, '');
+  const cleanPath = path.replace(/^\/+/, "");
   const url = new URL(`${base}/wp-json/${cleanPath}`);
   if (query && isRecord(query)) {
     for (const [k, v] of Object.entries(query)) {
@@ -64,17 +79,19 @@ function buildUrl(path: string, query?: Record<string, unknown>): string {
  * Output: { status: number; data: unknown }
  */
 const wpGet: Tool = {
-  name: 'wp_get',
+  name: "wp_get",
   description:
     'Generic GET gegen die WP-REST-API. Input: { path:"wp/v2/... (ohne führenden /wp-json)", query? } → { status, data }',
   async run(input) {
     const { path, query } = input as { path: string; query?: Record<string, unknown> };
-    if (!path) throw new Error('wp_get: missing path');
+    if (!path) throw new Error("wp_get: missing path");
 
     try {
       const res = await axios.get(buildUrl(path, query), {
-        timeout: 25000,
+        timeout: 30000,
         headers: { Authorization: wpAuthHeader() },
+        httpAgent: KEEP_ALIVE_HTTP,
+        httpsAgent: KEEP_ALIVE_HTTPS,
       });
       return { status: res.status, data: res.data };
     } catch (err) {
@@ -91,18 +108,18 @@ const wpGet: Tool = {
  * Output: { status:number; data:unknown }
  */
 const wpPost: Tool = {
-  name: 'wp_post',
+  name: "wp_post",
   description:
     'Generic POST/PUT/PATCH/DELETE gegen die WP-REST-API. Input: { method, path:"wp/v2/...", body?, query? } → { status, data }',
   async run(input) {
     const { method, path, body, query } = input as {
-      method: 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+      method: "POST" | "PUT" | "PATCH" | "DELETE";
       path: string;
       body?: unknown;
       query?: Record<string, unknown>;
     };
 
-    if (!method || !path) throw new Error('wp_post: missing method/path');
+    if (!method || !path) throw new Error("wp_post: missing method/path");
     const upper = method.toUpperCase() as typeof method;
 
     try {
@@ -110,12 +127,14 @@ const wpPost: Tool = {
         timeout: 30000,
         headers: {
           Authorization: wpAuthHeader(),
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
+        httpAgent: KEEP_ALIVE_HTTP,
+        httpsAgent: KEEP_ALIVE_HTTPS,
       };
       const url = buildUrl(path, query);
       const res =
-        upper === 'DELETE'
+        upper === "DELETE"
           ? await axios.delete(url, cfg)
           : await axios.request({ url, method: upper, data: body ?? {}, ...cfg });
 
@@ -127,16 +146,16 @@ const wpPost: Tool = {
 };
 
 /* ---------------------------------------------------
- * Tool: wp_media_upload (Base64)
+ * Tool: wp_media_upload (Base64 → multipart)
  * --------------------------------------------------- */
 /**
  * Input: { filename: string; mime: string; data_base64: string; title?: string; alt?: string; description?: string }
  * Output: { id?: number; source_url?: string; status: number }
  */
 const wpMediaUpload: Tool = {
-  name: 'wp_media_upload',
+  name: "wp_media_upload",
   description:
-    'Lädt eine Datei (Base64) in die WordPress-Mediathek hoch (wp/v2/media). Input: { filename, mime, data_base64, title?, alt?, description? } → { id, source_url, status }',
+    "Lädt eine Datei (Base64) in die WordPress-Mediathek hoch (wp/v2/media). Input: { filename, mime, data_base64, title?, alt?, description? } → { id, source_url, status }",
   async run(input) {
     const { filename, mime, data_base64, title, alt, description } = input as {
       filename: string;
@@ -148,30 +167,34 @@ const wpMediaUpload: Tool = {
     };
 
     if (!filename || !mime || !data_base64) {
-      throw new Error('wp_media_upload: missing filename/mime/data_base64');
+      throw new Error("wp_media_upload: missing filename/mime/data_base64");
     }
 
     const name = sanitizeFilename(filename);
-    const binary = Buffer.from(data_base64, 'base64');
+    const binary = Buffer.from(data_base64, "base64");
     const form = new FormData();
-    form.append('file', binary, { filename: name, contentType: mime });
+    form.append("file", binary, { filename: name, contentType: mime });
 
     try {
       const upload = await axios.post(`${wpBase()}/wp-json/wp/v2/media`, form, {
-        timeout: 60000,
+        timeout: 300000, // 5 Minuten
         headers: {
           ...form.getHeaders(),
           Authorization: wpAuthHeader(),
-          'Content-Disposition': `attachment; filename="${name}"`,
+          "Content-Disposition": `attachment; filename="${name}"`,
         },
         maxContentLength: Infinity,
         maxBodyLength: Infinity,
+        httpAgent: KEEP_ALIVE_HTTP,
+        httpsAgent: KEEP_ALIVE_HTTPS,
       });
 
       const data = upload.data as unknown;
-      const id = isRecord(data) && typeof data.id === 'number' ? data.id : undefined;
+      const id = isRecord(data) && typeof (data as any).id === "number" ? (data as any).id : undefined;
       const source_url =
-        isRecord(data) && typeof data.source_url === 'string' ? (data.source_url as string) : undefined;
+        isRecord(data) && typeof (data as any).source_url === "string"
+          ? ((data as any).source_url as string)
+          : undefined;
 
       if (id && (title || alt || description)) {
         await axios.post(
@@ -182,8 +205,10 @@ const wpMediaUpload: Tool = {
             ...(description ? { caption: description, description } : {}),
           },
           {
-            timeout: 15000,
+            timeout: 60000,
             headers: { Authorization: wpAuthHeader() },
+            httpAgent: KEEP_ALIVE_HTTP,
+            httpsAgent: KEEP_ALIVE_HTTPS,
           }
         );
       }
@@ -203,9 +228,9 @@ const wpMediaUpload: Tool = {
  * Output: { id?: number; source_url?: string; status:number }
  */
 const wpMediaUploadFromUrl: Tool = {
-  name: 'wp_media_upload_from_url',
+  name: "wp_media_upload_from_url",
   description:
-    'Lädt eine Datei von einer externen URL in die WP-Mediathek. Input: { file_url, filename?, mime?, title?, alt?, description? } → { id, source_url, status }',
+    "Lädt eine Datei von einer externen URL in die WP-Mediathek. Input: { file_url, filename?, mime?, title?, alt?, description? } → { id, source_url, status }",
   async run(input) {
     const { file_url, filename, mime, title, alt, description } = input as {
       file_url: string;
@@ -216,38 +241,44 @@ const wpMediaUploadFromUrl: Tool = {
       description?: string;
     };
 
-    if (!file_url) throw new Error('wp_media_upload_from_url: missing file_url');
+    if (!file_url) throw new Error("wp_media_upload_from_url: missing file_url");
 
     try {
-      // Datei holen
+      // Datei holen (längeres Timeout)
       const dl = await axios.get<ArrayBuffer>(file_url, {
-        responseType: 'arraybuffer',
-        timeout: 60000,
+        responseType: "arraybuffer",
+        timeout: 120000,
+        httpAgent: KEEP_ALIVE_HTTP,
+        httpsAgent: KEEP_ALIVE_HTTPS,
       });
 
-      const urlName = filename || new URL(file_url).pathname.split('/').pop() || `download_${Date.now()}`;
+      const urlName = filename || new URL(file_url).pathname.split("/").pop() || `download_${Date.now()}`;
       const name = sanitizeFilename(urlName);
-      const contentType = mime || (dl.headers['content-type'] as string) || 'application/octet-stream';
+      const contentType = mime || (dl.headers["content-type"] as string) || "application/octet-stream";
 
       // wie bei Base64-Upload
       const form = new FormData();
-      form.append('file', Buffer.from(dl.data), { filename: name, contentType });
+      form.append("file", Buffer.from(dl.data), { filename: name, contentType });
 
       const upload = await axios.post(`${wpBase()}/wp-json/wp/v2/media`, form, {
-        timeout: 60000,
+        timeout: 300000, // 5 Minuten
         headers: {
           ...form.getHeaders(),
           Authorization: wpAuthHeader(),
-          'Content-Disposition': `attachment; filename="${name}"`,
+          "Content-Disposition": `attachment; filename="${name}"`,
         },
         maxContentLength: Infinity,
         maxBodyLength: Infinity,
+        httpAgent: KEEP_ALIVE_HTTP,
+        httpsAgent: KEEP_ALIVE_HTTPS,
       });
 
       const data = upload.data as unknown;
-      const id = isRecord(data) && typeof data.id === 'number' ? data.id : undefined;
+      const id = isRecord(data) && typeof (data as any).id === "number" ? (data as any).id : undefined;
       const source_url =
-        isRecord(data) && typeof data.source_url === 'string' ? (data.source_url as string) : undefined;
+        isRecord(data) && typeof (data as any).source_url === "string"
+          ? ((data as any).source_url as string)
+          : undefined;
 
       if (id && (title || alt || description)) {
         await axios.post(
@@ -258,8 +289,10 @@ const wpMediaUploadFromUrl: Tool = {
             ...(description ? { caption: description, description } : {}),
           },
           {
-            timeout: 15000,
+            timeout: 60000,
             headers: { Authorization: wpAuthHeader() },
+            httpAgent: KEEP_ALIVE_HTTP,
+            httpsAgent: KEEP_ALIVE_HTTPS,
           }
         );
       }
@@ -279,9 +312,9 @@ const wpMediaUploadFromUrl: Tool = {
  * Output: { status:number; data:unknown }
  */
 const wpSetMediaMeta: Tool = {
-  name: 'wp_set_media_meta',
+  name: "wp_set_media_meta",
   description:
-    'Aktualisiert Metadaten eines Media-Objekts. Input: { id, title?, alt?, caption?, description? } → { status, data }',
+    "Aktualisiert Metadaten eines Media-Objekts. Input: { id, title?, alt?, caption?, description? } → { status, data }",
   async run(input) {
     const { id, title, alt, caption, description } = input as {
       id: number;
@@ -290,7 +323,7 @@ const wpSetMediaMeta: Tool = {
       caption?: string;
       description?: string;
     };
-    if (!id) throw new Error('wp_set_media_meta: missing id');
+    if (!id) throw new Error("wp_set_media_meta: missing id");
 
     try {
       const res = await axios.post(
@@ -304,6 +337,8 @@ const wpSetMediaMeta: Tool = {
         {
           timeout: 20000,
           headers: { Authorization: wpAuthHeader() },
+          httpAgent: KEEP_ALIVE_HTTP,
+          httpsAgent: KEEP_ALIVE_HTTPS,
         }
       );
       return { status: res.status, data: res.data };
