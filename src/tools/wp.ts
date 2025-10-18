@@ -1,18 +1,14 @@
-// src/tools/wp.ts
-
-// 1) Node-Builtins
-
-// 2) Externe Pakete
+// external (values)
 import axios, { isAxiosError } from "axios";
-import type { AxiosRequestConfig } from "axios";
 import FormData from "form-data";
+
+// builtin (values)
 import http from "node:http";
 import https from "node:https";
 
-// 3) Lokale Dateien
+// internal (types first), then external (types)
 import type { Tool } from "../types.js";
-
- 
+import type { AxiosRequestConfig } from "axios";
 
 /* ---------------------------------------------------
  * Helpers
@@ -21,6 +17,12 @@ import type { Tool } from "../types.js";
 function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === "object" && v !== null;
 }
+const readStr = (obj: unknown, key: string): string | undefined =>
+  isRecord(obj) && typeof obj[key] === "string" ? (obj[key] as string) : undefined;
+const readNum = (obj: unknown, key: string): number | undefined =>
+  isRecord(obj) && typeof obj[key] === "number" ? (obj[key] as number) : undefined;
+const hasMessage = (v: unknown): v is { message: string } =>
+  isRecord(v) && typeof (v as Record<string, unknown>).message === "string";
 
 function wpBase(): string {
   const url = process.env.WP_URL?.replace(/\/+$/, "") || "";
@@ -45,15 +47,13 @@ function axiosErrorToMessage(err: unknown): string {
   if (isAxiosError(err)) {
     const status = err.response?.status;
     const data = err.response?.data as unknown;
-    let msg: string | undefined;
-    if (isRecord(data) && typeof (data as any).message === "string") msg = (data as any).message;
+    const msg = hasMessage(data) ? data.message : undefined;
     return `${status ?? "no-status"}: ${msg ?? err.message ?? "Axios error"}`;
   }
   return err instanceof Error ? err.message : String(err);
 }
 
 function sanitizeFilename(name: string): string {
-  // sehr konservativ: nur Buchstaben, Zahlen, .-_ erlauben
   const cleaned = name.normalize("NFKD").replace(/[^\w.-]+/g, "_");
   return cleaned || `upload_${Date.now()}`;
 }
@@ -190,11 +190,8 @@ const wpMediaUpload: Tool = {
       });
 
       const data = upload.data as unknown;
-      const id = isRecord(data) && typeof (data as any).id === "number" ? (data as any).id : undefined;
-      const source_url =
-        isRecord(data) && typeof (data as any).source_url === "string"
-          ? ((data as any).source_url as string)
-          : undefined;
+      const id = readNum(data, "id");
+      const source_url = readStr(data, "source_url") ?? undefined;
 
       if (id && (title || alt || description)) {
         await axios.post(
@@ -252,9 +249,11 @@ const wpMediaUploadFromUrl: Tool = {
         httpsAgent: KEEP_ALIVE_HTTPS,
       });
 
-      const urlName = filename || new URL(file_url).pathname.split("/").pop() || `download_${Date.now()}`;
+      const urlName =
+        filename || new URL(file_url).pathname.split("/").pop() || `download_${Date.now()}`;
       const name = sanitizeFilename(urlName);
-      const contentType = mime || (dl.headers["content-type"] as string) || "application/octet-stream";
+      const contentType =
+        mime || (dl.headers["content-type"] as string) || "application/octet-stream";
 
       // wie bei Base64-Upload
       const form = new FormData();
@@ -274,11 +273,8 @@ const wpMediaUploadFromUrl: Tool = {
       });
 
       const data = upload.data as unknown;
-      const id = isRecord(data) && typeof (data as any).id === "number" ? (data as any).id : undefined;
-      const source_url =
-        isRecord(data) && typeof (data as any).source_url === "string"
-          ? ((data as any).source_url as string)
-          : undefined;
+      const id = readNum(data, "id");
+      const source_url = readStr(data, "source_url") ?? undefined;
 
       if (id && (title || alt || description)) {
         await axios.post(
@@ -354,4 +350,3 @@ const wpSetMediaMeta: Tool = {
 
 export const wpTools: Tool[] = [wpGet, wpPost, wpMediaUpload, wpMediaUploadFromUrl, wpSetMediaMeta];
 export { wpGet, wpPost, wpMediaUpload, wpMediaUploadFromUrl, wpSetMediaMeta };
-

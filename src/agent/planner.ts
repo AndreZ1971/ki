@@ -1,9 +1,14 @@
 // src/agent/planner.ts
-import OpenAI from "openai";
-import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 
-import type { Step, AgentMessage } from "../types.js";
+// external (values)
+import OpenAI from "openai";
+
+// internal (values)
 import { toolByName, toolCatalogForSystem } from "./tools.js";
+
+// internal (types)
+import type { Step, AgentMessage } from "../types.js";
+import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 

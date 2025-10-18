@@ -1,7 +1,9 @@
 import 'dotenv/config';
+
 import { Memory } from './agent/memory.js';
 import { planAndAct } from './agent/planner.js';
 import { logger } from './logger.js';
+
 import type { Step } from './types.js';
 
 function isRecord(v: unknown): v is Record<string, unknown> {

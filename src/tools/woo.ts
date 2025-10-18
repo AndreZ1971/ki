@@ -1,7 +1,9 @@
+// external (values)
 import axios, { isAxiosError } from 'axios';
-import type { AxiosInstance } from 'axios';
 
+// internal (types) – lokal vor extern, keine Leerzeile innerhalb der Type-Gruppe
 import type { Tool } from '../types.js';
+import type { AxiosInstance } from 'axios';
 
 /**
  * Woo REST-Client
@@ -278,3 +280,4 @@ export const wooTools: Tool[] = [
 
 // Zusätzlich: Named Exports, damit `import { wooPost } from "../../tools/woo"` funktioniert
 export { wooGet, wooPost };
+
