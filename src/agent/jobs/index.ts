@@ -1,59 +1,47 @@
-// src/agent/jobs/index.ts
-import 'dotenv/config';
-import { logger } from '../../logger';
+// external
+import "dotenv/config";
 
- 
+// internal
+import { logger } from "../../logger";
 
+const JOB_NAME = process.env.JOB?.trim() || "createFreebie";
+const MODE = (process.env.JOB_MODE?.trim() || "once").toLowerCase();
+const INTERVAL_MS = Number(process.env.JOB_INTERVAL_MS || 15 * 60 * 1000);
 
-// ⚙️ Konfiguration über ENV
-const JOB_NAME = process.env.JOB?.trim() || 'createFreebie';      // z.B. createFreebie
-const MODE = (process.env.JOB_MODE?.trim() || 'once').toLowerCase(); // 'once' | 'interval'
-const INTERVAL_MS = Number(process.env.JOB_INTERVAL_MS || 15 * 60 * 1000); // Standard: 15 min
+type UnknownModule = Record<string, unknown>;
+type AsyncVoidFn = () => Promise<void>;
+const toErr = (e: unknown) =>
+  e instanceof Error ? e : new Error(typeof e === "string" ? e : JSON.stringify(e));
 
-// Hilfs-Typ für dynamisch importierte Module
-type AnyModule = Record<string, any>;
-
-/**
- * Ermittelt eine ausführbare Funktion aus einem beliebigen Modul.
- * Unterstützt:
- *   - default export (funktion)
- *   - benannte Exports: run, execute, job
- */
-function resolveRunner(mod: AnyModule): (() => Promise<void>) {
+function resolveRunner(mod: UnknownModule): AsyncVoidFn {
   const candidate =
-    (typeof mod?.default === 'function' && mod.default) ||
-    (typeof mod?.run === 'function' && mod.run) ||
-    (typeof mod?.execute === 'function' && mod.execute) ||
-    (typeof mod?.job === 'function' && mod.job);
+    (typeof mod?.default === "function" && (mod.default as AsyncVoidFn)) ||
+    (typeof (mod as { run?: unknown })?.run === "function" &&
+      ((mod as { run: AsyncVoidFn }).run as AsyncVoidFn)) ||
+    (typeof (mod as { execute?: unknown })?.execute === "function" &&
+      ((mod as { execute: AsyncVoidFn }).execute as AsyncVoidFn)) ||
+    (typeof (mod as { job?: unknown })?.job === "function" &&
+      ((mod as { job: AsyncVoidFn }).job as AsyncVoidFn));
 
   if (!candidate) {
     throw new Error(
-      'Kein ausführbarer Export gefunden. Erwarte eine Funktion als default, run, execute oder job.'
+      "Kein ausführbarer Export gefunden. Erwarte eine Funktion als default, run, execute oder job."
     );
   }
-  // in Promise hüllen, falls sync
   return async () => await Promise.resolve(candidate());
 }
 
-/**
- * Mappe Job-Namen auf Module.
- * 👉 Neue Jobs hier eintragen (nur Import-Pfad, keine harten Exports nötig).
- */
-async function loadJobModule(name: string): Promise<AnyModule> {
+async function loadJobModule(name: string): Promise<UnknownModule> {
   switch (name) {
-    case 'createFreebie':
-      // namespace-import ist robust gegen unterschiedliche Export-Formen
-      return await import('./createFreebie');
-    // weitere Jobs:
-    // case 'ordersSync':
-    //   return await import('./ordersSync');
+    case "createFreebie":
+      return await import("./createFreebie");
     default:
       throw new Error(`Unbekannter JOB "${name}".`);
   }
 }
 
 async function runOnce() {
-  logger.info({ job: JOB_NAME, mode: MODE }, 'Starte Job einmal');
+  logger.info({ job: JOB_NAME, mode: MODE }, "Starte Job einmal");
   const mod = await loadJobModule(JOB_NAME);
   const runner = resolveRunner(mod);
 
@@ -61,13 +49,14 @@ async function runOnce() {
   try {
     await runner();
     const dur = Date.now() - startedAt;
-    logger.info({ job: JOB_NAME, duration_ms: dur }, 'Job erfolgreich beendet');
+    logger.info({ job: JOB_NAME, duration_ms: dur }, "Job erfolgreich beendet");
     process.exit(0);
-  } catch (err: any) {
+  } catch (err: unknown) {
     const dur = Date.now() - startedAt;
+    const e = toErr(err);
     logger.error(
-      { job: JOB_NAME, duration_ms: dur, err: err?.message, stack: err?.stack },
-      'Job fehlgeschlagen'
+      { job: JOB_NAME, duration_ms: dur, err: e.message, stack: e.stack },
+      "Job fehlgeschlagen"
     );
     process.exit(1);
   }
@@ -76,14 +65,14 @@ async function runOnce() {
 async function runInterval() {
   logger.info(
     { job: JOB_NAME, mode: MODE, every_ms: INTERVAL_MS },
-    'Starte Intervall-Runner'
+    "Starte Intervall-Runner"
   );
 
   let running = false;
 
   const tick = async () => {
     if (running) {
-      logger.warn({ job: JOB_NAME }, 'Vorherige Ausführung läuft noch – überspringe Tick');
+      logger.warn({ job: JOB_NAME }, "Vorherige Ausführung läuft noch – überspringe Tick");
       return;
     }
     running = true;
@@ -94,43 +83,42 @@ async function runInterval() {
       const runner = resolveRunner(mod);
       await runner();
       const dur = Date.now() - startedAt;
-      logger.info({ job: JOB_NAME, duration_ms: dur }, 'Intervall-Run erfolgreich');
-    } catch (err: any) {
+      logger.info({ job: JOB_NAME, duration_ms: dur }, "Intervall-Run erfolgreich");
+    } catch (err: unknown) {
       const dur = Date.now() - startedAt;
+      const e = toErr(err);
       logger.error(
-        { job: JOB_NAME, duration_ms: dur, err: err?.message, stack: err?.stack },
-        'Intervall-Run fehlgeschlagen'
+        { job: JOB_NAME, duration_ms: dur, err: e.message, stack: e.stack },
+        "Intervall-Run fehlgeschlagen"
       );
     } finally {
       running = false;
     }
   };
 
-  // sofort einmal ausführen, dann im Intervall
   tick();
   setInterval(tick, INTERVAL_MS);
 
-  // Prozess am Leben halten
-  process.on('SIGINT', () => {
-    logger.info({ job: JOB_NAME }, 'Beende (SIGINT)');
+  process.on("SIGINT", () => {
+    logger.info({ job: JOB_NAME }, "Beende (SIGINT)");
     process.exit(0);
   });
-  process.on('SIGTERM', () => {
-    logger.info({ job: JOB_NAME }, 'Beende (SIGTERM)');
+  process.on("SIGTERM", () => {
+    logger.info({ job: JOB_NAME }, "Beende (SIGTERM)");
     process.exit(0);
   });
 }
 
-// Bootstrap
 (async () => {
   try {
-    if (MODE === 'interval') {
+    if (MODE === "interval") {
       await runInterval();
     } else {
       await runOnce();
     }
-  } catch (err: any) {
-    logger.fatal({ err: err?.message, stack: err?.stack }, 'Job-Bootstrap fehlgeschlagen');
+  } catch (err: unknown) {
+    const e = toErr(err);
+    logger.fatal({ err: e.message, stack: e.stack }, "Job-Bootstrap fehlgeschlagen");
     process.exit(1);
   }
 })();

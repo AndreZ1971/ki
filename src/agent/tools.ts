@@ -1,8 +1,13 @@
 // src/agent/tools.ts
+
+// external (values)
 import axios, { isAxiosError } from 'axios';
 
+// internal (values)
 import { wooTools } from '../tools/woo.js';
 import { wpTools } from '../tools/wp.js';
+
+// internal (types)
 import type { Tool } from '../types.js';
 
 export const timeTool: Tool = {
