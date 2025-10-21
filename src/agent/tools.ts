@@ -1,18 +1,29 @@
 // src/agent/tools.ts
 
+// =======================
 // external (values)
-import axios, { isAxiosError } from 'axios';
+// =======================
+import axios, { isAxiosError } from "axios";
 
+// =======================
 // internal (values)
-import { wooTools } from '../tools/woo.js';
-import { wpTools } from '../tools/wp.js';
+// =======================
+// Wir binden WooCommerce direkt über zwei Funktions-Wrapper an,
+// damit die Tool-Namen exakt zu den vom Planner erzeugten Namen passen.
+import { wooGet, wooPost } from "../tools/woo.js";
+import { wpTools } from "../tools/wp.js";
 
+// =======================
 // internal (types)
-import type { Tool } from '../types.js';
+// =======================
+import type { Tool } from "../types.js";
 
+// --------------------------------------------------------------
+// Utilities
+// --------------------------------------------------------------
 export const timeTool: Tool = {
-  name: 'time_now',
-  description: 'Gibt die aktuelle ISO-Zeit zurück.',
+  name: "time_now",
+  description: "Gibt die aktuelle ISO-Zeit zurück.",
   async run() {
     return { now: new Date().toISOString() };
   },
@@ -27,7 +38,7 @@ type JSONValue =
   | JSONValue[];
 
 function isRecord(v: unknown): v is Record<string, unknown> {
-  return typeof v === 'object' && v !== null;
+  return typeof v === "object" && v !== null;
 }
 
 function extractHttpStatus(e: unknown): number | undefined {
@@ -39,7 +50,9 @@ function extractHttpMessage(e: unknown): string {
   if (isAxiosError(e)) {
     const d = e.response?.data as unknown;
     const msgFromData =
-      isRecord(d) && typeof d.message === 'string' ? d.message : undefined;
+      isRecord(d) && typeof (d as Record<string, unknown>).message === "string"
+        ? ((d as Record<string, unknown>).message as string)
+        : undefined;
     return msgFromData ?? e.message;
   }
   if (e instanceof Error) return e.message;
@@ -50,13 +63,16 @@ function wpRestFallback(url: string): string | null {
   // /wp-json -> /index.php?rest_route=/
   const m = url.match(/\/wp-json\/?$/i);
   if (!m) return null;
-  return url.replace(/\/wp-json\/?$/i, '/index.php?rest_route=/');
+  return url.replace(/\/wp-json\/?$/i, "/index.php?rest_route=/");
 }
 
+// --------------------------------------------------------------
+// HTTP GET (JSON) — nützlich für Diagnosen
+// --------------------------------------------------------------
 export const httpGetTool: Tool = {
-  name: 'http_get',
+  name: "http_get",
   description:
-    'HTTP GET (JSON erwartet). Input: { url: string, headers?: Record<string,string>, timeout_ms?: number }',
+    "HTTP GET (JSON erwartet). Input: { url: string, headers?: Record<string,string>, timeout_ms?: number }",
   async run(input) {
     const { url, headers, timeout_ms } = input as {
       url: string;
@@ -68,21 +84,21 @@ export const httpGetTool: Tool = {
     const token = process.env.GITHUB_TOKEN?.trim();
     const looksLikeGhToken =
       !!token &&
-      (token.startsWith('ghp_') ||
-        token.startsWith('github_pat_') ||
-        token.startsWith('gho_') ||
-        token.startsWith('ghu_') ||
-        token.startsWith('ghs_'));
+      (token.startsWith("ghp_") ||
+        token.startsWith("github_pat_") ||
+        token.startsWith("gho_") ||
+        token.startsWith("ghu_") ||
+        token.startsWith("ghs_"));
 
     const baseHeaders: Record<string, string> = {
-      'user-agent': 'ki-agent',
+      "user-agent": "ki-agent",
       ...(isGh
         ? {
-            accept: 'application/vnd.github+json',
-            'x-github-api-version': '2022-11-28',
+            accept: "application/vnd.github+json",
+            "x-github-api-version": "2022-11-28",
           }
         : {
-            accept: 'application/json, text/plain, */*',
+            accept: "application/json, text/plain, */*",
           }),
       ...(headers ?? {}),
     };
@@ -94,28 +110,37 @@ export const httpGetTool: Tool = {
         timeout: tmo,
         headers: {
           ...baseHeaders,
-          ...(useAuth && isGh && looksLikeGhToken ? { Authorization: `Bearer ${token}` } : {}),
+          ...(useAuth && isGh && looksLikeGhToken
+            ? { Authorization: `Bearer ${token}` }
+            : {}),
         },
-        // axios folgt Redirects standardmäßig; nichts weiter nötig
       });
 
     try {
       // 1) Primärversuch
       try {
         const res = await fetchOnce(true, defaultTimeout, url);
-        return { status: res.status, data: res.data as unknown as JSONValue, authed: isGh && looksLikeGhToken ? true : false };
+        return {
+          status: res.status,
+          data: res.data as unknown as JSONValue,
+          authed: isGh && looksLikeGhToken ? true : false,
+        };
       } catch (err: unknown) {
-        // GitHub: bei 401/403 ohne Auth fallbacken
         const status = extractHttpStatus(err);
         const code = isAxiosError(err) ? err.code : undefined;
 
-        const isTimeout = code === 'ECONNABORTED' || status === undefined; // Timeout oder kein Status
+        const isTimeout = code === "ECONNABORTED" || status === undefined; // Timeout oder kein Status
         const isGhAuthIssue = isGh && (status === 401 || status === 403);
 
         // 2) Bei GH-Auth-Issue: ohne Auth erneut probieren
         if (isGhAuthIssue) {
           const res = await fetchOnce(false, defaultTimeout, url);
-          return { status: res.status, data: res.data as unknown as JSONValue, authed: false as const, fallback: true as const };
+          return {
+            status: res.status,
+            data: res.data as unknown as JSONValue,
+            authed: false as const,
+            fallback: true as const,
+          };
         }
 
         // 3) Bei Timeout + WP: auf /index.php?rest_route=/ ausweichen
@@ -123,7 +148,11 @@ export const httpGetTool: Tool = {
           const alt = wpRestFallback(url);
           if (alt) {
             const res = await fetchOnce(false, defaultTimeout, alt);
-            return { status: res.status, data: res.data as unknown as JSONValue, fallback: 'wp_rest_route' as const };
+            return {
+              status: res.status,
+              data: res.data as unknown as JSONValue,
+              fallback: "wp_rest_route" as const,
+            };
           }
         }
 
@@ -133,15 +162,18 @@ export const httpGetTool: Tool = {
     } catch (err: unknown) {
       const status = extractHttpStatus(err);
       const msg = extractHttpMessage(err);
-      throw new Error(`HTTP GET failed (${status ?? 'no-status'}): ${msg}`);
+      throw new Error(`HTTP GET failed (${status ?? "no-status"}): ${msg}`);
     }
   },
 };
 
+// --------------------------------------------------------------
+// JSON pick (Dot-Path)
+// --------------------------------------------------------------
 /** Sichere JSON-Pfad-Navigation mit Dot-Path */
 function getByPath(obj: unknown, path: string): JSONValue | undefined {
   if (!path) return undefined;
-  const parts = path.split('.');
+  const parts = path.split(".");
   let cur: unknown = obj;
   for (const key of parts) {
     if (!isRecord(cur) || !(key in cur)) return undefined;
@@ -151,24 +183,62 @@ function getByPath(obj: unknown, path: string): JSONValue | undefined {
 }
 
 export const jsonPickTool: Tool = {
-  name: 'json_pick',
+  name: "json_pick",
   description:
-    'Extrahiert einen Wert aus JSON per einfachem Dot-Path. Input: { json: unknown, path: string }',
+    "Extrahiert einen Wert aus JSON per einfachem Dot-Path. Input: { json: unknown, path: string }",
   async run(input) {
     const { json, path } = input as { json: unknown; path: string };
     const value = getByPath(json, path);
     return value === undefined
-      ? { ok: false, reason: 'path not found', value: null as JSONValue | null }
+      ? { ok: false, reason: "path not found", value: null as JSONValue | null }
       : { ok: true, value: value as JSONValue };
   },
 };
 
+// --------------------------------------------------------------
+// Deterministische WooCommerce-Tools (Planner-kompatible Namen)
+// --------------------------------------------------------------
+export const wooGetTool: Tool = {
+  name: "woo_get",
+  description:
+    "WooCommerce GET. Input: { path: string, params?: Record<string,unknown> } → gibt Woo-API Antwort zurück.",
+  async run(input) {
+    const { path, params } = input as {
+      method?: string; // wird ignoriert
+      path: string;
+      params?: Record<string, unknown>;
+    };
+    return await wooGet(path, params ?? {});
+  },
+};
+
+export const wooPostTool: Tool = {
+  name: "woo_post",
+  description:
+    "WooCommerce POST/PUT. Input: { path: string, data?: Record<string,unknown>, params?: Record<string,unknown> } → gibt Woo-API Antwort zurück.",
+  async run(input) {
+    const { path, data, params } = input as {
+      method?: string; // wird ignoriert
+      path: string;
+      data?: Record<string, unknown>;
+      params?: Record<string, unknown>;
+    };
+    return await wooPost(path, data ?? {}, params ?? {});
+  },
+};
+
+// --------------------------------------------------------------
+// Tool-Registry & Katalog
+// --------------------------------------------------------------
 export const tools: Tool[] = [
   timeTool,
   httpGetTool,
   jsonPickTool,
-  ...wooTools, // WooCommerce-Tools
-  ...wpTools,  // WordPress-Upload-Tool
+  // Woo: EXPLIZIT, damit die Toolnamen sicher vorhanden sind:
+  wooGetTool,
+  wooPostTool,
+  // WP: Upload etc.
+  ...wpTools,
 ];
 
 export function toolByName(name: string): Tool | undefined {
@@ -176,5 +246,5 @@ export function toolByName(name: string): Tool | undefined {
 }
 
 export function toolCatalogForSystem(): string {
-  return tools.map((t) => `- ${t.name}: ${t.description}`).join('\n');
+  return tools.map((t) => `- ${t.name}: ${t.description}`).join("\n");
 }
