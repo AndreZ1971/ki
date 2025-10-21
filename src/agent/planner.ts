@@ -20,7 +20,15 @@ const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
  * Gibt { name, args } zurück, die direkt als Tool-Step ausgeführt werden können.
  */
 function detectManualWooCommand(source: string):
-  | { name: "woo_post" | "woo_get"; args: { path: string; params?: Record<string, unknown>; data?: Record<string, unknown>; method?: string } }
+  | {
+      name: "woo_post" | "woo_get";
+      args: {
+        path: string;
+        params?: Record<string, unknown>;
+        data?: Record<string, unknown>;
+        method?: string;
+      };
+    }
   | null {
   if (!source) return null;
   const text = source.trim();
@@ -40,7 +48,7 @@ function detectManualWooCommand(source: string):
     string | undefined
   ];
 
-    // JSON-ähnlich -> JSON:
+  // JSON-ähnlich -> JSON:
   // - Single Quotes -> Double Quotes
   // - Ungequotete Keys -> "keys"
   // - Trailing Commas entfernen
@@ -60,8 +68,10 @@ function detectManualWooCommand(source: string):
 
     try {
       return JSON.parse(s);
-    } catch (e) {
-      throw new Error(`Konnte params/data nicht parsen. Bitte gültiges JSON verwenden. Roh: ${raw}`);
+    } catch {
+      throw new Error(
+        `Konnte params/data nicht parsen. Bitte gültiges JSON verwenden. Roh: ${raw}`
+      );
     }
   };
 
@@ -91,7 +101,7 @@ export async function planAndAct(
   let manualFromHistory: ReturnType<typeof detectManualWooCommand> | null = null;
   for (let i = history.length - 1; i >= 0; i--) {
     const m = history[i];
-    if (m.role === "user") {
+    if (m && m.role === "user") {
       manualFromHistory = detectManualWooCommand(m.content);
       if (manualFromHistory) break;
     }
