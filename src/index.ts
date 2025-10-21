@@ -1,107 +1,66 @@
-import 'dotenv/config';
+// src/index.ts
+// Vereinfachter CLI-Entry-Point ohne GitHub-Fallback.
+// Führt ausschließlich planAndAct(...) aus und gibt Schritt- und Ergebnisinfos aus.
 
-import { Memory } from './agent/memory.js';
-import { planAndAct } from './agent/planner.js';
-import { logger } from './logger.js';
-
-import type { Step } from './types.js';
-
-function isRecord(v: unknown): v is Record<string, unknown> {
-  return typeof v === 'object' && v !== null;
-}
-
-function getFirstToolOutput(steps: Step[]): unknown {
-  for (const s of steps) {
-    const input = s.input;
-    if (input && '___nonexistent' in input) { /* TS hint noop */ }
-    if (input && ' __tool_output' in (input as never)) { /* never */ }
-    if (input && ' __tool_error' in (input as never)) { /* never */ }
-    const out = input?.__tool_output;
-    if (out !== undefined) return out;
-  }
-  return undefined;
-}
-
-function getFirstJsonPickValue(steps: Step[]): unknown {
-  for (const s of steps) {
-    if (s.tool === 'json_pick') {
-      const out = s.input?.__tool_output;
-      if (isRecord(out) && 'value' in out) return (out as Record<string, unknown>).value;
-    }
-  }
-  return undefined;
-}
-
-function getFirstToolError(steps: Step[]): string | undefined {
-  for (const s of steps) {
-    const err = s.input?.__tool_error;
-    if (typeof err === 'string') return err;
-  }
-  return undefined;
-}
+import "dotenv/config";
+import { planAndAct } from "./agent/planner.js";
+import { logger } from "./logger.js";
 
 async function main() {
-  const goal =
-    process.argv.slice(2).join(' ') ||
-    'Rufe https://api.github.com/repos/nodejs/node ab und gib die Sterne aus.';
-
-  const memory = new Memory();
-  memory.push({ role: 'system', content: 'Sprich knapp, aber präzise.' });
-  memory.push({ role: 'user', content: `Ziel: ${goal}` });
-
-  const res = await planAndAct(goal, memory.all());
-
-  for (const [i, s] of res.steps.entries()) {
-    logger.info(`${i + 1}. ${s.thought}${s.tool ? ` (Tool: ${s.tool})` : ''}`);
+  // kompletten Prompt aus den CLI-Argumenten lesen
+  const goal = process.argv.slice(2).join(" ").trim();
+  if (!goal) {
+    console.log(`
+Verwendung:
+  npm run dev -- "woo_get (GET, path:'/products/categories', params:{ per_page:100 }) und gib id, name, slug aus."
+  npm run dev -- "woo_post (POST, path:'/products', data:{ name:'Mini-Audit', slug:'mini-audit', type:'simple', status:'publish', virtual:true, downloadable:false, regular_price:'50', categories:[{ id:51 }] }) und gib id, permalink, status aus."
+`);
+    process.exit(1);
   }
 
-  let output = (res.result || '').trim();
+  logger.info(`Starte Agent mit Ziel:\n${goal}`);
 
-  // Platzhalter aus json_pick ersetzen
-  const pickVal = getFirstJsonPickValue(res.steps);
-  if (output.includes('<extracted_value>') && pickVal !== undefined) {
-    output = output.replace('<extracted_value>', String(pickVal));
-  }
+  // minimaler Verlauf – wichtig, damit detectManualWooCommand greifen kann
+  const history = [
+    { role: "system", content: "Du bist ein deterministischer KI-Agent für WooCommerce-Aufrufe." },
+    { role: "user", content: goal },
+  ];
 
-  // Fallbacks
-  if (!output || output === '...' || output.includes('<extracted_value>')) {
-    const toolErr = getFirstToolError(res.steps);
-    const toolOut = getFirstToolOutput(res.steps);
+  try {
+    const { result, steps } = await planAndAct(goal, history);
 
-    // GitHub Stars direkt aus http_get
-    if (pickVal === undefined && isRecord(toolOut) && 'data' in toolOut) {
-      const data = (toolOut as Record<string, unknown>).data;
-      const stars =
-        isRecord(data) && typeof (data as Record<string, unknown>).stargazers_count === 'number'
-          ? (data as Record<string, unknown>).stargazers_count
-          : undefined;
-
-      if (typeof stars === 'number') {
-        output = `Stars: ${stars}`;
+    console.log("== Schritte ==");
+    for (const [i, s] of steps.entries()) {
+      console.log(`${i + 1}. ${s.thought ?? ""}${s.tool ? ` (Tool: ${s.tool})` : ""}`);
+      if (s.input && (s.input as any).__tool_output) {
+        const out = (s.input as any).__tool_output;
+        const preview =
+          typeof out === "string"
+            ? out.slice(0, 300)
+            : JSON.stringify(out, null, 2).slice(0, 300);
+        console.log(`   ↳ Output: ${preview}${preview.length === 300 ? "…" : ""}`);
+      }
+      if (s.input && (s.input as any).__tool_error) {
+        console.log(`   ↳ ERROR: ${(s.input as any).__tool_error}`);
       }
     }
 
-    if (!output || output === '...' || output.includes('<extracted_value>')) {
-      if (pickVal !== undefined) {
-        output = `Wert: ${String(pickVal)}`;
-      } else if (toolErr) {
-        output = `Tool-Fehler: ${toolErr}`;
-      } else if (toolOut !== undefined) {
-        try {
-          output = `Rohdaten:\n${JSON.stringify(toolOut, null, 2)}`;
-        } catch {
-          output = String(toolOut);
-        }
-      } else {
-        output = 'Kein final_answer und kein Tool-Output verfügbar.';
-      }
-    }
-  }
+    console.log("\n== Ergebnis ==");
+    console.log(
+      typeof result === "string" ? result : JSON.stringify(result, null, 2)
+    );
 
-  console.log('\n== Ergebnis ==\n' + output);
+    const usedTools = steps.map((s) => s.tool).filter(Boolean);
+    if (!usedTools.includes("woo_get") && !usedTools.includes("woo_post")) {
+      console.warn(
+        "\n⚠️  Es wurde kein woo_* Tool ausgeführt – prüfe, ob dein Prompt exakt 'woo_get(...)' oder 'woo_post(...)' enthält (ASCII-Zeichen!)."
+      );
+    }
+  } catch (err) {
+    console.error("Fehler:", err instanceof Error ? err.message : String(err));
+    process.exit(1);
+  }
 }
 
-main().catch((err) => {
-  console.error('Agent-Fehler:', err);
-  process.exit(1);
-});
+main();
+
