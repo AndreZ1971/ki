@@ -18,6 +18,15 @@ import { wpTools } from "../tools/wp.js";
 // =======================
 import type { Tool } from "../types.js";
 
+// =======================
+// local jobs (values)
+// =======================
+import { createMiniAudit } from "./jobs/miniAudit.js";
+import { createStandardAudit } from "./jobs/standardAudit.js";
+import { createPremiumAudit } from "./jobs/premiumAudit.js";
+import { createKitsSeed } from "./jobs/kitsTemplates.js";
+import { createBundlesSeed } from "./jobs/bundles.js";
+
 // --------------------------------------------------------------
 // Utilities
 // --------------------------------------------------------------
@@ -228,15 +237,68 @@ export const wooPostTool: Tool = {
 };
 
 // --------------------------------------------------------------
+// Job-Tools (für schnelle Seeds & Produkt-Anlage)
+// --------------------------------------------------------------
+export const wooCreateMiniAuditTool: Tool = {
+  name: "woo_create_mini_audit",
+  description: "Legt das Mini-Audit (50 €) an und setzt die Beschreibung.",
+  async run() {
+    return await createMiniAudit();
+  },
+};
+
+export const wooCreateStandardAuditTool: Tool = {
+  name: "woo_create_standard_audit",
+  description: "Legt das Standard-Audit (150 €) an und setzt die Beschreibung.",
+  async run() {
+    return await createStandardAudit();
+  },
+};
+
+export const wooCreatePremiumAuditTool: Tool = {
+  name: "woo_create_premium_audit",
+  description: "Legt das Premium-Audit (250 €) an und setzt die Beschreibung.",
+  async run() {
+    return await createPremiumAudit();
+  },
+};
+
+export const wooCreateKitsSeedTool: Tool = {
+  name: "woo_create_kits_seed",
+  description: "Legt Kern-Kits in Kategorie 53 an (Prompt Pack, Notion Planner).",
+  async run() {
+    return await createKitsSeed();
+  },
+};
+
+export const wooCreateBundlesSeedTool: Tool = {
+  name: "woo_create_bundles_seed",
+  description: "Legt ein Kern-Bundle in Kategorie 52 an (Social Media Starter Bundle).",
+  async run() {
+    return await createBundlesSeed();
+  },
+};
+
+// --------------------------------------------------------------
 // Tool-Registry & Katalog
 // --------------------------------------------------------------
 export const tools: Tool[] = [
+  // Utils
   timeTool,
   httpGetTool,
   jsonPickTool,
+
   // Woo: EXPLIZIT, damit die Toolnamen sicher vorhanden sind:
   wooGetTool,
   wooPostTool,
+
+  // Jobs / Seeds
+  wooCreateMiniAuditTool,
+  wooCreateStandardAuditTool,
+  wooCreatePremiumAuditTool,
+  wooCreateKitsSeedTool,
+  wooCreateBundlesSeedTool,
+
   // WP: Upload etc.
   ...wpTools,
 ];
