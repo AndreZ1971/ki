@@ -12,6 +12,85 @@ import type { ChatCompletionMessageParam } from "openai/resources/chat/completio
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+/** Balanciert einen {...}-Block ab einer Startposition aus.
+ *  Erwartet, dass tail[idx] auf '{' zeigt. Gibt den Substring inkl. schließender '}' zurück.
+ */
+function extractBalancedObject(tail: string, idx: number): string | null {
+  let depth = 0;
+  let i = idx;
+  let inStr: '"' | "'" | null = null;
+  let escape = false;
+
+  for (; i < tail.length; i++) {
+    const ch = tail[i];
+
+    if (inStr) {
+      if (escape) {
+        escape = false;
+      } else if (ch === "\\") {
+        escape = true;
+      } else if (ch === inStr) {
+        inStr = null;
+      }
+      continue;
+    }
+
+    if (ch === '"' || ch === "'") {
+      inStr = ch as '"' | "'";
+      continue;
+    }
+
+    if (ch === "{") depth++;
+    if (ch === "}") {
+      depth--;
+      if (depth === 0) {
+        // inklusive abschließendem '}'
+        return tail.slice(idx, i + 1);
+      }
+    }
+  }
+  return null; // nicht balanciert
+}
+
+/** Sucht im tail nach ", key:{...}" (beliebige Whitespace), extrahiert balancierten Objekt-Block. */
+function findKeyObject(tail: string, key: "params" | "data"): string | undefined {
+  const keyRe = new RegExp(`,\\s*${key}\\s*:\\s*\\{`, "m");
+  const m = tail.match(keyRe);
+  if (!m || m.index === undefined) return undefined;
+
+  const start = m.index + m[0].length - 1; // position auf '{'
+  const obj = extractBalancedObject(tail, start);
+  return obj ?? undefined;
+}
+
+/** JSON-ähnlich -> JSON:
+ *  - Single Quotes -> Double Quotes
+ *  - Ungequotete Keys -> "keys"
+ *  - Trailing Commas entfernen
+ */
+function normalizeAndParseJSONish(raw?: string): unknown {
+  if (!raw) return undefined;
+
+  // 1) Quotes vereinheitlichen
+  let s = raw.replace(/'/g, "\"");
+
+  // 2) Keys quoten: { key: ..., foo_bar-1: ... } -> { "key": ..., "foo_bar-1": ... }
+  //    Greift nach { oder , gefolgt von evtl. Whitespace und dann einem Key bis zum Doppelpunkt.
+  //    Erlaubt Buchstaben/Ziffern/Unterstrich/Bindestrich im Key.
+  s = s.replace(/([{,]\s*)([A-Za-z_][A-Za-z0-9_-]*)\s*:/g, '$1"$2":');
+
+  // 3) Trailing Commas vor } oder ] entfernen
+  s = s.replace(/,\s*([}\]])/g, "$1");
+
+  try {
+    return JSON.parse(s);
+  } catch {
+    throw new Error(
+      `Konnte params/data nicht parsen. Bitte gültiges JSON verwenden. Roh: ${raw}`
+    );
+  }
+}
+
 /**
  * Erkenne und parse manuelle Woo-Kommandos im Goal/User-Prompt, z. B.:
  *   woo_post (POST, path:'/products', data:{ ... })
@@ -33,50 +112,29 @@ function detectManualWooCommand(source: string):
   if (!source) return null;
   const text = source.trim();
 
-  // Robust für Ein-/Mehrzeiler; params/data optional; einfache Quotes erlaubt
+  // Path mit ' oder " | params/data in beliebiger Reihenfolge
+  // Wir parsen den "Tail" zwischen path:... und der schließenden Klammer separat.
   const re =
-    /woo_(post|get)\s*\(\s*([A-Z]+)\s*,\s*path:'([^']+)'\s*(?:,\s*params:(\{[\s\S]*?\}))?\s*(?:,\s*data:(\{[\s\S]*?\}))?\s*\)/m;
+    /woo_(post|get)\s*\(\s*([A-Z]+)\s*,\s*path:\s*(?:'([^']+)'|"([^"]+)")([\s\S]*?)\)/m;
   const match = text.match(re);
   if (!match) return null;
 
-  const [, kind, method, path, paramsRaw, dataRaw] = match as [
+  const [, kind, method, path1, path2, tail] = match as [
     string,
     "post" | "get",
     string,
-    string,
     string | undefined,
-    string | undefined
+    string | undefined,
+    string
   ];
+  const path = path1 ?? path2 ?? "";
 
-  // JSON-ähnlich -> JSON:
-  // - Single Quotes -> Double Quotes
-  // - Ungequotete Keys -> "keys"
-  // - Trailing Commas entfernen
-  const toJSON = (raw?: string): unknown => {
-    if (!raw) return undefined;
+  // params:{...} und data:{...} unabhängig von der Reihenfolge & balanciert extrahieren
+  const paramsRaw = findKeyObject(tail, "params");
+  const dataRaw = findKeyObject(tail, "data");
 
-    // 1) Quotes vereinheitlichen
-    let s = raw.replace(/'/g, "\"");
-
-    // 2) Keys quoten: { key: ..., foo_bar-1: ... } -> { "key": ..., "foo_bar-1": ... }
-    //    Greift nach { oder , gefolgt von evtl. Whitespace und dann einem Key bis zum Doppelpunkt.
-    //    Erlaubt Buchstaben/Ziffern/Unterstrich/Bindestrich im Key.
-    s = s.replace(/([{,]\s*)([A-Za-z_][A-Za-z0-9_-]*)\s*:/g, '$1"$2":');
-
-    // 3) Trailing Commas vor } oder ] entfernen
-    s = s.replace(/,\s*([}\]])/g, "$1");
-
-    try {
-      return JSON.parse(s);
-    } catch {
-      throw new Error(
-        `Konnte params/data nicht parsen. Bitte gültiges JSON verwenden. Roh: ${raw}`
-      );
-    }
-  };
-
-  const params = toJSON(paramsRaw) as Record<string, unknown> | undefined;
-  const data = toJSON(dataRaw) as Record<string, unknown> | undefined;
+  const params = normalizeAndParseJSONish(paramsRaw) as Record<string, unknown> | undefined;
+  const data = normalizeAndParseJSONish(dataRaw) as Record<string, unknown> | undefined;
   const name = kind === "post" ? "woo_post" : "woo_get";
 
   return {
@@ -133,7 +191,6 @@ export async function planAndAct(
         input: { ...(manual.args ?? {}), __tool_output: output },
       });
 
-      // Ergebnis prägnant zurückgeben (wenn String → direkt; sonst kompaktes JSON)
       const result =
         typeof output === "string" ? output : JSON.stringify(output, null, 2);
 
@@ -166,7 +223,6 @@ Hinweise:
 - Wenn du per http_get JSON erhältst, nutze "json_pick", um konkrete Felder (z. B. "stargazers_count") zu extrahieren.
 - Fasse dich im "final_answer" kurz und nenne das Ergebnis prägnant (z. B. "Stars: 123456").`;
 
-  // Nur System- und User-Historie an das Modell geben (KEIN readonly-Array!)
   const coreHistory: Array<{ role: "system" | "user"; content: string }> = history
     .filter((m) => m.role === "system" || m.role === "user")
     .map((m) => ({ role: m.role as "system" | "user", content: m.content }));
@@ -191,14 +247,12 @@ Hinweise:
   try {
     parsed = JSON.parse(content);
   } catch {
-    // Falls das Modell einmal nicht korrektes JSON liefert
     parsed = {};
   }
 
   const steps: Step[] = parsed.steps ?? [];
   const executed: Step[] = [];
 
-  // Schrittweise Tools ausführen
   for (const s of steps) {
     if (!s.tool) {
       executed.push(s);

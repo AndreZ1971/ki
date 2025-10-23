@@ -1,43 +1,59 @@
-// external (values)
-import axios, { isAxiosError } from 'axios';
+// src/tools/woo.ts
+// Robuste WooCommerce-REST-Wrapper + optionale Tool-Objekte
+//
+// Erwartete ENV-Variablen:
+//   WOO_URL         = https://example.com
+//   WOO_KEY         = ck_xxxxxxx
+//   WOO_SECRET      = cs_xxxxxxx
+//   WOO_AUTH_MODE   = basic | query   (optional, default: basic)
+//   WOO_TIMEOUT_MS  = 30000           (optional)
 
-// internal (types) – lokal vor extern, keine Leerzeile innerhalb der Type-Gruppe
-import type { Tool } from '../types.js';
-import type { AxiosInstance } from 'axios';
+import axios, { isAxiosError, type AxiosInstance } from "axios";
+import type { Tool } from "../types.js";
 
-/**
- * Woo REST-Client
- * Auth: Basic (Consumer Key/Secret), BaseURL: {WOO_URL}/wp-json/wc/v3
- */
+/* ───────────────────────── Helpers & Client ───────────────────────── */
+
+const AUTH_MODE = (process.env.WOO_AUTH_MODE ?? "basic").toLowerCase();
+const TIMEOUT_MS = Number(process.env.WOO_TIMEOUT_MS ?? 30000);
+
 function createWooClient(): AxiosInstance {
-  const base = process.env.WOO_URL?.replace(/\/+$/, '') || '';
-  const key = process.env.WOO_KEY || '';
-  const secret = process.env.WOO_SECRET || '';
+  const base = process.env.WOO_URL?.replace(/\/+$/, "") || "";
+  const key = process.env.WOO_KEY || "";
+  const secret = process.env.WOO_SECRET || "";
 
   if (!base || !key || !secret) {
-    throw new Error('Woo config missing: WOO_URL, WOO_KEY, WOO_SECRET must be set in .env');
+    throw new Error("Woo config missing: WOO_URL, WOO_KEY, WOO_SECRET must be set in .env");
   }
 
   const baseURL = `${base}/wp-json/wc/v3`;
 
-  return axios.create({
+  const common = {
     baseURL,
-    timeout: 15000,
-    auth: { username: key, password: secret },
+    timeout: TIMEOUT_MS,
     headers: {
-      'user-agent': 'ki-agent',
-      accept: 'application/json',
-      'content-type': 'application/json',
+      "user-agent": "ki-agent",
+      accept: "application/json",
+      "content-type": "application/json",
     },
-  });
+  } as const;
+
+  if (AUTH_MODE === "basic") {
+    return axios.create({
+      ...common,
+      auth: { username: key, password: secret },
+    });
+  }
+
+  // AUTH_MODE === "query": Auth über Query-Params (stabil hinter Proxies/CDNs)
+  return axios.create({ ...common });
 }
 
 function pathNormalize(p: string): string {
-  return p.startsWith('/') ? p : `/${p}`;
+  return p.startsWith("/") ? p : `/${p}`;
 }
 
 function isRecord(v: unknown): v is Record<string, unknown> {
-  return typeof v === 'object' && v !== null;
+  return typeof v === "object" && v !== null;
 }
 
 function axiosErrorToMessage(err: unknown): string {
@@ -45,64 +61,128 @@ function axiosErrorToMessage(err: unknown): string {
     const status = err.response?.status;
     const data = err.response?.data as unknown;
     let msgFromData: string | undefined;
-    if (isRecord(data) && typeof data.message === 'string') {
+    if (isRecord(data) && typeof data.message === "string") {
       msgFromData = data.message;
     }
-    const msg = msgFromData ?? err.message ?? 'Axios error';
-    return `${status ?? 'no-status'}: ${msg}`;
+    const msg = msgFromData ?? err.message ?? "Axios error";
+    return `${status ?? "no-status"}: ${msg}`;
   }
   return err instanceof Error ? err.message : String(err);
 }
 
-/* ----------------------- Basis-Tools ----------------------- */
+/* ─────────────────────── Named Function Exports ───────────────────────
+   Diese Funktionen werden von src/agent/tools.ts direkt importiert:
+     import { wooGet, wooPost } from "../tools/woo.js"
+*/
 
-const wooGet: Tool = {
-  name: 'woo_get',
+export async function wooGet(
+  path: string,
+  params: Record<string, unknown> = {}
+): Promise<unknown> {
+  const client = createWooClient();
+  const url = pathNormalize(path);
+
+  // Bei query-Auth Schlüssel als Query-Parameter mitsenden
+  const qp =
+    AUTH_MODE === "query"
+      ? {
+          consumer_key: process.env.WOO_KEY,
+          consumer_secret: process.env.WOO_SECRET,
+          ...params,
+        }
+      : params;
+
+  try {
+    const res = await client.get(url, { params: qp });
+    return res.data;
+  } catch (err) {
+    throw new Error(`woo_get failed: ${axiosErrorToMessage(err)}`);
+  }
+}
+
+export async function wooPost(
+  path: string,
+  data: Record<string, unknown> = {},
+  params: Record<string, unknown> = {}
+): Promise<unknown> {
+  const client = createWooClient();
+  const url = pathNormalize(path);
+
+  // Optional Override via params.__method = "post" | "put" | "patch"
+  const override =
+    typeof params.__method === "string" ? params.__method.toLowerCase() : undefined;
+
+  // Heuristik: /products/123 → PUT, sonst POST
+  const inferred = /^\/[^?]+\/\d+($|[/?#])/i.test(url) ? "put" : "post";
+  const method = (override ?? inferred) as "post" | "put" | "patch";
+
+  // __method nicht an Woo senden
+  const { __method, ...restParams } = params as Record<string, unknown>;
+
+  // Bei query-Auth Schlüssel als Query-Parameter mitsenden
+  const qp =
+    AUTH_MODE === "query"
+      ? {
+          consumer_key: process.env.WOO_KEY,
+          consumer_secret: process.env.WOO_SECRET,
+          ...restParams,
+        }
+      : restParams;
+
+  try {
+    if (method === "put") {
+      const res = await client.put(url, data ?? {}, { params: qp });
+      return res.data;
+    } else if (method === "patch") {
+      const res = await client.patch(url, data ?? {}, { params: qp });
+      return res.data;
+    } else {
+      const res = await client.post(url, data ?? {}, { params: qp });
+      return res.data;
+    }
+  } catch (err) {
+    throw new Error(`woo_post failed: ${axiosErrorToMessage(err)}`);
+  }
+}
+
+/* ───────────────────────── Tool Objects (optional) ─────────────────────────
+   Falls du woo_* auch als Tool direkt registrieren möchtest,
+   gibt es hier passende Tool-Objekte, die auf die Funktionen oben mappen.
+*/
+
+const wooGetTool: Tool = {
+  name: "woo_get",
   description:
-    'GET auf WooCommerce REST. Input: { path: string, params?: Record<string,string|number> }',
+    "GET auf WooCommerce REST. Input: { path: string, params?: Record<string,unknown> }",
   async run(input) {
     const { path, params } = input as {
       path: string;
-      params?: Record<string, string | number>;
+      params?: Record<string, unknown>;
     };
-    const client = createWooClient();
-    try {
-      const res = await client.get(pathNormalize(path), { params });
-      return { status: res.status, data: res.data };
-    } catch (err) {
-      throw new Error(`woo_get failed: ${axiosErrorToMessage(err)}`);
-    }
+    return await wooGet(path, params ?? {});
   },
 };
 
-const wooPost: Tool = {
-  name: 'woo_post',
+const wooPostTool: Tool = {
+  name: "woo_post",
   description:
-    'POST/PATCH auf WooCommerce REST. Input: { path: string, method?: "post"|"patch", body?: unknown }',
+    "POST/PUT/PATCH auf WooCommerce REST. Input: { path: string, data?: Record<string,unknown>, params?: Record<string,unknown> }",
   async run(input) {
-    const { path, method = 'post', body } = input as {
+    const { path, data, params } = input as {
       path: string;
-      method?: 'post' | 'patch';
-      body?: unknown;
+      data?: Record<string, unknown>;
+      params?: Record<string, unknown>;
     };
-    const client = createWooClient();
-    try {
-      const url = pathNormalize(path);
-      const res =
-        method === 'patch'
-          ? await client.patch(url, body ?? {})
-          : await client.post(url, body ?? {});
-      return { status: res.status, data: res.data };
-    } catch (err) {
-      throw new Error(`woo_post failed: ${axiosErrorToMessage(err)}`);
-    }
+    return await wooPost(path, data ?? {}, params ?? {});
   },
 };
+
+/* ─────────── Zusätzliche Tools (optional, Beispiel) ─────────── */
 
 const wooListOrdersSince: Tool = {
-  name: 'woo_list_orders_since',
+  name: "woo_list_orders_since",
   description:
-    'Listet Bestellungen seit ISO-Zeitpunkt. Input: { since: string, per_page?: number, max_pages?: number }',
+    "Listet Bestellungen seit ISO-Zeitpunkt. Input: { since: string, per_page?: number, max_pages?: number }",
   async run(input) {
     const { since, per_page = 50, max_pages = 5 } = input as {
       since: string;
@@ -114,8 +194,19 @@ const wooListOrdersSince: Tool = {
     const all: unknown[] = [];
     try {
       for (let page = 1; page <= max_pages; page++) {
-        const res = await client.get('/orders', {
-          params: { after: since, per_page, page, orderby: 'date', order: 'asc' },
+        const res = await client.get("/orders", {
+          params:
+            AUTH_MODE === "query"
+              ? {
+                  consumer_key: process.env.WOO_KEY,
+                  consumer_secret: process.env.WOO_SECRET,
+                  after: since,
+                  per_page,
+                  page,
+                  orderby: "date",
+                  order: "asc",
+                }
+              : { after: since, per_page, page, orderby: "date", order: "asc" },
         });
         const chunk = Array.isArray(res.data) ? (res.data as unknown[]) : [];
         all.push(...chunk);
@@ -129,8 +220,8 @@ const wooListOrdersSince: Tool = {
 };
 
 const wooUpdateStock: Tool = {
-  name: 'woo_update_stock',
-  description: 'Setzt Lagerbestand. Input: { product_id: number, stock_quantity: number }',
+  name: "woo_update_stock",
+  description: "Setzt Lagerbestand. Input: { product_id: number, stock_quantity: number }",
   async run(input) {
     const { product_id, stock_quantity } = input as {
       product_id: number;
@@ -138,16 +229,31 @@ const wooUpdateStock: Tool = {
     };
     const client = createWooClient();
     try {
-      const res = await client.patch(`/products/${product_id}`, {
-        manage_stock: true,
-        stock_quantity,
-        stock_status: stock_quantity > 0 ? 'instock' : 'outofstock',
-      });
+      const params =
+        AUTH_MODE === "query"
+          ? {
+              consumer_key: process.env.WOO_KEY,
+              consumer_secret: process.env.WOO_SECRET,
+            }
+          : undefined;
+
+      const res = await client.patch(
+        `/products/${product_id}`,
+        {
+          manage_stock: true,
+          stock_quantity,
+          stock_status: stock_quantity > 0 ? "instock" : "outofstock",
+        },
+        { params }
+      );
       const data = res.data as unknown;
-      const id = isRecord(data) && typeof data.id === 'number' ? data.id : undefined;
+      const id =
+        isRecord(data) && typeof (data as Record<string, unknown>).id === "number"
+          ? (data as Record<string, unknown>).id
+          : undefined;
       const stock =
-        isRecord(data) && typeof data.stock_quantity === 'number'
-          ? data.stock_quantity
+        isRecord(data) && typeof (data as Record<string, unknown>).stock_quantity === "number"
+          ? (data as Record<string, unknown>).stock_quantity
           : undefined;
       return { status: res.status, id, stock };
     } catch (err) {
@@ -156,128 +262,14 @@ const wooUpdateStock: Tool = {
   },
 };
 
-/* ----------------------- Komfort-Tools für Freebies ----------------------- */
-
-type WooCategory = { id: number; name: string; slug: string };
-
-const wooFindCategoryId: Tool = {
-  name: 'woo_find_category_id',
-  description:
-    'Findet die Kategorie-ID per Name. Input: { name: string } → { ok, id?, name?, slug?, candidates? }',
-  async run(input) {
-    const { name } = input as { name: string };
-    const client = createWooClient();
-
-    try {
-      const res = await client.get('/products/categories', {
-        params: { search: name, per_page: 100, hide_empty: false },
-      });
-      const arr = Array.isArray(res.data) ? (res.data as unknown[]) : [];
-
-      // Nur gültige Kategorien herausfiltern
-      const candidates: WooCategory[] = [];
-      for (const it of arr) {
-        if (
-          isRecord(it) &&
-          typeof it.id === 'number' &&
-          typeof it.name === 'string' &&
-          typeof it.slug === 'string'
-        ) {
-          candidates.push({ id: it.id, name: it.name, slug: it.slug });
-        }
-      }
-
-      const found =
-        candidates.find((c) => c.name.toLowerCase() === name.toLowerCase()) ||
-        candidates.find((c) => c.slug.toLowerCase() === name.toLowerCase());
-
-      if (!found) {
-        return { ok: false, reason: `Category "${name}" not found`, candidates };
-      }
-      return { ok: true, id: found.id, name: found.name, slug: found.slug };
-    } catch (err) {
-      throw new Error(`woo_find_category_id failed: ${axiosErrorToMessage(err)}`);
-    }
-  },
-};
-
-type DownloadItem = { name: string; file: string };
-
-const wooCreateFreebie: Tool = {
-  name: 'woo_create_freebie',
-  description:
-    'Erstellt ein kostenloses, virtuelles, downloadbares Produkt. Input: { title, short_description, description, category_id, downloads: Array<{name,file}>, tags?: string[], images?: Array<{src,alt?}> }',
-  async run(input) {
-    const {
-      title,
-      short_description,
-      description,
-      category_id,
-      downloads,
-      tags = [],
-      images = [],
-    } = input as {
-      title: string;
-      short_description: string;
-      description: string;
-      category_id: number;
-      downloads: DownloadItem[];
-      tags?: string[];
-      images?: { src: string; alt?: string }[];
-    };
-
-    if (!title || !category_id || !Array.isArray(downloads) || downloads.length === 0) {
-      throw new Error('woo_create_freebie: missing title/category_id/downloads');
-    }
-
-    const client = createWooClient();
-
-    const productPayload = {
-      name: title,
-      type: 'simple',
-      status: 'publish',
-      regular_price: '0',
-      tax_status: 'none',
-      virtual: true,
-      downloadable: true,
-      short_description,
-      description,
-      categories: [{ id: category_id }],
-      tags: tags.map((t) => ({ name: t })),
-      images,
-      downloads: downloads.map((d) => ({ name: d.name, file: d.file })),
-      download_limit: -1,
-      download_expiry: -1,
-      manage_stock: false,
-      stock_status: 'instock',
-    };
-
-    try {
-      const res = await client.post('/products', productPayload);
-      const p = res.data as unknown;
-      const id = isRecord(p) && typeof p.id === 'number' ? p.id : undefined;
-      const slug = isRecord(p) && typeof p.slug === 'string' ? p.slug : undefined;
-      const permalink =
-        isRecord(p) && typeof p.permalink === 'string' ? p.permalink : undefined;
-
-      return { id, slug, permalink, status: res.status };
-    } catch (err) {
-      throw new Error(`woo_create_freebie failed: ${axiosErrorToMessage(err)}`);
-    }
-  },
-};
-
-/* ----------------------- Export-Katalog ----------------------- */
+/* ───────────────────────── Exporte ───────────────────────── */
 
 export const wooTools: Tool[] = [
-  wooGet,
-  wooPost,
+  wooGetTool,
+  wooPostTool,
   wooListOrdersSince,
   wooUpdateStock,
-  wooFindCategoryId,
-  wooCreateFreebie,
 ];
 
-// Zusätzlich: Named Exports, damit `import { wooPost } from "../../tools/woo"` funktioniert
-export { wooGet, wooPost };
-
+// Named Exports für direkte Funktionsverwendung:
+export { wooGetTool, wooPostTool };
