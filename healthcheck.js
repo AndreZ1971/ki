@@ -1,6 +1,5 @@
-// src/monitoring/health-checks.ts
-
-import http from 'http';
+// Simple health check für Docker
+const http = require('http');
 
 const options = {
   hostname: 'localhost',
@@ -9,7 +8,7 @@ const options = {
   timeout: 2000,
 };
 
-const req = http.request(options, (res: http.IncomingMessage) => {
+const req = http.request(options, (res) => {
   process.exit(res.statusCode === 200 ? 0 : 1);
 });
 

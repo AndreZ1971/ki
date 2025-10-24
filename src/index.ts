@@ -46,7 +46,8 @@ async function main(): Promise<void> {
 
   logInfo(`Starte Agent mit Ziel:\n${userPrompt}`);
 
-  const history = []; // keine Chat-Historie im CLI
+  // FIX: Explizite Typ-Definition für history
+  const history: any[] = []; // keine Chat-Historie im CLI
 
   // 1) Planung und Ausführung
   try {

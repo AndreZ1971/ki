@@ -36,7 +36,7 @@ async function main() {
   const tags = (args.tags ?? posTags ?? '')
     .toString()
     .split(',')
-    .map((s) => s.trim())
+    .map((s: string) => s.trim())
     .filter(Boolean);
   const slug = args.slug ?? posSlug;
 

@@ -7,10 +7,15 @@ import swagger from '@fastify/swagger';
 import swaggerUI from '@fastify/swagger-ui';
 import underPressure from '@fastify/under-pressure';
 import fastify from 'fastify';
-import { z } from 'zod';
+import { WooCommerceClient } from './woocommerce/client.js';
 
-import { ChatMessage, Memory } from './agent/memory.js';
+import { Memory } from './agent/memory.js';
 
+// ChatMessage lokal definieren
+interface ChatMessage {
+  role: 'system' | 'user' | 'assistant' | 'tool';
+  content: string;
+}
 
 // Server erstellen
 const server = fastify({
@@ -26,21 +31,18 @@ const server = fastify({
 });
 
 // Global Memory Instance
-const agentMemory = new Memory(200);
+const agentMemory = new Memory();
 
-// Zod Schemas für Validation
-const chatMessageSchema = z.object({
-  role: z.enum(['system', 'user', 'assistant', 'tool']),
-  content: z.string().min(1).max(5000),
-});
+// FIX: Helper functions für Memory-Operationen
+const getMemorySize = (): number => {
+  return agentMemory.all().length;
+};
 
-const pushMessageSchema = z.object({
-  message: chatMessageSchema,
-});
-
-const bulkMessagesSchema = z.object({
-  messages: z.array(chatMessageSchema).max(200),
-});
+const clearMemory = (): number => {
+  const previousSize = getMemorySize();
+  (agentMemory as any).messages = [];
+  return previousSize;
+};
 
 // Swagger Configuration
 const swaggerConfig = {
@@ -58,12 +60,12 @@ const swaggerConfig = {
 };
 
 const swaggerUIConfig = {
-  routePrefix: '/docs',
+  routePrefix: '/documentation',
   uiConfig: {
-    docExpansion: 'full',
-    deepLinking: false,
+    docExpansion: 'list' as const,
+    deepLinking: true
   },
-  staticCSP: true,
+  staticCSP: true
 };
 
 // Register Plugins
@@ -99,12 +101,16 @@ server.get(
       description: 'Health check endpoint',
       tags: ['System'],
       response: {
-        200: z.object({
-          status: z.string(),
-          timestamp: z.string(),
-          memorySize: z.number(),
-          uptime: z.number(),
-        }),
+        200: {
+          type: 'object',
+          properties: {
+            status: { type: 'string' },
+            timestamp: { type: 'string' },
+            memorySize: { type: 'number' },
+            uptime: { type: 'number' },
+          },
+          required: ['status', 'timestamp', 'memorySize', 'uptime']
+        },
       },
     },
   },
@@ -112,7 +118,7 @@ server.get(
     return {
       status: 'ok',
       timestamp: new Date().toISOString(),
-      memorySize: agentMemory.size(),
+      memorySize: getMemorySize(),
       uptime: process.uptime(),
     };
   }
@@ -126,10 +132,24 @@ server.get(
       description: 'Get all messages from memory',
       tags: ['Memory'],
       response: {
-        200: z.object({
-          messages: z.array(chatMessageSchema),
-          total: z.number(),
-        }),
+        200: {
+          type: 'object',
+          properties: {
+            messages: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  role: { type: 'string', enum: ['system', 'user', 'assistant', 'tool'] },
+                  content: { type: 'string' }
+                },
+                required: ['role', 'content']
+              }
+            },
+            total: { type: 'number' }
+          },
+          required: ['messages', 'total']
+        },
       },
     },
   },
@@ -143,71 +163,107 @@ server.get(
 );
 
 // Push single message
-server.post<{ Body: { message: ChatMessage } }>(
+server.post(
   '/memory',
   {
     schema: {
       description: 'Push a single message to memory',
       tags: ['Memory'],
-      body: pushMessageSchema,
+      body: {
+        type: 'object',
+        properties: {
+          message: {
+            type: 'object',
+            properties: {
+              role: { type: 'string', enum: ['system', 'user', 'assistant', 'tool'] },
+              content: { type: 'string' }
+            },
+            required: ['role', 'content']
+          }
+        },
+        required: ['message']
+      },
       response: {
-        201: z.object({
-          success: z.boolean(),
-          message: z.string(),
-          currentSize: z.number(),
-        }),
+        201: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            currentSize: { type: 'number' }
+          },
+          required: ['success', 'message', 'currentSize']
+        },
       },
     },
   },
   async (request, reply) => {
-    const { message } = request.body;
-
+    const { message } = request.body as any;
     agentMemory.push(message);
-
+    
     reply.code(201);
     return {
       success: true,
       message: 'Message added to memory',
-      currentSize: agentMemory.size(),
+      currentSize: getMemorySize(),
     };
   }
 );
 
-// Push multiple messages
-server.post<{ Body: { messages: ChatMessage[] } }>(
+// Push multiple messages - FIXED
+server.post(
   '/memory/bulk',
   {
     schema: {
       description: 'Push multiple messages to memory',
       tags: ['Memory'],
-      body: bulkMessagesSchema,
+      body: {
+        type: 'object',
+        properties: {
+          messages: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                role: { type: 'string', enum: ['system', 'user', 'assistant', 'tool'] },
+                content: { type: 'string' }
+              },
+              required: ['role', 'content']
+            }
+          }
+        },
+        required: ['messages']
+      },
       response: {
-        201: z.object({
-          success: z.boolean(),
-          message: z.string(),
-          added: z.number(),
-          currentSize: z.number(),
-        }),
+        201: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            added: { type: 'number' },
+            currentSize: { type: 'number' }
+          },
+          required: ['success', 'message', 'added', 'currentSize']
+        },
       },
     },
   },
   async (request, reply) => {
-    const { messages } = request.body;
-    const initialSize = agentMemory.size();
+    const { messages } = request.body as any;
+    const initialSize = getMemorySize();
 
-    messages.forEach((message) => agentMemory.push(message));
+    messages.forEach((message: ChatMessage) => agentMemory.push(message));
 
     reply.code(201);
     return {
       success: true,
       message: 'Messages added to memory',
-      added: agentMemory.size() - initialSize,
-      currentSize: agentMemory.size(),
+      added: getMemorySize() - initialSize,
+      currentSize: getMemorySize(),
     };
   }
 );
 
-// Clear memory
+// Clear memory - FIXED
 server.delete(
   '/memory',
   {
@@ -215,27 +271,30 @@ server.delete(
       description: 'Clear all messages from memory',
       tags: ['Memory'],
       response: {
-        200: z.object({
-          success: z.boolean(),
-          message: z.string(),
-          cleared: z.number(),
-        }),
+        200: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            cleared: { type: 'number' }
+          },
+          required: ['success', 'message', 'cleared']
+        },
       },
     },
   },
   async () => {
-    const previousSize = agentMemory.size();
-    agentMemory.clear();
+    const cleared = clearMemory();
 
     return {
       success: true,
       message: 'Memory cleared',
-      cleared: previousSize,
+      cleared,
     };
   }
 );
 
-// Get memory stats
+// Get memory stats - FIXED
 server.get(
   '/memory/stats',
   {
@@ -243,23 +302,195 @@ server.get(
       description: 'Get memory statistics',
       tags: ['Memory'],
       response: {
-        200: z.object({
-          totalMessages: z.number(),
-          maxCapacity: z.number(),
-          usagePercentage: z.number(),
-        }),
+        200: {
+          type: 'object',
+          properties: {
+            totalMessages: { type: 'number' },
+            maxCapacity: { type: 'number' },
+            usagePercentage: { type: 'number' }
+          },
+          required: ['totalMessages', 'maxCapacity', 'usagePercentage']
+        },
       },
     },
   },
   async () => {
-    const currentSize = agentMemory.size();
-    const maxCapacity = 200; // From Memory constructor
+    const currentSize = getMemorySize();
+    const maxCapacity = 200;
 
     return {
       totalMessages: currentSize,
       maxCapacity,
       usagePercentage: (currentSize / maxCapacity) * 100,
     };
+  }
+);
+
+// Get WooCommerce Products
+server.get(
+  '/woo/products',
+  {
+    schema: {
+      description: 'Get products from WooCommerce',
+      tags: ['WooCommerce'],
+      querystring: {
+        type: 'object',
+        properties: {
+          per_page: { type: 'number', default: 10 },
+          page: { type: 'number', default: 1 },
+          search: { type: 'string' }
+        }
+      },
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            products: { type: 'array' },
+            total: { type: 'number' }
+          },
+          required: ['success', 'products', 'total']
+        }
+      }
+    }
+  },
+  async (request) => {
+    const { per_page = 10, page = 1, search } = request.query as any;
+    const wooClient = new WooCommerceClient();
+    
+    let endpoint = `products?per_page=${per_page}&page=${page}`;
+    if (search) {
+      endpoint += `&search=${encodeURIComponent(search)}`;
+    }
+
+    const products = await wooClient.get<any[]>(endpoint);
+    
+    return {
+      success: true,
+      products,
+      total: products.length
+    };
+  }
+);
+
+// Get WooCommerce Categories
+server.get(
+  '/woo/categories',
+  {
+    schema: {
+      description: 'Get categories from WooCommerce',
+      tags: ['WooCommerce'],
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            categories: { type: 'array' },
+            total: { type: 'number' }
+          },
+          required: ['success', 'categories', 'total']
+        }
+      }
+    }
+  },
+  async () => {
+    const wooClient = new WooCommerceClient();
+    const categories = await wooClient.get<any[]>('products/categories?per_page=100');
+    
+    return {
+      success: true,
+      categories,
+      total: categories.length
+    };
+  }
+);
+
+// Create WooCommerce Product
+server.post(
+  '/woo/products',
+  {
+    schema: {
+      description: 'Create a new product in WooCommerce',
+      tags: ['WooCommerce'],
+      body: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          type: { type: 'string', enum: ['simple', 'variable', 'grouped', 'external'], default: 'simple' },
+          status: { type: 'string', enum: ['draft', 'publish', 'pending', 'private'], default: 'publish' },
+          regular_price: { type: 'string' },
+          description: { type: 'string' },
+          short_description: { type: 'string' },
+          categories: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                id: { type: 'number' }
+              }
+            }
+          },
+          images: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                src: { type: 'string' },
+                name: { type: 'string' },
+                alt: { type: 'string' }
+              }
+            }
+          },
+          virtual: { type: 'boolean', default: false },
+          downloadable: { type: 'boolean', default: false },
+          downloads: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                name: { type: 'string' },
+                file: { type: 'string' }
+              }
+            }
+          }
+        },
+        required: ['name']
+      },
+      response: {
+        201: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            product: { type: 'object' },
+            message: { type: 'string' }
+          },
+          required: ['success', 'product']
+        }
+      }
+    }
+  },
+  async (request, reply) => {
+    const productData = request.body as any;
+    const wooClient = new WooCommerceClient();
+
+    try {
+      const product = await wooClient.post<any>('products', productData);
+      
+      reply.code(201);
+      return {
+        success: true,
+        product,
+        message: 'Product created successfully'
+      };
+    } catch (error) {
+      console.error('Error creating product:', error);
+      reply.code(500);
+      return {
+        success: false,
+        product: null,
+        message: `Failed to create product: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
+    }
   }
 );
 
@@ -299,12 +530,15 @@ const start = async () => {
       host: '0.0.0.0',
     });
     console.log(`🚀 Server listening on ${address}`);
-    console.log(`📚 API Documentation available at ${address}/docs`);
+    console.log(`📚 API Documentation available at ${address}/documentation`);
   } catch (err) {
     server.log.error(err);
     process.exit(1);
   }
 };
+
+// Server starten
+start().catch(console.error);
 
 // Graceful Shutdown
 process.on('SIGINT', async () => {
