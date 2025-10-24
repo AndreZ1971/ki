@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import OpenAI from 'openai';
+
 import { wooCommerceService } from '../woocommerce/woocommerce.service';
 
 // 🔥 KORRIGIERTE OPENAI INITIALISIERUNG
