@@ -2,7 +2,7 @@
 // Node-Builtins: –
 // External: –
 // Local:
-import { wooPost } from "../../tools/woo.js";
+import { wooPost } from '../../tools/woo.js';
 
 export type WooId = number;
 
@@ -11,25 +11,25 @@ export async function createStandardAudit(): Promise<{
   updated: { id: WooId; name?: string };
 }> {
   // 1) Produkt anlegen
-  const createRes = (await wooPost("/products", {
-    name: "Standard-Audit",
-    slug: "standard-audit",
-    type: "simple",
-    status: "publish",
+  const createRes = (await wooPost('/products', {
+    name: 'Standard-Audit',
+    slug: 'standard-audit',
+    type: 'simple',
+    status: 'publish',
     virtual: true,
     downloadable: false,
     manage_stock: false,
-    regular_price: "150",
-    catalog_visibility: "visible",
+    regular_price: '150',
+    catalog_visibility: 'visible',
     categories: [{ id: 51 }], // Audits
     tags: [
-      { name: "Standard-Audit" },
-      { name: "Website-Audit" },
-      { name: "SEO-Check" },
-      { name: "UX-Review" },
-      { name: "Performance-Analyse" },
-      { name: "Conversion-Optimierung" },
-      { name: "Social-Media-Audit" },
+      { name: 'Standard-Audit' },
+      { name: 'Website-Audit' },
+      { name: 'SEO-Check' },
+      { name: 'UX-Review' },
+      { name: 'Performance-Analyse' },
+      { name: 'Conversion-Optimierung' },
+      { name: 'Social-Media-Audit' },
     ],
   })) as any;
 
@@ -37,7 +37,7 @@ export async function createStandardAudit(): Promise<{
 
   // 2) Beschreibung setzen
   const short_description =
-    "Vertiefte Analyse deiner Website inkl. 6–10 priorisierten Maßnahmen. Lieferung in 3–5 Werktagen.";
+    'Vertiefte Analyse deiner Website inkl. 6–10 priorisierten Maßnahmen. Lieferung in 3–5 Werktagen.';
   const description = `
 <h2>⭐ Standard-Audit – Vertieft, strukturiert, umsetzbar</h2>
 <p>Du erhältst eine fundierte Analyse mit <strong>6–10 priorisierten Maßnahmen</strong>, klaren nächsten Schritten und kurzen Aufwandsschätzungen.</p>

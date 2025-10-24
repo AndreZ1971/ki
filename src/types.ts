@@ -22,5 +22,3 @@ export interface AgentMessage {
   name?: string;
   content: string;
 }
-
-

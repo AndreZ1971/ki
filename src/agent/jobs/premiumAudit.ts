@@ -2,7 +2,7 @@
 // Node-Builtins: –
 // External: –
 // Local:
-import { wooPost } from "../../tools/woo.js";
+import { wooPost } from '../../tools/woo.js';
 
 export type WooId = number;
 
@@ -11,25 +11,25 @@ export async function createPremiumAudit(): Promise<{
   updated: { id: WooId; name?: string };
 }> {
   // 1) Produkt anlegen
-  const createRes = (await wooPost("/products", {
-    name: "Premium-Audit",
-    slug: "premium-audit",
-    type: "simple",
-    status: "publish",
+  const createRes = (await wooPost('/products', {
+    name: 'Premium-Audit',
+    slug: 'premium-audit',
+    type: 'simple',
+    status: 'publish',
     virtual: true,
     downloadable: false,
     manage_stock: false,
-    regular_price: "250",
-    catalog_visibility: "visible",
+    regular_price: '250',
+    catalog_visibility: 'visible',
     categories: [{ id: 51 }], // Audits
     tags: [
-      { name: "Premium-Audit" },
-      { name: "Website-Audit" },
-      { name: "SEO-Check" },
-      { name: "UX-Review" },
-      { name: "Performance-Analyse" },
-      { name: "Conversion-Optimierung" },
-      { name: "Social-Media-Audit" },
+      { name: 'Premium-Audit' },
+      { name: 'Website-Audit' },
+      { name: 'SEO-Check' },
+      { name: 'UX-Review' },
+      { name: 'Performance-Analyse' },
+      { name: 'Conversion-Optimierung' },
+      { name: 'Social-Media-Audit' },
     ],
   })) as any;
 
@@ -37,7 +37,7 @@ export async function createPremiumAudit(): Promise<{
 
   // 2) Beschreibung setzen
   const short_description =
-    "Tiefenprüfung inkl. Wettbewerbs-Abgleich, Tracking/Funnel-Check und 10–20 priorisierten Maßnahmen. Lieferung in 5–7 Werktagen + Abschluss-Call.";
+    'Tiefenprüfung inkl. Wettbewerbs-Abgleich, Tracking/Funnel-Check und 10–20 priorisierten Maßnahmen. Lieferung in 5–7 Werktagen + Abschluss-Call.';
   const description = `
 <h2>🥇 Premium-Audit – Tiefenprüfung mit Roadmap &amp; Call</h2>
 <p>Die umfassendste Analyse inkl. <strong>Wettbewerbs-Abgleich</strong>, <strong>Tracking/Funnel-Check</strong> und <strong>10–20 Maßnahmen</strong> mit Aufwandsschätzung.</p>

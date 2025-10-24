@@ -10,7 +10,7 @@ module.exports = {
       env: { NODE_ENV: 'production' },
       autorestart: true,
       min_uptime: '5s',
-      max_restarts: 10
+      max_restarts: 10,
     },
     {
       name: 'ki-jobs',
@@ -20,7 +20,7 @@ module.exports = {
       env: { NODE_ENV: 'production' },
       autorestart: true,
       min_uptime: '5s',
-      max_restarts: 10
-    }
-  ]
+      max_restarts: 10,
+    },
+  ],
 };

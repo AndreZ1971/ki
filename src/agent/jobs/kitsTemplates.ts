@@ -2,27 +2,35 @@
 // Node-Builtins: –
 // External: –
 // Local:
-import { wooPost } from "../../tools/woo.js";
+import { wooPost } from '../../tools/woo.js';
 
 type WooId = number;
 
-export async function createKit_SocialMediaPromptPack(): Promise<{ id: WooId }> {
-  const res = (await wooPost("/products", {
-    name: "Social Media Prompt Pack",
-    slug: "social-media-prompt-pack",
-    type: "simple",
-    status: "publish",
+export async function createKit_SocialMediaPromptPack(): Promise<{
+  id: WooId;
+}> {
+  const res = (await wooPost('/products', {
+    name: 'Social Media Prompt Pack',
+    slug: 'social-media-prompt-pack',
+    type: 'simple',
+    status: 'publish',
     virtual: true,
     downloadable: true,
-    regular_price: "19",
-    catalog_visibility: "visible",
+    regular_price: '19',
+    catalog_visibility: 'visible',
     categories: [{ id: 53 }], // Kits & Templates
-    tags: [{ name: "Prompt-Pack" }, { name: "Social Media" }, { name: "KI Content" }, { name: "Vorlage" }],
+    tags: [
+      { name: 'Prompt-Pack' },
+      { name: 'Social Media' },
+      { name: 'KI Content' },
+      { name: 'Vorlage' },
+    ],
   })) as any;
 
   const id: WooId = res?.id;
 
-  const short_description = "50+ KI-Prompts für Instagram, TikTok & LinkedIn – sofort anwendbar.";
+  const short_description =
+    '50+ KI-Prompts für Instagram, TikTok & LinkedIn – sofort anwendbar.';
   const description = `
 <h2>🚀 Social Media Prompt Pack</h2>
 <p><strong>50+ getestete Prompts</strong> für Hooks, Captions, Reels &amp; Ideen. Sofort nutzbar mit ChatGPT, Claude &amp; Gemini.</p>
@@ -39,22 +47,27 @@ export async function createKit_SocialMediaPromptPack(): Promise<{ id: WooId }> 
 }
 
 export async function createKit_NotionContentPlanner(): Promise<{ id: WooId }> {
-  const res = (await wooPost("/products", {
-    name: "Notion Content Planner",
-    slug: "notion-content-planner",
-    type: "simple",
-    status: "publish",
+  const res = (await wooPost('/products', {
+    name: 'Notion Content Planner',
+    slug: 'notion-content-planner',
+    type: 'simple',
+    status: 'publish',
     virtual: true,
     downloadable: true,
-    regular_price: "29",
-    catalog_visibility: "visible",
+    regular_price: '29',
+    catalog_visibility: 'visible',
     categories: [{ id: 53 }],
-    tags: [{ name: "Notion" }, { name: "Content Planner" }, { name: "Produktivität" }],
+    tags: [
+      { name: 'Notion' },
+      { name: 'Content Planner' },
+      { name: 'Produktivität' },
+    ],
   })) as any;
 
   const id: WooId = res?.id;
 
-  const short_description = "Notion-Template für Redaktionsplanung, Kanban, Kalender & Assets.";
+  const short_description =
+    'Notion-Template für Redaktionsplanung, Kanban, Kalender & Assets.';
   const description = `
 <h2>🗓️ Notion Content Planner</h2>
 <p>Redaktionsplanung mit <strong>Board, Kalender, Verantwortlichkeiten</strong> und Asset-Verwaltung. Ready-to-use.</p>
@@ -71,10 +84,17 @@ export async function createKit_NotionContentPlanner(): Promise<{ id: WooId }> {
 }
 
 /** Seed-Funktion: legt 2 Kern-Kits an */
-export async function createKitsSeed(): Promise<{ kits: { id: WooId; name: string }[] }> {
+export async function createKitsSeed(): Promise<{
+  kits: { id: WooId; name: string }[];
+}> {
   const a = await createKit_SocialMediaPromptPack();
   const b = await createKit_NotionContentPlanner();
-  return { kits: [{ id: a.id, name: "Social Media Prompt Pack" }, { id: b.id, name: "Notion Content Planner" }] };
+  return {
+    kits: [
+      { id: a.id, name: 'Social Media Prompt Pack' },
+      { id: b.id, name: 'Notion Content Planner' },
+    ],
+  };
 }
 
 export default createKitsSeed;

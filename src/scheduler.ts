@@ -12,7 +12,10 @@ cron.schedule('*/2 * * * *', async () => {
     const mem = new Memory();
     const goal = `Liste alle Bestellungen seit ${lastIso} und gib die neuen Bestell-IDs aus.`;
 
-    mem.push({ role: 'system', content: 'Arbeite deterministisch & idempotent.' });
+    mem.push({
+      role: 'system',
+      content: 'Arbeite deterministisch & idempotent.',
+    });
     mem.push({ role: 'user', content: `Nutze woo_list_orders_since.` });
 
     const res = await planAndAct(goal, mem.all());
