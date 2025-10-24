@@ -1,19 +1,21 @@
 // src/agent/jobs/index.ts
 
 // external
-import "dotenv/config";
+import 'dotenv/config';
 
 // internal
-import { logger } from "../../logger";
+import { logger } from '../../logger';
 
-const JOB_NAME = process.env.JOB?.trim() || "wooListCategories";
-const MODE = (process.env.JOB_MODE?.trim() || "once").toLowerCase();
+const JOB_NAME = process.env.JOB?.trim() || 'wooListCategories';
+const MODE = (process.env.JOB_MODE?.trim() || 'once').toLowerCase();
 const INTERVAL_MS = Number(process.env.JOB_INTERVAL_MS || 15 * 60 * 1000);
 
 type UnknownModule = Record<string, unknown>;
 type AsyncVoidFn = () => Promise<void>;
 const toErr = (e: unknown) =>
-  e instanceof Error ? e : new Error(typeof e === "string" ? e : JSON.stringify(e));
+  e instanceof Error
+    ? e
+    : new Error(typeof e === 'string' ? e : JSON.stringify(e));
 
 /**
  * Ermittelt eine ausführbare Funktion aus einem Modul.
@@ -21,17 +23,17 @@ const toErr = (e: unknown) =>
  */
 function resolveRunner(mod: UnknownModule): AsyncVoidFn {
   const candidate =
-    (typeof mod?.default === "function" && (mod.default as AsyncVoidFn)) ||
-    (typeof (mod as { run?: unknown })?.run === "function" &&
+    (typeof mod?.default === 'function' && (mod.default as AsyncVoidFn)) ||
+    (typeof (mod as { run?: unknown })?.run === 'function' &&
       ((mod as { run: AsyncVoidFn }).run as AsyncVoidFn)) ||
-    (typeof (mod as { execute?: unknown })?.execute === "function" &&
+    (typeof (mod as { execute?: unknown })?.execute === 'function' &&
       ((mod as { execute: AsyncVoidFn }).execute as AsyncVoidFn)) ||
-    (typeof (mod as { job?: unknown })?.job === "function" &&
+    (typeof (mod as { job?: unknown })?.job === 'function' &&
       ((mod as { job: AsyncVoidFn }).job as AsyncVoidFn));
 
   if (!candidate) {
     throw new Error(
-      "Kein ausführbarer Export gefunden. Erwarte eine Funktion als default, run, execute oder job."
+      'Kein ausführbarer Export gefunden. Erwarte eine Funktion als default, run, execute oder job.'
     );
   }
   return async () => await Promise.resolve(candidate());
@@ -43,21 +45,21 @@ function resolveRunner(mod: UnknownModule): AsyncVoidFn {
  */
 async function loadJobModule(name: string): Promise<UnknownModule> {
   switch (name) {
-    case "createFreebie":
-      return await import("./createFreebie");
+    case 'createFreebie':
+      return await import('./createFreebie');
 
     // ─── Neue Woo-Jobs ────────────────────────────────────────────────────────
-    case "wooListCategories":
+    case 'wooListCategories':
       // Listet Woo-Kategorien (z.B. zur ID-Ermittlung)
-      return await import("./wooListCategories");
+      return await import('./wooListCategories');
 
-    case "wooCreateProduct":
+    case 'wooCreateProduct':
       // Legt ein Produkt in Woo an (z. B. Mini-Audit, virtuell, nicht downloadbar)
-      return await import("./wooCreateProduct");
+      return await import('./wooCreateProduct');
 
-    case "wooUpdateProduct":
+    case 'wooUpdateProduct':
       // Aktualisiert ein Produkt (short_description, description, Preis, Status …)
-      return await import("./wooUpdateProduct");
+      return await import('./wooUpdateProduct');
 
     default:
       throw new Error(
@@ -67,7 +69,7 @@ async function loadJobModule(name: string): Promise<UnknownModule> {
 }
 
 async function runOnce() {
-  logger.info({ job: JOB_NAME, mode: MODE }, "Starte Job einmal");
+  logger.info({ job: JOB_NAME, mode: MODE }, 'Starte Job einmal');
   const startedAt = Date.now();
 
   try {
@@ -76,14 +78,14 @@ async function runOnce() {
     await runner();
 
     const dur = Date.now() - startedAt;
-    logger.info({ job: JOB_NAME, duration_ms: dur }, "Job erfolgreich beendet");
+    logger.info({ job: JOB_NAME, duration_ms: dur }, 'Job erfolgreich beendet');
     process.exit(0);
   } catch (err: unknown) {
     const dur = Date.now() - startedAt;
     const e = toErr(err);
     logger.error(
       { job: JOB_NAME, duration_ms: dur, err: e.message, stack: e.stack },
-      "Job fehlgeschlagen"
+      'Job fehlgeschlagen'
     );
     process.exit(1);
   }
@@ -92,14 +94,17 @@ async function runOnce() {
 async function runInterval() {
   logger.info(
     { job: JOB_NAME, mode: MODE, every_ms: INTERVAL_MS },
-    "Starte Intervall-Runner"
+    'Starte Intervall-Runner'
   );
 
   let running = false;
 
   const tick = async () => {
     if (running) {
-      logger.warn({ job: JOB_NAME }, "Vorherige Ausführung läuft noch – überspringe Tick");
+      logger.warn(
+        { job: JOB_NAME },
+        'Vorherige Ausführung läuft noch – überspringe Tick'
+      );
       return;
     }
     running = true;
@@ -111,13 +116,16 @@ async function runInterval() {
       await runner();
 
       const dur = Date.now() - startedAt;
-      logger.info({ job: JOB_NAME, duration_ms: dur }, "Intervall-Run erfolgreich");
+      logger.info(
+        { job: JOB_NAME, duration_ms: dur },
+        'Intervall-Run erfolgreich'
+      );
     } catch (err: unknown) {
       const dur = Date.now() - startedAt;
       const e = toErr(err);
       logger.error(
         { job: JOB_NAME, duration_ms: dur, err: e.message, stack: e.stack },
-        "Intervall-Run fehlgeschlagen"
+        'Intervall-Run fehlgeschlagen'
       );
     } finally {
       running = false;
@@ -128,27 +136,29 @@ async function runInterval() {
   tick();
   setInterval(tick, INTERVAL_MS);
 
-  process.on("SIGINT", () => {
-    logger.info({ job: JOB_NAME }, "Beende (SIGINT)");
+  process.on('SIGINT', () => {
+    logger.info({ job: JOB_NAME }, 'Beende (SIGINT)');
     process.exit(0);
   });
-  process.on("SIGTERM", () => {
-    logger.info({ job: JOB_NAME }, "Beende (SIGTERM)");
+  process.on('SIGTERM', () => {
+    logger.info({ job: JOB_NAME }, 'Beende (SIGTERM)');
     process.exit(0);
   });
 }
 
 (async () => {
   try {
-    if (MODE === "interval") {
+    if (MODE === 'interval') {
       await runInterval();
     } else {
       await runOnce();
     }
   } catch (err: unknown) {
     const e = toErr(err);
-    logger.fatal({ err: e.message, stack: e.stack }, "Job-Bootstrap fehlgeschlagen");
+    logger.fatal(
+      { err: e.message, stack: e.stack },
+      'Job-Bootstrap fehlgeschlagen'
+    );
     process.exit(1);
   }
 })();
-

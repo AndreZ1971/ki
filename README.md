@@ -4,8 +4,8 @@
 
 Dieses Repo automatisiert den **Freebie-Workflow** für einen WooCommerce/WordPress-Shop:
 
-- ZIP & Cover in die **WP-Mediathek** hochladen  
-- **WooCommerce-Produkt** (0 €, virtual + downloadable) erstellen  
+- ZIP & Cover in die **WP-Mediathek** hochladen
+- **WooCommerce-Produkt** (0 €, virtual + downloadable) erstellen
 - Downloads sauber am Produkt hinterlegen
 
 **Tech-Stack:** Node.js (TypeScript), tsx, Axios, WooCommerce/WordPress REST API.
@@ -14,12 +14,12 @@ Dieses Repo automatisiert den **Freebie-Workflow** für einen WooCommerce/WordPr
 
 ## Voraussetzungen
 
-- **Node.js** ≥ 18 (LTS empfohlen)  
-- **npm** ≥ 9  
-- **Git**  
-- **WooCommerce** ≥ 7, **WordPress** ≥ 6  
-- WordPress: **Application Password** für einen Benutzer mit ausreichenden Rechten  
-- WooCommerce: **Consumer Key/Secret (CK/CS)** mit `read/write`  
+- **Node.js** ≥ 18 (LTS empfohlen)
+- **npm** ≥ 9
+- **Git**
+- **WooCommerce** ≥ 7, **WordPress** ≥ 6
+- WordPress: **Application Password** für einen Benutzer mit ausreichenden Rechten
+- WooCommerce: **Consumer Key/Secret (CK/CS)** mit `read/write`
 
 Optional (Deployment): **PM2**
 
@@ -66,9 +66,9 @@ JOB_INTERVAL_MS=900000
 
 **Wichtig:**
 
-- `WP_URL`/`WC_API_URL` **ohne** Doppel-`/wp-json/...`  
-- Bei fehlenden Permalinks ggf. `WC_API_URL=https://example.com/index.php`  
-- Application Passwords sind **Basic Auth** (User/Pass)  
+- `WP_URL`/`WC_API_URL` **ohne** Doppel-`/wp-json/...`
+- Bei fehlenden Permalinks ggf. `WC_API_URL=https://example.com/index.php`
+- Application Passwords sind **Basic Auth** (User/Pass)
 - **Secrets niemals commiten**
 
 ---
@@ -110,12 +110,12 @@ Die Kernlogik liegt in `src/agent/jobs/createFreebie.ts`.
 
 ## WordPress / WooCommerce Hinweise
 
-- **Rollen:** REST + Medien-Upload + Produkt-Erstellung  
+- **Rollen:** REST + Medien-Upload + Produkt-Erstellung
 - **REST-Endpoints:**
-  - Medien: `POST /wp-json/wp/v2/media`  
+  - Medien: `POST /wp-json/wp/v2/media`
   - Produkt: `POST /wp-json/wc/v3/products`
 - **Base-URL:**
-  - Mit Permalinks: `https://example.com`  
+  - Mit Permalinks: `https://example.com`
   - Ohne Permalinks: `https://example.com/index.php`
 
 ---
@@ -157,17 +157,17 @@ Die Kernlogik liegt in `src/agent/jobs/createFreebie.ts`.
 module.exports = {
   apps: [
     {
-      name: "ki-agent",
-      script: "node",
-      args: "node_modules/tsx/dist/cli.mjs src/index.ts",
+      name: 'ki-agent',
+      script: 'node',
+      args: 'node_modules/tsx/dist/cli.mjs src/index.ts',
       env: {
-        NODE_ENV: "production",
-        JOB: "createFreebie",
-        JOB_MODE: "interval",
-        JOB_INTERVAL_MS: "900000"
-      }
-    }
-  ]
+        NODE_ENV: 'production',
+        JOB: 'createFreebie',
+        JOB_MODE: 'interval',
+        JOB_INTERVAL_MS: '900000',
+      },
+    },
+  ],
 };
 ```
 
@@ -183,8 +183,8 @@ pm2 restart ki-agent
 
 ## Changelog / Contributing
 
-- Lint-Regeln beibehalten (Pre-commit grün halten)  
-- PRs mit sprechenden Commits  
+- Lint-Regeln beibehalten (Pre-commit grün halten)
+- PRs mit sprechenden Commits
 - Keine Secrets in PRs oder Beispielen
 
 ---
@@ -201,6 +201,6 @@ Rename-Item eslint.config.js eslint.config.mjs
 
 ## Technikübersicht
 
-- **`src/tools/wp.ts`** – Upload, Keep-Alive, Fehlertexte  
-- **`src/agent/jobs/createFreebie.ts`** – strikte Typisierung, robustes Upload-Handling  
+- **`src/tools/wp.ts`** – Upload, Keep-Alive, Fehlertexte
+- **`src/agent/jobs/createFreebie.ts`** – strikte Typisierung, robustes Upload-Handling
 - **`src/agent/jobs/index.ts`** – Job-Bootstrap (once/interval), Logging

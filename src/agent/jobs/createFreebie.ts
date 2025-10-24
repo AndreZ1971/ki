@@ -5,14 +5,14 @@
 // - verknüpft den Medienlink sauber über WooCommerce "downloads"
 
 // external
-import axios from "axios";
+import axios from 'axios';
 
 // builtin
-import fs from "node:fs/promises";
-import path from "node:path";
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
 // internal
-import { wpMediaUpload } from "../../tools/wp";
+import { wpMediaUpload } from '../../tools/wp';
 
 // =======================
 // Typen
@@ -23,8 +23,8 @@ export type WooProduct = { id: number; name: string; slug: string };
 type WooProductCreatePayload = {
   name: string;
   slug: string;
-  type: "simple";
-  status: "publish";
+  type: 'simple';
+  status: 'publish';
   virtual: true;
   downloadable: true;
   price: string;
@@ -68,43 +68,47 @@ type WPAttachment = { id: number; source_url: string };
 function makeSlug(input: string): string {
   return input
     .toLowerCase()
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "") // Akzente entfernen
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)+/g, "");
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '') // Akzente entfernen
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '');
 }
 
 function ensureHtml(s: string): string {
-  const trimmed = (s ?? "").trim();
-  return trimmed.length ? trimmed : "<p></p>";
+  const trimmed = (s ?? '').trim();
+  return trimmed.length ? trimmed : '<p></p>';
 }
 
 function guessMimeByExt(filename: string): string {
   const ext = path.extname(filename).toLowerCase();
   switch (ext) {
-    case ".zip":
-      return "application/zip";
-    case ".png":
-      return "image/png";
-    case ".jpg":
-    case ".jpeg":
-      return "image/jpeg";
-    case ".webp":
-      return "image/webp";
-    case ".svg":
-      return "image/svg+xml";
+    case '.zip':
+      return 'application/zip';
+    case '.png':
+      return 'image/png';
+    case '.jpg':
+    case '.jpeg':
+      return 'image/jpeg';
+    case '.webp':
+      return 'image/webp';
+    case '.svg':
+      return 'image/svg+xml';
     default:
-      return "application/octet-stream";
+      return 'application/octet-stream';
   }
 }
 
 function isRecord(v: unknown): v is Record<string, unknown> {
-  return typeof v === "object" && v !== null;
+  return typeof v === 'object' && v !== null;
 }
 const readStr = (obj: unknown, key: string): string | undefined =>
-  isRecord(obj) && typeof obj[key] === "string" ? (obj[key] as string) : undefined;
+  isRecord(obj) && typeof obj[key] === 'string'
+    ? (obj[key] as string)
+    : undefined;
 const readNum = (obj: unknown, key: string): number | undefined =>
-  isRecord(obj) && typeof obj[key] === "number" ? (obj[key] as number) : undefined;
+  isRecord(obj) && typeof obj[key] === 'number'
+    ? (obj[key] as number)
+    : undefined;
 
 // =======================
 // Woo API Helper
@@ -113,17 +117,18 @@ function wcApiBase() {
   // Erwartete ENV-Variablen:
   // WC_API_URL z.B. https://example.com oder https://example.com/index.php
   // WC_CONSUMER_KEY / WC_CONSUMER_SECRET
-  const base = process.env.WC_API_URL?.replace(/\/+$/, "");
-  if (!base) throw new Error("ENV WC_API_URL fehlt.");
+  const base = process.env.WC_API_URL?.replace(/\/+$/, '');
+  if (!base) throw new Error('ENV WC_API_URL fehlt.');
   const url = `${base}/wp-json/wc/v3`;
   const ck = process.env.WC_CONSUMER_KEY;
   const cs = process.env.WC_CONSUMER_SECRET;
-  if (!ck || !cs) throw new Error("ENV WC_CONSUMER_KEY / WC_CONSUMER_SECRET fehlen.");
+  if (!ck || !cs)
+    throw new Error('ENV WC_CONSUMER_KEY / WC_CONSUMER_SECRET fehlen.');
   return { url, ck, cs };
 }
 
 async function wooRequest<T>(
-  method: "GET" | "POST" | "DELETE" | "PUT" | "PATCH",
+  method: 'GET' | 'POST' | 'DELETE' | 'PUT' | 'PATCH',
   path: string,
   data?: unknown,
   params?: StringMap
@@ -143,11 +148,15 @@ async function wooRequest<T>(
  * Lädt eine lokale Datei via Tool.run ins WP-Medienarchiv
  * und gibt {id, source_url} robust zurück.
  */
-async function uploadViaTool(filePath: string, title: string, alt?: string): Promise<WPAttachment> {
+async function uploadViaTool(
+  filePath: string,
+  title: string,
+  alt?: string
+): Promise<WPAttachment> {
   const filename = path.basename(filePath);
   const mime = guessMimeByExt(filename);
   const buf = await fs.readFile(filePath);
-  const data_base64 = buf.toString("base64");
+  const data_base64 = buf.toString('base64');
 
   const res: unknown = await wpMediaUpload.run({
     filename,
@@ -158,15 +167,20 @@ async function uploadViaTool(filePath: string, title: string, alt?: string): Pro
   });
 
   // Sowohl reine Attachment-Response als auch {status, data}-Wrapper tolerieren
-  const payload = isRecord(res) && "data" in res ? (res as { data: unknown }).data : res;
-  const id = readNum(payload, "id");
+  const payload =
+    isRecord(res) && 'data' in res ? (res as { data: unknown }).data : res;
+  const id = readNum(payload, 'id');
   const source_url =
-    readStr(payload, "source_url") ??
-    (isRecord(payload) && isRecord(payload.guid) ? readStr(payload.guid, "rendered") : undefined) ??
-    readStr(payload, "url");
+    readStr(payload, 'source_url') ??
+    (isRecord(payload) && isRecord(payload.guid)
+      ? readStr(payload.guid, 'rendered')
+      : undefined) ??
+    readStr(payload, 'url');
 
   if (!id || !source_url) {
-    throw new Error(`Unerwartete Medien-Upload-Response: ${JSON.stringify(res).slice(0, 500)}`);
+    throw new Error(
+      `Unerwartete Medien-Upload-Response: ${JSON.stringify(res).slice(0, 500)}`
+    );
   }
   return { id, source_url };
 }
@@ -188,12 +202,12 @@ export async function createDownloadFreebie(opts: CreateFreebieOpts) {
     shortDesc,
     longDesc,
     tags = [],
-    price = "0",
+    price = '0',
   } = opts;
 
-  if (!zipPath) throw new Error("zipPath fehlt.");
-  if (!categoryId) throw new Error("categoryId fehlt.");
-  if (!name) throw new Error("name fehlt.");
+  if (!zipPath) throw new Error('zipPath fehlt.');
+  if (!categoryId) throw new Error('categoryId fehlt.');
+  if (!name) throw new Error('name fehlt.');
 
   // 1) ZIP hochladen (via Tool.run)
   const zip: WPAttachment = await uploadViaTool(zipPath, `${name} – ZIP`);
@@ -209,8 +223,8 @@ export async function createDownloadFreebie(opts: CreateFreebieOpts) {
   const payload: WooProductCreatePayload = {
     name,
     slug: slug ? makeSlug(slug) : makeSlug(name),
-    type: "simple",
-    status: "publish",
+    type: 'simple',
+    status: 'publish',
     virtual: true,
     downloadable: true,
     price,
@@ -234,7 +248,7 @@ export async function createDownloadFreebie(opts: CreateFreebieOpts) {
   }
 
   // 4) Produkt anlegen
-  const product = await wooRequest<WooProduct>("POST", "/products", payload);
+  const product = await wooRequest<WooProduct>('POST', '/products', payload);
 
   return product;
 }

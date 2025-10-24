@@ -2,7 +2,7 @@
 // Node-Builtins: –
 // External: –
 // Local:
-import { wooPost } from "../../tools/woo.js";
+import { wooPost } from '../../tools/woo.js';
 
 export type WooId = number;
 
@@ -11,25 +11,25 @@ export async function createMiniAudit(): Promise<{
   updated: { id: WooId; name?: string };
 }> {
   // 1) Produkt anlegen
-  const createRes = (await wooPost("/products", {
-    name: "Mini-Audit",
-    slug: "mini-audit",
-    type: "simple",
-    status: "publish",
+  const createRes = (await wooPost('/products', {
+    name: 'Mini-Audit',
+    slug: 'mini-audit',
+    type: 'simple',
+    status: 'publish',
     virtual: true,
     downloadable: false,
     manage_stock: false,
-    regular_price: "50",
-    catalog_visibility: "visible",
+    regular_price: '50',
+    catalog_visibility: 'visible',
     categories: [{ id: 51 }], // Audits
     tags: [
-      { name: "Mini-Audit" },
-      { name: "Website-Audit" },
-      { name: "SEO-Check" },
-      { name: "UX-Review" },
-      { name: "Performance-Analyse" },
-      { name: "Conversion-Optimierung" },
-      { name: "Social-Media-Audit" },
+      { name: 'Mini-Audit' },
+      { name: 'Website-Audit' },
+      { name: 'SEO-Check' },
+      { name: 'UX-Review' },
+      { name: 'Performance-Analyse' },
+      { name: 'Conversion-Optimierung' },
+      { name: 'Social-Media-Audit' },
     ],
   })) as any;
 
@@ -37,7 +37,7 @@ export async function createMiniAudit(): Promise<{
 
   // 2) Beschreibung setzen
   const short_description =
-    "Kompakte Analyse deiner Website & Social-Profile – 3–5 konkrete Optimierungsschritte. Lieferung in 2 Werktagen.";
+    'Kompakte Analyse deiner Website & Social-Profile – 3–5 konkrete Optimierungsschritte. Lieferung in 2 Werktagen.';
   const description = `
 <h2>🌟 Mini-Audit – Kleine Analyse, große Wirkung</h2>
 <p>Finde schnell heraus, wie du deine Website und Social-Media-Profile nachhaltig verbessern kannst!

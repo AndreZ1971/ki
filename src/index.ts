@@ -1,76 +1,93 @@
 // src/index.ts
-// Vereinfachter CLI-Entry-Point ohne GitHub-Fallback.
-// Führt ausschließlich planAndAct(...) aus und gibt Schritt- und Ergebnisinfos aus.
 
-import "dotenv/config";
-import { planAndAct } from "./agent/planner.js";
-import { logger } from "./logger.js";
+import 'dotenv/config';
 
-type ToolIO = {
-  __tool_output?: unknown;
-  __tool_error?: unknown;
-};
+// Node builtins
+import process from 'node:process';
 
-function asToolIO(v: unknown): ToolIO | undefined {
-  return v && typeof v === "object" ? (v as ToolIO) : undefined;
+// Local modules
+import { planAndAct } from './agent/planner.js';
+
+// ---------- Logging helpers ----------
+function logInfo(msg: string) {
+  console.log(
+    JSON.stringify({
+      level: 30,
+      time: Date.now(),
+      pid: process.pid,
+      hostname: process.env.COMPUTERNAME ?? 'host',
+      msg,
+    })
+  );
 }
 
-async function main() {
-  // kompletten Prompt aus den CLI-Argumenten lesen
-  const goal = process.argv.slice(2).join(" ").trim();
-  if (!goal) {
-    console.log(`
-Verwendung:
-  npm run dev -- "woo_get (GET, path:'/products/categories', params:{ per_page:100 }) und gib id, name, slug aus."
-  npm run dev -- "woo_post (POST, path:'/products', data:{ name:'Mini-Audit', slug:'mini-audit', type:'simple', status:'publish', virtual:true, downloadable:false, regular_price:'50', categories:[{ id:51 }] }) und gib id, permalink, status aus."
-`);
-    process.exit(1);
-  }
+function logSection(title: string) {
+  console.log(`== ${title} ==`);
+}
 
-  logger.info(`Starte Agent mit Ziel:\n${goal}`);
-
-  // minimaler Verlauf – wichtig, damit detectManualWooCommand greifen kann
-  const history: { role: "system" | "user" | "assistant" | "tool"; content: string }[] = [
-    { role: "system", content: "Du bist ein deterministischer KI-Agent für WooCommerce-Aufrufe." },
-    { role: "user", content: goal },
-  ];
-
+function pretty(obj: unknown) {
   try {
-    const { result, steps } = await planAndAct(goal, history);
+    return JSON.stringify(obj, null, 2);
+  } catch {
+    return String(obj);
+  }
+}
 
-    console.log("== Schritte ==");
-    for (const [i, s] of steps.entries()) {
-      console.log(`${i + 1}. ${s.thought ?? ""}${s.tool ? ` (Tool: ${s.tool})` : ""}`);
+// ---------- Runner ----------
+async function main(): Promise<void> {
+  // Nimmt ALLES nach `tsx src/index.ts` als Prompt (inkl. Zeilenumbrüche/Sonderzeichen)
+  const userPrompt = process.argv.slice(2).join(' ').trim();
+  if (!userPrompt) {
+    console.error(
+      'Fehler: Kein Prompt übergeben.\nBeispiel:\n  npm run dev -- "woo_get (GET, path:\'/products/categories\', params:{ per_page:100 }) und gib id, name aus."'
+    );
+    process.exit(1);
+  }
 
-      const io = asToolIO(s.input);
-      if (io && io.__tool_output !== undefined) {
-        const out = io.__tool_output;
-        const preview =
-          typeof out === "string"
-            ? out.slice(0, 300)
-            : JSON.stringify(out, null, 2).slice(0, 300);
-        console.log(`   ↳ Output: ${preview}${preview.length === 300 ? "…" : ""}`);
-      }
-      if (io && io.__tool_error !== undefined) {
-        console.log(`   ↳ ERROR: ${String(io.__tool_error)}`);
-      }
+  logInfo(`Starte Agent mit Ziel:\n${userPrompt}`);
+
+  const history = []; // keine Chat-Historie im CLI
+
+  // 1) Planung und Ausführung
+  try {
+    const { result, steps } = await planAndAct(userPrompt, history);
+
+    // 2) Schritte anzeigen
+    logSection('Ausgeführte Schritte');
+    if (steps.length === 0) {
+      console.log('Keine Schritte ausgeführt (direktes Ergebnis).');
+    } else {
+      steps.forEach((step, i) => {
+        console.log(`${i + 1}. ${step.thought}`);
+        if (step.tool) {
+          console.log(`   ↳ Tool: ${step.tool}`);
+        }
+        if (step.input?.__tool_output) {
+          const outputStr = pretty(step.input.__tool_output);
+          console.log(
+            `   ↳ Output: ${outputStr.slice(0, 200)}${outputStr.length > 200 ? '…' : ''}`
+          );
+        }
+        if (step.input?.__tool_error) {
+          console.log(`   ↳ ERROR: ${step.input.__tool_error}`);
+        }
+      });
     }
 
-    console.log("\n== Ergebnis ==");
-    console.log(typeof result === "string" ? result : JSON.stringify(result, null, 2));
-
-    const usedTools = steps.map((s) => s.tool).filter(Boolean) as string[];
-    if (!usedTools.includes("woo_get") && !usedTools.includes("woo_post")) {
-      console.warn(
-        "\n⚠️  Es wurde kein woo_* Tool ausgeführt – prüfe, ob dein Prompt exakt 'woo_get(...)' oder 'woo_post(...)' enthält (ASCII-Zeichen!)."
-      );
-    }
+    // 3) Ergebnis
+    logSection('Ergebnis');
+    console.log(result);
   } catch (err) {
-    console.error("Fehler:", err instanceof Error ? err.message : String(err));
+    console.error(
+      `Fehler beim Planen: ${err instanceof Error ? err.message : String(err)}`
+    );
     process.exit(1);
   }
 }
 
-main();
-
-
+main().catch((e) => {
+  console.error(
+    `Unerwarteter Fehler: ${e instanceof Error ? e.message : String(e)}`
+  );
+  process.exit(1);
+});

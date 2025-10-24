@@ -1,16 +1,14 @@
 // src/agent/planner.ts
 
-// external (values)
-import OpenAI from "openai";
+// external (values) – nur Typ laden, keine Instanz hier erzeugen!
 
 // internal (values)
-import { toolByName, toolCatalogForSystem } from "./tools.js";
+import { toolByName, toolCatalogForSystem } from './tools.js';
 
 // internal (types)
-import type { Step, AgentMessage } from "../types.js";
-import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
-
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+import type { Step, AgentMessage } from '../types.js';
+import type OpenAI from 'openai';
+import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 
 /** Balanciert einen {...}-Block ab einer Startposition aus.
  *  Erwartet, dass tail[idx] auf '{' zeigt. Gibt den Substring inkl. schließender '}' zurück.
@@ -27,7 +25,7 @@ function extractBalancedObject(tail: string, idx: number): string | null {
     if (inStr) {
       if (escape) {
         escape = false;
-      } else if (ch === "\\") {
+      } else if (ch === '\\') {
         escape = true;
       } else if (ch === inStr) {
         inStr = null;
@@ -40,8 +38,8 @@ function extractBalancedObject(tail: string, idx: number): string | null {
       continue;
     }
 
-    if (ch === "{") depth++;
-    if (ch === "}") {
+    if (ch === '{') depth++;
+    if (ch === '}') {
       depth--;
       if (depth === 0) {
         // inklusive abschließendem '}'
@@ -53,8 +51,11 @@ function extractBalancedObject(tail: string, idx: number): string | null {
 }
 
 /** Sucht im tail nach ", key:{...}" (beliebige Whitespace), extrahiert balancierten Objekt-Block. */
-function findKeyObject(tail: string, key: "params" | "data"): string | undefined {
-  const keyRe = new RegExp(`,\\s*${key}\\s*:\\s*\\{`, "m");
+function findKeyObject(
+  tail: string,
+  key: 'params' | 'data'
+): string | undefined {
+  const keyRe = new RegExp(`,\\s*${key}\\s*:\\s*\\{`, 'm');
   const m = tail.match(keyRe);
   if (!m || m.index === undefined) return undefined;
 
@@ -72,7 +73,7 @@ function normalizeAndParseJSONish(raw?: string): unknown {
   if (!raw) return undefined;
 
   // 1) Quotes vereinheitlichen
-  let s = raw.replace(/'/g, "\"");
+  let s = raw.replace(/'/g, '"');
 
   // 2) Keys quoten: { key: ..., foo_bar-1: ... } -> { "key": ..., "foo_bar-1": ... }
   //    Greift nach { oder , gefolgt von evtl. Whitespace und dann einem Key bis zum Doppelpunkt.
@@ -80,7 +81,7 @@ function normalizeAndParseJSONish(raw?: string): unknown {
   s = s.replace(/([{,]\s*)([A-Za-z_][A-Za-z0-9_-]*)\s*:/g, '$1"$2":');
 
   // 3) Trailing Commas vor } oder ] entfernen
-  s = s.replace(/,\s*([}\]])/g, "$1");
+  s = s.replace(/,\s*([}\]])/g, '$1');
 
   try {
     return JSON.parse(s);
@@ -98,44 +99,66 @@ function normalizeAndParseJSONish(raw?: string): unknown {
  *
  * Gibt { name, args } zurück, die direkt als Tool-Step ausgeführt werden können.
  */
-function detectManualWooCommand(source: string):
-  | {
-      name: "woo_post" | "woo_get";
-      args: {
-        path: string;
-        params?: Record<string, unknown>;
-        data?: Record<string, unknown>;
-        method?: string;
-      };
-    }
-  | null {
-  if (!source) return null;
-  const text = source.trim();
+function detectManualWooCommand(source: string | string[]): {
+  name: 'woo_post' | 'woo_get';
+  args: {
+    path: string;
+    params?: Record<string, unknown>;
+    data?: Record<string, unknown>;
+    method?: string;
+  };
+} | null {
+  // FIX: Sicherstellen, dass source ein String ist
+  const text = Array.isArray(source)
+    ? source.join(' ')
+    : typeof source === 'string'
+      ? source
+      : String(source);
 
-  // Path mit ' oder " | params/data in beliebiger Reihenfolge
-  // Wir parsen den "Tail" zwischen path:... und der schließenden Klammer separat.
+  if (!text) return null;
+  const trimmedText = text.trim();
+
+  // VERBESSERTE Regex: Flexibler für verschiedene Formatierungen
   const re =
-    /woo_(post|get)\s*\(\s*([A-Z]+)\s*,\s*path:\s*(?:'([^']+)'|"([^"]+)")([\s\S]*?)\)/m;
-  const match = text.match(re);
+    /woo_(post|get)\s*\(\s*([A-Z]+)\s*,\s*path\s*:\s*(?:'([^']+)'|"([^"]+)"|`([^`]+)`)([\s\S]*?)\)/i;
+
+  const match = trimmedText.match(re);
+
+  // DEBUG: Zeige was gefunden wurde
+  if (match) {
+    console.log('DEBUG: Manual command detected:', match[0]);
+  } else {
+    console.log(
+      'DEBUG: No manual command found in:',
+      trimmedText.slice(0, 100) + '...'
+    );
+  }
+
   if (!match) return null;
 
-  const [, kind, method, path1, path2, tail] = match as [
+  const [, kind, method, path1, path2, path3, tail] = match as [
     string,
-    "post" | "get",
+    'post' | 'get',
     string,
     string | undefined,
     string | undefined,
-    string
+    string | undefined,
+    string,
   ];
-  const path = path1 ?? path2 ?? "";
+
+  const path = path1 ?? path2 ?? path3 ?? '';
 
   // params:{...} und data:{...} unabhängig von der Reihenfolge & balanciert extrahieren
-  const paramsRaw = findKeyObject(tail, "params");
-  const dataRaw = findKeyObject(tail, "data");
+  const paramsRaw = findKeyObject(tail, 'params');
+  const dataRaw = findKeyObject(tail, 'data');
 
-  const params = normalizeAndParseJSONish(paramsRaw) as Record<string, unknown> | undefined;
-  const data = normalizeAndParseJSONish(dataRaw) as Record<string, unknown> | undefined;
-  const name = kind === "post" ? "woo_post" : "woo_get";
+  const params = normalizeAndParseJSONish(paramsRaw) as
+    | Record<string, unknown>
+    | undefined;
+  const data = normalizeAndParseJSONish(dataRaw) as
+    | Record<string, unknown>
+    | undefined;
+  const name = kind === 'post' ? 'woo_post' : 'woo_get';
 
   return {
     name,
@@ -148,30 +171,58 @@ function detectManualWooCommand(source: string):
   };
 }
 
+/** OpenAI Client nur bei Bedarf & nur wenn API-Key gesetzt ist */
+async function getOpenAIClient(): Promise<OpenAI | null> {
+  const key = process.env.OPENAI_API_KEY?.trim();
+  if (!key) return null;
+  const { default: OpenAICtor } = await import('openai');
+  // @ts-expect-error: ctor typing from dynamic import
+  return new OpenAICtor({ apiKey: key }) as OpenAI;
+}
+
 export async function planAndAct(
-  goal: string,
-  history: AgentMessage[]
+  goal: string | string[],
+  history?: AgentMessage[]
 ): Promise<{ result: string; steps: Step[] }> {
+  // FIX: Sicherstellen, dass goal ein String ist
+  const goalText = Array.isArray(goal)
+    ? goal.join(' ')
+    : typeof goal === 'string'
+      ? goal
+      : String(goal);
+
+  console.log('DEBUG: Processing goal:', goalText.slice(0, 200) + '...');
+
+  // FIX: Sicherstellen, dass history definiert ist
+  const safeHistory = history || [];
+
   // ---------- 1) Harte Abkürzung: manuelles woo_* Kommando erkannt ----------
-  const manualFromGoal = detectManualWooCommand(goal);
+  const manualFromGoal = detectManualWooCommand(goalText);
 
   // Optional: auch die jüngste User-Nachricht durchsuchen (robuster bei unterschiedlichen Aufrufern)
-  let manualFromHistory: ReturnType<typeof detectManualWooCommand> | null = null;
-  for (let i = history.length - 1; i >= 0; i--) {
-    const m = history[i];
-    if (m && m.role === "user") {
+  let manualFromHistory: ReturnType<typeof detectManualWooCommand> | null =
+    null;
+  for (let i = safeHistory.length - 1; i >= 0; i--) {
+    const m = safeHistory[i];
+    if (m && m.role === 'user') {
       manualFromHistory = detectManualWooCommand(m.content);
       if (manualFromHistory) break;
     }
   }
 
   const manual = manualFromGoal ?? manualFromHistory;
+
   if (manual) {
+    console.log(
+      'DEBUG: Executing manual command:',
+      manual.name,
+      manual.args.path
+    );
+
     const steps: Step[] = [];
     const tool = toolByName(manual.name);
 
     if (!tool) {
-      // Sollte praktisch nicht vorkommen – schützt aber vor Fehlkonfigurationen
       steps.push({
         thought: `Manuelles Kommando erkannt, aber Tool "${manual.name}" nicht registriert.`,
         tool: null,
@@ -186,17 +237,22 @@ export async function planAndAct(
     try {
       const output = await tool.run(manual.args ?? {});
       steps.push({
-        thought: `Manuelles Woo-Kommando ausgeführt: ${manual.name} ${manual.args?.path ?? ""}`,
+        thought: `Manuelles Woo-Kommando ausgeführt: ${manual.name} ${manual.args?.path ?? ''}`,
         tool: manual.name,
         input: { ...(manual.args ?? {}), __tool_output: output },
       });
 
       const result =
-        typeof output === "string" ? output : JSON.stringify(output, null, 2);
+        typeof output === 'string' ? output : JSON.stringify(output, null, 2);
 
       return { result, steps };
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : typeof e === "string" ? e : "Unknown error";
+      const msg =
+        e instanceof Error
+          ? e.message
+          : typeof e === 'string'
+            ? e
+            : 'Unknown error';
       steps.push({
         thought: `Fehler bei manueller Woo-Ausführung: ${manual.name}`,
         tool: manual.name,
@@ -206,8 +262,29 @@ export async function planAndAct(
     }
   }
 
-  // ---------- 2) LLM-Planung (Fallback unverändert) ----------
-  const systemPrompt = `Du bist ein KI-Agent. Ziel: "${goal}".
+  console.log(
+    'DEBUG: No manual command detected, falling back to LLM planning'
+  );
+
+  // ---------- 2) LLM-Planung (nur wenn OPENAI_API_KEY vorhanden) ----------
+  const client = await getOpenAIClient();
+  if (!client) {
+    // Kein Key → sauberer, nicht-blockierender Fallback
+    const steps: Step[] = [
+      {
+        thought: 'OPENAI_API_KEY nicht gesetzt – LLM-Planung übersprungen.',
+        tool: null,
+        input: {},
+      },
+    ];
+    return {
+      result:
+        'LLM-Planung deaktiviert. Bitte manuelles woo_* verwenden oder OPENAI_API_KEY setzen.',
+      steps,
+    };
+  }
+
+  const systemPrompt = `Du bist ein KI-Agent. Ziel: "${goalText}".
 Dir stehen Tools zur Verfügung:
 ${toolCatalogForSystem()}
 
@@ -223,26 +300,27 @@ Hinweise:
 - Wenn du per http_get JSON erhältst, nutze "json_pick", um konkrete Felder (z. B. "stargazers_count") zu extrahieren.
 - Fasse dich im "final_answer" kurz und nenne das Ergebnis prägnant (z. B. "Stars: 123456").`;
 
-  const coreHistory: Array<{ role: "system" | "user"; content: string }> = history
-    .filter((m) => m.role === "system" || m.role === "user")
-    .map((m) => ({ role: m.role as "system" | "user", content: m.content }));
+  const coreHistory: Array<{ role: 'system' | 'user'; content: string }> =
+    safeHistory
+      .filter((m) => m.role === 'system' || m.role === 'user')
+      .map((m) => ({ role: m.role as 'system' | 'user', content: m.content }));
 
   const messages: ChatCompletionMessageParam[] = [
-    { role: "system", content: systemPrompt },
+    { role: 'system', content: systemPrompt },
     ...coreHistory,
-    { role: "user", content: "Starte die Bearbeitung des Ziels." },
+    { role: 'user', content: 'Starte die Bearbeitung des Ziels.' },
   ];
 
-  const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
+  const model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
 
   const completion = await client.chat.completions.create({
     model,
     temperature: 0.2,
-    response_format: { type: "json_object" },
+    response_format: { type: 'json_object' },
     messages,
   });
 
-  const content = completion.choices[0]?.message?.content ?? "{}";
+  const content = completion.choices[0]?.message?.content ?? '{}';
   let parsed: { steps?: Step[]; final_answer?: string } = {};
   try {
     parsed = JSON.parse(content);
@@ -263,7 +341,7 @@ Hinweise:
     if (!tool) {
       executed.push({
         ...s,
-        thought: `${s.thought ?? ""} (Unbekanntes Tool)`,
+        thought: `${s.thought ?? ''} (Unbekanntes Tool)`,
       });
       continue;
     }
@@ -276,7 +354,11 @@ Hinweise:
       });
     } catch (e: unknown) {
       const msg =
-        e instanceof Error ? e.message : typeof e === "string" ? e : "Unknown error";
+        e instanceof Error
+          ? e.message
+          : typeof e === 'string'
+            ? e
+            : 'Unknown error';
       executed.push({
         ...s,
         input: { ...(s.input ?? {}), __tool_error: String(msg) },
@@ -284,6 +366,6 @@ Hinweise:
     }
   }
 
-  const final_answer = parsed.final_answer ?? "Kein final_answer erhalten.";
+  const final_answer = parsed.final_answer ?? 'Kein final_answer erhalten.';
   return { result: final_answer, steps: executed };
 }
