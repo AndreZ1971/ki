@@ -176,7 +176,7 @@ async function getOpenAIClient(): Promise<OpenAI | null> {
   const key = process.env.OPENAI_API_KEY?.trim();
   if (!key) return null;
   const { default: OpenAICtor } = await import('openai');
-  // @ts-expect-error: ctor typing from dynamic import
+  
   return new OpenAICtor({ apiKey: key }) as OpenAI;
 }
 

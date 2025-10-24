@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  ki-agent:
+    build: .
+    container_name: woo-ki-agent
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - LOG_LEVEL=info
+    env_file:
+      - .env.production
+    volumes:
+      - ./data:/app/data:rw
+      - ./logs:/app/logs:rw
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Watchtower für automatische Updates
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 300 --cleanup
+    restart: unless-stopped

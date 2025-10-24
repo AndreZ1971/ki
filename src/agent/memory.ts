@@ -1,14 +1,28 @@
-import type { AgentMessage } from '../types.js';
-
 export class Memory {
-  private history: AgentMessage[] = [];
-  push(msg: AgentMessage) {
-    this.history.push(msg);
+  private messages: any[] = [];
+  private maxSize: number;
+
+  constructor(maxSize: number = 200) {
+    this.maxSize = maxSize;
   }
-  all() {
-    return this.history;
+
+  push(message: any): void {
+    this.messages.push(message);
+    // Evtl. Größe begrenzen
+    if (this.messages.length > this.maxSize) {
+      this.messages = this.messages.slice(-this.maxSize);
+    }
   }
-  last(n = 10) {
-    return this.history.slice(-n);
+
+  all(): any[] {
+    return this.messages;
+  }
+
+  size(): number {
+    return this.messages.length;
+  }
+
+  clear(): void {
+    this.messages = [];
   }
 }
