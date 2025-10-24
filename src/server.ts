@@ -1,8 +1,8 @@
-import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import dotenv from 'dotenv'; // 🔥 FEHLENDEN IMPORT HINZUGEFÜGT
+import Fastify from 'fastify';
 
 // 🔥 Umgebungsvariablen laden mit erweiterter Fehlerbehandlung
 dotenv.config();
