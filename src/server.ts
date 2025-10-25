@@ -64,30 +64,34 @@ async function buildServer() {
       transport: {
         target: 'pino-pretty'
       }
-    }
+    },
+    // 🔥 FIX: Body Limit erhöhen
+    bodyLimit: 1048576 * 10, // 10MB
   });
 
   try {
     // 🔥 SWAGGER zuerst registrieren
     await server.register(swagger, {
-      swagger: {
-        info: {
-          title: 'WooCommerce AI Agent API',
-          description: 'API für WooCommerce Integration mit AI-Funktionen',
-          version: '1.0.0'
-        },
-        host: 'localhost:3000',
-        schemes: ['http'],
-        consumes: ['application/json'],
-        produces: ['application/json'],
-        tags: [
-          { name: 'woocommerce', description: 'WooCommerce Operations' },
-          { name: 'memory', description: 'Agent Memory Management' },
-          { name: 'system', description: 'System Operations' },
-          { name: 'product-optimizer', description: 'AI Product Optimization' } // 🔥 NEUER TAG
-        ]
-      }
-    });
+  swagger: {
+    info: {
+      title: 'WooCommerce AI Agent API',
+      description: 'API für WooCommerce Integration mit AI-Funktionen',
+      version: '1.0.0'
+    },
+    host: 'localhost:3000',
+    schemes: ['http'],
+    consumes: ['application/json'],
+    produces: ['application/json'],
+    tags: [
+  { name: 'woocommerce', description: 'WooCommerce Operations' },
+  { name: 'memory', description: 'Agent Memory Management' },
+  { name: 'system', description: 'System Operations' },
+  { name: 'product-optimizer', description: 'AI Product Optimization' },
+  { name: 'reviews', description: 'Review Analysis & Sentiment' },
+  { name: 'ai', description: 'AI Content Generation' } // 🔥 NEU
+]
+  }
+});
 
     await server.register(swaggerUi, {
       routePrefix: '/documentation',
@@ -104,21 +108,25 @@ async function buildServer() {
     });
 
     // Routes - MIT DYNAMIC IMPORTS für besseres Error Handling
-    try {
-      const { default: wooCommerceRoutes } = await import('./routes/woocommerce.js');
-      const { default: memoryRoutes } = await import('./routes/memory.js');
-      const { default: systemRoutes } = await import('./routes/system.js');
-      const { default: productOptimizerRoutes } = await import('./routes/product-optimizer.js'); // 🔥 NEU
-      
-      await server.register(wooCommerceRoutes);
-      await server.register((instance) => memoryRoutes(instance, agentMemory));
-      await server.register((instance) => systemRoutes(instance, getMemorySize));
-      await server.register(productOptimizerRoutes, { prefix: '/product-optimizer' });
-      
-      console.log('✅ Alle Routes erfolgreich registriert');
-    } catch (routeError) {
-      console.error('❌ Fehler beim Registrieren der Routes:', routeError);
-    }
+try {
+  const { default: wooCommerceRoutes } = await import('./routes/woocommerce.js');
+  const { default: memoryRoutes } = await import('./routes/memory.js');
+  const { default: systemRoutes } = await import('./routes/system.js');
+  const { default: productOptimizerRoutes } = await import('./routes/product-optimizer.js');
+  const { default: reviewsRoutes } = await import('./routes/reviews.js');
+  const { default: aiEmailRoutes } = await import('./routes/ai-email.js'); // 🔥 NEU
+  
+  await server.register(wooCommerceRoutes);
+  await server.register((instance) => memoryRoutes(instance, agentMemory));
+  await server.register((instance) => systemRoutes(instance, getMemorySize));
+  await server.register(productOptimizerRoutes, { prefix: '/product-optimizer' });
+  await server.register(reviewsRoutes, { prefix: '/reviews' });
+  await server.register(aiEmailRoutes, { prefix: '/ai' }); // 🔥 NEU
+  
+  console.log('✅ Alle Routes erfolgreich registriert');
+} catch (routeError) {
+  console.error('❌ Fehler beim Registrieren der Routes:', routeError);
+}
 
     // Global Error Handler
     server.setErrorHandler((error, request, reply) => {
