@@ -48,6 +48,10 @@ async function loadJobModule(name: string): Promise<UnknownModule> {
     case 'createFreebie':
       return await import('./createFreebie');
 
+    // ─── Trend Analysis Job ───────────────────────────────────────────────────
+    case 'trendAnalysis':
+      return await import('./trendAnalysis');
+
     // ─── Neue Woo-Jobs ────────────────────────────────────────────────────────
     case 'wooListCategories':
       // Listet Woo-Kategorien (z.B. zur ID-Ermittlung)
@@ -63,7 +67,7 @@ async function loadJobModule(name: string): Promise<UnknownModule> {
 
     default:
       throw new Error(
-        `Unbekannter JOB "${name}". Unterstützt: createFreebie, wooListCategories, wooCreateProduct, wooUpdateProduct`
+        `Unbekannter JOB "${name}". Unterstützt: createFreebie, trendAnalysis, wooListCategories, wooCreateProduct, wooUpdateProduct`
       );
   }
 }
