@@ -1,7 +1,7 @@
 // backend/agent/jobs/autoProductCreator.ts
 import { trendAnalysisJob } from './trendAnalysis';
-//import { createFreebieJob } from './createFreebie';
 import { TrendData } from './trendAnalysis';
+import { wooPost } from '../../tools/woo';
 
 export interface AutoProductConfig {
   keyword: string;
@@ -82,34 +82,74 @@ export async function autoProductCreatorJob(config?: Partial<AutoProductConfig>)
  * Erstellt ein WooCommerce-Produkt aus einem Trend
  */
 async function createProductFromTrend(trend: TrendData, autoPublish: boolean = false) {
-  // Produkt-Daten aus Trend generieren
+  const productPrice = calculateOptimalPrice(trend.priceRange);
+  
+  // ✅ KORREKTE VIRTUELLE PRODUKT-KONFIGURATION
   const productData = {
     name: generateProductName(trend.niche),
     description: generateProductDescription(trend),
-    shortDescription: generateShortDescription(trend),
-    price: calculateOptimalPrice(trend.priceRange),
-    categories: determineCategories(trend),
-    tags: trend.keywords,
-    // ... weitere WooCommerce Felder
+    short_description: generateShortDescription(trend),
+    regular_price: productPrice.toString(),
+    categories: determineCategories(trend, productPrice),
+    tags: trend.keywords.map(keyword => ({ name: keyword })),
+    type: 'simple',
+    status: autoPublish ? 'publish' : 'draft',
+    
+    // 🔥 WICHTIG: VIRTUELLE PRODUKTE KONFIGURIEREN
+    virtual: true,
+    downloadable: true,
+    manage_stock: false,
+    stock_status: 'instock',
+    sold_individually: false,
+    
+    // 🚫 VERSAND DEAKTIVIEREN
+    shipping_class: '',
+    shipping_class_id: 0
   };
 
-  // Hier würden wir createFreebieJob anpassen für bezahlte Produkte
-  // Für jetzt: Platzhalter
-  console.log(`📦 Würde erstellen: "${productData.name}" für €${productData.price}`);
-  
-  return {
-    name: productData.name,
-    price: productData.price,
-    trend: trend.niche,
-    status: 'simulated' // Später: 'published' oder 'draft'
-  };
+  try {
+    console.log(`🔐 Versuche SICHERE WooCommerce-Integration...`);
+    console.log(`🛒 Erstelle: "${productData.name}" für €${productData.regular_price}`);
+    console.log(`📁 Kategorie: ${JSON.stringify(productData.categories)}`);
+    console.log(`⚡ Virtual: ${productData.virtual}, Downloadable: ${productData.downloadable}`);
+    
+    // 1. WOCOMMERCE VERSUCH
+    const createdProduct = await wooPost('/products', productData);
+    const productId = (createdProduct as any).id;
+    
+    console.log(`✅ WOOCOMMERCE ERFOLG! Produkt #${productId} erstellt`);
+    
+    return {
+      name: productData.name,
+      price: productPrice,
+      trend: trend.niche,
+      status: autoPublish ? 'published' : 'draft',
+      wooCommerceId: productId,
+      source: 'woocommerce',
+      categories: productData.categories
+    };
+    
+  } catch (error) {
+    // 2. SICHERER FALLBACK
+    console.warn(`⚠️ WooCommerce fehlgeschlagen, verwende Simulation`);
+    console.log(`📦 Simuliertes Produkt: "${productData.name}"`);
+    
+    return {
+      name: productData.name,
+      price: productPrice,
+      trend: trend.niche,
+      status: 'simulated',
+      source: 'simulation',
+      categories: productData.categories,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
+  }
 }
 
 /**
  * Generiert einen Produktnamen aus dem Trend
  */
 function generateProductName(trendNiche: string): string {
-  // Später: OpenAI für kreative Namen nutzen
   const prefixes = ['Premium', 'Ultimate', 'Pro', 'Expert', 'Complete'];
   const suffix = prefixes[Math.floor(Math.random() * prefixes.length)];
   return `${suffix} ${trendNiche}`;
@@ -135,18 +175,64 @@ function generateShortDescription(trend: TrendData): string {
 }
 
 /**
- Optimalen Preis berechnen
+ * Optimalen Preis berechnen
  */
 function calculateOptimalPrice(priceRange: { min: number; max: number }): number {
-  // Strategie: Mittlerer bis oberer Bereich für bessere Margen
-  return Math.round((priceRange.min + priceRange.max) / 2 / 5) * 5; // Auf 5er-Stufen runden
+  return Math.round((priceRange.min + priceRange.max) / 2 / 5) * 5;
 }
 
 /**
- Kategorien bestimmen
+ * INTELLIGENTE Kategorien für VIRTUELLE PRODUKTE
  */
-function determineCategories(trend: TrendData): number[] {
-  // Hier Kategorie-IDs basierend auf Trend-Inhalt
-  // Für jetzt: Standard-Kategorie
-  return [15]; // Beispiel-Kategorie-ID
+function determineCategories(trend: TrendData, price: number): { id: number }[] {
+  const niche = trend.niche.toLowerCase();
+  const keywords = trend.keywords.join(' ').toLowerCase();
+  
+  console.log(`🔍 Analysiere Kategorie für: "${trend.niche}"`);
+  console.log(`💰 Preis: €${price} | Keywords: ${trend.keywords.join(', ')}`);
+
+  // 1. FREEBIES (0€ Produkte)
+  if (price === 0) {
+    console.log(`🎯 Zuordnung: Freebies (ID: 15) - Kostenloses Produkt`);
+    return [{ id: 15 }]; // Freebies
+  }
+
+  // 2. BITCOIN/KRYPTO
+  if (niche.includes('bitcoin') || niche.includes('krypto') || 
+      niche.includes('blockchain') || keywords.includes('crypto')) {
+    console.log(`🎯 Zuordnung: Online-Kurse (ID: 145) - Krypto/Blockchain`);
+    return [{ id: 145 }]; // Online-Kurse
+  }
+  
+  // 3. AUDITS & SERVICES
+  else if (niche.includes('audit') || niche.includes('analyse') || 
+           niche.includes('review') || keywords.includes('service')) {
+    console.log(`🎯 Zuordnung: Audits (ID: 51) - Service/Consulting`);
+    return [{ id: 51 }]; // Audits
+  }
+  
+  // 4. BUNDLES & PAKETE
+  else if (niche.includes('bundle') || niche.includes('paket') || 
+           niche.includes('complete') || keywords.includes('package')) {
+    console.log(`🎯 Zuordnung: Bundles (ID: 52) - Produkt-Paket`);
+    return [{ id: 52 }]; // Bundles
+  }
+  
+  // 5. KITS & TEMPLATES (DevStarter etc.)
+  else if (niche.includes('kit') || niche.includes('template') || 
+           niche.includes('starter') || niche.includes('setup') ||
+           keywords.includes('development') || keywords.includes('code')) {
+    console.log(`🎯 Zuordnung: Kits & Templates (ID: 53) - Development`);
+    return [{ id: 53 }]; // Kits & Templates
+  }
+  
+  // 6. ONLINE-KURSE (Fallback für bezahlte Inhalte)
+  else if (price > 0) {
+    console.log(`🎯 Zuordnung: Online-Kurse (ID: 145) - Bezahltes Produkt`);
+    return [{ id: 145 }]; // Online-Kurse
+  }
+
+  // 7. FALLBACK: Freebies
+  console.log(`⚠️ Keine spezifische Kategorie, verwende Freebies (ID: 15)`);
+  return [{ id: 15 }];
 }
