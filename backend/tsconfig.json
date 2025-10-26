@@ -9,7 +9,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "./",  // Geändert von "./src" zu "./"
     "resolveJsonModule": true,
     "declaration": false,
     "removeComments": true,
@@ -17,6 +17,6 @@
     "allowImportingTsExtensions": false,
     "verbatimModuleSyntax": false
   },
-  "include": ["src/**/*"],
+  "include": ["**/*.ts"],  // Geändert von "src/**/*" zu "**/*.ts"
   "exclude": ["node_modules", "dist"]
 }

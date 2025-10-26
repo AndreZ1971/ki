@@ -1,0 +1,129 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  text-align: center;
+  width: 100%;
+}
+
+.App-header {
+  margin-bottom: 40px;
+  color: white;
+}
+
+.App-header h1 {
+  font-size: 3rem;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.App-header p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+/* Email Generator Styles */
+.email-generator {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 600px;
+}
+
+.email-generator h2 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+}
+
+.email-generator form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.email-generator form > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.email-generator label {
+  font-weight: 600;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.email-generator input,
+.email-generator select {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e1e5e9;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.email-generator input:focus,
+.email-generator select:focus {
+  outline: none;
+  border-color: #007acc;
+}
+
+.email-generator button {
+  padding: 14px;
+  background: linear-gradient(135deg, #007acc, #005a9e);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-top: 10px;
+}
+
+.email-generator button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,122,204,0.3);
+}
+
+.email-generator button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.result {
+  background: #f8f9fa;
+  padding: 25px;
+  border-radius: 8px;
+  margin-top: 25px;
+  text-align: left;
+  border-left: 4px solid #007acc;
+}
+
+.result h3 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.result h4 {
+  color: #555;
+  margin: 15px 0 10px 0;
+}
+
+.result ul {
+  padding-left: 20px;
+}
+
+.result li {
+  margin-bottom: 5px;
+  color: #666;
+}
