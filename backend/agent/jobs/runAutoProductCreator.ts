@@ -16,15 +16,25 @@ async function main() {
       h: 'help'
     },
     default: {
-      keyword: 'digitale produkte',
-      geo: 'DE',
-      'max-products': '3',
-      'min-score': '70',
-      'max-competition': '40',
-      'auto-publish': false,
-      help: false
-    }
+  keyword: 'datenschutz lösungen',  // 👈 Direkt ändern
+  geo: 'DE',
+  'max-products': '2',
+  'min-score': '40',    // 👈 Stark reduzieren
+  'max-competition': '70', // 👈 Stark erhöhen
+  'auto-publish': false,
+  help: false
+}
   });
+
+  // 🔍 DEBUG: Parameter-Überprüfung
+  console.log('\n🔧 CLI PARAMETER-ANALYSE:');
+  console.log('Empfangene Argumente:', process.argv.slice(2));
+  console.log('Parsed argv:', argv);
+  console.log(`Suchbegriff: "${argv.keyword}"`);
+  console.log(`Region: ${argv.geo}`);
+  console.log(`Max Produkte: ${argv['max-products']}`);
+  console.log(`Auto-Publish: ${argv['auto-publish']}`);
+  console.log('=' .repeat(50));
 
   // Manuell in Zahlen konvertieren
   const maxProducts = parseInt(argv['max-products'] as string);
@@ -33,13 +43,13 @@ async function main() {
 
   if (argv.help) {
     console.log(`
-🛒 Auto Product Creator CLI
+🛒 Auto Product Creator CLI - DEUTSCHER FOKUS
 
 Usage:
   npm run auto-product -- [options]
 
 Options:
-  --keyword, -k          Suchbegriff (default: "digitale produkte")
+  --keyword, -k          Suchbegriff (default: "dsgvo konforme software")
   --geo, -g              Region (default: "DE")
   --max-products, -m     Maximale Produkte (default: 3)
   --min-score, -s        Minimaler Demand Score (default: 70)
@@ -47,15 +57,17 @@ Options:
   --auto-publish, -p     Automatisch veröffentlichen (default: false)
   --help, -h             Hilfe anzeigen
 
-Examples:
-  npm run auto-product -- --keyword "online courses" --max-products 5
-  npm run auto-product -- -k "software tools" -s 80 -c 30
+Beispiele:
+  npm run auto-product -- --keyword "datenschutz lösungen" --max-products 5
+  npm run auto-product -- -k "deutsche software" -s 80 -c 30
   npm run auto-product -- --auto-publish
     `);
     process.exit(0);
   }
 
   try {
+    console.log('🚀 Starte deutsche Produkt-Kreation...');
+    
     const result = await autoProductCreatorJob({
       keyword: argv.keyword as string,
       geo: argv.geo as string,
@@ -65,7 +77,7 @@ Examples:
       autoPublish: argv['auto-publish'] as boolean
     });
 
-    console.log('\n🎉 AUTOMATISCHE PRODUKT-KREATION ABGESCHLOSSEN!');
+    console.log('\n🎉 DEUTSCHE PRODUKT-KREATION ABGESCHLOSSEN!');
     
     if (result) {
       console.log(`📊 Analysierte Trends: ${result.analyzedTrends}`);
@@ -76,12 +88,15 @@ Examples:
         console.log('\n📦 Erstellte Produkte:');
         result.products.forEach((product, index) => {
           console.log(`  ${index + 1}. ${product.name} - €${product.price} (${product.status})`);
+          if (product.categories) {
+            console.log(`     📁 Kategorien: ${JSON.stringify(product.categories)}`);
+          }
         });
       }
     }
     
   } catch (error) {
-    console.error('❌ Fehler bei automatischer Produkt-Kreation:', error);
+    console.error('❌ Fehler bei deutscher Produkt-Kreation:', error);
     process.exit(1);
   }
 }
