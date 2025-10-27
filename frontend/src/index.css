@@ -1,3 +1,4 @@
+/* src/index.css - ANPASSEN */
 /* Complete Reset */
 * {
   margin: 0;
@@ -9,7 +10,8 @@ body {
   margin: 0;
   padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* GRADIENT ENTFERNEN oder durch dunklen ersetzen */
+  background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -18,5 +20,5 @@ body {
 
 #root {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px;
 }
