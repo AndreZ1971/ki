@@ -11,7 +11,7 @@ export class WooCommerceService {
     const consumerSecret = process.env.WOOCOMMERCE_CONSUMER_SECRET;
     
     if (!baseUrl || !consumerKey || !consumerSecret) {
-      console.warn('⚠️ WooCommerce API nicht konfiguriert - bitte WOOCOMMERCE_URL, WOOCOMMERCE_CONSUMER_KEY und WOOCOMMERCE_CONSUMER_SECRET in .env setzen');
+      // console.warn('⚠️ WooCommerce API nicht konfiguriert - bitte WOOCOMMERCE_URL, WOOCOMMERCE_CONSUMER_KEY und WOOCOMMERCE_CONSUMER_SECRET in .env setzen');
       this.isConfigured = false;
       // Dummy-Werte zuweisen, um TypeScript-Fehler zu vermeiden
       this.baseUrl = '';

@@ -177,7 +177,7 @@ async function getOpenAIClient(): Promise<OpenAI | null> {
   if (!key) return null;
   const { default: OpenAICtor } = await import('openai');
   
-  return new OpenAICtor({ apiKey: key }) as OpenAI;
+ return new OpenAICtor({ apiKey: key }) as unknown as OpenAI;
 }
 
 export async function planAndAct(

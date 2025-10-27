@@ -1,28 +1,28 @@
 import { FastifyInstance } from 'fastify';
 import OpenAI from 'openai';
 
-// OpenAI Client mit besserem Error Handling
-let openai: OpenAI;
+// ✅ Korrekte lazy Initialisierung
+let openai: OpenAI | null = null;
 
-try {
-  // Prüfe ob API Key vorhanden und gültig ist
-  const apiKey = process.env.OPENAI_API_KEY;
+function initializeOpenAI() {
+  if (openai !== null) return openai; // Bereits initialisiert
   
-  // 🔥 KORRIGIERTE PRÜFUNG mit Debug-Info
-  console.log(`[Woocommerce] OpenAI Key Check - Vorhanden: ${!!apiKey}, Länge: ${apiKey?.length || 0}`);
-  
-  if (!apiKey || apiKey.trim() === '' || !apiKey.startsWith('sk-')) {
-    console.warn('⚠️  OpenAI API Key nicht korrekt konfiguriert. AI-Funktionen werden nicht verfügbar sein.');
-    openai = null as any;
-  } else {
-    openai = new OpenAI({
-      apiKey: apiKey
-    });
-    console.log('✅ OpenAI Client erfolgreich initialisiert');
+  try {
+    const apiKey = process.env.OPENAI_API_KEY; // ✅ Jetzt ist process.env geladen!
+    
+    if (!apiKey || apiKey.trim() === '' || !apiKey.startsWith('sk-')) {
+      console.warn('⚠️ OpenAI API Key nicht konfiguriert');
+      openai = null;
+    } else {
+      openai = new OpenAI({ apiKey });
+      console.log('✅ OpenAI Client erfolgreich initialisiert');
+    }
+  } catch (error) {
+    console.error('❌ Fehler bei OpenAI Initialisierung:', error);
+    openai = null;
   }
-} catch (error) {
-  console.error('❌ Fehler bei OpenAI Initialisierung:', error);
-  openai = null as any;
+  
+  return openai;
 }
 
 // Einfache WooCommerce Client Implementierung
@@ -32,12 +32,32 @@ class WooCommerceClient {
   private consumerSecret: string;
 
   constructor() {
-    this.baseUrl = process.env.WOOCOMMERCE_URL || 'https://your-store.com/wp-json/wc/v3';
-    this.consumerKey = process.env.CONSUMER_KEY || 'ck_your_consumer_key'; // 🔥 KORRIGIERT: CONSUMER_KEY statt WOOCOMMERCE_CONSUMER_KEY
-    this.consumerSecret = process.env.CONSUMER_SECRET || 'cs_your_consumer_secret'; // 🔥 KORRIGIERT: CONSUMER_SECRET statt WOOCOMMERCE_CONSUMER_SECRET
+    // 🔥 KORRIGIERT: Verwende die korrekten Environment Variable Namen
+    this.baseUrl = process.env.WOOCOMMERCE_URL || '';
+    this.consumerKey = process.env.WOOCOMMERCE_CONSUMER_KEY || process.env.CONSUMER_KEY || '';
+    this.consumerSecret = process.env.WOOCOMMERCE_CONSUMER_SECRET || process.env.CONSUMER_SECRET || '';
+    
+    // Prüfe Konfiguration beim Start
+    this.validateConfig();
+  }
+
+  private validateConfig() {
+    const isValid = !!(this.baseUrl && this.consumerKey && this.consumerSecret);
+    console.log(`[WooCommerce] Config Check - URL: ${!!this.baseUrl}, Key: ${!!this.consumerKey}, Secret: ${!!this.consumerSecret}`);
+    
+    if (!isValid) {
+      console.warn('⚠️ WooCommerce API nicht korrekt konfiguriert - bitte WOOCOMMERCE_URL, WOOCOMMERCE_CONSUMER_KEY und WOOCOMMERCE_CONSUMER_SECRET in .env setzen');
+    } else {
+      console.log('✅ WooCommerce Client erfolgreich konfiguriert');
+    }
   }
 
   private async makeRequest(endpoint: string, options: any = {}) {
+    // Prüfe ob Konfiguration vorhanden ist
+    if (!this.baseUrl || !this.consumerKey || !this.consumerSecret) {
+      throw new Error('WooCommerce API nicht konfiguriert. Bitte WOOCOMMERCE_URL, WOOCOMMERCE_CONSUMER_KEY und WOOCOMMERCE_CONSUMER_SECRET in .env setzen');
+    }
+
     const url = `${this.baseUrl}${endpoint}`;
     
     const auth = Buffer.from(`${this.consumerKey}:${this.consumerSecret}`).toString('base64');
@@ -531,7 +551,7 @@ export default async function wooCommerceRoutes(server: FastifyInstance) {
     }
   });
 
-  // AI description generation - VOLLSTÄNDIG KORRIGIERTE VERSION
+  // AI description generation - ✅ KORRIGIERT mit lazy initialization
   server.post('/woo/products/ai-description', {
     schema: {
       tags: ['woocommerce'],
@@ -586,10 +606,12 @@ export default async function wooCommerceRoutes(server: FastifyInstance) {
 
     const toneDescription = toneMap[tone] || toneMap.professional;
 
-    // 🔥 KORRIGIERTE PRÜFUNG mit Debug-Info
-    console.log(`[AI Description] OpenAI verfügbar: ${!!openai}`);
+    // ✅ Erst HIER wird initialisiert
+    const openAIClient = initializeOpenAI();
     
-    if (!openai) {
+    console.log(`[AI Description] OpenAI verfügbar: ${!!openAIClient}`);
+    
+    if (!openAIClient) {
       server.log.warn('OpenAI nicht verfügbar - verwende Fallback');
       
       const fallbackDescription = `🎯 **${productName}** - Das perfekte ${productType || 'Produkt'} für ${targetAudience || 'dich'}!
@@ -644,7 +666,7 @@ WICHTIG: Antworte NUR im JSON Format ohne zusätzlichen Text:
 
       server.log.info('Sende Request an OpenAI...');
       
-      const completion = await openai.chat.completions.create({
+      const completion = await openAIClient.chat.completions.create({
         model: process.env.OPENAI_MODEL || "gpt-4o-mini",
         messages: [
           { 

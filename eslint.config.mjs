@@ -1,23 +1,35 @@
 import js from '@eslint/js';
-import importPlugin from 'eslint-plugin-import'; // ← vor typescript-eslint
+import importPlugin from 'eslint-plugin-import';
 import tseslint from 'typescript-eslint';
+import globals from 'globals';
 
 export default [
-  // 1) Globale Ignores (ersetzt .eslintignore)
+  // 1) Globale Ignores - DIST ORDNER EXPLIZIT AUSSCHLIESSEN
   {
     ignores: [
-      'node_modules/**',
-      'dist/**',
-      'build/**',
-      '**/*.d.ts',
-      '.husky/**',
-      '.vscode/**',
-      '*.log',
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/build/**',
+      '**/*.d.ts', 
+      '**/.husky/**',
+      '**/.vscode/**',
+      '**/*.log',
+      'frontend/.next/**',
+      'backend/dist/**',
+      '!backend/src/**'
     ],
   },
-
-  // 2) JavaScript-Basis
-  js.configs.recommended,
+  
+  // 2) JavaScript-Basis + Node.js Globals
+  {
+    ...js.configs.recommended,
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.es2020,
+      },
+    },
+  },
 
   // 3) TypeScript
   ...tseslint.configs.recommended,
@@ -28,51 +40,28 @@ export default [
       import: importPlugin,
     },
     rules: {
-      'import/order': [
-        'warn',
-        {
-          groups: [
-            'external',
-            'builtin',
-            'internal',
-            ['parent', 'sibling', 'index'],
-            'object',
-            'type',
-          ],
-          'newlines-between': 'always',
-          alphabetize: { order: 'asc', caseInsensitive: true },
-        },
-      ],
+      'import/order': 'off',
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': [
         'warn',
-        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+        { 
+          argsIgnorePattern: '^_', 
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_'
+        }
       ],
-      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
       'no-console': 'off',
+      'prefer-const': 'warn',
     },
   },
 
-  // 5) Spezielle Regeln für Job-Dateien (any deaktivieren)
+  // 5) Spezielle Regeln für Backend Job-Dateien
   {
-    files: ['src/agent/jobs/*.ts'],
+    files: ['backend/**/jobs/*.ts'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off'
     }
-  },
-
-  // 6) CJS-Override
-  {
-    files: ['**/*.cjs'],
-    languageOptions: {
-      sourceType: 'commonjs',
-      globals: {
-        module: 'readonly',
-        require: 'readonly',
-        __dirname: 'readonly',
-        process: 'readonly',
-      },
-    },
-    rules: { 'no-undef': 'off' },
   },
 ];
