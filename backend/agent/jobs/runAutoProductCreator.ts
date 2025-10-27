@@ -1,6 +1,7 @@
 // backend/agent/jobs/runAutoProductCreator.ts
-import { autoProductCreatorJob } from './autoProductCreator';
 import minimist from 'minimist';
+
+import { autoProductCreatorJob } from './autoProductCreator';
 
 async function main() {
   const argv = minimist(process.argv.slice(2), {

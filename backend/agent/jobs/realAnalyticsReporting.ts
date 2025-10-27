@@ -1,8 +1,9 @@
 // agent/jobs/realAnalyticsReporting.ts
+import * as dotenv from 'dotenv';
+
+import { GoogleTrendsService } from './googleTrendsService';
 import { RealWooCommerceAnalytics } from './realWooCommerceAnalytics';
 import { WordPressAnalyticsService } from './wordpressAnalyticsService';
-import { GoogleTrendsService } from './googleTrendsService';
-import * as dotenv from 'dotenv';
 
 dotenv.config();
 

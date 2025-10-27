@@ -1,6 +1,7 @@
 // agent/jobs/contentMonetizer.ts
-import { WordPressAnalyticsService } from './wordpressAnalyticsService';
 import * as dotenv from 'dotenv';
+
+import { WordPressAnalyticsService } from './wordpressAnalyticsService';
 
 dotenv.config();
 
