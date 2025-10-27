@@ -3,9 +3,15 @@ import cors from '@fastify/cors';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import dotenv from 'dotenv';
-import Fastify from 'fastify';
+import Fastify, { FastifyRegisterOptions } from 'fastify';
 
 import shopMetricsRoutes from './routes/shop-metrics';
+import wooCommerceRoutes from './routes/woocommerce';
+import memoryRoutes from './routes/memory';
+import systemRoutes from './routes/system';
+import productOptimizerRoutes from './routes/product-optimizer';
+import reviewsRoutes from './routes/reviews';
+import aiEmailRoutes from './routes/ai-email';
 
 // Umgebungsvariablen laden mit erweiterter Fehlerbehandlung
 dotenv.config();
@@ -116,20 +122,13 @@ async function buildServer() {
     console.log('✅ Shop Metrics Routes erfolgreich registriert');
 
     // Andere Routes - MIT DYNAMIC IMPORTS für besseres Error Handling
-    try {
-      const { default: wooCommerceRoutes } = await import('./routes/woocommerce.js');
-      const { default: memoryRoutes } = await import('./routes/memory.js');
-      const { default: systemRoutes } = await import('./routes/system.js');
-      const { default: productOptimizerRoutes } = await import('./routes/product-optimizer.js');
-      const { default: reviewsRoutes } = await import('./routes/reviews.js');
-      const { default: aiEmailRoutes } = await import('./routes/ai-email.js');
-      
-      await server.register(wooCommerceRoutes);
-      await server.register((instance) => memoryRoutes(instance, agentMemory));
-      await server.register((instance) => systemRoutes(instance, getMemorySize));
-      await server.register(productOptimizerRoutes, { prefix: '/product-optimizer' });
-      await server.register(reviewsRoutes, { prefix: '/reviews' });
-      await server.register(aiEmailRoutes, { prefix: '/ai' });
+try {
+  await server.register(wooCommerceRoutes);
+  await server.register(memoryRoutes, { prefix: '/memory', ...agentMemory });
+  await server.register(systemRoutes, getMemorySize);
+  await server.register(productOptimizerRoutes, { prefix: '/product-optimizer' });
+  await server.register(reviewsRoutes, { prefix: '/reviews' });
+  await server.register(aiEmailRoutes, { prefix: '/ai' });
       
       console.log('✅ Alle Routes erfolgreich registriert');
     } catch (routeError) {

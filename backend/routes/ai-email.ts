@@ -1,20 +1,27 @@
 import { FastifyInstance } from 'fastify';
 import OpenAI from 'openai';
 
-let openai: OpenAI;
+// ✅ NEU (richtig - lazy Initialisierung)
+let openai: OpenAI | null = null;
 
-try {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey || apiKey.trim() === '' || !apiKey.startsWith('sk-')) {
-    console.warn('⚠️  OpenAI nicht verfügbar für AI-Generation');
-    openai = null as any;
-  } else {
-    openai = new OpenAI({ apiKey });
-    console.log('✅ AI Powerpack initialisiert');
+function initializeOpenAI() {
+  if (openai !== null) return openai;
+  
+  try {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey || apiKey.trim() === '' || !apiKey.startsWith('sk-')) {
+      console.warn('⚠️ OpenAI API Key nicht konfiguriert');
+      openai = null;
+    } else {
+      openai = new OpenAI({ apiKey });
+      console.log('✅ OpenAI Client erfolgreich initialisiert');
+    }
+  } catch (error) {
+    console.error('❌ Fehler bei OpenAI Initialisierung:', error);
+    openai = null;
   }
-} catch (error) {
-  console.error('❌ Fehler bei AI Initialisierung:', error);
-  openai = null as any;
+  
+  return openai;
 }
 
 export default async function aiEmailRoutes(server: FastifyInstance) {
@@ -79,7 +86,8 @@ export default async function aiEmailRoutes(server: FastifyInstance) {
       brandVoice 
     } = request.body;
 
-    if (!openai) {
+    const openAIClient = initializeOpenAI();
+    if (!openAIClient) {
       return {
         success: false,
         subject: '',
@@ -143,7 +151,7 @@ Antworte im JSON Format:
 }
 `;
 
-      const completion = await openai.chat.completions.create({
+      const completion = await openAIClient.chat.completions.create({
         model: process.env.OPENAI_MODEL || "gpt-4o-mini",
         messages: [
           {
@@ -169,7 +177,7 @@ Antworte im JSON Format:
             success: true,
             ...emailTemplate
           };
-        } catch (parseError) {
+        } catch (_parseError) {
           throw new Error('Failed to parse AI response');
         }
       } else {
@@ -189,7 +197,7 @@ Antworte im JSON Format:
     }
   });
 
-  // 💬 Chat Response Generator - VOLLSTÄNDIG IMPLEMENTIERT
+  // 💬 Chat Response Generator
   server.post('/chat-response', {
     schema: {
       tags: ['ai'],
@@ -238,7 +246,8 @@ Antworte im JSON Format:
       responseLength = 'medium'
     } = request.body;
 
-    if (!openai) {
+    const openAIClient = initializeOpenAI();
+    if (!openAIClient) {
       return {
         success: false,
         response: 'AI service not available',
@@ -285,7 +294,7 @@ Antworte im JSON Format:
 }
 `;
 
-      const completion = await openai.chat.completions.create({
+      const completion = await openAIClient.chat.completions.create({
         model: process.env.OPENAI_MODEL || "gpt-4o-mini",
         messages: [
           {
@@ -311,7 +320,7 @@ Antworte im JSON Format:
             success: true,
             ...chatResponse
           };
-        } catch (parseError) {
+        } catch (_parseError) {
           throw new Error('Failed to parse AI response');
         }
       } else {
@@ -330,7 +339,7 @@ Antworte im JSON Format:
     }
   });
 
-  // 📱 Social Media Content - VOLLSTÄNDIG IMPLEMENTIERT
+  // 📱 Social Media Content
   server.post('/social-media', {
     schema: {
       tags: ['ai'],
@@ -382,7 +391,8 @@ Antworte im JSON Format:
       hashtags = true
     } = request.body;
 
-    if (!openai) {
+    const openAIClient = initializeOpenAI();
+    if (!openAIClient) {
       return {
         success: false,
         post: '',
@@ -438,7 +448,7 @@ Antworte im JSON Format:
 }
 `;
 
-      const completion = await openai.chat.completions.create({
+      const completion = await openAIClient.chat.completions.create({
         model: process.env.OPENAI_MODEL || "gpt-4o-mini",
         messages: [
           {
@@ -464,7 +474,7 @@ Antworte im JSON Format:
             success: true,
             ...socialContent
           };
-        } catch (parseError) {
+        } catch (_parseError) {
           throw new Error('Failed to parse AI response');
         }
       } else {
@@ -484,7 +494,7 @@ Antworte im JSON Format:
     }
   });
 
-  // 🆕 PRODUCT DESCRIPTIONS - NEUI IMPLEMENTIERT
+  // 🆕 PRODUCT DESCRIPTIONS
   server.post('/product-descriptions', {
     schema: {
       tags: ['ai'],
@@ -539,7 +549,8 @@ Antworte im JSON Format:
       seoKeywords = []
     } = request.body;
 
-    if (!openai) {
+    const openAIClient = initializeOpenAI();
+    if (!openAIClient) {
       return {
         success: false,
         title: '',
@@ -596,7 +607,7 @@ Antworte im JSON Format:
 }
 `;
 
-      const completion = await openai.chat.completions.create({
+      const completion = await openAIClient.chat.completions.create({
         model: process.env.OPENAI_MODEL || "gpt-4o-mini",
         messages: [
           {
@@ -623,7 +634,7 @@ Antworte im JSON Format:
             success: true,
             ...productDescription
           };
-        } catch (parseError) {
+        } catch (_parseError) {
           throw new Error('Failed to parse AI response');
         }
       } else {
@@ -644,7 +655,7 @@ Antworte im JSON Format:
     }
   });
 
-  // 🆕 SEO CONTENT - NEU IMPLEMENTIERT
+  // 🆕 SEO CONTENT
   server.post('/seo-content', {
     schema: {
       tags: ['ai'],
@@ -693,7 +704,8 @@ Antworte im JSON Format:
       focusKeyword
     } = request.body;
 
-    if (!openai) {
+    const openAIClient = initializeOpenAI();
+    if (!openAIClient) {
       return {
         success: false,
         title: '',
@@ -743,7 +755,7 @@ Antworte im JSON Format:
 }
 `;
 
-      const completion = await openai.chat.completions.create({
+      const completion = await openAIClient.chat.completions.create({
         model: process.env.OPENAI_MODEL || "gpt-4o-mini",
         messages: [
           {
@@ -769,7 +781,7 @@ Antworte im JSON Format:
             success: true,
             ...seoContent
           };
-        } catch (parseError) {
+        } catch (_parseError) {
           throw new Error('Failed to parse AI response');
         }
       } else {

@@ -37,8 +37,8 @@
     "fix-conversion": "tsx agent/jobs/conversionReport.ts",
     "analytics:dev": "tsx watch agent/jobs/realAnalyticsReporting.ts",
     "conversion:dev": "tsx watch agent/jobs/conversionReport.ts",
-     "fix-payments": "tsx agent/jobs/paymentFixer.ts",
-    "fix-free-conversion": "tsx agent/jobs/freeToPaidConverter.ts", 
+    "fix-payments": "tsx agent/jobs/paymentFixer.ts",
+    "fix-free-conversion": "tsx agent/jobs/freeToPaidConverter.ts",
     "monetize-content": "tsx agent/jobs/contentMonetizer.ts",
     "quick-fixes": "npm run fix-payments && npm run fix-free-conversion && npm run monetize-content",
     "health-report": "tsx agent/jobs/shopHealthReport.ts",
@@ -76,6 +76,7 @@
     "preview": "node dist/server.js",
     "prepare": "husky",
     "type-check": "tsc --noEmit"
+    
   },
   "keywords": [
     "ai",
@@ -127,10 +128,10 @@
     "@types/minimist": "^1.2.5",
     "@types/node": "^24.7.0",
     "@types/node-cron": "^3.0.11",
-    "@typescript-eslint/eslint-plugin": "^8.45.0",
-    "@typescript-eslint/parser": "^8.45.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.2",
+    "@typescript-eslint/parser": "^8.46.2",
     "@vitest/ui": "^3.2.4",
-    "eslint": "^9.37.0",
+    "eslint": "^9.38.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
     "husky": "^9.1.7",

@@ -29,6 +29,9 @@
     "prepare": "husky",
     "type-check": "tsc --noEmit"
   },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": "eslint --quiet --fix"
+  },
   "keywords": [
     "ai",
     "agent",
@@ -79,6 +82,7 @@
     "eslint": "^9.37.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
+    "globals": "^16.4.0",
     "husky": "^9.1.7",
     "jest": "^29.7.0",
     "pino-pretty": "^13.1.1",

@@ -45,30 +45,20 @@ function resolveRunner(mod: UnknownModule): AsyncVoidFn {
  */
 async function loadJobModule(name: string): Promise<UnknownModule> {
   switch (name) {
-    case 'createFreebie':
-      return await import('./createFreebie');
-
-    // ─── Trend Analysis Job ───────────────────────────────────────────────────
-    case 'trendAnalysis':
-      return await import('./trendAnalysis');
-
-    // ─── Neue Woo-Jobs ────────────────────────────────────────────────────────
-    case 'wooListCategories':
-      // Listet Woo-Kategorien (z.B. zur ID-Ermittlung)
-      return await import('./wooListCategories');
-
-    case 'wooCreateProduct':
-      // Legt ein Produkt in Woo an (z. B. Mini-Audit, virtuell, nicht downloadbar)
-      return await import('./wooCreateProduct');
-
-    case 'wooUpdateProduct':
-      // Aktualisiert ein Produkt (short_description, description, Preis, Status …)
-      return await import('./wooUpdateProduct');
-
-    default:
-      throw new Error(
-        `Unbekannter JOB "${name}". Unterstützt: createFreebie, trendAnalysis, wooListCategories, wooCreateProduct, wooUpdateProduct`
-      );
+  case 'createFreebie':
+    return await import('./createFreebie.js');
+  case 'trendAnalysis':
+    return await import('./trendAnalysis.js');
+  case 'wooListCategories':
+    return await import('./wooListCategories.js');
+  case 'wooCreateProduct':
+    return await import('./wooCreateProduct.js');
+  case 'wooUpdateProduct':
+    return await import('./wooUpdateProduct.js');
+  default:
+    throw new Error(
+      `Unbekannter JOB "${name}". Unterstützt: createFreebie, trendAnalysis, wooListCategories, wooCreateProduct, wooUpdateProduct`
+    );
   }
 }
 

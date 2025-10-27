@@ -3,27 +3,28 @@ import OpenAI from 'openai';
 
 import { wooCommerceService } from '../woocommerce/woocommerce.service';
 
-// 🔥 KORRIGIERTE OPENAI INITIALISIERUNG
-let openai: OpenAI;
+// ✅ Korrekte lazy Initialisierung
+let openai: OpenAI | null = null;
 
-try {
-  const apiKey = process.env.OPENAI_API_KEY;
+function initializeOpenAI() {
+  if (openai !== null) return openai; // Bereits initialisiert
   
-  // 🔥 KORRIGIERTE PRÜFUNG mit Debug-Info
-  console.log(`[Product Optimizer] OpenAI Key Check - Vorhanden: ${!!apiKey}, Länge: ${apiKey?.length || 0}`);
-  
-  if (!apiKey || apiKey.trim() === '' || !apiKey.startsWith('sk-')) {
-    console.warn('⚠️  OpenAI API Key nicht korrekt konfiguriert. Product Optimizer wird nicht verfügbar sein.');
-    openai = null as any;
-  } else {
-    openai = new OpenAI({
-      apiKey: apiKey
-    });
-    console.log('✅ Product Optimizer OpenAI Client erfolgreich initialisiert');
+  try {
+    const apiKey = process.env.OPENAI_API_KEY; // ✅ Jetzt ist process.env geladen!
+    
+    if (!apiKey || apiKey.trim() === '' || !apiKey.startsWith('sk-')) {
+      console.warn('⚠️ OpenAI API Key nicht konfiguriert');
+      openai = null;
+    } else {
+      openai = new OpenAI({ apiKey });
+      console.log('✅ OpenAI Client erfolgreich initialisiert');
+    }
+  } catch (error) {
+    console.error('❌ Fehler bei OpenAI Initialisierung:', error);
+    openai = null;
   }
-} catch (error) {
-  console.error('❌ Fehler bei Product Optimizer Initialisierung:', error);
-  openai = null as any;
+  
+  return openai;
 }
 
 // ✅ Analyse-Funktion
@@ -33,7 +34,8 @@ async function analyzeProduct(productId: number, server: FastifyInstance) {
   
   // 2. OpenAI für Analyse nutzen (falls verfügbar)
   let aiAnalysis = null;
-  if (openai) {
+  const openAIClient = initializeOpenAI();
+  if (openAIClient) {
     try {
       aiAnalysis = await openAIAnalyzeProduct(product, server);
     } catch (error: any) {
@@ -66,6 +68,11 @@ async function analyzeProduct(productId: number, server: FastifyInstance) {
 
 // ✅ OpenAI Analyse-Funktion
 async function openAIAnalyzeProduct(product: any, server: FastifyInstance) {
+  const openAIClient = initializeOpenAI();
+  if (!openAIClient) {
+    throw new Error('OpenAI nicht verfügbar');
+  }
+
   const prompt = `
 Analysiere das folgende Produkt für einen WooCommerce Shop:
 
@@ -93,7 +100,7 @@ Antworte im JSON-Format:
 }
 `;
 
-  const response = await openai.chat.completions.create({
+  const response = await openAIClient.chat.completions.create({
     model: process.env.OPENAI_MODEL || "gpt-4o-mini",
     messages: [
       {
@@ -239,13 +246,15 @@ export default async function productOptimizerRoutes(server: FastifyInstance) {
     const { id } = request.params;
     const productId = parseInt(id);
     
-    // 🔥 KORRIGIERTE PRÜFUNG mit Debug-Info
+    // ✅ Erst HIER wird initialisiert
+    const openAIClient = initializeOpenAI();
     console.log(`[Product Optimizer] Starte Produkt-Analyse für ID: ${productId}`);
-    console.log(`[Product Optimizer] OpenAI verfügbar: ${!!openai}`);
+    console.log(`[Product Optimizer] OpenAI verfügbar: ${!!openAIClient}`);
     
     // Prüfe ob WooCommerce verfügbar ist
     if (!wooCommerceService.isReady()) {
       return reply.status(503).send({ 
+        success: false,
         error: 'WooCommerce Service nicht verfügbar',
         message: 'Bitte WooCommerce Konfiguration prüfen'
       });
@@ -255,10 +264,11 @@ export default async function productOptimizerRoutes(server: FastifyInstance) {
       server.log.info(`Starte Produkt-Analyse für ID: ${productId}`);
       const analysis = await analyzeProduct(productId, server);
       server.log.info(`✅ Produkt-Analyse abgeschlossen für ID: ${productId}`);
-      return analysis;
+      return { success: true, analysis, suggestions: analysis.recommendations };
     } catch (error: any) {
       server.log.error('Analyse fehlgeschlagen:', error.message);
       return reply.status(500).send({ 
+        success: false,
         error: 'Analyse fehlgeschlagen',
         message: error.message 
       });
@@ -273,10 +283,11 @@ export default async function productOptimizerRoutes(server: FastifyInstance) {
       description: 'Check if product optimizer is available'
     }
   }, async () => {
+    const openAIClient = initializeOpenAI();
     return {
-      available: !!openai,
+      available: !!openAIClient,
       service: 'product-optimizer',
-      openaiConfigured: !!openai,
+      openaiConfigured: !!openAIClient,
       timestamp: new Date().toISOString()
     };
   });
@@ -336,8 +347,9 @@ export default async function productOptimizerRoutes(server: FastifyInstance) {
       productCategory 
     } = request.body;
 
-    // 🔥 KORRIGIERTE PRÜFUNG
-    if (!openai) {
+    // ✅ Erst HIER wird initialisiert
+    const openAIClient = initializeOpenAI();
+    if (!openAIClient) {
       server.log.warn('OpenAI nicht verfügbar - verwende Fallback für SEO Optimierung');
       return {
         success: false,
@@ -393,8 +405,8 @@ RESPONSE IN JSON FORMAT:
 }
 `;
 
-      const completion = await openai.chat.completions.create({
-        model: process.env.OPENAI_MODEL || "gpt-4",
+      const completion = await openAIClient.chat.completions.create({
+        model: process.env.OPENAI_MODEL || "gpt-4o-mini",
         messages: [
           { 
             role: "system", 
@@ -503,7 +515,7 @@ RESPONSE IN JSON FORMAT:
       // 1. Erst SEO Optimierung durchführen
       const seoResponse = await server.inject({
         method: 'POST',
-        url: `/woo/products/${id}/seo-optimize`,
+        url: `/product-optimizer/woo/products/${id}/seo-optimize`,
         payload: {
           currentTitle,
           currentDescription,
@@ -659,8 +671,9 @@ RESPONSE IN JSON FORMAT:
       targetMargin 
     } = request.body;
 
-    // 🔥 KORRIGIERTE PRÜFUNG
-    if (!openai) {
+    // ✅ Erst HIER wird initialisiert
+    const openAIClient = initializeOpenAI();
+    if (!openAIClient) {
       server.log.warn('OpenAI nicht verfügbar - verwende Fallback für Price Intelligence');
       
       // Fallback price analysis
@@ -738,8 +751,8 @@ RESPONSE IN JSON FORMAT:
 }
 `;
 
-      const completion = await openai.chat.completions.create({
-        model: process.env.OPENAI_MODEL || "gpt-4",
+      const completion = await openAIClient.chat.completions.create({
+        model: process.env.OPENAI_MODEL || "gpt-4o-mini",
         messages: [
           { 
             role: "system", 
