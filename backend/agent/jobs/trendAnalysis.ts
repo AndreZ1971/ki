@@ -1,6 +1,7 @@
 //backend/jobs/trendAnalysis.ts
-const googleTrends = require('google-trends-api');
 import axios from 'axios';
+
+const googleTrends = require('google-trends-api');
 
 export interface TrendData {
   niche: string;

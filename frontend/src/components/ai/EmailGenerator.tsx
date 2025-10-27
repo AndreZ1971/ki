@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import { aiApi } from '../../lib/api';
 
 // TEMPORÄR: Kopiere das Interface hierher

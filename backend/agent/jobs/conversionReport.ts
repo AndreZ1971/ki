@@ -1,8 +1,9 @@
 // agent/jobs/conversionReport.ts
+import * as dotenv from 'dotenv';
+
 import { ConversionAnalysis, ConversionProblem } from './conversionAnalysis';
 import { RealWooCommerceAnalytics } from './realWooCommerceAnalytics';
 import { WordPressAnalyticsService } from './wordpressAnalyticsService';
-import * as dotenv from 'dotenv';
 
 dotenv.config();
 

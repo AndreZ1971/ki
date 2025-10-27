@@ -1,9 +1,11 @@
 // agent/jobs/shopHealthReport.ts
-import { PaymentFixer } from './paymentFixer';
-import { FreeToPaidConverter } from './freeToPaidConverter';
-import { ContentMonetizer } from './contentMonetizer';
-import { RealWooCommerceAnalytics } from './realWooCommerceAnalytics';
 import * as dotenv from 'dotenv';
+
+import { ContentMonetizer } from './contentMonetizer';
+import { FreeToPaidConverter } from './freeToPaidConverter';
+import { PaymentFixer } from './paymentFixer';
+import { RealWooCommerceAnalytics } from './realWooCommerceAnalytics';
+
 
 dotenv.config();
 

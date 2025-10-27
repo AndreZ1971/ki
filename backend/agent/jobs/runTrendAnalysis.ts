@@ -1,6 +1,7 @@
 // backend/agent/jobs/runTrendAnalysis.ts
-import { trendAnalysisJob } from './trendAnalysis';
 import minimist from 'minimist';
+
+import { trendAnalysisJob } from './trendAnalysis';
 
 async function main() {
   const argv = minimist(process.argv.slice(2), {
