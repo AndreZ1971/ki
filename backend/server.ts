@@ -3,15 +3,16 @@ import cors from '@fastify/cors';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import dotenv from 'dotenv';
-import Fastify, { FastifyRegisterOptions } from 'fastify';
+import Fastify, { FastifyPluginCallback, FastifyPluginAsync } from 'fastify';
 
-import shopMetricsRoutes from './routes/shop-metrics';
-import wooCommerceRoutes from './routes/woocommerce';
-import memoryRoutes from './routes/memory';
-import systemRoutes from './routes/system';
-import productOptimizerRoutes from './routes/product-optimizer';
-import reviewsRoutes from './routes/reviews';
-import aiEmailRoutes from './routes/ai-email';
+// 🔥 KORRIGIERTE IMPORTS FÜR NEUE STRUKTUR
+import shopMetricsRoutes from './routes/api/analytics/metrics/shop-metrics';
+import wooCommerceRoutes from './routes/api/products/woocommerce';
+import memoryRoutes from './routes/api/system/memory/memory';
+import systemRoutes from './routes/api/system/health/system';
+import productOptimizerRoutes from './routes/api/products/optimizer/product-optimizer';
+import reviewsRoutes from './routes/api/analytics/reviews';
+import aiEmailRoutes from './routes/api/ai/email/ai-email';
 
 // Umgebungsvariablen laden mit erweiterter Fehlerbehandlung
 dotenv.config();
@@ -98,7 +99,8 @@ async function buildServer() {
           { name: 'product-optimizer', description: 'AI Product Optimization' },
           { name: 'reviews', description: 'Review Analysis & Sentiment' },
           { name: 'ai', description: 'AI Content Generation' },
-          { name: 'shop-metrics', description: 'Shop Analytics & Dashboard' } // 🔥 NEU
+          { name: 'shop-metrics', description: 'Shop Analytics & Dashboard' },
+          { name: 'analytics', description: 'Analytics & Reports' }
         ]
       }
     });
@@ -117,23 +119,31 @@ async function buildServer() {
       methods: ['GET', 'POST', 'PUT', 'DELETE']
     });
 
-    // 🔥 SHOP METRICS ROUTES REGISTRIEREN - ZUERST!
-    await server.register(shopMetricsRoutes);
+    // 🔥 KORRIGIERTE ROUTE REGISTRATION
+    await server.register(shopMetricsRoutes, { prefix: '/api/analytics/metrics' });
     console.log('✅ Shop Metrics Routes erfolgreich registriert');
 
-    // Andere Routes - MIT DYNAMIC IMPORTS für besseres Error Handling
-try {
-  await server.register(wooCommerceRoutes);
-  await server.register(memoryRoutes, { prefix: '/memory', ...agentMemory });
-  await server.register(systemRoutes, getMemorySize);
-  await server.register(productOptimizerRoutes, { prefix: '/product-optimizer' });
-  await server.register(reviewsRoutes, { prefix: '/reviews' });
-  await server.register(aiEmailRoutes, { prefix: '/ai' });
-      
-      console.log('✅ Alle Routes erfolgreich registriert');
-    } catch (routeError) {
-      console.error('❌ Fehler beim Registrieren der Routes:', routeError);
-    }
+    await server.register(wooCommerceRoutes, { prefix: '/api/products' });
+    console.log('✅ WooCommerce Routes erfolgreich registriert');
+
+    // 🔥 FIX: systemRoutes mit korrekten Parametern
+    await server.register(systemRoutes);
+    console.log('✅ System Routes erfolgreich registriert');
+
+    // 🔥 FIX: memoryRoutes ohne agentMemory Spread
+    await server.register(memoryRoutes, { 
+      prefix: '/api/system/memory'
+    });
+    console.log('✅ Memory Routes erfolgreich registriert');
+
+    await server.register(productOptimizerRoutes, { prefix: '/api/products/optimizer' });
+    console.log('✅ Product Optimizer Routes erfolgreich registriert');
+
+    await server.register(reviewsRoutes, { prefix: '/api/analytics/reviews' });
+    console.log('✅ Reviews Routes erfolgreich registriert');
+
+    await server.register(aiEmailRoutes, { prefix: '/api/ai/email' });
+    console.log('✅ AI Email Routes erfolgreich registriert');
 
     // Global Error Handler
     server.setErrorHandler((error, request, reply) => {
@@ -142,6 +152,27 @@ try {
         success: false,
         error: process.env.NODE_ENV === 'development' ? error.message : 'Internal Server Error'
       });
+    });
+
+    // Health Check Endpoint
+    server.get('/health', async (request, reply) => {
+      return { 
+        status: 'ok', 
+        timestamp: new Date().toISOString(),
+        memory: agentMemory.getStats(),
+        services: ['api', 'memory', 'ai', 'woocommerce']
+      };
+    });
+
+    // System Health Endpoint
+    server.get('/api/system/health', async (request, reply) => {
+      return {
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        memory: process.memoryUsage(),
+        agentMemory: agentMemory.getStats()
+      };
     });
 
     return server;
@@ -166,7 +197,11 @@ const start = async () => {
     console.log('✅ Server läuft auf http://localhost:3000');
     console.log('📚 Documentation: http://localhost:3000/documentation');
     console.log('❤️  Health Check: http://localhost:3000/health');
-    console.log('📊 Shop Metrics: http://localhost:3000/api/shop-metrics'); // 🔥 NEU
+    console.log('⚕️  System Health: http://localhost:3000/api/system/health');
+    console.log('📊 Shop Metrics: http://localhost:3000/api/analytics/metrics');
+    console.log('📧 AI Email: http://localhost:3000/api/ai/email');
+    console.log('🛒 Products: http://localhost:3000/api/products');
+    console.log('📈 Analytics: http://localhost:3000/api/analytics');
 
   } catch (err) {
     console.error('💥 Server Start fehlgeschlagen:', err);

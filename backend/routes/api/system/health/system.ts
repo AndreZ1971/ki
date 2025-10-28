@@ -1,6 +1,12 @@
-import { FastifyInstance } from 'fastify';
+import { FastifyInstance, FastifyPluginOptions } from 'fastify';
+import os from 'os';
 
-export default async function systemRoutes(server: FastifyInstance, getMemorySize: () => number) {
+function getMemorySize(): string {
+  const totalMemory = os.totalmem();
+  return `${Math.round(totalMemory / 1024 / 1024)} MB`;
+}
+
+export default async function systemRoutes(server: FastifyInstance, options: any) {
   
   // System Health Information
   server.get('/system/health', async (request, reply) => {

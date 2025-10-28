@@ -1,4 +1,4 @@
-import { FastifyInstance } from 'fastify';
+import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 
 interface MemoryMessage {
   role: string;
@@ -15,7 +15,45 @@ interface AgentMemory {
   getStats: () => { totalMessages: number; memorySize: number };
 }
 
-export default async function memoryRoutes(server: FastifyInstance, agentMemory: AgentMemory) {
+// Simple in-memory implementation of AgentMemory.
+// Note: to keep the exported `messages` array reference stable for any consumers,
+// we mutate the array in-place instead of reassigning it.
+const agentMemory: AgentMemory = (() => {
+  const messages: MemoryMessage[] = [];
+
+  const addMessage = (role: string, content: string) => {
+    messages.push({
+      role,
+      content,
+      timestamp: Date.now()
+    });
+  };
+
+  const addMessages = (msgs: MemoryMessage[]) => {
+    const normalized = msgs.map(m => ({
+      role: m.role,
+      content: m.content,
+      timestamp: m.timestamp || Date.now()
+    }));
+    messages.push(...normalized);
+  };
+
+  const getMessages = () => messages.slice();
+
+  const clearMessages = () => {
+    messages.length = 0;
+  };
+
+  const getStats = () => {
+    const totalMessages = messages.length;
+    const memorySize = Buffer.byteLength(JSON.stringify(messages), 'utf8');
+    return { totalMessages, memorySize };
+  };
+
+  return { messages, addMessage, addMessages, getMessages, clearMessages, getStats };
+})();
+
+export default async function memoryRoutes(server: FastifyInstance, options: FastifyPluginOptions) {
   // Get memory
   server.get('/memory', {
     schema: {
