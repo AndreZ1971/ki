@@ -1,16 +1,14 @@
-// src/woocommerce/config.ts
-
+// woocommerce/config.ts
 export interface WooCommerceConfig {
   url: string;
   consumerKey: string;
   consumerSecret: string;
   version: string;
-  authMode: 'basic' | 'query';
+  authMode: 'query' | 'basic';
   timeout: number;
 }
 
 export const getWooConfig = (): WooCommerceConfig => {
-  // HARDCODED - funktioniert sofort!
   return {
     url: 'https://kaufe-es.eu',
     consumerKey: 'ck_6fa7b4e95ac20a09bb8fe67fb0e94d50888c1fb5',

@@ -1,7 +1,8 @@
-import { getWooConfig } from './config.js';
+// woocommerce/client.ts
+import { getWooConfig, WooCommerceConfig } from './config.js';
 
 export class WooCommerceClient {
-  private config;
+  private config: WooCommerceConfig;
 
   constructor() {
     this.config = getWooConfig();
@@ -18,25 +19,22 @@ export class WooCommerceClient {
     return baseUrl;
   }
 
-  private getHeaders(): HeadersInit {
-    const headers: HeadersInit = {
+  private getHeaders(): Record<string, string> {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'User-Agent': 'AI-Agent/1.0'
     };
 
     if (this.config.authMode === 'basic') {
-      const auth = Buffer.from(
-        `${this.config.consumerKey}:${this.config.consumerSecret}`
-      ).toString('base64');
+      const auth = Buffer.from(`${this.config.consumerKey}:${this.config.consumerSecret}`).toString('base64');
       headers['Authorization'] = `Basic ${auth}`;
     }
 
     return headers;
   }
 
-  async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  private async request(endpoint: string, options: RequestInit = {}): Promise<any> {
     const url = this.buildUrl(endpoint);
-    
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);
 
@@ -62,27 +60,26 @@ export class WooCommerceClient {
     }
   }
 
-  // CRUD Operations
-  async get<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint);
+  async get(endpoint: string): Promise<any> {
+    return this.request(endpoint);
   }
 
-  async post<T>(endpoint: string, data: any): Promise<T> {
-    return this.request<T>(endpoint, {
+  async post(endpoint: string, data: any): Promise<any> {
+    return this.request(endpoint, {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  async put<T>(endpoint: string, data: any): Promise<T> {
-    return this.request<T>(endpoint, {
-      method: 'PUT',
+  async put(endpoint: string, data: any): Promise<any> {
+    return this.request(endpoint, {
+      method: 'PUT', 
       body: JSON.stringify(data),
     });
   }
 
-  async delete<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, {
+  async delete(endpoint: string): Promise<any> {
+    return this.request(endpoint, {
       method: 'DELETE',
     });
   }
