@@ -1,4 +1,4 @@
-// backend/routes/shop-metrics.ts
+// routes/api/analytics/metrics/shop-metrics.ts
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
 interface WooCommerceOrder {
@@ -14,9 +14,25 @@ interface WooCommerceCustomer {
   date_created: string;
 }
 
-export default async function shopMetricsRoutes(fastify: FastifyInstance) {
-  // Dashboard Metrics Endpoint
-  fastify.get('/api/shop-metrics', async (request: FastifyRequest, reply: FastifyReply) => {
+export default async function shopMetricsRoutes(server: FastifyInstance, options: any) {
+  
+  // 🔥 ROOT ENDPOINT - Wird unter /api/analytics/metrics/ aufgerufen
+  server.get('/', async (request: FastifyRequest, reply: FastifyReply) => {
+    return {
+      success: true,
+      message: 'Shop Metrics API is working',
+      endpoints: [
+        '/dashboard',
+        '/revenue',
+        '/health',
+        '/woocommerce'
+      ],
+      timestamp: new Date().toISOString()
+    };
+  });
+
+  // Dashboard Metrics Endpoint - Wird unter /api/analytics/metrics/dashboard aufgerufen
+  server.get('/dashboard', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const wooCommerceConfig = {
         url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
@@ -95,15 +111,44 @@ export default async function shopMetricsRoutes(fastify: FastifyInstance) {
     }
   });
 
-  // Health Check Endpoint
-  fastify.get('/api/shop-health', async (request: FastifyRequest, reply: FastifyReply) => {
+  // Revenue Endpoint
+  server.get('/revenue', async (request: FastifyRequest, reply: FastifyReply) => {
+    return {
+      dailyRevenue: 2450,
+      weeklyRevenue: 8560,
+      monthlyRevenue: 12450,
+      revenueGrowth: 12.5,
+      timestamp: new Date().toISOString()
+    };
+  });
+
+  // Health Check Endpoint - Wird unter /api/analytics/metrics/health aufgerufen
+  server.get('/health', async (request: FastifyRequest, reply: FastifyReply) => {
     return reply.send({ 
       status: 'healthy', 
+      service: 'Shop Metrics',
       timestamp: new Date().toISOString(),
       wooCommerce: {
         url: process.env.WOOCOMMERCE_URL,
         configured: !!(process.env.CONSUMER_KEY && process.env.CONSUMER_SECRET)
       }
     });
+  });
+
+  // WooCommerce Status Endpoint
+  server.get('/woocommerce', async (request: FastifyRequest, reply: FastifyReply) => {
+    const wooCommerceConfig = {
+      url: process.env.WOOCOMMERCE_URL,
+      consumerKey: process.env.CONSUMER_KEY,
+      consumerSecret: process.env.CONSUMER_SECRET,
+    };
+
+    return {
+      configured: !!(wooCommerceConfig.url && wooCommerceConfig.consumerKey && wooCommerceConfig.consumerSecret),
+      url: wooCommerceConfig.url ? '✅ Gesetzt' : '❌ Fehlt',
+      consumerKey: wooCommerceConfig.consumerKey ? '✅ Gesetzt' : '❌ Fehlt',
+      consumerSecret: wooCommerceConfig.consumerSecret ? '✅ Gesetzt' : '❌ Fehlt',
+      timestamp: new Date().toISOString()
+    };
   });
 }

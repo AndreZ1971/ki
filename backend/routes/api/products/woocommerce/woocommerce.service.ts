@@ -7,11 +7,11 @@ export class WooCommerceService {
 
   constructor() {
     const baseUrl = process.env.WOOCOMMERCE_URL;
-    const consumerKey = process.env.WOOCOMMERCE_CONSUMER_KEY;
-    const consumerSecret = process.env.WOOCOMMERCE_CONSUMER_SECRET;
+    const consumerKey = process.env.WOOCOMMERCE_CONSUMER_KEY || process.env.CONSUMER_KEY;
+    const consumerSecret = process.env.WOOCOMMERCE_CONSUMER_SECRET || process.env.CONSUMER_SECRET;
     
     if (!baseUrl || !consumerKey || !consumerSecret) {
-      // console.warn('⚠️ WooCommerce API nicht konfiguriert - bitte WOOCOMMERCE_URL, WOOCOMMERCE_CONSUMER_KEY und WOOCOMMERCE_CONSUMER_SECRET in .env setzen');
+      // console.warn('⚠️ WooCommerce API nicht konfiguriert - bitte WOOCOMMERCE_URL, CONSUMER_KEY und CONSUMER_SECRET in .env setzen');
       this.isConfigured = false;
       // Dummy-Werte zuweisen, um TypeScript-Fehler zu vermeiden
       this.baseUrl = '';
@@ -89,8 +89,81 @@ export class WooCommerceService {
     }
   }
 
+  async createProduct(productData: any, server: FastifyInstance) {
+    if (!this.isConfigured) {
+      throw new Error('WooCommerce API nicht konfiguriert');
+    }
+
+    try {
+      const url = `${this.baseUrl}/wp-json/wc/v3/products`;
+      
+      server.log.info('Creating new WooCommerce product');
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${this.auth}`,
+          'Content-Type': 'application/json',
+          'User-Agent': 'Product-Optimizer/1.0'
+        },
+        body: JSON.stringify(productData)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        server.log.error(`WooCommerce API Error: ${response.status} - ${errorText}`);
+        throw new Error(`WooCommerce create failed: ${response.status} ${response.statusText}`);
+      }
+
+      const newProduct = await response.json();
+      server.log.info(`✅ WooCommerce product created successfully (ID: ${newProduct.id})`);
+      
+      return newProduct;
+
+    } catch (error: any) {
+      server.log.error('WooCommerce create product error:', error);
+      throw error;
+    }
+  }
+
+  async listProducts(params: any = {}, server: FastifyInstance) {
+    if (!this.isConfigured) {
+      throw new Error('WooCommerce API nicht konfiguriert');
+    }
+
+    try {
+      const urlParams = new URLSearchParams(params).toString();
+      const url = `${this.baseUrl}/wp-json/wc/v3/products${urlParams ? `?${urlParams}` : ''}`;
+      
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Basic ${this.auth}`,
+          'User-Agent': 'Product-Optimizer/1.0'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`WooCommerce list products failed: ${response.status} ${response.statusText}`);
+      }
+
+      return await response.json();
+
+    } catch (error: any) {
+      server.log.error('WooCommerce list products error:', error);
+      throw error;
+    }
+  }
+
   isReady(): boolean {
     return this.isConfigured;
+  }
+
+  getConfigurationStatus() {
+    return {
+      isConfigured: this.isConfigured,
+      baseUrl: this.baseUrl ? '✅ Gesetzt' : '❌ Fehlt',
+      hasAuth: this.auth ? '✅ Gesetzt' : '❌ Fehlt'
+    };
   }
 }
 
