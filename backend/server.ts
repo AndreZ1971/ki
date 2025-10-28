@@ -6,13 +6,13 @@ import dotenv from 'dotenv';
 import Fastify, { FastifyPluginCallback, FastifyPluginAsync } from 'fastify';
 
 // 🔥 KORRIGIERTE IMPORTS FÜR NEUE STRUKTUR
-import shopMetricsRoutes from './routes/api/analytics/metrics/shop-metrics';
-import wooCommerceRoutes from './routes/api/products/woocommerce';
-import memoryRoutes from './routes/api/system/memory/memory';
-import systemRoutes from './routes/api/system/health/system';
-import productOptimizerRoutes from './routes/api/products/optimizer/product-optimizer';
-import reviewsRoutes from './routes/api/analytics/reviews';
-import aiEmailRoutes from './routes/api/ai/email/ai-email';
+import shopMetricsRoutes from './routes/app/api/analytics/metrics/shop-metrics';
+import wooCommerceRoutes from './routes/app/api/products/woocommerce';
+import memoryRoutes from './routes/app/api/system/memory/memory';
+import systemRoutes from './routes/app/api/system/health/system';
+import productOptimizerRoutes from './routes/app/api/products/optimizer/product-optimizer';
+import reviewsRoutes from './routes/app/api/analytics/reviews';
+import aiEmailRoutes from './routes/app/api/ai/email/ai-email';
 
 // Umgebungsvariablen laden mit erweiterter Fehlerbehandlung
 dotenv.config();
