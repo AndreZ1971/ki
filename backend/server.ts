@@ -18,6 +18,7 @@ import aiEmailRoutes from './routes/app/api/ai/email/ai-email';
 import customersRoutes from './routes/app/api/woocommerce/customers';
 import emailSenderRoutes from './routes/app/api/email/email-sender';
 import emailTestRoutes from './routes/emailTest';
+import healthRoutes from './routes/app/api/health';
 
 // Umgebungsvariablen laden mit erweiterter Fehlerbehandlung
 dotenv.config();
@@ -158,6 +159,10 @@ async function buildServer() {
 
     await server.register(emailTestRoutes, { prefix: '/api/email' });
     console.log('✅ Email Test Routes erfolgreich registriert');
+
+    // 🔥 Health Routes für Shop Health Report
+    await server.register(healthRoutes, { prefix: '/api/health' });
+    console.log('✅ Health Routes erfolgreich registriert');
 
     // Global Error Handler
     server.setErrorHandler((error, request, reply) => {
