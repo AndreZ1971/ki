@@ -1,6 +1,7 @@
 // src/pages/AIDashboard.tsx
 import { motion, AnimatePresence } from 'framer-motion';
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import './AIDashboard.css';
 
@@ -17,6 +18,8 @@ const AIDashboard: React.FC = () => {
   const [chartData, setChartData] = useState<any[]>([]);
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>('all');
+  
+  const navigate = useNavigate();
 
   // ECHTE DATEN VON DER API LADEN
   useEffect(() => {
@@ -25,7 +28,6 @@ const AIDashboard: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        // 🔥 KORREKTE API-ROUTE FÜR METRIKEN
         const response = await fetch('http://localhost:3000/api/analytics/metrics/dashboard');
         
         if (!response.ok) {
@@ -34,7 +36,6 @@ const AIDashboard: React.FC = () => {
         
         const realData = await response.json();
         
-        // 🔥 ANGEPASSTE DATENSTRUKTUR FÜR BACKEND
         if (realData.success && realData.data) {
           setMetrics({
             sales: realData.data.totalSales || realData.data.sales || 0,
@@ -46,14 +47,12 @@ const AIDashboard: React.FC = () => {
           if (realData.data.salesData || realData.data.chartData) {
             setChartData(realData.data.salesData || realData.data.chartData);
           } else {
-            // Fallback Demo-Daten
             setChartData([
               { day: 'Mo', sales: 1200 }, { day: 'Di', sales: 1900 }, { day: 'Mi', sales: 1500 },
               { day: 'Do', sales: 2100 }, { day: 'Fr', sales: 1800 }, { day: 'Sa', sales: 2400 }, { day: 'So', sales: 1700 },
             ]);
           }
         } else {
-          // Fallback wenn Datenstruktur nicht passt
           setChartData([
             { day: 'Mo', sales: 1200 }, { day: 'Di', sales: 1900 }, { day: 'Mi', sales: 1500 },
             { day: 'Do', sales: 2100 }, { day: 'Fr', sales: 1800 }, { day: 'Sa', sales: 2400 }, { day: 'So', sales: 1700 },
@@ -63,7 +62,6 @@ const AIDashboard: React.FC = () => {
       } catch (err) {
         console.error('Fehler beim Laden der Shop-Daten:', err);
         setError('Konnte Shop-Daten nicht laden. Bitte API überprüfen.');
-        // Demo-Daten als Fallback
         setChartData([
           { day: 'Mo', sales: 1200 }, { day: 'Di', sales: 1900 }, { day: 'Mi', sales: 1500 },
           { day: 'Do', sales: 2100 }, { day: 'Fr', sales: 1800 }, { day: 'Sa', sales: 2400 }, { day: 'So', sales: 1700 },
@@ -78,12 +76,23 @@ const AIDashboard: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // 🔥 NEUE FUNKTION: Navigation zu Seiten
+  const navigateToPage = (pageUrl: string) => {
+    navigate(pageUrl);
+  };
+
   // FUNKTION ZUM STARTEN VON JOBS MIT KORREKTEN ENDPOINTS
-  const startAITool = async (toolId: string, endpoint: string) => {
+  const startAITool = async (toolId: string, endpoint: string, pageUrl?: string) => {
+    // 🔥 NEU: Wenn pageUrl existiert, navigiere zur Seite
+    if (pageUrl) {
+      navigateToPage(pageUrl);
+      return;
+    }
+
+    // Alte Logik für API-Aufrufe beibehalten
     try {
       setActiveTool(toolId);
       
-      // 🔥 VOLLSTÄNDIGE API-URL MIT KORREKTEN ROUTEN
       const response = await fetch(`http://localhost:3000/api/${endpoint}`, {
         method: 'POST',
         headers: {
@@ -110,7 +119,7 @@ const AIDashboard: React.FC = () => {
     }
   };
 
-  // 🔥 ALLE 46 TOOLS MIT KORREKTEN BACKEND-ROUTEN
+  // 🔥 ALLE TOOLS MIT SEITEN-VERLINKUNGEN FÜR ANALYTICS
   const toolCategories = [
     {
       id: 'analytics',
@@ -122,84 +131,96 @@ const AIDashboard: React.FC = () => {
           title: '📊 Live Shop Metrics',
           description: 'Echtzeit-Kennzahlen deines Shops - Umsatz, Conversion, Kunden',
           endpoint: 'analytics/metrics/dashboard',
-          icon: '📊'
+          icon: '📊',
+          pageUrl: '/analytics/shop-metrics'
         },
         {
           id: 'conversion-analysis',
           title: '📈 Conversion Analysis',
           description: 'Detaillierte Analyse der Conversion-Raten und Optimierung',
           endpoint: 'analytics/conversion/analyze',
-          icon: '📈'
+          icon: '📈',
+          pageUrl: '/analytics/conversion-analysis'
         },
         {
           id: 'conversion-reported',
           title: '📋 Conversion Reported',
           description: 'Automatische Conversion-Reports und Export',
           endpoint: 'analytics/conversion/report',
-          icon: '📋'
+          icon: '📋',
+          pageUrl: '/analytics/conversion-reported'
         },
         {
           id: 'trend-analysis',
           title: '📊 Trend Analysis',
           description: 'Erkenne Markt- und Verkaufstrends automatisch',
           endpoint: 'analytics/trends/analyze',
-          icon: '📊'
+          icon: '📊',
+          pageUrl: '/analytics/trend-analysis'
         },
         {
           id: 'run-trend-analysis',
           title: '🚀 Run Trend Analysis',
           description: 'Führe Trend-Analyse sofort aus',
           endpoint: 'analytics/trends/run',
-          icon: '🚀'
+          icon: '🚀',
+          pageUrl: '/analytics/run-trend-analysis'
         },
         {
           id: 'real-analytics',
           title: '🔍 Real Analytics',
           description: 'Echtzeit-Analytics mit tiefgehenden Insights',
           endpoint: 'analytics/real-time',
-          icon: '🔍'
+          icon: '🔍',
+          pageUrl: '/analytics/real-analytics'
         },
         {
           id: 'real-web-analytics',
           title: '🌐 Real Web Analytics',
           description: 'Web-Commerce Analytics und Tracking',
           endpoint: 'analytics/web',
-          icon: '🌐'
+          icon: '🌐',
+          pageUrl: '/analytics/real-web-analytics'
         },
         {
           id: 'analytic-regioning',
           title: '🗺️ Analytic Regioning',
           description: 'Regionale Analytics und Geo-Targeting',
           endpoint: 'analytics/regions',
-          icon: '🗺️'
+          icon: '🗺️',
+          pageUrl: '/analytics/analytic-regioning'
         },
         {
           id: 'shop-health-report',
           title: '🏪 Shop Health Report',
           description: 'Kompletter Gesundheits-Check deines Shops',
           endpoint: 'analytics/health',
-          icon: '🏪'
+          icon: '🏪',
+          pageUrl: '/analytics/shop-health-report'
         },
         {
           id: 'premium-audit',
           title: '⭐ Premium Audit',
           description: 'Premium-Shop-Audit mit Optimierungsempfehlungen',
           endpoint: 'analytics/audit/premium',
-          icon: '⭐'
+          icon: '⭐',
+          pageUrl: '/analytics/premium-audit'
         },
         {
           id: 'standard-audit',
           title: '🔧 Standard Audit',
           description: 'Basis-Audit für schnelle Shop-Optimierung',
           endpoint: 'analytics/audit/standard',
-          icon: '🔧'
+          icon: '🔧',
+          pageUrl: '/analytics/standard-audit'
         },
         {
           id: 'mini-audit',
           title: '🔎 Mini Audit',
           description: 'Schneller Check der wichtigsten Shop-Kennzahlen',
           endpoint: 'analytics/audit/mini',
-          icon: '🔎'
+          icon: '🔎',
+          pageUrl: '/analytics/mini-audit'
         }
       ]
     },
@@ -366,8 +387,9 @@ const AIDashboard: React.FC = () => {
           id: 'ai-email-generator',
           title: '📧 AI Email Generator',
           description: 'Erstelle professionelle Marketing-E-Mails in Sekunden',
-          endpoint: 'marketing/email/generate',
-          icon: '📧'
+          endpoint: 'ai/email/email-draft',
+          icon: '📧',
+          pageUrl: '/marketing/ai-email-generator'
         },
         {
           id: 'german-content-generator',
@@ -728,9 +750,9 @@ const AIDashboard: React.FC = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-                opacity: activeTool === tool.id ? 0.7 : 1
+              opacity: activeTool === tool.id ? 0.7 : 1
               }}
-              onClick={() => startAITool(tool.id, tool.endpoint)}
+              onClick={() => startAITool(tool.id, tool.endpoint, tool.pageUrl)}
             >
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
@@ -762,7 +784,7 @@ const AIDashboard: React.FC = () => {
                   width: '100%'
                 }}
               >
-                {activeTool === tool.id ? 'Wird ausgeführt...' : 'Tool starten'}
+                {activeTool === tool.id ? 'Wird ausgeführt...' : (tool.pageUrl ? 'Seite öffnen' : 'Tool starten')}
               </motion.button>
             </motion.div>
           ))}
