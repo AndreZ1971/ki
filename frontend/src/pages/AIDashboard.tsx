@@ -18,14 +18,21 @@ const AIDashboard: React.FC = () => {
   const [chartData, setChartData] = useState<any[]>([]);
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [isRefreshing, setIsRefreshing] = useState(false); // Neuer State für sanfte Updates
   
   const navigate = useNavigate();
 
-  // ECHTE DATEN VON DER API LADEN
+  // ECHTE DATEN VON DER API LADEN - NUR DATEN, KEIN RELOAD
   useEffect(() => {
-    const fetchRealMetrics = async () => {
+    const fetchRealMetrics = async (isInitialLoad = false) => {
       try {
-        setLoading(true);
+        // Nur beim ersten Laden setze loading=true
+        if (isInitialLoad) {
+          setLoading(true);
+        } else {
+          // Bei Background-Updates zeige sanften Refresh-Indikator
+          setIsRefreshing(true);
+        }
         setError(null);
         
         const response = await fetch('http://localhost:3000/api/analytics/metrics/dashboard');
@@ -37,6 +44,7 @@ const AIDashboard: React.FC = () => {
         const realData = await response.json();
         
         if (realData.success && realData.data) {
+          // Sanft die Metriken aktualisieren ohne Loading-Spinner
           setMetrics({
             sales: realData.data.totalSales || realData.data.sales || 0,
             orders: realData.data.totalOrders || realData.data.orders || 0,
@@ -61,18 +69,30 @@ const AIDashboard: React.FC = () => {
         
       } catch (err) {
         console.error('Fehler beim Laden der Shop-Daten:', err);
-        setError('Konnte Shop-Daten nicht laden. Bitte API überprüfen.');
+        // Bei Background-Updates keinen Error anzeigen
+        if (isInitialLoad) {
+          setError('Konnte Shop-Daten nicht laden. Bitte API überprüfen.');
+        }
         setChartData([
           { day: 'Mo', sales: 1200 }, { day: 'Di', sales: 1900 }, { day: 'Mi', sales: 1500 },
           { day: 'Do', sales: 2100 }, { day: 'Fr', sales: 1800 }, { day: 'Sa', sales: 2400 }, { day: 'So', sales: 1700 },
         ]);
       } finally {
-        setLoading(false);
+        if (isInitialLoad) {
+          setLoading(false);
+        } else {
+          // Refresh-Indikator nach kurzer Zeit ausblenden
+          setTimeout(() => setIsRefreshing(false), 500);
+        }
       }
     };
 
-    fetchRealMetrics();
-    const interval = setInterval(fetchRealMetrics, 30000);
+    // Erstes Laden mit Loading-Spinner
+    fetchRealMetrics(true);
+    
+    // Danach nur noch Daten-Updates im Hintergrund (keine Spinner)
+    const interval = setInterval(() => fetchRealMetrics(false), 30000);
+    
     return () => clearInterval(interval);
   }, []);
 
@@ -234,56 +254,64 @@ const AIDashboard: React.FC = () => {
           title: '🤖 Auto Product Creator',
           description: 'Automatische Erstellung und Optimierung von Produkten',
           endpoint: 'products/creator/auto',
-          icon: '🤖'
+          icon: '🤖',
+          pageUrl: '/products/auto-creator'
         },
         {
           id: 'run-auto-product-creator',
           title: '🚀 Run Product Creator',
           description: 'Starte automatische Produkterstellung sofort',
           endpoint: 'products/creator/run',
-          icon: '🚀'
+          icon: '🚀',
+          pageUrl: '/products/run-auto-creator'
         },
         {
           id: 'woo-product-create',
           title: '🛒 Woo Product Creator',
           description: 'Direkte Produkterstellung in WooCommerce',
           endpoint: 'woocommerce/products/create',
-          icon: '🛒'
+          icon: '🛒',
+          pageUrl: '/products/woo-create'
         },
         {
           id: 'woo-product-update',
           title: '✏️ Woo Product Updater',
           description: 'Automatische Produkt-Updates und Synchronisation',
           endpoint: 'woocommerce/products/update',
-          icon: '✏️'
+          icon: '✏️',
+          pageUrl: '/products/woo-update'
         },
         {
           id: 'categories-manager',
           title: '📑 Categories Manager',
           description: 'Automatische Kategorie-Verwaltung und Optimierung',
           endpoint: 'woocommerce/categories',
-          icon: '📑'
+          icon: '📑',
+          pageUrl: '/products/categories-manager'
         },
         {
           id: 'create-freebies',
           title: '🎁 Freebies Creator',
           description: 'Erstelle automatisch Gratis-Produkte',
           endpoint: 'products/freebies/create',
-          icon: '🎁'
+          icon: '🎁',
+          pageUrl: '/products/create-freebies'
         },
         {
           id: 'run-create-freebies',
           title: '🚀 Run Freebies Creator',
           description: 'Starte Freebies-Erstellung sofort',
           endpoint: 'products/freebies/run',
-          icon: '🚀'
+          icon: '🚀',
+          pageUrl: '/products/run-create-freebies'
         },
         {
           id: 'product-bundles',
           title: '📦 Product Bundles',
           description: 'Erstelle und verwalte Produkt-Bundles automatisch',
           endpoint: 'products/bundles',
-          icon: '📦'
+          icon: '📦',
+          pageUrl: '/products/bundles'
         }
       ]
     },
@@ -622,12 +650,23 @@ const AIDashboard: React.FC = () => {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3, duration: 0.6 }}
       >
-        <motion.div className="glass-card metric-card metric-glow">
+        <motion.div 
+          className="glass-card metric-card metric-glow"
+          animate={{ scale: isRefreshing ? 1.02 : 1 }}
+          transition={{ duration: 0.3 }}
+        >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h3 style={{ color: '#10b981', margin: 0 }}>💰 Umsatz</h3>
             <span className="live-pulse" style={{ color: '#ef4444', fontSize: '12px' }}>● LIVE</span>
           </div>
-          <motion.p className="metric-value" style={{ fontSize: '2rem', fontWeight: 'bold', color: '#10b981', margin: '10px 0' }}>
+          <motion.p 
+            className="metric-value" 
+            style={{ fontSize: '2rem', fontWeight: 'bold', color: '#10b981', margin: '10px 0' }}
+            key={metrics.sales}
+            initial={{ opacity: 0.5 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
             € {metrics.sales.toFixed(2)}
           </motion.p>
           <p style={{ color: '#6b7280', fontSize: '14px' }}>
@@ -635,12 +674,23 @@ const AIDashboard: React.FC = () => {
           </p>
         </motion.div>
 
-        <motion.div className="glass-card metric-card metric-glow">
+        <motion.div 
+          className="glass-card metric-card metric-glow"
+          animate={{ scale: isRefreshing ? 1.02 : 1 }}
+          transition={{ duration: 0.3 }}
+        >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h3 style={{ color: '#3b82f6', margin: 0 }}>📦 Bestellungen</h3>
             <span className="live-pulse" style={{ color: '#ef4444', fontSize: '12px' }}>● LIVE</span>
           </div>
-          <motion.p className="metric-value" style={{ fontSize: '2rem', fontWeight: 'bold', color: '#3b82f6', margin: '10px 0' }}>
+          <motion.p 
+            className="metric-value" 
+            style={{ fontSize: '2rem', fontWeight: 'bold', color: '#3b82f6', margin: '10px 0' }}
+            key={metrics.orders}
+            initial={{ opacity: 0.5 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
             {metrics.orders}
           </motion.p>
           <p style={{ color: '#6b7280', fontSize: '14px' }}>
@@ -648,12 +698,23 @@ const AIDashboard: React.FC = () => {
           </p>
         </motion.div>
 
-        <motion.div className="glass-card metric-card metric-glow">
+        <motion.div 
+          className="glass-card metric-card metric-glow"
+          animate={{ scale: isRefreshing ? 1.02 : 1 }}
+          transition={{ duration: 0.3 }}
+        >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h3 style={{ color: '#8b5cf6', margin: 0 }}>📊 Conversion</h3>
             <span className="live-pulse" style={{ color: '#ef4444', fontSize: '12px' }}>● LIVE</span>
           </div>
-          <motion.p className="metric-value" style={{ fontSize: '2rem', fontWeight: 'bold', color: '#8b5cf6', margin: '10px 0' }}>
+          <motion.p 
+            className="metric-value" 
+            style={{ fontSize: '2rem', fontWeight: 'bold', color: '#8b5cf6', margin: '10px 0' }}
+            key={metrics.conversion}
+            initial={{ opacity: 0.5 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
             {metrics.conversion}%
           </motion.p>
           <p style={{ color: '#6b7280', fontSize: '14px' }}>
@@ -661,12 +722,23 @@ const AIDashboard: React.FC = () => {
           </p>
         </motion.div>
 
-        <motion.div className="glass-card metric-card metric-glow">
+        <motion.div 
+          className="glass-card metric-card metric-glow"
+          animate={{ scale: isRefreshing ? 1.02 : 1 }}
+          transition={{ duration: 0.3 }}
+        >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h3 style={{ color: '#f59e0b', margin: 0 }}>👥 Kunden</h3>
             <span className="live-pulse" style={{ color: '#ef4444', fontSize: '12px' }}>● LIVE</span>
           </div>
-          <motion.p className="metric-value" style={{ fontSize: '2rem', fontWeight: 'bold', color: '#f59e0b', margin: '10px 0' }}>
+          <motion.p 
+            className="metric-value" 
+            style={{ fontSize: '2rem', fontWeight: 'bold', color: '#f59e0b', margin: '10px 0' }}
+            key={metrics.customers}
+            initial={{ opacity: 0.5 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
             {metrics.customers}
           </motion.p>
           <p style={{ color: '#6b7280', fontSize: '14px' }}>
