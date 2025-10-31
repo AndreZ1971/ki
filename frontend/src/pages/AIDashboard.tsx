@@ -570,6 +570,19 @@ const AIDashboard: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
+              onClick={() => navigate('/settings')}
+              className="theme-toggle"
+              style={{
+                background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                border: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              ⚙️ Settings
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
               onClick={() => setIsDark(!isDark)}
               className="theme-toggle"
             >
