@@ -20,6 +20,12 @@ import emailSenderRoutes from './routes/app/api/email/email-sender';
 import emailTestRoutes from './routes/emailTest';
 import healthRoutes from './routes/app/api/health';
 
+// 🔥 PRODUCT MANAGEMENT ROUTES
+import productManagementRoutes from './routes/app/api/products/product-management';
+import categoryRoutes from './routes/app/api/products/categories';
+import bundleRoutes from './routes/app/api/products/bundles';
+import freebieRoutes from './routes/app/api/products/freebies';
+
 // Umgebungsvariablen laden mit erweiterter Fehlerbehandlung
 dotenv.config();
 
@@ -104,7 +110,11 @@ async function buildServer() {
           { name: 'shop-metrics', description: 'Shop Analytics & Dashboard' },
           { name: 'analytics', description: 'Analytics & Reports' },
           { name: 'customers', description: 'Customer Management' },
-          { name: 'email', description: 'Email Sending' }
+          { name: 'email', description: 'Email Sending' },
+          { name: 'products', description: 'Product Management & Creation' },
+          { name: 'categories', description: 'Category Management' },
+          { name: 'bundles', description: 'Product Bundle Management' },
+          { name: 'freebies', description: 'Freebie Management' }
         ]
       }
     });
@@ -163,6 +173,19 @@ async function buildServer() {
     // 🔥 Health Routes für Shop Health Report
     await server.register(healthRoutes, { prefix: '/api/health' });
     console.log('✅ Health Routes erfolgreich registriert');
+
+    // 🔥 PRODUCT MANAGEMENT ROUTES
+    await server.register(productManagementRoutes, { prefix: '/api/products' });
+    console.log('✅ Product Management Routes erfolgreich registriert');
+
+    await server.register(categoryRoutes, { prefix: '/api/categories' });
+    console.log('✅ Category Routes erfolgreich registriert');
+
+    await server.register(bundleRoutes, { prefix: '/api/bundles' });
+    console.log('✅ Bundle Routes erfolgreich registriert');
+
+    await server.register(freebieRoutes, { prefix: '/api/freebies' });
+    console.log('✅ Freebie Routes erfolgreich registriert');
 
     // Global Error Handler
     server.setErrorHandler((error, request, reply) => {

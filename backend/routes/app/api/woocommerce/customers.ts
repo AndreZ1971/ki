@@ -1,46 +1,52 @@
 // backend/routes/app/api/woocommerce/customers.ts
 import { FastifyPluginAsync } from 'fastify';
+import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
 
 const customersRoutes: FastifyPluginAsync = async (fastify, options) => {
+  
+  // WooCommerce Client initialisieren
+  const WooCommerce = new WooCommerceRestApi({
+    url: process.env.WOOCOMMERCE_URL || '',
+    consumerKey: process.env.CONSUMER_KEY || '',
+    consumerSecret: process.env.CONSUMER_SECRET || '',
+    version: 'wc/v3'
+  });
   
   // GET: Alle Kunden aus WooCommerce
   fastify.get('/customers', async (request, reply) => {
     try {
-      // Für jetzt mocken wir die WooCommerce API Integration
-      // Später ersetzen mit echter WooCommerce REST API
+      console.log('📥 Fetching customers from WooCommerce...');
       
-      const mockCustomers = [
-        { 
-          id: 1, 
-          name: 'Max Mustermann', 
-          email: 'max@mustermann.de',
-          date_created: '2024-01-15T10:30:00',
-          orders_count: 5,
-          total_spent: '450.00'
-        },
-        { 
-          id: 2, 
-          name: 'Anna Schmidt', 
-          email: 'anna@schmidt.com',
-          date_created: '2024-02-20T14:22:00',
-          orders_count: 3,
-          total_spent: '210.50'
-        },
-        { 
-          id: 3, 
-          name: 'Thomas Weber', 
-          email: 'jannro771@gmail.com',
-          date_created: '2024-03-10T09:15:00',
-          orders_count: 7,
-          total_spent: '890.75'
-        }
-      ];
+      // Echte WooCommerce API Integration - hole ALLE Benutzer inkl. Abonnenten
+      const response = await WooCommerce.get('customers', {
+        per_page: 100, // Hole bis zu 100 Kunden
+        orderby: 'registered_date',
+        order: 'desc',
+        role: 'all' // Hole alle Rollen: customer, subscriber, administrator
+      });
+
+      const customers = response.data.map((customer: any) => ({
+        id: customer.id,
+        name: `${customer.first_name} ${customer.last_name}`.trim() || customer.username,
+        email: customer.email,
+        first_name: customer.first_name,
+        last_name: customer.last_name,
+        username: customer.username,
+        date_created: customer.date_created,
+        orders_count: customer.orders_count || 0,
+        total_spent: customer.total_spent || '0.00',
+        avatar_url: customer.avatar_url,
+        billing: customer.billing,
+        shipping: customer.shipping
+      }));
+
+      console.log(`✅ ${customers.length} Kunden erfolgreich geladen`);
 
       return {
         success: true,
-        data: mockCustomers,
-        total: mockCustomers.length,
-        message: 'Kunden erfolgreich geladen (Mock-Daten)'
+        data: customers,
+        total: customers.length,
+        message: `${customers.length} Kunden erfolgreich geladen`
       };
       
     } catch (error) {

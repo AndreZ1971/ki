@@ -51,7 +51,7 @@ export default async function shopMetricsRoutes(server: FastifyInstance, options
             'Content-Type': 'application/json',
           },
         }),
-        fetch(`${wooCommerceConfig.url}/wp-json/wc/v3/customers?per_page=100`, {
+        fetch(`${wooCommerceConfig.url}/wp-json/wc/v3/customers?per_page=100&role=all`, {
           headers: {
             'Authorization': `Basic ${auth}`,
             'Content-Type': 'application/json',
@@ -72,6 +72,10 @@ export default async function shopMetricsRoutes(server: FastifyInstance, options
       const orders: WooCommerceOrder[] = await ordersResponse.json();
       const customers: WooCommerceCustomer[] = await customersResponse.json();
       const products = await productsResponse.json();
+
+      console.log(`📊 Shop Metrics - Customers found: ${customers.length}`);
+      console.log(`📊 Shop Metrics - Orders found: ${orders.length}`);
+      console.log(`📊 Shop Metrics - Products found: ${products.length}`);
 
       // Heutige Daten berechnen
       const today = new Date().toISOString().split('T')[0];

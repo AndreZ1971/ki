@@ -6,6 +6,16 @@ import AIDashboard from './pages/AIDashboard';
 import AIEmailGenerator from './pages/MarketingContent/ai-email-generator';
 import Settings from './pages/Settings/Settings';
 
+// Product Management Pages
+import AutoProductCreator from './pages/ProductManagement/AutoProductCreator';
+import CategoriesManager from './pages/ProductManagement/CategoriesManager';
+import CreateFreebies from './pages/ProductManagement/CreateFreebies';
+import ProductBundles from './pages/ProductManagement/ProductBundles';
+import RunAutoProductCreator from './pages/ProductManagement/RunAutoProductCreator';
+import RunCreateFreebies from './pages/ProductManagement/RunCreateFreebies';
+import WooProductCreate from './pages/ProductManagement/WooProductCreate';
+import WooProductUpdate from './pages/ProductManagement/WooProductUpdate';
+
 // Analytics Pages
 import AnalyticRegioning from './pages/AnalyseMetrics/AnalyticRegioning';
 import ConversionAnalysis from './pages/AnalyseMetrics/ConversionAnalysis';
@@ -47,6 +57,16 @@ function App() {
           
           {/* AI Email Generator Seite */}
           <Route path="/marketing/ai-email-generator" element={<AIEmailGenerator />} />
+          
+          {/* Product Management Routes */}
+          <Route path="/products/auto-creator" element={<AutoProductCreator />} />
+          <Route path="/products/categories-manager" element={<CategoriesManager />} />
+          <Route path="/products/create-freebies" element={<CreateFreebies />} />
+          <Route path="/products/bundles" element={<ProductBundles />} />
+          <Route path="/products/run-auto-creator" element={<RunAutoProductCreator />} />
+          <Route path="/products/run-create-freebies" element={<RunCreateFreebies />} />
+          <Route path="/products/woo-create" element={<WooProductCreate />} />
+          <Route path="/products/woo-update" element={<WooProductUpdate />} />
           
           {/* Settings Seite */}
           <Route path="/settings" element={<Settings />} />
