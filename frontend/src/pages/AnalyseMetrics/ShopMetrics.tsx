@@ -1,11 +1,24 @@
-// frontend/src/pages/analytics/ShopMetrics.jsx
+// src/pages/analytics/ShopMetrics.tsx
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './page.css';
 
-const ShopMetrics = () => {
-  const [metrics, setMetrics] = useState(null);
+interface MetricsData {
+  totalSales?: number;
+  todaySales?: number;
+  totalOrders?: number;
+  todayOrders?: number;
+  totalCustomers?: number;
+  totalProducts?: number;
+  conversionRate?: number;
+  lastUpdated?: string;
+}
+
+const ShopMetrics: React.FC = () => {
+  const [metrics, setMetrics] = useState<MetricsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchMetrics();
@@ -22,10 +35,14 @@ const ShopMetrics = () => {
         setError('Failed to load metrics');
       }
     } catch (err) {
-      setError('Connection error: ' + err.message);
+      setError('Connection error: ' + (err as Error).message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleBackToDashboard = () => {
+    navigate('/');
   };
 
   if (loading) return <div className="loading-spinner">📊 Loading Metrics...</div>;
@@ -33,51 +50,72 @@ const ShopMetrics = () => {
 
   return (
     <div className="analytics-page">
+      {/* Absolut positionierter Back-Button */}
+      <button 
+        className="back-button floating-back" 
+        onClick={handleBackToDashboard}
+      >
+        ← Zurück
+      </button>
+
       <div className="analytics-header">
         <h1>📊 Live Shop Metrics</h1>
         <p>Echtzeit-Kennzahlen deines Shops</p>
       </div>
 
-      <div className="analytics-grid">
+      {/* KORRIGIERT: 2x4 Grid Layout - 2 Reihen, 4 Spalten */}
+      <div className="analytics-grid-2x4">
+        {/* Erste Reihe - 4 Karten nebeneinander */}
         <div className="metric-card">
+          <div className="metric-icon">💰</div>
           <div className="metric-label">Total Sales</div>
           <div className="metric-value">${metrics?.totalSales || 0}</div>
         </div>
 
         <div className="metric-card">
+          <div className="metric-icon">📈</div>
           <div className="metric-label">Today's Sales</div>
           <div className="metric-value">${metrics?.todaySales || 0}</div>
         </div>
 
         <div className="metric-card">
+          <div className="metric-icon">🛒</div>
           <div className="metric-label">Total Orders</div>
           <div className="metric-value">{metrics?.totalOrders || 0}</div>
         </div>
 
         <div className="metric-card">
+          <div className="metric-icon">📦</div>
           <div className="metric-label">Today's Orders</div>
           <div className="metric-value">{metrics?.todayOrders || 0}</div>
         </div>
 
+        {/* Zweite Reihe - 4 Karten nebeneinander */}
         <div className="metric-card">
+          <div className="metric-icon">👥</div>
           <div className="metric-label">Total Customers</div>
           <div className="metric-value">{metrics?.totalCustomers || 0}</div>
         </div>
 
         <div className="metric-card">
+          <div className="metric-icon">📱</div>
           <div className="metric-label">Total Products</div>
           <div className="metric-value">{metrics?.totalProducts || 0}</div>
         </div>
 
         <div className="metric-card">
+          <div className="metric-icon">🎯</div>
           <div className="metric-label">Conversion Rate</div>
           <div className="metric-value">{metrics?.conversionRate || 0}%</div>
         </div>
-      </div>
 
-      <div className="metric-card">
-        <h3>Last Updated</h3>
-        <p>{metrics?.lastUpdated ? new Date(metrics.lastUpdated).toLocaleString() : 'N/A'}</p>
+        <div className="metric-card last-updated">
+          <div className="metric-icon">🕒</div>
+          <div className="metric-label">Last Updated</div>
+          <div className="metric-value-small">
+            {metrics?.lastUpdated ? new Date(metrics.lastUpdated).toLocaleDateString('de-DE') : 'N/A'}
+          </div>
+        </div>
       </div>
     </div>
   );
