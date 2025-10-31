@@ -1,9 +1,9 @@
-// backend/server.ts - KOMPLETT AKTUALISIERT
+// backend/server.ts - KOMPLETT KORRIGIERT
 import cors from '@fastify/cors';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import dotenv from 'dotenv';
-import Fastify, { FastifyPluginCallback, FastifyPluginAsync } from 'fastify';
+import Fastify from 'fastify';
 
 // 🔥 KORRIGIERTE IMPORTS FÜR NEUE STRUKTUR
 import shopMetricsRoutes from './routes/app/api/analytics/metrics/shop-metrics';
@@ -13,6 +13,11 @@ import systemRoutes from './routes/app/api/system/health/system';
 import productOptimizerRoutes from './routes/app/api/products/optimizer/product-optimizer';
 import reviewsRoutes from './routes/app/api/analytics/reviews';
 import aiEmailRoutes from './routes/app/api/ai/email/ai-email';
+
+// 🔥 NEUE IMPORTS FÜR CUSTOMERS UND EMAIL
+import customersRoutes from './routes/app/api/woocommerce/customers';
+import emailSenderRoutes from './routes/app/api/email/email-sender';
+import emailTestRoutes from './routes/emailTest';
 
 // Umgebungsvariablen laden mit erweiterter Fehlerbehandlung
 dotenv.config();
@@ -63,10 +68,6 @@ const agentMemory = {
   }
 };
 
-const getMemorySize = () => {
-  return agentMemory.getStats().memorySize;
-};
-
 async function buildServer() {
   const server = Fastify({
     logger: {
@@ -100,7 +101,9 @@ async function buildServer() {
           { name: 'reviews', description: 'Review Analysis & Sentiment' },
           { name: 'ai', description: 'AI Content Generation' },
           { name: 'shop-metrics', description: 'Shop Analytics & Dashboard' },
-          { name: 'analytics', description: 'Analytics & Reports' }
+          { name: 'analytics', description: 'Analytics & Reports' },
+          { name: 'customers', description: 'Customer Management' },
+          { name: 'email', description: 'Email Sending' }
         ]
       }
     });
@@ -145,6 +148,17 @@ async function buildServer() {
     await server.register(aiEmailRoutes, { prefix: '/api/ai/email' });
     console.log('✅ AI Email Routes erfolgreich registriert');
 
+    // 🔥 NEUE ROUTES REGISTRIEREN
+    await server.register(customersRoutes, { prefix: '/api/woocommerce' });
+    console.log('✅ Customers Routes erfolgreich registriert');
+
+    // 🔥 FIX: Email Routes in korrekter Reihenfolge registrieren
+    await server.register(emailSenderRoutes, { prefix: '/api/email' });
+    console.log('✅ Email Sender Routes erfolgreich registriert');
+
+    await server.register(emailTestRoutes, { prefix: '/api/email' });
+    console.log('✅ Email Test Routes erfolgreich registriert');
+
     // Global Error Handler
     server.setErrorHandler((error, request, reply) => {
       console.error('🚨 Server Error:', error);
@@ -160,7 +174,7 @@ async function buildServer() {
         status: 'ok', 
         timestamp: new Date().toISOString(),
         memory: agentMemory.getStats(),
-        services: ['api', 'memory', 'ai', 'woocommerce']
+        services: ['api', 'memory', 'ai', 'woocommerce', 'customers', 'email']
       };
     });
 
@@ -173,6 +187,48 @@ async function buildServer() {
         memory: process.memoryUsage(),
         agentMemory: agentMemory.getStats()
       };
+    });
+
+    // 🔥 KORRIGIERT: Debug Route für alle registrierten Routes
+    server.get('/api/debug/routes', async (request, reply) => {
+      // Manuelle Route-Sammlung für Debug-Zwecke
+      const routeList = [
+        { method: 'GET', url: '/health' },
+        { method: 'GET', url: '/api/system/health' },
+        { method: 'GET', url: '/api/debug/routes' },
+        { method: 'GET', url: '/api/analytics/metrics/shop-metrics' },
+        { method: 'GET', url: '/api/products' },
+        { method: 'GET', url: '/api/products/optimizer' },
+        { method: 'GET', url: '/api/analytics/reviews' },
+        { method: 'GET', url: '/api/ai/email' },
+        { method: 'GET', url: '/api/woocommerce/customers' },
+        { method: 'GET', url: '/api/email/send' },
+        { method: 'GET', url: '/api/email/test-email-config' },
+        { method: 'GET', url: '/api/email/test' },
+        { method: 'GET', url: '/documentation' }
+      ];
+      
+      return {
+        totalRoutes: routeList.length,
+        emailRoutes: routeList.filter(r => r.url.includes('/email')),
+        allRoutes: routeList
+      };
+    });
+
+    // 🔥 KORRIGIERT: 404 Handler ohne routes Property
+    server.setNotFoundHandler((request, reply) => {
+      const availableEmailRoutes = [
+        'GET /api/email/send',
+        'GET /api/email/test-email-config', 
+        'GET /api/email/test'
+      ];
+      
+      reply.status(404).send({
+        success: false,
+        error: 'Route not found',
+        path: request.url,
+        availableEmailRoutes: availableEmailRoutes
+      });
     });
 
     return server;
@@ -201,6 +257,10 @@ const start = async () => {
     console.log('📊 Shop Metrics: http://localhost:3000/api/analytics/metrics');
     console.log('📧 AI Email: http://localhost:3000/api/ai/email');
     console.log('🛒 Products: http://localhost:3000/api/products');
+    console.log('👥 Customers: http://localhost:3000/api/woocommerce/customers');
+    console.log('📨 Email Sender: http://localhost:3000/api/email/send');
+    console.log('🧪 Email Test: http://localhost:3000/api/email/test-email-config');
+    console.log('🔍 Debug Routes: http://localhost:3000/api/debug/routes');
     console.log('📈 Analytics: http://localhost:3000/api/analytics');
 
   } catch (err) {
