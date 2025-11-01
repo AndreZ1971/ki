@@ -1,0 +1,170 @@
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { useProductManagement } from '../../hooks/useProductManagement';
+import { useToast } from '../../hooks/useToast';
+import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
+import { ToastContainer } from '../../components/Toast/ToastContainer';
+import './page.css';
+
+const ContentMonetized: React.FC = () => {
+  const { handleBackToDashboard, loading, setLoading, error, setError } = useProductManagement();
+  const { toasts, showToast } = useToast();
+  
+  const [contentType, setContentType] = useState('course');
+  const [monetizationStrategy, setMonetizationStrategy] = useState('one-time');
+  const [pricing, setPricing] = useState('');
+  const [contentTitle, setContentTitle] = useState('');
+  const [revenue, setRevenue] = useState({ today: 245, week: 1850, month: 6240, total: 18950 });
+
+  const contentTypes = [
+    { value: 'course', label: 'Online-Kurs', icon: '🎓', avgPrice: '€149' },
+    { value: 'ebook', label: 'E-Book', icon: '📚', avgPrice: '€29' },
+    { value: 'template', label: 'Template', icon: '📄', avgPrice: '€49' },
+    { value: 'membership', label: 'Mitgliedschaft', icon: '👥', avgPrice: '€19/Mo' },
+    { value: 'coaching', label: 'Coaching', icon: '💼', avgPrice: '€199' },
+    { value: 'software', label: 'Software/SaaS', icon: '💻', avgPrice: '€99/Mo' }
+  ];
+
+  const strategies = [
+    { value: 'one-time', label: 'Einmalzahlung', icon: '💰', growth: 'Stabil' },
+    { value: 'subscription', label: 'Abo-Modell', icon: '🔄', growth: 'Wachsend' },
+    { value: 'freemium', label: 'Freemium', icon: '🆓', growth: 'Schnell' },
+    { value: 'tiered', label: 'Preis-Stufen', icon: '📊', growth: 'Optimal' }
+  ];
+
+  const handleMonetize = async () => {
+    if (!contentTitle.trim() || !pricing.trim()) {
+      showToast('Bitte fülle alle Pflichtfelder aus', 'error');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('http://localhost:3000/api/marketing/content/monetize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contentTitle, contentType, monetizationStrategy, pricing })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success && data.revenue) {
+        setRevenue(data.revenue);
+        showToast('Content erfolgreich monetarisiert!', 'success');
+        setContentTitle('');
+        setPricing('');
+      } else {
+        throw new Error(data.error || 'Fehler beim Monetarisieren des Contents');
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten';
+      setError(errorMessage);
+      showToast(errorMessage, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="page-container">
+      <BackButton onClick={handleBackToDashboard} />
+      <ToastContainer toasts={toasts} onRemove={(_id) => {}} />
+      
+      <motion.div 
+        className="page-header"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1>� Content Monetized</h1>
+        <p>Monetarisiere deine Inhalte optimal</p>
+      </motion.div>
+
+      {error && <ErrorMessage message={error} />}
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '20px', marginTop: '20px' }}>
+        <motion.div className="form-container" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <h3 style={{ color: 'white', marginBottom: '20px' }}>💰 Content Setup</h3>
+
+          <div className="form-group">
+            <label>Content-Titel *</label>
+            <input type="text" value={contentTitle} onChange={(e) => setContentTitle(e.target.value)} placeholder="Titel deines Contents" className="form-input" />
+          </div>
+
+          <div className="form-group">
+            <label>Content-Typ</label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginTop: '10px' }}>
+              {contentTypes.map(ct => (
+                <motion.div key={ct.value} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={() => setContentType(ct.value)}
+                  style={{ padding: '12px', background: contentType === ct.value ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'rgba(255,255,255,0.05)',
+                    border: contentType === ct.value ? '2px solid rgba(102, 126, 234, 0.5)' : '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', cursor: 'pointer' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '18px' }}>{ct.icon}</span>
+                    <div><div style={{ fontSize: '13px', fontWeight: '600', color: 'white' }}>{ct.label}</div>
+                    <div style={{ fontSize: '10px', opacity: 0.7, color: 'white' }}>Ø {ct.avgPrice}</div></div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Monetarisierungs-Strategie</label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginTop: '10px' }}>
+              {strategies.map(str => (
+                <motion.div key={str.value} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={() => setMonetizationStrategy(str.value)}
+                  style={{ padding: '12px', background: monetizationStrategy === str.value ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'rgba(255,255,255,0.05)',
+                    border: monetizationStrategy === str.value ? '2px solid rgba(16, 185, 129, 0.5)' : '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', cursor: 'pointer' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '16px' }}>{str.icon}</span>
+                    <div><div style={{ fontSize: '12px', fontWeight: '600', color: 'white' }}>{str.label}</div>
+                    <div style={{ fontSize: '10px', opacity: 0.7, color: 'white' }}>{str.growth}</div></div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Preis (€) *</label>
+            <input type="text" value={pricing} onChange={(e) => setPricing(e.target.value)} placeholder="z.B. 49.99" className="form-input" />
+          </div>
+
+          <LoadingButton onClick={handleMonetize} loading={loading} loadingText="Erstelle...">
+            💸 Content Monetarisieren
+          </LoadingButton>
+        </motion.div>
+
+        <motion.div className="form-container" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+          <h3 style={{ color: 'white', marginBottom: '20px' }}>📊 Revenue Dashboard</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: '20px' }}>
+            <div style={{ textAlign: 'center', padding: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px' }}>
+              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#10b981', marginBottom: '4px' }}>€{revenue.today}</div>
+              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)' }}>Heute</div>
+            </div>
+            <div style={{ textAlign: 'center', padding: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px' }}>
+              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#3b82f6', marginBottom: '4px' }}>€{revenue.week}</div>
+              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)' }}>Diese Woche</div>
+            </div>
+            <div style={{ textAlign: 'center', padding: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px' }}>
+              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#f59e0b', marginBottom: '4px' }}>€{revenue.month}</div>
+              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)' }}>Dieser Monat</div>
+            </div>
+            <div style={{ textAlign: 'center', padding: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px' }}>
+              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#8b5cf6', marginBottom: '4px' }}>€{revenue.total}</div>
+              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)' }}>Gesamt</div>
+            </div>
+          </div>
+          <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.5)', padding: '40px 20px' }}>
+            <div style={{ fontSize: '48px', marginBottom: '12px' }}>💸</div>
+            <p style={{ margin: 0 }}>Verknüpfe Zahlungsanbieter für Live-Daten</p>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+};
+
+export default ContentMonetized;
