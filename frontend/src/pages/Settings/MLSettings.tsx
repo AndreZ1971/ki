@@ -1,43 +1,383 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '../AnalyseMetrics/page.css';
 
 interface MLConfig {
   enabled: boolean;
-  features: { productRecommendations: boolean; trendForecasting: boolean; emailOptimization: boolean };
-  models: { productRecommendation: { minConfidence: number } };
-  performance: { maxInferenceTime: number };
+  features: {
+    productRecommendations: boolean;
+    trendForecasting: boolean;
+    emailOptimization: boolean;
+    dynamicPricing: boolean;
+    churnPrediction: boolean;
+    sentimentAnalysis: boolean;
+    fraudDetection: boolean;
+  };
+  models: {
+    productRecommendation: {
+      enabled: boolean;
+      minConfidence: number;
+      fallbackToRules: boolean;
+    };
+    trendForecasting: {
+      enabled: boolean;
+      minConfidence: number;
+      fallbackToGoogleTrends: boolean;
+    };
+  };
+  performance: {
+    maxInferenceTime: number;
+    cacheResults: boolean;
+    cacheTTL: number;
+  };
 }
 
 export default function MLSettings() {
+  const navigate = useNavigate();
   const [config, setConfig] = useState<MLConfig | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/ml/config').then(r => r.json()).then(d => { setConfig(d); setLoading(false); });
+    loadConfig();
   }, []);
 
-  const save = () => {
-    if (config) fetch('http://localhost:3000/api/ml/config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(config) }).then(() => alert('Gespeichert!'));
+  const loadConfig = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:3000/api/ml/config');
+      if (!response.ok) throw new Error('Fehler');
+      const data = await response.json();
+      setConfig(data);
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Fehler beim Laden der ML-Konfiguration' });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (loading) return <div>Lädt...</div>;
-  if (!config) return <div>Fehler</div>;
+  const save = async () => {
+    if (!config) return;
+    try {
+      setSaving(true);
+      const response = await fetch('http://localhost:3000/api/ml/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config),
+      });
+      if (!response.ok) throw new Error('Fehler');
+      setMessage({ type: 'success', text: 'ML-Konfiguration erfolgreich gespeichert!' });
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Fehler beim Speichern' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleBack = () => navigate('/settings');
+
+  if (loading) {
+    return (
+      <div className="analytics-page">
+        <div className="analytics-header">
+          <h1>Lade ML-Konfiguration...</h1>
+        </div>
+      </div>
+    );
+  }
+
+  if (!config) {
+    return (
+      <div className="analytics-page">
+        <div className="analytics-header">
+          <h1>Fehler beim Laden</h1>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>🧠 ML Einstellungen</h1>
-      <button onClick={save}>Speichern</button>
-      <div style={{ marginTop: '20px' }}>
-        <label><input type="checkbox" checked={config.enabled} onChange={e => setConfig({...config, enabled: e.target.checked})} /> ML Aktiv</label>
+    <div className="analytics-page">
+      <button className="back-button floating-back" onClick={handleBack}>
+        Zurück
+      </button>
+
+      <div className="analytics-header">
+        <h1>Machine Learning Einstellungen</h1>
+        <p>KI-Features mit automatischen Fallbacks für deinen Shop</p>
       </div>
-      <div style={{ marginTop: '20px' }}>
-        <h3>Features</h3>
-        <label><input type="checkbox" checked={config.features.productRecommendations} onChange={e => setConfig({...config, features: {...config.features, productRecommendations: e.target.checked}})} /> Produkt-Empfehlungen</label><br/>
-        <label><input type="checkbox" checked={config.features.trendForecasting} onChange={e => setConfig({...config, features: {...config.features, trendForecasting: e.target.checked}})} /> Trend-Prognose</label><br/>
-        <label><input type="checkbox" checked={config.features.emailOptimization} onChange={e => setConfig({...config, features: {...config.features, emailOptimization: e.target.checked}})} /> E-Mail Optimierung</label>
-      </div>
-      <div style={{ marginTop: '20px' }}>
-        <label>Konfidenz: {Math.round(config.models.productRecommendation.minConfidence * 100)}%</label><br/>
-        <input type="range" min="0" max="100" value={config.models.productRecommendation.minConfidence * 100} onChange={e => setConfig({...config, models: {...config.models, productRecommendation: {...config.models.productRecommendation, minConfidence: parseInt(e.target.value) / 100}}})} style={{width: '300px'}} />
+
+      {message && (
+        <div className="analysis-section">
+          <div 
+            className="metric-card full-width"
+            style={{
+              background: message.type === 'success' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+              border: `2px solid ${message.type === 'success' ? '#22c55e' : '#ef4444'}`,
+              padding: '15px',
+              marginBottom: '20px'
+            }}
+          >
+            <p style={{ margin: 0, fontSize: '16px' }}>{message.text}</p>
+          </div>
+        </div>
+      )}
+
+      <div className="analysis-section">
+        <div className="metric-card full-width">
+          <h3 style={{ marginBottom: '20px' }}>Global ML Steuerung</h3>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            background: 'rgba(255,255,255,0.05)',
+            padding: '20px',
+            borderRadius: '8px',
+            border: config.enabled ? '2px solid #8b5cf6' : '2px solid rgba(255,255,255,0.1)'
+          }}>
+            <div>
+              <h4 style={{ marginBottom: '5px', fontSize: '18px' }}>Machine Learning Status</h4>
+              <p style={{ color: 'rgba(255,255,255,0.7)', margin: 0 }}>
+                {config.enabled ? 'KI-Features sind aktiviert und einsatzbereit' : 'KI-Features sind deaktiviert'}
+              </p>
+            </div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '15px', cursor: 'pointer' }}>
+              <span style={{ 
+                fontSize: '16px', 
+                fontWeight: 'bold',
+                color: config.enabled ? '#8b5cf6' : 'rgba(255,255,255,0.5)'
+              }}>
+                {config.enabled ? 'AKTIV' : 'INAKTIV'}
+              </span>
+              <input
+                type="checkbox"
+                checked={config.enabled}
+                onChange={e => setConfig({...config, enabled: e.target.checked})}
+                style={{ width: '24px', height: '24px', cursor: 'pointer' }}
+              />
+            </label>
+          </div>
+        </div>
+
+        <div className="metrics-grid">
+          <div 
+            className="metric-card"
+            style={{
+              background: config.features.productRecommendations ? 'rgba(139, 92, 246, 0.1)' : 'rgba(255,255,255,0.03)',
+              border: config.features.productRecommendations ? '2px solid #8b5cf6' : '1px solid rgba(255,255,255,0.1)'
+            }}
+          >
+            <div style={{ fontSize: '40px', marginBottom: '15px' }}>🛒</div>
+            <h3>Produkt-Empfehlungen</h3>
+            <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '15px', fontSize: '14px' }}>
+              KI-basierte Produktempfehlungen für höhere Conversion
+            </p>
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center',
+              padding: '10px 0',
+              borderTop: '1px solid rgba(255,255,255,0.1)'
+            }}>
+              <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#22c55e' }}>+15-30% Umsatz</span>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={config.features.productRecommendations}
+                  onChange={e => setConfig({...config, features: {...config.features, productRecommendations: e.target.checked}})}
+                  disabled={!config.enabled}
+                  style={{ width: '20px', height: '20px', cursor: config.enabled ? 'pointer' : 'not-allowed' }}
+                />
+              </label>
+            </div>
+          </div>
+
+          <div 
+            className="metric-card"
+            style={{
+              background: config.features.trendForecasting ? 'rgba(139, 92, 246, 0.1)' : 'rgba(255,255,255,0.03)',
+              border: config.features.trendForecasting ? '2px solid #8b5cf6' : '1px solid rgba(255,255,255,0.1)'
+            }}
+          >
+            <div style={{ fontSize: '40px', marginBottom: '15px' }}>📈</div>
+            <h3>Trend-Prognose</h3>
+            <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '15px', fontSize: '14px' }}>
+              Vorhersage von Produkt-Trends und Marktentwicklung
+            </p>
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center',
+              padding: '10px 0',
+              borderTop: '1px solid rgba(255,255,255,0.1)'
+            }}>
+              <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#22c55e' }}>Bessere Auswahl</span>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={config.features.trendForecasting}
+                  onChange={e => setConfig({...config, features: {...config.features, trendForecasting: e.target.checked}})}
+                  disabled={!config.enabled}
+                  style={{ width: '20px', height: '20px', cursor: config.enabled ? 'pointer' : 'not-allowed' }}
+                />
+              </label>
+            </div>
+          </div>
+
+          <div 
+            className="metric-card"
+            style={{
+              background: config.features.emailOptimization ? 'rgba(139, 92, 246, 0.1)' : 'rgba(255,255,255,0.03)',
+              border: config.features.emailOptimization ? '2px solid #8b5cf6' : '1px solid rgba(255,255,255,0.1)'
+            }}
+          >
+            <div style={{ fontSize: '40px', marginBottom: '15px' }}>📧</div>
+            <h3>E-Mail Optimierung</h3>
+            <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '15px', fontSize: '14px' }}>
+              Optimale Versandzeiten für maximale Open-Rate
+            </p>
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center',
+              padding: '10px 0',
+              borderTop: '1px solid rgba(255,255,255,0.1)'
+            }}>
+              <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#22c55e' }}>+20-40% Öffnung</span>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={config.features.emailOptimization}
+                  onChange={e => setConfig({...config, features: {...config.features, emailOptimization: e.target.checked}})}
+                  disabled={!config.enabled}
+                  style={{ width: '20px', height: '20px', cursor: config.enabled ? 'pointer' : 'not-allowed' }}
+                />
+              </label>
+            </div>
+          </div>
+
+          <div className="metric-card" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', opacity: 0.5 }}>
+            <div style={{ fontSize: '40px', marginBottom: '15px' }}>💰</div>
+            <h3>Dynamische Preise</h3>
+            <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '15px', fontSize: '14px' }}>Automatische Preisoptimierung</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+              <span style={{ fontSize: '12px', padding: '4px 8px', background: 'rgba(251, 191, 36, 0.2)', borderRadius: '4px' }}>Demnächst</span>
+            </div>
+          </div>
+
+          <div className="metric-card" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', opacity: 0.5 }}>
+            <div style={{ fontSize: '40px', marginBottom: '15px' }}>⚠️</div>
+            <h3>Churn-Vorhersage</h3>
+            <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '15px', fontSize: '14px' }}>Frühwarnung bei Kundenabwanderung</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+              <span style={{ fontSize: '12px', padding: '4px 8px', background: 'rgba(251, 191, 36, 0.2)', borderRadius: '4px' }}>Demnächst</span>
+            </div>
+          </div>
+
+          <div className="metric-card" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', opacity: 0.5 }}>
+            <div style={{ fontSize: '40px', marginBottom: '15px' }}>🛡️</div>
+            <h3>Betrugs-Erkennung</h3>
+            <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '15px', fontSize: '14px' }}>Automatische Betrugsprävention</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+              <span style={{ fontSize: '12px', padding: '4px 8px', background: 'rgba(251, 191, 36, 0.2)', borderRadius: '4px' }}>Demnächst</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="metric-card full-width">
+          <h3 style={{ marginBottom: '20px' }}>Erweiterte Einstellungen</h3>
+          
+          <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
+            <h4 style={{ marginBottom: '15px' }}>Produkt-Empfehlungen</h4>
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                Mindest-Konfidenz: <strong>{Math.round(config.models.productRecommendation.minConfidence * 100)}%</strong>
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={config.models.productRecommendation.minConfidence * 100}
+                onChange={e => setConfig({...config, models: {...config.models, productRecommendation: {...config.models.productRecommendation, minConfidence: parseInt(e.target.value) / 100}}})}
+                disabled={!config.enabled}
+                style={{ width: '100%', height: '8px', cursor: config.enabled ? 'pointer' : 'not-allowed' }}
+              />
+              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', marginTop: '8px' }}>
+                Minimale Sicherheit für ML-Vorhersagen (höher = konservativer)
+              </p>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <input
+                type="checkbox"
+                id="fallbackRules"
+                checked={config.models.productRecommendation.fallbackToRules}
+                onChange={e => setConfig({...config, models: {...config.models, productRecommendation: {...config.models.productRecommendation, fallbackToRules: e.target.checked}}})}
+                disabled={!config.enabled}
+                style={{ width: '18px', height: '18px', cursor: config.enabled ? 'pointer' : 'not-allowed' }}
+              />
+              <label htmlFor="fallbackRules" style={{ fontSize: '14px', cursor: config.enabled ? 'pointer' : 'not-allowed' }}>
+                Automatischer Fallback zu regelbasierten Empfehlungen
+              </label>
+            </div>
+          </div>
+
+          <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
+            <h4 style={{ marginBottom: '15px' }}>Performance</h4>
+            <div>
+              <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                Max. Inferenzzeit: <strong>{config.performance.maxInferenceTime / 1000}s</strong>
+              </label>
+              <input
+                type="range"
+                min="1000"
+                max="30000"
+                step="1000"
+                value={config.performance.maxInferenceTime}
+                onChange={e => setConfig({...config, performance: {...config.performance, maxInferenceTime: parseInt(e.target.value)}})}
+                disabled={!config.enabled}
+                style={{ width: '100%', height: '8px', cursor: config.enabled ? 'pointer' : 'not-allowed' }}
+              />
+              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', marginTop: '8px' }}>
+                Maximale Zeit für ML-Berechnungen (bei Timeout Fallback)
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="metric-card full-width" style={{ background: 'rgba(59, 130, 246, 0.1)', border: '2px solid #3b82f6' }}>
+          <h3 style={{ marginBottom: '15px' }}>Zero-Risk ML Integration</h3>
+          <ul style={{ fontSize: '14px', color: 'rgba(255,255,255,0.9)', paddingLeft: '20px', margin: 0, lineHeight: '1.8' }}>
+            <li>Automatischer Fallback zu regelbasierten Systemen</li>
+            <li>A/B Testing ohne Code-Änderungen möglich</li>
+            <li>Alle Features funktionieren mit und ohne ML</li>
+            <li>Performance-Monitoring inklusive</li>
+            <li>Konfidenz-basierte Qualitätssicherung</li>
+          </ul>
+        </div>
+
+        <div className="metric-card full-width">
+          <button
+            onClick={save}
+            disabled={saving}
+            style={{
+              width: '100%',
+              padding: '18px',
+              background: saving ? 'rgba(139, 92, 246, 0.5)' : 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
+              border: 'none',
+              borderRadius: '8px',
+              color: 'white',
+              fontSize: '18px',
+              fontWeight: 'bold',
+              cursor: saving ? 'not-allowed' : 'pointer',
+              transition: 'all 0.3s ease',
+              boxShadow: saving ? 'none' : '0 4px 15px rgba(139, 92, 246, 0.4)'
+            }}
+          >
+            {saving ? 'Speichert...' : 'Konfiguration speichern'}
+          </button>
+        </div>
       </div>
     </div>
   );

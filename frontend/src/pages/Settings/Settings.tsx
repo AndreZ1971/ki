@@ -271,6 +271,22 @@ const Settings = () => {
             >
               🔑 Lizenz
             </button>
+            <button
+              onClick={() => navigate('/settings/ml')}
+              style={{
+                padding: '12px 24px',
+                background: 'rgba(139, 92, 246, 0.2)',
+                border: '2px solid #8b5cf6',
+                borderRadius: '8px',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              🧠 Machine Learning
+            </button>
           </div>
 
           {/* TAB 1: Shop-Verbindung */}
