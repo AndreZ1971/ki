@@ -27,16 +27,6 @@ async function main() {
 }
   });
 
-  // 🔍 DEBUG: Parameter-Überprüfung
-  console.log('\n🔧 CLI PARAMETER-ANALYSE:');
-  console.log('Empfangene Argumente:', process.argv.slice(2));
-  console.log('Parsed argv:', argv);
-  console.log(`Suchbegriff: "${argv.keyword}"`);
-  console.log(`Region: ${argv.geo}`);
-  console.log(`Max Produkte: ${argv['max-products']}`);
-  console.log(`Auto-Publish: ${argv['auto-publish']}`);
-  console.log('=' .repeat(50));
-
   // Manuell in Zahlen konvertieren
   const maxProducts = parseInt(argv['max-products'] as string);
   const minScore = parseInt(argv['min-score'] as string);
@@ -97,7 +87,7 @@ Beispiele:
     }
     
   } catch (_error) {
-    console.error('❌ Fehler bei deutscher Produkt-Kreation:', error);
+    console.error('❌ Fehler bei deutscher Produkt-Kreation:', _error);
     process.exit(1);
   }
 }

@@ -124,16 +124,6 @@ function detectManualWooCommand(source: string | string[]): {
 
   const match = trimmedText.match(re);
 
-  // DEBUG: Zeige was gefunden wurde
-  if (match) {
-    console.log('DEBUG: Manual command detected:', match[0]);
-  } else {
-    console.log(
-      'DEBUG: No manual command found in:',
-      trimmedText.slice(0, 100) + '...'
-    );
-  }
-
   if (!match) return null;
 
   const [, kind, method, path1, path2, path3, tail] = match as [
@@ -213,12 +203,6 @@ export async function planAndAct(
   const manual = manualFromGoal ?? manualFromHistory;
 
   if (manual) {
-    console.log(
-      'DEBUG: Executing manual command:',
-      manual.name,
-      manual.args.path
-    );
-
     const steps: Step[] = [];
     const tool = toolByName(manual.name);
 
@@ -261,10 +245,6 @@ export async function planAndAct(
       return { result: `Fehler: ${String(msg)}`, steps };
     }
   }
-
-  console.log(
-    'DEBUG: No manual command detected, falling back to LLM planning'
-  );
 
   // ---------- 2) LLM-Planung (nur wenn OPENAI_API_KEY vorhanden) ----------
   const client = await getOpenAIClient();

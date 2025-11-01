@@ -29,19 +29,6 @@ function getWooConfig() {
   const key = process.env.WOO_KEY || process.env.WC_CONSUMER_KEY || '';
   const secret = process.env.WOO_SECRET || process.env.WC_CONSUMER_SECRET || '';
 
-  // DEBUG: Zeige welche Variablen gefunden wurden
-  console.log('DEBUG Woo Config:', {
-    WOO_URL: process.env.WOO_URL,
-    WC_API_URL: process.env.WC_API_URL,
-    WOO_KEY: process.env.WOO_KEY ? '***' : 'not set',
-    WC_CONSUMER_KEY: process.env.WC_CONSUMER_KEY ? '***' : 'not set',
-    WOO_SECRET: process.env.WOO_SECRET ? '***' : 'not set',
-    WC_CONSUMER_SECRET: process.env.WC_CONSUMER_SECRET ? '***' : 'not set',
-    selectedBase: base,
-    selectedKey: key ? '***' : 'not set',
-    selectedSecret: secret ? '***' : 'not set',
-  });
-
   if (!base || !key || !secret) {
     throw new Error(
       'Woo config missing: WOO_URL/WC_API_URL, WOO_KEY/WC_CONSUMER_KEY, WOO_SECRET/WC_CONSUMER_SECRET must be set in .env'
