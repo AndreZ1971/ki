@@ -1,0 +1,928 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '../AnalyseMetrics/page.css';
+
+interface ShopCredentials {
+  // WordPress
+  wpUrl: string;
+  wpUsername: string;
+  wpAppPassword: string;
+  
+  // WooCommerce
+  wcApiUrl: string;
+  wcConsumerKey: string;
+  wcConsumerSecret: string;
+  wooAuthMode: 'basic' | 'oauth';
+  wooTimeoutMs: number;
+  
+  // AI & Services
+  openaiApiKey: string;
+  openaiModel: string;
+  githubToken: string;
+  
+  // Job Configuration
+  jobMode: 'once' | 'interval';
+  jobIntervalMs: number;
+  
+  // Optional Services
+  enableAnalytics: boolean;
+  enableAutoProducts: boolean;
+  enableEmailMarketing: boolean;
+}
+
+interface Specialization {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  icon: string;
+  isActive: boolean;
+  features: string[];
+}
+
+const Settings = () => {
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'connection' | 'specialization' | 'license'>('connection');
+  const [testingConnection, setTestingConnection] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  // Shop-Verbindungsdaten
+  const [credentials, setCredentials] = useState<ShopCredentials>({
+    wpUrl: '',
+    wpUsername: '',
+    wpAppPassword: '',
+    wcApiUrl: '',
+    wcConsumerKey: '',
+    wcConsumerSecret: '',
+    wooAuthMode: 'basic',
+    wooTimeoutMs: 30000,
+    openaiApiKey: '',
+    openaiModel: 'gpt-4o-mini',
+    githubToken: '',
+    jobMode: 'once',
+    jobIntervalMs: 900000,
+    enableAnalytics: true,
+    enableAutoProducts: true,
+    enableEmailMarketing: true
+  });
+
+  // Lizenz-Daten
+  const [licenseKey, setLicenseKey] = useState('');
+  const [activatingLicense, setActivatingLicense] = useState(false);
+
+  // Verfügbare Spezialisierungen
+  const [specializations] = useState<Specialization[]>([
+    {
+      id: 'dsgvo-digital',
+      name: 'DSGVO Digitale Produkte',
+      description: 'Spezialisiert auf datenschutzkonforme digitale Inhalte für EU-Markt',
+      price: 99,
+      icon: '🔒',
+      isActive: true,
+      features: [
+        'DSGVO-konforme Produkttexte',
+        'EU-rechtskonforme Beschreibungen',
+        'Cookie-Consent Templates',
+        'Impressum & AGB Generator',
+        'Datenschutz-Optimierung'
+      ]
+    },
+    {
+      id: 'reisebuero',
+      name: 'Reisebüro',
+      description: 'Optimiert für Reise- und Tourismusbranche',
+      price: 149,
+      icon: '✈️',
+      isActive: false,
+      features: [
+        'Reisebeschreibungen',
+        'Hotel & Unterkunft Marketing',
+        'Destination Content',
+        'Buchungsoptimierung',
+        'Review-Management'
+      ]
+    },
+    {
+      id: '3d-druck',
+      name: '3D-Druck Objekte',
+      description: 'Spezialisiert auf 3D-Druck E-Commerce',
+      price: 129,
+      icon: '🖨️',
+      isActive: false,
+      features: [
+        'Technische Spezifikationen',
+        'Material-Beschreibungen',
+        'STL-File Handling',
+        'Custom-Order Workflows',
+        'Drucker-Kompatibilität'
+      ]
+    },
+    {
+      id: 'fashion',
+      name: 'Fashion & Bekleidung',
+      description: 'Mode und Bekleidungshandel',
+      price: 119,
+      icon: '👗',
+      isActive: false,
+      features: [
+        'Produkt-Styling Texte',
+        'Größentabellen',
+        'Material & Pflege',
+        'Trend-Analysen',
+        'Lookbook-Content'
+      ]
+    }
+  ]);
+
+  const handleBack = () => {
+    navigate('/');
+  };
+
+  const handleCredentialChange = (field: keyof ShopCredentials, value: string | number | boolean) => {
+    setCredentials(prev => ({ ...prev, [field]: value }));
+  };
+
+  const testConnection = async () => {
+    setTestingConnection(true);
+    setConnectionStatus('idle');
+    
+    try {
+      // Simuliere API-Call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Validierung
+      if (!credentials.wpUrl || !credentials.wcApiUrl) {
+        throw new Error('URLs fehlen');
+      }
+      
+      setConnectionStatus('success');
+      console.log('✅ Verbindung erfolgreich getestet');
+    } catch (error) {
+      setConnectionStatus('error');
+      console.error('❌ Verbindungsfehler:', error);
+    } finally {
+      setTestingConnection(false);
+    }
+  };
+
+  const saveConfiguration = async () => {
+    try {
+      console.log('💾 Speichere Konfiguration...', credentials);
+      alert('✅ Konfiguration gespeichert!');
+    } catch (error) {
+      console.error('❌ Fehler beim Speichern:', error);
+      alert('❌ Fehler beim Speichern der Konfiguration');
+    }
+  };
+
+  const activateLicense = async () => {
+    if (!licenseKey) {
+      alert('❌ Bitte gib einen Lizenzschlüssel ein');
+      return;
+    }
+
+    setActivatingLicense(true);
+    
+    try {
+      // Simuliere Lizenz-Aktivierung
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      console.log('🔑 Lizenz aktiviert:', licenseKey);
+      alert('✅ Lizenz erfolgreich aktiviert!');
+    } catch (error) {
+      console.error('❌ Lizenz-Aktivierung fehlgeschlagen:', error);
+      alert('❌ Ungültiger Lizenzschlüssel');
+    } finally {
+      setActivatingLicense(false);
+    }
+  };
+
+  const purchaseSpecialization = (spec: Specialization) => {
+    console.log('🛒 Kaufe Spezialisierung:', spec.name);
+    alert(`🛒 Weiterleitung zum Kauf: ${spec.name} (${spec.price}€)`);
+  };
+
+  return (
+    <div className="analytics-page">
+      {/* Floating Back Button */}
+      <button className="back-button floating-back" onClick={handleBack}>
+        ← Zurück
+      </button>
+
+      <div className="analytics-header">
+        <h1>⚙️ Konfiguration & Einstellungen</h1>
+        <p>Shop-Verbindung, Spezialisierung und Lizenz-Verwaltung</p>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="analysis-section">
+        <div className="metric-card full-width">
+          <div className="tab-navigation" style={{ 
+            display: 'flex', 
+            gap: '10px', 
+            marginBottom: '30px',
+            borderBottom: '2px solid rgba(255,255,255,0.1)',
+            paddingBottom: '10px'
+          }}>
+            <button
+              onClick={() => setActiveTab('connection')}
+              style={{
+                padding: '12px 24px',
+                background: activeTab === 'connection' ? 'rgba(59, 130, 246, 0.3)' : 'transparent',
+                border: activeTab === 'connection' ? '2px solid #3b82f6' : '2px solid transparent',
+                borderRadius: '8px',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: activeTab === 'connection' ? 'bold' : 'normal',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              🔌 Shop-Verbindung
+            </button>
+            <button
+              onClick={() => setActiveTab('specialization')}
+              style={{
+                padding: '12px 24px',
+                background: activeTab === 'specialization' ? 'rgba(59, 130, 246, 0.3)' : 'transparent',
+                border: activeTab === 'specialization' ? '2px solid #3b82f6' : '2px solid transparent',
+                borderRadius: '8px',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: activeTab === 'specialization' ? 'bold' : 'normal',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              🎯 Spezialisierung
+            </button>
+            <button
+              onClick={() => setActiveTab('license')}
+              style={{
+                padding: '12px 24px',
+                background: activeTab === 'license' ? 'rgba(59, 130, 246, 0.3)' : 'transparent',
+                border: activeTab === 'license' ? '2px solid #3b82f6' : '2px solid transparent',
+                borderRadius: '8px',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: activeTab === 'license' ? 'bold' : 'normal',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              🔑 Lizenz
+            </button>
+            <button
+              onClick={() => navigate('/settings/ml')}
+              style={{
+                padding: '12px 24px',
+                background: 'rgba(139, 92, 246, 0.2)',
+                border: '2px solid #8b5cf6',
+                borderRadius: '8px',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              🧠 Machine Learning
+            </button>
+          </div>
+
+          {/* TAB 1: Shop-Verbindung */}
+          {activeTab === 'connection' && (
+            <div>
+              <h3>🔌 Shop-Verbindung einrichten</h3>
+              <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '30px' }}>
+                Verbinde dein WooCommerce/WordPress Shop mit dem AI-Agent
+              </p>
+
+              <div style={{ display: 'grid', gap: '20px', marginBottom: '30px' }}>
+                {/* WordPress Credentials */}
+                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
+                  <h4 style={{ marginBottom: '15px' }}>📝 WordPress Zugangsdaten</h4>
+                  
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                      WordPress URL:
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="https://meinshop.de"
+                      value={credentials.wpUrl}
+                      onChange={(e) => handleCredentialChange('wpUrl', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        background: 'rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: 'white',
+                        fontSize: '14px'
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                      Username/Email:
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="admin@meinshop.de"
+                      value={credentials.wpUsername}
+                      onChange={(e) => handleCredentialChange('wpUsername', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        background: 'rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: 'white',
+                        fontSize: '14px'
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                      Application Password:
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="xxxx xxxx xxxx xxxx"
+                      value={credentials.wpAppPassword}
+                      onChange={(e) => handleCredentialChange('wpAppPassword', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        background: 'rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: 'white',
+                        fontSize: '14px'
+                      }}
+                    />
+                    <small style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>
+                      💡 Erstelle ein Application Password in WordPress unter Benutzer → Profil
+                    </small>
+                  </div>
+                </div>
+
+                {/* WooCommerce Credentials */}
+                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
+                  <h4 style={{ marginBottom: '15px' }}>🛒 WooCommerce API Keys</h4>
+                  
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                      WooCommerce API URL:
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="https://meinshop.de"
+                      value={credentials.wcApiUrl}
+                      onChange={(e) => handleCredentialChange('wcApiUrl', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        background: 'rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: 'white',
+                        fontSize: '14px'
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                      Consumer Key:
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="ck_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                      value={credentials.wcConsumerKey}
+                      onChange={(e) => handleCredentialChange('wcConsumerKey', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        background: 'rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: 'white',
+                        fontSize: '14px'
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                      Consumer Secret:
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="cs_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                      value={credentials.wcConsumerSecret}
+                      onChange={(e) => handleCredentialChange('wcConsumerSecret', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        background: 'rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: 'white',
+                        fontSize: '14px'
+                      }}
+                    />
+                    <small style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>
+                      💡 Erstelle API-Keys in WooCommerce → Einstellungen → Erweitert → REST API
+                    </small>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                        Auth Mode:
+                      </label>
+                      <select
+                        value={credentials.wooAuthMode}
+                        onChange={(e) => handleCredentialChange('wooAuthMode', e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '12px',
+                          background: 'rgba(0,0,0,0.3)',
+                          border: '1px solid rgba(255,255,255,0.2)',
+                          borderRadius: '6px',
+                          color: 'white',
+                          fontSize: '14px'
+                        }}
+                      >
+                        <option value="basic">Basic Auth</option>
+                        <option value="oauth">OAuth</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                        Timeout (ms):
+                      </label>
+                      <input
+                        type="number"
+                        value={credentials.wooTimeoutMs}
+                        onChange={(e) => handleCredentialChange('wooTimeoutMs', parseInt(e.target.value))}
+                        style={{
+                          width: '100%',
+                          padding: '12px',
+                          background: 'rgba(0,0,0,0.3)',
+                          border: '1px solid rgba(255,255,255,0.2)',
+                          borderRadius: '6px',
+                          color: 'white',
+                          fontSize: '14px'
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* AI & Services Configuration */}
+                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
+                  <h4 style={{ marginBottom: '15px' }}>🤖 AI & Services</h4>
+                  
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                      OpenAI API Key:
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                      value={credentials.openaiApiKey}
+                      onChange={(e) => handleCredentialChange('openaiApiKey', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        background: 'rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: 'white',
+                        fontSize: '14px'
+                      }}
+                    />
+                    <small style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>
+                      💡 Benötigt für AI-Features (Content-Generierung, Optimierung, etc.)
+                    </small>
+                  </div>
+
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                      OpenAI Model:
+                    </label>
+                    <select
+                      value={credentials.openaiModel}
+                      onChange={(e) => handleCredentialChange('openaiModel', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        background: 'rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: 'white',
+                        fontSize: '14px'
+                      }}
+                    >
+                      <option value="gpt-4o">GPT-4o (Empfohlen)</option>
+                      <option value="gpt-4o-mini">GPT-4o Mini (Schneller)</option>
+                      <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                      <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Günstig)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                      GitHub Token (Optional):
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                      value={credentials.githubToken}
+                      onChange={(e) => handleCredentialChange('githubToken', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        background: 'rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: 'white',
+                        fontSize: '14px'
+                      }}
+                    />
+                    <small style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>
+                      💡 Nur für erweiterte Integrationen notwendig
+                    </small>
+                  </div>
+                </div>
+
+                {/* Job Configuration */}
+                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
+                  <h4 style={{ marginBottom: '15px' }}>⚙️ Job-Konfiguration</h4>
+                  
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                      Job Mode:
+                    </label>
+                    <select
+                      value={credentials.jobMode}
+                      onChange={(e) => handleCredentialChange('jobMode', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        background: 'rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: 'white',
+                        fontSize: '14px'
+                      }}
+                    >
+                      <option value="once">Einmalig (Once)</option>
+                      <option value="interval">Intervall (Wiederkehrend)</option>
+                    </select>
+                    <small style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>
+                      💡 Legt fest, ob Jobs einmalig oder wiederkehrend ausgeführt werden
+                    </small>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                      Job Intervall (ms):
+                    </label>
+                    <input
+                      type="number"
+                      value={credentials.jobIntervalMs}
+                      onChange={(e) => handleCredentialChange('jobIntervalMs', parseInt(e.target.value))}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        background: 'rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: 'white',
+                        fontSize: '14px'
+                      }}
+                    />
+                    <small style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>
+                      💡 Standard: 900000ms (15 Minuten) - Nur relevant bei "Intervall"-Modus
+                    </small>
+                  </div>
+                </div>
+
+                {/* Feature Toggles */}
+                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
+                  <h4 style={{ marginBottom: '15px' }}>🎛️ Feature-Aktivierung</h4>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={credentials.enableAnalytics}
+                        onChange={(e) => handleCredentialChange('enableAnalytics', e.target.checked)}
+                        style={{ 
+                          marginRight: '10px', 
+                          width: '20px', 
+                          height: '20px',
+                          cursor: 'pointer'
+                        }}
+                      />
+                      <span style={{ color: 'rgba(255,255,255,0.9)' }}>
+                        📊 Analytics & Reporting aktivieren
+                      </span>
+                    </label>
+
+                    <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={credentials.enableAutoProducts}
+                        onChange={(e) => handleCredentialChange('enableAutoProducts', e.target.checked)}
+                        style={{ 
+                          marginRight: '10px', 
+                          width: '20px', 
+                          height: '20px',
+                          cursor: 'pointer'
+                        }}
+                      />
+                      <span style={{ color: 'rgba(255,255,255,0.9)' }}>
+                        🤖 Auto-Product-Creation aktivieren
+                      </span>
+                    </label>
+
+                    <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={credentials.enableEmailMarketing}
+                        onChange={(e) => handleCredentialChange('enableEmailMarketing', e.target.checked)}
+                        style={{ 
+                          marginRight: '10px', 
+                          width: '20px', 
+                          height: '20px',
+                          cursor: 'pointer'
+                        }}
+                      />
+                      <span style={{ color: 'rgba(255,255,255,0.9)' }}>
+                        📧 Email-Marketing aktivieren
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Connection Status */}
+              {connectionStatus !== 'idle' && (
+                <div style={{
+                  padding: '15px',
+                  borderRadius: '8px',
+                  marginBottom: '20px',
+                  background: connectionStatus === 'success' 
+                    ? 'rgba(34, 197, 94, 0.2)' 
+                    : 'rgba(239, 68, 68, 0.2)',
+                  border: `1px solid ${connectionStatus === 'success' ? '#22c55e' : '#ef4444'}`
+                }}>
+                  {connectionStatus === 'success' ? (
+                    <span style={{ color: '#22c55e' }}>✅ Verbindung erfolgreich getestet!</span>
+                  ) : (
+                    <span style={{ color: '#ef4444' }}>❌ Verbindung fehlgeschlagen. Prüfe deine Zugangsdaten.</span>
+                  )}
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  onClick={testConnection}
+                  disabled={testingConnection}
+                  style={{
+                    padding: '12px 24px',
+                    background: testingConnection ? 'rgba(100,100,100,0.3)' : 'rgba(59, 130, 246, 0.3)',
+                    border: '2px solid #3b82f6',
+                    borderRadius: '8px',
+                    color: 'white',
+                    cursor: testingConnection ? 'not-allowed' : 'pointer',
+                    fontSize: '16px',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  {testingConnection ? '🔄 Teste Verbindung...' : '🧪 Verbindung testen'}
+                </button>
+
+                <button
+                  onClick={saveConfiguration}
+                  style={{
+                    padding: '12px 24px',
+                    background: 'rgba(34, 197, 94, 0.3)',
+                    border: '2px solid #22c55e',
+                    borderRadius: '8px',
+                    color: 'white',
+                    cursor: 'pointer',
+                    fontSize: '16px',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  💾 Konfiguration speichern
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: Spezialisierung */}
+          {activeTab === 'specialization' && (
+            <div>
+              <h3>🎯 Agent-Spezialisierung wählen</h3>
+              <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '30px' }}>
+                Wähle eine Branche, um den AI-Agent optimal auf deine Produkte zu trainieren
+              </p>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+                {specializations.map((spec) => (
+                  <div
+                    key={spec.id}
+                    style={{
+                      background: spec.isActive 
+                        ? 'linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.05))'
+                        : 'rgba(255,255,255,0.05)',
+                      border: spec.isActive ? '2px solid #22c55e' : '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '12px',
+                      padding: '24px',
+                      position: 'relative',
+                      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                      cursor: 'pointer'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-5px)';
+                      e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.3)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
+                    {spec.isActive && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '10px',
+                        right: '10px',
+                        background: '#22c55e',
+                        color: 'white',
+                        padding: '4px 12px',
+                        borderRadius: '20px',
+                        fontSize: '12px',
+                        fontWeight: 'bold'
+                      }}>
+                        ✓ AKTIV
+                      </div>
+                    )}
+
+                    <div style={{ fontSize: '48px', marginBottom: '15px' }}>{spec.icon}</div>
+                    <h4 style={{ marginBottom: '10px', fontSize: '20px' }}>{spec.name}</h4>
+                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', marginBottom: '20px' }}>
+                      {spec.description}
+                    </p>
+
+                    <div style={{ marginBottom: '20px' }}>
+                      <strong style={{ color: 'rgba(255,255,255,0.9)', fontSize: '14px' }}>Features:</strong>
+                      <ul style={{ 
+                        marginTop: '10px', 
+                        paddingLeft: '20px', 
+                        fontSize: '13px',
+                        color: 'rgba(255,255,255,0.7)'
+                      }}>
+                        {spec.features.map((feature, idx) => (
+                          <li key={idx} style={{ marginBottom: '5px' }}>✓ {feature}</li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center',
+                      marginTop: 'auto'
+                    }}>
+                      <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#3b82f6' }}>
+                        {spec.price}€
+                      </div>
+                      {!spec.isActive && (
+                        <button
+                          onClick={() => purchaseSpecialization(spec)}
+                          style={{
+                            padding: '10px 20px',
+                            background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                            border: 'none',
+                            borderRadius: '8px',
+                            color: 'white',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            fontWeight: 'bold'
+                          }}
+                        >
+                          🛒 Jetzt kaufen
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: Lizenz */}
+          {activeTab === 'license' && (
+            <div>
+              <h3>🔑 Lizenz-Verwaltung</h3>
+              <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '30px' }}>
+                Aktiviere deine gekaufte Spezialisierung mit einem Lizenzschlüssel
+              </p>
+
+              <div style={{ background: 'rgba(255,255,255,0.05)', padding: '30px', borderRadius: '12px', maxWidth: '600px' }}>
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'block', marginBottom: '10px', color: 'rgba(255,255,255,0.9)', fontSize: '16px' }}>
+                    Lizenzschlüssel eingeben:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="XXXX-XXXX-XXXX-XXXX"
+                    value={licenseKey}
+                    onChange={(e) => setLicenseKey(e.target.value.toUpperCase())}
+                    style={{
+                      width: '100%',
+                      padding: '15px',
+                      background: 'rgba(0,0,0,0.3)',
+                      border: '2px solid rgba(255,255,255,0.2)',
+                      borderRadius: '8px',
+                      color: 'white',
+                      fontSize: '18px',
+                      fontFamily: 'monospace',
+                      textAlign: 'center',
+                      letterSpacing: '2px'
+                    }}
+                  />
+                  <small style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px', marginTop: '8px', display: 'block' }}>
+                    💡 Du findest deinen Lizenzschlüssel in der Kaufbestätigung per Email
+                  </small>
+                </div>
+
+                <button
+                  onClick={activateLicense}
+                  disabled={activatingLicense || !licenseKey}
+                  style={{
+                    width: '100%',
+                    padding: '15px',
+                    background: activatingLicense || !licenseKey 
+                      ? 'rgba(100,100,100,0.3)' 
+                      : 'linear-gradient(135deg, #22c55e, #16a34a)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: 'white',
+                    cursor: activatingLicense || !licenseKey ? 'not-allowed' : 'pointer',
+                    fontSize: '16px',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  {activatingLicense ? '⏳ Aktiviere Lizenz...' : '🔓 Lizenz aktivieren'}
+                </button>
+              </div>
+
+              {/* Aktive Lizenzen */}
+              <div style={{ marginTop: '40px' }}>
+                <h4 style={{ marginBottom: '20px' }}>📋 Aktive Lizenzen</h4>
+                <div style={{ background: 'rgba(34, 197, 94, 0.1)', border: '1px solid #22c55e', borderRadius: '8px', padding: '20px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '5px' }}>
+                        🔒 DSGVO Digitale Produkte
+                      </div>
+                      <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>
+                        Lizenz: DSGVO-2024-XXXX-XXXX
+                      </div>
+                      <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '5px' }}>
+                        Aktiviert am: 31.10.2025 | Läuft ab: 31.10.2026
+                      </div>
+                    </div>
+                    <div style={{
+                      background: '#22c55e',
+                      color: 'white',
+                      padding: '6px 16px',
+                      borderRadius: '20px',
+                      fontSize: '14px',
+                      fontWeight: 'bold'
+                    }}>
+                      ✓ AKTIV
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Settings;
