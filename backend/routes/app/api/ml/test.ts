@@ -31,7 +31,7 @@ const mlTestRoutes: FastifyPluginAsync = async (fastify) => {
         timestamp: new Date().toISOString()
       };
     } catch (_error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = _error instanceof Error ? _error.message : 'Unknown error';
       logger.error(`Error testing product recommendations: ${errorMessage}`);
       return reply.status(500).send({
         success: false,
@@ -65,7 +65,7 @@ const mlTestRoutes: FastifyPluginAsync = async (fastify) => {
         timestamp: new Date().toISOString()
       };
     } catch (_error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = _error instanceof Error ? _error.message : 'Unknown error';
       logger.error(`Error testing trend forecasting: ${errorMessage}`);
       return reply.status(500).send({
         success: false,

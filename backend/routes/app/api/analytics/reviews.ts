@@ -17,7 +17,7 @@ function initializeOpenAI() {
       console.log('✅ Reviews OpenAI Client erfolgreich initialisiert');
     }
   } catch (_error) {
-    console.error('❌ Fehler bei Reviews OpenAI Initialisierung:', error);
+    console.error('❌ Fehler bei Reviews OpenAI Initialisierung:', _error);
     openai = null;
   }
   

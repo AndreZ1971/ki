@@ -131,7 +131,7 @@ async function generateSocialMediaPosts() {
     return generatedPosts;
     
   } catch (_error) {
-    console.error('❌ Fehler bei Social Media Generierung:', error);
+    console.error('❌ Fehler bei Social Media Generierung:', _error);
     return [];
   }
 }
@@ -192,7 +192,7 @@ async function main() {
   try {
     await generateSocialMediaPosts();
   } catch (_error) {
-    console.error('❌ Fehler in main:', error);
+    console.error('❌ Fehler in main:', _error);
   }
 }
 

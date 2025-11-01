@@ -20,7 +20,7 @@ function initializeOpenAI() {
       console.log('✅ OpenAI Client erfolgreich initialisiert');
     }
   } catch (_error) {
-    console.error('❌ Fehler bei OpenAI Initialisierung:', error);
+    console.error('❌ Fehler bei OpenAI Initialisierung:', _error);
     openai = null;
   }
   

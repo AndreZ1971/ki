@@ -101,7 +101,7 @@ Examples:
     process.exit(0);
 
   } catch (_error) {
-    console.error('❌ Fehler bei der Trend-Analyse:', error);
+    console.error('❌ Fehler bei der Trend-Analyse:', _error);
     process.exit(1);
   }
 }

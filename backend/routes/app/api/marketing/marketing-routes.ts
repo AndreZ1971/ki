@@ -81,7 +81,7 @@ export default async function marketingRoutes(fastify: FastifyInstance) {
         });
 
       } catch (_error) {
-        fastify.log.error(error);
+        fastify.log.error(_error);
         return reply.status(500).send({
           success: false,
           error: 'Content-Generierung fehlgeschlagen'
@@ -129,7 +129,7 @@ export default async function marketingRoutes(fastify: FastifyInstance) {
         });
 
       } catch (_error) {
-        fastify.log.error(error);
+        fastify.log.error(_error);
         return reply.status(500).send({
           success: false,
           error: 'Kampagnen-Erstellung fehlgeschlagen'
@@ -164,7 +164,7 @@ export default async function marketingRoutes(fastify: FastifyInstance) {
         });
 
       } catch (_error) {
-        fastify.log.error(error);
+        fastify.log.error(_error);
         return reply.status(500).send({
           success: false,
           error: 'Audio-Generierung fehlgeschlagen'
@@ -214,7 +214,7 @@ export default async function marketingRoutes(fastify: FastifyInstance) {
         });
 
       } catch (_error) {
-        fastify.log.error(error);
+        fastify.log.error(_error);
         return reply.status(500).send({
           success: false,
           error: 'Post-Erstellung fehlgeschlagen'
@@ -268,7 +268,7 @@ export default async function marketingRoutes(fastify: FastifyInstance) {
         });
 
       } catch (_error) {
-        fastify.log.error(error);
+        fastify.log.error(_error);
         return reply.status(500).send({
           success: false,
           error: 'Conversion-Analyse fehlgeschlagen'
@@ -319,7 +319,7 @@ export default async function marketingRoutes(fastify: FastifyInstance) {
         });
 
       } catch (_error) {
-        fastify.log.error(error);
+        fastify.log.error(_error);
         return reply.status(500).send({
           success: false,
           error: 'Monetarisierung fehlgeschlagen'
@@ -381,7 +381,7 @@ export default async function marketingRoutes(fastify: FastifyInstance) {
         });
 
       } catch (_error) {
-        fastify.log.error(error);
+        fastify.log.error(_error);
         return reply.status(500).send({
           success: false,
           error: 'Template-Laden fehlgeschlagen'

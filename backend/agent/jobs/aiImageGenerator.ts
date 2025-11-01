@@ -99,7 +99,7 @@ async function generateProductImages() {
     return updatedProducts;
     
   } catch (_error) {
-    console.error('❌ Fehler bei der Bild-Zuweisung:', error);
+    console.error('❌ Fehler bei der Bild-Zuweisung:', _error);
     return [];
   }
 }
@@ -114,7 +114,7 @@ async function main() {
   try {
     await generateProductImages();
   } catch (_error) {
-    console.error('❌ Fehler in main:', error);
+    console.error('❌ Fehler in main:', _error);
   }
 }
 

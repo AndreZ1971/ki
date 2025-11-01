@@ -374,8 +374,8 @@ async function sendAutomatedReports() {
     };
     
   } catch (_error) {
-    console.error('❌ Fehler bei Report-Generierung:', error);
-    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    console.error('❌ Fehler bei Report-Generierung:', _error);
+    return { success: false, error: _error instanceof Error ? _error.message : 'Unknown error' };
   }
 }
 
@@ -413,7 +413,7 @@ async function checkPerformanceAlerts() {
     return alerts;
     
   } catch (_error) {
-    console.error('❌ Fehler bei Alert-Check:', error);
+    console.error('❌ Fehler bei Alert-Check:', _error);
     return [];
   }
 }
@@ -443,7 +443,7 @@ async function main() {
   try {
     await runAnalyticsAutomation();
   } catch (_error) {
-    console.error('❌ Fehler in main:', error);
+    console.error('❌ Fehler in main:', _error);
   }
 }
 

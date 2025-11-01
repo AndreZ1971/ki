@@ -100,7 +100,7 @@ async function analyzeGoogleTrends(keyword: string, geo: string): Promise<TrendD
     return trends;
 
   } catch (_error) {
-    console.error('❌ Google Trends Fehler:', error);
+    console.error('❌ Google Trends Fehler:', _error);
     return [];
   }
 }

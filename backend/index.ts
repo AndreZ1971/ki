@@ -80,7 +80,7 @@ async function main(): Promise<void> {
     console.log(result);
   } catch (_err) {
     console.error(
-      `Fehler beim Planen: ${err instanceof Error ? err.message : String(err)}`
+      `Fehler beim Planen: ${_err instanceof Error ? _err.message : String(_err)}`
     );
     process.exit(1);
   }
