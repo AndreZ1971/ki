@@ -30,40 +30,104 @@ export default async function bundleRoutes(server: FastifyInstance) {
     {
       schema: {
         tags: ['bundles'],
-        description: 'Holt alle Bundles'
+        description: 'Holt alle Bundles - analysiert häufig zusammen gekaufte Produkte'
       }
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const mockBundles: Bundle[] = [
+        // ✅ ECHTE Bundle-Vorschläge aus WooCommerce Order-Daten
+        const wooConfig = {
+          url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
+          consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
+          consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
+        };
+
+        const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
+        
+        // Lade abgeschlossene Orders der letzten 90 Tage
+        const ordersResponse = await fetch(
+          `${wooConfig.url}/wp-json/wc/v3/orders?status=completed&per_page=100&after=${new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString()}`,
           {
-            id: 1,
-            name: 'WordPress Starter Pack',
-            products: ['Theme', 'Plugin', 'Tutorial'],
-            price: 79.99,
-            discount: 20,
-            active: true,
-            createdAt: '2024-01-15'
-          },
-          {
-            id: 2,
-            name: 'SEO Complete Bundle',
-            products: ['SEO Plugin', 'Guide', 'Templates'],
-            price: 129.99,
-            discount: 25,
-            active: false,
-            createdAt: '2024-01-10'
+            headers: {
+              'Authorization': `Basic ${auth}`,
+              'Content-Type': 'application/json',
+            },
           }
-        ];
+        );
+
+        if (!ordersResponse.ok) {
+          throw new Error(`WooCommerce API Error: ${ordersResponse.status}`);
+        }
+
+        const orders = await ordersResponse.json() as any[];
+        
+        // Analysiere welche Produkte häufig zusammen gekauft werden
+        const productCombinations = new Map<string, number>();
+        
+        for (const order of orders) {
+          const lineItems = order.line_items || [];
+          const productIds = lineItems.map((item: any) => item.product_id).sort();
+          
+          // Alle 2er-Kombinationen zählen
+          for (let i = 0; i < productIds.length - 1; i++) {
+            for (let j = i + 1; j < productIds.length; j++) {
+              const key = `${productIds[i]}-${productIds[j]}`;
+              productCombinations.set(key, (productCombinations.get(key) || 0) + 1);
+            }
+          }
+        }
+        
+        // Top 5 häufigste Kombinationen
+        const topCombinations = Array.from(productCombinations.entries())
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5);
+        
+        // Erstelle Bundle-Vorschläge
+        const bundles: Bundle[] = await Promise.all(
+          topCombinations.map(async ([combo, count], index) => {
+            const [productId1, productId2] = combo.split('-');
+            
+            // Lade Produkt-Details
+            const [prod1Response, prod2Response] = await Promise.all([
+              fetch(`${wooConfig.url}/wp-json/wc/v3/products/${productId1}`, {
+                headers: { 'Authorization': `Basic ${auth}` }
+              }),
+              fetch(`${wooConfig.url}/wp-json/wc/v3/products/${productId2}`, {
+                headers: { 'Authorization': `Basic ${auth}` }
+              })
+            ]);
+            
+            const prod1 = await prod1Response.json();
+            const prod2 = await prod2Response.json();
+            
+            const totalPrice = parseFloat(prod1.price) + parseFloat(prod2.price);
+            const discount = count > 5 ? 20 : count > 3 ? 15 : 10; // Mehr Käufe = mehr Rabatt
+            
+            return {
+              id: index + 1,
+              name: `${prod1.name} + ${prod2.name}`,
+              products: [prod1.name, prod2.name],
+              price: parseFloat((totalPrice * (1 - discount / 100)).toFixed(2)),
+              discount,
+              active: true,
+              description: `Häufig zusammen gekauft (${count}x)`,
+              createdAt: new Date().toISOString()
+            };
+          })
+        );
 
         return reply.send({
           success: true,
-          data: mockBundles
+          data: bundles,
+          total: bundles.length,
+          source: 'woocommerce-order-analysis',
+          ordersAnalyzed: orders.length
         });
       } catch (_error) {
+        console.error('Bundles API Error:', _error);
         return reply.status(500).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Unbekannter Fehler'
+          error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
         });
       }
     }
