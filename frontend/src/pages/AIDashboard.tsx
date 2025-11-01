@@ -325,84 +325,96 @@ const AIDashboard: React.FC = () => {
           title: '⚡ Payment Fast',
           description: 'Schnelle Payment-Verarbeitung und Bestätigung',
           endpoint: 'payments/process',
-          icon: '⚡'
+          icon: '⚡',
+          pageUrl: '/payments/fast'
         },
         {
           id: 'payment-simplified',
           title: '🎯 Payment Simplified',
           description: 'Vereinfachte Payment-Abläufe für bessere Conversion',
           endpoint: 'payments/simplify',
-          icon: '🎯'
+          icon: '🎯',
+          pageUrl: '/payments/simplified'
         },
         {
           id: 'payment-tester',
           title: '🧪 Payment Tester',
           description: 'Teste Payment-Prozesse automatisch',
           endpoint: 'payments/test',
-          icon: '🧪'
+          icon: '🧪',
+          pageUrl: '/payments/tester'
         },
         {
           id: 'payment-verifier',
           title: '✅ Payment Verifier',
           description: 'Automatische Payment-Verifikation und Validierung',
           endpoint: 'payments/verify',
-          icon: '✅'
+          icon: '✅',
+          pageUrl: '/payments/verifier'
         },
         {
           id: 'payment-success',
           title: '🎉 Payment Success',
           description: 'Erfolgreiche Payment-Abschlüsse verwalten',
           endpoint: 'payments/success',
-          icon: '🎉'
+          icon: '🎉',
+          pageUrl: '/payments/success'
         },
         {
           id: 'payment-validation',
           title: '🔐 Payment Validation',
           description: 'Sichere Payment-Validierung und Fraud-Check',
           endpoint: 'payments/validate',
-          icon: '🔐'
+          icon: '🔐',
+          pageUrl: '/payments/validation'
         },
         {
           id: 'payment-issued-detector',
           title: '📋 Payment Issued Detector',
           description: 'Erkenne und behandle Payment-Probleme automatisch',
           endpoint: 'payments/issues',
-          icon: '📋'
+          icon: '📋',
+          pageUrl: '/payments/issued-detector'
         },
         {
           id: 'payment-user-favor',
           title: '❤️ Payment User Favor',
           description: 'Personalized Payment-Erfahrungen für Kunden',
           endpoint: 'payments/experience',
-          icon: '❤️'
+          icon: '❤️',
+          pageUrl: '/payments/user-favor'
         },
         {
           id: 'payment-delisoger',
           title: '📦 Payment Delivery',
           description: 'Payment-Delivery und Versandabwicklung',
           endpoint: 'payments/delivery',
-          icon: '📦'
+          icon: '📦',
+          pageUrl: '/payments/delivery'
         },
         {
           id: 'payment-energency',
           title: '🚨 Payment Emergency',
           description: 'Notfall-System für Payment-Probleme',
           endpoint: 'payments/emergency',
-          icon: '🚨'
+          icon: '🚨',
+          pageUrl: '/payments/emergency'
         },
         {
           id: 'payment-frompansion',
           title: '📈 Payment Expansion',
           description: 'Payment-System Erweiterung und Skalierung',
           endpoint: 'payments/expand',
-          icon: '📈'
+          icon: '📈',
+          pageUrl: '/payments/expansion'
         },
         {
           id: 'payment-quickcheck',
           title: '⚡ Payment Quick Check',
           description: 'Schneller Payment-Status Check',
           endpoint: 'payments/quickcheck',
-          icon: '⚡'
+          icon: '⚡',
+          pageUrl: '/payments/quick-check'
         }
       ]
     },
@@ -487,42 +499,48 @@ const AIDashboard: React.FC = () => {
           title: '🧠 Context Generator',
           description: 'Generiere KI-Kontexte für bessere Ergebnisse',
           endpoint: 'ai/context/generate',
-          icon: '🧠'
+          icon: '🧠',
+          pageUrl: '/advanced/context-generator'
         },
         {
           id: 'string-generator',
           title: '🔤 String Generator',
           description: 'Intelligente String-Generierung für verschiedene Use-Cases',
           endpoint: 'ai/string/generate',
-          icon: '🔤'
+          icon: '🔤',
+          pageUrl: '/advanced/string-generator'
         },
         {
           id: 'auto-framplementator',
           title: '🔄 Auto Framplementator',
           description: 'Automatische Framework-Implementierung',
           endpoint: 'ai/framework/implement',
-          icon: '🔄'
+          icon: '🔄',
+          pageUrl: '/advanced/auto-framplementator'
         },
         {
           id: 'woocommerce-sync',
           title: '🔄 WooCommerce Sync',
           description: 'Automatische Synchronisation mit WooCommerce',
           endpoint: 'woocommerce/sync',
-          icon: '🔄'
+          icon: '🔄',
+          pageUrl: '/advanced/woocommerce-sync'
         },
         {
           id: 'memory-system',
           title: '💾 Memory System',
           description: 'KI-Gedächtnis für personalisierte Ergebnisse',
           endpoint: 'ai/memory',
-          icon: '💾'
+          icon: '💾',
+          pageUrl: '/advanced/memory-system'
         },
         {
           id: 'system-health',
           title: '⚙️ System Health',
           description: 'System-Status und Performance-Monitoring',
           endpoint: 'system/health',
-          icon: '⚙️'
+          icon: '⚙️',
+          pageUrl: '/advanced/system-health'
         }
       ]
     }
