@@ -33,10 +33,10 @@ export async function executeOpenAI<T>(
       'OpenAI API Failed',
       `Operation ${operationName} failed after retries`,
       'OpenAI',
-      error instanceof Error ? error : new Error(String(error)),
+      _error instanceof Error ? _error : new Error(String(_error)),
       metadata
     );
-    throw error;
+    throw _error;
   }
 }
 
@@ -45,9 +45,9 @@ try {
   const openai = getOpenAIClient();
   // ... AI-Funktionen nutzen mit executeOpenAI() wrapper
 } catch (_error) {
-  if (error instanceof Error) {
-    console.log('⚠️ OpenAI nicht verfügbar:', error.message);
+  if (_error instanceof Error) {
+    console.log('⚠️ OpenAI nicht verfügbar:', _error.message);
   } else {
-    console.log('⚠️ OpenAI nicht verfügbar:', String(error));
+    console.log('⚠️ OpenAI nicht verfügbar:', String(_error));
   }
 }
