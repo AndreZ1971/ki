@@ -40,7 +40,7 @@ export class ProductRecommendationEngine {
 
     try {
       // 1. Get customer's purchase history
-      const orders = await wooGet(`customers/${customerId}/orders`, { per_page: 100 });
+      const orders = await wooGet(`customers/${customerId}/orders`, { per_page: 100 }) as any[];
       
       // 2. Extract purchased product IDs
       const purchasedProductIds = new Set<number>();
@@ -51,7 +51,7 @@ export class ProductRecommendationEngine {
       }
 
       // 3. Find similar customers (simple collaborative filtering)
-      const allCustomers = await wooGet('customers', { per_page: 100 });
+      const allCustomers = await wooGet('customers', { per_page: 100 }) as any[];
       const similarCustomers = await this.findSimilarCustomers(
         customerId,
         allCustomers,
@@ -100,13 +100,13 @@ export class ProductRecommendationEngine {
 
     try {
       // 1. Get customer's purchase history
-      const orders = await wooGet(`customers/${customerId}/orders`, { per_page: 50 });
+      const orders = await wooGet(`customers/${customerId}/orders`, { per_page: 50 }) as any[];
       
       // 2. Get purchased categories
       const purchasedCategories = new Set<number>();
       for (const order of orders) {
         for (const item of order.line_items) {
-          const product = await wooGet(`products/${item.product_id}`);
+          const product = await wooGet(`products/${item.product_id}`) as any;
           for (const category of product.categories) {
             purchasedCategories.add(category.id);
           }
@@ -118,7 +118,7 @@ export class ProductRecommendationEngine {
         const topProducts = await wooGet('products', {
           orderby: 'popularity',
           per_page: limit,
-        });
+        }) as any[];
         
         return topProducts.map((product: any, index: number) => ({
           productId: product.id,
@@ -138,7 +138,7 @@ export class ProductRecommendationEngine {
           category: categoryId,
           per_page: Math.ceil(limit / categoryIds.length),
           orderby: 'popularity',
-        });
+        }) as any[];
 
         for (const product of products) {
           if (recommendations.length >= limit) break;
@@ -161,7 +161,7 @@ export class ProductRecommendationEngine {
         orderby: 'date',
         order: 'desc',
         per_page: limit,
-      });
+      }) as any[];
 
       return products.map((product: any, index: number) => ({
         productId: product.id,
@@ -184,7 +184,7 @@ export class ProductRecommendationEngine {
 
       const customerOrders = await wooGet(`customers/${customer.id}/orders`, {
         per_page: 100,
-      });
+      }) as any[];
       
       const customerProducts = new Set<number>();
       for (const order of customerOrders) {
@@ -219,7 +219,7 @@ export class ProductRecommendationEngine {
     for (const customerId of similarCustomerIds) {
       const orders = await wooGet(`customers/${customerId}/orders`, {
         per_page: 50,
-      });
+      }) as any[];
 
       for (const order of orders) {
         for (const item of order.line_items) {
