@@ -64,10 +64,10 @@ const MLDashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="page-container">
-        <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+      <div className="analytics-page">
+        <div className="analytics-header">
           <div style={{ fontSize: '64px', marginBottom: '20px' }}>🤖</div>
-          <p style={{ color: 'rgba(255,255,255,0.6)' }}>Lade ML Dashboard...</p>
+          <h1>Lade ML Dashboard...</h1>
         </div>
       </div>
     );
@@ -75,32 +75,30 @@ const MLDashboard: React.FC = () => {
 
   if (!mlStatus || !mlStatus.enabled) {
     return (
-      <div className="page-container">
-        <div className="page-header">
-          <button className="back-button" onClick={handleBackToDashboard}>
-            ← Zurück
-          </button>
-          <h1>🤖 Machine Learning Dashboard</h1>
-        </div>
+      <div className="analytics-page">
+        <button className="back-button floating-back" onClick={handleBackToDashboard}>
+          ← Zurück zum Dashboard
+        </button>
 
-        <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+        <div className="analytics-header">
           <div style={{ fontSize: '96px', marginBottom: '20px' }}>🤖</div>
-          <h2 style={{ color: 'white', marginBottom: '12px' }}>Machine Learning ist deaktiviert</h2>
-          <p style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '24px', fontSize: '16px' }}>
+          <h1>Machine Learning ist deaktiviert</h1>
+          <p style={{ marginBottom: '24px' }}>
             Aktiviere ML in den Einstellungen, um intelligente Vorhersagen zu nutzen
           </p>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate('/settings/ml')}
+            className="action-button"
             style={{
-              padding: '12px 24px',
+              padding: '14px 28px',
               background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
               border: 'none',
               borderRadius: '12px',
               color: 'white',
               fontSize: '16px',
-              fontWeight: '600',
+              fontWeight: '700',
               cursor: 'pointer',
               boxShadow: '0 4px 12px rgba(139, 92, 246, 0.4)'
             }}
@@ -138,35 +136,36 @@ const MLDashboard: React.FC = () => {
   }));
 
   return (
-    <div className="page-container">
+    <div className="analytics-page">
+      {/* Floating Back Button */}
+      <button className="back-button floating-back" onClick={handleBackToDashboard}>
+        ← Zurück zum Dashboard
+      </button>
+
       {/* Header */}
-      <div className="page-header">
-        <button className="back-button" onClick={handleBackToDashboard}>
-          ← Zurück
-        </button>
-        <div>
-          <h1>🤖 Machine Learning Dashboard</h1>
-          <p style={{ color: 'rgba(255,255,255,0.6)', marginTop: '8px' }}>
-            Echtzeit-Übersicht deiner ML-Modelle und Predictions
-          </p>
-        </div>
+      <div className="analytics-header">
+        <h1>🤖 Machine Learning Dashboard</h1>
+        <p>Echtzeit-Übersicht deiner ML-Modelle und Predictions</p>
         <span
           className="live-pulse"
           style={{
-            background: 'rgba(16, 185, 129, 0.2)',
-            color: '#10b981',
-            padding: '6px 16px',
-            borderRadius: '12px',
-            fontSize: '12px',
-            fontWeight: 'bold'
+            display: 'inline-block',
+            marginTop: '12px',
+            background: 'linear-gradient(135deg, #10b981, #059669)',
+            color: 'white',
+            padding: '8px 20px',
+            borderRadius: '20px',
+            fontSize: '13px',
+            fontWeight: '700',
+            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
           }}
         >
-          ● AKTIV
+          ● ML SYSTEM AKTIV
         </span>
       </div>
 
       {/* Key Metrics */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginBottom: '30px' }}>
+      <div className="metrics-grid">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -218,21 +217,21 @@ const MLDashboard: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="metric-card"
+          className="metric-card last-updated"
         >
           <div className="metric-icon">🔢</div>
           <div className="metric-label">Predictions heute</div>
-          <div className="metric-value" style={{ color: '#f59e0b' }}>
+          <div className="metric-value-small">
             {totalPredictions}
           </div>
-          <div className="metric-subtitle">
+          <div className="metric-subtitle" style={{ color: 'rgba(255,255,255,0.9)' }}>
             {mlStatus.featureCount} Features aktiv
           </div>
         </motion.div>
       </div>
 
       {/* Charts Section */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '20px', marginBottom: '30px' }}>
+      <div className="analysis-section">
         {/* Confidence Timeline */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -240,7 +239,9 @@ const MLDashboard: React.FC = () => {
           transition={{ delay: 0.4 }}
           className="metric-card full-width"
         >
-          <h3 style={{ marginBottom: '20px' }}>📈 Konfidenz-Verlauf</h3>
+          <h3 style={{ marginBottom: '20px', color: '#2c3e50', fontSize: '1.5rem', fontWeight: '800' }}>
+            📈 Konfidenz-Verlauf
+          </h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={confidenceData}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
@@ -265,8 +266,11 @@ const MLDashboard: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
           className="metric-card full-width"
+          style={{ marginTop: '20px' }}
         >
-          <h3 style={{ marginBottom: '20px' }}>⚡ Performance-Verlauf</h3>
+          <h3 style={{ marginBottom: '20px', color: '#2c3e50', fontSize: '1.5rem', fontWeight: '800' }}>
+            ⚡ Performance-Verlauf
+          </h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={performanceData}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
@@ -287,15 +291,18 @@ const MLDashboard: React.FC = () => {
       </div>
 
       {/* Feature Distribution & Recent Predictions */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px', marginBottom: '30px' }}>
+      <div className="analysis-section">
         {/* Feature Distribution */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
           className="metric-card"
+          style={{ marginBottom: '20px' }}
         >
-          <h3 style={{ marginBottom: '20px' }}>🎯 Feature-Verteilung</h3>
+          <h3 style={{ marginBottom: '20px', color: '#2c3e50', fontSize: '1.5rem', fontWeight: '800' }}>
+            🎯 Feature-Verteilung
+          </h3>
           <ResponsiveContainer width="100%" height={250}>
             <PieChart>
               <Pie
@@ -331,7 +338,9 @@ const MLDashboard: React.FC = () => {
           transition={{ delay: 0.7 }}
           className="metric-card"
         >
-          <h3 style={{ marginBottom: '20px' }}>🕒 Letzte Predictions</h3>
+          <h3 style={{ marginBottom: '20px', color: '#2c3e50', fontSize: '1.5rem', fontWeight: '800' }}>
+            � Letzte Predictions
+          </h3>
           <div style={{ maxHeight: '280px', overflowY: 'auto' }}>
             {predictionHistory.slice(0, 5).map((pred, index) => (
               <div
@@ -380,14 +389,17 @@ const MLDashboard: React.FC = () => {
       </div>
 
       {/* Active Models */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8 }}
-        className="metric-card full-width"
-      >
-        <h3 style={{ marginBottom: '20px' }}>🧠 Aktive Modelle</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
+      <div className="analysis-section">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="metric-card full-width"
+        >
+          <h3 style={{ marginBottom: '20px', color: '#2c3e50', fontSize: '1.5rem', fontWeight: '800' }}>
+            🧠 Aktive Modelle
+          </h3>
+          <div className="metrics-grid">
           {/* Product Recommendations */}
           <div style={{
             background: mlStatus.models.productRecommendation.enabled
@@ -481,53 +493,59 @@ const MLDashboard: React.FC = () => {
             </span>
           </div>
         </div>
-      </motion.div>
+        </motion.div>
+      </div>
 
       {/* Action Buttons */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.9 }}
-        style={{ display: 'flex', gap: '12px', marginTop: '20px' }}
-      >
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => navigate('/settings/ml')}
-          style={{
-            flex: 1,
-            padding: '14px',
-            background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
-            border: 'none',
-            borderRadius: '12px',
-            color: 'white',
-            fontSize: '15px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(139, 92, 246, 0.4)'
-          }}
+      <div className="analysis-section">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.9 }}
+          style={{ display: 'flex', gap: '12px' }}
         >
-          ⚙️ ML Einstellungen
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={fetchMLData}
-          style={{
-            flex: 1,
-            padding: '14px',
-            background: 'rgba(255,255,255,0.1)',
-            border: '1px solid rgba(255,255,255,0.2)',
-            borderRadius: '12px',
-            color: 'white',
-            fontSize: '15px',
-            fontWeight: '600',
-            cursor: 'pointer'
-          }}
-        >
-          🔄 Daten aktualisieren
-        </motion.button>
-      </motion.div>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => navigate('/settings/ml')}
+            style={{
+              flex: 1,
+              padding: '16px',
+              background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+              border: 'none',
+              borderRadius: '12px',
+              color: 'white',
+              fontSize: '15px',
+              fontWeight: '700',
+              cursor: 'pointer',
+              boxShadow: '0 8px 20px rgba(139, 92, 246, 0.4)',
+              transition: 'all 0.3s ease'
+            }}
+          >
+            ⚙️ ML Einstellungen
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={fetchMLData}
+            style={{
+              flex: 1,
+              padding: '16px',
+              background: 'linear-gradient(135deg, #10b981, #059669)',
+              border: 'none',
+              borderRadius: '12px',
+              color: 'white',
+              fontSize: '15px',
+              fontWeight: '700',
+              cursor: 'pointer',
+              boxShadow: '0 8px 20px rgba(16, 185, 129, 0.4)',
+              transition: 'all 0.3s ease'
+            }}
+          >
+            🔄 Daten aktualisieren
+          </motion.button>
+        </motion.div>
+      </div>
     </div>
   );
 };
