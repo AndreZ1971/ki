@@ -39,17 +39,8 @@ import mlTestRoutes from './routes/app/api/ml/test';
 // Umgebungsvariablen laden mit erweiterter Fehlerbehandlung
 dotenv.config();
 
-// 🔥 ERROR HANDLING INITIALISIERUNG
-console.log('🛡️ Initializing Error Handling System...');
+// Error Handling Initialisierung
 setupErrorHandling();
-console.log('✅ Error Handling System active');
-
-// DEBUG: Überprüfe ob Umgebungsvariablen geladen werden
-console.log('[dotenv] Geladene Umgebungsvariablen:');
-console.log('- OPENAI_API_KEY vorhanden:', !!process.env.OPENAI_API_KEY);
-console.log('- WOOCOMMERCE_URL vorhanden:', !!process.env.WOOCOMMERCE_URL);
-console.log('- CONSUMER_KEY vorhanden:', !!process.env.CONSUMER_KEY);
-console.log('- CONSUMER_SECRET vorhanden:', !!process.env.CONSUMER_SECRET);
 
 // Fallback für Development
 if (!process.env.OPENAI_API_KEY) {
@@ -244,31 +235,24 @@ async function buildServer() {
       };
     });
 
-    // 🔥 KORRIGIERT: Debug Route für alle registrierten Routes
-    server.get('/api/debug/routes', async (request, reply) => {
-      // Manuelle Route-Sammlung für Debug-Zwecke
-      const routeList = [
-        { method: 'GET', url: '/health' },
-        { method: 'GET', url: '/api/system/health' },
-        { method: 'GET', url: '/api/debug/routes' },
-        { method: 'GET', url: '/api/analytics/metrics/shop-metrics' },
-        { method: 'GET', url: '/api/products' },
-        { method: 'GET', url: '/api/products/optimizer' },
-        { method: 'GET', url: '/api/analytics/reviews' },
-        { method: 'GET', url: '/api/ai/email' },
-        { method: 'GET', url: '/api/woocommerce/customers' },
-        { method: 'GET', url: '/api/email/send' },
-        { method: 'GET', url: '/api/email/test-email-config' },
-        { method: 'GET', url: '/api/email/test' },
-        { method: 'GET', url: '/documentation' }
-      ];
-      
-      return {
-        totalRoutes: routeList.length,
-        emailRoutes: routeList.filter(r => r.url.includes('/email')),
-        allRoutes: routeList
-      };
-    });
+        });
+
+    console.log('\n🌟 ===================================');
+    console.log('🚀 KI-Agent Server erfolgreich gestartet!');
+    console.log(`📡 Port: ${port}`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log('=====================================\n');
+    console.log('📍 Verfügbare Endpoints:');
+    console.log('─────────────────────────────────────');
+    console.log('❤️  Health Check: http://localhost:3000/health');
+    console.log('⚕️  System Health: http://localhost:3000/api/system/health');
+    console.log('📊 Shop Metrics: http://localhost:3000/api/analytics/metrics');
+    console.log('📧 AI Email: http://localhost:3000/api/ai/email');
+    console.log('🛒 Products: http://localhost:3000/api/products');
+    console.log('👥 Customers: http://localhost:3000/api/woocommerce/customers');
+    console.log('📨 Email Sender: http://localhost:3000/api/email/send');
+    console.log('🧪 Email Test: http://localhost:3000/api/email/test-email-config');
+    console.log('📈 Analytics: http://localhost:3000/api/analytics');
 
     // 🔥 KORRIGIERT: 404 Handler ohne routes Property
     server.setNotFoundHandler((request, reply) => {
