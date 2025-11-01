@@ -54,12 +54,12 @@ export class WooCommerceClient {
 
       return response.json();
     } catch (_error) {
-      if (error instanceof Error && error.name === 'AbortError') {
+      if (_error instanceof Error && _error.name === 'AbortError') {
         const timeoutError = new Error(`WooCommerce API timeout after ${this.config.timeout}ms`);
         (timeoutError as any).code = 'ETIMEDOUT';
         throw timeoutError;
       }
-      throw error;
+      throw _error;
     } finally {
       clearTimeout(timeoutId);
     }
@@ -90,10 +90,10 @@ export class WooCommerceClient {
         'WooCommerce POST Failed',
         `Failed to POST to ${endpoint}`,
         'WooCommerceClient',
-        error instanceof Error ? error : new Error(String(error)),
+        _error instanceof Error ? _error : new Error(String(_error)),
         { endpoint, dataKeys: Object.keys(data) }
       );
-      throw error;
+      throw _error;
     }
   }
 
@@ -113,10 +113,10 @@ export class WooCommerceClient {
         'WooCommerce PUT Failed',
         `Failed to PUT to ${endpoint}`,
         'WooCommerceClient',
-        error instanceof Error ? error : new Error(String(error)),
+        _error instanceof Error ? _error : new Error(String(_error)),
         { endpoint, dataKeys: Object.keys(data) }
       );
-      throw error;
+      throw _error;
     }
   }
 
