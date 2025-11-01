@@ -60,7 +60,7 @@ export class CircuitBreaker {
       return result;
     } catch (_error) {
       this.onFailure();
-      throw error;
+      throw _error;
     }
   }
 

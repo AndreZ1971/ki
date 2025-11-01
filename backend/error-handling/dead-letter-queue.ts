@@ -58,7 +58,7 @@ export class DeadLetterQueue {
       await fs.mkdir(this.options.storagePath, { recursive: true });
       await this.loadFromDisk();
     } catch (_error) {
-      console.error('[DLQ] Initialization error:', error);
+      console.error('[DLQ] Initialization error:', _error);
     }
 
     // Starte Auto-Retry wenn aktiviert
@@ -235,7 +235,7 @@ export class DeadLetterQueue {
       const filePath = path.join(this.options.storagePath, `${id}.json`);
       await fs.writeFile(filePath, JSON.stringify(message, null, 2), 'utf-8');
     } catch (_error) {
-      console.error(`[DLQ] Failed to save message ${id}:`, error);
+      console.error(`[DLQ] Failed to save message ${id}:`, _error);
     }
   }
 
@@ -246,7 +246,7 @@ export class DeadLetterQueue {
     } catch (_error) {
       // Ignore if file doesn't exist
       if ((error as any).code !== 'ENOENT') {
-        console.error(`[DLQ] Failed to delete message ${id}:`, error);
+        console.error(`[DLQ] Failed to delete message ${id}:`, _error);
       }
     }
   }
@@ -265,13 +265,13 @@ export class DeadLetterQueue {
           const message = JSON.parse(content) as DeadLetterMessage;
           this.messages.set(message.id, message);
         } catch (_error) {
-          console.error(`[DLQ] Failed to load message from ${file}:`, error);
+          console.error(`[DLQ] Failed to load message from ${file}:`, _error);
         }
       }
 
       console.log(`[DLQ] Loaded ${this.messages.size} messages from disk`);
     } catch (_error) {
-      console.error('[DLQ] Failed to load from disk:', error);
+      console.error('[DLQ] Failed to load from disk:', _error);
     }
   }
 

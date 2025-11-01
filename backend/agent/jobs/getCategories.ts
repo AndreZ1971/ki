@@ -13,7 +13,7 @@ async function listCategories() {
     
     return categories;
   } catch (_error) {
-    console.error('❌ Fehler:', error);
+    console.error('❌ Fehler:', _error);
   }
 }
 

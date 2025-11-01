@@ -205,7 +205,7 @@ async function main() {
   try {
     await createAIProducts();
   } catch (_error) {
-    console.error('❌ Fehler in main:', error);
+    console.error('❌ Fehler in main:', _error);
   }
 }
 

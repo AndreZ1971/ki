@@ -172,7 +172,7 @@ export default async function bundleRoutes(server: FastifyInstance) {
       } catch (_error) {
         return reply.status(500).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Unbekannter Fehler'
+          error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
         });
       }
     }
@@ -217,7 +217,7 @@ export default async function bundleRoutes(server: FastifyInstance) {
       } catch (_error) {
         return reply.status(500).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Unbekannter Fehler'
+          error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
         });
       }
     }

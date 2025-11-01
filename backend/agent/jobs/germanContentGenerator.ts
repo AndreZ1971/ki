@@ -130,7 +130,7 @@ async function main() {
   try {
     await createGermanDSGVOProducts();
   } catch (_error) {
-    console.error('❌ Fehler in main:', error);
+    console.error('❌ Fehler in main:', _error);
   }
 }
 

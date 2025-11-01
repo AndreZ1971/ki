@@ -18,7 +18,7 @@ function initializeOpenAI() {
       console.log('✅ OpenAI Client erfolgreich initialisiert');
     }
   } catch (_error) {
-    console.error('❌ Fehler bei OpenAI Initialisierung:', error);
+    console.error('❌ Fehler bei OpenAI Initialisierung:', _error);
     openai = null;
   }
   
@@ -79,7 +79,7 @@ class WooCommerceClient {
       
       return await response.json();
     } catch (_error) {
-      console.error(`Fehler bei WooCommerce Request ${endpoint}:`, error);
+      console.error(`Fehler bei WooCommerce Request ${endpoint}:`, _error);
       throw error;
     }
   }

@@ -73,7 +73,7 @@ export class AlertingService {
           }
         });
       } catch (_error) {
-        console.error('[Alerting] Failed to initialize email transport:', error);
+        console.error('[Alerting] Failed to initialize email transport:', _error);
       }
     }
   }
@@ -214,7 +214,7 @@ export class AlertingService {
           break;
       }
     } catch (_error) {
-      console.error(`[Alerting] Failed to send to ${channel.type}:`, error);
+      console.error(`[Alerting] Failed to send to ${channel.type}:`, _error);
     }
   }
 
