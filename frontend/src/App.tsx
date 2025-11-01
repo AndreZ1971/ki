@@ -39,6 +39,28 @@ import ShopMetrics from './pages/AnalyseMetrics/ShopMetrics';
 import StandardAudit from './pages/AnalyseMetrics/StandardAudit';
 import TrendAnalysis from './pages/AnalyseMetrics/TrendAnalysis';
 
+// Advanced AI Pages
+import AutoFramplementator from './pages/Advanced/AutoFramplementator';
+import ContextGenerator from './pages/Advanced/ContextGenerator';
+import MemorySystem from './pages/Advanced/MemorySystem';
+import StringGenerator from './pages/Advanced/StringGenerator';
+import SystemHealth from './pages/Advanced/SystemHealth';
+import WooCommerceSync from './pages/Advanced/WooCommerceSync';
+
+// Payment & Finances Pages
+import PaymentDelivery from './pages/PaymentFinances/PaymentDelivery';
+import PaymentEmergency from './pages/PaymentFinances/PaymentEmergency';
+import PaymentExpansion from './pages/PaymentFinances/PaymentExpansion';
+import PaymentFast from './pages/PaymentFinances/PaymentFast';
+import PaymentIssuedDetector from './pages/PaymentFinances/PaymentIssuedDetector';
+import PaymentQuickCheck from './pages/PaymentFinances/PaymentQuickCheck';
+import PaymentSimplified from './pages/PaymentFinances/PaymentSimplified';
+import PaymentSuccess from './pages/PaymentFinances/PaymentSuccess';
+import PaymentTester from './pages/PaymentFinances/PaymentTester';
+import PaymentUserFavor from './pages/PaymentFinances/PaymentUserFavor';
+import PaymentValidation from './pages/PaymentFinances/PaymentValidation';
+import PaymentVerifier from './pages/PaymentFinances/PaymentVerifier';
+
 // Styles
 import './App.css';
 
@@ -83,6 +105,28 @@ function App() {
           <Route path="/products/run-create-freebies" element={<RunCreateFreebies />} />
           <Route path="/products/woo-create" element={<WooProductCreate />} />
           <Route path="/products/woo-update" element={<WooProductUpdate />} />
+          
+          {/* Advanced AI Routes */}
+          <Route path="/advanced/auto-framplementator" element={<AutoFramplementator />} />
+          <Route path="/advanced/context-generator" element={<ContextGenerator />} />
+          <Route path="/advanced/memory-system" element={<MemorySystem />} />
+          <Route path="/advanced/string-generator" element={<StringGenerator />} />
+          <Route path="/advanced/system-health" element={<SystemHealth />} />
+          <Route path="/advanced/woocommerce-sync" element={<WooCommerceSync />} />
+          
+          {/* Payment & Finances Routes */}
+          <Route path="/payments/delivery" element={<PaymentDelivery />} />
+          <Route path="/payments/emergency" element={<PaymentEmergency />} />
+          <Route path="/payments/expansion" element={<PaymentExpansion />} />
+          <Route path="/payments/fast" element={<PaymentFast />} />
+          <Route path="/payments/issued-detector" element={<PaymentIssuedDetector />} />
+          <Route path="/payments/quick-check" element={<PaymentQuickCheck />} />
+          <Route path="/payments/simplified" element={<PaymentSimplified />} />
+          <Route path="/payments/success" element={<PaymentSuccess />} />
+          <Route path="/payments/tester" element={<PaymentTester />} />
+          <Route path="/payments/user-favor" element={<PaymentUserFavor />} />
+          <Route path="/payments/validation" element={<PaymentValidation />} />
+          <Route path="/payments/verifier" element={<PaymentVerifier />} />
           
           {/* Settings Seite */}
           <Route path="/settings" element={<Settings />} />
