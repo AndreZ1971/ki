@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AIDashboard from './pages/AIDashboard';
 import Settings from './pages/Settings/Settings';
 import MLSettings from './pages/Settings/MLSettings';
+import MLDashboard from './pages/ML/MLDashboard';
 
 // Marketing Content Pages
 import AIEmailGenerator from './pages/MarketingContent/ai-email-generator';
@@ -132,6 +133,9 @@ function App() {
           {/* Settings Seite */}
           <Route path="/settings" element={<Settings />} />
           <Route path="/settings/ml" element={<MLSettings />} />
+          
+          {/* ML Dashboard */}
+          <Route path="/ml/dashboard" element={<MLDashboard />} />
         </Routes>
       </Router>
     </div>

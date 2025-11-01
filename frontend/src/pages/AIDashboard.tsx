@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { MLDashboardWidget } from '../components/ML/MLDashboardWidget';
 import './AIDashboard.css';
 
 const AIDashboard: React.FC = () => {
@@ -770,6 +771,15 @@ const AIDashboard: React.FC = () => {
             {metrics.customers > 0 ? 'Registrierte Kunden' : 'Keine Kundendaten'}
           </p>
         </motion.div>
+      </motion.div>
+
+      {/* ML WIDGET */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.6 }}
+      >
+        <MLDashboardWidget />
       </motion.div>
 
       {/* INTERACTIVE CHART */}

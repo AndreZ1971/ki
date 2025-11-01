@@ -34,6 +34,7 @@ import marketingRoutes from './routes/app/api/marketing/marketing-routes';
 
 // 🔥 ML CONFIGURATION ROUTES
 import mlConfigRoutes from './routes/app/api/ml/config';
+import mlTestRoutes from './routes/app/api/ml/test';
 
 // Umgebungsvariablen laden mit erweiterter Fehlerbehandlung
 dotenv.config();
@@ -204,6 +205,10 @@ async function buildServer() {
     // 🔥 ML CONFIGURATION ROUTES
     await server.register(mlConfigRoutes, { prefix: '/api/ml' });
     console.log('✅ ML Config Routes erfolgreich registriert');
+
+    // 🧪 ML TEST ROUTES (Development/Testing)
+    await server.register(mlTestRoutes, { prefix: '/api/ml/test' });
+    console.log('✅ ML Test Routes erfolgreich registriert');
 
     // 🔥 MARKETING ROUTES
     await server.register(marketingRoutes, { prefix: '/api/marketing' });
