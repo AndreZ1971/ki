@@ -60,7 +60,7 @@ const emailSenderRoutes: FastifyPluginAsync = async (fastify, options) => {
           // Kurze Pause zwischen Emails (100ms)
           await new Promise(resolve => setTimeout(resolve, 100));
           
-        } catch (error) {
+        } catch (_error) {
           console.error(`❌ Fehler bei ${customer.email}:`, error);
           failedEmails.push({
             email: customer.email,
@@ -85,7 +85,7 @@ const emailSenderRoutes: FastifyPluginAsync = async (fastify, options) => {
         }
       };
       
-    } catch (error) {
+    } catch (_error) {
       console.error('Email Send Error:', error);
       reply.status(500).send({ 
         success: false, 
@@ -122,7 +122,7 @@ const emailSenderRoutes: FastifyPluginAsync = async (fastify, options) => {
         }
       };
       
-    } catch (error) {
+    } catch (_error) {
       console.error('SMTP Test Error:', error);
       reply.status(500).send({ 
         success: false, 

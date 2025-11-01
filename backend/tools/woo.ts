@@ -128,7 +128,7 @@ export async function wooGet(
   try {
     const res = await client.get(url, { params: qp });
     return res.data;
-  } catch (err) {
+  } catch (_err) {
     throw new Error(`woo_get failed: ${axiosErrorToMessage(err)}`);
   }
 }
@@ -176,7 +176,7 @@ export async function wooPost(
       const res = await client.post(url, data ?? {}, { params: qp });
       return res.data;
     }
-  } catch (err) {
+  } catch (_err) {
     throw new Error(`woo_post failed: ${axiosErrorToMessage(err)}`);
   }
 }
@@ -254,7 +254,7 @@ const wooListOrdersSince: Tool = {
         if (chunk.length < per_page) break;
       }
       return { count: all.length, orders: all };
-    } catch (err) {
+    } catch (_err) {
       throw new Error(
         `woo_list_orders_since failed: ${axiosErrorToMessage(err)}`
       );
@@ -304,7 +304,7 @@ const wooUpdateStock: Tool = {
           ? (data as Record<string, unknown>).stock_quantity
           : undefined;
       return { status: res.status, id, stock };
-    } catch (err) {
+    } catch (_err) {
       throw new Error(`woo_update_stock failed: ${axiosErrorToMessage(err)}`);
     }
   },

@@ -53,7 +53,7 @@ export class WooCommerceClient {
       }
 
       return response.json();
-    } catch (error) {
+    } catch (_error) {
       if (error instanceof Error && error.name === 'AbortError') {
         const timeoutError = new Error(`WooCommerce API timeout after ${this.config.timeout}ms`);
         (timeoutError as any).code = 'ETIMEDOUT';
@@ -85,7 +85,7 @@ export class WooCommerceClient {
           body: JSON.stringify(data),
         }))
       );
-    } catch (error) {
+    } catch (_error) {
       await alertError(
         'WooCommerce POST Failed',
         `Failed to POST to ${endpoint}`,
@@ -108,7 +108,7 @@ export class WooCommerceClient {
           body: JSON.stringify(data),
         }))
       );
-    } catch (error) {
+    } catch (_error) {
       await alertError(
         'WooCommerce PUT Failed',
         `Failed to PUT to ${endpoint}`,

@@ -46,7 +46,7 @@ export default async function freebieRoutes(server: FastifyInstance) {
           success: true,
           data: mockFreebies
         });
-      } catch (error) {
+      } catch (_error) {
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Unbekannter Fehler'
@@ -90,7 +90,7 @@ export default async function freebieRoutes(server: FastifyInstance) {
           data: newFreebie,
           message: 'Freebie erfolgreich erstellt'
         });
-      } catch (error) {
+      } catch (_error) {
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Unbekannter Fehler'
@@ -134,7 +134,7 @@ export default async function freebieRoutes(server: FastifyInstance) {
           data: aiGeneratedFreebie,
           message: 'Freebie erfolgreich mit AI erstellt'
         });
-      } catch (error) {
+      } catch (_error) {
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Unbekannter Fehler'

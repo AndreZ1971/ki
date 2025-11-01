@@ -130,7 +130,7 @@ async function generateSocialMediaPosts() {
     
     return generatedPosts;
     
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Fehler bei Social Media Generierung:', error);
     return [];
   }
@@ -191,7 +191,7 @@ function getRandomItem(array: string[]): string {
 async function main() {
   try {
     await generateSocialMediaPosts();
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Fehler in main:', error);
   }
 }

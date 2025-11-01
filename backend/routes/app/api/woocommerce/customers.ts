@@ -49,7 +49,7 @@ const customersRoutes: FastifyPluginAsync = async (fastify, options) => {
         message: `${customers.length} Kunden erfolgreich geladen`
       };
       
-    } catch (error) {
+    } catch (_error) {
       console.error('WooCommerce API Error:', error);
       const details = error instanceof Error ? error.message : String(error);
       reply.status(500).send({
@@ -95,7 +95,7 @@ const customersRoutes: FastifyPluginAsync = async (fastify, options) => {
         message: 'Abonnenten erfolgreich geladen (Mock-Daten)'
       };
       
-    } catch (error) {
+    } catch (_error) {
       console.error('WooCommerce API Error:', error);
       reply.status(500).send({ 
         success: false, 
@@ -119,7 +119,7 @@ const customersRoutes: FastifyPluginAsync = async (fastify, options) => {
         success: true,
         data: stats
       };
-    } catch (error) {
+    } catch (_error) {
       reply.status(500).send({ 
         success: false, 
         error: 'Konnte Statistiken nicht laden' 

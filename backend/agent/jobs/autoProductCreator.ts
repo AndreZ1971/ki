@@ -55,7 +55,7 @@ export async function autoProductCreatorJob(config?: Partial<AutoProductConfig>)
       const product = await createProductFromTrend(trend, autoPublish);
       createdProducts.push(product);
       console.log(`✅ Produkt erfolgreich erstellt: ${product.name}`);
-    } catch (err) {
+    } catch (_err) {
       const errorMessage = err instanceof Error
         ? err.message
         : (typeof err === 'string' ? err : JSON.stringify(err));
@@ -129,7 +129,7 @@ async function createProductFromTrend(trend: TrendData, autoPublish: boolean = f
       categories: productData.categories
     };
     
-  } catch (error) {
+  } catch (_error) {
     // 2. SICHERER FALLBACK
     console.warn(`⚠️ WooCommerce fehlgeschlagen, verwende Simulation`);
     console.log(`📦 Simuliertes Produkt: "${productData.name}"`);

@@ -16,7 +16,7 @@ function initializeOpenAI() {
       openai = new OpenAI({ apiKey });
       console.log('✅ OpenAI Client erfolgreich initialisiert');
     }
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Fehler bei OpenAI Initialisierung:', error);
     openai = null;
   }
@@ -177,7 +177,7 @@ Antworte im JSON Format:
             success: true,
             ...emailTemplate
           };
-        } catch (_parseError) {
+        } catch (__parseError) {
           throw new Error('Failed to parse AI response');
         }
       } else {
@@ -320,7 +320,7 @@ Antworte im JSON Format:
             success: true,
             ...chatResponse
           };
-        } catch (_parseError) {
+        } catch (__parseError) {
           throw new Error('Failed to parse AI response');
         }
       } else {
@@ -474,7 +474,7 @@ Antworte im JSON Format:
             success: true,
             ...socialContent
           };
-        } catch (_parseError) {
+        } catch (__parseError) {
           throw new Error('Failed to parse AI response');
         }
       } else {
@@ -634,7 +634,7 @@ Antworte im JSON Format:
             success: true,
             ...productDescription
           };
-        } catch (_parseError) {
+        } catch (__parseError) {
           throw new Error('Failed to parse AI response');
         }
       } else {
@@ -781,7 +781,7 @@ Antworte im JSON Format:
             success: true,
             ...seoContent
           };
-        } catch (_parseError) {
+        } catch (__parseError) {
           throw new Error('Failed to parse AI response');
         }
       } else {

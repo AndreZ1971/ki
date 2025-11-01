@@ -45,7 +45,7 @@ export class RetryStrategy {
     for (let attempt = 1; attempt <= this.options.maxAttempts; attempt++) {
       try {
         return await fn();
-      } catch (error) {
+      } catch (_error) {
         lastError = error instanceof Error ? error : new Error(String(error));
         
         // Letzter Versuch oder nicht retry-bar
@@ -196,7 +196,7 @@ export async function retryOn<T>(
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       return await fn();
-    } catch (error) {
+    } catch (_error) {
       lastError = error instanceof Error ? error : new Error(String(error));
       
       if (attempt === maxAttempts || !errorCondition(lastError)) {

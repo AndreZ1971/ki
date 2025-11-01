@@ -24,7 +24,7 @@ cron.schedule('*/2 * * * *', async () => {
     // Simple Fortschrittsmarke: neuestes Bestelldatum extrahieren (falls vom Modell geliefert)
     // Optional: Du kannst hier direkt Tool-Outputs parsen und lastIso schieben.
     lastIso = new Date().toISOString();
-  } catch (e) {
+  } catch (_e) {
     logger.error(e, 'cron error');
   }
 });

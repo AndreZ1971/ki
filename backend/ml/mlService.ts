@@ -69,7 +69,7 @@ export class MLService {
       );
       return prediction;
 
-    } catch (error) {
+    } catch (_error) {
       logger.error(`ML prediction failed for ${feature}: ${error}`);
       
       // Always fallback on error

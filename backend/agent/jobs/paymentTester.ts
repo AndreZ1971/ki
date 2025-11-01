@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const wooCommerce = new WooCommerceRestApi({
+const _wooCommerce = getWooCommerceClient();
   url: process.env.WOOCOMMERCE_URL!,
   consumerKey: process.env.CONSUMER_KEY!,
   consumerSecret: process.env.CONSUMER_SECRET!,
@@ -17,7 +17,8 @@ class PaymentTester {
     
     try {
       // 1. Test-Produkt erstellen
-      const testProduct = await this.createTestProduct();
+          // Create test product
+    const _testProduct = await wooCommerce.post('products', {
       
       // 2. Payment Method Verfügbarkeit prüfen
       await this.checkPaymentMethods();

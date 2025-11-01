@@ -121,7 +121,7 @@ export async function executeWithFullProtection<T>(
 
   try {
     return await retryStrategy.execute(() => circuitBreaker.execute(fn));
-  } catch (error) {
+  } catch (_error) {
     const err = error instanceof Error ? error : new Error(String(error));
     
     // In DLQ speichern

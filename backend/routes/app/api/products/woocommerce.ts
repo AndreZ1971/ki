@@ -17,7 +17,7 @@ function initializeOpenAI() {
       openai = new OpenAI({ apiKey });
       console.log('✅ OpenAI Client erfolgreich initialisiert');
     }
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Fehler bei OpenAI Initialisierung:', error);
     openai = null;
   }
@@ -78,7 +78,7 @@ class WooCommerceClient {
       }
       
       return await response.json();
-    } catch (error) {
+    } catch (_error) {
       console.error(`Fehler bei WooCommerce Request ${endpoint}:`, error);
       throw error;
     }
@@ -706,7 +706,7 @@ WICHTIG: Antworte NUR im JSON Format ohne zusätzlichen Text:
               shortDescription: parsedResponse.shortDescription,
               tags: parsedResponse.tags
             };
-          } catch (secondParseError) {
+          } catch (_secondParseError) {
             // Finaler Fallback: Verwende die rohe Antwort
             return {
               success: true,

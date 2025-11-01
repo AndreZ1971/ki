@@ -53,7 +53,7 @@ export class TrendForecastingEngine {
           const parsed = JSON.parse(results);
           const values = parsed.default?.timelineData?.map((d: any) => d.value[0]) || [];
           trendsData.push({ keyword, values });
-        } catch (err) {
+        } catch (_err) {
           logger.warn(`Failed to get trends for ${keyword}`);
           trendsData.push({ keyword, values: [50] }); // Fallback
         }
@@ -125,7 +125,7 @@ ANTWORT FORMAT (JSON):
         modelVersion: 'gpt-4o-mini',
       };
 
-    } catch (error) {
+    } catch (_error) {
       logger.error(`ML trend forecast failed: ${error}`);
       throw error;
     }
@@ -179,7 +179,7 @@ ANTWORT FORMAT (JSON):
           });
         }
 
-      } catch (error) {
+      } catch (_error) {
         logger.error(`Google Trends failed for "${keyword}": ${error}`);
         forecasts.push({
           keyword,

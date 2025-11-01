@@ -130,7 +130,7 @@ const ANALYTICS_SERVICE = {
         conversionRate: Math.random() * 0.1 + 0.02, // 2-12%
         date: new Date()
       }));
-    } catch (error) {
+    } catch (_error) {
       console.log('❌ Fehler beim Laden der Sales Metrics:', error);
       return [];
     }
@@ -337,7 +337,7 @@ async function sendAutomatedReports() {
       summary: report.summary
     };
     
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Fehler bei Report-Generierung:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
@@ -376,7 +376,7 @@ async function checkPerformanceAlerts() {
     
     return alerts;
     
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Fehler bei Alert-Check:', error);
     return [];
   }
@@ -406,7 +406,7 @@ async function runAnalyticsAutomation() {
 async function main() {
   try {
     await runAnalyticsAutomation();
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Fehler in main:', error);
   }
 }

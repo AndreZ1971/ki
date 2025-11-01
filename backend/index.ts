@@ -78,7 +78,7 @@ async function main(): Promise<void> {
     // 3) Ergebnis
     logSection('Ergebnis');
     console.log(result);
-  } catch (err) {
+  } catch (_err) {
     console.error(
       `Fehler beim Planen: ${err instanceof Error ? err.message : String(err)}`
     );

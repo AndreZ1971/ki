@@ -95,7 +95,7 @@ const AIEmailGenerator: React.FC = () => {
       } else {
         setApiStatus('disconnected');
       }
-    } catch (error) {
+    } catch (_error) {
       setApiStatus('disconnected');
     }
   };
@@ -120,7 +120,7 @@ const AIEmailGenerator: React.FC = () => {
         // Fallback zu Mock-Daten
         setCustomers(mockCustomers);
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Fehler beim Laden der Kunden:', error);
       setCustomers(mockCustomers);
     }
@@ -136,7 +136,7 @@ const AIEmailGenerator: React.FC = () => {
         setSubscribers(result.data);
         console.log('✅ Abonnenten-Daten geladen:', result.data.length);
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Fehler beim Laden der Abonnenten:', error);
     }
   };
@@ -150,7 +150,7 @@ const AIEmailGenerator: React.FC = () => {
         { id: 4, name: 'Support Response Standard', type: 'support-response', data: {} }
       ];
       setSavedTemplates(mockTemplates);
-    } catch (error) {
+    } catch (_error) {
       console.error('Fehler beim Laden der Templates:', error);
     }
   };
@@ -188,7 +188,7 @@ const AIEmailGenerator: React.FC = () => {
       setEmailData(result);
       setIsPreviewModalOpen(true); // 🔥 MODAL ÖFFNEN
       showToast('Email erfolgreich generiert!', 'success');
-    } catch (error) {
+    } catch (_error) {
       console.error('Email generation failed:', error);
       showToast('Fehler beim Generieren der Email. Bitte versuche es erneut.', 'error');
     } finally {
@@ -275,7 +275,7 @@ const AIEmailGenerator: React.FC = () => {
       setSavedTemplates(prev => [...prev, newTemplate]);
       setFormData(prev => ({ ...prev, templateName: '' }));
       showToast('Template erfolgreich gespeichert!', 'success');
-    } catch (error) {
+    } catch (_error) {
       console.error('Fehler beim Speichern:', error);
       showToast('Fehler beim Speichern des Templates', 'error');
     }

@@ -96,7 +96,7 @@ Beispiele:
       }
     }
     
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Fehler bei deutscher Produkt-Kreation:', error);
     process.exit(1);
   }

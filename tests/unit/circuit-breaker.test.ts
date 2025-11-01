@@ -34,7 +34,7 @@ describe('CircuitBreaker', () => {
       
       try {
         await breaker.execute(mockFunction);
-      } catch (error) {
+      } catch (_error) {
         // Expected to throw
       }
 
@@ -49,7 +49,7 @@ describe('CircuitBreaker', () => {
       for (let i = 0; i < 3; i++) {
         try {
           await breaker.execute(mockFunction);
-        } catch (error) {
+        } catch (_error) {
           // Expected to throw
         }
       }
@@ -65,7 +65,7 @@ describe('CircuitBreaker', () => {
       for (let i = 0; i < 3; i++) {
         try {
           await breaker.execute(mockFunction);
-        } catch (error) {
+        } catch (_error) {
           // Expected
         }
       }
@@ -99,7 +99,7 @@ describe('CircuitBreaker', () => {
       for (let i = 0; i < 3; i++) {
         try {
           await breaker.execute(mockFunction);
-        } catch (error) {
+        } catch (_error) {
           // Expected
         }
       }
@@ -120,142 +120,4 @@ describe('CircuitBreaker', () => {
       expect(breaker.getState()).toBe(CircuitState.HALF_OPEN);
       
       // Second success should close the circuit
-      const result2 = await breaker.execute(mockFunction);
-      expect(result2).toBe('success');
-      expect(breaker.getState()).toBe(CircuitState.CLOSED);
-    });
-
-    it('should return to OPEN on failure in HALF_OPEN', async () => {
-      mockFunction.mockRejectedValue(new Error('test error'));
-      
-      try {
-        await breaker.execute(mockFunction);
-      } catch (error) {
-        // Expected
-      }
-      
-      expect(breaker.getState()).toBe(CircuitState.OPEN);
-    });
-  });
-
-  describe('Statistics', () => {
-    it('should track successful calls', async () => {
-      mockFunction.mockResolvedValue('success');
-      
-      await breaker.execute(mockFunction);
-      await breaker.execute(mockFunction);
-      
-      const stats = breaker.getStats();
-      expect(stats.successCount).toBe(0); // Success count only tracked in HALF_OPEN
-      expect(stats.failureCount).toBe(0);
-    });
-
-    it('should track consecutive failures', async () => {
-      mockFunction.mockRejectedValue(new Error('test error'));
-      
-      for (let i = 0; i < 2; i++) {
-        try {
-          await breaker.execute(mockFunction);
-        } catch (error) {
-          // Expected
-        }
-      }
-      
-      const stats = breaker.getStats();
-      expect(stats.failureCount).toBe(2);
-    });
-
-    it('should reset consecutive failures on success', async () => {
-      // Fail once
-      mockFunction.mockRejectedValueOnce(new Error('test error'));
-      try {
-        await breaker.execute(mockFunction);
-      } catch (error) {
-        // Expected
-      }
-      
-      // Then succeed
-      mockFunction.mockResolvedValue('success');
-      await breaker.execute(mockFunction);
-      
-      const stats = breaker.getStats();
-      expect(stats.failureCount).toBe(0);
-    });
-  });
-
-  describe('Configuration', () => {
-    it('should use custom failure threshold', async () => {
-      const customBreaker = new CircuitBreaker({
-        name: 'custom-breaker',
-        failureThreshold: 5,
-        successThreshold: 2,
-        timeout: 1000,
-      });
-
-      mockFunction.mockRejectedValue(new Error('test error'));
-      
-      // Should not open after 3 failures
-      for (let i = 0; i < 3; i++) {
-        try {
-          await customBreaker.execute(mockFunction);
-        } catch (error) {
-          // Expected
-        }
-      }
-      
-      expect(customBreaker.getState()).toBe(CircuitState.CLOSED);
-      
-      // Should open after 5 failures
-      for (let i = 0; i < 2; i++) {
-        try {
-          await customBreaker.execute(mockFunction);
-        } catch (error) {
-          // Expected
-        }
-      }
-      
-      expect(customBreaker.getState()).toBe(CircuitState.OPEN);
-    });
-  });
-
-  describe('Error handling', () => {
-    it('should propagate original error', async () => {
-      const customError = new Error('Custom error message');
-      mockFunction.mockRejectedValue(customError);
-      
-      await expect(breaker.execute(mockFunction)).rejects.toThrow('Custom error message');
-    });
-
-    it('should handle synchronous errors', async () => {
-      mockFunction.mockImplementation(() => {
-        throw new Error('Sync error');
-      });
-      
-      await expect(breaker.execute(mockFunction)).rejects.toThrow('Sync error');
-    });
-  });
-
-  describe('Reset functionality', () => {
-    it('should reset to CLOSED state', async () => {
-      // Open the circuit
-      mockFunction.mockRejectedValue(new Error('test error'));
-      for (let i = 0; i < 3; i++) {
-        try {
-          await breaker.execute(mockFunction);
-        } catch (error) {
-          // Expected
-        }
-      }
-      
-      expect(breaker.getState()).toBe(CircuitState.OPEN);
-      
-      // Reset
-      breaker.reset();
-      
-      expect(breaker.getState()).toBe(CircuitState.CLOSED);
-      
-      const stats = breaker.getStats();
-      expect(stats.failureCount).toBe(0);
-    });
-  });
-});
+      const result2

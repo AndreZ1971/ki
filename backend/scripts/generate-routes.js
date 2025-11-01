@@ -82,7 +82,7 @@ const routeTemplates = {
         analysisType: '{{routeName}}'
       }
     });
-  } catch (error) {
+  } catch (_error) {
     return Response.json({
       success: false,
       error: error.message
@@ -134,7 +134,7 @@ export async function GET() {
         processingTime: '\${(Math.random() * 1.5 + 0.3).toFixed(1)}s'
       }
     });
-  } catch (error) {
+  } catch (_error) {
     return Response.json({
       success: false,
       error: error.message
@@ -183,7 +183,7 @@ export async function GET() {
         security: 'pci_compliant'
       }
     });
-  } catch (error) {
+  } catch (_error) {
     return Response.json({
       success: false,
       error: error.message
@@ -236,7 +236,7 @@ export async function GET() {
         processingTime: '\${(Math.random() * 1.2 + 0.8).toFixed(1)}s'
       }
     });
-  } catch (error) {
+  } catch (_error) {
     return Response.json({
       success: false,
       error: error.message
@@ -289,7 +289,7 @@ export async function GET() {
         tokensUsed: aiResponse.response.tokens
       }
     });
-  } catch (error) {
+  } catch (_error) {
     return Response.json({
       success: false,
       error: error.message
@@ -342,7 +342,7 @@ export async function GET() {
         system: 'production'
       }
     });
-  } catch (error) {
+  } catch (_error) {
     return Response.json({
       success: false,
       error: error.message
@@ -407,7 +407,7 @@ function generateRoutes() {
       console.log(`✅ ${config.path.padEnd(45)} | ${config.description}`);
       createdCount++;
       
-    } catch (error) {
+    } catch (_error) {
       console.log(`❌ ${config.path.padEnd(45)} | FEHLER: ${error.message}`);
       errorCount++;
     }

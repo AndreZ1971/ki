@@ -56,7 +56,7 @@ async function generateProductImages() {
         // OPTIMIERT: Kurze Pause zwischen Requests
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-      } catch (error) {
+      } catch (_error) {
         console.error(`❌ Fehler bei Produkt #${product.id}:`, error instanceof Error ? error.message : 'Timeout/Server Error');
         failedProducts.push(product.id);
         
@@ -90,7 +90,7 @@ async function generateProductImages() {
           console.log(`✅ Retry erfolgreich für Produkt #${productId}`);
           await new Promise(resolve => setTimeout(resolve, 1500));
           
-        } catch (retryError) {
+        } catch (_retryError) {
           console.log(`❌ Retry fehlgeschlagen für #${productId}`);
         }
       }
@@ -98,7 +98,7 @@ async function generateProductImages() {
     
     return updatedProducts;
     
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Fehler bei der Bild-Zuweisung:', error);
     return [];
   }
@@ -113,7 +113,7 @@ function getExistingImage(product: any): string {
 async function main() {
   try {
     await generateProductImages();
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Fehler in main:', error);
   }
 }

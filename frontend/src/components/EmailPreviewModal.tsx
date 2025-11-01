@@ -1,5 +1,4 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
 
 interface EmailPreviewModalProps {
   isOpen: boolean;

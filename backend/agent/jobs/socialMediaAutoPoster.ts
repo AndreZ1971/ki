@@ -67,7 +67,7 @@ async function autoPostToSocialMedia() {
         const linkedinResult = await SOCIAL_MEDIA_APIS.linkedin.post(contentSet.posts.linkedin);
         postingResults.push(linkedinResult);
         console.log(`✅ LinkedIn: Erfolgreich gepostet`);
-      } catch (error) {
+      } catch (_error) {
         console.log(`❌ LinkedIn: Fehler - ${error}`);
         postingResults.push({ success: false, platform: 'linkedin', error: error instanceof Error ? error.message : 'Unknown error' });
       }
@@ -77,7 +77,7 @@ async function autoPostToSocialMedia() {
         const twitterResult = await SOCIAL_MEDIA_APIS.twitter.post(contentSet.posts.twitter);
         postingResults.push(twitterResult);
         console.log(`✅ Twitter: Erfolgreich gepostet`);
-      } catch (error) {
+      } catch (_error) {
         console.log(`❌ Twitter: Fehler - ${error}`);
         postingResults.push({ success: false, platform: 'twitter', error: error instanceof Error ? error.message : 'Unknown error' });
       }
@@ -89,7 +89,7 @@ async function autoPostToSocialMedia() {
           const instagramResult = await SOCIAL_MEDIA_APIS.instagram.post(contentSet.posts.instagram);
           postingResults.push(instagramResult);
           console.log(`✅ Instagram: Erfolgreich gepostet`);
-        } catch (error) {
+        } catch (_error) {
           console.log(`❌ Instagram: Fehler - ${error}`);
           postingResults.push({ success: false, platform: 'instagram', error: error instanceof Error ? error.message : 'Unknown error' });
         }
@@ -126,7 +126,7 @@ async function autoPostToSocialMedia() {
     
     return postingResults;
     
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Fehler beim automatischen Posting:', error);
     return [];
   }
@@ -175,7 +175,7 @@ async function main() {
     console.log('\n' + '='.repeat(50));
     await scheduleSocialMediaPosts();
     
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Fehler in main:', error);
   }
 }

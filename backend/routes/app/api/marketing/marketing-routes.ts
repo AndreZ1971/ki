@@ -80,7 +80,7 @@ export default async function marketingRoutes(fastify: FastifyInstance) {
           }
         });
 
-      } catch (error) {
+      } catch (_error) {
         fastify.log.error(error);
         return reply.status(500).send({
           success: false,
@@ -128,7 +128,7 @@ export default async function marketingRoutes(fastify: FastifyInstance) {
           }
         });
 
-      } catch (error) {
+      } catch (_error) {
         fastify.log.error(error);
         return reply.status(500).send({
           success: false,
@@ -163,7 +163,7 @@ export default async function marketingRoutes(fastify: FastifyInstance) {
           }
         });
 
-      } catch (error) {
+      } catch (_error) {
         fastify.log.error(error);
         return reply.status(500).send({
           success: false,
@@ -213,7 +213,7 @@ export default async function marketingRoutes(fastify: FastifyInstance) {
           }
         });
 
-      } catch (error) {
+      } catch (_error) {
         fastify.log.error(error);
         return reply.status(500).send({
           success: false,
@@ -267,7 +267,7 @@ export default async function marketingRoutes(fastify: FastifyInstance) {
           }
         });
 
-      } catch (error) {
+      } catch (_error) {
         fastify.log.error(error);
         return reply.status(500).send({
           success: false,
@@ -318,7 +318,7 @@ export default async function marketingRoutes(fastify: FastifyInstance) {
           }
         });
 
-      } catch (error) {
+      } catch (_error) {
         fastify.log.error(error);
         return reply.status(500).send({
           success: false,
@@ -380,7 +380,7 @@ export default async function marketingRoutes(fastify: FastifyInstance) {
           category: templateCategory
         });
 
-      } catch (error) {
+      } catch (_error) {
         fastify.log.error(error);
         return reply.status(500).send({
           success: false,

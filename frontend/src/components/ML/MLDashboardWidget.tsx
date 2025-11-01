@@ -46,7 +46,7 @@ export const MLDashboardWidget: React.FC = () => {
       const response = await fetch('http://localhost:3000/api/ml/status');
       const data = await response.json();
       setMlStatus(data);
-    } catch (error) {
+    } catch (_error) {
       console.error('Failed to fetch ML status:', error);
     }
   };
@@ -64,7 +64,7 @@ export const MLDashboardWidget: React.FC = () => {
         avgConfidence: 0.82,
         lastPrediction: new Date().toISOString()
       });
-    } catch (error) {
+    } catch (_error) {
       console.error('Failed to fetch ML stats:', error);
     } finally {
       setLoading(false);

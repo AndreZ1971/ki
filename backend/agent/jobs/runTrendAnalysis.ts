@@ -100,7 +100,7 @@ Examples:
 
     process.exit(0);
 
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Fehler bei der Trend-Analyse:', error);
     process.exit(1);
   }

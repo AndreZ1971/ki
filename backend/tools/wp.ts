@@ -109,7 +109,7 @@ const wpGet: Tool = {
           return { status: res.status, data: res.data };
         })
       );
-    } catch (err) {
+    } catch (_err) {
       const error = new Error(`wp_get failed: ${axiosErrorToMessage(err)}`);
       await alertError('WordPress GET Failed', `Failed to GET ${path}`, 'WordPressTools', 
         err instanceof Error ? err : error, { path, query });
@@ -167,7 +167,7 @@ const wpPost: Tool = {
           return { status: res.status, data: res.data };
         })
       );
-    } catch (err) {
+    } catch (_err) {
       const error = new Error(`wp_post failed: ${axiosErrorToMessage(err)}`);
       await alertError('WordPress POST Failed', `Failed ${method} to ${path}`, 'WordPressTools',
         err instanceof Error ? err : error, { method, path, query });
@@ -247,7 +247,7 @@ const wpMediaUpload: Tool = {
           return { id, source_url, status: upload.status };
         })
       );
-    } catch (err) {
+    } catch (_err) {
       const error = new Error(`wp_media_upload failed: ${axiosErrorToMessage(err)}`);
       await alertError('WordPress Media Upload Failed', `Failed to upload ${name}`, 'WordPressTools',
         err instanceof Error ? err : error, { filename: name, mime });
@@ -341,7 +341,7 @@ const wpMediaUploadFromUrl: Tool = {
       }
 
       return { id, source_url, status: upload.status };
-    } catch (err) {
+    } catch (_err) {
       throw new Error(
         `wp_media_upload_from_url failed: ${axiosErrorToMessage(err)}`
       );
@@ -387,7 +387,7 @@ const wpSetMediaMeta: Tool = {
         }
       );
       return { status: res.status, data: res.data };
-    } catch (err) {
+    } catch (_err) {
       throw new Error(`wp_set_media_meta failed: ${axiosErrorToMessage(err)}`);
     }
   },
