@@ -11,7 +11,7 @@ export async function run(): Promise<void> {
     // const categories = await wooCommerceAPI.get('products/categories');
     
     logger.info('wooListCategories abgeschlossen (Platzhalter)');
-  } catch (error) {
+  } catch (_error) {
     logger.error({ error }, 'Fehler in wooListCategories');
     throw error;
   }

@@ -106,7 +106,7 @@ export default async function shopMetricsRoutes(server: FastifyInstance, options
         data: metrics
       });
 
-    } catch (error) {
+    } catch (_error) {
       console.error('Shop Metrics Error:', error);
       return reply.status(500).send({
         success: false,

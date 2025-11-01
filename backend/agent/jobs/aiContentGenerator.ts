@@ -119,7 +119,7 @@ async function createAIProducts() {
         original: product.baseName
       });
       
-    } catch (error) {
+    } catch (_error) {
       console.error(`❌ Fehler bei "${product.baseName}":`, error instanceof Error ? error.message : error);
     }
   }
@@ -204,7 +204,7 @@ function shuffleArray(array: any[]): any[] {
 async function main() {
   try {
     await createAIProducts();
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Fehler in main:', error);
   }
 }

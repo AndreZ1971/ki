@@ -184,7 +184,7 @@ async function runWelcomeEmailCampaign() {
         emailResults.push(result);
         console.log(`✅ Welcome Email an ${subscriber} gesendet`);
         
-      } catch (error) {
+      } catch (_error) {
         console.log(`❌ Fehler bei ${subscriber}: ${error}`);
         emailResults.push({ success: false, to: subscriber, error: error instanceof Error ? error.message : 'Unknown error' });
       }
@@ -205,7 +205,7 @@ async function runWelcomeEmailCampaign() {
       results: emailResults
     };
     
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Fehler in Welcome Kampagne:', error);
     return { campaign: 'welcome', sent: 0, failed: 0, results: [] };
   }
@@ -251,7 +251,7 @@ async function runNewsletterCampaign() {
         emailResults.push(result);
         console.log(`✅ Newsletter an ${subscriber} gesendet`);
         
-      } catch (error) {
+      } catch (_error) {
         console.log(`❌ Fehler bei ${subscriber}: ${error}`);
         emailResults.push({ success: false, to: subscriber, error: error instanceof Error ? error.message : 'Unknown error' });
       }
@@ -271,7 +271,7 @@ async function runNewsletterCampaign() {
       results: emailResults
     };
     
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Fehler in Newsletter Kampagne:', error);
     return { campaign: 'newsletter', sent: 0, failed: 0, results: [] };
   }
@@ -323,7 +323,7 @@ async function runProductRecommendationCampaign() {
         emailResults.push(result);
         console.log(`✅ Produkt-Empfehlung an ${customer} gesendet`);
         
-      } catch (error) {
+      } catch (_error) {
         console.log(`❌ Fehler bei ${customer}: ${error}`);
         emailResults.push({ success: false, to: customer, error: error instanceof Error ? error.message : 'Unknown error' });
       }
@@ -344,7 +344,7 @@ async function runProductRecommendationCampaign() {
       results: emailResults
     };
     
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Fehler in Produkt-Empfehlungs Kampagne:', error);
     return { campaign: 'product_recommendation', sent: 0, failed: 0, results: [] };
   }
@@ -397,7 +397,7 @@ async function runEmailMarketingAutomation() {
 async function main() {
   try {
     await runEmailMarketingAutomation();
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Fehler in main:', error);
   }
 }

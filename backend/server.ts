@@ -288,7 +288,7 @@ async function buildServer() {
 
     return server;
 
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Fehler beim Server Setup:', error);
     throw error;
   }
@@ -318,7 +318,7 @@ const start = async () => {
     console.log('🔍 Debug Routes: http://localhost:3000/api/debug/routes');
     console.log('📈 Analytics: http://localhost:3000/api/analytics');
 
-  } catch (err) {
+  } catch (_err) {
     console.error('💥 Server Start fehlgeschlagen:', err);
     process.exit(1);
   }

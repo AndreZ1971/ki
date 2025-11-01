@@ -33,7 +33,7 @@ export async function POST(request) {
         system: 'production'
       }
     });
-  } catch (error) {
+  } catch (_error) {
     return Response.json({
       success: false,
       error: error.message

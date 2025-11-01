@@ -99,7 +99,7 @@ async function analyzeGoogleTrends(keyword: string, geo: string): Promise<TrendD
     console.log(`✅ Google Trends: ${trends.length} Trends gefunden`);
     return trends;
 
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Google Trends Fehler:', error);
     return [];
   }

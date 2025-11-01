@@ -81,7 +81,7 @@ async function createGermanDSGVOProducts() {
         status: 'draft'
       });
       
-    } catch (error) {
+    } catch (_error) {
       console.error(`❌ Fehler bei "${product.name}":`, error instanceof Error ? error.message : error);
     }
   }
@@ -129,7 +129,7 @@ function generateGermanDescription(product: any): string {
 async function main() {
   try {
     await createGermanDSGVOProducts();
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Fehler in main:', error);
   }
 }

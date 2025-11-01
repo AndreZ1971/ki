@@ -56,7 +56,7 @@ export default async function productRoutes(server: FastifyInstance) {
           category,
           optimization
         });
-      } catch (error) {
+      } catch (_error) {
         console.error('Error in auto-create:', error);
         return reply.status(500).send({
           success: false,
@@ -82,7 +82,7 @@ export default async function productRoutes(server: FastifyInstance) {
           success: true,
           data: []
         });
-      } catch (error) {
+      } catch (_error) {
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Unbekannter Fehler'
@@ -128,7 +128,7 @@ export default async function productRoutes(server: FastifyInstance) {
           data: createdProduct,
           message: 'Produkt erfolgreich erstellt'
         });
-      } catch (error) {
+      } catch (_error) {
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Unbekannter Fehler'
@@ -166,7 +166,7 @@ export default async function productRoutes(server: FastifyInstance) {
           message: `${productIds?.length || 0} Produkte aktualisiert (${type})`,
           updatedCount: productIds?.length || 0
         });
-      } catch (error) {
+      } catch (_error) {
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Unbekannter Fehler'

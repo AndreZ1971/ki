@@ -13,7 +13,7 @@ export async function run(): Promise<void> {
     // await wooCommerceAPI.put(`products/${productId}`, updateData);
     
     logger.info('wooUpdateProduct abgeschlossen (Platzhalter)');
-  } catch (error) {
+  } catch (_error) {
     logger.error({ error }, 'Fehler in wooUpdateProduct');
     throw error;
   }

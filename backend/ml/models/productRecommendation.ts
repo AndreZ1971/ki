@@ -141,7 +141,7 @@ ANTWORT FORMAT (JSON):
         modelVersion: 'gpt-4o-mini',
       };
 
-    } catch (error) {
+    } catch (_error) {
       logger.error(`ML recommendation failed: ${error}`);
       throw error;
     }
@@ -211,7 +211,7 @@ ANTWORT FORMAT (JSON):
 
       return recommendations;
 
-    } catch (error) {
+    } catch (_error) {
       logger.error(`Rule-based recommendation failed: ${error}`);
       
       // Ultimate fallback: just recommend newest products

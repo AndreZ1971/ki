@@ -16,7 +16,7 @@ interface ConversionData {
 const ConversionAnalysis = () => {
   const [conversionData, setConversionData] = useState<ConversionData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [_error, _setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,8 +40,8 @@ const ConversionAnalysis = () => {
     navigate('/');
   };
 
-  if (loading) return <div className="loading-spinner">📈 Loading Conversion Analysis...</div>;
-  if (error) return <div className="error-message">Error: {error}</div>;
+  if (loading) return <div className="loading-spinner">Lade Conversion-Daten...</div>;
+  if (_error) return <div className="error-message">Error: {_error}</div>;
 
   return (
     <div className="analytics-page">

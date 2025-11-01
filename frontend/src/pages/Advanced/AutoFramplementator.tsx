@@ -89,7 +89,7 @@ export default App;` : `// ${framework.toUpperCase()} implementation`}
 
       setGeneratedCode(code);
       showToast('Framework erfolgreich generiert!', 'success');
-    } catch (err) {
+    } catch (_err) {
       const errorMessage = err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten';
       setError(errorMessage);
       showToast(errorMessage, 'error');

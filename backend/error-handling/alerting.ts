@@ -72,7 +72,7 @@ export class AlertingService {
             pass: emailChannel.config.pass || process.env.SMTP_PASS
           }
         });
-      } catch (error) {
+      } catch (_error) {
         console.error('[Alerting] Failed to initialize email transport:', error);
       }
     }
@@ -213,7 +213,7 @@ export class AlertingService {
           await this.sendToSlack(alert, channel.config);
           break;
       }
-    } catch (error) {
+    } catch (_error) {
       console.error(`[Alerting] Failed to send to ${channel.type}:`, error);
     }
   }

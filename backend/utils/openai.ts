@@ -28,7 +28,7 @@ export async function executeOpenAI<T>(
     return await openAIRetry.execute(() =>
       openAIBreaker.execute(operation)
     );
-  } catch (error) {
+  } catch (_error) {
     await alertError(
       'OpenAI API Failed',
       `Operation ${operationName} failed after retries`,
@@ -44,7 +44,7 @@ export async function executeOpenAI<T>(
 try {
   const openai = getOpenAIClient();
   // ... AI-Funktionen nutzen mit executeOpenAI() wrapper
-} catch (error) {
+} catch (_error) {
   if (error instanceof Error) {
     console.log('⚠️ OpenAI nicht verfügbar:', error.message);
   } else {

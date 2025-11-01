@@ -18,7 +18,7 @@ class GoogleTrendsService {
       );
 
       return trends;
-    } catch (error) {
+    } catch (_error) {
       console.error('❌ Fehler beim Laden der Google Trends:', error);
       return this.getFallbackTrendData();
     }

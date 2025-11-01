@@ -60,7 +60,7 @@ export default async function bundleRoutes(server: FastifyInstance) {
           success: true,
           data: mockBundles
         });
-      } catch (error) {
+      } catch (_error) {
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Unbekannter Fehler'
@@ -105,7 +105,7 @@ export default async function bundleRoutes(server: FastifyInstance) {
           data: newBundle,
           message: 'Bundle erfolgreich erstellt'
         });
-      } catch (error) {
+      } catch (_error) {
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Unbekannter Fehler'
@@ -150,7 +150,7 @@ export default async function bundleRoutes(server: FastifyInstance) {
           data: updatedBundle,
           message: 'Bundle erfolgreich aktualisiert'
         });
-      } catch (error) {
+      } catch (_error) {
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Unbekannter Fehler'

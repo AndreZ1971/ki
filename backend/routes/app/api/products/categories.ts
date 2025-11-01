@@ -44,7 +44,7 @@ export default async function categoryRoutes(server: FastifyInstance) {
           success: true,
           data: mockCategories
         });
-      } catch (error) {
+      } catch (_error) {
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Unbekannter Fehler'
@@ -89,7 +89,7 @@ export default async function categoryRoutes(server: FastifyInstance) {
           data: newCategory,
           message: 'Kategorie erfolgreich erstellt'
         });
-      } catch (error) {
+      } catch (_error) {
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Unbekannter Fehler'
@@ -116,7 +116,7 @@ export default async function categoryRoutes(server: FastifyInstance) {
           message: 'Alle Kategorien erfolgreich optimiert',
           optimizedCount: 4
         });
-      } catch (error) {
+      } catch (_error) {
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Unbekannter Fehler'

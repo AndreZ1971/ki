@@ -19,7 +19,7 @@ function initializeOpenAI() {
       openai = new OpenAI({ apiKey });
       console.log('✅ OpenAI Client erfolgreich initialisiert');
     }
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Fehler bei OpenAI Initialisierung:', error);
     openai = null;
   }

@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const wooCommerce = new WooCommerceRestApi({
+const _wooCommerce = getWooCommerceClient();
   url: process.env.WOOCOMMERCE_URL!,
   consumerKey: process.env.CONSUMER_KEY!,
   consumerSecret: process.env.CONSUMER_SECRET!,

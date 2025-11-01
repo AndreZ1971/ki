@@ -12,7 +12,7 @@ export async function run(): Promise<void> {
     // await wooCommerceAPI.post('products', productData);
     
     logger.info('wooCreateProduct abgeschlossen (Platzhalter)');
-  } catch (error) {
+  } catch (_error) {
     logger.error({ error }, 'Fehler in wooCreateProduct');
     throw error;
   }
