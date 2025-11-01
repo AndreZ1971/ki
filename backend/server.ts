@@ -26,6 +26,9 @@ import categoryRoutes from './routes/app/api/products/categories';
 import bundleRoutes from './routes/app/api/products/bundles';
 import freebieRoutes from './routes/app/api/products/freebies';
 
+// 🔥 MARKETING ROUTES
+import marketingRoutes from './routes/app/api/marketing/marketing-routes';
+
 // Umgebungsvariablen laden mit erweiterter Fehlerbehandlung
 dotenv.config();
 
@@ -186,6 +189,10 @@ async function buildServer() {
 
     await server.register(freebieRoutes, { prefix: '/api/freebies' });
     console.log('✅ Freebie Routes erfolgreich registriert');
+
+    // 🔥 MARKETING ROUTES
+    await server.register(marketingRoutes, { prefix: '/api/marketing' });
+    console.log('✅ Marketing Routes erfolgreich registriert');
 
     // Global Error Handler
     server.setErrorHandler((error, request, reply) => {

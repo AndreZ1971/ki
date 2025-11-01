@@ -3,8 +3,17 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 // Pages
 import AIDashboard from './pages/AIDashboard';
-import AIEmailGenerator from './pages/MarketingContent/ai-email-generator';
 import Settings from './pages/Settings/Settings';
+
+// Marketing Content Pages
+import AIEmailGenerator from './pages/MarketingContent/ai-email-generator';
+import GermanContentGenerator from './pages/MarketingContent/GermanContentGenerator';
+import EmailMarketingAutomation from './pages/MarketingContent/EmailMarketingAutomation';
+import SocialMediaAudio from './pages/MarketingContent/SocialMediaAudio';
+import SocialMediaPoster from './pages/MarketingContent/SocialMediaPoster';
+import FreeToPostConverter from './pages/MarketingContent/FreeToPostConverter';
+import ContentMonetized from './pages/MarketingContent/ContentMonetized';
+import KiteTemplates from './pages/MarketingContent/KiteTemplates';
 
 // Product Management Pages
 import AutoProductCreator from './pages/ProductManagement/AutoProductCreator';
@@ -55,8 +64,15 @@ function App() {
           <Route path="/analytics/standard-audit" element={<StandardAudit />} />
           <Route path="/analytics/trend-analysis" element={<TrendAnalysis />} />
           
-          {/* AI Email Generator Seite */}
+          {/* Marketing Content Routes */}
           <Route path="/marketing/ai-email-generator" element={<AIEmailGenerator />} />
+          <Route path="/marketing/german-content-generator" element={<GermanContentGenerator />} />
+          <Route path="/marketing/email-marketing-automation" element={<EmailMarketingAutomation />} />
+          <Route path="/marketing/social-media-audio" element={<SocialMediaAudio />} />
+          <Route path="/marketing/social-media-poster" element={<SocialMediaPoster />} />
+          <Route path="/marketing/free-to-post-converter" element={<FreeToPostConverter />} />
+          <Route path="/marketing/content-monetized" element={<ContentMonetized />} />
+          <Route path="/marketing/kite-templates" element={<KiteTemplates />} />
           
           {/* Product Management Routes */}
           <Route path="/products/auto-creator" element={<AutoProductCreator />} />
