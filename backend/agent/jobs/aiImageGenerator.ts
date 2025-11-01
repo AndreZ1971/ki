@@ -57,7 +57,7 @@ async function generateProductImages() {
         await new Promise(resolve => setTimeout(resolve, 1000));
         
       } catch (_error) {
-        console.error(`❌ Fehler bei Produkt #${product.id}:`, error instanceof Error ? error.message : 'Timeout/Server Error');
+        console.error(`❌ Fehler bei Produkt #${product.id}:`, _error instanceof Error ? _error.message : 'Timeout/Server Error');
         failedProducts.push(product.id);
         
         // OPTIMIERT: Längere Pause nach Fehlern

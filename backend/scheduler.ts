@@ -25,6 +25,6 @@ cron.schedule('*/2 * * * *', async () => {
     // Optional: Du kannst hier direkt Tool-Outputs parsen und lastIso schieben.
     lastIso = new Date().toISOString();
   } catch (_e) {
-    logger.error(e, 'cron error');
+    logger.error(_e, 'cron error');
   }
 });

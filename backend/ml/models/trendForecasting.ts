@@ -2,7 +2,7 @@
 // Trend Forecasting: ML vs. Google Trends
 
 import { MLPrediction, MLService } from '../mlService.js';
-// @ts-expect-error - no types available for google-trends-api
+/// <reference path="../../types/google-trends-api.d.ts" />
 import googleTrends from 'google-trends-api';
 import { logger } from '../../logger.js';
 import { getOpenAIClient } from '../../utils/openai.js';
@@ -126,8 +126,8 @@ ANTWORT FORMAT (JSON):
       };
 
     } catch (_error) {
-      logger.error(`ML trend forecast failed: ${error}`);
-      throw error;
+      logger.error(`ML trend forecast failed: ${_error}`);
+      throw _error;
     }
   }
 
@@ -180,7 +180,7 @@ ANTWORT FORMAT (JSON):
         }
 
       } catch (_error) {
-        logger.error(`Google Trends failed for "${keyword}": ${error}`);
+        logger.error(`Google Trends failed for "${keyword}": ${_error}`);
         forecasts.push({
           keyword,
           score: 0,

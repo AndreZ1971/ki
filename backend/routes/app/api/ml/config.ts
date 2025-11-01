@@ -18,7 +18,7 @@ const mlConfigRoutes: FastifyPluginAsync = async (fastify) => {
         performance: mlConfig.performance,
       };
     } catch (_error) {
-      logger.error(`ML Config GET error: ${error}`);
+      logger.error(`ML Config GET error: ${_error}`);
       reply.status(500).send({ error: 'Failed to get ML configuration' });
     }
   });
@@ -59,7 +59,7 @@ const mlConfigRoutes: FastifyPluginAsync = async (fastify) => {
         config: mlConfig,
       };
     } catch (_error) {
-      logger.error(`ML Config POST error: ${error}`);
+      logger.error(`ML Config POST error: ${_error}`);
       reply.status(500).send({ error: 'Failed to update ML configuration' });
     }
   });
@@ -91,7 +91,7 @@ const mlConfigRoutes: FastifyPluginAsync = async (fastify) => {
         },
       };
     } catch (_error) {
-      logger.error(`ML Status error: ${error}`);
+      logger.error(`ML Status error: ${_error}`);
       reply.status(500).send({ error: 'Failed to get ML status' });
     }
   });
@@ -144,8 +144,8 @@ async function updateEnvFile(config: typeof mlConfig) {
     await fs.writeFile(envPath, newEnvContent, 'utf-8');
     logger.info('✅ .env file updated with ML configuration');
   } catch (_error) {
-    logger.error(`Failed to update .env file: ${error}`);
-    throw error;
+    logger.error(`Failed to update .env file: ${_error}`);
+    throw _error;
   }
 }
 

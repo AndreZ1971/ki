@@ -82,7 +82,7 @@ async function createGermanDSGVOProducts() {
       });
       
     } catch (_error) {
-      console.error(`❌ Fehler bei "${product.name}":`, error instanceof Error ? error.message : error);
+      console.error(`❌ Fehler bei "${product.name}":`, _error instanceof Error ? _error.message : _error);
     }
   }
   

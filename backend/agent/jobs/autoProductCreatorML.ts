@@ -62,8 +62,8 @@ export class AutoProductCreatorML {
       return createdProducts;
 
     } catch (_error) {
-      logger.error(`Auto Product Creator failed: ${error}`);
-      throw error;
+      logger.error(`Auto Product Creator failed: ${_error}`);
+      throw _error;
     }
   }
 
@@ -113,8 +113,8 @@ export class AutoProductCreatorML {
       return bundleProduct;
 
     } catch (_error) {
-      logger.error(`Bundle creation failed: ${error}`);
-      throw error;
+      logger.error(`Bundle creation failed: ${_error}`);
+      throw _error;
     }
   }
 
