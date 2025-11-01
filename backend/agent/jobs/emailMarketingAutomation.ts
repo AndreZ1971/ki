@@ -185,8 +185,8 @@ async function runWelcomeEmailCampaign() {
         console.log(`✅ Welcome Email an ${subscriber} gesendet`);
         
       } catch (_error) {
-        console.log(`❌ Fehler bei ${subscriber}: ${error}`);
-        emailResults.push({ success: false, to: subscriber, error: error instanceof Error ? error.message : 'Unknown error' });
+        console.log(`❌ Fehler bei ${subscriber}: ${_error}`);
+        emailResults.push({ success: false, to: subscriber, error: _error instanceof Error ? _error.message : 'Unknown error' });
       }
       
       // Kurze Pause zwischen Emails
@@ -206,7 +206,7 @@ async function runWelcomeEmailCampaign() {
     };
     
   } catch (_error) {
-    console.error('❌ Fehler in Welcome Kampagne:', error);
+    console.error('❌ Fehler in Welcome Kampagne:', _error);
     return { campaign: 'welcome', sent: 0, failed: 0, results: [] };
   }
 }
@@ -252,8 +252,8 @@ async function runNewsletterCampaign() {
         console.log(`✅ Newsletter an ${subscriber} gesendet`);
         
       } catch (_error) {
-        console.log(`❌ Fehler bei ${subscriber}: ${error}`);
-        emailResults.push({ success: false, to: subscriber, error: error instanceof Error ? error.message : 'Unknown error' });
+        console.log(`❌ Fehler bei ${subscriber}: ${_error}`);
+        emailResults.push({ success: false, to: subscriber, error: _error instanceof Error ? _error.message : 'Unknown error' });
       }
       
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -272,7 +272,7 @@ async function runNewsletterCampaign() {
     };
     
   } catch (_error) {
-    console.error('❌ Fehler in Newsletter Kampagne:', error);
+    console.error('❌ Fehler in Newsletter Kampagne:', _error);
     return { campaign: 'newsletter', sent: 0, failed: 0, results: [] };
   }
 }
@@ -324,8 +324,8 @@ async function runProductRecommendationCampaign() {
         console.log(`✅ Produkt-Empfehlung an ${customer} gesendet`);
         
       } catch (_error) {
-        console.log(`❌ Fehler bei ${customer}: ${error}`);
-        emailResults.push({ success: false, to: customer, error: error instanceof Error ? error.message : 'Unknown error' });
+        console.log(`❌ Fehler bei ${customer}: ${_error}`);
+        emailResults.push({ success: false, to: customer, error: _error instanceof Error ? _error.message : 'Unknown error' });
       }
       
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -345,7 +345,7 @@ async function runProductRecommendationCampaign() {
     };
     
   } catch (_error) {
-    console.error('❌ Fehler in Produkt-Empfehlungs Kampagne:', error);
+    console.error('❌ Fehler in Produkt-Empfehlungs Kampagne:', _error);
     return { campaign: 'product_recommendation', sent: 0, failed: 0, results: [] };
   }
 }
@@ -398,7 +398,7 @@ async function main() {
   try {
     await runEmailMarketingAutomation();
   } catch (_error) {
-    console.error('❌ Fehler in main:', error);
+    console.error('❌ Fehler in main:', _error);
   }
 }
 
