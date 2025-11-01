@@ -5,6 +5,9 @@ import swaggerUi from '@fastify/swagger-ui';
 import dotenv from 'dotenv';
 import Fastify from 'fastify';
 
+// 🔥 ERROR HANDLING SYSTEM
+import { setupErrorHandling } from './error-handling';
+
 // 🔥 KORRIGIERTE IMPORTS FÜR NEUE STRUKTUR
 import shopMetricsRoutes from './routes/app/api/analytics/metrics/shop-metrics';
 import wooCommerceRoutes from './routes/app/api/products/woocommerce';
@@ -31,6 +34,11 @@ import marketingRoutes from './routes/app/api/marketing/marketing-routes';
 
 // Umgebungsvariablen laden mit erweiterter Fehlerbehandlung
 dotenv.config();
+
+// 🔥 ERROR HANDLING INITIALISIERUNG
+console.log('🛡️ Initializing Error Handling System...');
+setupErrorHandling();
+console.log('✅ Error Handling System active');
 
 // DEBUG: Überprüfe ob Umgebungsvariablen geladen werden
 console.log('[dotenv] Geladene Umgebungsvariablen:');
