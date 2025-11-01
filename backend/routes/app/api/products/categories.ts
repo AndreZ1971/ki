@@ -32,22 +32,50 @@ export default async function categoryRoutes(server: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        // TODO: WooCommerce API Integration
-        const mockCategories: Category[] = [
-          { id: 1, name: 'WordPress Themes', productCount: 15, needsOptimization: false },
-          { id: 2, name: 'Plugins', productCount: 8, needsOptimization: true },
-          { id: 3, name: 'Templates', productCount: 12, needsOptimization: false },
-          { id: 4, name: 'Digital Products', productCount: 25, needsOptimization: true }
-        ];
+        // ✅ ECHTE WooCommerce API statt Mock-Daten
+        const wooConfig = {
+          url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
+          consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
+          consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
+        };
+
+        const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
+        
+        const response = await fetch(`${wooConfig.url}/wp-json/wc/v3/products/categories?per_page=100`, {
+          headers: {
+            'Authorization': `Basic ${auth}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`WooCommerce API Error: ${response.status}`);
+        }
+
+        const wooCategories = await response.json() as any[];
+        
+        // Transformiere WooCommerce-Format zu unserem Format
+        const categories: Category[] = wooCategories.map(cat => ({
+          id: cat.id,
+          name: cat.name,
+          slug: cat.slug,
+          productCount: cat.count || 0,
+          needsOptimization: cat.count > 0 && !cat.description, // Optimierung nötig wenn Produkte aber keine Beschreibung
+          parentId: cat.parent || undefined,
+          description: cat.description || undefined
+        }));
 
         return reply.send({
           success: true,
-          data: mockCategories
+          data: categories,
+          total: categories.length,
+          source: 'woocommerce-api'
         });
       } catch (_error) {
+        console.error('Categories API Error:', _error);
         return reply.status(500).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Unbekannter Fehler'
+          error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
         });
       }
     }
@@ -92,7 +120,7 @@ export default async function categoryRoutes(server: FastifyInstance) {
       } catch (_error) {
         return reply.status(500).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Unbekannter Fehler'
+          error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
         });
       }
     }
@@ -119,7 +147,7 @@ export default async function categoryRoutes(server: FastifyInstance) {
       } catch (_error) {
         return reply.status(500).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Unbekannter Fehler'
+          error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
         });
       }
     }

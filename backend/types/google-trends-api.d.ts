@@ -11,7 +11,9 @@ declare module 'google-trends-api' {
     property?: string;
   }
 
-  interface InterestOverTimeOptions extends TrendOptions {}
+  interface InterestOverTimeOptions extends TrendOptions {
+    granularTimeResolution?: boolean;
+  }
   interface RelatedQueriesOptions extends TrendOptions {}
   interface RelatedTopicsOptions extends TrendOptions {}
 

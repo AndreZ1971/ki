@@ -1,4 +1,6 @@
 // agent/jobs/googleTrendsService.ts
+import googleTrends from 'google-trends-api';
+
 class GoogleTrendsService {
   static async getIndustryTrends() {
     try {
@@ -19,19 +21,55 @@ class GoogleTrendsService {
 
       return trends;
     } catch (_error) {
-      console.error('❌ Fehler beim Laden der Google Trends:', error);
+      console.error('❌ Fehler beim Laden der Google Trends:', _error);
       return this.getFallbackTrendData();
     }
   }
 
-  private static async getTrendData(keyword: string) {
-    // Vereinfachte Trends - könnte mit offizieller API erweitert werden
-    return {
-      keyword,
-      trendScore: Math.floor(Math.random() * 100) + 1,
-      change: (Math.random() - 0.5) * 20, // -10% bis +10% Change
-      seasonality: this.calculateSeasonality()
-    };
+  private static async getTrendData(keyword: string, geo: string = 'DE') {
+    try {
+      // ✅ ECHTE Google Trends API statt Math.random()
+      const result = await googleTrends.interestOverTime({
+        keyword,
+        geo,
+        startTime: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), // Letzte 90 Tage
+        granularTimeResolution: true
+      });
+
+      const data = JSON.parse(result);
+      const timelineData = data.default?.timelineData || [];
+      
+      if (timelineData.length === 0) {
+        throw new Error('Keine Trend-Daten verfügbar');
+      }
+
+      // Aktueller Trend-Score (0-100)
+      const latestValue = timelineData[timelineData.length - 1]?.value?.[0] || 0;
+      
+      // Trend-Änderung berechnen (Vergleich mit vor 30 Tagen)
+      const thirtyDaysAgo = timelineData[Math.max(0, timelineData.length - 30)]?.value?.[0] || latestValue;
+      const change = thirtyDaysAgo > 0 ? ((latestValue - thirtyDaysAgo) / thirtyDaysAgo) * 100 : 0;
+
+      return {
+        keyword,
+        trendScore: latestValue,
+        change: parseFloat(change.toFixed(2)),
+        seasonality: this.calculateSeasonality(),
+        dataSource: 'google-trends-api',
+        lastUpdated: new Date().toISOString()
+      };
+    } catch (error) {
+      console.warn(`⚠️ Google Trends Fehler für "${keyword}":`, error instanceof Error ? error.message : 'Unknown error');
+      // Fallback zu Mock-Daten wenn API fehlschlägt
+      return {
+        keyword,
+        trendScore: Math.floor(Math.random() * 100) + 1,
+        change: (Math.random() - 0.5) * 20,
+        seasonality: this.calculateSeasonality(),
+        dataSource: 'fallback',
+        lastUpdated: new Date().toISOString()
+      };
+    }
   }
 
   private static calculateSeasonality() {
