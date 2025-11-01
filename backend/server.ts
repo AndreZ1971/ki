@@ -32,6 +32,9 @@ import freebieRoutes from './routes/app/api/products/freebies';
 // 🔥 MARKETING ROUTES
 import marketingRoutes from './routes/app/api/marketing/marketing-routes';
 
+// 🔥 ML CONFIGURATION ROUTES
+import mlConfigRoutes from './routes/app/api/ml/config';
+
 // Umgebungsvariablen laden mit erweiterter Fehlerbehandlung
 dotenv.config();
 
@@ -197,6 +200,10 @@ async function buildServer() {
 
     await server.register(freebieRoutes, { prefix: '/api/freebies' });
     console.log('✅ Freebie Routes erfolgreich registriert');
+
+    // 🔥 ML CONFIGURATION ROUTES
+    await server.register(mlConfigRoutes, { prefix: '/api/ml' });
+    console.log('✅ ML Config Routes erfolgreich registriert');
 
     // 🔥 MARKETING ROUTES
     await server.register(marketingRoutes, { prefix: '/api/marketing' });
