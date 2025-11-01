@@ -121,17 +121,53 @@ const ANALYTICS_SERVICE = {
     console.log('💰 Lade Sales Metrics...');
     
     try {
-      const products = await wooGet('/products') as any[];
+      // ✅ ECHTE Order-Daten statt Math.random()
+      const [products, orders] = await Promise.all([
+        wooGet('/products', { per_page: 100 }) as Promise<any[]>,
+        wooGet('/orders', { status: 'completed', per_page: 100 }) as Promise<any[]>
+      ]);
       
-      return products.slice(0, 5).map(product => ({
-        product: product.name,
-        orders: Math.floor(Math.random() * 20) + 5, // Simulierte Daten
-        revenue: (Math.floor(Math.random() * 1000) + 100),
-        conversionRate: Math.random() * 0.1 + 0.02, // 2-12%
-        date: new Date()
-      }));
+      // Zähle tatsächliche Orders pro Produkt
+      const productSales = new Map<number, { orders: number; revenue: number }>();
+      
+      for (const order of orders) {
+        const lineItems = order.line_items || [];
+        for (const item of lineItems) {
+          const productId = item.product_id;
+          const current = productSales.get(productId) || { orders: 0, revenue: 0 };
+          productSales.set(productId, {
+            orders: current.orders + item.quantity,
+            revenue: current.revenue + parseFloat(item.total || '0')
+          });
+        }
+      }
+      
+      // Transformiere zu SalesMetrics (Top 5 Produkte)
+      const metricsArray: SalesMetrics[] = [];
+      
+      for (const product of products) {
+        const sales = productSales.get(product.id);
+        if (sales && sales.orders > 0) {
+          const totalViews = product.total_sales || sales.orders; // Fallback zu Orders
+          const conversionRate = totalViews > 0 ? (sales.orders / totalViews) : 0;
+          
+          metricsArray.push({
+            product: product.name,
+            orders: sales.orders,
+            revenue: parseFloat(sales.revenue.toFixed(2)),
+            conversionRate: parseFloat((conversionRate * 100).toFixed(2)), // Als Prozent
+            date: new Date()
+          });
+        }
+      }
+      
+      // Sortiere nach Revenue und nimm Top 5
+      return metricsArray
+        .sort((a, b) => b.revenue - a.revenue)
+        .slice(0, 5);
+      
     } catch (_error) {
-      console.log('❌ Fehler beim Laden der Sales Metrics:', error);
+      console.log('❌ Fehler beim Laden der Sales Metrics:', _error);
       return [];
     }
   }
