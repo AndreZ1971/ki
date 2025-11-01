@@ -110,9 +110,9 @@ const wpGet: Tool = {
         })
       );
     } catch (_err) {
-      const error = new Error(`wp_get failed: ${axiosErrorToMessage(err)}`);
+      const error = new Error(`wp_get failed: ${axiosErrorToMessage(_err)}`);
       await alertError('WordPress GET Failed', `Failed to GET ${path}`, 'WordPressTools', 
-        err instanceof Error ? err : error, { path, query });
+        _err instanceof Error ? _err : error, { path, query });
       throw error;
     }
   },
@@ -168,9 +168,9 @@ const wpPost: Tool = {
         })
       );
     } catch (_err) {
-      const error = new Error(`wp_post failed: ${axiosErrorToMessage(err)}`);
+      const error = new Error(`wp_post failed: ${axiosErrorToMessage(_err)}`);
       await alertError('WordPress POST Failed', `Failed ${method} to ${path}`, 'WordPressTools',
-        err instanceof Error ? err : error, { method, path, query });
+        _err instanceof Error ? _err : error, { method, path, query });
       throw error;
     }
   },
@@ -248,9 +248,9 @@ const wpMediaUpload: Tool = {
         })
       );
     } catch (_err) {
-      const error = new Error(`wp_media_upload failed: ${axiosErrorToMessage(err)}`);
+      const error = new Error(`wp_media_upload failed: ${axiosErrorToMessage(_err)}`);
       await alertError('WordPress Media Upload Failed', `Failed to upload ${name}`, 'WordPressTools',
-        err instanceof Error ? err : error, { filename: name, mime });
+        _err instanceof Error ? _err : error, { filename: name, mime });
       throw error;
     }
   },
@@ -343,7 +343,7 @@ const wpMediaUploadFromUrl: Tool = {
       return { id, source_url, status: upload.status };
     } catch (_err) {
       throw new Error(
-        `wp_media_upload_from_url failed: ${axiosErrorToMessage(err)}`
+        `wp_media_upload_from_url failed: ${axiosErrorToMessage(_err)}`
       );
     }
   },
@@ -388,7 +388,7 @@ const wpSetMediaMeta: Tool = {
       );
       return { status: res.status, data: res.data };
     } catch (_err) {
-      throw new Error(`wp_set_media_meta failed: ${axiosErrorToMessage(err)}`);
+      throw new Error(`wp_set_media_meta failed: ${axiosErrorToMessage(_err)}`);
     }
   },
 };

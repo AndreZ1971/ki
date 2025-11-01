@@ -61,10 +61,10 @@ const emailSenderRoutes: FastifyPluginAsync = async (fastify, options) => {
           await new Promise(resolve => setTimeout(resolve, 100));
           
         } catch (_error) {
-          console.error(`❌ Fehler bei ${customer.email}:`, error);
+          console.error(`❌ Fehler bei ${customer.email}:`, _error);
           failedEmails.push({
             email: customer.email,
-            error: error instanceof Error ? error.message : String(error)
+            error: _error instanceof Error ? _error.message : String(_error)
           });
         }
       }
@@ -86,11 +86,11 @@ const emailSenderRoutes: FastifyPluginAsync = async (fastify, options) => {
       };
       
     } catch (_error) {
-      console.error('Email Send Error:', error);
+      console.error('Email Send Error:', _error);
       reply.status(500).send({ 
         success: false, 
         error: 'Email-Versand fehlgeschlagen',
-        details: error instanceof Error ? error.message : String(error)
+        details: _error instanceof Error ? _error.message : String(_error)
       });
     }
   });
@@ -123,11 +123,11 @@ const emailSenderRoutes: FastifyPluginAsync = async (fastify, options) => {
       };
       
     } catch (_error) {
-      console.error('SMTP Test Error:', error);
+      console.error('SMTP Test Error:', _error);
       reply.status(500).send({ 
         success: false, 
         error: 'SMTP Verbindungstest fehlgeschlagen',
-        details: error instanceof Error ? error.message : String(error)
+        details: _error instanceof Error ? _error.message : String(_error)
       });
     }
   });
