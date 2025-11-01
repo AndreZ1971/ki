@@ -5,6 +5,7 @@ import { MLPrediction, MLService } from '../mlService.js';
 import { wooGet } from '../../tools/woo.js';
 import { logger } from '../../logger.js';
 import { isMLEnabled } from '../../config/ml.config.js';
+import { getOpenAIClient } from '../../utils/openai.js';
 
 export interface ProductRecommendation {
   productId: number;
@@ -28,7 +29,7 @@ export class ProductRecommendationEngine {
   }
 
   /**
-   * ML-based recommendations (Collaborative Filtering)
+   * ML-based recommendations (OpenAI-powered)
    */
   private static async mlRecommendations(
     customerId: number,
@@ -36,51 +37,108 @@ export class ProductRecommendationEngine {
   ): Promise<MLPrediction<ProductRecommendation[]>> {
     const startTime = Date.now();
     
-    logger.info(`🤖 ML: Generating recommendations for customer ${customerId}`);
+    logger.info(`🤖 ML (OpenAI): Generating recommendations for customer ${customerId}`);
 
     try {
-      // 1. Get customer's purchase history
-      const orders = await wooGet(`customers/${customerId}/orders`, { per_page: 100 }) as any[];
+      // 1. Get customer data
+      const customer = await wooGet(`customers/${customerId}`) as any;
+      const orders = await wooGet(`customers/${customerId}/orders`, { per_page: 20 }) as any[];
       
-      // 2. Extract purchased product IDs
+      // 2. Extract purchase history
+      const purchasedProducts: Array<{name: string; category: string; price: number}> = [];
       const purchasedProductIds = new Set<number>();
+      
       for (const order of orders) {
         for (const item of order.line_items) {
           purchasedProductIds.add(item.product_id);
+          purchasedProducts.push({
+            name: item.name,
+            category: item.categories?.[0]?.name || 'Allgemein',
+            price: parseFloat(item.price)
+          });
         }
       }
 
-      // 3. Find similar customers (simple collaborative filtering)
-      const allCustomers = await wooGet('customers', { per_page: 100 }) as any[];
-      const similarCustomers = await this.findSimilarCustomers(
-        customerId,
-        allCustomers,
-        purchasedProductIds
-      );
-
-      // 4. Get products bought by similar customers
-      const recommendedProducts = await this.getProductsFromSimilarCustomers(
-        similarCustomers,
-        purchasedProductIds
-      );
-
-      // 5. Score and rank products
-      const recommendations = recommendedProducts
-        .slice(0, limit)
-        .map((product, index) => ({
-          productId: product.id,
-          score: 1 - index / limit, // Simple scoring
-          reason: `Kunden mit ähnlichem Kaufverhalten kauften auch "${product.name}"`,
+      // 3. Get available products (exclude already purchased)
+      const allProducts = await wooGet('products', { per_page: 50, status: 'publish' }) as any[];
+      const availableProducts = allProducts
+        .filter((p: any) => !purchasedProductIds.has(p.id))
+        .map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          price: parseFloat(p.price),
+          categories: p.categories.map((c: any) => c.name).join(', '),
+          shortDescription: p.short_description?.replace(/<[^>]*>/g, '').substring(0, 100)
         }));
 
-      const confidence = recommendedProducts.length >= limit ? 0.85 : 0.6;
+      // 4. OpenAI-powered recommendation
+      const openai = getOpenAIClient();
+      
+      const prompt = `
+Als E-Commerce Empfehlungs-Experte analysiere das Kaufverhalten und empfehle passende Produkte.
+
+KUNDE:
+- E-Mail: ${customer.email}
+- Vorname: ${customer.first_name || 'Unbekannt'}
+- Bestellungen: ${orders.length}
+
+GEKAUFTE PRODUKTE (letzte ${purchasedProducts.length}):
+${purchasedProducts.slice(0, 10).map(p => `- ${p.name} (${p.category}, €${p.price.toFixed(2)})`).join('\n')}
+
+VERFÜGBARE PRODUKTE (${availableProducts.length} zur Auswahl):
+${availableProducts.slice(0, 30).map(p => `- ID: ${p.id} | ${p.name} | €${p.price} | ${p.categories}`).join('\n')}
+
+AUFGABE:
+Empfehle ${limit} Produkte die zu den Kaufgewohnheiten passen.
+Berücksichtige: Kategorien, Preissegment, Cross-Selling Potenzial
+
+ANTWORT FORMAT (JSON):
+{
+  "recommendations": [
+    {
+      "productId": 123,
+      "score": 0.95,
+      "reason": "Passt perfekt zu bisherigen Käufen in Kategorie X"
+    }
+  ],
+  "confidence": 0.85,
+  "reasoning": "Kunde kauft primär..."
+}
+`;
+
+      const completion = await openai.chat.completions.create({
+        model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: 'Du bist ein E-Commerce Recommendation Engine. Analysiere Kaufverhalten und empfehle passende Produkte. Antworte immer in JSON.'
+          },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.7,
+        max_tokens: 1000,
+        response_format: { type: 'json_object' }
+      });
+
+      const aiResponse = completion.choices[0]?.message?.content;
+      
+      if (!aiResponse) {
+        throw new Error('No response from OpenAI');
+      }
+
+      const parsed = JSON.parse(aiResponse);
+      const recommendations: ProductRecommendation[] = parsed.recommendations || [];
+      const confidence = parsed.confidence || 0.75;
+
+      logger.info(`✅ OpenAI: Generated ${recommendations.length} recommendations (confidence: ${confidence})`);
+      logger.info(`🧠 Reasoning: ${parsed.reasoning?.substring(0, 100)}`);
 
       return {
-        prediction: recommendations,
+        prediction: recommendations.slice(0, limit),
         confidence,
         source: 'ml',
         inferenceTime: Date.now() - startTime,
-        modelVersion: '1.0.0',
+        modelVersion: 'gpt-4o-mini',
       };
 
     } catch (error) {

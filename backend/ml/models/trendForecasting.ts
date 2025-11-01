@@ -5,6 +5,7 @@ import { MLPrediction, MLService } from '../mlService.js';
 // @ts-expect-error - no types available for google-trends-api
 import googleTrends from 'google-trends-api';
 import { logger } from '../../logger.js';
+import { getOpenAIClient } from '../../utils/openai.js';
 
 export interface TrendForecast {
   keyword: string;
@@ -28,51 +29,100 @@ export class TrendForecastingEngine {
   }
 
   /**
-   * ML-based trend forecasting (Time Series Analysis)
+   * ML-based trend forecasting (OpenAI + Google Trends Hybrid)
    */
   private static async mlForecast(
     keywords: string[]
   ): Promise<MLPrediction<TrendForecast[]>> {
     const startTime = Date.now();
     
-    logger.info(`🤖 ML: Forecasting trends for ${keywords.length} keywords`);
+    logger.info(`🤖 ML (OpenAI + Google Trends): Forecasting ${keywords.length} keywords`);
 
     try {
-      const forecasts: TrendForecast[] = [];
-
+      // 1. Get Google Trends data for context
+      const trendsData: Array<{keyword: string; values: number[]}> = [];
+      
       for (const keyword of keywords) {
-        // 1. Get historical Google Trends data (last 12 months)
-        const historicalData = await this.getHistoricalTrendData(keyword, 12);
-        
-        // 2. Calculate trend direction using simple linear regression
-        const trendDirection = this.calculateTrendDirection(historicalData);
-        
-        // 3. Forecast next month using moving average
-        const forecast = this.forecastNextPeriod(historicalData);
-        
-        // 4. Determine trend status
-        let trend: 'rising' | 'stable' | 'falling';
-        if (trendDirection > 0.1) trend = 'rising';
-        else if (trendDirection < -0.1) trend = 'falling';
-        else trend = 'stable';
-
-        forecasts.push({
-          keyword,
-          score: Math.round(forecast),
-          trend,
-          confidence: this.calculateConfidence(historicalData),
-        });
+        try {
+          const results = await googleTrends.interestOverTime({
+            keyword,
+            startTime: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), // 90 days
+            geo: 'DE',
+          });
+          
+          const parsed = JSON.parse(results);
+          const values = parsed.default?.timelineData?.map((d: any) => d.value[0]) || [];
+          trendsData.push({ keyword, values });
+        } catch (err) {
+          logger.warn(`Failed to get trends for ${keyword}`);
+          trendsData.push({ keyword, values: [50] }); // Fallback
+        }
       }
 
-      // Average confidence across all keywords
+      // 2. OpenAI analysis
+      const openai = getOpenAIClient();
+      
+      const prompt = `
+Als Markt-Trend-Analyst analysiere die Google Trends Daten und prognostiziere Entwicklungen.
+
+DATEN (letzte 90 Tage):
+${trendsData.map(t => `${t.keyword}: [${t.values.slice(-10).join(', ')}] (letzte 10 Werte)`).join('\n')}
+
+AUFGABE:
+1. Analysiere den Trend: rising/stable/falling
+2. Bewerte die Stärke (Score 0-100)
+3. Prognostiziere die nächsten 30 Tage
+4. Begründe deine Einschätzung
+
+ANTWORT FORMAT (JSON):
+{
+  "forecasts": [
+    {
+      "keyword": "Keyword",
+      "score": 75,
+      "trend": "rising",
+      "confidence": 0.8,
+      "reasoning": "Starker Aufwärtstrend in den letzten 30 Tagen..."
+    }
+  ],
+  "overallTrend": "E-Commerce zeigt positive Entwicklung...",
+  "recommendations": ["Fokus auf Keyword X", "Keyword Y abnehmend"]
+}
+`;
+
+      const completion = await openai.chat.completions.create({
+        model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: 'Du bist ein E-Commerce Trend-Analyst mit Expertise in Google Trends Interpretation und Marktprognosen. Antworte in JSON.'
+          },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.5,
+        max_tokens: 1500,
+        response_format: { type: 'json_object' }
+      });
+
+      const aiResponse = completion.choices[0]?.message?.content;
+      
+      if (!aiResponse) {
+        throw new Error('No response from OpenAI');
+      }
+
+      const parsed = JSON.parse(aiResponse);
+      const forecasts: TrendForecast[] = parsed.forecasts || [];
       const avgConfidence = forecasts.reduce((sum, f) => sum + f.confidence, 0) / forecasts.length;
+
+      logger.info(`✅ OpenAI: Analyzed ${forecasts.length} trends`);
+      logger.info(`📊 Overall: ${parsed.overallTrend?.substring(0, 100)}`);
 
       return {
         prediction: forecasts,
         confidence: avgConfidence,
         source: 'ml',
         inferenceTime: Date.now() - startTime,
-        modelVersion: '1.0.0',
+        modelVersion: 'gpt-4o-mini',
       };
 
     } catch (error) {
