@@ -72,16 +72,16 @@ export default async function freebieRoutes(server: FastifyInstance) {
           const name = product.name.toLowerCase();
           const categories = product.categories?.map((c: any) => c.name.toLowerCase()) || [];
           
-          if (name.includes('ebook') || name.includes('e-book') || categories.some(c => c.includes('ebook'))) {
+          if (name.includes('ebook') || name.includes('e-book') || categories.some((c: string) => c.includes('ebook'))) {
             return 'ebook';
           }
-          if (name.includes('checklist') || categories.some(c => c.includes('checklist'))) {
+          if (name.includes('checklist') || categories.some((c: string) => c.includes('checklist'))) {
             return 'checklist';
           }
-          if (name.includes('template') || categories.some(c => c.includes('template'))) {
+          if (name.includes('template') || categories.some((c: string) => c.includes('template'))) {
             return 'templates';
           }
-          if (name.includes('guide') || name.includes('anleitung') || categories.some(c => c.includes('guide'))) {
+          if (name.includes('guide') || name.includes('anleitung') || categories.some((c: string) => c.includes('guide'))) {
             return 'guide';
           }
           return 'guide'; // Default
@@ -153,7 +153,7 @@ export default async function freebieRoutes(server: FastifyInstance) {
       } catch (_error) {
         return reply.status(500).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Unbekannter Fehler'
+          error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
         });
       }
     }
@@ -197,7 +197,7 @@ export default async function freebieRoutes(server: FastifyInstance) {
       } catch (_error) {
         return reply.status(500).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Unbekannter Fehler'
+          error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
         });
       }
     }

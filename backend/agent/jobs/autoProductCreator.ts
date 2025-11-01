@@ -56,9 +56,9 @@ export async function autoProductCreatorJob(config?: Partial<AutoProductConfig>)
       createdProducts.push(product);
       console.log(`✅ Produkt erfolgreich erstellt: ${product.name}`);
     } catch (_err) {
-      const errorMessage = err instanceof Error
-        ? err.message
-        : (typeof err === 'string' ? err : JSON.stringify(err));
+      const errorMessage = _err instanceof Error
+        ? _err.message
+        : (typeof _err === 'string' ? _err : JSON.stringify(_err));
       console.error(`❌ Fehler beim Erstellen von "${trend.niche}": ${errorMessage}`);
     }
   }
@@ -141,7 +141,7 @@ async function createProductFromTrend(trend: TrendData, autoPublish: boolean = f
       status: 'simulated',
       source: 'simulation',
       categories: productData.categories,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: _error instanceof Error ? _error.message : 'Unknown error'
     };
   }
 }
