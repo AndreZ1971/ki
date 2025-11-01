@@ -235,25 +235,6 @@ async function buildServer() {
       };
     });
 
-        });
-
-    console.log('\n🌟 ===================================');
-    console.log('🚀 KI-Agent Server erfolgreich gestartet!');
-    console.log(`📡 Port: ${port}`);
-    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log('=====================================\n');
-    console.log('📍 Verfügbare Endpoints:');
-    console.log('─────────────────────────────────────');
-    console.log('❤️  Health Check: http://localhost:3000/health');
-    console.log('⚕️  System Health: http://localhost:3000/api/system/health');
-    console.log('📊 Shop Metrics: http://localhost:3000/api/analytics/metrics');
-    console.log('📧 AI Email: http://localhost:3000/api/ai/email');
-    console.log('🛒 Products: http://localhost:3000/api/products');
-    console.log('👥 Customers: http://localhost:3000/api/woocommerce/customers');
-    console.log('📨 Email Sender: http://localhost:3000/api/email/send');
-    console.log('🧪 Email Test: http://localhost:3000/api/email/test-email-config');
-    console.log('📈 Analytics: http://localhost:3000/api/analytics');
-
     // 🔥 KORRIGIERT: 404 Handler ohne routes Property
     server.setNotFoundHandler((request, reply) => {
       const availableEmailRoutes = [
@@ -273,8 +254,8 @@ async function buildServer() {
     return server;
 
   } catch (_error) {
-    console.error('❌ Fehler beim Server Setup:', error);
-    throw error;
+    console.error('❌ Fehler beim Server Setup:', _error);
+    throw _error;
   }
 }
 
@@ -303,7 +284,7 @@ const start = async () => {
     console.log('📈 Analytics: http://localhost:3000/api/analytics');
 
   } catch (_err) {
-    console.error('💥 Server Start fehlgeschlagen:', err);
+    console.error('💥 Server Start fehlgeschlagen:', _err);
     process.exit(1);
   }
 };
