@@ -31,25 +31,85 @@ export default async function freebieRoutes(server: FastifyInstance) {
     {
       schema: {
         tags: ['freebies'],
-        description: 'Holt alle Freebies'
+        description: 'Holt alle kostenlosen Produkte (Preis = 0) aus WooCommerce'
       }
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const mockFreebies: Freebie[] = [
-          { id: 1, name: 'SEO Guide Ebook', type: 'ebook', downloads: 142, created: '2024-01-15' },
-          { id: 2, name: 'WordPress Checklist', type: 'checklist', downloads: 89, created: '2024-01-10' },
-          { id: 3, name: 'Social Media Templates', type: 'templates', downloads: 203, created: '2024-01-05' }
-        ];
+        // ✅ ECHTE Freebies aus WooCommerce (Produkte mit Preis = 0)
+        const wooConfig = {
+          url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
+          consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
+          consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
+        };
+
+        const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
+        
+        // Lade alle Produkte und filtere kostenlose
+        const productsResponse = await fetch(
+          `${wooConfig.url}/wp-json/wc/v3/products?per_page=100`,
+          {
+            headers: {
+              'Authorization': `Basic ${auth}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        if (!productsResponse.ok) {
+          throw new Error(`WooCommerce API Error: ${productsResponse.status}`);
+        }
+
+        const products = await productsResponse.json() as any[];
+        
+        // Filtere Produkte mit Preis = 0 oder "0.00"
+        const freeProducts = products.filter(p => 
+          parseFloat(p.price) === 0 || p.price === '0' || p.price === '0.00'
+        );
+        
+        // Typ-Erkennung basierend auf Kategorie oder Name
+        const detectType = (product: any): Freebie['type'] => {
+          const name = product.name.toLowerCase();
+          const categories = product.categories?.map((c: any) => c.name.toLowerCase()) || [];
+          
+          if (name.includes('ebook') || name.includes('e-book') || categories.some(c => c.includes('ebook'))) {
+            return 'ebook';
+          }
+          if (name.includes('checklist') || categories.some(c => c.includes('checklist'))) {
+            return 'checklist';
+          }
+          if (name.includes('template') || categories.some(c => c.includes('template'))) {
+            return 'templates';
+          }
+          if (name.includes('guide') || name.includes('anleitung') || categories.some(c => c.includes('guide'))) {
+            return 'guide';
+          }
+          return 'guide'; // Default
+        };
+        
+        // Transformiere zu Freebie-Format
+        const freebies: Freebie[] = freeProducts.map(product => ({
+          id: product.id,
+          name: product.name,
+          type: detectType(product),
+          downloads: product.total_sales || 0, // Total Sales = Downloads bei kostenlosen Produkten
+          created: product.date_created,
+          description: product.short_description || product.description,
+          fileUrl: product.downloads?.[0]?.file || product.permalink
+        }));
 
         return reply.send({
           success: true,
-          data: mockFreebies
+          data: freebies,
+          total: freebies.length,
+          source: 'woocommerce-free-products',
+          totalProducts: products.length
         });
       } catch (_error) {
+        console.error('Freebies API Error:', _error);
         return reply.status(500).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Unbekannter Fehler'
+          error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
         });
       }
     }

@@ -50,8 +50,8 @@ const customersRoutes: FastifyPluginAsync = async (fastify, options) => {
       };
       
     } catch (_error) {
-      console.error('WooCommerce API Error:', error);
-      const details = error instanceof Error ? error.message : String(error);
+      console.error('WooCommerce API Error:', _error);
+      const details = _error instanceof Error ? _error.message : String(_error);
       reply.status(500).send({
         success: false,
         error: 'Konnte Kunden nicht laden',
@@ -63,40 +63,39 @@ const customersRoutes: FastifyPluginAsync = async (fastify, options) => {
   // GET: Newsletter Abonnenten
   fastify.get('/subscribers', async (request, reply) => {
     try {
-      // Mock-Daten für Abonnenten
-      const mockSubscribers = [
-        {
-          id: 1,
-          name: 'Max Mustermann',
-          email: 'max@mustermann.de',
-          status: 'subscribed',
-          date_subscribed: '2024-01-20T08:00:00'
-        },
-        {
-          id: 2, 
-          name: 'Anna Schmidt',
-          email: 'anna@schmidt.com',
-          status: 'subscribed',
-          date_subscribed: '2024-02-25T16:45:00'
-        },
-        {
-          id: 3,
-          name: 'Sarah Müller', 
-          email: 'sarah@mueller.com',
-          status: 'subscribed',
-          date_subscribed: '2024-03-15T11:30:00'
-        }
-      ];
+      console.log('📥 Fetching subscribers from WooCommerce...');
+      
+      // ✅ ECHTE Subscriber aus WooCommerce (User mit Rolle "subscriber")
+      const response = await WooCommerce.get('customers', {
+        per_page: 100,
+        orderby: 'registered_date',
+        order: 'desc',
+        role: 'subscriber' // Nur Subscriber-Rolle
+      });
+
+      const subscribers = response.data.map((subscriber: any) => ({
+        id: subscriber.id,
+        name: `${subscriber.first_name} ${subscriber.last_name}`.trim() || subscriber.username || subscriber.email,
+        email: subscriber.email,
+        status: 'subscribed',
+        date_subscribed: subscriber.date_created,
+        first_name: subscriber.first_name,
+        last_name: subscriber.last_name,
+        username: subscriber.username
+      }));
+
+      console.log(`✅ ${subscribers.length} Abonnenten erfolgreich geladen`);
 
       return {
         success: true,
-        data: mockSubscribers,
-        total: mockSubscribers.length,
-        message: 'Abonnenten erfolgreich geladen (Mock-Daten)'
+        data: subscribers,
+        total: subscribers.length,
+        source: 'woocommerce-subscribers',
+        message: `${subscribers.length} Abonnenten erfolgreich geladen`
       };
       
     } catch (_error) {
-      console.error('WooCommerce API Error:', error);
+      console.error('Subscribers API Error:', _error);
       reply.status(500).send({ 
         success: false, 
         error: 'Konnte Abonnenten nicht laden' 
