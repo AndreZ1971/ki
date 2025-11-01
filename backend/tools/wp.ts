@@ -10,6 +10,9 @@ import https from 'node:https';
 import type { Tool } from '../types.js';
 import type { AxiosRequestConfig } from 'axios';
 
+// Error Handling
+import { wordPressBreaker, standardRetry, alertError } from '../error-handling/index.js';
+
 /* ---------------------------------------------------
  * Helpers
  * --------------------------------------------------- */
@@ -94,15 +97,23 @@ const wpGet: Tool = {
     if (!path) throw new Error('wp_get: missing path');
 
     try {
-      const res = await axios.get(buildUrl(path, query), {
-        timeout: 30000,
-        headers: { Authorization: wpAuthHeader() },
-        httpAgent: KEEP_ALIVE_HTTP,
-        httpsAgent: KEEP_ALIVE_HTTPS,
-      });
-      return { status: res.status, data: res.data };
+      // Mit Circuit Breaker & Retry Protection
+      return await standardRetry.execute(() =>
+        wordPressBreaker.execute(async () => {
+          const res = await axios.get(buildUrl(path, query), {
+            timeout: 30000,
+            headers: { Authorization: wpAuthHeader() },
+            httpAgent: KEEP_ALIVE_HTTP,
+            httpsAgent: KEEP_ALIVE_HTTPS,
+          });
+          return { status: res.status, data: res.data };
+        })
+      );
     } catch (err) {
-      throw new Error(`wp_get failed: ${axiosErrorToMessage(err)}`);
+      const error = new Error(`wp_get failed: ${axiosErrorToMessage(err)}`);
+      await alertError('WordPress GET Failed', `Failed to GET ${path}`, 'WordPressTools', 
+        err instanceof Error ? err : error, { path, query });
+      throw error;
     }
   },
 };
@@ -130,29 +141,37 @@ const wpPost: Tool = {
     const upper = method.toUpperCase() as typeof method;
 
     try {
-      const cfg: AxiosRequestConfig = {
-        timeout: 30000,
-        headers: {
-          Authorization: wpAuthHeader(),
-          'Content-Type': 'application/json',
-        },
-        httpAgent: KEEP_ALIVE_HTTP,
-        httpsAgent: KEEP_ALIVE_HTTPS,
-      };
-      const url = buildUrl(path, query);
-      const res =
-        upper === 'DELETE'
-          ? await axios.delete(url, cfg)
-          : await axios.request({
-              url,
-              method: upper,
-              data: body ?? {},
-              ...cfg,
-            });
+      // Mit Circuit Breaker & Retry Protection
+      return await standardRetry.execute(() =>
+        wordPressBreaker.execute(async () => {
+          const cfg: AxiosRequestConfig = {
+            timeout: 30000,
+            headers: {
+              Authorization: wpAuthHeader(),
+              'Content-Type': 'application/json',
+            },
+            httpAgent: KEEP_ALIVE_HTTP,
+            httpsAgent: KEEP_ALIVE_HTTPS,
+          };
+          const url = buildUrl(path, query);
+          const res =
+            upper === 'DELETE'
+              ? await axios.delete(url, cfg)
+              : await axios.request({
+                  url,
+                  method: upper,
+                  data: body ?? {},
+                  ...cfg,
+                });
 
-      return { status: res.status, data: res.data };
+          return { status: res.status, data: res.data };
+        })
+      );
     } catch (err) {
-      throw new Error(`wp_post failed: ${axiosErrorToMessage(err)}`);
+      const error = new Error(`wp_post failed: ${axiosErrorToMessage(err)}`);
+      await alertError('WordPress POST Failed', `Failed ${method} to ${path}`, 'WordPressTools',
+        err instanceof Error ? err : error, { method, path, query });
+      throw error;
     }
   },
 };
@@ -188,43 +207,51 @@ const wpMediaUpload: Tool = {
     form.append('file', binary, { filename: name, contentType: mime });
 
     try {
-      const upload = await axios.post(`${wpBase()}/wp-json/wp/v2/media`, form, {
-        timeout: 300000, // 5 Minuten
-        headers: {
-          ...form.getHeaders(),
-          Authorization: wpAuthHeader(),
-          'Content-Disposition': `attachment; filename="${name}"`,
-        },
-        maxContentLength: Infinity,
-        maxBodyLength: Infinity,
-        httpAgent: KEEP_ALIVE_HTTP,
-        httpsAgent: KEEP_ALIVE_HTTPS,
-      });
-
-      const data = upload.data as unknown;
-      const id = readNum(data, 'id');
-      const source_url = readStr(data, 'source_url') ?? undefined;
-
-      if (id && (title || alt || description)) {
-        await axios.post(
-          `${wpBase()}/wp-json/wp/v2/media/${id}`,
-          {
-            ...(title ? { title } : {}),
-            ...(alt ? { alt_text: alt } : {}),
-            ...(description ? { caption: description, description } : {}),
-          },
-          {
-            timeout: 60000,
-            headers: { Authorization: wpAuthHeader() },
+      // Mit Circuit Breaker & Retry Protection (längeres Timeout für Uploads)
+      return await standardRetry.execute(() =>
+        wordPressBreaker.execute(async () => {
+          const upload = await axios.post(`${wpBase()}/wp-json/wp/v2/media`, form, {
+            timeout: 300000, // 5 Minuten
+            headers: {
+              ...form.getHeaders(),
+              Authorization: wpAuthHeader(),
+              'Content-Disposition': `attachment; filename="${name}"`,
+            },
+            maxContentLength: Infinity,
+            maxBodyLength: Infinity,
             httpAgent: KEEP_ALIVE_HTTP,
             httpsAgent: KEEP_ALIVE_HTTPS,
-          }
-        );
-      }
+          });
 
-      return { id, source_url, status: upload.status };
+          const data = upload.data as unknown;
+          const id = readNum(data, 'id');
+          const source_url = readStr(data, 'source_url') ?? undefined;
+
+          if (id && (title || alt || description)) {
+            await axios.post(
+              `${wpBase()}/wp-json/wp/v2/media/${id}`,
+              {
+                ...(title ? { title } : {}),
+                ...(alt ? { alt_text: alt } : {}),
+                ...(description ? { caption: description, description } : {}),
+              },
+              {
+                timeout: 60000,
+                headers: { Authorization: wpAuthHeader() },
+                httpAgent: KEEP_ALIVE_HTTP,
+                httpsAgent: KEEP_ALIVE_HTTPS,
+              }
+            );
+          }
+
+          return { id, source_url, status: upload.status };
+        })
+      );
     } catch (err) {
-      throw new Error(`wp_media_upload failed: ${axiosErrorToMessage(err)}`);
+      const error = new Error(`wp_media_upload failed: ${axiosErrorToMessage(err)}`);
+      await alertError('WordPress Media Upload Failed', `Failed to upload ${name}`, 'WordPressTools',
+        err instanceof Error ? err : error, { filename: name, mime });
+      throw error;
     }
   },
 };
