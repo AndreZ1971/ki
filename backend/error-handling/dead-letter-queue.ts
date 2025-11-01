@@ -245,7 +245,7 @@ export class DeadLetterQueue {
       await fs.unlink(filePath);
     } catch (_error) {
       // Ignore if file doesn't exist
-      if ((error as any).code !== 'ENOENT') {
+      if ((_error as any).code !== 'ENOENT') {
         console.error(`[DLQ] Failed to delete message ${id}:`, _error);
       }
     }

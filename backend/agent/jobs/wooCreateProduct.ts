@@ -13,8 +13,8 @@ export async function run(): Promise<void> {
     
     logger.info('wooCreateProduct abgeschlossen (Platzhalter)');
   } catch (_error) {
-    logger.error({ error }, 'Fehler in wooCreateProduct');
-    throw error;
+    logger.error({ error: _error }, 'Fehler in wooCreateProduct');
+    throw _error;
   }
 }
 

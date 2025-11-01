@@ -80,7 +80,7 @@ class WooCommerceClient {
       return await response.json();
     } catch (_error) {
       console.error(`Fehler bei WooCommerce Request ${endpoint}:`, _error);
-      throw error;
+      throw _error;
     }
   }
 

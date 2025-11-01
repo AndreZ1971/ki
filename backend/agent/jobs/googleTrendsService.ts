@@ -1,4 +1,5 @@
 // agent/jobs/googleTrendsService.ts
+/// <reference path="../../types/google-trends-api.d.ts" />
 import googleTrends from 'google-trends-api';
 
 class GoogleTrendsService {

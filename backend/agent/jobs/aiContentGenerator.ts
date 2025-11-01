@@ -120,7 +120,7 @@ async function createAIProducts() {
       });
       
     } catch (_error) {
-      console.error(`❌ Fehler bei "${product.baseName}":`, error instanceof Error ? error.message : error);
+      console.error(`❌ Fehler bei "${product.baseName}":`, _error instanceof Error ? _error.message : _error);
     }
   }
   

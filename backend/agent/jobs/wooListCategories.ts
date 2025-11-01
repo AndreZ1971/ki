@@ -12,8 +12,8 @@ export async function run(): Promise<void> {
     
     logger.info('wooListCategories abgeschlossen (Platzhalter)');
   } catch (_error) {
-    logger.error({ error }, 'Fehler in wooListCategories');
-    throw error;
+    logger.error({ error: _error }, 'Fehler in wooListCategories');
+    throw _error;
   }
 }
 

@@ -142,8 +142,8 @@ ANTWORT FORMAT (JSON):
       };
 
     } catch (_error) {
-      logger.error(`ML recommendation failed: ${error}`);
-      throw error;
+      logger.error(`ML recommendation failed: ${_error}`);
+      throw _error;
     }
   }
 
@@ -212,7 +212,7 @@ ANTWORT FORMAT (JSON):
       return recommendations;
 
     } catch (_error) {
-      logger.error(`Rule-based recommendation failed: ${error}`);
+      logger.error(`Rule-based recommendation failed: ${_error}`);
       
       // Ultimate fallback: just recommend newest products
       const products = await wooGet('products', {

@@ -14,8 +14,8 @@ export async function run(): Promise<void> {
     
     logger.info('wooUpdateProduct abgeschlossen (Platzhalter)');
   } catch (_error) {
-    logger.error({ error }, 'Fehler in wooUpdateProduct');
-    throw error;
+    logger.error({ error: _error }, 'Fehler in wooUpdateProduct');
+    throw _error;
   }
 }
 
