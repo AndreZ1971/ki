@@ -1,8 +1,11 @@
-// frontend/src/pages/MarketingContent/ai-email-generator.tsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import './AIEmailGenerator.css';
+import { motion } from 'framer-motion';
+import { useProductManagement } from '../../hooks/useProductManagement';
+import { useToast } from '../../hooks/useToast';
+import { BackButton } from '../../components/shared';
+import { ToastContainer } from '../../components/Toast/ToastContainer';
+import { EmailPreviewModal } from '../../components/EmailPreviewModal';
+import './page.css';
 
 interface EmailTemplate {
   id: number;
@@ -32,7 +35,8 @@ const mockCustomers: Customer[] = [
 ];
 
 const AIEmailGenerator: React.FC = () => {
-  const navigate = useNavigate();
+  const { handleBackToDashboard } = useProductManagement();
+  const { toasts, showToast } = useToast();
   const [emailData, setEmailData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
@@ -43,6 +47,7 @@ const AIEmailGenerator: React.FC = () => {
   const [activeView, setActiveView] = useState<'generator' | 'templates' | 'subscribers'>('generator');
   const [searchTerm, setSearchTerm] = useState('');
   const [apiStatus, setApiStatus] = useState<'connected' | 'disconnected' | 'loading'>('loading');
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     emailType: 'welcome-email',
@@ -152,7 +157,7 @@ const AIEmailGenerator: React.FC = () => {
 
   const generateEmail = async () => {
     if (!formData.productName.trim() || selectedCustomers.length === 0) {
-      alert('Bitte wähle Kunden aus und gib einen Produktnamen ein');
+      showToast('Bitte wähle Kunden aus und gib einen Produktnamen ein', 'error');
       return;
     }
 
@@ -181,9 +186,11 @@ const AIEmailGenerator: React.FC = () => {
 
       const result = await response.json();
       setEmailData(result);
+      setIsPreviewModalOpen(true); // 🔥 MODAL ÖFFNEN
+      showToast('Email erfolgreich generiert!', 'success');
     } catch (error) {
       console.error('Email generation failed:', error);
-      alert('Fehler beim Generieren der Email. Bitte versuche es erneut.');
+      showToast('Fehler beim Generieren der Email. Bitte versuche es erneut.', 'error');
     } finally {
       setLoading(false);
     }
@@ -192,7 +199,7 @@ const AIEmailGenerator: React.FC = () => {
   // 🔥 KORRIGIERT: Vereinfachte sendEmail ohne vorherige Config-Prüfung
   const sendEmail = async () => {
     if (selectedCustomers.length === 0) {
-      alert('Bitte wähle mindestens einen Kunden aus');
+      showToast('Bitte wähle mindestens einen Kunden aus', 'error');
       return;
     }
 
@@ -221,9 +228,10 @@ const AIEmailGenerator: React.FC = () => {
       const result = await response.json();
       
       if (result.success) {
-        alert(`✅ ${result.message}`);
+        showToast(result.message || 'Emails erfolgreich versendet!', 'success');
         setEmailData(null);
         setSelectedCustomers([]);
+        setIsPreviewModalOpen(false); // 🔥 MODAL SCHLIESSEN
       } else {
         throw new Error(result.error || 'Unbekannter Fehler beim Senden');
       }
@@ -234,11 +242,11 @@ const AIEmailGenerator: React.FC = () => {
       // 🔥 Verbesserte Fehlerbehandlung
       const errorMessage = error.message.toLowerCase();
       if (errorMessage.includes('smtp') || errorMessage.includes('email') || errorMessage.includes('config') || errorMessage.includes('auth')) {
-        alert('❌ Email-Konfiguration fehlerhaft. Bitte prüfe die SMTP-Einstellungen im Backend.');
+        showToast('Email-Konfiguration fehlerhaft. Bitte prüfe die SMTP-Einstellungen im Backend.', 'error');
       } else if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
-        alert('❌ Netzwerkfehler. Bitte prüfe die Verbindung zum Backend.');
+        showToast('Netzwerkfehler. Bitte prüfe die Verbindung zum Backend.', 'error');
       } else {
-        alert('❌ Fehler beim Senden der Email: ' + error.message);
+        showToast('Fehler beim Senden der Email: ' + error.message, 'error');
       }
     } finally {
       setSending(false);
@@ -247,12 +255,12 @@ const AIEmailGenerator: React.FC = () => {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    alert('✅ In Zwischenablage kopiert!');
+    showToast('In Zwischenablage kopiert!', 'success');
   };
 
   const saveAsTemplate = async () => {
     if (!formData.templateName.trim()) {
-      alert('Bitte gib einen Namen für das Template ein');
+      showToast('Bitte gib einen Namen für das Template ein', 'error');
       return;
     }
 
@@ -266,10 +274,10 @@ const AIEmailGenerator: React.FC = () => {
       
       setSavedTemplates(prev => [...prev, newTemplate]);
       setFormData(prev => ({ ...prev, templateName: '' }));
-      alert('✅ Template erfolgreich gespeichert!');
+      showToast('Template erfolgreich gespeichert!', 'success');
     } catch (error) {
       console.error('Fehler beim Speichern:', error);
-      alert('Fehler beim Speichern des Templates');
+      showToast('Fehler beim Speichern des Templates', 'error');
     }
   };
 
@@ -277,7 +285,7 @@ const AIEmailGenerator: React.FC = () => {
     setFormData(prev => ({ ...prev, ...template.data }));
     setEmailData(template.data.emailData);
     setActiveView('generator');
-    alert('✅ Template geladen!');
+    showToast('Template geladen!', 'success');
   };
 
   const toggleCustomerSelection = (customerId: string) => {
@@ -329,122 +337,226 @@ const AIEmailGenerator: React.FC = () => {
   };
 
   return (
-    <div className="ai-email-generator">
-      {/* HEADER - Gleiches Design wie Dashboard */}
-      <motion.header 
-        className="App-header"
-        initial={{ opacity: 0, y: -50 }}
+    <div className="page-container">
+      <BackButton onClick={handleBackToDashboard} />
+      <ToastContainer toasts={toasts} onRemove={(_id) => {}} />
+      
+      {/* MODERNISIERTER HEADER */}
+      <motion.div 
+        className="page-header"
+        initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
+        transition={{ duration: 0.5 }}
       >
-        <div className="email-header">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
           <div>
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="glass-button"
-              style={{ marginBottom: '15px' }}
-            >
-              ← Zurück zum Dashboard
-            </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '5px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '8px' }}>
               <h1>📧 AI Email Generator</h1>
               {getApiStatusBadge()}
             </div>
-            <p>Erstelle und versende personalisierte Emails mit KI</p>
+            <p style={{ margin: 0 }}>Erstelle und versende personalisierte Emails mit KI</p>
             {apiStatus === 'connected' && (
-              <p style={{ fontSize: '14px', color: '#10b981', margin: '5px 0 0 0' }}>
-                ✅ Verbunden mit WooCommerce API - {customers.length} Kunden geladen
+              <p style={{ fontSize: '13px', color: '#10b981', margin: '8px 0 0 0', opacity: 0.9 }}>
+                ✅ {customers.length} Kunden • {subscribers.filter(s => s.status === 'subscribed').length} Abonnenten
               </p>
             )}
           </div>
-          <div className="header-controls">
+          
+          {/* VIEW TABS */}
+          <div style={{ display: 'flex', gap: '8px', background: 'rgba(255,255,255,0.05)', padding: '6px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
               onClick={() => setActiveView('generator')}
-              className={`glass-button ${activeView === 'generator' ? 'primary' : ''}`}
+              style={{
+                padding: '10px 18px',
+                background: activeView === 'generator' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'transparent',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: activeView === 'generator' ? '600' : '500',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
             >
-              📧 Generator
+              <span>📧</span> Generator
             </motion.button>
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
               onClick={() => setActiveView('templates')}
-              className={`glass-button ${activeView === 'templates' ? 'primary' : ''}`}
+              style={{
+                padding: '10px 18px',
+                background: activeView === 'templates' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'transparent',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: activeView === 'templates' ? '600' : '500',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
             >
-              📁 Templates ({savedTemplates.length})
+              <span>📁</span> Templates <span style={{ fontSize: '11px', opacity: 0.8 }}>({savedTemplates.length})</span>
             </motion.button>
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
               onClick={() => setActiveView('subscribers')}
-              className={`glass-button ${activeView === 'subscribers' ? 'primary' : ''}`}
+              style={{
+                padding: '10px 18px',
+                background: activeView === 'subscribers' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'transparent',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: activeView === 'subscribers' ? '600' : '500',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
             >
-              👥 Abonnenten ({subscribers.filter(s => s.status === 'subscribed').length})
+              <span>👥</span> Abonnenten <span style={{ fontSize: '11px', opacity: 0.8 }}>({subscribers.filter(s => s.status === 'subscribed').length})</span>
             </motion.button>
           </div>
         </div>
-      </motion.header>
+      </motion.div>
 
       {activeView === 'generator' && (
         <motion.div 
-          className="email-grid"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
+          transition={{ delay: 0.2 }}
+          style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', 
+            gap: '20px',
+            marginTop: '20px'
+          }}
         >
           
-          {/* Left Column - Email Type & Tone */}
-          <div className="space-y-6">
-            
-            {/* Email Type Selection */}
-            <div className="glass-card">
-              <h3 style={{ color: 'white', marginBottom: '20px' }}>📨 Email-Typ</h3>
-              <div className="tools-grid">
-                {emailTypes.map(type => (
-                  <motion.div
-                    key={type.value}
-                    className={`tool-option ${formData.emailType === type.value ? 'selected' : ''}`}
-                    onClick={() => setFormData({...formData, emailType: type.value})}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div className="tool-icon">{type.icon}</div>
-                    <h4 className="tool-label">{type.label}</h4>
-                    <p className="tool-category">
+          {/* Email Type Selection - Kompakt */}
+          <motion.div 
+            className="form-container"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <h3 style={{ marginBottom: '16px', fontSize: '18px', fontWeight: '600' }}>📨 Email-Typ</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
+              {emailTypes.map(type => (
+                <motion.div
+                  key={type.value}
+                  onClick={() => setFormData({...formData, emailType: type.value})}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  style={{
+                    padding: '14px',
+                    background: formData.emailType === type.value 
+                      ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                      : 'rgba(255,255,255,0.05)',
+                    border: formData.emailType === type.value 
+                      ? '2px solid rgba(102, 126, 234, 0.5)'
+                      : '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px'
+                  }}
+                >
+                  <span style={{ fontSize: '24px' }}>{type.icon}</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '2px' }}>{type.label}</div>
+                    <div style={{ fontSize: '11px', opacity: 0.7 }}>
                       {type.category === 'marketing' ? 'Marketing' : 'Transaktion'}
-                    </p>
-                  </motion.div>
-                ))}
-              </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
             </div>
 
-            {/* Tone Selection */}
-            <div className="glass-card">
-              <h3 style={{ color: 'white', marginBottom: '20px' }}>🎭 Tonfall</h3>
-              <div className="tools-grid">
+            {/* Tone Selection - Inline */}
+            <div style={{ marginTop: '20px' }}>
+              <h3 style={{ marginBottom: '12px', fontSize: '18px', fontWeight: '600' }}>🎭 Tonfall</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
                 {tones.map(tone => (
                   <motion.div
                     key={tone.value}
-                    className={`tool-option ${formData.tone === tone.value ? 'selected' : ''}`}
                     onClick={() => setFormData({...formData, tone: tone.value})}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    style={{
+                      padding: '12px',
+                      background: formData.tone === tone.value 
+                        ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                        : 'rgba(255,255,255,0.05)',
+                      border: formData.tone === tone.value 
+                        ? '2px solid rgba(102, 126, 234, 0.5)'
+                        : '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '10px',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px'
+                    }}
                   >
-                    <div className="tool-icon">{tone.icon}</div>
-                    <h4 className="tool-label">{tone.label}</h4>
+                    <span style={{ fontSize: '20px' }}>{tone.icon}</span>
+                    <span style={{ fontSize: '14px', fontWeight: '500' }}>{tone.label}</span>
                   </motion.div>
                 ))}
               </div>
             </div>
 
-          </div>
+            {/* Product Details - Inline */}
+            <div style={{ marginTop: '20px' }}>
+              <h3 style={{ marginBottom: '12px', fontSize: '18px', fontWeight: '600' }}>🎯 Produktdetails</h3>
+              <div className="form-group">
+                <label>Produktname *</label>
+                <input
+                  type="text"
+                  value={formData.productName}
+                  onChange={(e) => setFormData({...formData, productName: e.target.value})}
+                  className="form-input"
+                  placeholder="z.B. Digital Marketing Masterclass"
+                  style={{ width: '100%' }}
+                />
+              </div>
+              <div className="form-group" style={{ marginTop: '12px' }}>
+                <label>Markenstil (optional)</label>
+                <input
+                  type="text"
+                  value={formData.brandVoice}
+                  onChange={(e) => setFormData({...formData, brandVoice: e.target.value})}
+                  className="form-input"
+                  placeholder="z.B. modern, jung, dynamisch"
+                  style={{ width: '100%' }}
+                />
+              </div>
+            </div>
+          </motion.div>
 
-          {/* Middle Column - Customer Selection */}
-          <div className="glass-card">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ color: 'white', margin: 0 }}>👥 Kunden Auswahl</h3>
-              <div style={{ display: 'flex', gap: '10px' }}>
+          {/* Customer Selection - Verbessert */}
+          <motion.div 
+            className="form-container"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>👥 Empfänger ({selectedCustomers.length})</h3>
+              <div style={{ display: 'flex', gap: '8px' }}>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -518,219 +630,133 @@ const AIEmailGenerator: React.FC = () => {
                 </span>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Right Column - Product & Email Content */}
-          <div className="space-y-6">
-            
-            {/* Product Details */}
-            <div className="glass-card">
-              <h3 style={{ color: 'white', marginBottom: '20px' }}>🎯 Produktdetails</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                <div>
-                  <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '8px', fontSize: '14px' }}>
-                    Produktname *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.productName}
-                    onChange={(e) => setFormData({...formData, productName: e.target.value})}
-                    className="glass-input"
-                    placeholder="Digital Marketing Masterclass"
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '8px', fontSize: '14px' }}>
-                    Markenstil (optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.brandVoice}
-                    onChange={(e) => setFormData({...formData, brandVoice: e.target.value})}
-                    className="glass-input"
-                    placeholder="z.B. modern, jung, dynamisch"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Email Preview - Flexible Height */}
-            <div className="glass-card">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h3 style={{ color: 'white', margin: 0 }}>👁️ Email Vorschau</h3>
-                {emailData && (
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => copyToClipboard(emailData.subject + '\n\n' + emailData.body)}
-                    className="glass-button"
-                    style={{ padding: '8px 16px', fontSize: '12px' }}
-                  >
-                    Alles kopieren
-                  </motion.button>
-                )}
-              </div>
-              
-              {emailData ? (
-                <div className="space-y-4">
-                  <div>
-                    <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '10px', fontSize: '14px' }}>
-                      Betreff
-                    </label>
-                    <div className="email-preview" style={{ maxHeight: '80px' }}>
-                      <div style={{ color: 'white', fontWeight: '600' }}>{emailData.subject}</div>
-                    </div>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => copyToClipboard(emailData.subject)}
-                      className="glass-button"
-                      style={{ marginTop: '8px', padding: '6px 12px', fontSize: '11px' }}
-                    >
-                      Betreff kopieren
-                    </motion.button>
-                  </div>
-
-                  <div>
-                    <label style={{ display: 'block', color: 'rgba(255,255,255,0.8)', marginBottom: '10px', fontSize: '14px' }}>
-                      Email-Text
-                    </label>
-                    <div className="email-preview">
-                      <pre className="email-preview-content">{emailData.body}</pre>
-                    </div>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => copyToClipboard(emailData.body)}
-                      className="glass-button"
-                      style={{ marginTop: '8px', padding: '6px 12px', fontSize: '11px' }}
-                    >
-                      Text kopieren
-                    </motion.button>
-                  </div>
-                </div>
-              ) : (
-                <div style={{ textAlign: 'center', padding: '40px 20px', color: 'rgba(255,255,255,0.5)' }}>
-                  <div style={{ fontSize: '48px', marginBottom: '16px' }}>📧</div>
-                  <p style={{ fontSize: '18px', margin: 0 }}>Generiere deine erste Email</p>
-                  <p style={{ fontSize: '14px', margin: '8px 0 0 0' }}>Die Vorschau erscheint hier</p>
-                </div>
+          {/* Actions & DSGVO Info - Kompakt */}
+          <motion.div 
+            className="form-container"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <h3 style={{ color: 'white', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              ⚡ Aktionen
+              {emailData && (
+                <span style={{ fontSize: '12px', color: '#10b981', fontWeight: 'normal' }}>
+                  ✅ Email generiert
+                </span>
               )}
-            </div>
-
-            {/* Actions & DSGVO Info */}
-            <div className="action-buttons">
-              {/* Actions */}
-              <div className="glass-card">
-                <h3 style={{ color: 'white', marginBottom: '20px' }}>⚡ Aktionen</h3>
-                
-                {!emailData ? (
-                  <motion.button
-                    onClick={generateEmail}
-                    disabled={loading || selectedCustomers.length === 0 || apiStatus !== 'connected'}
-                    className="glass-button primary"
-                    whileHover={{ scale: (loading || apiStatus !== 'connected') ? 1 : 1.05 }}
-                    whileTap={{ scale: (loading || apiStatus !== 'connected') ? 1 : 0.95 }}
-                    style={{ 
-                      width: '100%', 
-                      opacity: (loading || selectedCustomers.length === 0 || apiStatus !== 'connected') ? 0.7 : 1 
-                    }}
-                  >
-                    {loading ? (
-                      <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          style={{
-                            width: '20px',
-                            height: '20px',
-                            border: '2px solid rgba(255,255,255,0.3)',
-                            borderTop: '2px solid white',
-                            borderRadius: '50%',
-                            marginRight: '10px'
-                          }}
-                        />
-                        Generiere Email...
-                      </span>
-                    ) : apiStatus !== 'connected' ? (
-                      '❌ API Nicht Verbunden'
-                    ) : (
-                      '🚀 Email Generieren'
-                    )}
-                  </motion.button>
-                ) : (
-                  <div className="space-y-4">
-                    <motion.button
-                      onClick={sendEmail}
-                      disabled={sending || apiStatus !== 'connected'}
-                      className="glass-button success"
-                      whileHover={{ scale: (sending || apiStatus !== 'connected') ? 1 : 1.05 }}
-                      whileTap={{ scale: (sending || apiStatus !== 'connected') ? 1 : 0.95 }}
-                      style={{ 
-                        width: '100%',
-                        opacity: (sending || apiStatus !== 'connected') ? 0.7 : 1 
+            </h3>
+            
+            {!emailData ? (
+              <motion.button
+                onClick={generateEmail}
+                disabled={loading || selectedCustomers.length === 0 || apiStatus !== 'connected'}
+                className="glass-button primary"
+                whileHover={{ scale: (loading || apiStatus !== 'connected') ? 1 : 1.05 }}
+                whileTap={{ scale: (loading || apiStatus !== 'connected') ? 1 : 0.95 }}
+                style={{ 
+                  width: '100%', 
+                  padding: '16px',
+                  fontSize: '16px',
+                  opacity: (loading || selectedCustomers.length === 0 || apiStatus !== 'connected') ? 0.7 : 1 
+                }}
+              >
+                {loading ? (
+                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      style={{
+                        width: '20px',
+                        height: '20px',
+                        border: '2px solid rgba(255,255,255,0.3)',
+                        borderTop: '2px solid white',
+                        borderRadius: '50%',
+                        marginRight: '10px'
                       }}
-                    >
-                      {sending ? 'Wird gesendet...' : 
-                       apiStatus !== 'connected' ? '❌ API Nicht Verbunden' : 
-                       `📤 An ${selectedCustomers.length} Kunden senden`}
-                    </motion.button>
-                    
-                    <div className="action-buttons">
-                      <motion.button
-                        onClick={() => setEmailData(null)}
-                        className="glass-button"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        Neue Email
-                      </motion.button>
-                      <motion.button
-                        onClick={saveAsTemplate}
-                        className="glass-button primary"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        Template speichern
-                      </motion.button>
-                    </div>
-
-                    <input
-                      type="text"
-                      value={formData.templateName}
-                      onChange={(e) => setFormData({...formData, templateName: e.target.value})}
-                      placeholder="Template Name eingeben..."
-                      className="glass-input"
                     />
-                  </div>
-                )}
-              </div>
-
-              {/* DSGVO Info */}
-              <div className={`dsgvo-info ${getEmailTypeCategory(formData.emailType)}`}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px' }}>
-                  <span style={{ fontSize: '24px' }}>
-                    {getEmailTypeCategory(formData.emailType) === 'marketing' ? '⚠️' : '✅'}
+                    Generiere Email...
                   </span>
-                  <div>
-                    <p style={{ color: 'white', fontWeight: 'bold', margin: '0 0 8px 0', fontSize: '16px' }}>
-                      {getEmailTypeCategory(formData.emailType) === 'marketing' 
-                        ? 'Marketing-Email'
-                        : 'Transaktions-Email'
-                      }
-                    </p>
-                    <p style={{ color: 'rgba(255,255,255,0.8)', margin: 0, fontSize: '14px', lineHeight: '1.4' }}>
-                      {getEmailTypeCategory(formData.emailType) === 'marketing' 
-                        ? 'Nur an Abonnenten mit Einwilligung versenden'
-                        : 'DSGVO konform für alle Kunden'
-                      }
-                    </p>
-                  </div>
+                ) : apiStatus !== 'connected' ? (
+                  '❌ API Nicht Verbunden'
+                ) : (
+                  '🚀 Email Generieren'
+                )}
+              </motion.button>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <motion.button
+                  onClick={() => setIsPreviewModalOpen(true)}
+                  className="glass-button"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  style={{ 
+                    width: '100%',
+                    padding: '16px',
+                    fontSize: '16px',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                  }}
+                >
+                  �️ Email Vorschau & Versenden
+                </motion.button>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <motion.button
+                    onClick={() => setEmailData(null)}
+                    className="glass-button"
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                    🔄 Neue Email
+                  </motion.button>
+                  <motion.button
+                    onClick={saveAsTemplate}
+                    className="glass-button"
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                    💾 Als Template
+                  </motion.button>
+                </div>
+
+                <input
+                  type="text"
+                  value={formData.templateName}
+                  onChange={(e) => setFormData({...formData, templateName: e.target.value})}
+                  placeholder="Template Name eingeben..."
+                  className="glass-input"
+                  style={{ marginTop: '4px' }}
+                />
+              </div>
+            )}
+
+            {/* DSGVO Info */}
+            <div 
+              className={`dsgvo-info ${getEmailTypeCategory(formData.emailType)}`}
+              style={{ marginTop: '20px' }}
+            >
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px' }}>
+                <span style={{ fontSize: '24px' }}>
+                  {getEmailTypeCategory(formData.emailType) === 'marketing' ? '⚠️' : '✅'}
+                </span>
+                <div>
+                  <p style={{ color: 'white', fontWeight: 'bold', margin: '0 0 8px 0', fontSize: '16px' }}>
+                    {getEmailTypeCategory(formData.emailType) === 'marketing' 
+                      ? 'Marketing-Email'
+                      : 'Transaktions-Email'
+                    }
+                  </p>
+                  <p style={{ color: 'rgba(255,255,255,0.8)', margin: 0, fontSize: '14px', lineHeight: '1.4' }}>
+                    {getEmailTypeCategory(formData.emailType) === 'marketing' 
+                      ? 'Nur an Abonnenten mit Einwilligung versenden'
+                      : 'DSGVO konform für alle Kunden'
+                    }
+                  </p>
                 </div>
               </div>
             </div>
-
-          </div>
+          </motion.div>
         </motion.div>
       )}
 
@@ -825,6 +851,17 @@ const AIEmailGenerator: React.FC = () => {
           )}
         </motion.div>
       )}
+
+      {/* Email Preview Modal */}
+      <EmailPreviewModal
+        isOpen={isPreviewModalOpen}
+        onClose={() => setIsPreviewModalOpen(false)}
+        emailData={emailData}
+        selectedCustomers={customers.filter(c => selectedCustomers.includes(c.id))}
+        onSend={sendEmail}
+        onCopy={copyToClipboard}
+        isSending={sending}
+      />
     </div>
   );
 };

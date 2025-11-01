@@ -424,49 +424,56 @@ const AIDashboard: React.FC = () => {
           title: '🇩🇪 German Content Generator',
           description: 'Deutsche Content-Erstellung für lokales Marketing',
           endpoint: 'marketing/content/german',
-          icon: '🇩🇪'
+          icon: '🇩🇪',
+          pageUrl: '/marketing/german-content-generator'
         },
         {
           id: 'email-marketing-automation',
           title: '✉️ Email Marketing Automation',
           description: 'Komplette Email-Marketing Automatisierung',
           endpoint: 'marketing/email/automate',
-          icon: '✉️'
+          icon: '✉️',
+          pageUrl: '/marketing/email-marketing-automation'
         },
         {
           id: 'social-media-audio',
           title: '🎵 Social Media Audio',
           description: 'Audio-Beiträge für Social Media automatisch erstellen',
           endpoint: 'marketing/social/audio',
-          icon: '🎵'
+          icon: '🎵',
+          pageUrl: '/marketing/social-media-audio'
         },
         {
           id: 'social-media-poster',
           title: '📱 Social Media Poster',
           description: 'Automatisches Posting auf Social Media Kanäle',
           endpoint: 'marketing/social/poster',
-          icon: '📱'
+          icon: '📱',
+          pageUrl: '/marketing/social-media-poster'
         },
         {
           id: 'free-to-post-converter',
           title: '🆓 Free to Post Converter',
           description: 'Konvertiere Free-User zu aktiven Postern',
           endpoint: 'marketing/conversion/free-to-paid',
-          icon: '🆓'
+          icon: '🆓',
+          pageUrl: '/marketing/free-to-post-converter'
         },
         {
           id: 'content-monetized',
           title: '💸 Content Monetized',
           description: 'Automatische Content-Monetarisierung',
           endpoint: 'marketing/content/monetize',
-          icon: '💸'
+          icon: '💸',
+          pageUrl: '/marketing/content-monetized'
         },
         {
           id: 'kite-templates',
           title: '🎨 Kite Templates',
           description: 'Professionelle Templates für alle Marketing-Kanäle',
           endpoint: 'marketing/templates',
-          icon: '🎨'
+          icon: '🎨',
+          pageUrl: '/marketing/kite-templates'
         }
       ]
     },
