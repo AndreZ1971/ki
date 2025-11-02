@@ -11,11 +11,35 @@ const CreateFreebies = () => {
   const { handleBackToDashboard, loading, setLoading, error, setError, clearError } = useProductManagement();
   const toast = useToast();
   const [freebieType, setFreebieType] = useState<Freebie['type']>('ebook');
-  const [freebies, setFreebies] = useState<Freebie[]>([
-    { id: 1, name: 'SEO Guide Ebook', type: 'ebook', downloads: 142, created: '2024-01-15' },
-    { id: 2, name: 'WordPress Checklist', type: 'checklist', downloads: 89, created: '2024-01-10' },
-    { id: 3, name: 'Social Media Templates', type: 'templates', downloads: 203, created: '2024-01-05' }
-  ]);
+  const [freebies, setFreebies] = useState<Freebie[]>([]);
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  // Load freebies on mount
+  React.useEffect(() => {
+    const loadFreebies = async () => {
+      try {
+        setInitialLoading(true);
+        const response = await freebieApi.getFreebies();
+        
+        if (response.success && response.data) {
+          setFreebies(response.data);
+          toast.success(`${response.data.length} Freebies geladen`);
+        } else {
+          throw new Error(response.error || 'Freebies konnten nicht geladen werden');
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Fehler beim Laden der Freebies';
+        setError(errorMessage);
+        toast.error(errorMessage);
+        setFreebies([]);
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+    
+    loadFreebies();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleCreateFreebie = async () => {
     try {

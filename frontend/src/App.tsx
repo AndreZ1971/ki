@@ -32,6 +32,37 @@ import ShopMetrics from './pages/AnalyseMetrics/ShopMetrics';
 import StandardAudit from './pages/AnalyseMetrics/StandardAudit';
 import TrendAnalysis from './pages/AnalyseMetrics/TrendAnalysis';
 
+// Advanced Tools Pages
+import AutoFramplementator from './pages/Advanced/AutoFramplementator';
+import ContextGenerator from './pages/Advanced/ContextGenerator';
+import MemorySystem from './pages/Advanced/MemorySystem';
+import StringGenerator from './pages/Advanced/StringGenerator';
+import SystemHealth from './pages/Advanced/SystemHealth';
+import WooCommerceSync from './pages/Advanced/WooCommerceSync';
+
+// Marketing Content Pages
+import ContentMonetized from './pages/MarketingContent/ContentMonetized';
+import EmailMarketingAutomation from './pages/MarketingContent/EmailMarketingAutomation';
+import FreeToPostConverter from './pages/MarketingContent/FreeToPostConverter';
+import GermanContentGenerator from './pages/MarketingContent/GermanContentGenerator';
+import KiteTemplates from './pages/MarketingContent/KiteTemplates';
+import SocialMediaAudio from './pages/MarketingContent/SocialMediaAudio';
+import SocialMediaPoster from './pages/MarketingContent/SocialMediaPoster';
+
+// Payment & Finances Pages
+import PaymentDelivery from './pages/PaymentFinances/PaymentDelivery';
+import PaymentEmergency from './pages/PaymentFinances/PaymentEmergency';
+import PaymentExpansion from './pages/PaymentFinances/PaymentExpansion';
+import PaymentFast from './pages/PaymentFinances/PaymentFast';
+import PaymentIssuedDetector from './pages/PaymentFinances/PaymentIssuedDetector';
+import PaymentQuickCheck from './pages/PaymentFinances/PaymentQuickCheck';
+import PaymentSimplified from './pages/PaymentFinances/PaymentSimplified';
+import PaymentSuccess from './pages/PaymentFinances/PaymentSuccess';
+import PaymentTester from './pages/PaymentFinances/PaymentTester';
+import PaymentUserFavor from './pages/PaymentFinances/PaymentUserFavor';
+import PaymentValidation from './pages/PaymentFinances/PaymentValidation';
+import PaymentVerifier from './pages/PaymentFinances/PaymentVerifier';
+
 // Styles
 import './App.css';
 
@@ -57,8 +88,15 @@ function App() {
           <Route path="/analytics/standard-audit" element={<StandardAudit />} />
           <Route path="/analytics/trend-analysis" element={<TrendAnalysis />} />
           
-          {/* AI Email Generator Seite */}
+          {/* Marketing Content Routes */}
           <Route path="/marketing/ai-email-generator" element={<AIEmailGenerator />} />
+          <Route path="/marketing/content-monetized" element={<ContentMonetized />} />
+          <Route path="/marketing/email-automation" element={<EmailMarketingAutomation />} />
+          <Route path="/marketing/free-to-post" element={<FreeToPostConverter />} />
+          <Route path="/marketing/german-content" element={<GermanContentGenerator />} />
+          <Route path="/marketing/kite-templates" element={<KiteTemplates />} />
+          <Route path="/marketing/social-audio" element={<SocialMediaAudio />} />
+          <Route path="/marketing/social-poster" element={<SocialMediaPoster />} />
           
           {/* Product Management Routes */}
           <Route path="/products/auto-creator" element={<AutoProductCreator />} />
@@ -72,6 +110,28 @@ function App() {
           
           {/* ML Routes */}
           <Route path="/ml/dashboard" element={<MLDashboard />} />
+          
+          {/* Advanced Tools Routes */}
+          <Route path="/advanced/auto-framplementator" element={<AutoFramplementator />} />
+          <Route path="/advanced/context-generator" element={<ContextGenerator />} />
+          <Route path="/advanced/memory-system" element={<MemorySystem />} />
+          <Route path="/advanced/string-generator" element={<StringGenerator />} />
+          <Route path="/advanced/system-health" element={<SystemHealth />} />
+          <Route path="/advanced/woocommerce-sync" element={<WooCommerceSync />} />
+          
+          {/* Payment & Finances Routes */}
+          <Route path="/payments/delivery" element={<PaymentDelivery />} />
+          <Route path="/payments/emergency" element={<PaymentEmergency />} />
+          <Route path="/payments/expansion" element={<PaymentExpansion />} />
+          <Route path="/payments/fast" element={<PaymentFast />} />
+          <Route path="/payments/issue-detector" element={<PaymentIssuedDetector />} />
+          <Route path="/payments/quick-check" element={<PaymentQuickCheck />} />
+          <Route path="/payments/simplified" element={<PaymentSimplified />} />
+          <Route path="/payments/success" element={<PaymentSuccess />} />
+          <Route path="/payments/tester" element={<PaymentTester />} />
+          <Route path="/payments/user-favor" element={<PaymentUserFavor />} />
+          <Route path="/payments/validation" element={<PaymentValidation />} />
+          <Route path="/payments/verifier" element={<PaymentVerifier />} />
           
           {/* Settings Seiten */}
           <Route path="/settings" element={<Settings />} />

@@ -45,6 +45,9 @@ const Settings = () => {
   const [activeTab, setActiveTab] = useState<'connection' | 'specialization' | 'license'>('connection');
   const [testingConnection, setTestingConnection] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [connectionMessage, setConnectionMessage] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   // Shop-Verbindungsdaten
   const [credentials, setCredentials] = useState<ShopCredentials>({
@@ -65,6 +68,11 @@ const Settings = () => {
     enableAutoProducts: true,
     enableEmailMarketing: true
   });
+
+  // Load credentials on mount
+  React.useEffect(() => {
+    loadCredentials();
+  }, []);
 
   // Lizenz-Daten
   const [licenseKey, setLicenseKey] = useState('');
@@ -138,6 +146,25 @@ const Settings = () => {
     navigate('/');
   };
 
+  const loadCredentials = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:3000/api/settings/connection');
+      if (!response.ok) throw new Error('Fehler beim Laden');
+      const data = await response.json();
+      
+      // Backend sends masked credentials, keep them for display
+      if (data.success && data.credentials) {
+        setCredentials(data.credentials);
+      }
+    } catch (error) {
+      console.error('❌ Fehler beim Laden der Credentials:', error);
+      setConnectionMessage('⚠️ Fehler beim Laden der Einstellungen');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleCredentialChange = (field: keyof ShopCredentials, value: string | number | boolean) => {
     setCredentials(prev => ({ ...prev, [field]: value }));
   };
@@ -145,20 +172,33 @@ const Settings = () => {
   const testConnection = async () => {
     setTestingConnection(true);
     setConnectionStatus('idle');
+    setConnectionMessage('');
     
     try {
-      // Simuliere API-Call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await fetch('http://localhost:3000/api/settings/connection/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials),
+      });
       
-      // Validierung
-      if (!credentials.wpUrl || !credentials.wcApiUrl) {
-        throw new Error('URLs fehlen');
+      if (!response.ok) throw new Error('Test fehlgeschlagen');
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setConnectionStatus('success');
+        setConnectionMessage(
+          `${data.results.wordpress.message}\n${data.results.woocommerce.message}`
+        );
+      } else {
+        setConnectionStatus('error');
+        setConnectionMessage(data.message || 'Verbindungstest fehlgeschlagen');
       }
       
-      setConnectionStatus('success');
-      console.log('✅ Verbindung erfolgreich getestet');
+      console.log('🔍 Verbindungstest:', data);
     } catch (error) {
       setConnectionStatus('error');
+      setConnectionMessage('❌ Verbindungsfehler - Backend nicht erreichbar');
       console.error('❌ Verbindungsfehler:', error);
     } finally {
       setTestingConnection(false);
@@ -167,11 +207,37 @@ const Settings = () => {
 
   const saveConfiguration = async () => {
     try {
-      console.log('💾 Speichere Konfiguration...', credentials);
-      alert('✅ Konfiguration gespeichert!');
+      setSaving(true);
+      
+      const response = await fetch('http://localhost:3000/api/settings/connection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials),
+      });
+      
+      if (!response.ok) throw new Error('Speichern fehlgeschlagen');
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setConnectionStatus('success');
+        setConnectionMessage('✅ Konfiguration erfolgreich gespeichert und in .env persistiert!');
+        console.log('✅ Konfiguration gespeichert');
+        
+        // Clear message after 3 seconds
+        setTimeout(() => {
+          setConnectionMessage('');
+          setConnectionStatus('idle');
+        }, 3000);
+      } else {
+        throw new Error('Speichern fehlgeschlagen');
+      }
     } catch (error) {
+      setConnectionStatus('error');
+      setConnectionMessage('❌ Fehler beim Speichern der Konfiguration');
       console.error('❌ Fehler beim Speichern:', error);
-      alert('❌ Fehler beim Speichern der Konfiguration');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -292,12 +358,44 @@ const Settings = () => {
           {/* TAB 1: Shop-Verbindung */}
           {activeTab === 'connection' && (
             <div>
-              <h3>🔌 Shop-Verbindung einrichten</h3>
-              <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '30px' }}>
-                Verbinde dein WooCommerce/WordPress Shop mit dem AI-Agent
-              </p>
+              {loading && (
+                <div style={{ textAlign: 'center', padding: '40px' }}>
+                  <h3>Lade Einstellungen...</h3>
+                </div>
+              )}
 
-              <div style={{ display: 'grid', gap: '20px', marginBottom: '30px' }}>
+              {!loading && (
+                <>
+                  <h3>🔌 Shop-Verbindung einrichten</h3>
+                  <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '30px' }}>
+                    Verbinde dein WooCommerce/WordPress Shop mit dem AI-Agent
+                  </p>
+
+                  {/* Status Message */}
+                  {connectionMessage && (
+                    <div style={{
+                      padding: '15px',
+                      marginBottom: '20px',
+                      background: connectionStatus === 'success' 
+                        ? 'rgba(34, 197, 94, 0.2)' 
+                        : connectionStatus === 'error'
+                        ? 'rgba(239, 68, 68, 0.2)'
+                        : 'rgba(59, 130, 246, 0.2)',
+                      border: `2px solid ${
+                        connectionStatus === 'success' 
+                          ? '#22c55e' 
+                          : connectionStatus === 'error'
+                          ? '#ef4444'
+                          : '#3b82f6'
+                      }`,
+                      borderRadius: '8px',
+                      whiteSpace: 'pre-line'
+                    }}>
+                      {connectionMessage}
+                    </div>
+                  )}
+
+                  <div style={{ display: 'grid', gap: '20px', marginBottom: '30px' }}>
                 {/* WordPress Credentials */}
                 <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
                   <h4 style={{ marginBottom: '15px' }}>📝 WordPress Zugangsdaten</h4>
@@ -713,20 +811,23 @@ const Settings = () => {
 
                 <button
                   onClick={saveConfiguration}
+                  disabled={saving}
                   style={{
                     padding: '12px 24px',
-                    background: 'rgba(34, 197, 94, 0.3)',
+                    background: saving ? 'rgba(100,100,100,0.3)' : 'rgba(34, 197, 94, 0.3)',
                     border: '2px solid #22c55e',
                     borderRadius: '8px',
                     color: 'white',
-                    cursor: 'pointer',
+                    cursor: saving ? 'not-allowed' : 'pointer',
                     fontSize: '16px',
                     fontWeight: 'bold'
                   }}
                 >
-                  💾 Konfiguration speichern
+                  {saving ? '💾 Speichert...' : '💾 Konfiguration speichern'}
                 </button>
               </div>
+                </>
+              )}
             </div>
           )}
 

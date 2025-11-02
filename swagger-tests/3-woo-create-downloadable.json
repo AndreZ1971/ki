@@ -1,0 +1,7 @@
+{
+  "name": "Test Produkt Downloadable",
+  "description": "Ein digitales Download-Produkt erstellt via Swagger",
+  "price": 9.99,
+  "category": "117",
+  "type": "downloadable"
+}

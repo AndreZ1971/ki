@@ -50,6 +50,8 @@ export interface ProductCreationResult {
   productsCreated?: number;
   estimatedTime?: string;
   errors?: string[];
+  timestamp?: string;
+  products?: any[];
 }
 
 export interface ApiResponse<T> {

@@ -106,16 +106,49 @@ export default async function categoryRoutes(server: FastifyInstance) {
       try {
         const categoryData = request.body;
 
-        // TODO: WooCommerce API Integration
+        // ✅ WooCommerce API Integration
+        const wooConfig = {
+          url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
+          consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
+          consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
+        };
+
+        const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
+        
+        const response = await fetch(`${wooConfig.url}/wp-json/wc/v3/products/categories`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Basic ${auth}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: categoryData.name,
+            slug: categoryData.slug,
+            description: categoryData.description,
+            parent: categoryData.parentId || 0
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`WooCommerce API Error: ${response.status}`);
+        }
+
+        const wooCategory = await response.json() as any;
+        
         const newCategory: Category = {
-          id: Date.now(),
-          ...categoryData
+          id: wooCategory.id,
+          name: wooCategory.name,
+          slug: wooCategory.slug,
+          productCount: wooCategory.count || 0,
+          needsOptimization: false,
+          parentId: wooCategory.parent || undefined,
+          description: wooCategory.description || undefined
         };
 
         return reply.send({
           success: true,
           data: newCategory,
-          message: 'Kategorie erfolgreich erstellt'
+          message: 'Kategorie erfolgreich in WooCommerce erstellt'
         });
       } catch (_error) {
         return reply.status(500).send({

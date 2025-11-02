@@ -1,21 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
 import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
-import { productApi } from '../../services/productApi';
-import type { ProductCreationResult } from '../../types/product';
+import { productApi, categoryApi } from '../../services/productApi';
+import type { ProductCreationResult, Category } from '../../types/product';
 import './page.css';
 
 const AutoProductCreator = () => {
   const { handleBackToDashboard, loading, setLoading, error, setError, clearError } = useProductManagement();
   const toast = useToast();
   const [result, setResult] = useState<ProductCreationResult | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [config, setConfig] = useState({
     count: 5,
     category: 'all',
+    productType: 'simple' as 'simple' | 'virtual' | 'downloadable',
     optimization: 'high' as 'low' | 'medium' | 'high'
   });
+
+  // Lade WooCommerce Kategorien
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const response = await categoryApi.getCategories();
+        if (response.success && response.data) {
+          setCategories(response.data);
+        }
+      } catch (err) {
+        console.error('Failed to load categories:', err);
+      }
+    };
+    loadCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleCreateProducts = async () => {
     try {
@@ -74,8 +92,20 @@ const AutoProductCreator = () => {
               onChange={(e) => setConfig({...config, category: e.target.value})}
             >
               <option value="all">Alle Kategorien</option>
-              <option value="digital">Digitale Produkte</option>
-              <option value="physical">Physische Produkte</option>
+              {categories.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </select>
+          </div>
+          <div className="config-item">
+            <label>Produkttyp:</label>
+            <select 
+              value={config.productType}
+              onChange={(e) => setConfig({...config, productType: e.target.value as 'simple' | 'virtual' | 'downloadable'})}
+            >
+              <option value="simple">Simple (Physisch)</option>
+              <option value="virtual">Virtual (Kein Versand)</option>
+              <option value="downloadable">Downloadable (Digital)</option>
             </select>
           </div>
           <div className="config-item">
@@ -101,30 +131,44 @@ const AutoProductCreator = () => {
 
         {result && (
           <div className="result-section">
-            <h4>✅ Erstellung gestartet</h4>
+            <h4>✅ Erstellung abgeschlossen</h4>
             <p>{result.message}</p>
             <div className="result-details">
               <span>📦 {result.productsCreated} Produkte</span>
               <span>⏱️ {result.estimatedTime}</span>
+              {result.timestamp && (
+                <span>🕐 {new Date(result.timestamp).toLocaleString('de-DE', {
+                  dateStyle: 'short',
+                  timeStyle: 'short'
+                })}</span>
+              )}
             </div>
+            {result.products && result.products.length > 0 && (
+              <div className="created-products">
+                <h5>Erstellte Produkte:</h5>
+                <ul>
+                  {result.products.map((product: any) => (
+                    <li key={product.id}>
+                      <a href={product.permalink} target="_blank" rel="noopener noreferrer">
+                        {product.name} - {product.price}€
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {result.errors && result.errors.length > 0 && (
+              <div className="creation-errors">
+                <h5>⚠️ Fehler:</h5>
+                <ul>
+                  {result.errors.map((error: string, idx: number) => (
+                    <li key={idx}>{error}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         )}
-      </div>
-
-      <div className="metric-card">
-        <h3>📊 Letzte Erstellungen</h3>
-        <div className="history-list">
-          <div className="history-item">
-            <span className="date">Heute, 14:30</span>
-            <span className="products">5 Produkte erstellt</span>
-            <span className="status success">✅ Abgeschlossen</span>
-          </div>
-          <div className="history-item">
-            <span className="date">Gestern, 09:15</span>
-            <span className="products">3 Produkte erstellt</span>
-            <span className="status success">✅ Abgeschlossen</span>
-          </div>
-        </div>
       </div>
     </div>
   );

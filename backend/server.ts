@@ -39,8 +39,18 @@ import mlTestRoutes from './routes/app/api/ml/test';
 // 🔥 TREND AGGREGATOR ROUTES
 import { trendAggregatorRoutes } from './routes/app/api/trends/trends-routes';
 
+// 🔥 SETTINGS ROUTES
+import connectionRoutes from './routes/app/api/settings/connection';
+
+// 🔥 MONITORING ROUTES
+import monitoringRoutes from './routes/app/api/monitoring/system';
+
+import path from 'path';
+
 // Umgebungsvariablen laden mit erweiterter Fehlerbehandlung
-dotenv.config();
+// Load .env from backend directory (works from both backend/ and backend/dist/)
+const envPath = path.resolve(__dirname, '../.env');
+dotenv.config({ path: envPath });
 
 // Error Handling Initialisierung
 setupErrorHandling();
@@ -212,6 +222,14 @@ async function buildServer() {
     // 🔥 MARKETING ROUTES
     await server.register(marketingRoutes, { prefix: '/api/marketing' });
     console.log('✅ Marketing Routes erfolgreich registriert');
+
+    // 🔥 SETTINGS ROUTES
+    await server.register(connectionRoutes, { prefix: '/api/settings' });
+    console.log('✅ Settings Routes erfolgreich registriert');
+
+    // 🔥 MONITORING ROUTES (System Health & Performance)
+    await server.register(monitoringRoutes, { prefix: '/api/monitoring' });
+    console.log('✅ Monitoring Routes erfolgreich registriert');
 
     // Global Error Handler
     server.setErrorHandler((error, request, reply) => {

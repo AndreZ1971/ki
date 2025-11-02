@@ -10,28 +10,44 @@ import './page.css';
 const CategoriesManager = () => {
   const { handleBackToDashboard, loading, setLoading, error, setError, clearError } = useProductManagement();
   const toast = useToast();
-  const [categories, setCategories] = useState<Category[]>([
-    { id: 1, name: 'WordPress Themes', productCount: 15, needsOptimization: false },
-    { id: 2, name: 'Plugins', productCount: 8, needsOptimization: true },
-    { id: 3, name: 'Templates', productCount: 12, needsOptimization: false },
-    { id: 4, name: 'Digital Products', productCount: 25, needsOptimization: true }
-  ]);
-
-  useEffect(() => {
-    loadCategories();
-  }, []);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   const loadCategories = async () => {
     try {
+      setInitialLoading(true);
+      console.log('🔍 Starting to load categories...');
+      
+      if (!categoryApi || !categoryApi.getCategories) {
+        throw new Error('Category API is not available');
+      }
+      
       const response = await categoryApi.getCategories();
+      console.log('📦 API Response:', response);
+      
       if (response.success && response.data) {
         setCategories(response.data);
+        if (toast && toast.success) {
+          toast.success(`${response.data.length} Kategorien geladen`);
+        }
+      } else {
+        throw new Error(response.error || 'Kategorien konnten nicht geladen werden');
       }
     } catch (err) {
-      // Fallback auf Mock-Daten wenn Backend nicht verfügbar
-      console.log('Using mock data for categories');
+      console.error('❌ Load Categories Error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Fehler beim Laden der Kategorien';
+      if (setError) setError(errorMessage);
+      if (toast && toast.error) toast.error(errorMessage);
+      setCategories([]);
+    } finally {
+      setInitialLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Nur beim Mount laden
 
   const handleOptimizeAll = async () => {
     try {
@@ -75,6 +91,58 @@ const CategoriesManager = () => {
       setLoading(false);
     }
   };
+
+  // Loading State
+  if (initialLoading) {
+    return (
+      <div className="analytics-page">
+        <ToastContainer toasts={toast.toasts} onRemove={toast.removeToast} />
+        <BackButton onClick={handleBackToDashboard} />
+        <div className="analytics-header">
+          <h1>📑 Categories Manager</h1>
+          <p>Lade Kategorien...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error State (no data)
+  if (error && categories.length === 0) {
+    return (
+      <div className="analytics-page">
+        <ToastContainer toasts={toast.toasts} onRemove={toast.removeToast} />
+        <BackButton onClick={handleBackToDashboard} />
+        <div className="analytics-header">
+          <h1>📑 Categories Manager</h1>
+          <p style={{ color: '#f44336' }}>{error}</p>
+        </div>
+        <div style={{ padding: '2rem', textAlign: 'center' }}>
+          <button onClick={loadCategories} className="action-button">
+            Erneut versuchen
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Empty State
+  if (categories.length === 0) {
+    return (
+      <div className="analytics-page">
+        <ToastContainer toasts={toast.toasts} onRemove={toast.removeToast} />
+        <BackButton onClick={handleBackToDashboard} />
+        <div className="analytics-header">
+          <h1>📑 Categories Manager</h1>
+          <p>Keine Kategorien gefunden</p>
+        </div>
+        <div style={{ padding: '2rem', textAlign: 'center' }}>
+          <button onClick={loadCategories} className="action-button">
+            Kategorien aktualisieren
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="analytics-page">

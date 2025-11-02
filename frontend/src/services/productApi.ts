@@ -32,10 +32,10 @@ async function apiRequest<T>(
     }
 
     const data = await response.json();
-    return {
-      success: true,
-      data,
-    };
+    
+    // Backend gibt bereits {success, data, error} zurück
+    // Nicht nochmal wrappen!
+    return data;
   } catch (error) {
     console.error(`API Error [${endpoint}]:`, error);
     return {

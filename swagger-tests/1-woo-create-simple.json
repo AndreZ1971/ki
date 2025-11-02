@@ -1,0 +1,8 @@
+{
+  "name": "Test Produkt Simple",
+  "description": "Ein einfaches Test-Produkt erstellt via Swagger",
+  "price": 29.99,
+  "category": "117",
+  "type": "simple",
+  "stock": 10
+}
