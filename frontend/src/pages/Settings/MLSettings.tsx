@@ -101,7 +101,7 @@ export default function MLSettings() {
   return (
     <div className="analytics-page">
       <button className="back-button floating-back" onClick={handleBack}>
-        Zurück
+        ← Zurück
       </button>
 
       <div className="analytics-header">
