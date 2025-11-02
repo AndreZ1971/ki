@@ -77,7 +77,7 @@ const MLDashboard: React.FC = () => {
     return (
       <div className="analytics-page">
         <button className="back-button floating-back" onClick={handleBackToDashboard}>
-          ← Zurück zum Dashboard
+          ← Zurück 
         </button>
 
         <div className="analytics-header">
@@ -139,7 +139,7 @@ const MLDashboard: React.FC = () => {
     <div className="analytics-page">
       {/* Floating Back Button */}
       <button className="back-button floating-back" onClick={handleBackToDashboard}>
-        ← Zurück zum Dashboard
+        ← Zurück 
       </button>
 
       {/* Header */}

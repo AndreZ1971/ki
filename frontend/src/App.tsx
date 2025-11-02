@@ -5,6 +5,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AIDashboard from './pages/AIDashboard';
 import AIEmailGenerator from './pages/MarketingContent/ai-email-generator';
 import Settings from './pages/Settings/Settings';
+import MLSettings from './pages/Settings/MLSettings';
+import MLDashboard from './pages/ML/MLDashboard';
 
 // Product Management Pages
 import AutoProductCreator from './pages/ProductManagement/AutoProductCreator';
@@ -68,8 +70,12 @@ function App() {
           <Route path="/products/woo-create" element={<WooProductCreate />} />
           <Route path="/products/woo-update" element={<WooProductUpdate />} />
           
-          {/* Settings Seite */}
+          {/* ML Routes */}
+          <Route path="/ml/dashboard" element={<MLDashboard />} />
+          
+          {/* Settings Seiten */}
           <Route path="/settings" element={<Settings />} />
+          <Route path="/settings/ml" element={<MLSettings />} />
         </Routes>
       </Router>
     </div>

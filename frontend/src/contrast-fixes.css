@@ -1,0 +1,300 @@
+/* contrast-fixes.css - Globale Kontrast-Korrekturen für bessere Lesbarkeit */
+
+/* ============================================
+   GLOBALE TEXT-KONTRAST FIXES
+   ============================================ */
+
+/* Alle weißen Texte auf weißem/hellem Hintergrund dunkel machen */
+.analytics-page .loading-spinner {
+  color: #2c3e50 !important;
+  text-shadow: 0 2px 4px rgba(255,255,255,0.3) !important;
+}
+
+.analytics-page .error-message {
+  color: white !important;
+  background: rgba(220, 53, 69, 0.95) !important;
+}
+
+/* Buttons mit hellem Hintergrund - dunkler Text */
+.back-button.floating-back {
+  color: white !important;
+}
+
+/* ============================================
+   METRIC CARDS - Text immer lesbar
+   ============================================ */
+
+/* Standard Metric Cards - dunkler Text auf hellem Hintergrund */
+.metric-card .metric-value {
+  color: #2c3e50 !important;
+}
+
+.metric-card .metric-value-small {
+  color: #2c3e50 !important;
+}
+
+.metric-card .metric-label {
+  color: #6c757d !important;
+}
+
+/* Spezielle Cards mit dunklem Hintergrund - heller Text */
+.metric-card.last-updated .metric-label,
+.metric-card.last-updated .metric-value,
+.metric-card.last-updated .metric-value-small {
+  color: white !important;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* ============================================
+   FORM ELEMENTS - Settings Seiten
+   ============================================ */
+
+/* Labels und Text in Forms */
+.settings-group label,
+.form-group label,
+.checkbox-label,
+label {
+  color: #2c3e50 !important;
+}
+
+/* Input Felder */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+textarea,
+select {
+  color: #2c3e50 !important;
+  background: white !important;
+  border: 1px solid #ced4da !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #6c757d !important;
+}
+
+/* Disabled Inputs */
+input:disabled,
+textarea:disabled,
+select:disabled {
+  background: #e9ecef !important;
+  color: #6c757d !important;
+}
+
+/* ============================================
+   CHECKBOXES UND SWITCHES
+   ============================================ */
+
+.checkbox-label {
+  color: #2c3e50 !important;
+}
+
+.switch-label {
+  color: #2c3e50 !important;
+}
+
+/* ============================================
+   BUTTONS - Alle Varianten
+   ============================================ */
+
+/* Primary Buttons - heller Text auf dunklem Hintergrund */
+.btn-primary,
+.save-button,
+.start-button,
+.action-button {
+  color: white !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+/* Secondary Buttons - dunkler Text auf hellem Hintergrund */
+.btn-secondary,
+.cancel-button {
+  color: #2c3e50 !important;
+  background: white !important;
+  border: 2px solid #6c757d !important;
+}
+
+/* Danger Buttons */
+.btn-danger,
+.delete-button {
+  color: white !important;
+  background: #dc3545 !important;
+}
+
+/* Success Buttons */
+.btn-success {
+  color: white !important;
+  background: #28a745 !important;
+}
+
+/* ============================================
+   CARDS UND CONTAINERS
+   ============================================ */
+
+/* Settings Cards */
+.settings-card,
+.config-card,
+.info-card {
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: #2c3e50 !important;
+}
+
+.settings-card h2,
+.settings-card h3,
+.settings-card h4,
+.config-card h2,
+.config-card h3,
+.config-card h4 {
+  color: #2c3e50 !important;
+}
+
+/* ============================================
+   TABELLEN
+   ============================================ */
+
+table thead th {
+  color: white !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+table tbody td {
+  color: #2c3e50 !important;
+  background: white !important;
+}
+
+table tbody tr:hover td {
+  background: #f8f9fa !important;
+}
+
+/* ============================================
+   MESSAGES UND ALERTS
+   ============================================ */
+
+.message,
+.alert {
+  color: #2c3e50 !important;
+}
+
+.message.success,
+.alert-success {
+  background: rgba(40, 167, 69, 0.1) !important;
+  border-left: 4px solid #28a745 !important;
+  color: #155724 !important;
+}
+
+.message.error,
+.alert-error,
+.alert-danger {
+  background: rgba(220, 53, 69, 0.1) !important;
+  border-left: 4px solid #dc3545 !important;
+  color: #721c24 !important;
+}
+
+.message.warning,
+.alert-warning {
+  background: rgba(255, 193, 7, 0.1) !important;
+  border-left: 4px solid #ffc107 !important;
+  color: #856404 !important;
+}
+
+.message.info,
+.alert-info {
+  background: rgba(23, 162, 184, 0.1) !important;
+  border-left: 4px solid #17a2b8 !important;
+  color: #0c5460 !important;
+}
+
+/* ============================================
+   SPEZIELLE ML SETTINGS FIXES
+   ============================================ */
+
+.ml-settings-page {
+  color: #2c3e50 !important;
+}
+
+.ml-settings-page h1,
+.ml-settings-page h2,
+.ml-settings-page h3,
+.ml-settings-page h4 {
+  color: #2c3e50 !important;
+}
+
+.ml-settings-page p,
+.ml-settings-page span,
+.ml-settings-page div {
+  color: #2c3e50 !important;
+}
+
+/* Feature Toggles */
+.feature-toggle label {
+  color: #2c3e50 !important;
+}
+
+.feature-description {
+  color: #6c757d !important;
+}
+
+/* ============================================
+   DASHBOARD WIDGETS
+   ============================================ */
+
+.dashboard-widget {
+  background: rgba(255, 255, 255, 0.95) !important;
+}
+
+.dashboard-widget h3,
+.dashboard-widget h4,
+.dashboard-widget p {
+  color: #2c3e50 !important;
+}
+
+.widget-value {
+  color: #2c3e50 !important;
+  font-weight: bold;
+}
+
+.widget-label {
+  color: #6c757d !important;
+}
+
+/* ============================================
+   STATISTICS UND METRICS
+   ============================================ */
+
+.stat-value {
+  color: #2c3e50 !important;
+  font-weight: 900;
+}
+
+.stat-label {
+  color: #6c757d !important;
+  text-transform: uppercase;
+}
+
+.trend-up {
+  color: #28a745 !important;
+}
+
+.trend-down {
+  color: #dc3545 !important;
+}
+
+.trend-neutral {
+  color: #6c757d !important;
+}
+
+/* ============================================
+   RESPONSIVE - Tablet und Mobile
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Alle Texte auch auf Mobile lesbar */
+  body, p, span, div, label {
+    color: #2c3e50 !important;
+  }
+  
+  .analytics-header h1,
+  .analytics-header p {
+    color: #2c3e50 !important;
+  }
+}
