@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
 import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
@@ -11,32 +11,71 @@ interface ProductItem {
   id: number;
   name: string;
   price: number;
-  updated: boolean;
+  stock_quantity?: number;
+  description?: string;
+  manage_stock?: boolean;
+  permalink?: string;
 }
 
 const WooProductUpdate = () => {
   const { handleBackToDashboard, loading, setLoading, error, setError, clearError } = useProductManagement();
   const toast = useToast();
   const [updateType, setUpdateType] = useState<UpdateType>('prices');
-  const [products, setProducts] = useState<ProductItem[]>([
-    { id: 1, name: 'Premium Theme', price: 49.99, updated: true },
-    { id: 2, name: 'Business Plugin', price: 29.99, updated: false },
-    { id: 3, name: 'SEO Template', price: 19.99, updated: true }
-  ]);
+  const [products, setProducts] = useState<ProductItem[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+
+  // Lade echte Produkte aus WooCommerce
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  const loadProducts = async () => {
+    try {
+      setLoadingProducts(true);
+      const response = await fetch('/api/products/woo/list');
+      const data = await response.json();
+      
+      if (data.success && data.data) {
+        setProducts(data.data);
+        // Alle Produkte standardmäßig auswählen
+        setSelectedProducts(data.data.map((p: ProductItem) => p.id));
+      }
+    } catch (err) {
+      console.error('Failed to load products:', err);
+      toast.error('Fehler beim Laden der Produkte');
+    } finally {
+      setLoadingProducts(false);
+    }
+  };
+
+  const toggleProduct = (productId: number) => {
+    setSelectedProducts(prev => 
+      prev.includes(productId) 
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId]
+    );
+  };
 
   const handleUpdate = async () => {
+    if (selectedProducts.length === 0) {
+      toast.error('Bitte wähle mindestens ein Produkt aus');
+      return;
+    }
+
     try {
       setLoading(true);
       clearError();
 
       const response = await productApi.updateWooProducts({
         type: updateType,
-        productIds: products.map(p => p.id)
+        productIds: selectedProducts
       });
 
       if (response.success) {
-        setProducts(products.map(p => ({ ...p, updated: true })));
-        toast.success('Produkt-Updates erfolgreich durchgeführt!');
+        toast.success(`${selectedProducts.length} Produkt(e) erfolgreich aktualisiert!`);
+        // Produkte neu laden um aktuelle Daten zu zeigen
+        await loadProducts();
       } else {
         throw new Error(response.error || 'Update fehlgeschlagen');
       }
@@ -112,18 +151,56 @@ const WooProductUpdate = () => {
       </div>
 
       <div className="metric-card">
-        <h3>📋 Zu aktualisierende Produkte</h3>
-        <div className="products-list">
-          {products.map(product => (
-            <div key={product.id} className="product-item">
-              <span className="product-name">{product.name}</span>
-              <span className="product-price">€{product.price}</span>
-              <span className={`status ${product.updated ? 'success' : 'pending'}`}>
-                {product.updated ? '✅ Aktuell' : '⚠️ Update nötig'}
-              </span>
+        <h3>📋 Zu aktualisierende Produkte ({selectedProducts.length} ausgewählt)</h3>
+        
+        {loadingProducts ? (
+          <p>Lade Produkte aus WooCommerce...</p>
+        ) : products.length === 0 ? (
+          <p>Keine Produkte gefunden.</p>
+        ) : (
+          <>
+            <div className="select-all">
+              <label>
+                <input 
+                  type="checkbox" 
+                  checked={selectedProducts.length === products.length}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedProducts(products.map(p => p.id));
+                    } else {
+                      setSelectedProducts([]);
+                    }
+                  }}
+                />
+                <span>Alle auswählen</span>
+              </label>
             </div>
-          ))}
-        </div>
+            
+            <div className="products-list">
+              {products.map(product => (
+                <div key={product.id} className="product-item">
+                  <label className="product-checkbox">
+                    <input 
+                      type="checkbox" 
+                      checked={selectedProducts.includes(product.id)}
+                      onChange={() => toggleProduct(product.id)}
+                    />
+                  </label>
+                  <span className="product-name">{product.name}</span>
+                  <span className="product-price">€{product.price}</span>
+                  {updateType === 'inventory' && product.manage_stock && (
+                    <span className="product-stock">📦 {product.stock_quantity || 0} auf Lager</span>
+                  )}
+                  {product.permalink && (
+                    <a href={product.permalink} target="_blank" rel="noopener noreferrer" className="product-link">
+                      🔗
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

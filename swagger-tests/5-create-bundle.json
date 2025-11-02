@@ -1,0 +1,8 @@
+{
+  "name": "Starter Bundle - Komplett Paket",
+  "products": ["Produkt A", "Produkt B", "Produkt C"],
+  "price": 79.99,
+  "discount": 25,
+  "active": true,
+  "description": "Perfektes Starter-Paket mit 25% Rabatt! Enthält alles was Sie für den Einstieg benötigen. Sparen Sie beim Kauf als Bundle."
+}

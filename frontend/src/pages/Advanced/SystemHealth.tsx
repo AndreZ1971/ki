@@ -16,6 +16,13 @@ interface HealthStatus {
   status: 'healthy' | 'warning' | 'critical';
 }
 
+interface ServiceStatus {
+  name: string;
+  status: 'healthy' | 'warning' | 'critical';
+  responseTime: number;
+  message: string;
+}
+
 const SystemHealth: React.FC = () => {
   const { handleBackToDashboard, loading, setLoading, error, setError } = useProductManagement();
   const { toasts, showToast } = useToast();
@@ -23,32 +30,48 @@ const SystemHealth: React.FC = () => {
   const [monitoringEnabled, setMonitoringEnabled] = useState(true);
   const [alertThreshold, setAlertThreshold] = useState('80');
   const [healthStatus, setHealthStatus] = useState<HealthStatus | null>(null);
+  const [services, setServices] = useState<ServiceStatus[]>([]);
 
   const handleCheckHealth = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // ✅ Hole ECHTE System-Metriken vom Backend
+      const response = await fetch('http://localhost:3000/api/monitoring/system/metrics');
       
-      const cpu = Math.floor(Math.random() * 100);
-      const memory = Math.floor(Math.random() * 100);
-      const disk = Math.floor(Math.random() * 100);
+      if (!response.ok) {
+        throw new Error('Konnte System-Metriken nicht laden');
+      }
       
-      let status: 'healthy' | 'warning' | 'critical' = 'healthy';
-      if (cpu > 90 || memory > 90 || disk > 90) status = 'critical';
-      else if (cpu > 70 || memory > 70 || disk > 70) status = 'warning';
+      const data = await response.json();
       
+      if (!data.success) {
+        throw new Error(data.error || 'Unbekannter Fehler');
+      }
+      
+      const metrics = data.metrics;
+      
+      // Transformiere Backend-Daten ins Frontend-Format
       setHealthStatus({
-        cpu,
-        memory,
-        disk,
-        network: Math.random() > 0.1 ? 'online' : 'offline',
-        uptime: `${Math.floor(Math.random() * 30)}d ${Math.floor(Math.random() * 24)}h`,
-        status
+        cpu: Math.round(metrics.cpu.usage),
+        memory: metrics.memory.usagePercent,
+        disk: metrics.disk.usagePercent,
+        network: metrics.network.status,
+        uptime: metrics.uptime.formatted,
+        status: metrics.status
       });
       
-      showToast(`System-Status: ${status === 'healthy' ? 'Gesund ✅' : status === 'warning' ? 'Warnung ⚠️' : 'Kritisch 🚨'}`, status === 'healthy' ? 'success' : 'error');
+      // Lade auch Services-Status
+      const servicesResponse = await fetch('http://localhost:3000/api/monitoring/services/status');
+      if (servicesResponse.ok) {
+        const servicesData = await servicesResponse.json();
+        if (servicesData.success) {
+          setServices(servicesData.services);
+        }
+      }
+      
+      showToast(`System-Status: ${metrics.status === 'healthy' ? 'Gesund ✅' : metrics.status === 'warning' ? 'Warnung ⚠️' : 'Kritisch 🚨'}`, metrics.status === 'healthy' ? 'success' : 'error');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Health-Check Fehler';
       setError(errorMessage);
@@ -190,6 +213,63 @@ const SystemHealth: React.FC = () => {
           )}
         </motion.div>
       </div>
+
+      {/* Services Status Section */}
+      {services.length > 0 && (
+        <motion.div 
+          className="form-container" 
+          initial={{ opacity: 0, y: 20 }} 
+          animate={{ opacity: 1, y: 0 }}
+          style={{ marginTop: '20px' }}
+        >
+          <h3 style={{ color: 'white', marginBottom: '20px' }}>🔌 Services Status</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {services.map((service, index) => (
+              <div 
+                key={index}
+                style={{
+                  background: 'rgba(0,0,0,0.3)',
+                  border: `1px solid ${
+                    service.status === 'healthy' ? 'rgba(52, 199, 89, 0.5)' :
+                    service.status === 'warning' ? 'rgba(255, 149, 0, 0.5)' :
+                    'rgba(255, 59, 48, 0.5)'
+                  }`,
+                  borderRadius: '10px',
+                  padding: '15px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ fontSize: '24px' }}>
+                    {service.status === 'healthy' ? '✅' : service.status === 'warning' ? '⚠️' : '🚨'}
+                  </div>
+                  <div>
+                    <div style={{ color: 'white', fontWeight: 'bold', fontSize: '14px' }}>
+                      {service.name}
+                    </div>
+                    <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px', marginTop: '2px' }}>
+                      {service.message}
+                    </div>
+                  </div>
+                </div>
+                {service.responseTime > 0 && (
+                  <div style={{ 
+                    color: 'white', 
+                    fontSize: '12px', 
+                    background: 'rgba(255,255,255,0.1)', 
+                    padding: '4px 10px', 
+                    borderRadius: '6px' 
+                  }}>
+                    {service.responseTime}ms
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 };

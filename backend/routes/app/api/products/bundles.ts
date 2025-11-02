@@ -157,19 +157,86 @@ export default async function bundleRoutes(server: FastifyInstance) {
     async (request: FastifyRequest<{ Body: CreateBundleBody }>, reply: FastifyReply) => {
       try {
         const bundleData = request.body;
+        console.log('📦 Creating bundle:', bundleData);
+
+        // ✅ ECHTE WooCommerce Bundle-Erstellung
+        const wooConfig = {
+          url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
+          consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
+          consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
+        };
+
+        if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
+          throw new Error('WooCommerce-Konfiguration fehlt');
+        }
+
+        const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
+
+        // Erstelle ein "Grouped Product" in WooCommerce
+        // Grouped Products können mehrere Kind-Produkte enthalten (Bundle-Komponenten)
+        const wooPayload = {
+          name: bundleData.name,
+          type: 'grouped',
+          description: bundleData.description || `Bundle bestehend aus: ${bundleData.products.join(', ')}`,
+          status: bundleData.active ? 'publish' : 'draft',
+          // Grouped products haben keinen eigenen Preis - der Preis wird aus den Kind-Produkten berechnet
+          // Aber wir speichern den Bundle-Preis und Rabatt in meta_data
+          meta_data: [
+            {
+              key: '_bundle_price',
+              value: bundleData.price.toString()
+            },
+            {
+              key: '_bundle_discount',
+              value: bundleData.discount.toString()
+            },
+            {
+              key: '_bundle_products',
+              value: bundleData.products.join(',')
+            }
+          ]
+        };
+
+        console.log('📤 Sending to WooCommerce:', JSON.stringify(wooPayload, null, 2));
+
+        const response = await fetch(`${wooConfig.url}/wp-json/wc/v3/products`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Basic ${auth}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(wooPayload)
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('❌ WooCommerce Error:', errorText);
+          throw new Error(`WooCommerce API Error: ${response.status} - ${errorText}`);
+        }
+
+        const wooBundle = await response.json();
+        console.log('✅ Bundle created in WooCommerce:', wooBundle.id);
 
         const newBundle: Bundle = {
-          id: Date.now(),
-          ...bundleData,
-          createdAt: new Date().toISOString()
+          id: wooBundle.id,
+          name: wooBundle.name,
+          products: bundleData.products,
+          price: bundleData.price,
+          discount: bundleData.discount,
+          active: wooBundle.status === 'publish',
+          description: wooBundle.description,
+          createdAt: wooBundle.date_created
         };
 
         return reply.send({
           success: true,
           data: newBundle,
-          message: 'Bundle erfolgreich erstellt'
+          message: `Bundle "${newBundle.name}" erfolgreich in WooCommerce erstellt`,
+          woocommerceId: wooBundle.id,
+          permalink: wooBundle.permalink
         });
       } catch (_error) {
+        console.error('❌ Bundle creation error:', _error);
         return reply.status(500).send({
           success: false,
           error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'

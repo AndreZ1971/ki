@@ -139,18 +139,91 @@ export default async function freebieRoutes(server: FastifyInstance) {
     async (request: FastifyRequest<{ Body: CreateFreebieBody }>, reply: FastifyReply) => {
       try {
         const freebieData = request.body;
+        console.log('🎁 Creating freebie:', freebieData);
+
+        // ✅ ECHTE WooCommerce Freebie-Erstellung
+        const wooConfig = {
+          url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
+          consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
+          consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
+        };
+
+        if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
+          throw new Error('WooCommerce-Konfiguration fehlt');
+        }
+
+        const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
+
+        // Freebies sind normalerweise downloadable/virtual products mit Preis 0
+        const isDownloadable = freebieData.type === 'ebook' || freebieData.type === 'guide';
+        
+        const wooPayload: any = {
+          name: freebieData.name,
+          type: 'simple',
+          regular_price: '0',
+          sale_price: '0',
+          price: '0',
+          virtual: true,
+          downloadable: isDownloadable,
+          description: freebieData.description || `Kostenloses ${freebieData.type} - ${freebieData.name}`,
+          status: 'publish',
+          meta_data: [
+            {
+              key: '_freebie_type',
+              value: freebieData.type
+            }
+          ]
+        };
+
+        // Wenn File URL vorhanden, füge Download hinzu
+        if (freebieData.fileUrl && isDownloadable) {
+          wooPayload.downloads = [
+            {
+              name: freebieData.name,
+              file: freebieData.fileUrl
+            }
+          ];
+        }
+
+        console.log('📤 Sending to WooCommerce:', JSON.stringify(wooPayload, null, 2));
+
+        const response = await fetch(`${wooConfig.url}/wp-json/wc/v3/products`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Basic ${auth}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(wooPayload)
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('❌ WooCommerce Error:', errorText);
+          throw new Error(`WooCommerce API Error: ${response.status} - ${errorText}`);
+        }
+
+        const wooFreebie = await response.json();
+        console.log('✅ Freebie created in WooCommerce:', wooFreebie.id);
 
         const newFreebie: Freebie = {
-          id: Date.now(),
-          ...freebieData
+          id: wooFreebie.id,
+          name: wooFreebie.name,
+          type: freebieData.type,
+          downloads: 0,
+          created: wooFreebie.date_created,
+          description: wooFreebie.description,
+          fileUrl: wooFreebie.downloads?.[0]?.file || wooFreebie.permalink
         };
 
         return reply.send({
           success: true,
           data: newFreebie,
-          message: 'Freebie erfolgreich erstellt'
+          message: `Freebie "${newFreebie.name}" erfolgreich in WooCommerce erstellt`,
+          woocommerceId: wooFreebie.id,
+          permalink: wooFreebie.permalink
         });
       } catch (_error) {
+        console.error('❌ Freebie creation error:', _error);
         return reply.status(500).send({
           success: false,
           error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
@@ -178,23 +251,131 @@ export default async function freebieRoutes(server: FastifyInstance) {
     async (request: FastifyRequest<{ Body: AutoCreateBody }>, reply: FastifyReply) => {
       try {
         const { type } = request.body;
+        console.log('🤖 Auto-creating freebie:', type);
 
-        // TODO: AI-basierte Freebie-Generierung
-        const aiGeneratedFreebie: Freebie = {
-          id: Date.now(),
-          name: `AI-Generated ${type} #${Date.now()}`,
+        // ✅ AI-basierte Freebie-Generierung mit OpenAI
+        const OpenAI = (await import('openai')).default;
+        const openai = new OpenAI({
+          apiKey: process.env.OPENAI_API_KEY
+        });
+
+        // Generiere Freebie-Idee mit OpenAI
+        const typeTranslations: Record<string, string> = {
+          'ebook': 'E-Book',
+          'checklist': 'Checkliste',
+          'templates': 'Vorlagen-Set',
+          'guide': 'Schritt-für-Schritt Anleitung'
+        };
+
+        const prompt = `Erstelle eine kreative Idee für ein kostenloses ${typeTranslations[type]} für einen E-Commerce Shop.
+
+Das ${typeTranslations[type]} sollte:
+- Einen attraktiven, professionellen Namen haben
+- Eine überzeugende Beschreibung (150-200 Wörter) enthalten
+- Mehrwert für potenzielle Kunden bieten
+- Zum Download verfügbar sein
+
+Antworte mit einem JSON Objekt im Format:
+{
+  "name": "Titel des ${typeTranslations[type]}",
+  "description": "Detaillierte Beschreibung mit Mehrwert und Benefits"
+}`;
+
+        const completion = await openai.chat.completions.create({
+          model: 'gpt-4o-mini',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.9,
+          response_format: { type: 'json_object' }
+        });
+
+        const responseContent = completion.choices[0].message.content || '{"name": "Freebie", "description": ""}';
+        console.log('🤖 OpenAI Response:', responseContent);
+        
+        let freebieIdea: any;
+        try {
+          freebieIdea = JSON.parse(responseContent);
+        } catch (parseError) {
+          console.error('❌ JSON Parse Error:', parseError);
+          throw new Error('Fehler beim Parsen der AI Antwort');
+        }
+
+        // Erstelle Freebie in WooCommerce
+        const wooConfig = {
+          url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
+          consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
+          consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
+        };
+
+        if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
+          throw new Error('WooCommerce-Konfiguration fehlt');
+        }
+
+        const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
+
+        const isDownloadable = type === 'ebook' || type === 'guide';
+        
+        const wooPayload: any = {
+          name: freebieIdea.name,
+          type: 'simple',
+          regular_price: '0',
+          sale_price: '0',
+          price: '0',
+          virtual: true,
+          downloadable: isDownloadable,
+          description: freebieIdea.description,
+          status: 'publish',
+          meta_data: [
+            {
+              key: '_freebie_type',
+              value: type
+            },
+            {
+              key: '_ai_generated',
+              value: 'true'
+            }
+          ]
+        };
+
+        console.log('📤 Sending to WooCommerce:', JSON.stringify(wooPayload, null, 2));
+
+        const response = await fetch(`${wooConfig.url}/wp-json/wc/v3/products`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Basic ${auth}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(wooPayload)
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('❌ WooCommerce Error:', errorText);
+          throw new Error(`WooCommerce API Error: ${response.status} - ${errorText}`);
+        }
+
+        const wooFreebie = await response.json();
+        console.log('✅ Freebie created in WooCommerce:', wooFreebie.id);
+
+        const newFreebie: Freebie = {
+          id: wooFreebie.id,
+          name: wooFreebie.name,
           type,
           downloads: 0,
-          created: new Date().toISOString().split('T')[0],
-          description: 'Automatisch mit AI erstellt'
+          created: wooFreebie.date_created,
+          description: wooFreebie.description,
+          fileUrl: wooFreebie.permalink
         };
 
         return reply.send({
           success: true,
-          data: aiGeneratedFreebie,
-          message: 'Freebie erfolgreich mit AI erstellt'
+          data: newFreebie,
+          message: `Freebie "${newFreebie.name}" erfolgreich mit AI erstellt und in WooCommerce veröffentlicht`,
+          woocommerceId: wooFreebie.id,
+          permalink: wooFreebie.permalink,
+          timestamp: new Date().toISOString()
         });
       } catch (_error) {
+        console.error('❌ Auto-create freebie error:', _error);
         return reply.status(500).send({
           success: false,
           error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'

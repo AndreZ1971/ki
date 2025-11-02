@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
 import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
-import { productApi } from '../../services/productApi';
-import type { Product } from '../../types/product';
+import { productApi, categoryApi } from '../../services/productApi';
+import type { Product, Category } from '../../types/product';
 import './page.css';
 
 const WooProductCreate = () => {
   const { handleBackToDashboard, loading, setLoading, error, setError, clearError } = useProductManagement();
   const toast = useToast();
+  const [categories, setCategories] = useState<Category[]>([]);
   const [productData, setProductData] = useState<Partial<Product>>({
     name: '',
     description: '',
@@ -18,6 +19,22 @@ const WooProductCreate = () => {
     type: 'simple'
   });
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+
+  // Lade WooCommerce Kategorien
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const response = await categoryApi.getCategories();
+        if (response.success && response.data) {
+          setCategories(response.data);
+        }
+      } catch (err) {
+        console.error('Failed to load categories:', err);
+      }
+    };
+    loadCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const validateForm = (): boolean => {
     const errors: string[] = [];
@@ -130,16 +147,16 @@ const WooProductCreate = () => {
             </div>
 
             <div className="form-group">
-              <label>Kategorie</label>
+              <label>Kategorie *</label>
               <select 
                 value={productData.category || ''}
                 onChange={(e) => setProductData({...productData, category: e.target.value})}
                 required
               >
-                <option value="">Kategorie wählen</option>
-                <option value="themes">WordPress Themes</option>
-                <option value="plugins">Plugins</option>
-                <option value="templates">Vorlagen</option>
+                <option value="">WooCommerce Kategorie wählen</option>
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.name} ({cat.productCount} Produkte)</option>
+                ))}
               </select>
             </div>
 
@@ -149,10 +166,12 @@ const WooProductCreate = () => {
                 value={productData.type}
                 onChange={(e) => setProductData({...productData, type: e.target.value as Product['type']})}
               >
-                <option value="simple">Einfaches Produkt</option>
-                <option value="variable">Variables Produkt</option>
-                <option value="grouped">Gruppiertes Produkt</option>
-                <option value="external">Externes Produkt</option>
+                <option value="simple">Simple - Standard Produkt</option>
+                <option value="virtual">Virtual - Kein Versand</option>
+                <option value="downloadable">Downloadable - Digitaler Download</option>
+                <option value="variable">Variable - Mit Varianten</option>
+                <option value="grouped">Grouped - Produkt-Gruppe</option>
+                <option value="external">External - Externes Produkt</option>
               </select>
             </div>
           </div>

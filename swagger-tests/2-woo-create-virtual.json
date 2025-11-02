@@ -1,0 +1,7 @@
+{
+  "name": "Test Produkt Virtual",
+  "description": "Ein virtuelles Produkt (kein Versand) erstellt via Swagger",
+  "price": 19.99,
+  "category": "117",
+  "type": "virtual"
+}

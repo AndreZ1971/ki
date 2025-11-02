@@ -1,0 +1,7 @@
+{
+  "name": "Test Kategorie",
+  "slug": "test-kategorie",
+  "productCount": 0,
+  "needsOptimization": false,
+  "description": "Eine Test-Kategorie erstellt via Swagger"
+}

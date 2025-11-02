@@ -10,24 +10,35 @@ import './page.css';
 const ProductBundles = () => {
   const { handleBackToDashboard, loading, setLoading, error, setError, clearError } = useProductManagement();
   const toast = useToast();
-  const [bundles, setBundles] = useState<Bundle[]>([
-    { 
-      id: 1, 
-      name: 'WordPress Starter Pack', 
-      products: ['Theme', 'Plugin', 'Tutorial'], 
-      price: 79.99,
-      discount: 20,
-      active: true 
-    },
-    { 
-      id: 2, 
-      name: 'SEO Complete Bundle', 
-      products: ['SEO Plugin', 'Guide', 'Templates'], 
-      price: 129.99,
-      discount: 25,
-      active: false 
-    }
-  ]);
+  const [bundles, setBundles] = useState<Bundle[]>([]);
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  // Load bundles on mount
+  React.useEffect(() => {
+    const loadBundles = async () => {
+      try {
+        setInitialLoading(true);
+        const response = await bundleApi.getBundles();
+        
+        if (response.success && response.data) {
+          setBundles(response.data);
+          toast.success(`${response.data.length} Bundles geladen`);
+        } else {
+          throw new Error(response.error || 'Bundles konnten nicht geladen werden');
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Fehler beim Laden der Bundles';
+        setError(errorMessage);
+        toast.error(errorMessage);
+        setBundles([]);
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+    
+    loadBundles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleCreateBundle = async () => {
     try {
