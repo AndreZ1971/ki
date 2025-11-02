@@ -103,7 +103,7 @@ async function fixFile(filePath, pattern, replacement) {
     
     return false;
   } catch (_error) {
-    console.log(`❌ Error fixing ${filePath}:`, error.message);
+    console.log(`❌ Error fixing ${filePath}:`, _error.message);
     return false;
   }
 }

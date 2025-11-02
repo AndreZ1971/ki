@@ -408,7 +408,7 @@ function generateRoutes() {
       createdCount++;
       
     } catch (_error) {
-      console.log(`❌ ${config.path.padEnd(45)} | FEHLER: ${error.message}`);
+      console.log(`❌ ${config.path.padEnd(45)} | FEHLER: ${_error.message}`);
       errorCount++;
     }
   });

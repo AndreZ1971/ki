@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "build": "tsc",
-    "dev": "tsx watch server.ts",
+    "dev": "tsc && node --watch dist/server.js",
     "dev:agent": "tsx watch agent/planner.ts",
     "start": "node dist/server.js",
     "start:agent": "node dist/agent/planner.js",

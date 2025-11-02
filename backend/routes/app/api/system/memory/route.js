@@ -36,7 +36,7 @@ export async function POST(request) {
   } catch (_error) {
     return Response.json({
       success: false,
-      error: error.message
+      error: _error.message
     }, { status: 500 });
   }
 }
