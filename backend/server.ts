@@ -36,6 +36,9 @@ import marketingRoutes from './routes/app/api/marketing/marketing-routes';
 import mlConfigRoutes from './routes/app/api/ml/config';
 import mlTestRoutes from './routes/app/api/ml/test';
 
+// 🔥 TREND AGGREGATOR ROUTES
+import { trendAggregatorRoutes } from './routes/app/api/trends/trends-routes';
+
 // Umgebungsvariablen laden mit erweiterter Fehlerbehandlung
 dotenv.config();
 
@@ -120,7 +123,8 @@ async function buildServer() {
           { name: 'products', description: 'Product Management & Creation' },
           { name: 'categories', description: 'Category Management' },
           { name: 'bundles', description: 'Product Bundle Management' },
-          { name: 'freebies', description: 'Freebie Management' }
+          { name: 'freebies', description: 'Freebie Management' },
+          { name: 'Trends', description: 'Multi-Source Trend Analysis' }
         ]
       }
     });
@@ -200,6 +204,10 @@ async function buildServer() {
     // 🧪 ML TEST ROUTES (Development/Testing)
     await server.register(mlTestRoutes, { prefix: '/api/ml/test' });
     console.log('✅ ML Test Routes erfolgreich registriert');
+
+    // 🔥 TREND AGGREGATOR ROUTES (Multi-Source Trend Analysis)
+    await server.register(trendAggregatorRoutes, { prefix: '/api/trends' });
+    console.log('✅ Trend Aggregator Routes erfolgreich registriert');
 
     // 🔥 MARKETING ROUTES
     await server.register(marketingRoutes, { prefix: '/api/marketing' });
