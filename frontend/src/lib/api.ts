@@ -1,4 +1,4 @@
-import { EmailDraftRequest, EmailDraftResponse } from './types/ai';
+import type { EmailDraftRequest, EmailDraftResponse } from './types/ai';
 
 const API_BASE = 'http://localhost:3000/ai';
 
