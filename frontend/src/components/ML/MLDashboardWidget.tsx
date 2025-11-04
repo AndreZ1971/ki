@@ -27,10 +27,12 @@ export const MLDashboardWidget: React.FC = () => {
   const [mlStatus, setMlStatus] = useState<MLStatus | null>(null);
   const [mlStats, setMlStats] = useState<MLStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchMLStatus();
-    fetchMLStats();
+  fetchMLStatus();
+  fetchMLStats();
+  setError(null);
     
     // Refresh every 30 seconds
     const interval = setInterval(() => {
@@ -45,9 +47,13 @@ export const MLDashboardWidget: React.FC = () => {
 const fetchMLStatus = async () => {
   try {
     const response = await fetch(`${apiUrl}/ml/status`);
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status}`);
+    }
     const data = await response.json();
     setMlStatus(data);
   } catch (_error) {
+    setError('Fehler beim Laden des ML-Status. Bitte API prüfen.');
     console.error('Failed to fetch ML status:', _error);
   }
 };
@@ -65,6 +71,7 @@ const fetchMLStatus = async () => {
         lastPrediction: new Date().toISOString()
       });
     } catch (_error) {
+      setError('Fehler beim Laden der ML-Statistiken.');
       console.error('Failed to fetch ML stats:', _error);
     } finally {
       setLoading(false);
@@ -87,6 +94,13 @@ const fetchMLStatus = async () => {
       >
         <div style={{ fontSize: '32px', marginBottom: '12px' }}>🤖</div>
         <p style={{ color: 'rgba(255,255,255,0.6)', margin: 0 }}>Lade ML Status...</p>
+        {error && (
+          <p style={{ color: '#ef4444', marginTop: '10px', fontWeight: 'bold' }}>
+            ⚠️ {error}
+            <br />
+            <small>API: {import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}</small>
+          </p>
+        )}
       </motion.div>
     );
   }
