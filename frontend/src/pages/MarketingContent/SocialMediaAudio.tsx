@@ -15,6 +15,7 @@ const SocialMediaAudio: React.FC = () => {
   const [voice, setVoice] = useState('neutral');
   const [platform, setPlatform] = useState('instagram');
   const [generatedAudio, setGeneratedAudio] = useState<string | null>(null);
+  const [audioDuration, setAudioDuration] = useState<number>(0);
 
   const voices = [
     { value: 'neutral', label: 'Neutral', icon: '😐', description: 'Ausgewogene Stimme' },
@@ -40,7 +41,7 @@ const SocialMediaAudio: React.FC = () => {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:3000/api/marketing/social/audio', {
+      const response = await fetch('/api/marketing/social/audio', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ audioText, voice, platform })
@@ -49,8 +50,9 @@ const SocialMediaAudio: React.FC = () => {
       const data = await response.json();
       
       if (data.success && data.audio) {
-        setGeneratedAudio(data.audio.url);
-        showToast('Audio erfolgreich generiert!', 'success');
+        setGeneratedAudio(data.audio.data); // Base64 data URL
+        setAudioDuration(data.audio.duration);
+        showToast(`Audio erfolgreich generiert! (${data.audio.duration}s)`, 'success');
       } else {
         throw new Error(data.error || 'Fehler beim Generieren des Audios');
       }
@@ -131,8 +133,33 @@ const SocialMediaAudio: React.FC = () => {
         <motion.div className="form-container" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <h3 style={{ color: 'white', marginBottom: '20px' }}>🎧 Audio Preview</h3>
           {generatedAudio ? (
-            <div><audio controls style={{ width: '100%', marginBottom: '16px' }}><source src={generatedAudio} type="audio/mpeg" /></audio>
-            <button style={{ width: '100%', padding: '12px', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', border: 'none', borderRadius: '8px', color: 'white', cursor: 'pointer' }}>📥 Audio Herunterladen</button></div>
+            <div>
+              <div style={{ marginBottom: '16px', padding: '12px', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '8px' }}>
+                <div style={{ fontSize: '14px', color: '#10b981', marginBottom: '8px' }}>✅ Audio erfolgreich generiert</div>
+                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>Dauer: {audioDuration} Sekunden</div>
+              </div>
+              <audio controls style={{ width: '100%', marginBottom: '16px' }}>
+                <source src={generatedAudio} type="audio/mpeg" />
+              </audio>
+              <a 
+                href={generatedAudio} 
+                download={`social-audio-${Date.now()}.mp3`}
+                style={{ 
+                  display: 'block',
+                  width: '100%', 
+                  padding: '12px', 
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', 
+                  border: 'none', 
+                  borderRadius: '8px', 
+                  color: 'white', 
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                  textDecoration: 'none'
+                }}
+              >
+                📥 Audio Herunterladen
+              </a>
+            </div>
           ) : (
             <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.5)', padding: '60px 20px' }}>
               <div style={{ fontSize: '64px', marginBottom: '12px' }}>🎵</div>

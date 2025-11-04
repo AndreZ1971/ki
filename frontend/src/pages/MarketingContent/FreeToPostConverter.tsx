@@ -13,21 +13,50 @@ const FreeToPostConverter: React.FC = () => {
   const [userSegment, setUserSegment] = useState('inactive');
   const [incentiveType, setIncentiveType] = useState('discount');
   const [conversionGoal, setConversionGoal] = useState('');
-  const [conversionData, setConversionData] = useState({ current: 12, target: 28, users: 450 });
-
-  const segments = [
-    { value: 'inactive', label: 'Inaktive Nutzer', icon: '😴', count: '1.2k', rate: '8%' },
-    { value: 'free-users', label: 'Kostenlos', icon: '🆓', count: '3.5k', rate: '12%' },
-    { value: 'trial-expired', label: 'Trial Abgelaufen', icon: '⏰', count: '450', rate: '22%' },
-    { value: 'low-engagement', label: 'Wenig Aktiv', icon: '📉', count: '890', rate: '15%' }
-  ];
+  const [conversionData, setConversionData] = useState({ current: 0, target: 0, users: 0, avgOrderValue: 0 });
+  const [segments, setSegments] = useState([
+    { value: 'inactive', label: 'Inaktive Kunden', icon: '😴', count: '...', rate: '...' },
+    { value: 'one-time', label: 'Einmalkäufer', icon: '🛒', count: '...', rate: '...' },
+    { value: 'abandoned-cart', label: 'Warenkorbabbrecher', icon: '🛒❌', count: '...', rate: '...' },
+    { value: 'low-value', label: 'Niedrigwert-Kunden', icon: '�', count: '...', rate: '...' }
+  ]);
 
   const incentives = [
     { value: 'discount', label: 'Rabatt-Code', icon: '🏷️', conversion: '+18%' },
-    { value: 'trial', label: 'Trial Verlängern', icon: '⏱️', conversion: '+25%' },
-    { value: 'feature', label: 'Exklusive Features', icon: '⭐', conversion: '+32%' },
-    { value: 'bundle', label: 'Bundle-Angebot', icon: '📦', conversion: '+28%' }
+    { value: 'free-shipping', label: 'Gratis Versand', icon: '📦', conversion: '+25%' },
+    { value: 'loyalty', label: 'Treueprogramm', icon: '⭐', conversion: '+32%' },
+    { value: 'bundle', label: 'Bundle-Angebot', icon: '🎁', conversion: '+28%' }
   ];
+
+  // Lade echte WooCommerce-Kundendaten
+  React.useEffect(() => {
+    const loadCustomerSegments = async () => {
+      try {
+        const response = await fetch('/api/marketing/conversion/segments');
+        const data = await response.json();
+        
+        if (data.success) {
+          setSegments([
+            { value: 'inactive', label: 'Inaktive Kunden', icon: '😴', count: data.data.inactive.count.toString(), rate: `${data.data.inactive.conversionRate}%` },
+            { value: 'one-time', label: 'Einmalkäufer', icon: '🛒', count: data.data.oneTime.count.toString(), rate: `${data.data.oneTime.conversionRate}%` },
+            { value: 'abandoned-cart', label: 'Warenkorbabbrecher', icon: '🛒❌', count: data.data.abandonedCart.count.toString(), rate: `${data.data.abandonedCart.conversionRate}%` },
+            { value: 'low-value', label: 'Niedrigwert-Kunden', icon: '�', count: data.data.lowValue.count.toString(), rate: `${data.data.lowValue.conversionRate}%` }
+          ]);
+          
+          setConversionData({
+            current: data.data.currentConversions || 0,
+            target: data.data.targetConversions || 0,
+            users: data.data.totalUsers || 0,
+            avgOrderValue: data.data.avgOrderValue || 0
+          });
+        }
+      } catch (err) {
+        console.error('Fehler beim Laden der Conversion-Daten:', err);
+      }
+    };
+    
+    loadCustomerSegments();
+  }, []);
 
   const handleConvert = async () => {
     if (!conversionGoal.trim()) {
@@ -39,18 +68,33 @@ const FreeToPostConverter: React.FC = () => {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:3000/api/marketing/conversion/free-to-paid', {
+      const response = await fetch('/api/marketing/conversion/create-campaign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userSegment, incentiveType, conversionGoal })
+        body: JSON.stringify({ 
+          userSegment, 
+          incentiveType, 
+          conversionGoal 
+        })
       });
       
       const data = await response.json();
       
-      if (data.success && data.data) {
-        setConversionData(data.data);
-        showToast('Conversion-Kampagne erfolgreich erstellt!', 'success');
+      if (data.success) {
+        showToast(data.message || 'Conversion-Kampagne erfolgreich erstellt!', 'success');
         setConversionGoal('');
+        
+        // Reload segments nach Kampagne
+        const reloadResponse = await fetch('/api/marketing/conversion/segments');
+        const reloadData = await reloadResponse.json();
+        if (reloadData.success) {
+          setConversionData({
+            current: reloadData.data.currentConversions || 0,
+            target: reloadData.data.targetConversions || 0,
+            users: reloadData.data.totalUsers || 0,
+            avgOrderValue: reloadData.data.avgOrderValue || 0
+          });
+        }
       } else {
         throw new Error(data.error || 'Fehler beim Erstellen der Conversion-Kampagne');
       }
@@ -74,8 +118,8 @@ const FreeToPostConverter: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1>� Free to Post Converter</h1>
-        <p>Konvertiere kostenlose Nutzer zu zahlenden Kunden</p>
+        <h1>🔄 Customer Conversion Tool</h1>
+        <p>Reaktiviere inaktive Kunden und steigere Wiederholungskäufe</p>
       </motion.div>
 
       {error && <ErrorMessage message={error} />}

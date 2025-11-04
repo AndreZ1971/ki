@@ -10,19 +10,43 @@ const ContentMonetized: React.FC = () => {
   const { handleBackToDashboard, loading, setLoading, error, setError } = useProductManagement();
   const { toasts, showToast } = useToast();
   
-  const [contentType, setContentType] = useState('course');
+  const [contentType, setContentType] = useState('digital');
   const [monetizationStrategy, setMonetizationStrategy] = useState('one-time');
   const [pricing, setPricing] = useState('');
   const [contentTitle, setContentTitle] = useState('');
-  const [revenue, setRevenue] = useState({ today: 245, week: 1850, month: 6240, total: 18950 });
+  const [revenue, setRevenue] = useState({ today: 0, week: 0, month: 0, total: 0, productCount: 0 });
+
+  // Lade echte WooCommerce Revenue-Daten
+  React.useEffect(() => {
+    const loadRevenueData = async () => {
+      try {
+        const response = await fetch('/api/marketing/content/revenue');
+        const data = await response.json();
+        
+        if (data.success) {
+          setRevenue({
+            today: data.data.today || 0,
+            week: data.data.week || 0,
+            month: data.data.month || 0,
+            total: data.data.total || 0,
+            productCount: data.data.productCount || 0
+          });
+        }
+      } catch (err) {
+        console.error('Fehler beim Laden der Revenue-Daten:', err);
+      }
+    };
+    
+    loadRevenueData();
+  }, []);
 
   const contentTypes = [
+    { value: 'digital', label: 'Digitales Produkt', icon: '💾', avgPrice: '€49' },
+    { value: 'downloadable', label: 'Download', icon: '�', avgPrice: '€29' },
+    { value: 'virtual', label: 'Virtuelles Produkt', icon: '🌐', avgPrice: '€79' },
+    { value: 'subscription', label: 'Abo-Produkt', icon: '�', avgPrice: '€19/Mo' },
     { value: 'course', label: 'Online-Kurs', icon: '🎓', avgPrice: '€149' },
-    { value: 'ebook', label: 'E-Book', icon: '📚', avgPrice: '€29' },
-    { value: 'template', label: 'Template', icon: '📄', avgPrice: '€49' },
-    { value: 'membership', label: 'Mitgliedschaft', icon: '👥', avgPrice: '€19/Mo' },
-    { value: 'coaching', label: 'Coaching', icon: '💼', avgPrice: '€199' },
-    { value: 'software', label: 'Software/SaaS', icon: '💻', avgPrice: '€99/Mo' }
+    { value: 'template', label: 'Template/Theme', icon: '🎨', avgPrice: '€59' }
   ];
 
   const strategies = [
@@ -42,21 +66,38 @@ const ContentMonetized: React.FC = () => {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:3000/api/marketing/content/monetize', {
+      const response = await fetch('/api/marketing/content/create-digital-product', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contentTitle, contentType, monetizationStrategy, pricing })
+        body: JSON.stringify({ 
+          contentTitle, 
+          contentType, 
+          monetizationStrategy, 
+          pricing: parseFloat(pricing) 
+        })
       });
       
       const data = await response.json();
       
-      if (data.success && data.revenue) {
-        setRevenue(data.revenue);
-        showToast('Content erfolgreich monetarisiert!', 'success');
+      if (data.success) {
+        showToast(data.message || 'Digitales Produkt erfolgreich erstellt!', 'success');
         setContentTitle('');
         setPricing('');
+        
+        // Reload revenue
+        const revenueResponse = await fetch('/api/marketing/content/revenue');
+        const revenueData = await revenueResponse.json();
+        if (revenueData.success) {
+          setRevenue({
+            today: revenueData.data.today || 0,
+            week: revenueData.data.week || 0,
+            month: revenueData.data.month || 0,
+            total: revenueData.data.total || 0,
+            productCount: revenueData.data.productCount || 0
+          });
+        }
       } else {
-        throw new Error(data.error || 'Fehler beim Monetarisieren des Contents');
+        throw new Error(data.error || 'Fehler beim Erstellen des Produkts');
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten';
@@ -78,8 +119,8 @@ const ContentMonetized: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1>� Content Monetized</h1>
-        <p>Monetarisiere deine Inhalte optimal</p>
+        <h1>💸 Digital Product Revenue</h1>
+        <p>Verwalte und analysiere digitale Produkte & Downloads</p>
       </motion.div>
 
       {error && <ErrorMessage message={error} />}
