@@ -58,9 +58,26 @@ import monitoringRoutes from './routes/app/api/monitoring/system';
 import path from 'path';
 
 // Umgebungsvariablen laden mit erweiterter Fehlerbehandlung
-// Load .env from backend directory (works from both backend/ and backend/dist/)
-const envPath = path.resolve(__dirname, '../.env');
-dotenv.config({ path: envPath });
+// Try multiple .env locations: backend/.env, root/.env, .env.production
+const envPaths = [
+  path.resolve(__dirname, '../.env'),        // backend/.env (local dev)
+  path.resolve(__dirname, '../../.env'),     // root/.env (docker)
+  path.resolve(__dirname, '../../.env.production')  // root/.env.production (docker prod)
+];
+
+let envLoaded = false;
+for (const envPath of envPaths) {
+  const result = dotenv.config({ path: envPath });
+  if (!result.error) {
+    console.log(`✅ .env geladen von: ${envPath}`);
+    envLoaded = true;
+    break;
+  }
+}
+
+if (!envLoaded) {
+  console.warn('⚠️ Keine .env Datei gefunden in:', envPaths);
+}
 
 // Error Handling Initialisierung
 setupErrorHandling();
