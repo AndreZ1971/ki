@@ -39,15 +39,3 @@ export async function executeOpenAI<T>(
     throw _error;
   }
 }
-
-// Verwendung:
-try {
-  const openai = getOpenAIClient();
-  // ... AI-Funktionen nutzen mit executeOpenAI() wrapper
-} catch (_error) {
-  if (_error instanceof Error) {
-    console.log('⚠️ OpenAI nicht verfügbar:', _error.message);
-  } else {
-    console.log('⚠️ OpenAI nicht verfügbar:', String(_error));
-  }
-}
