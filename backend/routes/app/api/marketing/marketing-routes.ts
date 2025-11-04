@@ -138,27 +138,64 @@ export default async function marketingRoutes(fastify: FastifyInstance) {
     }
   );
 
-  // 3. Social Media Audio Generator
+  // 3. Social Media Audio Generator (OpenAI TTS)
   fastify.post<{ Body: AudioRequest }>(
     '/social/audio',
     async (request: FastifyRequest<{ Body: AudioRequest }>, reply: FastifyReply) => {
       const { audioText, voice, platform } = request.body;
 
       try {
-        // Simuliere Audio-Generierung
-        const duration = Math.min(audioText.length / 10, platform === 'tiktok' ? 180 : 60);
+        if (!process.env.OPENAI_API_KEY) {
+          throw new Error('OpenAI API Key nicht konfiguriert');
+        }
+
+        // Map voice zu OpenAI TTS voices
+        const voiceMap: Record<string, string> = {
+          'neutral': 'alloy',
+          'friendly': 'nova',
+          'professional': 'onyx',
+          'energetic': 'fable'
+        };
+
+        const openaiVoice = voiceMap[voice] || 'alloy';
+
+        // OpenAI TTS API Call
+        const ttsResponse = await fetch('https://api.openai.com/v1/audio/speech', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: 'tts-1',
+            input: audioText,
+            voice: openaiVoice,
+            response_format: 'mp3'
+          })
+        });
+
+        if (!ttsResponse.ok) {
+          throw new Error(`OpenAI TTS Error: ${ttsResponse.status}`);
+        }
+
+        // Konvertiere Audio-Stream zu Base64
+        const audioBuffer = await ttsResponse.arrayBuffer();
+        const base64Audio = Buffer.from(audioBuffer).toString('base64');
+        
+        // Berechne ungefähre Dauer (ca. 150 Wörter pro Minute)
+        const wordCount = audioText.split(/\s+/).length;
+        const estimatedDuration = Math.round((wordCount / 150) * 60);
         
         return reply.send({
           success: true,
           audio: {
             id: `audio_${Date.now()}`,
-            url: `https://example.com/audio/${Date.now()}.mp3`, // Simulierte URL
-            duration: Math.round(duration),
-            voice,
+            data: `data:audio/mp3;base64,${base64Audio}`,
+            duration: estimatedDuration,
+            voice: openaiVoice,
             platform,
             text: audioText,
             format: 'mp3',
-            sampleRate: 44100,
             generatedAt: new Date().toISOString()
           }
         });
@@ -167,7 +204,7 @@ export default async function marketingRoutes(fastify: FastifyInstance) {
         fastify.log.error(_error);
         return reply.status(500).send({
           success: false,
-          error: 'Audio-Generierung fehlgeschlagen'
+          error: _error instanceof Error ? _error.message : 'Audio-Generierung fehlgeschlagen'
         });
       }
     }
