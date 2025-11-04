@@ -4,6 +4,7 @@ import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import dotenv from 'dotenv';
 import Fastify from 'fastify';
+import fs from 'fs';
 
 // 🔥 ERROR HANDLING SYSTEM
 import { setupErrorHandling } from './error-handling';
@@ -181,8 +182,9 @@ async function buildServer() {
     });
 
     // 🔥 STATIC FILES (Frontend) - Production Only
+    const staticPath = path.join(__dirname, '../public');
+    
     if (process.env.NODE_ENV === 'production') {
-      const staticPath = path.join(__dirname, '../public');
       console.log(`📁 Serving static files from: ${staticPath}`);
       
       // Dynamic import for @fastify/static
@@ -198,11 +200,9 @@ async function buildServer() {
           }
         }
       });
-      
-      console.log('✅ Frontend wird als Static Files geserved');
-    }
 
-    // 🔥 KORRIGIERTE ROUTE REGISTRATION
+      console.log('✅ Frontend wird als Static Files geserved');
+    }    // 🔥 KORRIGIERTE ROUTE REGISTRATION
     await server.register(shopMetricsRoutes, { prefix: '/api/analytics/metrics' });
     console.log('✅ Shop Metrics Routes erfolgreich registriert');
 
@@ -351,7 +351,9 @@ async function buildServer() {
       
       // All other routes → SPA (index.html)
       if (process.env.NODE_ENV === 'production') {
-        return reply.type('text/html').sendFile('index.html');
+        const indexPath = path.join(staticPath, 'index.html');
+        const indexHtml = await fs.promises.readFile(indexPath, 'utf-8');
+        return reply.type('text/html').send(indexHtml);
       } else {
         return reply.status(404).send({ error: 'Not found (dev mode)' });
       }
