@@ -4,8 +4,10 @@
  */
 
 import axios from 'axios';
+// @ts-ignore - No type definitions available
 import googleTrends from 'google-trends-api';
 import { logger } from '../logger';
+// @ts-ignore - No type definitions available
 import Parser from 'rss-parser';
 
 // ============================================================================
@@ -301,7 +303,7 @@ export class TrendAggregatorService {
       
       const feed = await this.rssParser.parseURL(rssUrl);
       
-      const recentArticles = feed.items.filter(item => {
+      const recentArticles = feed.items.filter((item: any) => {
         const pubDate = new Date(item.pubDate || '');
         const dayAgo = Date.now() - 24 * 60 * 60 * 1000;
         return pubDate.getTime() > dayAgo;

@@ -119,6 +119,7 @@
     "openai": "^6.6.0",
     "pino": "^10.0.0",
     "prom-client": "^15.0.0",
+    "rss-parser": "^3.13.0",
     "zod": "^4.1.12"
   },
   "devDependencies": {
