@@ -338,21 +338,9 @@ async function buildServer() {
       };
     });
 
-    // 🔥 KORRIGIERT: 404 Handler ohne routes Property
-    server.setNotFoundHandler((request, reply) => {
-      const availableEmailRoutes = [
-        'GET /api/email/send',
-        'GET /api/email/test-email-config', 
-        'GET /api/email/test'
-      ];
-      
-      reply.status(404).send({
-        success: false,
-        error: 'Route not found',
-        path: request.url,
-        availableEmailRoutes: availableEmailRoutes
-      });
-    });
+    // 🔥 NOT FOUND HANDLER - Removed to avoid conflict with @fastify/static
+    // @fastify/static already sets a NotFoundHandler for serving frontend
+    // If custom 404 is needed, it must be registered BEFORE @fastify/static
 
     return server;
 
