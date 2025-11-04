@@ -26,7 +26,7 @@ const ShopMetrics: React.FC = () => {
 
   const fetchMetrics = async () => {
     try {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/analytics/metrics/dashboard`);
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/analytics/metrics/dashboard`);
       const data = await response.json();
       
       if (data.success) {
