@@ -58,7 +58,7 @@ export default async function conversionRoutes(server: FastifyInstance) {
       };
 
       let totalOrderValue = 0;
-      let totalOrders = orders.length;
+      const totalOrders = orders.length;
 
       customers.forEach((customer) => {
         const customerOrders = customer.orders;
@@ -170,26 +170,30 @@ export default async function conversionRoutes(server: FastifyInstance) {
         const now = new Date();
         const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
 
-        let targetCustomers = customers.filter((customer) => {
+        const targetCustomers = customers.filter((customer) => {
           const customerOrders = customer.orders;
           const lastOrderDate = customerOrders.length > 0 
             ? new Date(Math.max(...customerOrders.map((o: any) => new Date(o.date_created).getTime())))
             : null;
 
           switch (userSegment) {
-            case 'inactive':
+            case 'inactive': {
               return !lastOrderDate || lastOrderDate < ninetyDaysAgo;
-            case 'one-time':
+            }
+            case 'one-time': {
               return customerOrders.length === 1;
-            case 'low-value':
+            }
+            case 'low-value': {
               const customerValue = customerOrders.reduce((sum: number, order: any) => 
                 sum + parseFloat(order.total), 0
               );
               const avgValue = orders.reduce((sum: number, o: any) => sum + parseFloat(o.total), 0) / orders.length;
               return customerValue < avgValue;
-            case 'abandoned-cart':
+            }
+            case 'abandoned-cart': {
               // Simuliert - könnte mit WooCommerce Plugins erweitert werden
               return Math.random() > 0.85;
+            }
             default:
               return true;
           }
