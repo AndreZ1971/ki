@@ -190,15 +190,12 @@ async function buildServer() {
       await server.register(fastifyStatic.default, {
         root: staticPath,
         prefix: '/',
-        decorateReply: false
-      });
-      
-      // SPA fallback - alle nicht-API routes → index.html
-      server.setNotFoundHandler((request, reply) => {
-        if (!request.url.startsWith('/api') && !request.url.startsWith('/documentation')) {
-          reply.sendFile('index.html');
-        } else {
-          reply.status(404).send({ error: 'Route not found', path: request.url });
+        decorateReply: false,
+        wildcard: false, // Disable automatic wildcard to allow custom 404 handler
+        setHeaders: (res: any, path: string) => {
+          if (path.endsWith('.html')) {
+            res.setHeader('Cache-Control', 'no-cache');
+          }
         }
       });
       
@@ -338,9 +335,27 @@ async function buildServer() {
       };
     });
 
-    // 🔥 NOT FOUND HANDLER - Removed to avoid conflict with @fastify/static
-    // @fastify/static already sets a NotFoundHandler for serving frontend
-    // If custom 404 is needed, it must be registered BEFORE @fastify/static
+    // 🔥 SPA FALLBACK - Serve index.html for all non-API routes
+    // This must be registered AFTER all other routes
+    server.setNotFoundHandler(async (request, reply) => {
+      const url = request.url;
+      
+      // API routes → 404 JSON
+      if (url.startsWith('/api/') || url.startsWith('/documentation') || url.startsWith('/health')) {
+        return reply.status(404).send({ 
+          success: false,
+          error: 'Route not found',
+          path: url 
+        });
+      }
+      
+      // All other routes → SPA (index.html)
+      if (process.env.NODE_ENV === 'production') {
+        return reply.type('text/html').sendFile('index.html');
+      } else {
+        return reply.status(404).send({ error: 'Not found (dev mode)' });
+      }
+    });
 
     return server;
 
