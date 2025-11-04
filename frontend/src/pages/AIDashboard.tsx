@@ -438,7 +438,7 @@ const AIDashboard: React.FC = () => {
           description: 'Deutsche Content-Erstellung für lokales Marketing',
           endpoint: 'marketing/content/german',
           icon: '🇩🇪',
-          pageUrl: '/marketing/german-content-generator'
+          pageUrl: '/marketing/german-content'
         },
         {
           id: 'email-marketing-automation',
@@ -446,7 +446,7 @@ const AIDashboard: React.FC = () => {
           description: 'Komplette Email-Marketing Automatisierung',
           endpoint: 'marketing/email/automate',
           icon: '✉️',
-          pageUrl: '/marketing/email-marketing-automation'
+          pageUrl: '/marketing/email-automation'
         },
         {
           id: 'social-media-audio',
@@ -454,7 +454,7 @@ const AIDashboard: React.FC = () => {
           description: 'Audio-Beiträge für Social Media automatisch erstellen',
           endpoint: 'marketing/social/audio',
           icon: '🎵',
-          pageUrl: '/marketing/social-media-audio'
+          pageUrl: '/marketing/social-audio'
         },
         {
           id: 'social-media-poster',
@@ -462,7 +462,7 @@ const AIDashboard: React.FC = () => {
           description: 'Automatisches Posting auf Social Media Kanäle',
           endpoint: 'marketing/social/poster',
           icon: '📱',
-          pageUrl: '/marketing/social-media-poster'
+          pageUrl: '/marketing/social-poster'
         },
         {
           id: 'free-to-post-converter',
@@ -470,7 +470,7 @@ const AIDashboard: React.FC = () => {
           description: 'Konvertiere Free-User zu aktiven Postern',
           endpoint: 'marketing/conversion/free-to-paid',
           icon: '🆓',
-          pageUrl: '/marketing/free-to-post-converter'
+          pageUrl: '/marketing/free-to-post'
         },
         {
           id: 'content-monetized',

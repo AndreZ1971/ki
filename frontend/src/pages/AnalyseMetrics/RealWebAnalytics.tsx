@@ -42,21 +42,9 @@ const RealWebAnalytics = () => {
         setLoading(true);
         setError(null);
         
-        // ZUERST VERSUCHEN WIR ECHTE DATEN ZU HOLEN
-        const response = await fetch(`http://localhost:3000/api/analytics/web?range=${timeRange}`);
-        
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success) {
-            setAnalyticsData(data.data);
-          } else {
-            throw new Error('API returned error');
-          }
-        } else {
-          throw new Error('API nicht verfügbar');
-        }
-      } catch (err) {
-        console.log('Verwende realistische Mock-Daten für Web Analytics');
+        // VERWENDE MOCK-DATEN FÜR MVP/DEMO
+        // TODO: Backend-Endpoint /api/analytics/web implementieren für echte Analytics-Daten
+        console.log('📊 Verwende realistische Mock-Daten für Web Analytics (MVP)');
         
         // REALISTISCHE MOCK-DATEN basierend auf einem typischen WooCommerce Shop
         const mockData: AnalyticsData = {
