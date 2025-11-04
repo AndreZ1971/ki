@@ -89,7 +89,7 @@ const AIEmailGenerator: React.FC = () => {
   // 🔥 NEU: API Status prüfen
   const checkApiStatus = async () => {
     try {
-      const response = await fetch('http://localhost:3000/health');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/health`);
       if (response.ok) {
         setApiStatus('connected');
       } else {
@@ -103,7 +103,7 @@ const AIEmailGenerator: React.FC = () => {
   // 🔥 NEU: Echte Kundendaten laden
   const loadRealCustomers = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/woocommerce/customers');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/woocommerce/customers`);
       const result = await response.json();
       
       if (result.success) {
@@ -129,7 +129,7 @@ const AIEmailGenerator: React.FC = () => {
   // 🔥 NEU: Echte Abonnenten-Daten laden
   const loadRealSubscribers = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/woocommerce/subscribers');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/woocommerce/subscribers`);
       const result = await response.json();
       
       if (result.success) {
@@ -163,7 +163,7 @@ const AIEmailGenerator: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/api/ai/email/email-draft', {
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/ai/email/email-draft`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -207,7 +207,7 @@ const AIEmailGenerator: React.FC = () => {
     try {
       const selectedCustomerData = customers.filter(c => selectedCustomers.includes(c.id));
       
-      const response = await fetch('http://localhost:3000/api/email/send', {
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/email/send`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
