@@ -149,7 +149,7 @@ const Settings = () => {
   const loadCredentials = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:3000/api/settings/connection');
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/settings/connection`);
       if (!response.ok) throw new Error('Fehler beim Laden');
       const data = await response.json();
       
@@ -175,7 +175,7 @@ const Settings = () => {
     setConnectionMessage('');
     
     try {
-      const response = await fetch('http://localhost:3000/api/settings/connection/test', {
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/settings/connection/test`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),
@@ -209,7 +209,7 @@ const Settings = () => {
     try {
       setSaving(true);
       
-      const response = await fetch('http://localhost:3000/api/settings/connection', {
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/settings/connection`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),

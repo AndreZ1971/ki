@@ -36,7 +36,7 @@ const MLDashboard: React.FC = () => {
   const fetchMLData = async () => {
     try {
       // Fetch ML status
-      const statusResponse = await fetch('http://localhost:3000/api/ml/status');
+  const statusResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/ml/status`);
       const statusData = await statusResponse.json();
       setMlStatus(statusData);
 

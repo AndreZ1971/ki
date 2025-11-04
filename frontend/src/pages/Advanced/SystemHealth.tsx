@@ -38,7 +38,8 @@ const SystemHealth: React.FC = () => {
 
     try {
       // ✅ Hole ECHTE System-Metriken vom Backend
-      const response = await fetch('http://localhost:3000/api/monitoring/system/metrics');
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+  const response = await fetch(`${apiUrl}/monitoring/system/metrics`);
       
       if (!response.ok) {
         throw new Error('Konnte System-Metriken nicht laden');
@@ -63,7 +64,7 @@ const SystemHealth: React.FC = () => {
       });
       
       // Lade auch Services-Status
-      const servicesResponse = await fetch('http://localhost:3000/api/monitoring/services/status');
+  const servicesResponse = await fetch(`${apiUrl}/monitoring/services/status`);
       if (servicesResponse.ok) {
         const servicesData = await servicesResponse.json();
         if (servicesData.success) {

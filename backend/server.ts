@@ -378,18 +378,22 @@ const start = async () => {
       host: '0.0.0.0' 
     });
     
-    console.log('✅ Server läuft auf http://localhost:3000');
-    console.log('📚 Documentation: http://localhost:3000/documentation');
-    console.log('❤️  Health Check: http://localhost:3000/health');
-    console.log('⚕️  System Health: http://localhost:3000/api/system/health');
-    console.log('📊 Shop Metrics: http://localhost:3000/api/analytics/metrics');
-    console.log('📧 AI Email: http://localhost:3000/api/ai/email');
-    console.log('🛒 Products: http://localhost:3000/api/products');
-    console.log('👥 Customers: http://localhost:3000/api/woocommerce/customers');
-    console.log('📨 Email Sender: http://localhost:3000/api/email/send');
-    console.log('🧪 Email Test: http://localhost:3000/api/email/test-email-config');
-    console.log('🔍 Debug Routes: http://localhost:3000/api/debug/routes');
-    console.log('📈 Analytics: http://localhost:3000/api/analytics');
+
+      const host = process.env.HOST || 'localhost';
+      const port = process.env.PORT || 3000;
+      const baseUrl = `http://${host}:${port}`;
+      console.log(`✅ Server läuft auf ${baseUrl}`);
+      console.log(`📚 Documentation: ${baseUrl}/documentation`);
+      console.log(`❤️  Health Check: ${baseUrl}/health`);
+      console.log(`⚕️  System Health: ${baseUrl}/api/system/health`);
+      console.log(`📊 Shop Metrics: ${baseUrl}/api/analytics/metrics`);
+      console.log(`📧 AI Email: ${baseUrl}/api/ai/email`);
+      console.log(`🛒 Products: ${baseUrl}/api/products`);
+      console.log(`👥 Customers: ${baseUrl}/api/woocommerce/customers`);
+      console.log(`📨 Email Sender: ${baseUrl}/api/email/send`);
+      console.log(`🧪 Email Test: ${baseUrl}/api/email/test-email-config`);
+      console.log(`🔍 Debug Routes: ${baseUrl}/api/debug/routes`);
+      console.log(`📈 Analytics: ${baseUrl}/api/analytics`);
 
   } catch (_err) {
     console.error('💥 Server Start fehlgeschlagen:', _err);

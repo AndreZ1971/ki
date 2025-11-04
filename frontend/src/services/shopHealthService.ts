@@ -1,7 +1,9 @@
 // services/shopHealthService.ts
 
+const API_URL = import.meta.env.VITE_API_URL;
 const request = async <T>(url: string, init?: RequestInit): Promise<T> => {
-  const response = await fetch(url, {
+  const fullUrl = url.startsWith('http') ? url : `${API_URL}${url}`;
+  const response = await fetch(fullUrl, {
     headers: {
       'Content-Type': 'application/json',
       ...(init?.headers || {})
@@ -63,18 +65,18 @@ export interface SEOAnalysisResponse {
 
 export const shopHealthService = {
   clearCache: async (): Promise<CacheClearResponse> => {
-    return request<CacheClearResponse>('/api/health/clear-cache', { method: 'POST' });
+  return request<CacheClearResponse>('/api/health/clear-cache', { method: 'POST' });
   },
 
   generatePerformanceReport: async (): Promise<PerformanceReportResponse> => {
-    return request<PerformanceReportResponse>('/api/health/performance-report', { method: 'GET' });
+  return request<PerformanceReportResponse>('/api/health/performance-report', { method: 'GET' });
   },
 
   runSecurityScan: async (): Promise<SecurityScanResponse> => {
-    return request<SecurityScanResponse>('/api/health/security-scan', { method: 'POST' });
+  return request<SecurityScanResponse>('/api/health/security-scan', { method: 'POST' });
   },
 
   analyzeSEO: async (): Promise<SEOAnalysisResponse> => {
-    return request<SEOAnalysisResponse>('/api/health/seo-analysis', { method: 'POST' });
+  return request<SEOAnalysisResponse>('/api/health/seo-analysis', { method: 'POST' });
   }
 };

@@ -43,7 +43,7 @@ const SocialMediaPoster: React.FC = () => {
 
   // Check connection status on mount
   React.useEffect(() => {
-    fetch('http://localhost:3000/api/auth/status')
+  fetch(`${import.meta.env.VITE_API_URL}/api/auth/status`)
       .then(res => res.json())
       .then(data => {
         if (data.success) {
@@ -80,7 +80,7 @@ const SocialMediaPoster: React.FC = () => {
       window.open('https://buffer.com/app', '_blank');
       showToast(`Verbinde deinen ${accountPlatform.toUpperCase()} Account in Buffer und lade dann die Seite neu!`, 'info');
     } else {
-      window.location.href = `http://localhost:3000/api/auth/${accountPlatform}`;
+  window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/${accountPlatform}`;
     }
   };  const handleCreatePost = async () => {
     if (!postContent.trim()) {
@@ -100,10 +100,10 @@ const SocialMediaPoster: React.FC = () => {
 
     try {
         const endpoint = useWebhook
-          ? 'http://localhost:3000/api/social/webhook/post'
+          ? `${import.meta.env.VITE_API_URL}/api/social/webhook/post`
           : useBuffer 
-            ? 'http://localhost:3000/api/social/buffer/post'
-            : 'http://localhost:3000/api/social/post';
+            ? `${import.meta.env.VITE_API_URL}/api/social/buffer/post`
+            : `${import.meta.env.VITE_API_URL}/api/social/post`;
 
         const response = await fetch(endpoint, {
           method: 'POST',
