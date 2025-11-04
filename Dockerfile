@@ -37,6 +37,7 @@ COPY --from=backend-builder /app/backend/dist ./dist
     # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodeuser -u 1001 -G nodejs && \
+    mkdir -p /app/data/dlq /app/logs && \
     chown -R nodeuser:nodejs /app
 
 USER nodeuser
