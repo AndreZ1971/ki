@@ -666,7 +666,7 @@ const AIDashboard: React.FC = () => {
           >
             <strong>⚠️ Fehler: </strong>{error}
             <br />
-            <small>Stelle sicher, dass die API unter http://localhost:3000 erreichbar ist</small>
+            <small>Stelle sicher, dass die API unter {import.meta.env.VITE_API_URL || 'http://localhost:3000'} erreichbar ist</small>
           </motion.div>
         )}
       </AnimatePresence>
