@@ -168,7 +168,7 @@ async function buildServer() {
       const staticPath = path.join(__dirname, '../public');
       console.log(`📁 Serving static files from: ${staticPath}`);
       
-      // @ts-ignore - Fastify static import
+      // @ts-expect-error - Fastify static import
       const fastifyStatic = await import('@fastify/static');
       await server.register(fastifyStatic.default, {
         root: staticPath,
