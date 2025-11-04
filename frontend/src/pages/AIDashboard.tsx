@@ -36,7 +36,8 @@ const AIDashboard: React.FC = () => {
         }
         setError(null);
         
-        const response = await fetch('http://localhost:3000/api/analytics/metrics/dashboard');
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+  const response = await fetch(`${apiUrl}/analytics/metrics/dashboard`);
         
         if (!response.ok) {
           throw new Error(`API Error: ${response.status}`);
@@ -114,7 +115,8 @@ const AIDashboard: React.FC = () => {
     try {
       setActiveTool(toolId);
       
-      const response = await fetch(`http://localhost:3000/api/${endpoint}`, {
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+  const response = await fetch(`${apiUrl}/${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

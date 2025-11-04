@@ -41,16 +41,16 @@ export const MLDashboardWidget: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const fetchMLStatus = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/api/ml/status');
-      const data = await response.json();
-      setMlStatus(data);
-    } catch (_error) {
-      console.error('Failed to fetch ML status:', _error);
-    }
-  };
-
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const fetchMLStatus = async () => {
+  try {
+    const response = await fetch(`${apiUrl}/ml/status`);
+    const data = await response.json();
+    setMlStatus(data);
+  } catch (_error) {
+    console.error('Failed to fetch ML status:', _error);
+  }
+};
   const fetchMLStats = async () => {
     try {
       // Mock stats for now - replace with real API call later
