@@ -13,16 +13,39 @@ const EmailMarketingAutomation: React.FC = () => {
   
   const [campaignName, setCampaignName] = useState('');
   const [emailSubject, setEmailSubject] = useState('');
+  const [emailContent, setEmailContent] = useState('');
   const [targetSegment, setTargetSegment] = useState('all');
   const [sendTime, setSendTime] = useState('immediate');
   const [campaignStats, setCampaignStats] = useState({ sent: 0, opened: 0, clicked: 0 });
+  const [segments, setSegments] = useState([
+    { value: 'all', label: 'Alle Kunden', icon: '👥', count: '...' },
+    { value: 'new', label: 'Neue Kunden', icon: '🆕', count: '...' },
+    { value: 'active', label: 'Aktive Kunden', icon: '⭐', count: '...' },
+    { value: 'inactive', label: 'Inaktive Kunden', icon: '😴', count: '...' }
+  ]);
 
-  const segments = [
-    { value: 'all', label: 'Alle Kunden', icon: '👥', count: '1.2k' },
-    { value: 'new', label: 'Neue Kunden', icon: '🆕', count: '320' },
-    { value: 'active', label: 'Aktive Kunden', icon: '⭐', count: '650' },
-    { value: 'inactive', label: 'Inaktive Kunden', icon: '😴', count: '230' }
-  ];
+  // Lade echte Kundendaten aus WooCommerce
+  React.useEffect(() => {
+    const loadCustomerSegments = async () => {
+      try {
+        const response = await fetch('/api/customers/segments');
+        const data = await response.json();
+        
+        if (data.success) {
+          setSegments([
+            { value: 'all', label: 'Alle Kunden', icon: '👥', count: data.data.all.toString() },
+            { value: 'new', label: 'Neue Kunden', icon: '🆕', count: data.data.new.toString() },
+            { value: 'active', label: 'Aktive Kunden', icon: '⭐', count: data.data.active.toString() },
+            { value: 'inactive', label: 'Inaktive Kunden', icon: '😴', count: data.data.inactive.toString() }
+          ]);
+        }
+      } catch (err) {
+        console.error('Fehler beim Laden der Kundensegmente:', err);
+      }
+    };
+    
+    loadCustomerSegments();
+  }, []);
 
   const scheduleOptions = [
     { value: 'immediate', label: 'Sofort senden', icon: '⚡', description: 'Direkt nach Erstellung' },
@@ -31,7 +54,7 @@ const EmailMarketingAutomation: React.FC = () => {
   ];
 
   const handleCreateCampaign = async () => {
-    if (!campaignName.trim() || !emailSubject.trim()) {
+    if (!campaignName.trim() || !emailSubject.trim() || !emailContent.trim()) {
       showToast('Bitte fülle alle Pflichtfelder aus', 'error');
       return;
     }
@@ -40,28 +63,34 @@ const EmailMarketingAutomation: React.FC = () => {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:3000/api/marketing/email/automate', {
+      const response = await fetch('/api/marketing/email/send-campaign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ campaignName, emailSubject, targetSegment, sendTime })
+        body: JSON.stringify({ 
+          campaignName, 
+          emailSubject, 
+          emailContent,
+          targetSegment, 
+          sendTime 
+        })
       });
       
       const data = await response.json();
       
-      if (data.success && data.campaign) {
-        setCampaignStats(data.stats || {
-          sent: 0,
+      if (data.success) {
+        setCampaignStats({
+          sent: data.stats?.sent || 0,
           opened: 0,
-          clicked: 0,
-          converted: 0
+          clicked: 0
         });
-        showToast(`Kampagne "${data.campaign.name}" erfolgreich erstellt!`, 'success');
+        showToast(data.message || `E-Mails erfolgreich gesendet!`, 'success');
         setCampaignName('');
         setEmailSubject('');
+        setEmailContent('');
         setTargetSegment('all');
-        setSendTime('');
+        setSendTime('immediate');
       } else {
-        throw new Error(data.error || 'Fehler beim Erstellen der Kampagne');
+        throw new Error(data.error || 'Fehler beim Senden der E-Mails');
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten';
@@ -102,6 +131,18 @@ const EmailMarketingAutomation: React.FC = () => {
           <div className="form-group">
             <label>E-Mail Betreff *</label>
             <input type="text" value={emailSubject} onChange={(e) => setEmailSubject(e.target.value)} placeholder="z.B. Willkommen bei unserem Shop!" className="form-input" />
+          </div>
+
+          <div className="form-group">
+            <label>E-Mail Inhalt *</label>
+            <textarea 
+              value={emailContent} 
+              onChange={(e) => setEmailContent(e.target.value)} 
+              placeholder="Ihre E-Mail Nachricht..." 
+              className="form-input" 
+              rows={6}
+              style={{ resize: 'vertical', fontFamily: 'inherit' }}
+            />
           </div>
 
           <div className="form-group">

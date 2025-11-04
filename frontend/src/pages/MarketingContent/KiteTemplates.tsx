@@ -38,7 +38,7 @@ const KiteTemplates: React.FC = () => {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:3000/api/marketing/templates', {
+      const response = await fetch('/api/marketing/templates/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ templateCategory, industry, customization })
@@ -59,6 +59,30 @@ const KiteTemplates: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDownloadTemplate = () => {
+    if (!selectedTemplate) return;
+
+    const element = document.createElement('a');
+    const file = new Blob([selectedTemplate.content], { type: 'text/html' });
+    element.href = URL.createObjectURL(file);
+    element.download = `${selectedTemplate.name.replace(/\s+/g, '-').toLowerCase()}.html`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+    showToast('Template heruntergeladen!', 'success');
+  };
+
+  const handleUseTemplate = () => {
+    if (!selectedTemplate) return;
+    
+    // Kopiere Template-Code in Zwischenablage
+    navigator.clipboard.writeText(selectedTemplate.content).then(() => {
+      showToast('Template in Zwischenablage kopiert!', 'success');
+    }).catch(() => {
+      showToast('Fehler beim Kopieren', 'error');
+    });
   };
 
   return (
@@ -128,14 +152,40 @@ const KiteTemplates: React.FC = () => {
         <motion.div className="form-container" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <h3 style={{ color: 'white', marginBottom: '20px' }}>📄 Template Preview</h3>
           {selectedTemplate ? (
-            <div><div style={{ padding: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', marginBottom: '12px' }}>
-              <h4 style={{ color: 'white', marginBottom: '8px' }}>{selectedTemplate.name}</h4>
-              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '12px', margin: 0 }}>{selectedTemplate.description}</p>
+            <div>
+              <div style={{ padding: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', marginBottom: '12px' }}>
+                <h4 style={{ color: 'white', marginBottom: '8px' }}>{selectedTemplate.name}</h4>
+                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '12px', marginBottom: '12px' }}>{selectedTemplate.description}</p>
+                <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)' }}>
+                  Kategorie: {selectedTemplate.category} • Branche: {selectedTemplate.industry}
+                </div>
+              </div>
+
+              {/* Preview iFrame */}
+              <div style={{ marginBottom: '12px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', overflow: 'hidden', height: '300px' }}>
+                <iframe
+                  srcDoc={selectedTemplate.content}
+                  style={{ width: '100%', height: '100%', border: 'none', background: 'white' }}
+                  title="Template Preview"
+                  sandbox="allow-same-origin"
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
+                <button 
+                  onClick={handleUseTemplate}
+                  style={{ padding: '12px', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', border: 'none', borderRadius: '8px', color: 'white', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}
+                >
+                  📋 In Zwischenablage
+                </button>
+                <button 
+                  onClick={handleDownloadTemplate}
+                  style={{ padding: '12px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', border: 'none', borderRadius: '8px', color: 'white', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}
+                >
+                  📥 Download HTML
+                </button>
+              </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
-              <button style={{ padding: '10px', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', border: 'none', borderRadius: '8px', color: 'white', cursor: 'pointer', fontSize: '12px' }}>✔️ Verwenden</button>
-              <button style={{ padding: '10px', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '8px', color: 'white', cursor: 'pointer', fontSize: '12px' }}>📥 Download</button>
-            </div></div>
           ) : (
             <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.5)', padding: '60px 20px' }}>
               <div style={{ fontSize: '64px', marginBottom: '12px' }}>🎨</div>
