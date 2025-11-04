@@ -2,7 +2,8 @@
 // Trend Forecasting: ML vs. Google Trends
 
 import { MLPrediction, MLService } from '../mlService.js';
-/// <reference path="../../types/google-trends-api.d.ts" />
+// Types are defined in ../../types/google-trends-api.d.ts
+// @ts-ignore - No type definitions available
 import googleTrends from 'google-trends-api';
 import { logger } from '../../logger.js';
 import { getOpenAIClient } from '../../utils/openai.js';
