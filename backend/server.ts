@@ -31,6 +31,16 @@ import freebieRoutes from './routes/app/api/products/freebies';
 
 // 🔥 MARKETING ROUTES
 import marketingRoutes from './routes/app/api/marketing/marketing-routes';
+import emailMarketingRoutes from './routes/app/api/marketing/email-marketing';
+import conversionRoutes from './routes/app/api/marketing/conversion-routes';
+import contentRoutes from './routes/app/api/marketing/content-routes';
+import templateRoutes from './routes/app/api/marketing/template-routes';
+
+// 🔥 SOCIAL MEDIA ROUTES
+import oauthRoutes from './routes/app/api/social/oauth-routes';
+import postRoutes from './routes/app/api/social/post-routes';
+import bufferRoutes from './routes/app/api/social/buffer-routes';
+import webhookRoutes from './routes/app/api/social/webhook-routes';
 
 // 🔥 ML CONFIGURATION ROUTES
 import mlConfigRoutes from './routes/app/api/ml/config';
@@ -153,6 +163,31 @@ async function buildServer() {
       methods: ['GET', 'POST', 'PUT', 'DELETE']
     });
 
+    // 🔥 STATIC FILES (Frontend) - Production Only
+    if (process.env.NODE_ENV === 'production') {
+      const staticPath = path.join(__dirname, '../public');
+      console.log(`📁 Serving static files from: ${staticPath}`);
+      
+      // @ts-ignore - Fastify static import
+      const fastifyStatic = await import('@fastify/static');
+      await server.register(fastifyStatic.default, {
+        root: staticPath,
+        prefix: '/',
+        decorateReply: false
+      });
+      
+      // SPA fallback - alle nicht-API routes → index.html
+      server.setNotFoundHandler((request, reply) => {
+        if (!request.url.startsWith('/api') && !request.url.startsWith('/documentation')) {
+          reply.sendFile('index.html');
+        } else {
+          reply.status(404).send({ error: 'Route not found', path: request.url });
+        }
+      });
+      
+      console.log('✅ Frontend wird als Static Files geserved');
+    }
+
     // 🔥 KORRIGIERTE ROUTE REGISTRATION
     await server.register(shopMetricsRoutes, { prefix: '/api/analytics/metrics' });
     console.log('✅ Shop Metrics Routes erfolgreich registriert');
@@ -222,6 +257,31 @@ async function buildServer() {
     // 🔥 MARKETING ROUTES
     await server.register(marketingRoutes, { prefix: '/api/marketing' });
     console.log('✅ Marketing Routes erfolgreich registriert');
+    
+    await server.register(emailMarketingRoutes); // Already has full paths
+    console.log('✅ Email Marketing Routes erfolgreich registriert');
+    
+    await server.register(conversionRoutes); // Already has full paths
+    console.log('✅ Conversion Routes erfolgreich registriert');
+    
+    await server.register(contentRoutes); // Already has full paths
+    console.log('✅ Content Routes erfolgreich registriert');
+    
+    await server.register(templateRoutes); // Already has full paths
+    console.log('✅ Template Routes erfolgreich registriert');
+
+    // 🔥 SOCIAL MEDIA ROUTES (OAuth + Posting)
+    await server.register(oauthRoutes, { prefix: '/api' }); // OAuth endpoints like /api/auth/facebook
+    console.log('✅ Social Media OAuth Routes erfolgreich registriert');
+    
+    await server.register(postRoutes, { prefix: '/api' }); // Post endpoints like /api/social/post
+    console.log('✅ Social Media Post Routes erfolgreich registriert');
+    
+    await server.register(bufferRoutes, { prefix: '/api' }); // Buffer API (einfacher als direktes OAuth!)
+    console.log('✅ Buffer Routes erfolgreich registriert');
+    
+    await server.register(webhookRoutes, { prefix: '/api' }); // Make.com/Zapier Webhooks (Make = 1000 FREE!)
+    console.log('✅ Webhook Routes erfolgreich registriert');
 
     // 🔥 SETTINGS ROUTES
     await server.register(connectionRoutes, { prefix: '/api/settings' });
