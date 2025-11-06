@@ -10,3 +10,4 @@ coverage
 *.ts
 !*.d.ts
 tsconfig.json
+!frontend/.env.production
