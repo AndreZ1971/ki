@@ -136,6 +136,10 @@ async function buildServer() {
 
   try {
     // SWAGGER zuerst registrieren
+    // Dynamische Host/Scheme Konfiguration, damit in Docker/Prod kein 'localhost:3000' hartkodiert ist.
+    const swaggerHost = process.env.SWAGGER_HOST || `${process.env.HOST || 'localhost'}:${process.env.PORT || 3000}`;
+    const swaggerSchemes = (process.env.FORCE_HTTPS === 'true' || (process.env.NODE_ENV === 'production' && process.env.FORCE_HTTPS !== 'false')) ? ['https'] : ['http'];
+
     await server.register(swagger, {
       swagger: {
         info: {
@@ -143,8 +147,7 @@ async function buildServer() {
           description: 'API für WooCommerce Integration mit AI-Funktionen',
           version: '1.0.0'
         },
-        host: 'localhost:3000',
-        schemes: ['http'],
+        schemes: swaggerSchemes,
         consumes: ['application/json'],
         produces: ['application/json'],
         tags: [
@@ -379,21 +382,22 @@ const start = async () => {
     });
     
 
-      const host = process.env.HOST || 'localhost';
-      const port = process.env.PORT || 3000;
-      const baseUrl = `http://${host}:${port}`;
-      console.log(`✅ Server läuft auf ${baseUrl}`);
-      console.log(`📚 Documentation: ${baseUrl}/documentation`);
-      console.log(`❤️  Health Check: ${baseUrl}/health`);
-      console.log(`⚕️  System Health: ${baseUrl}/api/system/health`);
-      console.log(`📊 Shop Metrics: ${baseUrl}/api/analytics/metrics`);
-      console.log(`📧 AI Email: ${baseUrl}/api/ai/email`);
-      console.log(`🛒 Products: ${baseUrl}/api/products`);
-      console.log(`👥 Customers: ${baseUrl}/api/woocommerce/customers`);
-      console.log(`📨 Email Sender: ${baseUrl}/api/email/send`);
-      console.log(`🧪 Email Test: ${baseUrl}/api/email/test-email-config`);
-      console.log(`🔍 Debug Routes: ${baseUrl}/api/debug/routes`);
-      console.log(`📈 Analytics: ${baseUrl}/api/analytics`);
+  const host = process.env.HOST || 'localhost';
+  const port = process.env.PORT || 3000;
+  const protocol = (process.env.FORCE_HTTPS === 'true' || (process.env.NODE_ENV === 'production' && process.env.FORCE_HTTPS !== 'false')) ? 'https' : 'http';
+  const baseUrl = `${protocol}://${host}:${port}`;
+  console.log(`✅ Server läuft auf ${baseUrl}`);
+  console.log(`📚 Swagger-UI:   ${baseUrl}/documentation`);
+  console.log(`❤️  Health:      ${baseUrl}/health`);
+  console.log(`⚕️  System:      ${baseUrl}/api/system/health`);
+  console.log(`📊 Metrics:      ${baseUrl}/api/analytics/metrics`);
+  console.log(`📧 AI Email:     ${baseUrl}/api/ai/email`);
+  console.log(`🛒 Products:     ${baseUrl}/api/products`);
+  console.log(`👥 Customers:    ${baseUrl}/api/woocommerce/customers`);
+  console.log(`📨 Email Sender: ${baseUrl}/api/email/send`);
+  console.log(`🧪 Email Test:   ${baseUrl}/api/email/test-email-config`);
+  console.log(`🔍 Debug Routes: ${baseUrl}/api/debug/routes`);
+  console.log(`📈 Analytics:    ${baseUrl}/api/analytics`);
 
   } catch (_err) {
     console.error('💥 Server Start fehlgeschlagen:', _err);
