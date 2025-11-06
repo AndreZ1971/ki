@@ -8,7 +8,10 @@ import type {
   ProductUpdateRequest
 } from '../types/product';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+if (!import.meta.env.VITE_API_URL) {
+  throw new Error('VITE_API_URL is not set!');
+}
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 /**
  * Generischer API Request Handler mit Error Handling
