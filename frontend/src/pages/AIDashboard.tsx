@@ -36,7 +36,10 @@ const AIDashboard: React.FC = () => {
         }
         setError(null);
         
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+  if (!import.meta.env.VITE_API_URL) {
+    throw new Error('VITE_API_URL is not set!');
+  }
+  const apiUrl = import.meta.env.VITE_API_URL;
   const response = await fetch(`${apiUrl}/analytics/metrics/dashboard`);
         
         if (!response.ok) {
@@ -115,7 +118,10 @@ const AIDashboard: React.FC = () => {
     try {
       setActiveTool(toolId);
       
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+  if (!import.meta.env.VITE_API_URL) {
+    throw new Error('VITE_API_URL is not set!');
+  }
+  const apiUrl = import.meta.env.VITE_API_URL;
   const response = await fetch(`${apiUrl}/${endpoint}`, {
         method: 'POST',
         headers: {
@@ -666,7 +672,7 @@ const AIDashboard: React.FC = () => {
           >
             <strong>⚠️ Fehler: </strong>{error}
             <br />
-            <small>Stelle sicher, dass die API unter {import.meta.env.VITE_API_URL || 'http://localhost:3000'} erreichbar ist</small>
+            <small>Stelle sicher, dass die API unter {import.meta.env.VITE_API_URL} erreichbar ist</small>
           </motion.div>
         )}
       </AnimatePresence>
