@@ -36,11 +36,13 @@ const AIDashboard: React.FC = () => {
         }
         setError(null);
         
-  if (!import.meta.env.VITE_API_URL) {
-    throw new Error('VITE_API_URL is not set!');
-  }
-  const apiUrl = import.meta.env.VITE_API_URL;
-  const response = await fetch(`${apiUrl}/analytics/metrics/dashboard`);
+        if (!import.meta.env.VITE_API_URL) {
+          throw new Error('VITE_API_URL is not set!');
+        }
+        const apiUrl = import.meta.env.VITE_API_URL;
+        const fullUrl = `${apiUrl}/analytics/metrics/dashboard`;
+        console.log('AIDashboard API-URL:', fullUrl);
+        const response = await fetch(fullUrl);
         
         if (!response.ok) {
           throw new Error(`API Error: ${response.status}`);
