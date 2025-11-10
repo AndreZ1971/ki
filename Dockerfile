@@ -5,6 +5,7 @@
 # Stage 1: Build Frontend
 FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend
+COPY frontend/.env.production .env.production
 COPY frontend/package*.json ./
 RUN npm ci
 COPY frontend/ ./
