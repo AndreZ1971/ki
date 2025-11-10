@@ -32,6 +32,8 @@ RUN npm ci --omit=dev
 COPY --from=backend-builder /app/backend/dist ./dist
 # Copy built frontend (wird vom Backend als static files geserved)
 COPY --from=frontend-builder /app/frontend/dist ./public
+# Copy .env.production explicitly to /app/frontend/.env.production
+COPY --from=frontend-builder /app/frontend/.env.production ./frontend/.env.production
 # Copy health check
 COPY healthcheck.js ./
 # Create non-root user for security
