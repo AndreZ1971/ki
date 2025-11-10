@@ -8,6 +8,7 @@ WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm ci
 COPY frontend/ ./
+COPY frontend/.env.production ./frontend/.env.production
 RUN npm run build
 
 # Stage 2: Build Backend
