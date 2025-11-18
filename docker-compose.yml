@@ -1,28 +1,33 @@
 version: '3.8'
 
+version: '3.8'
+
 services:
-  ki-agent:
-    build: .
-    container_name: woo-ki-agent
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: https://api.deinedomain.com
+        VITE_VERSION: 1.0.0
+    container_name: woo-frontend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: woo-backend
     restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - LOG_LEVEL=info
-    env_file:
-      - .env.production
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
     volumes:
-      - ./data:/app/data:rw
-      - ./logs:/app/logs:rw
-    healthcheck:
-      test: ["CMD", "node", "healthcheck.js"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      - ./backend/data:/app/data:rw
 
-  # Optional: Watchtower für automatische Updates
   watchtower:
     image: containrrr/watchtower
     volumes:
