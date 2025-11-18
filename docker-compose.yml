@@ -1,6 +1,41 @@
 version: '3.8'
 
 services:
+<<<<<<< HEAD
+=======
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: https://my-working-space.de
+        VITE_VERSION: 1.0.0
+    container_name: woo-frontend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: woo-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+    volumes:
+      - ./backend/data:/app/data:rw
+
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 300 --cleanup
+    restart: unless-stopped
+
+>>>>>>> f6db666 (docker-compose.yml modifiziert. ESLint wird ignoriert.)
   nginx:
     version: '3.8'
 
