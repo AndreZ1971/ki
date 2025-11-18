@@ -6,7 +6,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        VITE_API_URL: https://my-working-space.de
+        VITE_API_URL: https://my-working-space.de/api
         VITE_VERSION: 1.0.0
     container_name: woo-frontend
     ports:
