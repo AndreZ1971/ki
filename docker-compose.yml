@@ -1,6 +1,10 @@
+# ===========================
+# Docker Compose für Hetzner Production
+# ===========================
 version: '3.8'
 
 services:
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
   frontend:
@@ -85,6 +89,12 @@ services:
         driver: bridge
     image: nginx:latest
     container_name: woo-nginx
+=======
+  nginx:
+    image: nginx:alpine
+    container_name: kaufe-es-nginx
+    restart: unless-stopped
+>>>>>>> 2d5cac2 (nginx.conf und gdocker-compose.yml modifiziert. ESLint wird ignoriert.)
     ports:
       - "80:80"
       - "443:443"
@@ -93,8 +103,67 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
 <<<<<<< HEAD
+<<<<<<< HEAD
       - backend
 =======
       - frontend
       - backend
 >>>>>>> b160c4f (docker-compose.yml modifiziert. ESLint wird ignoriert.)
+=======
+      - kaufe-es-agent
+    networks:
+      - kaufe-es-network
+
+  kaufe-es-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kaufe-es-agent
+    restart: unless-stopped
+    
+    # Load production ENV
+    env_file:
+      - .env.production
+    
+    # KEINE ports mehr nach außen - nur intern für Nginx
+    expose:
+      - "3000"
+    
+    # Persistent data (Logs, Cache)
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+    
+    # Resource Limits (Hetzner CPX11 hat 2 vCPU, 2GB RAM)
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 1536M
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    
+    # Health Check
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.js"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    # Network
+    networks:
+      - kaufe-es-network
+
+networks:
+  kaufe-es-network:
+    driver: bridge
+>>>>>>> 2d5cac2 (nginx.conf und gdocker-compose.yml modifiziert. ESLint wird ignoriert.)
