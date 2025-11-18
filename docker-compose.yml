@@ -92,4 +92,9 @@ services:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
+<<<<<<< HEAD
       - backend
+=======
+      - frontend
+      - backend
+>>>>>>> b160c4f (docker-compose.yml modifiziert. ESLint wird ignoriert.)
