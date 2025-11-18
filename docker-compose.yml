@@ -99,6 +99,7 @@ services:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
 <<<<<<< HEAD
+<<<<<<< HEAD
     depends_on:
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -112,14 +113,17 @@ services:
 =======
       - ./frontend-dist:/usr/share/nginx/html:ro  # Falls Frontend vorhanden
 >>>>>>> 4aeea4b (nginx.conf und docker-compose.yml modifiziert. ESLint wird ignoriert.)
+=======
+      - ./frontend-dist:/usr/share/nginx/html:ro
+>>>>>>> 8981605 (nginx.conf und docker-compose.yml modifiziert. ESLint wird ignoriert.)
     networks:
       - kaufe-es-network
 
-  kaufe-es-agent:
+  ki-agent:
     build: 
       context: .
       dockerfile: Dockerfile
-    container_name: kaufe-es-agent
+    container_name: woo-ki-agent
     restart: unless-stopped
     expose:
       - "3000"
@@ -137,6 +141,16 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    networks:
+      - kaufe-es-network
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: ki-watchtower-1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 300 --cleanup
+    restart: unless-stopped
     networks:
       - kaufe-es-network
 
