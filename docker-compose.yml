@@ -115,7 +115,12 @@ services:
 >>>>>>> 4aeea4b (nginx.conf und docker-compose.yml modifiziert. ESLint wird ignoriert.)
 =======
       - ./frontend-dist:/usr/share/nginx/html:ro
+<<<<<<< HEAD
 >>>>>>> 8981605 (nginx.conf und docker-compose.yml modifiziert. ESLint wird ignoriert.)
+=======
+    depends_on:
+      - ki-agent
+>>>>>>> 6e4def7 (nginx.conf und docker-compose.yml modifiziert. ESLint wird ignoriert.)
     networks:
       - kaufe-es-network
 
@@ -123,7 +128,7 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-    container_name: woo-ki-agent
+    container_name: ki-agent
     restart: unless-stopped
     expose:
       - "3000"
