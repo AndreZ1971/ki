@@ -121,4 +121,7 @@ describe('Dead Letter Queue (DLQ)', () => {
       const id = await dlqWithDelay.add('test-job', {}, new Error('Test'));
       
       const message = await dlqWithDelay.get(id);
-      const nextRetryTime = new Date(message!
+            const nextRetryTime = new Date(message!.nextRetryAt ?? 0);
+          });
+        });
+      });

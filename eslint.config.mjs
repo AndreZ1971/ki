@@ -2,6 +2,7 @@ import js from '@eslint/js';
 import importPlugin from 'eslint-plugin-import';
 import tseslint from 'typescript-eslint';
 import globals from 'globals';
+import reactHooksPlugin from 'eslint-plugin-react-hooks';
 
 export default [
   // 1) Globale Ignores - DIST ORDNER EXPLIZIT AUSSCHLIESSEN
@@ -38,6 +39,7 @@ export default [
   {
     plugins: {
       import: importPlugin,
+      'react-hooks': reactHooksPlugin,
     },
     rules: {
       'import/order': 'off',
@@ -54,6 +56,7 @@ export default [
       '@typescript-eslint/no-require-imports': 'off',
       'no-console': 'off',
       'prefer-const': 'warn',
+      'react-hooks/exhaustive-deps': 'warn',
     },
   },
 

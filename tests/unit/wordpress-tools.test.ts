@@ -136,4 +136,10 @@ describe.skip('WordPress Tools', () => {
         data: { posts: [] },
       });
 
-      await wpGet.run({ path: 'wp/v2
+      await wpGet.run({ path: 'wp/v2/posts' });
+      const authHeader = mockGet.mock.calls[0][1]?.headers?.Authorization;
+      const expectedAuth = `Basic ${Buffer.from('fallback_user:testpass123').toString('base64')}`;
+      expect(authHeader).toBe(expectedAuth);
+    });
+  });
+});
