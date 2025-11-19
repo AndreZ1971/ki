@@ -3,7 +3,7 @@
 
 import { MLPrediction, MLService } from '../mlService.js';
 // Types are defined in ../../types/google-trends-api.d.ts
-// @ts-expect-error - No type definitions available
+// ...existing code...
 import googleTrends from 'google-trends-api';
 import { logger } from '../../logger.js';
 import { getOpenAIClient } from '../../utils/openai.js';
