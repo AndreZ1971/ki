@@ -31,6 +31,7 @@ services:
     volumes:
       - ./backend/data:/app/data:rw
       - ./logs:/app/logs:rw
+      - ./backend/.env:/app/.env:ro
     networks:
       - kaufe-es-network
 
