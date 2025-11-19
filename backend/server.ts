@@ -313,7 +313,7 @@ async function buildServer() {
       console.error('🚨 Server Error:', error);
       reply.status(500).send({
         success: false,
-        error: process.env.NODE_ENV === 'development' ? error.message : 'Internal Server Error'
+        error: process.env.NODE_ENV === 'development' && error instanceof Error ? error.message : 'Internal Server Error'
       });
     });
 
