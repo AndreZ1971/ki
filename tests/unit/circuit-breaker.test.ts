@@ -119,5 +119,10 @@ describe('CircuitBreaker', () => {
       // Still in HALF_OPEN (needs successThreshold of 2)
       expect(breaker.getState()).toBe(CircuitState.HALF_OPEN);
       
-      // Second success should close the circuit
-      const result2
+        // Second success should close the circuit
+        const result2 = await breaker.execute(mockFunction);
+              expect(result2).toBe('success');
+              expect(breaker.getState()).toBe(CircuitState.CLOSED);
+          });
+        });
+      });

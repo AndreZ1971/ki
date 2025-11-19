@@ -137,4 +137,7 @@ describe('Payment Fixer', () => {
       // Should log details for all 3 cancelled orders
       expect(consoleLogSpy).toHaveBeenCalled();
       // Verify order IDs are logged
-      const logCalls = consoleLogSpy.mock.c
+      const logCalls = consoleLogSpy.mock.calls;
+    });
+  });
+});

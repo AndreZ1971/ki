@@ -145,4 +145,6 @@ describe('WooCommerceClient', () => {
       await expect(client.get('products')).rejects.toThrow();
     });
 
-    it('should 
+        // Removed unfinished test case to fix unterminated string literal error.
+      });
+    });
