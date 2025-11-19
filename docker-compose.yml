@@ -27,8 +27,6 @@ services:
       - "3000"
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=${DATABASE_URL}
-      - JWT_SECRET=${JWT_SECRET}
     volumes:
       - ./backend/data:/app/data:rw
       - ./logs:/app/logs:rw
