@@ -27,7 +27,7 @@ WORKDIR /app
 # Install production dependencies (skip prepare scripts like husky)
 ENV HUSKY=0
 COPY backend/package*.json ./
-RUN npm ci --omit=dev
+  RUN npm ci
 # Copy built backend
 COPY --from=backend-builder /app/backend/dist ./dist
 # Copy built frontend (wird vom Backend als static files geserved)
