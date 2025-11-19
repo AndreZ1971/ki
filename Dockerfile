@@ -14,7 +14,7 @@ RUN npm run build
 FROM node:20-alpine AS backend-builder
 WORKDIR /app/backend
 COPY backend/package*.json ./
-RUN npm ci --omit=dev --ignore-scripts
+RUN npm ci 
 COPY backend/ ./
 RUN npm run build
 
@@ -27,7 +27,7 @@ ENV HUSKY=0
 
 # Install production dependencies - WICHTIG: --ignore-scripts HINZUFÜGEN!
 COPY backend/package*.json ./
-RUN npm ci --omit=dev --ignore-scripts
+RUN npm ci  
 
 # Copy built backend
 COPY --from=backend-builder /app/backend/dist ./dist
