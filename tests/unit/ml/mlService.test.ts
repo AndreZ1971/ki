@@ -116,10 +116,12 @@ describe('ML Service', () => {
 
       const fallbackFunction = vi.fn().mockResolvedValue(['fallback1']);
 
-      const result = await MLService.predict(
-        'productRecommendations',
-        mlFunction,
-        fallbackFunction
-      );
-
-      expec
+        const result = await MLService.predict(
+          'productRecommendations',
+          mlFunction,
+          fallbackFunction
+        );
+        expect(fallbackFunction).toHaveBeenCalled();
+      });
+    });
+});

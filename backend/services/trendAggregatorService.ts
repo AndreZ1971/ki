@@ -4,10 +4,10 @@
  */
 
 import axios from 'axios';
-// @ts-ignore - No type definitions available
+// @ts-expect-error - No type definitions available
 import googleTrends from 'google-trends-api';
 import { logger } from '../logger';
-// @ts-ignore - No type definitions available
+// @ts-expect-error - No type definitions available
 import Parser from 'rss-parser';
 
 // ============================================================================
