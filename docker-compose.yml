@@ -1,3 +1,4 @@
+version: '3.8'
 
 services:
   nginx:
@@ -31,7 +32,7 @@ services:
     volumes:
       - ./backend/data:/app/data:rw
       - ./logs:/app/logs:rw
-      - ./backend/.env:/app/.env:ro
+      - ./backend/.env.production:/app/.env:ro
     networks:
       - kaufe-es-network
 
