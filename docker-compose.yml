@@ -17,9 +17,9 @@ services:
       - kaufe-es-network
 
   backend:
-    build: 
+    build:
       context: .
-      dockerfile: Dockerfile  # Verwende separates Backend Dockerfile
+      dockerfile: Dockerfile
     container_name: woo-backend
     restart: unless-stopped
     expose:
