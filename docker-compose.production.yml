@@ -1,7 +1,3 @@
-# ===========================
-# Docker Compose für Hetzner Production
-# ===========================
-version: '3.8'
 
 services:
   kaufe-es-agent:

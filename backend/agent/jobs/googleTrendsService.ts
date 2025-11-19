@@ -1,6 +1,6 @@
 // agent/jobs/googleTrendsService.ts
 // Types are defined in ../../types/google-trends-api.d.ts
-// @ts-ignore - No type definitions available
+// ...existing code...
 import googleTrends from 'google-trends-api';
 
 class GoogleTrendsService {

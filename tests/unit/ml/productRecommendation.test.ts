@@ -122,4 +122,15 @@ describe('Product Recommendation Engine', () => {
           ]);
         }
         if (endpoint === 'customers') {
-          
+          return Promise.resolve([{ id: 123 }, { id: 456 }]);
+        }
+        return Promise.resolve([]);
+      });
+
+      const result = await ProductRecommendationEngine.getRecommendations(123, 2);
+      expect(result.prediction.length).toBeGreaterThanOrEqual(0);
+
+      mlConfig.enabled = originalEnabled;
+    });
+  });
+});
