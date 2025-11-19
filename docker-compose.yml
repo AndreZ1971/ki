@@ -19,7 +19,7 @@ services:
   backend:
     build: 
       context: .
-      dockerfile: Dockerfile.backend  # Verwende separates Backend Dockerfile
+      dockerfile: Dockerfile  # Verwende separates Backend Dockerfile
     container_name: woo-backend
     restart: unless-stopped
     expose:
