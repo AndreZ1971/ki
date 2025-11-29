@@ -39,7 +39,7 @@ export const trendAggregatorRoutes: FastifyPluginAsync = async (fastify) => {
         }
       }
     }
-  }, async (request, reply) => {
+    }, async (_request, _reply) => {
     try {
       const sources = trendAggregator.getAvailableSources();
       
@@ -105,7 +105,7 @@ export const trendAggregatorRoutes: FastifyPluginAsync = async (fastify) => {
         }
       }
     }
-  }, async (request, reply) => {
+    }, async (_request, _reply) => {
     try {
       const { keyword } = request.params;
       const sources = request.query.sources?.split(',');
@@ -176,7 +176,7 @@ export const trendAggregatorRoutes: FastifyPluginAsync = async (fastify) => {
         }
       }
     }
-  }, async (request, reply) => {
+    }, async (_request, _reply) => {
     try {
       const { keywords } = request.body;
 
@@ -248,7 +248,7 @@ export const trendAggregatorRoutes: FastifyPluginAsync = async (fastify) => {
         }
       }
     }
-  }, async (request, reply) => {
+    }, async (_request, _reply) => {
     try {
       const keywords = request.query.keywords.split(',').map(k => k.trim());
 

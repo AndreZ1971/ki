@@ -16,10 +16,7 @@
     "noEmitOnError": true,
     "allowImportingTsExtensions": false,
     "verbatimModuleSyntax": false,
-    "baseUrl": "./",
-    "paths": {
-      "@/*": ["*"]
-    },
+    "ignoreDeprecations": "6.0",
     "typeRoots": ["./node_modules/@types", "./types"],
     "sourceMap": true,
     "incremental": true,

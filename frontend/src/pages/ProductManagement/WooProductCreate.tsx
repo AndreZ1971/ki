@@ -33,7 +33,6 @@ const WooProductCreate = () => {
       }
     };
     loadCategories();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const validateForm = (): boolean => {

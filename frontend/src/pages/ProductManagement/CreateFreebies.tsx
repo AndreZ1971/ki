@@ -12,7 +12,7 @@ const CreateFreebies = () => {
   const toast = useToast();
   const [freebieType, setFreebieType] = useState<Freebie['type']>('ebook');
   const [freebies, setFreebies] = useState<Freebie[]>([]);
-  const [initialLoading, setInitialLoading] = useState(true);
+  const [_initialLoading, setInitialLoading] = useState(true);
 
   // Load freebies on mount
   React.useEffect(() => {
