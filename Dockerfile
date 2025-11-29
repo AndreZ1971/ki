@@ -38,11 +38,11 @@ COPY --from=frontend-builder /app/frontend/dist ./public
 # Copy health check
 COPY healthcheck.js ./
 
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodeuser -u 1001 -G nodejs && \
-    mkdir -p /app/data /app/logs && \
-    chown -R nodeuser:nodejs /app
+# Create non-root user (Debian/Ubuntu syntax)
+RUN groupadd -g 1001 nodejs && \
+  useradd -m -u 1001 -g nodejs nodeuser && \
+  mkdir -p /app/data /app/logs && \
+  chown -R nodeuser:nodejs /app
 
 USER nodeuser
 EXPOSE 3000
