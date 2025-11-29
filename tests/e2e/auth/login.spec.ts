@@ -28,9 +28,9 @@ test.describe('Authentication Flow', () => {
     password: 'WrongPassword',
   };
 
-  test.beforeEach(async ({ page }) => {
-    loginPage = new LoginPage(page);
-    dashboardPage = new DashboardPage(page);
+  test.beforeEach(async ({ _page }) => {
+    loginPage = new LoginPage(_page);
+    dashboardPage = new DashboardPage(_page);
   });
 
   test('should display login form', async () => {
@@ -108,7 +108,7 @@ test.describe('Authentication Flow', () => {
     expect(isOnDashboard).toBeTruthy();
   });
 
-  test('should logout successfully', async ({ page }) => {
+  test('should logout successfully', async ({ _page }) => {
     // Login first
     await loginPage.navigate();
     await loginPage.login(validCredentials.email, validCredentials.password);
@@ -125,7 +125,7 @@ test.describe('Authentication Flow', () => {
     expect(currentUrl).toContain('/login');
   });
 
-  test('should not access dashboard without login', async ({ page, context }) => {
+  test('should not access dashboard without login', async ({ _page, context }) => {
     // Clear all cookies to ensure we're logged out
     await context.clearCookies();
     

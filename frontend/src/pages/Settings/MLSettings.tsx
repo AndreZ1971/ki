@@ -50,7 +50,7 @@ export default function MLSettings() {
       if (!response.ok) throw new Error('Fehler');
       const data = await response.json();
       setConfig(data);
-    } catch (error) {
+    } catch (_error) {
       setMessage({ type: 'error', text: 'Fehler beim Laden der ML-Konfiguration' });
     } finally {
       setLoading(false);
@@ -69,7 +69,7 @@ export default function MLSettings() {
       if (!response.ok) throw new Error('Fehler');
       setMessage({ type: 'success', text: 'ML-Konfiguration erfolgreich gespeichert!' });
       setTimeout(() => setMessage(null), 3000);
-    } catch (error) {
+    } catch (_error) {
       setMessage({ type: 'error', text: 'Fehler beim Speichern' });
     } finally {
       setSaving(false);

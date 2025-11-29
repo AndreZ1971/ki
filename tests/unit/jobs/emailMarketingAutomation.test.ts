@@ -261,7 +261,7 @@ describe('Email Marketing Automation', () => {
     });
 
     it('should log errors without crashing', async () => {
-      const consoleErrorSpy = vi.spyOn(console, 'error');
+      const _consoleErrorSpy = vi.spyOn(console, 'error');
       (wooGet as any).mockRejectedValueOnce(new Error('Test error'));
       
       const results = await runEmailMarketingAutomation();

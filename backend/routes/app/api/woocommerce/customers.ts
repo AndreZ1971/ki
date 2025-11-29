@@ -2,7 +2,7 @@
 import { FastifyPluginAsync } from 'fastify';
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
 
-const customersRoutes: FastifyPluginAsync = async (fastify, options) => {
+const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
   
   // WooCommerce Client initialisieren
   const WooCommerce = new WooCommerceRestApi({

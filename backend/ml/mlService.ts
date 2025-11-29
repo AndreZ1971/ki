@@ -1,7 +1,7 @@
 // backend/ml/mlService.ts
 // ML Service with automatic fallback to rule-based systems
 
-import { isMLEnabled, getModelConfig, mlConfig } from '../config/ml.config.js';
+import { isMLEnabled, mlConfig } from '../config/ml.config.js';
 import { logger } from '../logger.js';
 
 export interface MLPrediction<T> {

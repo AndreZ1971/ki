@@ -65,13 +65,7 @@ vi.mock('../../backend/error-handling/index.js', () => ({
 }));
 
 // Now import the tools AFTER all mocks are set up
-import {
-  wpGet,
-  wpPost,
-  wpMediaUpload,
-  wpMediaUploadFromUrl,
-  wpSetMediaMeta,
-} from '../../backend/tools/wp.js';
+import { wpGet } from '../../backend/tools/wp.js';
 
 describe.skip('WordPress Tools', () => {
   const originalEnv = process.env;

@@ -140,12 +140,7 @@ const EMAIL_SERVICE = {
 };
 
 // Type Definitionen
-interface EmailCampaign {
-  type: 'welcome' | 'newsletter' | 'product_recommendation';
-  subject: string;
-  html: string;
-  recipients: string[];
-}
+// Entfernt: EmailCampaign Interface, da nicht verwendet
 
 interface EmailResult {
   campaign: string;

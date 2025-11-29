@@ -63,9 +63,8 @@ class RealAnalyticsReporting {
     const freeProducts = data.sales.products.filter((p: any) => p.revenue === 0 && p.quantity > 0);
     
     if (paidProducts.length > 0) {
-      paidProducts.forEach((product: any, index: number) => {
-        console.log(`   ${index + 1}. ${product.name}`);
-        console.log(`      💵 €${product.revenue.toFixed(2)} | 🛒 ${product.quantity}x | 📊 €${(product.revenue / product.quantity).toFixed(2)} pro Stück`);
+      paidProducts.forEach((_index: number) => {
+        // ...existing code...
       });
     } else {
       console.log(`   💡 Noch keine bezahlten Verkäufe - Fokus auf Conversion`);
@@ -73,10 +72,10 @@ class RealAnalyticsReporting {
 
     if (freeProducts.length > 0) {
       console.log(`\n🎁 POPULÄRE FREEBIES:`);
-      freeProducts.slice(0, 3).forEach((product: any, index: number) => {
-        console.log(`   ${index + 1}. ${product.name}`);
-        console.log(`      📥 ${product.quantity}x heruntergeladen`);
-      });
+        freeProducts.slice(0, 3).forEach((product: any, _index: number) => {
+          console.log(`   ${_index + 1}. ${product.name}`);
+          console.log(`      📥 ${product.quantity}x heruntergeladen`);
+        });
     }
 
     // Content Performance mit Conversion-Potential
@@ -146,7 +145,7 @@ class RealAnalyticsReporting {
     actions.push('   • Trust-Elemente (Reviews, Garantien)');
     actions.push('   • Checkout-Prozess optimieren');
 
-    actions.forEach((action, index) => {
+    actions.forEach((action, _index) => {
       console.log(`   ${action}`);
     });
 

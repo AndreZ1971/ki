@@ -16,7 +16,7 @@ interface ReportData {
 const ConversionReported = () => {
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, _setError] = useState<string | null>(null);
   const [activeAction, setActiveAction] = useState<string | null>(null);
   const [exportFormat, setExportFormat] = useState('pdf');
   const [scheduleTime, setScheduleTime] = useState('08:00');
