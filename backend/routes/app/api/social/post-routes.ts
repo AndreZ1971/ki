@@ -16,7 +16,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
   fastify.post<{ Body: PostRequest }>(
     '/social/post',
     async (request: FastifyRequest<{ Body: PostRequest }>, reply: FastifyReply) => {
-      const { platform, content, mediaUrl, mediaType, _scheduleTime } = request.body;
+      const { platform, content, mediaUrl, mediaType, scheduleTime } = request.body;
 
       if (!content) {
         return reply.status(400).send({

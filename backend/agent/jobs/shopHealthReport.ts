@@ -29,7 +29,7 @@ class ShopHealthReport {
       console.log('📅 Reportdatum:', new Date().toLocaleDateString('de-DE'));
       
       // Kritische Probleme zusammenfassen
-      await this.showCriticalIssues(salesData);
+      await this.showCriticalIssues();
       
       // Priorisierte Aktionsliste
       await this.generateActionPriorityList();

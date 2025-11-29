@@ -36,7 +36,7 @@ async function emailTestRoutes(fastify: any, _options: any) {
       };
     } catch (error: any) {
       console.error('❌ Email Test fehlgeschlagen:', error.message);
-      return reply.status(500).send({
+      return _reply.status(500).send({
         success: false,
         error: error.message,
         config: {

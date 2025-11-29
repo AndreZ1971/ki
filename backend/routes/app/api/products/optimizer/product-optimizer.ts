@@ -30,16 +30,16 @@ function initializeOpenAI() {
 // ✅ Analyse-Funktion
 async function analyzeProduct(productId: number, _server: FastifyInstance) {
   // 1. Produkt von WooCommerce abrufen
-  const product = await wooCommerceService.getProduct(productId, server);
+  const product = await wooCommerceService.getProduct(productId, _server);
   
   // 2. OpenAI für Analyse nutzen (falls verfügbar)
   let aiAnalysis = null;
   const openAIClient = initializeOpenAI();
   if (openAIClient) {
     try {
-      aiAnalysis = await openAIAnalyzeProduct(product, server);
+      aiAnalysis = await openAIAnalyzeProduct(product, _server);
     } catch (error: any) {
-      server.log.error('OpenAI Analyse fehlgeschlagen:', error.message);
+      _server.log.error('OpenAI Analyse fehlgeschlagen:', error.message);
       // Fallback: Metriken ohne AI
     }
   }
@@ -203,7 +203,7 @@ function calculateOverallScore(aiAnalysis: any, metrics: any) {
 export default async function productOptimizerRoutes(_server: FastifyInstance) {
   
   // 🔥 NEUE ANALYSE-ROUTE mit korrekter Pfad-Struktur
-  server.post('/analyze/:id', {
+  _server.post('/analyze/:id', {
     schema: {
       tags: ['product-optimizer'],
       summary: 'Analyze product using AI',
@@ -243,7 +243,7 @@ export default async function productOptimizerRoutes(_server: FastifyInstance) {
       }
     }
   }, async (_request: any, _reply) => {
-    const { id } = request.params;
+    const { id } = _request.params;
     const productId = parseInt(id);
     
     // ✅ Erst HIER wird initialisiert
@@ -253,7 +253,7 @@ export default async function productOptimizerRoutes(_server: FastifyInstance) {
     
     // Prüfe ob WooCommerce verfügbar ist
     if (!wooCommerceService.isReady()) {
-      return reply.status(503).send({ 
+      return _reply.status(503).send({ 
         success: false,
         error: 'WooCommerce Service nicht verfügbar',
         message: 'Bitte WooCommerce Konfiguration prüfen'
@@ -261,13 +261,13 @@ export default async function productOptimizerRoutes(_server: FastifyInstance) {
     }
     
     try {
-      server.log.info(`Starte Produkt-Analyse für ID: ${productId}`);
-      const analysis = await analyzeProduct(productId, server);
-      server.log.info(`✅ Produkt-Analyse abgeschlossen für ID: ${productId}`);
+      _server.log.info(`Starte Produkt-Analyse für ID: ${productId}`);
+      const analysis = await analyzeProduct(productId, _server);
+      _server.log.info(`✅ Produkt-Analyse abgeschlossen für ID: ${productId}`);
       return { success: true, analysis, suggestions: analysis.recommendations };
     } catch (error: any) {
-      server.log.error('Analyse fehlgeschlagen:', error.message);
-      return reply.status(500).send({ 
+      _server.log.error('Analyse fehlgeschlagen:', error.message);
+      return _reply.status(500).send({ 
         success: false,
         error: 'Analyse fehlgeschlagen',
         message: error.message 
@@ -276,7 +276,7 @@ export default async function productOptimizerRoutes(_server: FastifyInstance) {
   });
 
   // 🔥 STATUS ENDPOINT hinzugefügt
-  server.get('/status', {
+  _server.get('/status', {
     schema: {
       tags: ['product-optimizer'],
       summary: 'Get optimizer status',
@@ -293,7 +293,7 @@ export default async function productOptimizerRoutes(_server: FastifyInstance) {
   });
 
   // 🔍 SEO OPTIMIZER (bestehend)
-  server.post('/woo/products/:id/seo-optimize', {
+  _server.post('/woo/products/:id/seo-optimize', {
     schema: {
       tags: ['product-optimizer'],
       summary: 'AI SEO Optimization for products',
@@ -338,19 +338,19 @@ export default async function productOptimizerRoutes(_server: FastifyInstance) {
       }
     }
   }, async (_request: any) => {
-    const { id } = request.params;
+    const { id } = _request.params;
     const { 
       currentTitle, 
       currentDescription, 
       targetKeywords, 
       brand, 
       productCategory 
-    } = request.body;
+    } = _request.body;
 
     // ✅ Erst HIER wird initialisiert
     const openAIClient = initializeOpenAI();
     if (!openAIClient) {
-      server.log.warn('OpenAI nicht verfügbar - verwende Fallback für SEO Optimierung');
+      _server.log.warn('OpenAI nicht verfügbar - verwende Fallback für SEO Optimierung');
       return {
         success: false,
         optimizedTitle: currentTitle,
@@ -425,7 +425,7 @@ RESPONSE IN JSON FORMAT:
         const seoOptimization = JSON.parse(aiResponse);
         
         // Log the optimization
-        server.log.info(`SEO optimization for product ${id}: Score ${seoOptimization.seoScore}/100`);
+        _server.log.info(`SEO optimization for product ${id}: Score ${seoOptimization.seoScore}/100`);
         
         return {
           success: true,
@@ -437,7 +437,7 @@ RESPONSE IN JSON FORMAT:
       }
 
     } catch (error: any) {
-      server.log.error('SEO Optimization error:', error.message);
+      _server.log.error('SEO Optimization error:', error.message);
       
       return {
         success: false,
@@ -458,7 +458,7 @@ RESPONSE IN JSON FORMAT:
   });
 
   // 🔄 AUTO-UPDATE WOOCOMMERCE MIT SEO OPTIMIERUNGEN
-  server.post('/woo/products/:id/seo-apply', {
+  _server.post('/woo/products/:id/seo-apply', {
     schema: {
       tags: ['product-optimizer'],
       summary: 'Apply SEO optimizations directly to WooCommerce',
@@ -500,20 +500,20 @@ RESPONSE IN JSON FORMAT:
       }
     }
   }, async (_request: any, _reply: any) => {
-    const { id } = request.params;
+    const { id } = _request.params;
     const { 
       currentTitle, 
       currentDescription, 
       targetKeywords, 
       brand, 
       productCategory 
-    } = request.body;
+    } = _request.body;
 
     try {
-      server.log.info(`Starting SEO apply for product ${id}`);
+      _server.log.info(`Starting SEO apply for product ${id}`);
 
       // 1. Erst SEO Optimierung durchführen
-      const seoResponse = await server.inject({
+      const seoResponse = await _server.inject({
         method: 'POST',
         url: `/product-optimizer/woo/products/${id}/seo-optimize`,
         payload: {
@@ -528,14 +528,14 @@ RESPONSE IN JSON FORMAT:
       const seoData = JSON.parse(seoResponse.payload);
       
       if (!seoData.success) {
-        server.log.error(`SEO optimization failed for product ${id}:`, seoData.error);
+        _server.log.error(`SEO optimization failed for product ${id}:`, seoData.error);
         return {
           success: false,
           error: 'SEO optimization failed: ' + seoData.error
         };
       }
 
-      server.log.info(`SEO optimization successful for product ${id}, score: ${seoData.seoScore}`);
+      _server.log.info(`SEO optimization successful for product ${id}, score: ${seoData.seoScore}`);
 
       // 2. WooCommerce Update vorbereiten
       const wcUpdate = {
@@ -560,7 +560,7 @@ RESPONSE IN JSON FORMAT:
       };
 
       // 3. WooCommerce aktualisieren
-      const updatedProduct = await wooCommerceService.updateProduct(id, wcUpdate, server);
+      const updatedProduct = await wooCommerceService.updateProduct(id, wcUpdate, _server);
 
       // 4. Erfolgsresponse
       return {
@@ -586,7 +586,7 @@ RESPONSE IN JSON FORMAT:
       };
 
     } catch (error: any) {
-      server.log.error(`SEO apply error for product ${id}:`, error.message);
+      _server.log.error(`SEO apply error for product ${id}:`, error.message);
       
       return {
         success: false,
@@ -597,7 +597,7 @@ RESPONSE IN JSON FORMAT:
   });
 
   // 💰 PRICE INTELLIGENCE - NEU!
-  server.post('/woo/products/:id/price-analysis', {
+  _server.post('/woo/products/:id/price-analysis', {
     schema: {
       tags: ['product-optimizer'],
       summary: 'AI-powered price analysis and recommendations',
@@ -660,7 +660,7 @@ RESPONSE IN JSON FORMAT:
       }
     }
   }, async (_request: any) => {
-    const { id } = request.params;
+    const { id } = _request.params;
     const { 
       currentPrice, 
       productName, 
@@ -669,12 +669,12 @@ RESPONSE IN JSON FORMAT:
       competitorPrices, 
       marketConditions,
       targetMargin 
-    } = request.body;
+    } = _request.body;
 
     // ✅ Erst HIER wird initialisiert
     const openAIClient = initializeOpenAI();
     if (!openAIClient) {
-      server.log.warn('OpenAI nicht verfügbar - verwende Fallback für Price Intelligence');
+      _server.log.warn('OpenAI nicht verfügbar - verwende Fallback für Price Intelligence');
       
       // Fallback price analysis
       const averageCompetitorPrice = competitorPrices.length > 0 
@@ -771,7 +771,7 @@ RESPONSE IN JSON FORMAT:
         const priceAnalysis = JSON.parse(aiResponse);
         
         // Log the analysis
-        server.log.info(`Price analysis for product ${id}: Recommended €${priceAnalysis.priceRecommendation} (Confidence: ${priceAnalysis.confidence}%)`);
+        _server.log.info(`Price analysis for product ${id}: Recommended €${priceAnalysis.priceRecommendation} (Confidence: ${priceAnalysis.confidence}%)`);
         
         return {
           success: true,
@@ -785,7 +785,7 @@ RESPONSE IN JSON FORMAT:
       }
 
     } catch (error: any) {
-      server.log.error('Price Intelligence error:', error.message);
+      _server.log.error('Price Intelligence error:', error.message);
       
       // Fallback price analysis
       const averageCompetitorPrice = competitorPrices.length > 0 
@@ -821,7 +821,7 @@ RESPONSE IN JSON FORMAT:
   });
 
   // 🎁 BUNDLE SUGGESTIONS (Placeholder)
-  server.post('/woo/products/:id/bundle-suggestions', {
+  _server.post('/woo/products/:id/bundle-suggestions', {
     schema: {
       tags: ['product-optimizer'],
       summary: 'AI-generated product bundle recommendations',
@@ -836,7 +836,7 @@ RESPONSE IN JSON FORMAT:
   });
 
   // ✅ OPTIMIZE ROUTE KORRIGIERT - INNERHALB DER FUNKTION
-  server.post('/optimize/:id', async (_request, _reply) => {
+  _server.post('/optimize/:id', async (_request, _reply) => {
     // Deine bestehende Optimize-Logik
     return { message: 'Optimize route - to be implemented' };
   });

@@ -341,11 +341,11 @@ async function buildServer() {
     // 🔥 SPA FALLBACK - Serve index.html for all non-API routes
     // This must be registered AFTER all other routes
     server.setNotFoundHandler(async (_request, _reply) => {
-      const url = request.url;
+      const url = _request.url;
       
       // API routes → 404 JSON
       if (url.startsWith('/api/') || url.startsWith('/documentation') || url.startsWith('/health')) {
-        return reply.status(404).send({ 
+        return _reply.status(404).send({
           success: false,
           error: 'Route not found',
           path: url 
@@ -356,9 +356,9 @@ async function buildServer() {
       if (process.env.NODE_ENV === 'production') {
         const indexPath = path.join(staticPath, 'index.html');
         const indexHtml = await fs.promises.readFile(indexPath, 'utf-8');
-        return reply.type('text/html').send(indexHtml);
+        return _reply.type('text/html').send(indexHtml);
       } else {
-        return reply.status(404).send({ error: 'Not found (dev mode)' });
+        return _reply.status(404).send({ error: 'Not found (dev mode)' });
       }
     });
 

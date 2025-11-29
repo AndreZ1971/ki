@@ -28,6 +28,7 @@ export async function trendAnalysisJob(options?: {
 }): Promise<TrendAnalysisResult> {
   // ...existing code...
   const geo = options?.geo || 'DE';
+  const keyword = options?.keyword || '';
   
   console.log(`🔍 Starte Trend-Analyse für: "${keyword}" in ${geo}`);
 
@@ -88,7 +89,7 @@ async function analyzeGoogleTrends(keyword: string, geo: string): Promise<TrendD
             niche: item.query,
             demandScore: Math.min(100, Math.max(20, 100 - index * 5)), // Höher = besserer Rank
             competition: Math.min(100, Math.max(10, index * 6)), // Niedriger = weniger Competition
-            seasonality: analyzeSeasonality(parsedInterest),
+            seasonality: analyzeSeasonality(),
             priceRange: estimatePriceRange(item.query),
             keywords: extractKeywords(item.query)
           });
