@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyPluginOptions } from 'fastify';
+import { FastifyInstance } from 'fastify';
 import os from 'os';
 
 function getMemorySize(): string {
@@ -6,10 +6,10 @@ function getMemorySize(): string {
   return `${Math.round(totalMemory / 1024 / 1024)} MB`;
 }
 
-export default async function systemRoutes(server: FastifyInstance, options: any) {
+export default async function systemRoutes(server: FastifyInstance, _options: any) {
   
   // System Health Information
-  server.get('/system/health', async (request, reply) => {
+  server.get('/system/health', async (_request, _reply) => {
     return {
       status: 'healthy',
       timestamp: new Date().toISOString(),
@@ -21,7 +21,7 @@ export default async function systemRoutes(server: FastifyInstance, options: any
   });
 
   // Memory Information
-  server.get('/system/memory', async (request, reply) => {
+  server.get('/system/memory', async (_request, _reply) => {
     const memoryUsage = process.memoryUsage();
     return {
       agentMemory: getMemorySize(),
@@ -35,7 +35,7 @@ export default async function systemRoutes(server: FastifyInstance, options: any
   });
 
   // Environment Information (ohne sensible Daten)
-  server.get('/system/environment', async (request, reply) => {
+  server.get('/system/environment', async (_request, _reply) => {
     return {
       nodeEnv: process.env.NODE_ENV || 'development',
       pid: process.pid,
@@ -48,7 +48,7 @@ export default async function systemRoutes(server: FastifyInstance, options: any
   });
 
   // Server Statistics
-  server.get('/system/stats', async (request, reply) => {
+  server.get('/system/stats', async (_request, _reply) => {
     return {
       timestamp: new Date().toISOString(),
       requests: (server as any).requestCount || 0,
@@ -58,7 +58,7 @@ export default async function systemRoutes(server: FastifyInstance, options: any
   });
 
   // Configuration Status
-  server.get('/system/config-status', async (request, reply) => {
+  server.get('/system/config-status', async (_request, _reply) => {
     return {
       openai: {
         configured: !!process.env.OPENAI_API_KEY,
@@ -79,7 +79,7 @@ export default async function systemRoutes(server: FastifyInstance, options: any
   });
 
   // Request Counter Middleware (für Stats)
-  server.addHook('onRequest', async (request, reply) => {
+  server.addHook('onRequest', async (_request, _reply) => {
     if (!(server as any).requestCount) {
       (server as any).requestCount = 0;
     }

@@ -24,39 +24,41 @@ interface MLStats {
 }
 
 export const MLDashboardWidget: React.FC = () => {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+
+    const fetchMLStatus = React.useCallback(async () => {
+      try {
+        const response = await fetch(`${apiUrl}/ml/status`);
+        if (!response.ok) {
+          throw new Error(`API Error: ${response.status}`);
+        }
+        const data = await response.json();
+        setMlStatus(data);
+      } catch (_error) {
+        setError('Fehler beim Laden des ML-Status. Bitte API prüfen.');
+        console.error('Failed to fetch ML status:', _error);
+      }
+    }, [apiUrl]);
   const [mlStatus, setMlStatus] = useState<MLStatus | null>(null);
   const [mlStats, setMlStats] = useState<MLStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // ...existing code...
+
   useEffect(() => {
-  fetchMLStatus();
-  fetchMLStats();
-  setError(null);
-    
+    fetchMLStatus();
+    fetchMLStats();
+    setError(null);
     // Refresh every 30 seconds
     const interval = setInterval(() => {
       fetchMLStatus();
       fetchMLStats();
     }, 30000);
-    
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchMLStatus]);
 
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-const fetchMLStatus = async () => {
-  try {
-    const response = await fetch(`${apiUrl}/ml/status`);
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status}`);
-    }
-    const data = await response.json();
-    setMlStatus(data);
-  } catch (_error) {
-    setError('Fehler beim Laden des ML-Status. Bitte API prüfen.');
-    console.error('Failed to fetch ML status:', _error);
-  }
-};
+// ...existing code...
   const fetchMLStats = async () => {
     try {
       // Mock stats for now - replace with real API call later

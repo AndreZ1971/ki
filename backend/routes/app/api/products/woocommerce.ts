@@ -420,7 +420,7 @@ export default async function wooCommerceRoutes(server: FastifyInstance) {
   }, async (request: any) => {
     try {
       const { id } = request.params;
-      const result = await wooCommerce.deleteProduct(id);
+      await wooCommerce.deleteProduct(id);
       
       return { 
         success: true, 
@@ -617,7 +617,7 @@ export default async function wooCommerceRoutes(server: FastifyInstance) {
       const fallbackDescription = `🎯 **${productName}** - Das perfekte ${productType || 'Produkt'} für ${targetAudience || 'dich'}!
 
 ✨ **Hauptfeatures:**
-${keyFeatures.map((feature: string, index: number) => `• ✅ ${feature}`).join('\n')}
+${keyFeatures.map((feature: string, _index: number) => `• ✅ ${feature}`).join('\n')}
 
 💫 **Warum ${productName}?**
 Entdecke die einzigartigen Vorteile und die herausragende Qualität dieses Produkts. Perfekt abgestimmt auf die Bedürfnisse ${targetAudience ? `von ${targetAudience}` : 'moderner Anwender'}.
@@ -727,7 +727,7 @@ WICHTIG: Antworte NUR im JSON Format ohne zusätzlichen Text:
       const fallbackDescription = `🎯 **${productName}** - Das perfekte ${productType || 'Produkt'} für ${targetAudience || 'dich'}!
 
 ✨ **Hauptfeatures:**
-${keyFeatures.map((feature: string, index: number) => `• ✅ ${feature}`).join('\n')}
+${keyFeatures.map((feature: string, _index: number) => `• ✅ ${feature}`).join('\n')}
 
 💫 **Warum ${productName}?**
 Entdecke die einzigartigen Vorteile und die herausragende Qualität dieses Produkts. Perfekt abgestimmt auf die Bedürfnisse ${targetAudience ? `von ${targetAudience}` : 'moderner Anwender'}.

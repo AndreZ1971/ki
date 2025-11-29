@@ -28,7 +28,7 @@ function initializeOpenAI() {
 }
 
 // ✅ Analyse-Funktion
-async function analyzeProduct(productId: number, server: FastifyInstance) {
+async function analyzeProduct(productId: number, _server: FastifyInstance) {
   // 1. Produkt von WooCommerce abrufen
   const product = await wooCommerceService.getProduct(productId, server);
   
@@ -67,7 +67,7 @@ async function analyzeProduct(productId: number, server: FastifyInstance) {
 }
 
 // ✅ OpenAI Analyse-Funktion
-async function openAIAnalyzeProduct(product: any, server: FastifyInstance) {
+async function openAIAnalyzeProduct(product: any, _server: FastifyInstance) {
   const openAIClient = initializeOpenAI();
   if (!openAIClient) {
     throw new Error('OpenAI nicht verfügbar');
@@ -200,7 +200,7 @@ function calculateOverallScore(aiAnalysis: any, metrics: any) {
   return Math.round((score / totalWeight) * 100);
 }
 
-export default async function productOptimizerRoutes(server: FastifyInstance) {
+export default async function productOptimizerRoutes(_server: FastifyInstance) {
   
   // 🔥 NEUE ANALYSE-ROUTE mit korrekter Pfad-Struktur
   server.post('/analyze/:id', {
@@ -242,7 +242,7 @@ export default async function productOptimizerRoutes(server: FastifyInstance) {
         }
       }
     }
-  }, async (request: any, reply) => {
+  }, async (_request: any, _reply) => {
     const { id } = request.params;
     const productId = parseInt(id);
     
@@ -337,7 +337,7 @@ export default async function productOptimizerRoutes(server: FastifyInstance) {
         }
       }
     }
-  }, async (request: any) => {
+  }, async (_request: any) => {
     const { id } = request.params;
     const { 
       currentTitle, 
@@ -499,7 +499,7 @@ RESPONSE IN JSON FORMAT:
         }
       }
     }
-  }, async (request: any, reply: any) => {
+  }, async (_request: any, _reply: any) => {
     const { id } = request.params;
     const { 
       currentTitle, 
@@ -659,7 +659,7 @@ RESPONSE IN JSON FORMAT:
         }
       }
     }
-  }, async (request: any) => {
+  }, async (_request: any) => {
     const { id } = request.params;
     const { 
       currentPrice, 
@@ -827,7 +827,7 @@ RESPONSE IN JSON FORMAT:
       summary: 'AI-generated product bundle recommendations',
       description: 'Suggest smart product bundles for increased average order value'
     }
-  }, async (request: any) => {
+  }, async (_request: any) => {
     return {
       success: false,
       message: 'Bundle suggestions module coming soon!',
@@ -836,7 +836,7 @@ RESPONSE IN JSON FORMAT:
   });
 
   // ✅ OPTIMIZE ROUTE KORRIGIERT - INNERHALB DER FUNKTION
-  server.post('/optimize/:id', async (request, reply) => {
+  server.post('/optimize/:id', async (_request, _reply) => {
     // Deine bestehende Optimize-Logik
     return { message: 'Optimize route - to be implemented' };
   });

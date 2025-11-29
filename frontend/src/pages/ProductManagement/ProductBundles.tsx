@@ -11,7 +11,7 @@ const ProductBundles = () => {
   const { handleBackToDashboard, loading, setLoading, error, setError, clearError } = useProductManagement();
   const toast = useToast();
   const [bundles, setBundles] = useState<Bundle[]>([]);
-  const [initialLoading, setInitialLoading] = useState(true);
+  const [_initialLoading, setInitialLoading] = useState(true);
 
   // Load bundles on mount
   React.useEffect(() => {

@@ -67,7 +67,7 @@ class ContentMonetizer {
     console.log('🎯 CONTENT MONETIZATION STRATEGIEN:\n');
 
     console.log('1. 🚀 PRODUCT PLACEMENT IN TOP-CONTENT:');
-    topContent.slice(0, 3).forEach((post: any, index: number) => {
+    topContent.slice(0, 3).forEach((post: any) => {
       console.log(`   📄 "${post.title.substring(0, 40)}..."`);
       console.log(`      • Related Products Widget einbauen`);
       console.log(`      • "Das könnte dir auch gefallen" Section`);

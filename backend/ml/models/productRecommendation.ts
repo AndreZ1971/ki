@@ -4,7 +4,7 @@
 import { MLPrediction, MLService } from '../mlService.js';
 import { wooGet } from '../../tools/woo.js';
 import { logger } from '../../logger.js';
-import { isMLEnabled } from '../../config/ml.config.js';
+// Entfernt: isMLEnabled Import, da nicht verwendet
 import { getOpenAIClient } from '../../utils/openai.js';
 
 export interface ProductRecommendation {
@@ -178,10 +178,10 @@ ANTWORT FORMAT (JSON):
           per_page: limit,
         }) as any[];
         
-        return topProducts.map((product: any, index: number) => ({
+        return topProducts.map((product: any, _index: number) => ({
           productId: product.id,
-          score: 1 - index / limit,
-          reason: 'Bestseller in unserem Shop',
+          score: 1 - _index * 0.1,
+          reason: 'Top Seller'
         }));
       }
 
@@ -221,7 +221,7 @@ ANTWORT FORMAT (JSON):
         per_page: limit,
       }) as any[];
 
-      return products.map((product: any, index: number) => ({
+      return products.map((product: any, _index: number) => ({
         productId: product.id,
         score: 0.5,
         reason: 'Neu in unserem Shop',

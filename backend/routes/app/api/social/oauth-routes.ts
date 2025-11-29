@@ -118,7 +118,7 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
   fastify.get<{ Querystring: OAuthCallbackQuery }>(
     '/auth/tiktok/callback',
     async (request: FastifyRequest<{ Querystring: OAuthCallbackQuery }>, reply: FastifyReply) => {
-      const { code, state } = request.query;
+      const { code, _state } = request.query;
 
       if (!code) {
         return reply.status(400).send({ success: false, error: 'No authorization code received' });

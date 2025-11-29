@@ -3,8 +3,6 @@ import {
   RetryStrategy,
   standardRetry,
   aggressiveRetry,
-  conservativeRetry,
-  openAIRetry,
 } from '../../backend/error-handling/retry-strategies';
 
 describe('Retry Strategies', () => {

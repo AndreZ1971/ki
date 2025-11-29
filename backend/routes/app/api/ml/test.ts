@@ -75,7 +75,7 @@ const mlTestRoutes: FastifyPluginAsync = async (fastify) => {
   });
 
   // Health check for ML system
-  fastify.get('/health', async (request, reply) => {
+  fastify.get('/health', async (_request, _reply) => {
     return {
       success: true,
       message: 'ML test endpoints ready',

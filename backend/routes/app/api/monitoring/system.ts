@@ -146,7 +146,7 @@ export default async function monitoringRoutes(fastify: FastifyInstance) {
       const metrics = await getQuickMetrics();
       const services = await checkServicesStatus();
       
-      const allHealthy = services.every(s => s.status === 'healthy');
+      const _allHealthy = services.every(s => s.status === 'healthy');
       const hasWarnings = services.some(s => s.status === 'warning');
       const hasCritical = services.some(s => s.status === 'critical');
       

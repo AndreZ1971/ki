@@ -53,7 +53,7 @@ const agentMemory: AgentMemory = (() => {
   return { messages, addMessage, addMessages, getMessages, clearMessages, getStats };
 })();
 
-export default async function memoryRoutes(server: FastifyInstance, options: FastifyPluginOptions) {
+export default async function memoryRoutes(server: FastifyInstance, _options: FastifyPluginOptions) {
   // Get memory
   server.get('/memory', {
     schema: {

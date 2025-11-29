@@ -16,7 +16,7 @@ interface ConversionData {
 const ConversionAnalysis = () => {
   const [conversionData, setConversionData] = useState<ConversionData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, _setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
