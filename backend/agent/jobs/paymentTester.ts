@@ -1,15 +1,9 @@
 // agent/jobs/paymentTester.ts
-import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const wooCommerce = new WooCommerceRestApi({
-  url: process.env.WOOCOMMERCE_URL!,
-  consumerKey: process.env.CONSUMER_KEY!,
-  consumerSecret: process.env.CONSUMER_SECRET!,
-  version: 'wc/v3'
-});
+// Entfernt: wooCommerce Instanz, da nicht verwendet
 
 class PaymentTester {
   static async testPaymentSetup() {

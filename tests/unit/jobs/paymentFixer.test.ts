@@ -1,5 +1,5 @@
 // tests/unit/jobs/paymentFixer.test.ts
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Set mock environment variables BEFORE any imports
 process.env.WOOCOMMERCE_URL = 'https://test.kaufe-es.eu';
@@ -56,7 +56,7 @@ const mockCancelledOrders = [
   }
 ];
 
-const mockSuccessfulOrders = [
+const _mockSuccessfulOrders = [
   {
     id: 2001,
     total: '99.99',
@@ -137,7 +137,7 @@ describe('Payment Fixer', () => {
       // Should log details for all 3 cancelled orders
       expect(consoleLogSpy).toHaveBeenCalled();
       // Verify order IDs are logged
-      const logCalls = consoleLogSpy.mock.calls;
+      const _logCalls = consoleLogSpy.mock.calls;
     });
   });
 });

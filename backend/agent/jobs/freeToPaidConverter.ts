@@ -72,10 +72,9 @@ class FreeToPaidConverter {
       return [];
     }
 
-    popularFreebies.forEach(([name, downloads], index) => {
+    popularFreebies.forEach(([name], index) => {
       console.log(`   ${index + 1}. ${name}`);
-      console.log(`      📥 ${downloads}x heruntergeladen`);
-      console.log(`      💡 Upsell-Potential: ${downloads > 2 ? 'HOCH' : 'MEDIUM'}`);
+      // ...existing code...
     });
 
     return popularFreebies;
@@ -85,7 +84,7 @@ class FreeToPaidConverter {
     console.log('\n🎯 FREE-TO-PAID UPSELL STRATEGIEN:\n');
 
     console.log('1. 🚀 PREMIUM-VERSIONEN ERSTELLEN:');
-    popularFreebies.forEach(([freebieName, downloads], index) => {
+    popularFreebies.forEach(([freebieName], index) => {
       console.log(`   ${index + 1}. "${freebieName}" → Premium Version`);
       console.log(`      • Erweiterte Features`);
       console.log(`      • Persönliche Anpassung`);

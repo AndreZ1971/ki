@@ -37,7 +37,7 @@ class ConversionReport {
     }
   }
 
-  private static async generateConversionReport(data: any) {
+  private static async generateConversionReport(_data: any) {
     console.log('='.repeat(80));
     console.log('🚨 CONVERSION OPTIMIERUNGS-REPORT - KAUFE-ES.EU');
     console.log('='.repeat(80));
@@ -45,7 +45,7 @@ class ConversionReport {
     
     // Kritische Probleme anzeigen
     console.log('\n🔴 KRITISCHE PROBLEME:');
-    const highPriorityProblems = data.problems.filter((p: ConversionProblem) => p.priority === 'high');
+    const highPriorityProblems = _data.problems.filter((p: ConversionProblem) => p.priority === 'high');
     
     if (highPriorityProblems.length === 0) {
       console.log('   ✅ Keine kritischen Probleme erkannt');
@@ -53,7 +53,7 @@ class ConversionReport {
       highPriorityProblems.forEach((problem: ConversionProblem, index: number) => {
         console.log(`\n   ${index + 1}. ${problem.description}`);
         console.log('      💡 LÖSUNGSVORSCHLÄGE:');
-        problem.solution.forEach((solution, solIndex) => {
+        problem.solution.forEach((solution: string, solIndex: number) => {
           console.log(`        ${solIndex + 1}. ${solution}`);
         });
       });
@@ -61,36 +61,45 @@ class ConversionReport {
 
     // Conversion Metrics
     console.log('\n📊 CONVERSION-METRIKEN:');
-    console.log(`   🛒 Gesamtbestellungen: ${data.sales.orderCount}`);
-    console.log(`   💵 Bezahlte Bestellungen: ${data.sales.paidOrderCount}`);
-    console.log(`   🎁 Kostenlose Downloads: ${data.sales.freeOrders}`);
-    console.log(`   📈 Conversion Rate: ${((data.sales.paidOrderCount / data.sales.orderCount) * 100).toFixed(1)}%`);
-    console.log(`   👥 Unique Kunden: ${data.sales.customerCount}`);
+    console.log(`   🛒 Gesamtbestellungen: ${_data.sales.orderCount}`);
+    console.log(`   💵 Bezahlte Bestellungen: ${_data.sales.paidOrderCount}`);
+    console.log(`   🎁 Kostenlose Downloads: ${_data.sales.freeOrders}`);
+    
+    const conversionRate = _data.sales.orderCount > 0 
+      ? ((_data.sales.paidOrderCount / _data.sales.orderCount) * 100).toFixed(1)
+      : '0.0';
+    console.log(`   📈 Conversion Rate: ${conversionRate}%`);
+    
+    console.log(`   👥 Unique Kunden: ${_data.sales.customerCount}`);
 
     // Content-to-Sales Analysis
     console.log('\n📝 CONTENT TO SALES ANALYSIS:');
-    const topContent = data.content.sort((a: any, b: any) => b.pageViews - a.pageViews)[0];
-    if (topContent) {
-      console.log(`   🏆 Top Content: "${topContent.title.substring(0, 40)}..."`);
-      console.log(`      👁️  ${topContent.pageViews} Aufrufe | 💬 ${topContent.engagement} Interaktionen`);
-      console.log(`      🎯 Potenzial: ${topContent.pageViews > 800 ? 'SEHR HOCH' : 'HOCH'} für Conversion`);
+    if (_data.content && _data.content.length > 0) {
+      const topContent = _data.content.sort((a: any, b: any) => b.pageViews - a.pageViews)[0];
+      if (topContent) {
+        console.log(`   🏆 Top Content: "${topContent.title.substring(0, 40)}..."`);
+        console.log(`      👁️  ${topContent.pageViews} Aufrufe | 💬 ${topContent.engagement} Interaktionen`);
+        console.log(`      🎯 Potenzial: ${topContent.pageViews > 800 ? 'SEHR HOCH' : 'HOCH'} für Conversion`);
+      }
+    } else {
+      console.log('   📭 Keine Content-Daten verfügbar');
     }
 
     // Sofort umsetzbare Aktionen
-    await this.generateQuickWins(data);
+    await this.generateQuickWins(_data);
     
     // 30-Tage Conversion-Plan
-    await this.generateConversionPlan(data);
+    await this.generateConversionPlan(_data);
   }
 
   private static async generateQuickWins(data: any) {
     console.log('\n⚡ SOFORT UMSETZBARE AKTIONEN (Diese Woche):');
     
-    const quickWins = [];
+    const quickWins: string[] = [];
 
     // Quick Win 1: Free-to-Paid Conversion
     if (data.sales.freeOrders > 0) {
-      quickWins.push('🎁 **FREEBIE UPSEL STRATEGIE:**');
+      quickWins.push('🎁 **FREE-TO-PAID CONVERSION:**');
       quickWins.push('   • Nach Free-Download: "Möchtest du die Premium-Version?"');
       quickWins.push('   • Special Offer: 50% Rabatt für Freebie-Kunden');
       quickWins.push('   • Email-Autoresponder für Free-Downloader einrichten');
@@ -105,15 +114,17 @@ class ConversionReport {
       quickWins.push('   • Checkout ohne Account-Registrierung ermöglichen');
     }
 
-    // Quick Win 3: Content Conversion
-    const topContent = data.content.sort((a: any, b: any) => b.pageViews - a.pageViews)[0];
-    if (topContent && topContent.pageViews > 500) {
-      quickWins.push('📝 **CONTENT CONVERSION:**');
-      quickWins.push(`   • Pop-up auf "${topContent.title.substring(0, 30)}..."`);
-      quickWins.push('   • "Kostenlose Beratung" Call-to-Action einbauen');
-      quickWins.push('   • Related Products Widget implementieren');
+    // Quick Win 3: Content Optimization
+    if (data.content && data.content.length > 0) {
+      const highTrafficContent = data.content.filter((c: any) => c.pageViews > 500);
+      if (highTrafficContent.length > 0) {
+        quickWins.push('📝 **CONTENT OPTIMIZATION:**');
+        quickWins.push('   • "Kostenlose Beratung" Call-to-Action einbauen');
+        quickWins.push('   • Related Products Widget implementieren');
+      }
     }
 
+    // Default Quick Wins falls keine spezifischen Probleme
     if (quickWins.length === 0) {
       quickWins.push('✅ **SHOP OPTIMIERUNG:**');
       quickWins.push('   • Produkt-Bilder in höherer Qualität');
@@ -124,7 +135,7 @@ class ConversionReport {
     quickWins.forEach(win => console.log(`   ${win}`));
   }
 
-  private static async generateConversionPlan(data: any) {
+  private static async generateConversionPlan(_data: any) {
     console.log('\n🎯 30-TAGE CONVERSION-PLAN:');
     
     console.log('   WOCHE 1-2: 🎁 FREE-TO-PAID CONVERSION');

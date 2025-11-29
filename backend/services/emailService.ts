@@ -30,7 +30,7 @@ console.log('🔧 Email Konfiguration geladen:', {
 const transporter = nodemailer.createTransport(emailConfig);
 
 // Verbindung testen mit besserem Error Handling
-transporter.verify(function(error, success) {
+transporter.verify(function(error, _success) {
   if (error) {
     console.log('❌ SMTP Verbindung fehlgeschlagen:', error.message);
     console.log('🔍 Details:', {

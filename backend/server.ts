@@ -137,7 +137,7 @@ async function buildServer() {
   try {
     // SWAGGER zuerst registrieren
     // Dynamische Host/Scheme Konfiguration, damit in Docker/Prod kein 'localhost:3000' hartkodiert ist.
-    const swaggerHost = process.env.SWAGGER_HOST || `${process.env.HOST || 'localhost'}:${process.env.PORT || 3000}`;
+    const _swaggerHost = process.env.SWAGGER_HOST || `${process.env.HOST || 'localhost'}:${process.env.PORT || 3000}`;
     const swaggerSchemes = (process.env.FORCE_HTTPS === 'true' || (process.env.NODE_ENV === 'production' && process.env.FORCE_HTTPS !== 'false')) ? ['https'] : ['http'];
 
     await server.register(swagger, {
@@ -318,7 +318,7 @@ async function buildServer() {
     });
 
     // Health Check Endpoint
-    server.get('/health', async (request, reply) => {
+    server.get('/health', async (_request, _reply) => {
       return { 
         status: 'ok', 
         timestamp: new Date().toISOString(),
@@ -328,7 +328,7 @@ async function buildServer() {
     });
 
     // System Health Endpoint
-    server.get('/api/system/health', async (request, reply) => {
+    server.get('/api/system/health', async (_request, _reply) => {
       return {
         status: 'healthy',
         timestamp: new Date().toISOString(),
@@ -340,7 +340,7 @@ async function buildServer() {
 
     // 🔥 SPA FALLBACK - Serve index.html for all non-API routes
     // This must be registered AFTER all other routes
-    server.setNotFoundHandler(async (request, reply) => {
+    server.setNotFoundHandler(async (_request, _reply) => {
       const url = request.url;
       
       // API routes → 404 JSON

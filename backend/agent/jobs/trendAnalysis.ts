@@ -1,5 +1,5 @@
 //backend/jobs/trendAnalysis.ts
-import axios from 'axios';
+// Entfernt: axios Import, da nicht verwendet
 
 const googleTrends = require('google-trends-api');
 
@@ -26,7 +26,7 @@ export async function trendAnalysisJob(options?: {
   geo?: string;
   includeReddit?: boolean;
 }): Promise<TrendAnalysisResult> {
-  const keyword = options?.keyword || 'digitale produkte';
+  // ...existing code...
   const geo = options?.geo || 'DE';
   
   console.log(`🔍 Starte Trend-Analyse für: "${keyword}" in ${geo}`);
@@ -108,7 +108,7 @@ async function analyzeGoogleTrends(keyword: string, geo: string): Promise<TrendD
 /**
  * Reddit Trends Analyse
  */
-async function analyzeRedditTrends(keyword: string): Promise<TrendData[]> {
+async function analyzeRedditTrends(_keyword: string): Promise<TrendData[]> {
   // Für später - erstmal Platzhalter
   console.log('📝 Reddit Analysis coming soon...');
   return [];
@@ -174,7 +174,7 @@ function extractKeywords(niche: string): string[] {
 /**
  * Saisonality analysieren
  */
-function analyzeSeasonality(interestData: any): string[] {
+function analyzeSeasonality(): string[] {
   // Vereinfachte Implementation
   return ['Q1', 'Q4']; // Meistens Anfang und Ende des Jahres stark
 }

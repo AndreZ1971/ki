@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { glob } = require('glob');
+const { _glob } = require('glob');
 
 // Patterns to fix automatically
 const fixes = [

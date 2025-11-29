@@ -93,7 +93,7 @@ const RealWebAnalytics = () => {
     return value >= 0 ? '↑' : '↓';
   };
 
-  const getTrendColor = (value: number) => {
+  const _getTrendColor = (value: number) => {
     return value >= 0 ? '#27ae60' : '#e74c3c';
   };
 
@@ -101,7 +101,7 @@ const RealWebAnalytics = () => {
     navigate('/');
   };
 
-  const handleRefresh = () => {
+  const _handleRefresh = () => {
     window.location.reload();
   };
 

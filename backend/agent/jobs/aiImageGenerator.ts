@@ -38,14 +38,14 @@ async function generateProductImages() {
         const imageUrl = getExistingImage(product);
         
         // OPTIMIERT: Timeout vermeiden mit schnellerem Request
-        const updatedProduct = await wooPost(`/products/${product.id}`, {
+        await wooPost(`/products/${product.id}`, {
           images: [{
             src: imageUrl,
             alt: `Bild für ${product.name}`,
             name: product.name
           }]
         }, { timeout: 15000 }); // 👈 Kürzeres Timeout
-        
+
         console.log(`✅ Bild zugewiesen zu Produkt #${product.id}`);
         updatedProducts.push({
           id: product.id,

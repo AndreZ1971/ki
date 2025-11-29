@@ -1,5 +1,5 @@
 // routes/api/analytics/metrics/shop-metrics.ts
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { FastifyInstance } from 'fastify';
 
 interface WooCommerceOrder {
   id: number;
@@ -14,10 +14,17 @@ interface WooCommerceCustomer {
   date_created: string;
 }
 
-export default async function shopMetricsRoutes(server: FastifyInstance, options: any) {
+interface WooCommerceProduct {
+  id: number;
+  name: string;
+  price: string;
+  status: string;
+}
+
+export default async function shopMetricsRoutes(server: FastifyInstance) {
   
   // 🔥 ROOT ENDPOINT - Wird unter /api/analytics/metrics/ aufgerufen
-  server.get('/', async (request: FastifyRequest, reply: FastifyReply) => {
+  server.get('/', async () => {
     return {
       success: true,
       message: 'Shop Metrics API is working',
@@ -32,13 +39,22 @@ export default async function shopMetricsRoutes(server: FastifyInstance, options
   });
 
   // Dashboard Metrics Endpoint - Wird unter /api/analytics/metrics/dashboard aufgerufen
-  server.get('/dashboard', async (request: FastifyRequest, reply: FastifyReply) => {
+  server.get('/dashboard', async () => {
     try {
       const wooCommerceConfig = {
         url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
         consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
         consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
       };
+
+      // Validate WooCommerce configuration
+      if (!wooCommerceConfig.url || !wooCommerceConfig.consumerKey || !wooCommerceConfig.consumerSecret) {
+        return {
+          success: false,
+          error: 'WooCommerce configuration missing',
+          timestamp: new Date().toISOString()
+        };
+      }
 
       // Basic Auth für WooCommerce API
       const auth = Buffer.from(`${wooCommerceConfig.consumerKey}:${wooCommerceConfig.consumerSecret}`).toString('base64');
@@ -65,13 +81,13 @@ export default async function shopMetricsRoutes(server: FastifyInstance, options
         })
       ]);
 
-      if (!ordersResponse.ok || !customersResponse.ok) {
-        throw new Error('WooCommerce API Error');
+      if (!ordersResponse.ok || !customersResponse.ok || !productsResponse.ok) {
+        throw new Error(`WooCommerce API Error: Orders: ${ordersResponse.status}, Customers: ${customersResponse.status}, Products: ${productsResponse.status}`);
       }
 
       const orders: WooCommerceOrder[] = await ordersResponse.json();
       const customers: WooCommerceCustomer[] = await customersResponse.json();
-      const products = await productsResponse.json();
+      const products: WooCommerceProduct[] = await productsResponse.json();
 
       console.log(`📊 Shop Metrics - Customers found: ${customers.length}`);
       console.log(`📊 Shop Metrics - Orders found: ${orders.length}`);
@@ -86,11 +102,11 @@ export default async function shopMetricsRoutes(server: FastifyInstance, options
       const totalSales = orders.reduce((sum, order) => sum + parseFloat(order.total), 0);
       const todaySales = todayOrders.reduce((sum, order) => sum + parseFloat(order.total), 0);
       
-      // Conversion Rate (vereinfacht - kann später verfeinert werden)
-      const conversionRate = orders.length > 0 ? (orders.length / 1000 * 100) : 0;
+      // Conversion Rate (verbesserte Version)
+      const conversionRate = customers.length > 0 ? (orders.length / customers.length * 100) : 0;
 
       const metrics = {
-        totalSales,
+        totalSales: parseFloat(totalSales.toFixed(2)),
         todaySales: parseFloat(todaySales.toFixed(2)),
         totalOrders: orders.length,
         todayOrders: todayOrders.length,
@@ -101,22 +117,24 @@ export default async function shopMetricsRoutes(server: FastifyInstance, options
         lastUpdated: new Date().toISOString()
       };
 
-      return reply.send({
+      return {
         success: true,
         data: metrics
-      });
+      };
 
-    } catch (_error) {
-      console.error('Shop Metrics Error:', _error);
-      return reply.status(500).send({
+    } catch (error) {
+      console.error('Shop Metrics Error:', error);
+      return {
         success: false,
-        error: 'Failed to fetch shop metrics'
-      });
+        error: 'Failed to fetch shop metrics',
+        details: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      };
     }
   });
 
   // Revenue Endpoint
-  server.get('/revenue', async (request: FastifyRequest, reply: FastifyReply) => {
+  server.get('/revenue', async () => {
     return {
       dailyRevenue: 2450,
       weeklyRevenue: 8560,
@@ -127,8 +145,8 @@ export default async function shopMetricsRoutes(server: FastifyInstance, options
   });
 
   // Health Check Endpoint - Wird unter /api/analytics/metrics/health aufgerufen
-  server.get('/health', async (request: FastifyRequest, reply: FastifyReply) => {
-    return reply.send({ 
+  server.get('/health', async () => {
+    return { 
       status: 'healthy', 
       service: 'Shop Metrics',
       timestamp: new Date().toISOString(),
@@ -136,11 +154,11 @@ export default async function shopMetricsRoutes(server: FastifyInstance, options
         url: process.env.WOOCOMMERCE_URL,
         configured: !!(process.env.CONSUMER_KEY && process.env.CONSUMER_SECRET)
       }
-    });
+    };
   });
 
   // WooCommerce Status Endpoint
-  server.get('/woocommerce', async (request: FastifyRequest, reply: FastifyReply) => {
+  server.get('/woocommerce', async () => {
     const wooCommerceConfig = {
       url: process.env.WOOCOMMERCE_URL,
       consumerKey: process.env.CONSUMER_KEY,
@@ -155,4 +173,4 @@ export default async function shopMetricsRoutes(server: FastifyInstance, options
       timestamp: new Date().toISOString()
     };
   });
-}
+} // ← Fehlende schließende Klammer hinzugefügt
