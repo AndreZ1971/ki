@@ -14,6 +14,8 @@ services:
     volumes:
       - ./backend/data:/app/data:rw
       - ./.env.production:/app/.env.production:ro
+    networks:
+      - kaufe-es-network
 
   nginx:
     image: nginx:latest
