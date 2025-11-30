@@ -38,7 +38,7 @@ const SystemHealth: React.FC = () => {
 
     try {
       // ✅ Hole ECHTE System-Metriken vom Backend
-  const apiUrl = import.meta.env.VITE_API_URL || '/api';
+  const apiUrl = import.meta.env.VITE_API_URL;
   const response = await fetch(`${apiUrl}/monitoring/system/metrics`);
       
       if (!response.ok) {

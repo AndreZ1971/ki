@@ -1,6 +1,6 @@
 import type { EmailDraftRequest, EmailDraftResponse } from './types/ai';
 
-const API_BASE = (import.meta.env.VITE_API_URL || '/api') + '/ai';
+const API_BASE = import.meta.env.VITE_API_URL + '/ai';
 
 export const aiApi = {
   async generateEmail(data: EmailDraftRequest): Promise<EmailDraftResponse> {
