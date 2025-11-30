@@ -9,12 +9,13 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
+    env_file:
+      - .env.production
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=${DATABASE_URL}
-      - JWT_SECRET=${JWT_SECRET}
     volumes:
       - ./backend/data:/app/data:rw
+      - ./.env.production:/app/.env.production:ro
 
   nginx:
     image: nginx:latest
