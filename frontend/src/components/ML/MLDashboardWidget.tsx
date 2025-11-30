@@ -24,7 +24,7 @@ interface MLStats {
 }
 
 export const MLDashboardWidget: React.FC = () => {
-    const apiUrl = import.meta.env.VITE_API_URL || '/api';
+    const apiUrl = import.meta.env.VITE_API_URL;
 
     const fetchMLStatus = React.useCallback(async () => {
       try {
@@ -100,7 +100,7 @@ export const MLDashboardWidget: React.FC = () => {
           <p style={{ color: '#ef4444', marginTop: '10px', fontWeight: 'bold' }}>
             ⚠️ {error}
             <br />
-            <small>API: {import.meta.env.VITE_API_URL || '/api'}</small>
+            <small>API: {import.meta.env.VITE_API_URL}</small>
           </p>
         )}
       </motion.div>
