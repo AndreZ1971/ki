@@ -125,6 +125,7 @@
   "devDependencies": {
     "@eslint/js": "^9.37.0",
     "@types/bcryptjs": "^2.4.6",
+    "@types/express": "^5.0.5",
     "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/minimist": "^1.2.5",

@@ -5,6 +5,8 @@ import swaggerUi from '@fastify/swagger-ui';
 import dotenv from 'dotenv';
 import Fastify from 'fastify';
 import fs from 'fs';
+import path from 'path';
+import { wooAuthMiddleware } from './security/wooAuthMiddleware';
 
 // 🔥 ERROR HANDLING SYSTEM
 import { setupErrorHandling } from './error-handling';
@@ -56,7 +58,6 @@ import connectionRoutes from './routes/app/api/settings/connection';
 // 🔥 MONITORING ROUTES
 import monitoringRoutes from './routes/app/api/monitoring/system';
 
-import path from 'path';
 
 // Umgebungsvariablen laden mit erweiterter Fehlerbehandlung
 // Try multiple .env locations: backend/.env, root/.env, .env.production
@@ -133,6 +134,21 @@ async function buildServer() {
     // Body Limit erhöhen
     bodyLimit: 1048576 * 10, // 10MB
   });
+
+    // Globaler Auth-Hook für alle /api-Routen
+    server.addHook('onRequest', async (request, reply) => {
+      if (request.url.startsWith('/api/')) {
+        const query = request.query as Record<string, any>;
+        const key = request.headers['x-woocommerce-key'] || query?.consumer_key;
+        const secret = request.headers['x-woocommerce-secret'] || query?.consumer_secret;
+        if (
+          key !== process.env.WOOCOMMERCE_CONSUMER_KEY ||
+          secret !== process.env.WOOCOMMERCE_CONSUMER_SECRET
+        ) {
+          reply.status(401).send({ error: 'Unauthorized' });
+        }
+      }
+    });
 
   try {
     // SWAGGER zuerst registrieren
