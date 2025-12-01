@@ -1,48 +1,48 @@
 
 services:
-app:
-build:
-context: .
-dockerfile: Dockerfile
-container_name: woo-app
-restart: unless-stopped
-ports:
-- "3000:3000"
-env_file:
-- .env.production
-environment:
-- NODE_ENV=production
-volumes:
-- ./backend/data:/app/data:rw
-- ./.env.production:/app/.env.production:ro
-networks:
-- kaufe-es-network
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: woo-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.production
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./backend/data:/app/data:rw
+      - ./.env.production:/app/.env.production:ro
+    networks:
+      - kaufe-es-network
 
-nginx:
-image: nginx:latest
-container_name: woo-nginx
-ports:
-- "80:80"
-- "443:443"
-volumes:
-- ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-- /etc/letsencrypt:/etc/letsencrypt:ro
-- ./frontend/dist:/app/public:ro
-depends_on:
-- app
-networks:
-- kaufe-es-network
+  nginx:
+    image: nginx:latest
+    container_name: woo-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - ./frontend/dist:/app/public:ro
+    depends_on:
+      - app
+    networks:
+      - kaufe-es-network
 
-watchtower:
-image: containrrr/watchtower
-container_name: ki-watchtower-1
-volumes:
-- /var/run/docker.sock:/var/run/docker.sock
-command: --interval 300 --cleanup
-restart: unless-stopped
-networks:
-- kaufe-es-network
+  watchtower:
+    image: containrrr/watchtower
+    container_name: ki-watchtower-1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 300 --cleanup
+    restart: unless-stopped
+    networks:
+      - kaufe-es-network
 
 networks:
-kaufe-es-network:
-driver: bridge
+  kaufe-es-network:
+    driver: Bridge
