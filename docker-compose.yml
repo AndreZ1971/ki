@@ -45,4 +45,4 @@ services:
 
 networks:
   kaufe-es-network:
-    driver: Bridge
+    driver: bridge
