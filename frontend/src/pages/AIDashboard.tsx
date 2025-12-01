@@ -46,7 +46,14 @@ const AIDashboard: React.FC = () => {
           console.warn('Warnung: API-URL enthält Port 3000. Bei HTTPS/Proxy sollte die URL ohne Port sein!');
         }
         console.log('AIDashboard API-URL:', fullUrl);
-        const response = await fetch(fullUrl);
+        const response = await fetch(fullUrl, {
+          method: 'GET',
+          headers: {
+            'x-woocommerce-key': import.meta.env.WOOCOMMERCE_CONSUMER_KEY,
+            'x-woocommerce-secret': import.meta.env.WOOCOMMERCE_CONSUMER_SECRET,
+            'Content-Type': 'application/json'
+          }
+        });
         
         if (!response.ok) {
           throw new Error(`API Error: ${response.status}`);
@@ -131,6 +138,8 @@ const AIDashboard: React.FC = () => {
   const response = await fetch(`${apiUrl}/${endpoint}`, {
         method: 'POST',
         headers: {
+          'x-woocommerce-key': import.meta.env.WOOCOMMERCE_CONSUMER_KEY,
+          'x-woocommerce-secret': import.meta.env.WOOCOMMERCE_CONSUMER_SECRET,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
