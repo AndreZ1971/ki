@@ -16,7 +16,7 @@ interface TrendData {
 const TrendAnalysis = () => {
   const [trendData, setTrendData] = useState<TrendData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, _setError] = useState<string | null>(null);
   const [timeRange, setTimeRange] = useState('30d');
   const navigate = useNavigate();
 

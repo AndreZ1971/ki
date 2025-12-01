@@ -1,5 +1,5 @@
 //backend/jobs/trendAnalysis.ts
-import axios from 'axios';
+// Entfernt: axios Import, da nicht verwendet
 
 const googleTrends = require('google-trends-api');
 
@@ -26,8 +26,9 @@ export async function trendAnalysisJob(options?: {
   geo?: string;
   includeReddit?: boolean;
 }): Promise<TrendAnalysisResult> {
-  const keyword = options?.keyword || 'digitale produkte';
+  // ...existing code...
   const geo = options?.geo || 'DE';
+  const keyword = options?.keyword || '';
   
   console.log(`🔍 Starte Trend-Analyse für: "${keyword}" in ${geo}`);
 
@@ -88,7 +89,7 @@ async function analyzeGoogleTrends(keyword: string, geo: string): Promise<TrendD
             niche: item.query,
             demandScore: Math.min(100, Math.max(20, 100 - index * 5)), // Höher = besserer Rank
             competition: Math.min(100, Math.max(10, index * 6)), // Niedriger = weniger Competition
-            seasonality: analyzeSeasonality(parsedInterest),
+            seasonality: analyzeSeasonality(),
             priceRange: estimatePriceRange(item.query),
             keywords: extractKeywords(item.query)
           });
@@ -108,7 +109,7 @@ async function analyzeGoogleTrends(keyword: string, geo: string): Promise<TrendD
 /**
  * Reddit Trends Analyse
  */
-async function analyzeRedditTrends(keyword: string): Promise<TrendData[]> {
+async function analyzeRedditTrends(_keyword: string): Promise<TrendData[]> {
   // Für später - erstmal Platzhalter
   console.log('📝 Reddit Analysis coming soon...');
   return [];
@@ -174,7 +175,7 @@ function extractKeywords(niche: string): string[] {
 /**
  * Saisonality analysieren
  */
-function analyzeSeasonality(interestData: any): string[] {
+function analyzeSeasonality(): string[] {
   // Vereinfachte Implementation
   return ['Q1', 'Q4']; // Meistens Anfang und Ende des Jahres stark
 }

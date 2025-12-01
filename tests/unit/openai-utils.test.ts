@@ -129,13 +129,16 @@ describe('OpenAI Utils', () => {
       expect(openAIBreaker.execute).toHaveBeenCalled();
     });
 
-    it('should execute with retry protection', async () => {
-      const { openAIRetry } = await import('../../backend/error-handling');
-      const operation = vi.fn().mockResolvedValue({ success: true });
-
-      await executeOpenAI(operation, 'test');
-
-      expect(openAIRetry.execute).toHaveBeenCalled();
-    });
+        it('should execute with retry protection', async () => {
+          const { openAIRetry } = await import('../../backend/error-handling');
+          const operation = vi.fn().mockResolvedValue({ success: true });
+    
+          await executeOpenAI(operation, 'test');
+    
+          expect(openAIRetry.execute).toHaveBeenCalled();
+        });
+    
+      }); // Close describe('executeOpenAI')
+    }); // Close describe('OpenAI Utils')
 
    

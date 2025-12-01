@@ -37,170 +37,22 @@ const StandardAudit = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [scanInProgress, setScanInProgress] = useState(false);
 
-  useEffect(() => {
-    loadAuditData();
-  }, []);
-
-  const loadAuditData = () => {
+  const loadAuditData = React.useCallback(() => {
     setLoading(true);
-    
     // Simuliere Audit-Scan
     setTimeout(() => {
       const mockAuditChecks: AuditCheck[] = [
-        // Performance Checks
-        {
-          id: 'perf-1',
-          category: 'performance',
-          name: 'Ladezeit optimieren',
-          description: 'Seiten-Ladezeit unter 3 Sekunden',
-          status: 'warning',
-          importance: 'critical',
-          fixSuggestion: 'Bilder komprimieren, Caching aktivieren',
-          quickFix: true
-        },
-        {
-          id: 'perf-2',
-          category: 'performance',
-          name: 'Mobile Performance',
-          description: 'Mobile Ladezeit akzeptabel',
-          status: 'passed',
-          importance: 'important',
-          fixSuggestion: 'Weiterhin überwachen'
-        },
-        {
-          id: 'perf-3',
-          category: 'performance',
-          name: 'Browser-Caching',
-          description: 'Caching korrekt konfiguriert',
-          status: 'failed',
-          importance: 'important',
-          fixSuggestion: 'Cache-Header für statische Ressourcen setzen',
-          quickFix: true
-        },
-
-        // SEO Checks
-        {
-          id: 'seo-1',
-          category: 'seo',
-          name: 'Meta-Titles',
-          description: 'Einzigartige Title-Tags vorhanden',
-          status: 'passed',
-          importance: 'critical',
-          fixSuggestion: '-'
-        },
-        {
-          id: 'seo-2',
-          category: 'seo',
-          name: 'Meta-Descriptions',
-          description: 'Meta-Beschreibungen optimieren',
-          status: 'warning',
-          importance: 'important',
-          fixSuggestion: 'Beschreibungen für Produktseiten hinzufügen'
-        },
-        {
-          id: 'seo-3',
-          category: 'seo',
-          name: 'SEO-freundliche URLs',
-          description: 'URL-Struktur korrekt',
-          status: 'passed',
-          importance: 'recommended',
-          fixSuggestion: '-'
-        },
-
-        // Security Checks
-        {
-          id: 'sec-1',
-          category: 'security',
-          name: 'SSL-Zertifikat',
-          description: 'HTTPS aktiv und gültig',
-          status: 'passed',
-          importance: 'critical',
-          fixSuggestion: '-'
-        },
-        {
-          id: 'sec-2',
-          category: 'security',
-          name: 'Sicherheits-Headers',
-          description: 'Basic Security Headers vorhanden',
-          status: 'failed',
-          importance: 'important',
-          fixSuggestion: 'Content-Security-Policy implementieren'
-        },
-        {
-          id: 'sec-3',
-          category: 'security',
-          name: 'Software-Updates',
-          description: 'Aktuelle Versionen im Einsatz',
-          status: 'warning',
-          importance: 'critical',
-          fixSuggestion: 'WordPress und Plugins updaten',
-          quickFix: true
-        },
-
-        // UX/Conversion Checks
-        {
-          id: 'ux-1',
-          category: 'ux',
-          name: 'Mobile Responsive',
-          description: 'Mobile Darstellung korrekt',
-          status: 'passed',
-          importance: 'critical',
-          fixSuggestion: '-'
-        },
-        {
-          id: 'ux-2',
-          category: 'ux',
-          name: 'Kontaktinformationen',
-          description: 'Kontaktdaten leicht auffindbar',
-          status: 'failed',
-          importance: 'important',
-          fixSuggestion: 'Im Footer und Impressum anzeigen'
-        },
-        {
-          id: 'ux-3',
-          category: 'ux',
-          name: 'Ladeanzeigen',
-          description: 'Loading States vorhanden',
-          status: 'warning',
-          importance: 'recommended',
-          fixSuggestion: 'Loading-Spinner für langsame Bereiche'
-        },
-
-        // Content Checks
-        {
-          id: 'content-1',
-          category: 'content',
-          name: 'Rechtliche Seiten',
-          description: 'Impressum, Datenschutz vorhanden',
-          status: 'passed',
-          importance: 'critical',
-          fixSuggestion: '-'
-        },
-        {
-          id: 'content-2',
-          category: 'content',
-          name: 'Produktbeschreibungen',
-          description: 'Ausführliche Produktinfos',
-          status: 'warning',
-          importance: 'important',
-          fixSuggestion: 'Beschreibungen um 30% erweitern'
-        },
-        {
-          id: 'content-3',
-          category: 'content',
-          name: 'Bildqualität',
-          description: 'Hohe Bildqualität gewährleistet',
-          status: 'passed',
-          importance: 'recommended',
-          fixSuggestion: '-'
-        }
+        // ...existing code...
       ];
-
       setAuditChecks(mockAuditChecks);
-      calculateSummary(mockAuditChecks);
       setLoading(false);
-    }, 2000);
-  };
+    }, 1000);
+  }, []);
+
+  useEffect(() => {
+    loadAuditData();
+  }, [loadAuditData]);
+
 
   const calculateSummary = (checks: AuditCheck[]) => {
     const total = checks.length;

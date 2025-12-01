@@ -71,7 +71,7 @@ const RealAnalytics = () => {
         };
         setRealTimeData(fallbackData);
       }
-    } catch (error) {
+    } catch (_error) {
       console.log('Keine Live-Daten verfügbar, verwende Standdard-Werte');
       // VERWENDE DIE DATEN DIE WIR SICHER HABEN
       const defaultData = {

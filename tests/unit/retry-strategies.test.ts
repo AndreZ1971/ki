@@ -3,8 +3,6 @@ import {
   RetryStrategy,
   standardRetry,
   aggressiveRetry,
-  conservativeRetry,
-  openAIRetry,
 } from '../../backend/error-handling/retry-strategies';
 
 describe('Retry Strategies', () => {
@@ -126,8 +124,17 @@ describe('Retry Strategies', () => {
     it('should handle multiple failures', async () => {
       const error = new Error('Timeout') as any;
       error.code = 'ETIMEDOUT';
-      mockFunction
-        .mockRejectedValueOnce(error)
-        .mockRejectedValueOnce(error)
-        .mockRejectedValueOnce(error)
-        .mockResolvedValue
+        mockFunction
+          .mockRejectedValueOnce(error)
+          .mockRejectedValueOnce(error)
+          .mockRejectedValueOnce(error)
+          .mockResolvedValue('success');
+  
+        const promise = aggressiveRetry.execute(mockFunction);
+        await vi.runAllTimersAsync();
+  
+        const result = await promise;
+        expect(result).toBe('success');
+      });
+    });
+  });

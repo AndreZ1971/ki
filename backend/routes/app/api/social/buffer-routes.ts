@@ -94,11 +94,11 @@ export default async function bufferRoutes(fastify: FastifyInstance) {
           }
         });
 
-      } catch (error) {
-        console.error('❌ Buffer API Error:', error);
+      } catch (_error) {
+        console.error('❌ Buffer API Error:', _error);
         return reply.status(500).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Post fehlgeschlagen'
+          error: _error instanceof Error ? _error.message : 'Post fehlgeschlagen'
         });
       }
     }
@@ -139,11 +139,11 @@ export default async function bufferRoutes(fastify: FastifyInstance) {
         total: formatted.length
       });
 
-    } catch (error) {
-      console.error('❌ Buffer Profiles Error:', error);
+    } catch (_error) {
+      console.error('❌ Buffer Profiles Error:', _error);
       return reply.status(500).send({
         success: false,
-        error: error instanceof Error ? error.message : 'Konnte Profile nicht laden'
+        error: _error instanceof Error ? _error.message : 'Konnte Profile nicht laden'
       });
     }
   });
@@ -182,7 +182,7 @@ export default async function bufferRoutes(fastify: FastifyInstance) {
         stats
       });
 
-    } catch (error) {
+    } catch (_error) {
       return reply.status(500).send({
         success: false,
         error: 'Stats konnten nicht geladen werden'

@@ -1,9 +1,7 @@
 // agent/jobs/shopHealthReport.ts
 import * as dotenv from 'dotenv';
 
-import { ContentMonetizer } from './contentMonetizer';
-import { FreeToPaidConverter } from './freeToPaidConverter';
-import { PaymentFixer } from './paymentFixer';
+// Entfernt: ContentMonetizer, FreeToPaidConverter, PaymentFixer (nicht verwendet)
 import { RealWooCommerceAnalytics } from './realWooCommerceAnalytics';
 
 
@@ -31,7 +29,7 @@ class ShopHealthReport {
       console.log('📅 Reportdatum:', new Date().toLocaleDateString('de-DE'));
       
       // Kritische Probleme zusammenfassen
-      await this.showCriticalIssues(salesData);
+      await this.showCriticalIssues();
       
       // Priorisierte Aktionsliste
       await this.generateActionPriorityList();
@@ -47,7 +45,7 @@ class ShopHealthReport {
     }
   }
 
-  private static async showCriticalIssues(salesData: any) {
+  private static async showCriticalIssues() {
     console.log('\n🔴 KRITISCHE PROBLEME (Priorität 1):');
     
     console.log('   1. 💳 PAYMENT-SYSTEM FEHLGESCHLAGEN');

@@ -16,10 +16,6 @@
     "noEmitOnError": true,
     "allowImportingTsExtensions": false,
     "verbatimModuleSyntax": false,
-    "baseUrl": "./",
-    "paths": {
-      "@/*": ["*"]
-    },
     "typeRoots": ["./node_modules/@types", "./types"],
     "sourceMap": true,
     "incremental": true,
@@ -32,8 +28,7 @@
     "node_modules",
     "dist",
     "**/*.test.ts",
-    "**/*.spec.ts",
-    "**/*.d.ts"
+    "**/*.spec.ts"
   ],
   "ts-node": {
     "transpileOnly": true,

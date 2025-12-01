@@ -14,6 +14,10 @@ let toastCount = 0;
 export const useToast = () => {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
+  const removeToast = useCallback((id: string) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  }, []);
+
   const showToast = useCallback((message: string, type: ToastType = 'info', duration = 3000) => {
     const id = `toast-${++toastCount}`;
     const newToast: Toast = { id, message, type, duration };
@@ -25,11 +29,7 @@ export const useToast = () => {
         removeToast(id);
       }, duration);
     }
-  }, []);
-
-  const removeToast = useCallback((id: string) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id));
-  }, []);
+  }, [removeToast]);
 
   const success = useCallback((message: string, duration?: number) => {
     showToast(message, 'success', duration);

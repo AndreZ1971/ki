@@ -5,6 +5,8 @@ import swaggerUi from '@fastify/swagger-ui';
 import dotenv from 'dotenv';
 import Fastify from 'fastify';
 import fs from 'fs';
+import path from 'path';
+import { wooAuthMiddleware } from './security/wooAuthMiddleware';
 
 // 🔥 ERROR HANDLING SYSTEM
 import { setupErrorHandling } from './error-handling';
@@ -56,7 +58,6 @@ import connectionRoutes from './routes/app/api/settings/connection';
 // 🔥 MONITORING ROUTES
 import monitoringRoutes from './routes/app/api/monitoring/system';
 
-import path from 'path';
 
 // Umgebungsvariablen laden mit erweiterter Fehlerbehandlung
 // Try multiple .env locations: backend/.env, root/.env, .env.production
@@ -134,10 +135,25 @@ async function buildServer() {
     bodyLimit: 1048576 * 10, // 10MB
   });
 
+    // Globaler Auth-Hook für alle /api-Routen
+    server.addHook('onRequest', async (request, reply) => {
+      if (request.url.startsWith('/api/')) {
+        const query = request.query as Record<string, any>;
+        const key = request.headers['x-woocommerce-key'] || query?.consumer_key;
+        const secret = request.headers['x-woocommerce-secret'] || query?.consumer_secret;
+        if (
+          key !== process.env.WOOCOMMERCE_CONSUMER_KEY ||
+          secret !== process.env.WOOCOMMERCE_CONSUMER_SECRET
+        ) {
+          reply.status(401).send({ error: 'Unauthorized' });
+        }
+      }
+    });
+
   try {
     // SWAGGER zuerst registrieren
     // Dynamische Host/Scheme Konfiguration, damit in Docker/Prod kein 'localhost:3000' hartkodiert ist.
-    const swaggerHost = process.env.SWAGGER_HOST || `${process.env.HOST || 'localhost'}:${process.env.PORT || 3000}`;
+    const _swaggerHost = process.env.SWAGGER_HOST || `${process.env.HOST || 'localhost'}:${process.env.PORT || 3000}`;
     const swaggerSchemes = (process.env.FORCE_HTTPS === 'true' || (process.env.NODE_ENV === 'production' && process.env.FORCE_HTTPS !== 'false')) ? ['https'] : ['http'];
 
     await server.register(swagger, {
@@ -313,12 +329,12 @@ async function buildServer() {
       console.error('🚨 Server Error:', error);
       reply.status(500).send({
         success: false,
-        error: process.env.NODE_ENV === 'development' ? error.message : 'Internal Server Error'
+        error: process.env.NODE_ENV === 'development' && error instanceof Error ? error.message : 'Internal Server Error'
       });
     });
 
     // Health Check Endpoint
-    server.get('/health', async (request, reply) => {
+    server.get('/health', async (_request, _reply) => {
       return { 
         status: 'ok', 
         timestamp: new Date().toISOString(),
@@ -328,7 +344,7 @@ async function buildServer() {
     });
 
     // System Health Endpoint
-    server.get('/api/system/health', async (request, reply) => {
+    server.get('/api/system/health', async (_request, _reply) => {
       return {
         status: 'healthy',
         timestamp: new Date().toISOString(),
@@ -340,12 +356,12 @@ async function buildServer() {
 
     // 🔥 SPA FALLBACK - Serve index.html for all non-API routes
     // This must be registered AFTER all other routes
-    server.setNotFoundHandler(async (request, reply) => {
-      const url = request.url;
+    server.setNotFoundHandler(async (_request, _reply) => {
+      const url = _request.url;
       
       // API routes → 404 JSON
       if (url.startsWith('/api/') || url.startsWith('/documentation') || url.startsWith('/health')) {
-        return reply.status(404).send({ 
+        return _reply.status(404).send({
           success: false,
           error: 'Route not found',
           path: url 
@@ -356,9 +372,9 @@ async function buildServer() {
       if (process.env.NODE_ENV === 'production') {
         const indexPath = path.join(staticPath, 'index.html');
         const indexHtml = await fs.promises.readFile(indexPath, 'utf-8');
-        return reply.type('text/html').send(indexHtml);
+        return _reply.type('text/html').send(indexHtml);
       } else {
-        return reply.status(404).send({ error: 'Not found (dev mode)' });
+        return _reply.status(404).send({ error: 'Not found (dev mode)' });
       }
     });
 

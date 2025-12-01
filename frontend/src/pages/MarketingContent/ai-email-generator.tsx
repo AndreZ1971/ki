@@ -95,7 +95,7 @@ const AIEmailGenerator: React.FC = () => {
       } else {
         setApiStatus('disconnected');
       }
-    } catch (error) {
+    } catch (_error) {
       setApiStatus('disconnected');
     }
   };

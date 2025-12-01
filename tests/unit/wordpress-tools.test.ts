@@ -65,13 +65,7 @@ vi.mock('../../backend/error-handling/index.js', () => ({
 }));
 
 // Now import the tools AFTER all mocks are set up
-import {
-  wpGet,
-  wpPost,
-  wpMediaUpload,
-  wpMediaUploadFromUrl,
-  wpSetMediaMeta,
-} from '../../backend/tools/wp.js';
+import { wpGet } from '../../backend/tools/wp.js';
 
 describe.skip('WordPress Tools', () => {
   const originalEnv = process.env;
@@ -136,4 +130,10 @@ describe.skip('WordPress Tools', () => {
         data: { posts: [] },
       });
 
-      await wpGet.run({ path: 'wp/v2
+      await wpGet.run({ path: 'wp/v2/posts' });
+      const authHeader = mockGet.mock.calls[0][1]?.headers?.Authorization;
+      const expectedAuth = `Basic ${Buffer.from('fallback_user:testpass123').toString('base64')}`;
+      expect(authHeader).toBe(expectedAuth);
+    });
+  });
+});

@@ -39,7 +39,7 @@ export const trendAggregatorRoutes: FastifyPluginAsync = async (fastify) => {
         }
       }
     }
-  }, async (request, reply) => {
+    }, async (_request, _reply) => {
     try {
       const sources = trendAggregator.getAvailableSources();
       
@@ -105,10 +105,10 @@ export const trendAggregatorRoutes: FastifyPluginAsync = async (fastify) => {
         }
       }
     }
-  }, async (request, reply) => {
+    }, async (_request, _reply) => {
     try {
-      const { keyword } = request.params;
-      const sources = request.query.sources?.split(',');
+      const { keyword } = _request.params;
+      const sources = _request.query.sources?.split(',');
 
       logger.info({ keyword, sources }, 'Analyzing trends');
 
@@ -116,8 +116,8 @@ export const trendAggregatorRoutes: FastifyPluginAsync = async (fastify) => {
 
       return result;
     } catch (error) {
-      logger.error({ error, keyword: request.params.keyword }, 'Trend analysis failed');
-      reply.code(500);
+      logger.error({ error, keyword: _request.params.keyword }, 'Trend analysis failed');
+      _reply.code(500);
       return { error: 'Trend analysis failed' };
     }
   });
@@ -176,12 +176,12 @@ export const trendAggregatorRoutes: FastifyPluginAsync = async (fastify) => {
         }
       }
     }
-  }, async (request, reply) => {
+    }, async (_request, _reply) => {
     try {
-      const { keywords } = request.body;
+      const { keywords } = _request.body;
 
       if (!keywords || keywords.length === 0) {
-        reply.code(400);
+        _reply.code(400);
         return { error: 'Keywords array is required' };
       }
 
@@ -202,7 +202,7 @@ export const trendAggregatorRoutes: FastifyPluginAsync = async (fastify) => {
       };
     } catch (error) {
       logger.error({ error }, 'Batch trend analysis failed');
-      reply.code(500);
+      _reply.code(500);
       return { error: 'Batch trend analysis failed' };
     }
   });
@@ -248,12 +248,12 @@ export const trendAggregatorRoutes: FastifyPluginAsync = async (fastify) => {
         }
       }
     }
-  }, async (request, reply) => {
+    }, async (_request, _reply) => {
     try {
-      const keywords = request.query.keywords.split(',').map(k => k.trim());
+      const keywords = _request.query.keywords.split(',').map((k: string) => k.trim());
 
       if (keywords.length < 2) {
-        reply.code(400);
+        _reply.code(400);
         return { error: 'At least 2 keywords required for comparison' };
       }
 
@@ -274,7 +274,7 @@ export const trendAggregatorRoutes: FastifyPluginAsync = async (fastify) => {
       };
     } catch (error) {
       logger.error({ error }, 'Trend comparison failed');
-      reply.code(500);
+      _reply.code(500);
       return { error: 'Trend comparison failed' };
     }
   });

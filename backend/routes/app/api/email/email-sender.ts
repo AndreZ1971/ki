@@ -2,7 +2,7 @@
 import { FastifyPluginAsync } from 'fastify';
 import nodemailer from 'nodemailer';
 
-const emailSenderRoutes: FastifyPluginAsync = async (fastify, options) => {
+const emailSenderRoutes: FastifyPluginAsync = async (fastify, _options) => {
   
   // SMTP Transporter erstellen
   const createTransporter = () => {
@@ -22,9 +22,9 @@ const emailSenderRoutes: FastifyPluginAsync = async (fastify, options) => {
   };
 
   // POST: ECHTER Email-Versand
-  fastify.post('/send', async (request, reply) => {
+  fastify.post('/send', async (_request, _reply) => {
     try {
-      const { customers, subject, body, emailType } = request.body as any;
+      const { customers, subject, body, emailType } = _request.body as any;
       
       console.log('📧 Starte echten Email-Versand:');
       console.log(`- An: ${customers.length} Kunden`);
@@ -87,7 +87,7 @@ const emailSenderRoutes: FastifyPluginAsync = async (fastify, options) => {
       
     } catch (_error) {
       console.error('Email Send Error:', _error);
-      reply.status(500).send({ 
+      _reply.status(500).send({ 
         success: false, 
         error: 'Email-Versand fehlgeschlagen',
         details: _error instanceof Error ? _error.message : String(_error)
@@ -96,7 +96,7 @@ const emailSenderRoutes: FastifyPluginAsync = async (fastify, options) => {
   });
 
   // GET: SMTP Verbindung testen
-  fastify.get('/test-smtp', async (request, reply) => {
+  fastify.get('/test-smtp', async (_request, _reply) => {
     try {
       const transporter = createTransporter();
       
@@ -124,7 +124,7 @@ const emailSenderRoutes: FastifyPluginAsync = async (fastify, options) => {
       
     } catch (_error) {
       console.error('SMTP Test Error:', _error);
-      reply.status(500).send({ 
+      _reply.status(500).send({ 
         success: false, 
         error: 'SMTP Verbindungstest fehlgeschlagen',
         details: _error instanceof Error ? _error.message : String(_error)
@@ -133,11 +133,11 @@ const emailSenderRoutes: FastifyPluginAsync = async (fastify, options) => {
   });
 
   // Rest der Routes bleiben gleich...
-  fastify.get('/status', async (request, reply) => {
+  fastify.get('/status', async (_request, _reply) => {
     // ... existing code
   });
 
-  fastify.get('/history', async (request, reply) => {
+  fastify.get('/history', async (_request, _reply) => {
     // ... existing code
   });
 };

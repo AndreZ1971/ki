@@ -26,28 +26,28 @@ const WooProductUpdate = () => {
   const [loadingProducts, setLoadingProducts] = useState(true);
 
   // Lade echte Produkte aus WooCommerce
-  useEffect(() => {
-    loadProducts();
-  }, []);
-
-  const loadProducts = async () => {
-    try {
-      setLoadingProducts(true);
-      const response = await fetch('/api/products/woo/list');
-      const data = await response.json();
+    const loadProducts = React.useCallback(async () => {
+      try {
+        setLoadingProducts(true);
+        const response = await fetch('/api/products/woo/list');
+        const data = await response.json();
       
-      if (data.success && data.data) {
-        setProducts(data.data);
-        // Alle Produkte standardmäßig auswählen
-        setSelectedProducts(data.data.map((p: ProductItem) => p.id));
+        if (data.success && data.data) {
+          setProducts(data.data);
+          // Alle Produkte standardmäßig auswählen
+          setSelectedProducts(data.data.map((p: ProductItem) => p.id));
+        }
+      } catch (err) {
+        console.error('Failed to load products:', err);
+        toast.error('Fehler beim Laden der Produkte');
+      } finally {
+        setLoadingProducts(false);
       }
-    } catch (err) {
-      console.error('Failed to load products:', err);
-      toast.error('Fehler beim Laden der Produkte');
-    } finally {
-      setLoadingProducts(false);
-    }
-  };
+    }, [toast]);
+
+    useEffect(() => {
+      loadProducts();
+    }, [loadProducts]);
 
   const toggleProduct = (productId: number) => {
     setSelectedProducts(prev => 

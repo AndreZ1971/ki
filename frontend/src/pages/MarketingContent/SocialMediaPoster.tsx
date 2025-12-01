@@ -29,8 +29,8 @@ const SocialMediaPoster: React.FC = () => {
     tiktok: false,
     youtube: false
   });
-  const [bufferProfiles, setBufferProfiles] = useState<any[]>([]);
-  const [webhookStatus, setWebhookStatus] = useState<any>(null);
+  const [_bufferProfiles, _setBufferProfiles] = useState<any[]>([]);
+  const [_webhookStatus, _setWebhookStatus] = useState<any>(null);
 
   const platformOptions = [
     { value: 'linkedin', label: 'LinkedIn', icon: '💼', followers: '0', connected: connectedAccounts.linkedin },

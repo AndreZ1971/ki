@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { DeadLetterQueue, DeadLetterMessage } from '../../backend/error-handling/dead-letter-queue';
+import { DeadLetterQueue } from '../../backend/error-handling/dead-letter-queue';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -98,7 +98,7 @@ describe('Dead Letter Queue (DLQ)', () => {
     });
 
     it('should set timestamps correctly', async () => {
-      const beforeAdd = Date.now();
+      const _beforeAdd = Date.now();
       const id = await dlq.add('test-job', {}, new Error('Test'));
       const afterAdd = Date.now();
 
@@ -117,8 +117,11 @@ describe('Dead Letter Queue (DLQ)', () => {
         autoRetry: false,
       });
 
-      const beforeAdd = Date.now();
+      const _beforeAdd = Date.now();
       const id = await dlqWithDelay.add('test-job', {}, new Error('Test'));
       
       const message = await dlqWithDelay.get(id);
-      const nextRetryTime = new Date(message!
+            const _nextRetryTime = new Date(message!.nextRetryAt ?? 0);
+          });
+        });
+      });

@@ -2,10 +2,10 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import transporter from '../services/emailService';
 
-async function emailTestRoutes(fastify: any, options: any) {
+async function emailTestRoutes(fastify: any, _options: any) {
   
   // Test-Endpoint für Email-Konfiguration
-  fastify.get('/test-email-config', async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.get('/test-email-config', async (_request: FastifyRequest, _reply: FastifyReply) => {
     try {
       console.log('🧪 Teste Email-Konfiguration...');
       
@@ -36,7 +36,7 @@ async function emailTestRoutes(fastify: any, options: any) {
       };
     } catch (error: any) {
       console.error('❌ Email Test fehlgeschlagen:', error.message);
-      return reply.status(500).send({
+      return _reply.status(500).send({
         success: false,
         error: error.message,
         config: {
@@ -49,7 +49,7 @@ async function emailTestRoutes(fastify: any, options: any) {
   });
 
   // Zusätzlicher einfacher Test-Endpoint
-  fastify.get('/test', async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.get('/test', async (_request: FastifyRequest, _reply: FastifyReply) => {
     return { 
       success: true, 
       message: 'Email Test Route funktioniert!',
