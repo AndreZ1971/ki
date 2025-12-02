@@ -34,7 +34,7 @@ export async function trendAnalysisJob(options?: {
 
   // 1. Google Trends Daten abrufen
   const googleData = await analyzeGoogleTrends(keyword, geo);
-  
+
   // 2. Reddit Daten (optional)
   let redditData: TrendData[] = [];
   if (options?.includeReddit && process.env.REDDIT_CLIENT_ID) {
@@ -68,15 +68,8 @@ async function analyzeGoogleTrends(keyword: string, geo: string): Promise<TrendD
     });
 
     // Interest Over Time
-    const interestOverTime = await googleTrends.interestOverTime({
-      keyword,
-      startTime: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), // 90 Tage
-      endTime: new Date(),
-      geo
-    });
 
     const parsedQueries = JSON.parse(relatedQueries);
-    const parsedInterest = JSON.parse(interestOverTime);
 
     // Trends aus Google Daten extrahieren
     const trends: TrendData[] = [];

@@ -21,7 +21,7 @@ class ShopHealthReport {
       };
 
       // Alle Daten sammeln
-      const salesData = await RealWooCommerceAnalytics.getSalesData(dateRange);
+      await RealWooCommerceAnalytics.getSalesData(dateRange);
       
       console.log('='.repeat(80));
       console.log('🏪 SHOP GESUNDHEITSREPORT - KAUFE-ES.EU');

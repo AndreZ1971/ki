@@ -6,7 +6,6 @@ import dotenv from 'dotenv';
 import Fastify from 'fastify';
 import fs from 'fs';
 import path from 'path';
-import { wooAuthMiddleware } from './security/wooAuthMiddleware';
 
 // 🔥 ERROR HANDLING SYSTEM
 import { setupErrorHandling } from './error-handling';
@@ -135,20 +134,20 @@ async function buildServer() {
     bodyLimit: 1048576 * 10, // 10MB
   });
 
-    // Globaler Auth-Hook für alle /api-Routen
-    server.addHook('onRequest', async (request, reply) => {
-      if (request.url.startsWith('/api/')) {
-        const query = request.query as Record<string, any>;
-        const key = request.headers['x-woocommerce-key'] || query?.consumer_key;
-        const secret = request.headers['x-woocommerce-secret'] || query?.consumer_secret;
-        if (
-          key !== process.env.WOOCOMMERCE_CONSUMER_KEY ||
-          secret !== process.env.WOOCOMMERCE_CONSUMER_SECRET
-        ) {
-          reply.status(401).send({ error: 'Unauthorized' });
-        }
-      }
-    });
+    // Globaler Auth-Hook für alle /api-Routen (temporär deaktiviert)
+    // server.addHook('onRequest', async (request, reply) => {
+    //   if (request.url.startsWith('/api/')) {
+    //     const query = request.query as Record<string, any>;
+    //     const key = request.headers['x-woocommerce-key'] || query?.consumer_key;
+    //     const secret = request.headers['x-woocommerce-secret'] || query?.consumer_secret;
+    //     if (
+    //       key !== process.env.WOOCOMMERCE_CONSUMER_KEY ||
+    //       secret !== process.env.WOOCOMMERCE_CONSUMER_SECRET
+    //     ) {
+    //       reply.status(401).send({ error: 'Unauthorized' });
+    //     }
+    //   }
+    // });
 
   try {
     // SWAGGER zuerst registrieren
