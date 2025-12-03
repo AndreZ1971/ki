@@ -20,12 +20,11 @@ interface ShopCredentials {
   // AI & Services
   openaiApiKey: string;
   openaiModel: string;
-  githubToken: string;
-  
+
   // Job Configuration
   jobMode: 'once' | 'interval';
   jobIntervalMs: number;
-  
+
   // Optional Services
   enableAnalytics: boolean;
   enableAutoProducts: boolean;
@@ -35,113 +34,77 @@ interface ShopCredentials {
 const connectionRoutes: FastifyPluginAsync = async (fastify) => {
   
   // GET /api/settings/connection - Get current credentials from .env
-  fastify.get('/connection', async (request, reply) => {
-    try {
-      logger.info('📊 Settings: Getting current connection credentials');
-      
-      const credentials: ShopCredentials = {
-        // WordPress
-        wpUrl: process.env.WORDPRESS_URL || '',
-        wpUsername: process.env.WORDPRESS_USERNAME || '',
-        wpAppPassword: process.env.WORDPRESS_APP_PASSWORD || '',
-        
-        // WooCommerce
-        wcApiUrl: process.env.WOOCOMMERCE_URL || '',
-        wcConsumerKey: process.env.WOOCOMMERCE_CONSUMER_KEY || '',
-        wcConsumerSecret: process.env.WOOCOMMERCE_CONSUMER_SECRET || '',
-        wooAuthMode: (process.env.WOO_AUTH_MODE as 'basic' | 'oauth') || 'basic',
-        wooTimeoutMs: parseInt(process.env.WOO_TIMEOUT_MS || '30000'),
-        
-        // AI & Services
-        openaiApiKey: process.env.OPENAI_API_KEY || '',
-        openaiModel: process.env.OPENAI_MODEL || 'gpt-4o-mini',
-        githubToken: process.env.GITHUB_TOKEN || '',
-        
-        // Job Configuration
-        jobMode: (process.env.JOB_MODE as 'once' | 'interval') || 'once',
-        jobIntervalMs: parseInt(process.env.JOB_INTERVAL_MS || '900000'),
-        
-        // Optional Services
-        enableAnalytics: process.env.ENABLE_ANALYTICS === 'true',
-        enableAutoProducts: process.env.ENABLE_AUTO_PRODUCTS === 'true',
-        enableEmailMarketing: process.env.ENABLE_EMAIL_MARKETING === 'true',
-      };
-      
-      return {
-        success: true,
-        credentials: credentials, // Send full credentials to frontend for editing
-        hasFull: {
-          wordpress: !!(credentials.wpUrl && credentials.wpUsername && credentials.wpAppPassword),
-          woocommerce: !!(credentials.wcApiUrl && credentials.wcConsumerKey && credentials.wcConsumerSecret),
-          openai: !!credentials.openaiApiKey,
-          github: !!credentials.githubToken,
+    fastify.get('/connection', async (request, reply) => {
+      try {
+        logger.info('📊 Settings: Getting current connection credentials (connection.json)');
+        const jsonPath = path.resolve(process.cwd(), 'connection.json');
+        let credentials: ShopCredentials;
+        try {
+          const json = await fs.readFile(jsonPath, 'utf-8');
+          credentials = JSON.parse(json);
+        } catch {
+          // Datei existiert nicht oder ist leer
+          credentials = {
+            wpUrl: '',
+            wpUsername: '',
+            wpAppPassword: '',
+            wcApiUrl: '',
+            wcConsumerKey: '',
+            wcConsumerSecret: '',
+            wooAuthMode: 'basic',
+            wooTimeoutMs: 30000,
+            openaiApiKey: '',
+            openaiModel: 'gpt-4o-mini',
+            jobMode: 'once',
+            jobIntervalMs: 900000,
+            enableAnalytics: true,
+            enableAutoProducts: true,
+            enableEmailMarketing: true
+          };
         }
-      };
-    } catch (error) {
-      logger.error(`Settings GET error: ${error}`);
-      reply.status(500).send({ error: 'Failed to get connection settings' });
-    }
-  });
+        return {
+          success: true,
+          credentials,
+          hasFull: {
+            wordpress: !!(credentials.wpUrl && credentials.wpUsername && credentials.wpAppPassword),
+            woocommerce: !!(credentials.wcApiUrl && credentials.wcConsumerKey && credentials.wcConsumerSecret),
+            openai: !!credentials.openaiApiKey,
+          }
+        };
+      } catch (error) {
+        logger.error(`Settings GET error: ${error}`);
+        reply.status(500).send({ error: 'Failed to get connection settings' });
+      }
+    });
 
   // POST /api/settings/connection - Update credentials and save to .env
   fastify.post('/connection', async (request, reply) => {
     try {
       const newCredentials = request.body as ShopCredentials;
-      
-      logger.info('💾 Settings: Updating connection credentials');
-      
-      // Helper: Don't save masked values (****), keep existing ones
-      const unmaskValue = (newValue: string, envKey: string): string => {
-        if (newValue.startsWith('****')) {
-          return process.env[envKey] || '';
+      logger.info('💾 Settings: Updating connection credentials (connection.json)');
+      const jsonPath = path.resolve(process.cwd(), 'connection.json');
+      // Masked Werte behandeln: Wenn Wert mit **** beginnt, alten Wert aus JSON übernehmen
+      let oldCredentials: Partial<ShopCredentials> = {};
+      try {
+        const json = await fs.readFile(jsonPath, 'utf-8');
+        oldCredentials = JSON.parse(json);
+      } catch {
+        // intentionally left blank: falls Datei nicht existiert, bleibt oldCredentials leer
+      }
+      const unmaskValue = (newValue: string, oldValue: string | undefined): string => {
+        if (typeof newValue === 'string' && newValue.startsWith('****')) {
+          return oldValue || '';
         }
         return newValue;
       };
-      
-      // Unmask credentials before saving
-      const cleanedCredentials = {
+      const cleanedCredentials: ShopCredentials = {
         ...newCredentials,
-        wpAppPassword: unmaskValue(newCredentials.wpAppPassword, 'WORDPRESS_APP_PASSWORD'),
-        wcConsumerSecret: unmaskValue(newCredentials.wcConsumerSecret, 'WOOCOMMERCE_CONSUMER_SECRET'),
-        openaiApiKey: unmaskValue(newCredentials.openaiApiKey, 'OPENAI_API_KEY'),
-        githubToken: unmaskValue(newCredentials.githubToken, 'GITHUB_TOKEN'),
+        wpAppPassword: unmaskValue(newCredentials.wpAppPassword, oldCredentials.wpAppPassword),
+        wcConsumerSecret: unmaskValue(newCredentials.wcConsumerSecret, oldCredentials.wcConsumerSecret),
+        openaiApiKey: unmaskValue(newCredentials.openaiApiKey, oldCredentials.openaiApiKey),
       };
-      
-      // Update .env file
-      await updateEnvFile(cleanedCredentials);
-      
-      // Update process.env in-memory (runtime)
-      process.env.WORDPRESS_URL = cleanedCredentials.wpUrl;
-      process.env.WORDPRESS_USERNAME = cleanedCredentials.wpUsername;
-      if (cleanedCredentials.wpAppPassword) {
-        process.env.WORDPRESS_APP_PASSWORD = cleanedCredentials.wpAppPassword;
-      }
-      
-      process.env.WOOCOMMERCE_URL = cleanedCredentials.wcApiUrl;
-      process.env.WOOCOMMERCE_CONSUMER_KEY = cleanedCredentials.wcConsumerKey;
-      if (cleanedCredentials.wcConsumerSecret) {
-        process.env.WOOCOMMERCE_CONSUMER_SECRET = cleanedCredentials.wcConsumerSecret;
-      }
-      process.env.WOO_AUTH_MODE = cleanedCredentials.wooAuthMode;
-      process.env.WOO_TIMEOUT_MS = cleanedCredentials.wooTimeoutMs.toString();
-      
-      if (cleanedCredentials.openaiApiKey) {
-        process.env.OPENAI_API_KEY = cleanedCredentials.openaiApiKey;
-      }
-      process.env.OPENAI_MODEL = cleanedCredentials.openaiModel;
-      if (cleanedCredentials.githubToken) {
-        process.env.GITHUB_TOKEN = cleanedCredentials.githubToken;
-      }
-      
-      process.env.JOB_MODE = newCredentials.jobMode;
-      process.env.JOB_INTERVAL_MS = newCredentials.jobIntervalMs.toString();
-      
-      process.env.ENABLE_ANALYTICS = newCredentials.enableAnalytics.toString();
-      process.env.ENABLE_AUTO_PRODUCTS = newCredentials.enableAutoProducts.toString();
-      process.env.ENABLE_EMAIL_MARKETING = newCredentials.enableEmailMarketing.toString();
-      
-      logger.info('✅ Settings: Connection credentials updated successfully');
-      
+      await fs.writeFile(jsonPath, JSON.stringify(cleanedCredentials, null, 2), 'utf-8');
+      logger.info('✅ Settings: connection.json updated successfully');
       return {
         success: true,
         message: 'Konfiguration erfolgreich gespeichert!',
@@ -247,67 +210,6 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
   });
 };
 
-async function updateEnvFile(credentials: ShopCredentials) {
-  try {
-    // Find .env file in project root
-    const envPath = path.resolve(process.cwd(), '.env');
-    
-    logger.info(`📝 Updating .env file: ${envPath}`);
-    
-    // Read current .env file
-    let envContent = '';
-    try {
-      envContent = await fs.readFile(envPath, 'utf-8');
-    } catch {
-      // .env doesn't exist, create new one
-      logger.info('📄 Creating new .env file');
-      envContent = '# Auto-generated by Settings API\n\n';
-    }
-    
-    // Helper function to update or add env variable
-    const updateOrAdd = (key: string, value: string | number | boolean) => {
-      const valueStr = value.toString();
-      const regex = new RegExp(`^${key}=.*$`, 'm');
-      
-      if (regex.test(envContent)) {
-        // Update existing
-        envContent = envContent.replace(regex, `${key}=${valueStr}`);
-      } else {
-        // Add new
-        envContent += `${key}=${valueStr}\n`;
-      }
-    };
-    
-    // Update all credentials
-    updateOrAdd('WORDPRESS_URL', credentials.wpUrl);
-    updateOrAdd('WORDPRESS_USERNAME', credentials.wpUsername);
-    updateOrAdd('WORDPRESS_APP_PASSWORD', credentials.wpAppPassword);
-    
-    updateOrAdd('WOOCOMMERCE_URL', credentials.wcApiUrl);
-    updateOrAdd('WOOCOMMERCE_CONSUMER_KEY', credentials.wcConsumerKey);
-    updateOrAdd('WOOCOMMERCE_CONSUMER_SECRET', credentials.wcConsumerSecret);
-    updateOrAdd('WOO_AUTH_MODE', credentials.wooAuthMode);
-    updateOrAdd('WOO_TIMEOUT_MS', credentials.wooTimeoutMs);
-    
-    updateOrAdd('OPENAI_API_KEY', credentials.openaiApiKey);
-    updateOrAdd('OPENAI_MODEL', credentials.openaiModel);
-    updateOrAdd('GITHUB_TOKEN', credentials.githubToken);
-    
-    updateOrAdd('JOB_MODE', credentials.jobMode);
-    updateOrAdd('JOB_INTERVAL_MS', credentials.jobIntervalMs);
-    
-    updateOrAdd('ENABLE_ANALYTICS', credentials.enableAnalytics);
-    updateOrAdd('ENABLE_AUTO_PRODUCTS', credentials.enableAutoProducts);
-    updateOrAdd('ENABLE_EMAIL_MARKETING', credentials.enableEmailMarketing);
-    
-    // Write back to file
-    await fs.writeFile(envPath, envContent, 'utf-8');
-    
-    logger.info('✅ .env file updated successfully');
-  } catch (error) {
-    logger.error(`Failed to update .env file: ${error}`);
-    throw error;
-  }
-}
+// updateEnvFile entfernt, da jetzt connection.json verwendet wird
 
 export default connectionRoutes;

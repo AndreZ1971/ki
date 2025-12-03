@@ -1,8 +1,10 @@
 // backend/server.ts - KOMPLETT KORRIGIERT
+require('module-alias/register');
 import cors from '@fastify/cors';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import dotenv from 'dotenv';
+import config from './config';
 import Fastify from 'fastify';
 import fs from 'fs';
 import path from 'path';
@@ -83,10 +85,16 @@ if (!envLoaded) {
 // Error Handling Initialisierung
 setupErrorHandling();
 
-// Fallback für Development
-if (!process.env.OPENAI_API_KEY) {
-  console.warn('❌ OPENAI_API_KEY nicht in .env gefunden!');
-  console.warn('💡 Stelle sicher, dass deine .env Datei im Root-Verzeichnis liegt und korrekt formatiert ist.');
+
+// Hinweis, falls OpenAI-Config fehlt
+if (!config.openAI?.apiKey) {
+  console.warn('❌ OpenAI API-Key nicht in connection.json gefunden!');
+  console.warn('💡 Bitte trage deinen OpenAI-Key in die connection.json ein.');
+}
+
+// Hinweis, falls WooCommerce-Config fehlt
+if (!config.woocommerce?.url || !config.woocommerce?.consumerKey || !config.woocommerce?.consumerSecret) {
+  console.warn('⚠️ WooCommerce API nicht korrekt konfiguriert – bitte URL, consumerKey und consumerSecret in connection.json setzen!');
 }
 
 // Memory Management
@@ -134,8 +142,9 @@ async function buildServer() {
     bodyLimit: 1048576 * 10, // 10MB
   });
 
-    // Globaler Auth-Hook für alle /api-Routen (temporär deaktiviert)
+    // Globaler Auth-Hook für alle /api-Routen (nur für Nicht-OPTIONS)
     // server.addHook('onRequest', async (request, reply) => {
+    //   if (request.method === 'OPTIONS') return;
     //   if (request.url.startsWith('/api/')) {
     //     const query = request.query as Record<string, any>;
     //     const key = request.headers['x-woocommerce-key'] || query?.consumer_key;
@@ -194,9 +203,13 @@ async function buildServer() {
     });
 
     // CORS
+    // CORS als erstes Plugin registrieren
     await server.register(cors, {
-      origin: true,
-      methods: ['GET', 'POST', 'PUT', 'DELETE']
+      origin: process.env.NODE_ENV === 'production'
+        ? ['https://my-working-space.de']
+        : ['http://localhost:5173', 'http://localhost:3000'],
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
     });
 
     // 🔥 STATIC FILES (Frontend) - Production Only

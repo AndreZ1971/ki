@@ -1,5 +1,7 @@
 // routes/api/analytics/metrics/shop-metrics.ts
+
 import { FastifyInstance } from 'fastify';
+import config from '../../../../../config';
 
 interface WooCommerceOrder {
   id: number;
@@ -41,10 +43,11 @@ export default async function shopMetricsRoutes(server: FastifyInstance) {
   // Dashboard Metrics Endpoint - Wird unter /api/analytics/metrics/dashboard aufgerufen
   server.get('/dashboard', async () => {
     try {
+
       const wooCommerceConfig = {
-        url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
-        consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
-        consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
+        url: config.woocommerce?.url || '',
+        consumerKey: config.woocommerce?.consumerKey || '',
+        consumerSecret: config.woocommerce?.consumerSecret || '',
       };
 
       // Validate WooCommerce configuration
@@ -160,9 +163,9 @@ export default async function shopMetricsRoutes(server: FastifyInstance) {
   // WooCommerce Status Endpoint
   server.get('/woocommerce', async () => {
     const wooCommerceConfig = {
-      url: process.env.WOOCOMMERCE_URL,
-      consumerKey: process.env.CONSUMER_KEY,
-      consumerSecret: process.env.CONSUMER_SECRET,
+      url: config.woocommerce?.url || '',
+      consumerKey: config.woocommerce?.consumerKey || '',
+      consumerSecret: config.woocommerce?.consumerSecret || '',
     };
 
     return {

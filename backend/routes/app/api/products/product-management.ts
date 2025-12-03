@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import OpenAI from 'openai';
+import config from '@config';
 
 interface CreateProductBody {
   count: number;
@@ -49,23 +50,22 @@ export default async function productRoutes(server: FastifyInstance) {
         const { count, category, productType = 'simple', optimization } = request.body;
         console.log('🤖 Auto-creating products:', { count, category, productType, optimization });
 
-        // WooCommerce Config
-        const wooConfig = {
-          url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
-          consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
-          consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
-        };
 
+        // WooCommerce Config aus zentraler config.json
+        const wooConfig = {
+          url: config.woocommerce?.url || '',
+          consumerKey: config.woocommerce?.consumerKey || '',
+          consumerSecret: config.woocommerce?.consumerSecret || '',
+        };
         if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
           throw new Error('WooCommerce API nicht konfiguriert');
         }
 
         // OpenAI für Produktideen
         const openai = new OpenAI({
-          apiKey: process.env.OPENAI_API_KEY
+          apiKey: config.openAI?.apiKey || ''
         });
-
-        if (!process.env.OPENAI_API_KEY) {
+        if (!config.openAI?.apiKey) {
           throw new Error('OpenAI API Key nicht konfiguriert');
         }
 
@@ -77,9 +77,9 @@ export default async function productRoutes(server: FastifyInstance) {
         const prompt = `Generiere ${count} kreative Produktideen für einen WooCommerce Shop.
 Kategorie-ID: ${category}
 Produkttyp: ${productType}
-Qualität: ${optimization}
-
-Für jedes Produkt erstelle:
+                const openai = new OpenAI({
+                  apiKey: config.openAI?.apiKey || ''
+                });
 - name: Produktname (kreativ, einzigartig)
 - description: Detaillierte Beschreibung (${optimization === 'high' ? '200-300' : optimization === 'medium' ? '100-150' : '50-80'} Wörter)
 - price: Preis in Euro (realistisch, zwischen 9.99 und 299.99)
@@ -232,11 +232,11 @@ Antworte mit einem JSON Objekt im Format: {"products": [...]}`;
         const productData = request.body;
         console.log('📥 Received product data:', JSON.stringify(productData, null, 2));
 
-        // ✅ WooCommerce API Integration
+        // ✅ WooCommerce API Integration (aus zentraler config)
         const wooConfig = {
-          url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
-          consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
-          consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
+          url: config.woocommerce?.url || '',
+          consumerKey: config.woocommerce?.consumerKey || '',
+          consumerSecret: config.woocommerce?.consumerSecret || '',
         };
 
         if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
@@ -323,9 +323,9 @@ Antworte mit einem JSON Objekt im Format: {"products": [...]}`;
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         const wooConfig = {
-          url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
-          consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
-          consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
+          url: config.woocommerce?.url || '',
+          consumerKey: config.woocommerce?.consumerKey || '',
+          consumerSecret: config.woocommerce?.consumerSecret || '',
         };
 
         if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
@@ -393,9 +393,9 @@ Antworte mit einem JSON Objekt im Format: {"products": [...]}`;
         }
 
         const wooConfig = {
-          url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
-          consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
-          consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
+          url: config.woocommerce?.url || '',
+          consumerKey: config.woocommerce?.consumerKey || '',
+          consumerSecret: config.woocommerce?.consumerSecret || '',
         };
 
         if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {

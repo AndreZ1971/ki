@@ -37,7 +37,7 @@ const RealAnalytics = () => {
     setLoading(true);
     try {
       // VERSUCHE ECHTE WOOCOMMERCE DATEN ZU HOLEN
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/analytics/metrics/dashboard`);
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/analytics/metrics/dashboard`);
       
       if (response.ok) {
         const data = await response.json();

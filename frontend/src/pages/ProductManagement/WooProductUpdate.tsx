@@ -47,7 +47,8 @@ const WooProductUpdate = () => {
 
     useEffect(() => {
       loadProducts();
-    }, [loadProducts]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
   const toggleProduct = (productId: number) => {
     setSelectedProducts(prev => 

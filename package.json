@@ -47,6 +47,9 @@
   ],
   "author": "Your Name",
   "license": "ISC",
+  "_moduleAliases": {
+    "@config": "backend/dist/config.js"
+  },
   "dependencies": {
     "@fastify/cors": "^11.1.0",
     "@fastify/helmet": "^13.0.2",
@@ -67,6 +70,7 @@
     "jsonwebtoken": "^9.0.2",
     "knex": "^3.1.0",
     "minimist": "^1.2.8",
+    "module-alias": "^2.2.3",
     "node-cron": "^4.2.1",
     "openai": "^6.6.0",
     "pino": "^10.0.0",

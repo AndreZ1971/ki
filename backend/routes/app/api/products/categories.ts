@@ -1,4 +1,6 @@
+
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import config from '@config';
 
 interface Category {
   id: number;
@@ -32,15 +34,19 @@ export default async function categoryRoutes(server: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        // ✅ ECHTE WooCommerce API statt Mock-Daten
+        // WooCommerce-Konfiguration aus zentraler config
         const wooConfig = {
-          url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
-          consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
-          consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
+          url: config.woocommerce?.url || '',
+          consumerKey: config.woocommerce?.consumerKey || '',
+          consumerSecret: config.woocommerce?.consumerSecret || '',
         };
 
+        if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
+          throw new Error('WooCommerce API nicht konfiguriert');
+        }
+
         const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
-        
+
         const response = await fetch(`${wooConfig.url}/wp-json/wc/v3/products/categories?per_page=100`, {
           headers: {
             'Authorization': `Basic ${auth}`,
@@ -53,7 +59,7 @@ export default async function categoryRoutes(server: FastifyInstance) {
         }
 
         const wooCategories = await response.json() as any[];
-        
+
         // Transformiere WooCommerce-Format zu unserem Format
         const categories: Category[] = wooCategories.map(cat => ({
           id: cat.id,
@@ -106,15 +112,19 @@ export default async function categoryRoutes(server: FastifyInstance) {
       try {
         const categoryData = request.body;
 
-        // ✅ WooCommerce API Integration
+        // WooCommerce-Konfiguration aus zentraler config
         const wooConfig = {
-          url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
-          consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
-          consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
+          url: config.woocommerce?.url || '',
+          consumerKey: config.woocommerce?.consumerKey || '',
+          consumerSecret: config.woocommerce?.consumerSecret || '',
         };
 
+        if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
+          throw new Error('WooCommerce API nicht konfiguriert');
+        }
+
         const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
-        
+
         const response = await fetch(`${wooConfig.url}/wp-json/wc/v3/products/categories`, {
           method: 'POST',
           headers: {
@@ -134,7 +144,7 @@ export default async function categoryRoutes(server: FastifyInstance) {
         }
 
         const wooCategory = await response.json() as any;
-        
+
         const newCategory: Category = {
           id: wooCategory.id,
           name: wooCategory.name,

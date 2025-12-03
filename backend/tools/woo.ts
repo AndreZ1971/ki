@@ -9,7 +9,8 @@
 //   WOO_TIMEOUT_MS  = 30000           (optional)
 
 // FÜGE DIESE ZEILE HINZU: Environment Variablen laden
-import 'dotenv/config';
+
+import config from '../config';
 
 import axios, { isAxiosError, type AxiosInstance } from 'axios';
 
@@ -21,17 +22,14 @@ const AUTH_MODE = (process.env.WOO_AUTH_MODE ?? 'basic').toLowerCase();
 const TIMEOUT_MS = Number(process.env.WOO_TIMEOUT_MS ?? 30000);
 
 function getWooConfig() {
-  // Unterstütze sowohl WOO_* als auch WC_* Environment Variablen
-  const base =
-    process.env.WOO_URL?.replace(/\/+$/, '') ||
-    process.env.WC_API_URL?.replace(/\/+$/, '') ||
-    '';
-  const key = process.env.WOO_KEY || process.env.WC_CONSUMER_KEY || '';
-  const secret = process.env.WOO_SECRET || process.env.WC_CONSUMER_SECRET || '';
+  // Hole WooCommerce-Konfiguration aus connection.json (config.woocommerce)
+  const base = config.woocommerce?.url?.replace(/\/+$/, '') || '';
+  const key = config.woocommerce?.consumerKey || '';
+  const secret = config.woocommerce?.consumerSecret || '';
 
   if (!base || !key || !secret) {
     throw new Error(
-      'Woo config missing: WOO_URL/WC_API_URL, WOO_KEY/WC_CONSUMER_KEY, WOO_SECRET/WC_CONSUMER_SECRET must be set in .env'
+      'Woo config missing: url, consumerKey, consumerSecret müssen in connection.json gesetzt sein.'
     );
   }
 

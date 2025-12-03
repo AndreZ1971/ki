@@ -1,59 +1,53 @@
 // config.ts
-import dotenv from 'dotenv';
+
+import fs from 'fs';
 import path from 'path';
 
-// .env laden BEVOR wir config erstellen
-// __dirname ist in CommonJS verfügbar (TypeScript kompiliert zu CommonJS)
-const envPaths = [
-  path.resolve(__dirname, '.env'),           // backend/.env (local dev)
-  path.resolve(__dirname, '../.env'),        // root/.env (docker)
-  path.resolve(__dirname, '../.env.production')  // root/.env.production (prod)
-];
-
-for (const envPath of envPaths) {
-  const result = dotenv.config({ path: envPath });
-  if (!result.error) {
-    console.log(`✅ [config.ts] .env geladen von: ${envPath}`);
-    break;
+// connection.json IMMER aus dem Backend-Quellverzeichnis laden (unabhängig von dist oder src)
+const configPath = path.resolve(__dirname, '../connection.json');
+let configData: any = {};
+if (fs.existsSync(configPath)) {
+  configData = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+  console.log(`✅ [config.ts] connection.json geladen von: ${configPath}`);
+  // Debug: Zeige OpenAI API-Key
+  if (configData.openAI && configData.openAI.apiKey) {
+    console.log(`[config.ts] OpenAI API-Key gefunden: ${configData.openAI.apiKey.substring(0, 8)}...`);
+  } else {
+    console.warn('[config.ts] OpenAI API-Key NICHT gefunden!');
   }
+} else {
+  console.warn('⚠️ [config.ts] connection.json nicht gefunden! Bitte im aktuellen Arbeitsverzeichnis ablegen.');
 }
+
+
 
 export interface Config {
-  openAI: {
-    apiKey: string | null;
-    isAvailable: () => boolean;
+  openAI?: {
+    apiKey?: string;
+    model?: string;
   };
-  woocommerce: {
-    url: string | undefined;
-    consumerKey: string | undefined;
-    consumerSecret: string | undefined;
-    isAvailable: () => boolean;
+  woocommerce?: {
+    url?: string;
+    consumerKey?: string;
+    consumerSecret?: string;
   };
+  wordpress?: {
+    url?: string;
+    username?: string;
+    appPassword?: string;
+  };
+  // ...weitere Bereiche nach Bedarf
 }
 
-// Config als Getter-Funktionen, damit sie zur Laufzeit ausgewertet werden
-export const config: Config = {
-  openAI: {
-    get apiKey() {
-      return process.env.OPENAI_API_KEY?.trim() || null;
-    },
-    isAvailable: () => !!process.env.OPENAI_API_KEY?.trim()
-  },
-  woocommerce: {
-    get url() {
-      return process.env.WOOCOMMERCE_URL;
-    },
-    get consumerKey() {
-      return process.env.WOOCOMMERCE_CONSUMER_KEY;
-    },
-    get consumerSecret() {
-      return process.env.WOOCOMMERCE_CONSUMER_SECRET;
-    },
-    isAvailable: () => !!(process.env.WOOCOMMERCE_URL && 
-                         process.env.WOOCOMMERCE_CONSUMER_KEY && 
-                         process.env.WOOCOMMERCE_CONSUMER_SECRET)
-  }
+
+const config: Config = {
+  openAI: configData.openAI || {},
+  woocommerce: configData.woocommerce || {},
+  wordpress: configData.wordpress || {},
+  // ...weitere Bereiche nach Bedarf
 };
+
+export default config;
 
 // Beispiel: Verwende das config-Objekt in anderen Modulen.
 // import { config } from './config';

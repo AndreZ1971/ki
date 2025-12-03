@@ -3,6 +3,37 @@ import { useNavigate } from 'react-router-dom';
 import '../AnalyseMetrics/page.css';
 
 interface ShopCredentials {
+    // Reddit
+    redditClientId: string;
+    redditClientSecret: string;
+
+    // E-Mail
+    smtpHost: string;
+    smtpPort: number;
+    smtpSecure: boolean;
+    smtpUser: string;
+    smtpPassword: string;
+    smtpFrom: string;
+
+    // Machine Learning
+    mlEnabled: boolean;
+    mlProductRecommendations: boolean;
+    mlTrendForecasting: boolean;
+    mlDynamicPricing: boolean;
+    mlEmailOptimization: boolean;
+    mlChurnPrediction: boolean;
+    mlSentimentAnalysis: boolean;
+    mlFraudDetection: boolean;
+    mlProductRecMinConfidence: number;
+    mlProductRecFallback: boolean;
+    mlTrendMinConfidence: number;
+    mlTrendFallback: boolean;
+    mlEmailMinConfidence: number;
+    mlEmailFallback: boolean;
+    mlEmailDefaultTime: string;
+    mlMaxInferenceTime: number;
+    mlCacheResults: boolean;
+    mlCacheTtl: number;
   // WordPress
   wpUrl: string;
   wpUsername: string;
@@ -18,7 +49,6 @@ interface ShopCredentials {
   // AI & Services
   openaiApiKey: string;
   openaiModel: string;
-  githubToken: string;
   
   // Job Configuration
   jobMode: 'once' | 'interval';
@@ -40,6 +70,51 @@ interface Specialization {
   features: string[];
 }
 
+
+const defaultCredentials: ShopCredentials = {
+  wpUrl: '',
+  wpUsername: '',
+  wpAppPassword: '',
+  wcApiUrl: '',
+  wcConsumerKey: '',
+  wcConsumerSecret: '',
+  wooAuthMode: 'basic',
+  wooTimeoutMs: 30000,
+  openaiApiKey: '',
+  openaiModel: 'gpt-4o-mini',
+  jobMode: 'once',
+  jobIntervalMs: 900000,
+  enableAnalytics: true,
+  enableAutoProducts: true,
+  enableEmailMarketing: true,
+  redditClientId: '',
+  redditClientSecret: '',
+  smtpHost: '',
+  smtpPort: 465,
+  smtpSecure: true,
+  smtpUser: '',
+  smtpPassword: '',
+  smtpFrom: '',
+  mlEnabled: true,
+  mlProductRecommendations: true,
+  mlTrendForecasting: true,
+  mlDynamicPricing: false,
+  mlEmailOptimization: true,
+  mlChurnPrediction: false,
+  mlSentimentAnalysis: false,
+  mlFraudDetection: false,
+  mlProductRecMinConfidence: 0.7,
+  mlProductRecFallback: true,
+  mlTrendMinConfidence: 0.6,
+  mlTrendFallback: true,
+  mlEmailMinConfidence: 0.65,
+  mlEmailFallback: true,
+  mlEmailDefaultTime: '09:00',
+  mlMaxInferenceTime: 5000,
+  mlCacheResults: true,
+  mlCacheTtl: 3600
+};
+
 const Settings = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'connection' | 'specialization' | 'license'>('connection');
@@ -50,29 +125,82 @@ const Settings = () => {
   const [saving, setSaving] = useState(false);
 
   // Shop-Verbindungsdaten
-  const [credentials, setCredentials] = useState<ShopCredentials>({
-    wpUrl: '',
-    wpUsername: '',
-    wpAppPassword: '',
-    wcApiUrl: '',
-    wcConsumerKey: '',
-    wcConsumerSecret: '',
-    wooAuthMode: 'basic',
-    wooTimeoutMs: 30000,
-    openaiApiKey: '',
-    openaiModel: 'gpt-4o-mini',
-    githubToken: '',
-    jobMode: 'once',
-    jobIntervalMs: 900000,
-    enableAnalytics: true,
-    enableAutoProducts: true,
-    enableEmailMarketing: true
-  });
+  const [credentials, setCredentials] = useState<ShopCredentials>({ ...defaultCredentials });
 
   // Load credentials on mount
   React.useEffect(() => {
     loadCredentials();
   }, []);
+
+  // Import-Konfiguration (connection.json) laden
+  const handleImportConfig = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const json = event.target?.result as string;
+        const data = JSON.parse(json);
+        // Mapping von verschachtelter Struktur zu flachem ShopCredentials-Objekt
+        const mapped: ShopCredentials = {
+          // WordPress
+          wpUrl: data.wordpress?.url || '',
+          wpUsername: data.wordpress?.username || '',
+          wpAppPassword: data.wordpress?.appPassword || '',
+          // WooCommerce
+          wcApiUrl: data.woocommerce?.url || '',
+          wcConsumerKey: data.woocommerce?.consumerKey || '',
+          wcConsumerSecret: data.woocommerce?.consumerSecret || '',
+          wooAuthMode: data.woocommerce?.authMode || 'basic',
+          wooTimeoutMs: data.woocommerce?.timeoutMs || 30000,
+          // AI & Services
+          openaiApiKey: data.openAI?.apiKey || '',
+          openaiModel: data.openAI?.model || 'gpt-4o-mini',
+          // Job Configuration
+          jobMode: data.job?.mode || 'once',
+          jobIntervalMs: data.job?.intervalMs || 900000,
+          // Optional Services
+          enableAnalytics: data.features?.enableAnalytics ?? true,
+          enableAutoProducts: data.features?.enableAutoProducts ?? true,
+          enableEmailMarketing: data.features?.enableEmailMarketing ?? true,
+          // Reddit
+          redditClientId: data.reddit?.clientId || '',
+          redditClientSecret: data.reddit?.clientSecret || '',
+          // E-Mail
+          smtpHost: data.smtp?.host || '',
+          smtpPort: data.smtp?.port || 465,
+          smtpSecure: data.smtp?.secure ?? true,
+          smtpUser: data.smtp?.user || '',
+          smtpPassword: data.smtp?.password || '',
+          smtpFrom: data.smtp?.from || '',
+          // Machine Learning
+          mlEnabled: data.ml?.enabled ?? true,
+          mlProductRecommendations: data.ml?.productRecommendations ?? true,
+          mlTrendForecasting: data.ml?.trendForecasting ?? true,
+          mlDynamicPricing: data.ml?.dynamicPricing ?? false,
+          mlEmailOptimization: data.ml?.emailOptimization ?? true,
+          mlChurnPrediction: data.ml?.churnPrediction ?? false,
+          mlSentimentAnalysis: data.ml?.sentimentAnalysis ?? false,
+          mlFraudDetection: data.ml?.fraudDetection ?? false,
+          mlProductRecMinConfidence: data.ml?.productRecMinConfidence ?? 0.7,
+          mlProductRecFallback: data.ml?.productRecFallback ?? true,
+          mlTrendMinConfidence: data.ml?.trendMinConfidence ?? 0.6,
+          mlTrendFallback: data.ml?.trendFallback ?? true,
+          mlEmailMinConfidence: data.ml?.emailMinConfidence ?? 0.65,
+          mlEmailFallback: data.ml?.emailFallback ?? true,
+          mlEmailDefaultTime: data.ml?.emailDefaultTime || '09:00',
+          mlMaxInferenceTime: data.ml?.maxInferenceTime ?? 5000,
+          mlCacheResults: data.ml?.cacheResults ?? true,
+          mlCacheTtl: data.ml?.cacheTtl ?? 3600
+        };
+        setCredentials({ ...defaultCredentials, ...mapped });
+        setConnectionMessage('✅ Konfiguration geladen. Jetzt speichern, um sie zu übernehmen.');
+      } catch (_err) {
+        setConnectionMessage('❌ Fehler beim Laden der Datei. Bitte gültige connection.json wählen.');
+      }
+    };
+    reader.readAsText(file);
+  };
 
   // Lizenz-Daten
   const [licenseKey, setLicenseKey] = useState('');
@@ -149,7 +277,7 @@ const Settings = () => {
   const loadCredentials = async () => {
     try {
       setLoading(true);
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/settings/connection`);
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/settings/connection`);
       if (!response.ok) throw new Error('Fehler beim Laden');
       const data = await response.json();
       
@@ -158,8 +286,8 @@ const Settings = () => {
         setCredentials(data.credentials);
       }
     } catch (error) {
-      console.error('❌ Fehler beim Laden der Credentials:', error);
-      setConnectionMessage('⚠️ Fehler beim Laden der Einstellungen');
+      console.warn('Hinweis: Einstellungen noch nicht ausgefüllt.', error);
+      setConnectionMessage('ℹ️ Ihr Agent ist noch nicht konfiguriert. Bitte füllen Sie alle Pflichtfelder aus, um die Verbindung herzustellen.');
     } finally {
       setLoading(false);
     }
@@ -175,7 +303,7 @@ const Settings = () => {
     setConnectionMessage('');
     
     try {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/settings/connection/test`, {
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/settings/connection/test`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),
@@ -209,7 +337,7 @@ const Settings = () => {
     try {
       setSaving(true);
       
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/settings/connection`, {
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/settings/connection`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),
@@ -221,7 +349,7 @@ const Settings = () => {
       
       if (data.success) {
         setConnectionStatus('success');
-        setConnectionMessage('✅ Konfiguration erfolgreich gespeichert und in .env persistiert!');
+        setConnectionMessage('✅ Konfiguration erfolgreich gespeichert!');
         console.log('✅ Konfiguration gespeichert');
         
         // Clear message after 3 seconds
@@ -370,6 +498,8 @@ const Settings = () => {
                   <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '30px' }}>
                     Verbinde dein WooCommerce/WordPress Shop mit dem AI-Agent
                   </p>
+
+                  {/* Import-Konfiguration: Button wird unten platziert */}
 
                   {/* Status Message */}
                   {connectionMessage && (
@@ -582,6 +712,113 @@ const Settings = () => {
                   </div>
                 </div>
 
+                {/* Reddit Credentials */}
+                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
+                  <h4 style={{ marginBottom: '15px' }}>👽 Reddit API</h4>
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                      Reddit Client ID:
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Reddit Client ID"
+                      value={credentials.redditClientId}
+                      onChange={(e) => handleCredentialChange('redditClientId', e.target.value)}
+                      style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
+                    />
+                  </div>
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                      Reddit Client Secret:
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="Reddit Client Secret"
+                      value={credentials.redditClientSecret}
+                      onChange={(e) => handleCredentialChange('redditClientSecret', e.target.value)}
+                      style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
+                    />
+                  </div>
+                </div>
+
+                {/* E-Mail Konfiguration */}
+                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
+                  <h4 style={{ marginBottom: '15px' }}>📧 E-Mail Konfiguration</h4>
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                      SMTP Host:
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="SMTP Host"
+                      value={credentials.smtpHost}
+                      onChange={(e) => handleCredentialChange('smtpHost', e.target.value)}
+                      style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
+                    />
+                  </div>
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                      SMTP Port:
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="465"
+                      value={credentials.smtpPort}
+                      onChange={(e) => handleCredentialChange('smtpPort', Number(e.target.value))}
+                      style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
+                    />
+                  </div>
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                      SMTP Secure:
+                    </label>
+                    <select
+                      value={credentials.smtpSecure ? 'true' : 'false'}
+                      onChange={(e) => handleCredentialChange('smtpSecure', e.target.value === 'true')}
+                      style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
+                    >
+                      <option value="true">True</option>
+                      <option value="false">False</option>
+                    </select>
+                  </div>
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                      SMTP User:
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="info@kaufe-es.eu"
+                      value={credentials.smtpUser}
+                      onChange={(e) => handleCredentialChange('smtpUser', e.target.value)}
+                      style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
+                    />
+                  </div>
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                      SMTP Password:
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="SMTP Passwort"
+                      value={credentials.smtpPassword}
+                      onChange={(e) => handleCredentialChange('smtpPassword', e.target.value)}
+                      style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
+                    />
+                  </div>
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                      SMTP From:
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="info@kaufe-es.eu"
+                      value={credentials.smtpFrom}
+                      onChange={(e) => handleCredentialChange('smtpFrom', e.target.value)}
+                      style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
+                    />
+                  </div>
+                </div>
+
                 {/* AI & Services Configuration */}
                 <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
                   <h4 style={{ marginBottom: '15px' }}>🤖 AI & Services</h4>
@@ -634,29 +871,6 @@ const Settings = () => {
                     </select>
                   </div>
 
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
-                      GitHub Token (Optional):
-                    </label>
-                    <input
-                      type="password"
-                      placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                      value={credentials.githubToken}
-                      onChange={(e) => handleCredentialChange('githubToken', e.target.value)}
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        background: 'rgba(0,0,0,0.3)',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        borderRadius: '6px',
-                        color: 'white',
-                        fontSize: '14px'
-                      }}
-                    />
-                    <small style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>
-                      💡 Nur für erweiterte Integrationen notwendig
-                    </small>
-                  </div>
                 </div>
 
                 {/* Job Configuration */}
@@ -790,8 +1004,8 @@ const Settings = () => {
                 </div>
               )}
 
-              {/* Action Buttons */}
-              <div style={{ display: 'flex', gap: '10px' }}>
+              {/* Action Buttons inkl. Import-Konfiguration */}
+              <div style={{ display: 'flex', gap: '10px', marginTop: '30px', alignItems: 'center' }}>
                 <button
                   onClick={testConnection}
                   disabled={testingConnection}
@@ -825,6 +1039,29 @@ const Settings = () => {
                 >
                   {saving ? '💾 Speichert...' : '💾 Konfiguration speichern'}
                 </button>
+
+                {/* Import-Konfiguration Button */}
+                <label htmlFor="import-config" style={{
+                  display: 'inline-block',
+                  background: 'rgba(59, 130, 246, 0.15)',
+                  color: '#3b82f6',
+                  padding: '12px 24px',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  border: '2px solid #3b82f6',
+                  fontSize: '16px',
+                  marginLeft: '10px'
+                }}>
+                  📂 Konfiguration laden
+                  <input
+                    id="import-config"
+                    type="file"
+                    accept="application/json"
+                    style={{ display: 'none' }}
+                    onChange={handleImportConfig}
+                  />
+                </label>
               </div>
                 </>
               )}

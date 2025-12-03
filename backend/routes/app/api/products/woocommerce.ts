@@ -26,42 +26,37 @@ function initializeOpenAI() {
 }
 
 // Einfache WooCommerce Client Implementierung
+import config from '@config';
+
 class WooCommerceClient {
   private baseUrl: string;
   private consumerKey: string;
   private consumerSecret: string;
 
   constructor() {
-    // 🔥 KORRIGIERT: Verwende die korrekten Environment Variable Namen
-    this.baseUrl = process.env.WOOCOMMERCE_URL || '';
-    this.consumerKey = process.env.WOOCOMMERCE_CONSUMER_KEY || process.env.CONSUMER_KEY || '';
-    this.consumerSecret = process.env.WOOCOMMERCE_CONSUMER_SECRET || process.env.CONSUMER_SECRET || '';
-    
-    // Prüfe Konfiguration beim Start
+    const woo = config.woocommerce || {};
+    this.baseUrl = woo.url || '';
+    this.consumerKey = woo.consumerKey || '';
+    this.consumerSecret = woo.consumerSecret || '';
     this.validateConfig();
   }
 
   private validateConfig() {
     const isValid = !!(this.baseUrl && this.consumerKey && this.consumerSecret);
     console.log(`[WooCommerce] Config Check - URL: ${!!this.baseUrl}, Key: ${!!this.consumerKey}, Secret: ${!!this.consumerSecret}`);
-    
     if (!isValid) {
-      console.warn('⚠️ WooCommerce API nicht korrekt konfiguriert - bitte WOOCOMMERCE_URL, WOOCOMMERCE_CONSUMER_KEY und WOOCOMMERCE_CONSUMER_SECRET in .env setzen');
+      console.warn('⚠️ WooCommerce API nicht korrekt konfiguriert - bitte Werte in connection.json setzen');
     } else {
       console.log('✅ WooCommerce Client erfolgreich konfiguriert');
     }
   }
 
   private async makeRequest(endpoint: string, options: any = {}) {
-    // Prüfe ob Konfiguration vorhanden ist
     if (!this.baseUrl || !this.consumerKey || !this.consumerSecret) {
-      throw new Error('WooCommerce API nicht konfiguriert. Bitte WOOCOMMERCE_URL, WOOCOMMERCE_CONSUMER_KEY und WOOCOMMERCE_CONSUMER_SECRET in .env setzen');
+      throw new Error('WooCommerce API nicht konfiguriert. Bitte Werte in connection.json setzen');
     }
-
     const url = `${this.baseUrl}${endpoint}`;
-    
     const auth = Buffer.from(`${this.consumerKey}:${this.consumerSecret}`).toString('base64');
-    
     const defaultOptions = {
       method: 'GET',
       headers: {
@@ -69,14 +64,11 @@ class WooCommerceClient {
         'Content-Type': 'application/json',
       },
     };
-
     try {
       const response = await fetch(url, { ...defaultOptions, ...options });
-      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
       return await response.json();
     } catch (_error) {
       console.error(`Fehler bei WooCommerce Request ${endpoint}:`, _error);

@@ -124,7 +124,7 @@ function App() {
           <Route path="/payments/emergency" element={<PaymentEmergency />} />
           <Route path="/payments/expansion" element={<PaymentExpansion />} />
           <Route path="/payments/fast" element={<PaymentFast />} />
-          <Route path="/payments/issue-detector" element={<PaymentIssuedDetector />} />
+          <Route path="/payments/issued-detector" element={<PaymentIssuedDetector />} />
           <Route path="/payments/quick-check" element={<PaymentQuickCheck />} />
           <Route path="/payments/simplified" element={<PaymentSimplified />} />
           <Route path="/payments/success" element={<PaymentSuccess />} />

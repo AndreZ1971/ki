@@ -31,18 +31,21 @@ const readNum = (obj: unknown, key: string): number | undefined =>
 const hasMessage = (v: unknown): v is { message: string } =>
   isRecord(v) && typeof (v as Record<string, unknown>).message === 'string';
 
+
+import config from '../config';
+
 function wpBase(): string {
-  const url = process.env.WP_URL?.replace(/\/+$/, '') || '';
-  if (!url) throw new Error('WP_URL missing in .env');
+  const url = config.wordpress?.url?.replace(/\/+$/, '') || '';
+  if (!url) throw new Error('WordPress URL fehlt in connection.json');
   return url;
 }
 
-// Akzeptiert WP_USERNAME ODER WP_USER (Fallback für ältere .env)
+
 function wpAuthHeader(): string {
-  const user = process.env.WP_USERNAME || process.env.WP_USER;
-  const pass = process.env.WP_APP_PASSWORD;
+  const user = config.wordpress?.username;
+  const pass = config.wordpress?.appPassword;
   if (!user || !pass)
-    throw new Error('WP_USERNAME/WP_USER oder WP_APP_PASSWORD fehlen in .env');
+    throw new Error('WordPress username oder appPassword fehlen in connection.json');
   return 'Basic ' + Buffer.from(`${user}:${pass}`).toString('base64');
 }
 

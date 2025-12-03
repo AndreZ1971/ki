@@ -1,14 +1,16 @@
 // backend/routes/app/api/woocommerce/customers.ts
 import { FastifyPluginAsync } from 'fastify';
+
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
+import config from '../../../../config';
 
 const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
   
   // WooCommerce Client initialisieren
   const WooCommerce = new WooCommerceRestApi({
-    url: process.env.WOOCOMMERCE_URL || '',
-    consumerKey: process.env.CONSUMER_KEY || '',
-    consumerSecret: process.env.CONSUMER_SECRET || '',
+    url: config.woocommerce?.url || '',
+    consumerKey: config.woocommerce?.consumerKey || '',
+    consumerSecret: config.woocommerce?.consumerSecret || '',
     version: 'wc/v3'
   });
   

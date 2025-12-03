@@ -1,14 +1,17 @@
 // utils/openai.ts
+
 import OpenAI from "openai";
 import { openAIBreaker, openAIRetry, alertError } from '../error-handling';
+import config from '../config';
+
 
 let openAIClient: OpenAI | null = null;
 
 export function getOpenAIClient() {
   if (!openAIClient) {
-    const apiKey = process.env.OPENAI_API_KEY?.trim();
+    const apiKey = config.openAI?.apiKey?.trim();
     if (!apiKey) {
-      throw new Error('OpenAI API Key nicht konfiguriert');
+      throw new Error('OpenAI API Key nicht in connection.json konfiguriert');
     }
     openAIClient = new OpenAI({ apiKey, timeout: 120000 }); // 2 Minuten Timeout für GPT-4/DALL-E
   }
