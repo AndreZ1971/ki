@@ -1,4 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import config from '@config';
 
 interface Freebie {
   id: number;
@@ -37,10 +38,11 @@ export default async function freebieRoutes(server: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         // ✅ ECHTE Freebies aus WooCommerce (Produkte mit Preis = 0)
+        // WooCommerce-Konfiguration aus zentraler connection.json
         const wooConfig = {
-          url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
-          consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
-          consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
+          url: config.woocommerce?.url,
+          consumerKey: config.woocommerce?.consumerKey,
+          consumerSecret: config.woocommerce?.consumerSecret,
         };
 
         const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
@@ -56,6 +58,9 @@ export default async function freebieRoutes(server: FastifyInstance) {
           }
         );
 
+        if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
+          throw new Error('WooCommerce-Konfiguration fehlt (connection.json unvollständig)');
+        }
         if (!productsResponse.ok) {
           throw new Error(`WooCommerce API Error: ${productsResponse.status}`);
         }

@@ -1,4 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import config from '@config';
 
 interface Bundle {
   id: number;
@@ -36,10 +37,11 @@ export default async function bundleRoutes(server: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         // ✅ ECHTE Bundle-Vorschläge aus WooCommerce Order-Daten
+        // WooCommerce-Konfiguration aus zentraler connection.json
         const wooConfig = {
-          url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
-          consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
-          consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
+          url: config.woocommerce?.url,
+          consumerKey: config.woocommerce?.consumerKey,
+          consumerSecret: config.woocommerce?.consumerSecret,
         };
 
         const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');

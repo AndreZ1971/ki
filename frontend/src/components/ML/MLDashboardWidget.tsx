@@ -28,7 +28,7 @@ export const MLDashboardWidget: React.FC = () => {
 
     const fetchMLStatus = React.useCallback(async () => {
       try {
-        const response = await fetch(`${apiUrl}/ml/status`);
+        const response = await fetch(`${apiUrl}/api/ml/status`);
         if (!response.ok) {
           throw new Error(`API Error: ${response.status}`);
         }

@@ -40,7 +40,7 @@ const AIDashboard: React.FC = () => {
           throw new Error('VITE_API_URL is not set!');
         }
         const apiUrl = import.meta.env.VITE_API_URL;
-        const fullUrl = `${apiUrl}/analytics/metrics/dashboard`;
+        const fullUrl = `${apiUrl}/api/analytics/metrics/dashboard`;
         // Prüfe, ob die API-URL ein :3000 enthält (sollte bei HTTPS/Proxy nicht sein)
         if (fullUrl.includes(':3000')) {
           console.warn('Warnung: API-URL enthält Port 3000. Bei HTTPS/Proxy sollte die URL ohne Port sein!');

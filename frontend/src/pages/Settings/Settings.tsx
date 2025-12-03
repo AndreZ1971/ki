@@ -277,7 +277,7 @@ const Settings = () => {
   const loadCredentials = async () => {
     try {
       setLoading(true);
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/settings/connection`);
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/settings/connection`);
       if (!response.ok) throw new Error('Fehler beim Laden');
       const data = await response.json();
       
@@ -303,7 +303,7 @@ const Settings = () => {
     setConnectionMessage('');
     
     try {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/settings/connection/test`, {
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/settings/connection/test`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),
@@ -336,23 +336,77 @@ const Settings = () => {
   const saveConfiguration = async () => {
     try {
       setSaving(true);
-      
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/settings/connection`, {
+      // Mapping: flach -> verschachtelt
+      const payload = {
+        wordpress: {
+          url: credentials.wpUrl,
+          username: credentials.wpUsername,
+          appPassword: credentials.wpAppPassword,
+        },
+        woocommerce: {
+          url: credentials.wcApiUrl,
+          consumerKey: credentials.wcConsumerKey,
+          consumerSecret: credentials.wcConsumerSecret,
+          authMode: credentials.wooAuthMode,
+          timeoutMs: credentials.wooTimeoutMs,
+        },
+        openAI: {
+          apiKey: credentials.openaiApiKey,
+          model: credentials.openaiModel,
+        },
+        smtp: {
+          host: credentials.smtpHost,
+          port: credentials.smtpPort,
+          secure: credentials.smtpSecure,
+          user: credentials.smtpUser,
+          password: credentials.smtpPassword,
+          from: credentials.smtpFrom,
+        },
+        job: {
+          mode: credentials.jobMode,
+          intervalMs: credentials.jobIntervalMs,
+        },
+        features: {
+          enableAnalytics: credentials.enableAnalytics,
+          enableAutoProducts: credentials.enableAutoProducts,
+          enableEmailMarketing: credentials.enableEmailMarketing,
+        },
+        reddit: {
+          clientId: credentials.redditClientId,
+          clientSecret: credentials.redditClientSecret,
+        },
+        ml: {
+          enabled: credentials.mlEnabled,
+          productRecommendations: credentials.mlProductRecommendations,
+          trendForecasting: credentials.mlTrendForecasting,
+          dynamicPricing: credentials.mlDynamicPricing,
+          emailOptimization: credentials.mlEmailOptimization,
+          churnPrediction: credentials.mlChurnPrediction,
+          sentimentAnalysis: credentials.mlSentimentAnalysis,
+          fraudDetection: credentials.mlFraudDetection,
+          productRecMinConfidence: credentials.mlProductRecMinConfidence,
+          productRecFallback: credentials.mlProductRecFallback,
+          trendMinConfidence: credentials.mlTrendMinConfidence,
+          trendFallback: credentials.mlTrendFallback,
+          emailMinConfidence: credentials.mlEmailMinConfidence,
+          emailFallback: credentials.mlEmailFallback,
+          emailDefaultTime: credentials.mlEmailDefaultTime,
+          maxInferenceTime: credentials.mlMaxInferenceTime,
+          cacheResults: credentials.mlCacheResults,
+          cacheTtl: credentials.mlCacheTtl,
+        }
+      };
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/settings/connection`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials),
+        body: JSON.stringify(payload),
       });
-      
       if (!response.ok) throw new Error('Speichern fehlgeschlagen');
-      
       const data = await response.json();
-      
       if (data.success) {
         setConnectionStatus('success');
         setConnectionMessage('✅ Konfiguration erfolgreich gespeichert!');
         console.log('✅ Konfiguration gespeichert');
-        
-        // Clear message after 3 seconds
         setTimeout(() => {
           setConnectionMessage('');
           setConnectionStatus('idle');
@@ -367,7 +421,7 @@ const Settings = () => {
     } finally {
       setSaving(false);
     }
-  };
+  }
 
   const activateLicense = async () => {
     if (!licenseKey) {
@@ -537,7 +591,7 @@ const Settings = () => {
                     <input
                       type="text"
                       placeholder="https://meinshop.de"
-                      value={credentials.wpUrl}
+                      value={credentials.wpUrl || ''}
                       onChange={(e) => handleCredentialChange('wpUrl', e.target.value)}
                       style={{
                         width: '100%',
@@ -558,7 +612,7 @@ const Settings = () => {
                     <input
                       type="text"
                       placeholder="admin@meinshop.de"
-                      value={credentials.wpUsername}
+                      value={credentials.wpUsername || ''}
                       onChange={(e) => handleCredentialChange('wpUsername', e.target.value)}
                       style={{
                         width: '100%',
@@ -579,7 +633,7 @@ const Settings = () => {
                     <input
                       type="password"
                       placeholder="xxxx xxxx xxxx xxxx"
-                      value={credentials.wpAppPassword}
+                      value={credentials.wpAppPassword || ''}
                       onChange={(e) => handleCredentialChange('wpAppPassword', e.target.value)}
                       style={{
                         width: '100%',
@@ -608,7 +662,7 @@ const Settings = () => {
                     <input
                       type="text"
                       placeholder="https://meinshop.de"
-                      value={credentials.wcApiUrl}
+                      value={credentials.wcApiUrl || ''}
                       onChange={(e) => handleCredentialChange('wcApiUrl', e.target.value)}
                       style={{
                         width: '100%',
@@ -629,7 +683,7 @@ const Settings = () => {
                     <input
                       type="text"
                       placeholder="ck_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                      value={credentials.wcConsumerKey}
+                      value={credentials.wcConsumerKey || ''}
                       onChange={(e) => handleCredentialChange('wcConsumerKey', e.target.value)}
                       style={{
                         width: '100%',
@@ -650,7 +704,7 @@ const Settings = () => {
                     <input
                       type="password"
                       placeholder="cs_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                      value={credentials.wcConsumerSecret}
+                      value={credentials.wcConsumerSecret || ''}
                       onChange={(e) => handleCredentialChange('wcConsumerSecret', e.target.value)}
                       style={{
                         width: '100%',
@@ -673,7 +727,7 @@ const Settings = () => {
                         Auth Mode:
                       </label>
                       <select
-                        value={credentials.wooAuthMode}
+                        value={credentials.wooAuthMode || 'basic'}
                         onChange={(e) => handleCredentialChange('wooAuthMode', e.target.value)}
                         style={{
                           width: '100%',
@@ -696,8 +750,8 @@ const Settings = () => {
                       </label>
                       <input
                         type="number"
-                        value={credentials.wooTimeoutMs}
-                        onChange={(e) => handleCredentialChange('wooTimeoutMs', parseInt(e.target.value))}
+                        value={credentials.wooTimeoutMs ?? 0}
+                        onChange={(e) => handleCredentialChange('wooTimeoutMs', parseInt(e.target.value) || 0)}
                         style={{
                           width: '100%',
                           padding: '12px',
@@ -722,7 +776,7 @@ const Settings = () => {
                     <input
                       type="text"
                       placeholder="Reddit Client ID"
-                      value={credentials.redditClientId}
+                      value={credentials.redditClientId || ''}
                       onChange={(e) => handleCredentialChange('redditClientId', e.target.value)}
                       style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
                     />
@@ -734,7 +788,7 @@ const Settings = () => {
                     <input
                       type="password"
                       placeholder="Reddit Client Secret"
-                      value={credentials.redditClientSecret}
+                      value={credentials.redditClientSecret || ''}
                       onChange={(e) => handleCredentialChange('redditClientSecret', e.target.value)}
                       style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
                     />
@@ -751,7 +805,7 @@ const Settings = () => {
                     <input
                       type="text"
                       placeholder="SMTP Host"
-                      value={credentials.smtpHost}
+                      value={credentials.smtpHost || ''}
                       onChange={(e) => handleCredentialChange('smtpHost', e.target.value)}
                       style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
                     />
@@ -763,8 +817,8 @@ const Settings = () => {
                     <input
                       type="number"
                       placeholder="465"
-                      value={credentials.smtpPort}
-                      onChange={(e) => handleCredentialChange('smtpPort', Number(e.target.value))}
+                      value={credentials.smtpPort ?? 0}
+                      onChange={(e) => handleCredentialChange('smtpPort', Number(e.target.value) || 0)}
                       style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
                     />
                   </div>
@@ -788,7 +842,7 @@ const Settings = () => {
                     <input
                       type="text"
                       placeholder="info@kaufe-es.eu"
-                      value={credentials.smtpUser}
+                      value={credentials.smtpUser || ''}
                       onChange={(e) => handleCredentialChange('smtpUser', e.target.value)}
                       style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
                     />
@@ -800,7 +854,7 @@ const Settings = () => {
                     <input
                       type="password"
                       placeholder="SMTP Passwort"
-                      value={credentials.smtpPassword}
+                      value={credentials.smtpPassword || ''}
                       onChange={(e) => handleCredentialChange('smtpPassword', e.target.value)}
                       style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
                     />
@@ -812,7 +866,7 @@ const Settings = () => {
                     <input
                       type="text"
                       placeholder="info@kaufe-es.eu"
-                      value={credentials.smtpFrom}
+                      value={credentials.smtpFrom || ''}
                       onChange={(e) => handleCredentialChange('smtpFrom', e.target.value)}
                       style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
                     />
@@ -830,7 +884,7 @@ const Settings = () => {
                     <input
                       type="password"
                       placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                      value={credentials.openaiApiKey}
+                      value={credentials.openaiApiKey || ''}
                       onChange={(e) => handleCredentialChange('openaiApiKey', e.target.value)}
                       style={{
                         width: '100%',
@@ -852,7 +906,7 @@ const Settings = () => {
                       OpenAI Model:
                     </label>
                     <select
-                      value={credentials.openaiModel}
+                      value={credentials.openaiModel || 'gpt-4o-mini'}
                       onChange={(e) => handleCredentialChange('openaiModel', e.target.value)}
                       style={{
                         width: '100%',
@@ -882,7 +936,7 @@ const Settings = () => {
                       Job Mode:
                     </label>
                     <select
-                      value={credentials.jobMode}
+                      value={credentials.jobMode || 'once'}
                       onChange={(e) => handleCredentialChange('jobMode', e.target.value)}
                       style={{
                         width: '100%',
@@ -908,8 +962,8 @@ const Settings = () => {
                     </label>
                     <input
                       type="number"
-                      value={credentials.jobIntervalMs}
-                      onChange={(e) => handleCredentialChange('jobIntervalMs', parseInt(e.target.value))}
+                      value={credentials.jobIntervalMs ?? 0}
+                      onChange={(e) => handleCredentialChange('jobIntervalMs', parseInt(e.target.value) || 0)}
                       style={{
                         width: '100%',
                         padding: '12px',
@@ -934,7 +988,7 @@ const Settings = () => {
                     <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                       <input
                         type="checkbox"
-                        checked={credentials.enableAnalytics}
+                        checked={!!credentials.enableAnalytics}
                         onChange={(e) => handleCredentialChange('enableAnalytics', e.target.checked)}
                         style={{ 
                           marginRight: '10px', 
@@ -951,7 +1005,7 @@ const Settings = () => {
                     <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                       <input
                         type="checkbox"
-                        checked={credentials.enableAutoProducts}
+                        checked={!!credentials.enableAutoProducts}
                         onChange={(e) => handleCredentialChange('enableAutoProducts', e.target.checked)}
                         style={{ 
                           marginRight: '10px', 
@@ -968,7 +1022,7 @@ const Settings = () => {
                     <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                       <input
                         type="checkbox"
-                        checked={credentials.enableEmailMarketing}
+                        checked={!!credentials.enableEmailMarketing}
                         onChange={(e) => handleCredentialChange('enableEmailMarketing', e.target.checked)}
                         style={{ 
                           marginRight: '10px', 
