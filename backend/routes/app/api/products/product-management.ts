@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import OpenAI from 'openai';
-import config from '@config';
+import config from '../../../../config';
 
 interface CreateProductBody {
   count: number;

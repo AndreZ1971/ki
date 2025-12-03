@@ -1,6 +1,6 @@
 
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import config from '@config';
+import config from '../../../../config';
 
 interface Category {
   id: number;

@@ -60,7 +60,7 @@
     "validate-payment-success": "tsx agent/jobs/paymentSuccessValidator.ts",
     "ultimate-payment-fix": "npm run payment-emergency && npm run validate-payment-success",
     "_moduleAliases": {
-      "@config": "dist/config.js"
+      "@config": "./dist/config.js"
     },
     "simple-payment-fix": "tsx agent/jobs/paymentSimpleFix.ts",
     "lint": "eslint .",
@@ -123,7 +123,8 @@
     "pino": "^10.0.0",
     "prom-client": "^15.0.0",
     "rss-parser": "^3.13.0",
-    "zod": "^4.1.12"
+    "zod": "^4.1.12",
+    "module-alias": "^2.2.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.37.0",

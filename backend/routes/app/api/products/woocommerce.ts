@@ -26,7 +26,7 @@ function initializeOpenAI() {
 }
 
 // Einfache WooCommerce Client Implementierung
-import config from '@config';
+import config from '../../../../config';
 
 class WooCommerceClient {
   private baseUrl: string;
