@@ -43,7 +43,7 @@ COPY healthcheck.js ./
 RUN groupadd -g 1001 nodejs && \
   useradd -m -u 1001 -g nodejs nodeuser && \
   mkdir -p /app/data /app/data/dlq /app/logs /app/backend && \
-  chown -R nodeuser:nodejs /app/data /app/logs /app/backend
+  chown -R nodeuser:nodejs /app /app/data /app/logs /app/backend
 
 USER nodeuser
 EXPOSE 3000
