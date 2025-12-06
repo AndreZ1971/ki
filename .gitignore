@@ -1,3 +1,4 @@
+
 node_modules/
 .env
 .DS_Store
@@ -9,11 +10,12 @@ playwright-report/
 test-results/
 screenshots/
 
-
 # SENSITIVE & LOCAL CONFIG FILES
+# Erlaube explizit die production-Umgebungen für Backend und Frontend
+!backend/.env.production
+!frontend/.env.production
 .env.production
 backend/connection.json  # Niemals ins Repo!
-frontend/.env.production
 
 # BUILD & DIST
 frontend/dist/
