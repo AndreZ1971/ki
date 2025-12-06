@@ -11,3 +11,6 @@ coverage
 !*.d.ts
 tsconfig.json
 !frontend/.env.production
+
+# SENSITIVE: connection.json darf nie ins Image!
+backend/connection.json

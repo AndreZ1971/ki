@@ -26,15 +26,17 @@ const ShopMetrics: React.FC = () => {
 
   const fetchMetrics = async () => {
     try {
-      const apiUrl = `${import.meta.env.VITE_API_URL}/api/analytics/metrics/dashboard`;
-      // Prüfe, ob die API-URL ein :3000 enthält (sollte bei HTTPS nicht sein)
+      let base = (import.meta.env.VITE_API_URL || '').trim();
+      // Entferne evtl. abschließenden Slash
+      if (base.endsWith('/')) base = base.slice(0, -1);
+      // Wenn leer, nutze nur den relativen Pfad
+      const apiUrl = base ? `${base}/api/analytics/metrics/dashboard` : `/api/analytics/metrics/dashboard`;
       if (apiUrl.includes(':3000')) {
         console.warn('Warnung: API-URL enthält Port 3000. Bei HTTPS/Proxy sollte die URL ohne Port sein!');
       }
       console.log('ShopMetrics API-URL:', apiUrl);
       const response = await fetch(apiUrl);
       const data = await response.json();
-      
       if (data.success) {
         setMetrics(data.data);
       } else {

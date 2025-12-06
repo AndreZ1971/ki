@@ -9,9 +9,10 @@ playwright-report/
 test-results/
 screenshots/
 
+
 # SENSITIVE & LOCAL CONFIG FILES
 .env.production
-backend/connection.json
+backend/connection.json  # Niemals ins Repo!
 frontend/.env.production
 
 # BUILD & DIST

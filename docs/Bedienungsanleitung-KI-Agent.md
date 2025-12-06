@@ -2,20 +2,48 @@
 
 Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automatisierungs-Plattform.
 
+## 🚀 Erste Schritte: System als Container nutzen
+
+So startest du die KI-Agent-Plattform als Endnutzer ganz ohne Quellcode-Installation:
+
+1. **Voraussetzungen prüfen**
+   - Stelle sicher, dass Docker und Docker Compose installiert sind.
+
+2. **Container starten**
+   - Lade die aktuelle `connection.json` (Konfigurationsdatei) von deinem Anbieter oder Support-Team herunter.
+   - Platziere die Datei im Hauptverzeichnis.
+   - Starte die Plattform mit folgendem Befehl:
+
+   ```bash
+   docker compose up -d
+   ```
+
+3. **Frontend öffnen**
+   - Öffne deinen Browser und rufe `http://localhost:5173` auf.
+
+4. **Konfiguration prüfen**
+   - Gehe auf die Settings-Seite im Frontend.
+   - Lade die `connection.json` über die Import-Funktion hoch oder prüfe, ob alle Felder korrekt befüllt sind.
+   - Speichere die Einstellungen.
+
+5. **System nutzen**
+   - Alle Funktionen sind jetzt einsatzbereit.
+   - Bei Problemen wende dich an den Support.
+
 ---
 
 ## 📊 Analytics & Metrics Tools
 
 ### AnalyticRegioning
 
-#### Was kann ich damit machen?
+#### Was kann ich mit AnalyticRegioning machen?
 
 - Regionale Performance-Analyse Ihrer Geschäftsaktivitäten
 - Geografische Verteilung von Kunden und Umsätzen
 - Identifikation von regionalen Wachstumsmöglichkeiten
 - Vergleich verschiedener Standorte oder Märkte
 
-#### Wie kann ich das machen?
+#### Wie nutze ich AnalyticRegioning?
 
 1. **Datenquelle auswählen** - Wählen Sie die zu analysierenden Daten (Umsätze, Kunden, Conversions)
 2. **Regionen definieren** - Legen Sie geografische Bereiche fest (Länder, Bundesländer, Postleitzahlen)
@@ -34,14 +62,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### ConversionAnalysis
 
-#### Was kann ich damit machen?
+#### Was kann ich mit ConversionAnalysis machen?
 
 - Detaillierte Analyse Ihrer Conversion-Raten
 - Identifikation von Conversion-Blockern
 - Optimierung von Verkaufsprozessen
 - Tracking der Customer Journey
 
-#### Wie kann ich das machen?
+#### Wie nutze ich ConversionAnalysis?
 
 1. **Conversion-Ziel definieren** - Was ist eine erfolgreiche Conversion? (Kauf, Anmeldung, Download)
 2. **Datenquellen verbinden** - Google Analytics, Shop-System, CRM
@@ -50,7 +78,7 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 5. **Auswertung starten** - Klicken Sie auf "Conversion-Analyse starten"
 6. **Optimierungsvorschläge prüfen** - System erkennt automatisch Verbesserungspotentiale
 
-#### Wichtige Metriken
+#### Wichtige Metriken für ShopMetrics
 
 - Gesamt-Conversion-Rate
 - Funnel-Abbruchquoten
@@ -61,14 +89,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### ConversionReported
 
-#### Was kann ich damit machen?
+#### Was kann ich mit ConversionReported machen?
 
 - Automatische Conversion-Reporting
 - Echtzeit-Benachrichtigungen bei Conversions
 - Performance-Tracking über mehrere Kanäle
 - ROI-Berechnung pro Marketing-Kanal
 
-#### Wie kann ich das machen?
+#### Wie nutze ich ConversionReported?
 
 1. **Reporting-Ziele festlegen** - Welche Conversions sollen getrackt werden?
 2. **Benachrichtigungen einrichten** - E-Mail, Slack, Teams Benachrichtigungen
@@ -88,14 +116,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### MiniAudit
 
-#### Was kann ich damit machen?
+#### Was kann ich mit MiniAudit machen?
 
 - Schnelle Website- und Shop-Analyse
 - Identifikation von sofort umsetzbaren Verbesserungen
 - Technische SEO-Prüfung
 - Performance-Check
 
-#### Wie kann ich das machen?
+#### Wie nutze ich MiniAudit?
 
 1. **URL eingeben** - Website-URL, die analysiert werden soll
 2. **Audit-Bereiche wählen** - SEO, Performance, Security, UX
@@ -116,14 +144,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### PremiumAudit
 
-#### Was kann ich damit machen?
+#### Was kann ich mit PremiumAudit machen?
 
 - Umfassende Business-Analyse
 - Tiefgehende Competitive Intelligence
 - Markt- und Branchenanalyse
 - Strategische Empfehlungen
 
-#### Wie kann ich das machen?
+#### Wie nutze ich PremiumAudit?
 
 1. **Audit-Scope definieren** - Wählen Sie den Analyseumfang
 2. **Datenquellen verbinden** - Analytics, CRM, Social Media, Competition
@@ -144,14 +172,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### RealAnalytics
 
-#### Was kann ich damit machen?
+#### Was kann ich mit RealAnalytics machen?
 
 - Echtzeit-Datenvisualisierung
 - Live-Performance-Monitoring
 - Sofortige Erkennung von Trends und Anomalien
 - Interaktive Dashboards
 
-#### Wie kann ich das machen?
+#### Wie nutze ich RealAnalytics?
 
 1. **Datenquellen verbinden** - Verbinden Sie alle relevanten Datenquellen
 2. **Dashboards erstellen** - Drag & Drop Dashboard-Builder
@@ -171,14 +199,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### RealWebAnalytics
 
-#### Was kann ich damit machen?
+#### Was kann ich mit RealWebAnalytics machen?
 
 - Detaillierte Website-Analyse
 - User Behavior Tracking
 - Customer Journey Mapping
 - Conversion-Optimierung
 
-#### Wie kann ich das machen?
+#### Wie nutze ich RealWebAnalytics?
 
 1. **Tracking-Code installieren** - Fügen Sie den Code zu Ihrer Website hinzu
 2. **Ziele definieren** - Was sind wichtige User-Aktionen?
@@ -199,14 +227,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### RunTrendAnalysis
 
-#### Was kann ich damit machen?
+#### Was kann ich mit RunTrendAnalysis machen?
 
 - Automatische Trend-Erkennung
 - Vorhersage zukünftiger Entwicklungen
 - Saisonale Muster identifizieren
 - Prognose-Modelle erstellen
 
-#### Wie kann ich das machen?
+#### Wie nutze ich RunTrendAnalysis?
 
 1. **Daten auswählen** - Wählen Sie die zu analysierenden Zeitreihen
 2. **Analysezeitraum festlegen** - Historische Daten für die Analyse
@@ -215,7 +243,7 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 5. **Ergebnisse interpretieren** - System zeigt Trend-Verläufe und Prognosen
 6. **Automatisierte Reports** - Einrichten regelmäßiger Trend-Updates
 
-#### Analysierte Trends
+#### Analysierte Trends für TrendAnalysis
 
 - Umsatzentwicklung
 - Kundenwachstum
@@ -227,14 +255,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### ShopHealthReport
 
-#### Was kann ich damit machen?
+#### Was kann ich mit ShopHealthReport machen?
 
 - Umfassende Shop-Gesundheitscheck
 - Technische Performance-Analyse
 - Sicherheits-Überprüfung
 - SEO-Optimierungspotentiale
 
-#### Wie kann ich das machen?
+#### Wie nutze ich ShopHealthReport?
 
 1. **Shop-URL eingeben** - URL Ihres Online-Shops
 2. **Check-Bereiche auswählen** - Performance, Security, SEO, UX
@@ -256,14 +284,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### ShopMetrics
 
-#### Was kann ich damit machen?
+#### Was kann ich mit ShopMetrics machen?
 
 - Umfassende Shop-Kennzahlen
 - Performance-Tracking
 - KPI-Überwachung
 - Benchmarking
 
-#### Wie kann ich das machen?
+#### Wie nutze ich ShopMetrics?
 
 1. **Shop-Daten verbinden** - Anbindung an Shop-System (Shopify, WooCommerce, etc.)
 2. **Metriken auswählen** - Wichtige Kennzahlen für Ihr Business
@@ -285,14 +313,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### StandardAudit
 
-#### Was kann ich damit machen?
+#### Was kann ich mit StandardAudit machen?
 
 - Standardisierte Business-Analyse
 - Vergleich mit Branchen-Standards
 - Identifikation von Optimierungspotentialen
 - Best Practices-Check
 
-#### Wie kann ich das machen?
+#### Wie nutze ich StandardAudit?
 
 1. **Audit-Typ wählen** - Wählen Sie den gewünschten Audit-Bereich
 2. **Daten bereitstellen** - Laden Sie relevante Geschäftsdaten hoch
@@ -313,14 +341,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### TrendAnalysis
 
-#### Was kann ich damit machen?
+#### Was kann ich mit TrendAnalysis machen?
 
 - Detaillierte Trend-Analyse
 - Saisonale Mustererkennung
 - Vorhersage zukünftiger Entwicklungen
 - Competitive Trend-Monitoring
 
-#### Wie kann ich das machen?
+#### Wie nutze ich TrendAnalysis?
 
 1. **Datenquellen auswählen** - Interne Daten und externe Marktdaten
 2. **Analysezeitraum festlegen** - Ausreichend historische Daten für valide Trends
@@ -343,14 +371,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### AI Email Generator
 
-#### Was kann ich damit machen?
+#### Was kann ich mit AI Email Generator machen?
 
 - Professionelle Marketing-E-Mails automatisch generieren
 - Personalisierte Newsletter erstellen
 - Kampagnen-Vorlagen nutzen
 - A/B Testing von E-Mail-Varianten
 
-#### Wie kann ich das machen?
+#### Wie nutze ich AI Email Generator?
 
 1. **E-Mail-Typ wählen** - Newsletter, Promotion, Welcome Email, etc.
 2. **Zielgruppe definieren** - Für wen ist die E-Mail?
@@ -371,14 +399,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### German Content Generator
 
-#### Was kann ich damit machen?
+#### Was kann ich mit German Content Generator machen?
 
 - Deutsche Marketing-Texte erstellen
 - Lokalisierte Content-Strategie
 - Kultur-spezifische Anpassungen
 - Regionale Marketing-Kampagnen
 
-#### Wie kann ich das machen?
+#### Wie nutze ich German Content Generator?
 
 1. **Content-Typ wählen** - Blogpost, Social Media, Produktbeschreibung
 2. **Zielgruppe definieren** - Deutsche Zielgruppe spezifizieren
@@ -398,14 +426,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Email Marketing Automation
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Email Marketing Automation machen?
 
 - Komplette E-Mail-Kampagnen automatisieren
 - Trigger-basierte E-Mail-Sequenzen
 - Personalisierte Customer Journeys
 - Performance-Optimierung
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Email Marketing Automation?
 
 1. **Automation-Typ wählen** - Welcome Series, Lead Nurturing, Re-Engagement
 2. **Trigger definieren** - Was startet die Automation?
@@ -426,14 +454,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Social Media Audio
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Social Media Audio machen?
 
 - Audio-Content für Social Media erstellen
 - Automatische Podcast-Snippets generieren
 - Voice-Over für Videos produzieren
 - Audio-Kampagnen managen
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Social Media Audio?
 
 1. **Audio-Typ wählen** - Podcast, Voice-Over, Social Media Audio
 2. **Text eingeben** - Script oder Key Messages
@@ -454,14 +482,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Social Media Poster
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Social Media Poster machen?
 
 - Automatisches Posting auf Social Media
 - Content-Kalender management
 - Multi-Plattform Publishing
 - Performance Analytics
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Social Media Poster?
 
 1. **Plattformen verbinden** - Social Media Accounts verknüpfen
 2. **Content erstellen** - Texte, Bilder, Videos vorbereiten
@@ -483,14 +511,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Free to Post Converter
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Free to Post Converter machen?
 
 - Free-User zu aktiven Postern konvertieren
 - Engagement-Strategien automatisieren
 - User-Aktivierungskampagnen
 - Conversion-Optimierung
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Free to Post Converter?
 
 1. **User-Segmente definieren** - Inaktive vs. aktive User identifizieren
 2. **Aktivierungs-Trigger setzen** - Was löst Conversion aus?
@@ -511,14 +539,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Content Monetized
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Content Monetized machen?
 
 - Content automatisch monetarisieren
 - Revenue-Streams optimieren
 - Bezahlschranken implementieren
 - Affiliate-Marketing automatisieren
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Content Monetized?
 
 1. **Content-Typ wählen** - Welcher Content soll monetarisiert werden?
 2. **Monetarisierungs-Modell wählen** - Subscription, Pay-per-View, Affiliate
@@ -539,14 +567,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Kite Templates
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Kite Templates machen?
 
 - Professionelle Marketing-Vorlagen nutzen
 - Brand-consistentes Design
 - Schnelle Content-Erstellung
 - Multi-Channel Templates
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Kite Templates?
 
 1. **Template-Kategorie wählen** - E-Mail, Social Media, Website, etc.
 2. **Vorlage auswählen** - Aus Template-Bibliothek wählen
@@ -570,14 +598,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Payment Fast
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Payment Fast machen?
 
 - Schnelle Payment-Verarbeitung
 - Sofortige Transaktions-Bestätigungen
 - Optimierte Checkout-Prozesse
 - Reduced Abandonment Rates
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Payment Fast?
 
 1. **Payment-Methoden aktivieren** - Kreditkarten, PayPal, etc.
 2. **Checkout-Optimierung** - One-Click Checkout einrichten
@@ -598,14 +626,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Payment Simplified
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Payment Simplified machen?
 
 - Vereinfachte Payment-Prozesse
 - User-friendly Checkout Experience
 - Higher Conversion Rates
 - Reduced Cognitive Load
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Payment Simplified?
 
 1. **Checkout-Prozess analysieren** - Aktuelle Prozesse bewerten
 2. **Vereinfachungs-Optionen wählen** - Welche Schritte können vereinfacht werden?
@@ -626,14 +654,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Payment Tester
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Payment Tester machen?
 
 - Payment-Prozesse automatisch testen
 - Fehlererkennung und -behebung
 - Performance-Benchmarking
 - Security Testing
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Payment Tester?
 
 1. **Test-Szenarien definieren** - Welche Prozesse sollen getestet werden?
 2. **Test-Parameter setzen** - Transaktionswerte, Währungen, etc.
@@ -654,14 +682,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Payment Verifier
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Payment Verifier machen?
 
 - Automatische Payment-Verifikation
 - Transaktions-Validierung
 - Compliance-Checks
 - Audit Trail Generation
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Payment Verifier?
 
 1. **Verifikations-Regeln definieren** - Was soll geprüft werden?
 2. **Compliance-Einstellungen** - Regionale Vorschriften konfigurieren
@@ -682,14 +710,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Payment Success
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Payment Success machen?
 
 - Erfolgreiche Payments verwalten
 - Success-Rate Optimierung
 - Customer Satisfaction Tracking
 - Revenue Management
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Payment Success?
 
 1. **Success-Metriken definieren** - Was definiert einen erfolgreichen Payment?
 2. **Tracking aktivieren** - Klicken Sie auf "Success Monitoring"
@@ -710,14 +738,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Payment Validation
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Payment Validation machen?
 
 - Sichere Payment-Validierung
 - Fraud Detection und Prevention
 - Risiko-Management
 - Security Compliance
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Payment Validation?
 
 1. **Validierungs-Regeln konfigurieren** - Sicherheitsparameter setzen
 2. **Fraud-Patterns definieren** - Betrugsmuster erkennen
@@ -738,14 +766,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Payment Issued Detector
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Payment Issued Detector machen?
 
 - Payment-Probleme automatisch erkennen
 - Issue-Resolution automatisieren
 - Proaktive Problemvermeidung
 - Customer Support Optimierung
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Payment Issued Detector?
 
 1. **Issue-Typen definieren** - Welche Probleme sollen erkannt werden?
 2. **Detection-Regeln einrichten** - Schwellenwerte und Patterns
@@ -766,14 +794,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Payment User Favor
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Payment User Favor machen?
 
 - Personalisierte Payment-Erfahrungen
 - Customer-Centric Payment-Optionen
 - User Preference Management
 - Enhanced Customer Loyalty
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Payment User Favor?
 
 1. **User Preferences sammeln** - Zahlungspräferenzen erfassen
 2. **Personalization Rules** - Anpassungsregeln definieren
@@ -794,14 +822,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Payment Delivery
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Payment Delivery machen?
 
 - Payment-Delivery Management
 - Versandabwicklung automatisieren
 - Lieferverfolgung integrieren
 - Fulfillment Optimization
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Payment Delivery?
 
 1. **Delivery-Systeme verbinden** - Versandpartner integrieren
 2. **Automation Rules einrichten** - Wann wird versandt?
@@ -822,14 +850,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Payment Emergency
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Payment Emergency machen?
 
 - Notfall-System für Payment-Probleme
 - Crisis Management
 - Emergency Response Automation
 - Business Continuity
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Payment Emergency?
 
 1. **Emergency-Szenarien definieren** - Mögliche Krisensituationen
 2. **Response-Pläne erstellen** - Schritt-für-Schritt Notfallpläne
@@ -850,14 +878,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Payment Expansion
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Payment Expansion machen?
 
 - Payment-System Erweiterung
 - International Expansion Support
 - Multi-Currency Processing
 - Global Compliance Management
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Payment Expansion?
 
 1. **Expansion-Ziele definieren** - Welche Märkte/Methoden?
 2. **Requirements analysieren** - Lokale Anforderungen prüfen
@@ -878,14 +906,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Payment Quick Check
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Payment Quick Check machen?
 
 - Schneller Payment-Status Check
 - Echtzeit-Transaktionsüberwachung
 - Instant Problem-Erkennung
 - Mobile Status-Checks
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Payment Quick Check?
 
 1. **Check-Parameter definieren** - Was soll geprüft werden?
 2. **Monitoring aktivieren** - Klicken Sie auf "Quick Check Mode"
@@ -908,14 +936,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### ML Dashboard
 
-#### Was kann ich damit machen?
+#### Was kann ich mit ML Dashboard machen?
 
 - **Echtzeit-Überwachung** aller Machine Learning Modelle
 - **Performance-Metriken** und Prediction-Erfolgsraten visualisieren
 - **Konfidenz-Verläufe** und Response-Zeiten tracken
 - **Feature-Verteilung** und aktive Modelle monitoren
 
-#### Wie kann ich das machen?
+#### Wie nutze ich ML Dashboard?
 
 1. **Dashboard öffnen** - Navigieren Sie zu `/ml/dashboard` oder klicken Sie auf "ML Dashboard öffnen" im Widget
 2. **Live-Status prüfen** - Sehen Sie in Echtzeit welche ML-Modelle aktiv sind
@@ -941,14 +969,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### ML Dashboard Widget
 
-#### Was kann ich damit machen?
+#### Was kann ich mit ML Dashboard Widget machen?
 
 - **Schneller Überblick** über ML-Status direkt auf der Startseite
 - **Wichtigste Metriken** auf einen Blick
 - **Schnellzugriff** auf ML Dashboard und Einstellungen
 - **Live-Status-Anzeige** der aktiven Features
 
-#### Wie kann ich das machen?
+#### Wie nutze ich ML Dashboard Widget?
 
 1. **Widget finden** - Das ML Dashboard Widget befindet sich auf der Hauptseite (AIDashboard)
 2. **Status prüfen** - Live-Badge zeigt ob ML aktiv ist (grüner Puls)
@@ -970,14 +998,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### ML Settings
 
-#### Was kann ich damit machen?
+#### Was kann ich mit ML Settings machen?
 
 - **Machine Learning Features** aktivieren/deaktivieren
 - **Konfidenz-Schwellenwerte** für jedes Modell konfigurieren
 - **OpenAI-Integration** einrichten
 - **ML-Modelle** einzeln steuern
 
-#### Wie kann ich das machen?
+#### Wie nutze ich ML Settings?
 
 1. **Einstellungen öffnen** - Navigieren Sie zu `/settings/ml` oder über ML Dashboard
 2. **Global ML aktivieren** - Toggle "Machine Learning aktivieren" (Master-Switch)
@@ -1022,14 +1050,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Context Generator
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Context Generator machen?
 
 - KI-Kontexte für bessere Ergebnisse generieren
 - Prompt-Optimierung
 - Context-Aware AI Responses
 - Personalized AI Interactions
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Context Generator?
 
 1. **Use-Case definieren** - Wofür wird der Kontext benötigt?
 2. **Input-Daten bereitstellen** - Hintergrundinformationen
@@ -1050,14 +1078,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### String Generator
 
-#### Was kann ich damit machen?
+#### Was kann ich mit String Generator machen?
 
 - Intelligente String-Generierung
 - Code-Snippets erstellen
 - Text-Patterns generieren
 - Data Generation für Testing
 
-#### Wie kann ich das machen?
+#### Wie nutze ich String Generator?
 
 1. **String-Typ wählen** - Code, Text, Daten, etc.
 2. **Parameter definieren** - Länge, Format, Pattern
@@ -1078,14 +1106,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Auto Framplementator
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Auto Framplementator machen?
 
 - Automatische Framework-Implementierung
 - Code-Boilerplate Generation
 - Project Setup Automation
 - Best Practices Implementation
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Auto Framplementator?
 
 1. **Framework wählen** - React, Vue, Angular, etc.
 2. **Projekt-Parameter setzen** - Name, Struktur, Features
@@ -1105,14 +1133,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### WooCommerce Sync
 
-#### Was kann ich damit machen?
+#### Was kann ich mit WooCommerce Sync machen?
 
 - Automatische Synchronisation mit WooCommerce
 - Product Management Automation
 - Order Processing Optimization
 - Inventory Sync
 
-#### Wie kann ich das machen?
+#### Wie nutze ich WooCommerce Sync?
 
 1. **WooCommerce verbinden** - API Keys und Zugänge
 2. **Sync-Bereiche wählen** - Produkte, Bestellungen, Kunden
@@ -1133,14 +1161,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Memory System
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Memory System machen?
 
 - KI-Gedächtnis für personalisierte Ergebnisse
 - Context Persistence
 - User Preference Memory
 - Learning System Implementation
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Memory System?
 
 1. **Memory-Typ definieren** - User, Session, Application Memory
 2. **Data Sources verbinden** - Woher kommen die Daten?
@@ -1161,14 +1189,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### System Health
 
-#### Was kann ich damit machen?
+#### Was kann ich mit System Health machen?
 
 - System-Status und Performance-Monitoring
 - Proactive Issue Detection
 - Resource Optimization
 - Health Analytics
 
-#### Wie kann ich das machen?
+#### Wie nutze ich System Health?
 
 1. **Monitoring-Bereiche wählen** - Server, Database, Application
 2. **Thresholds setzen** - Warn- und Fehlerschwellen
@@ -1191,14 +1219,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### System Health Dashboard
 
-#### Was kann ich damit machen?
+#### Was kann ich mit System Health Dashboard machen?
 
 - Echtzeit-Überwachung aller Systemkomponenten
 - Performance-Metriken visualisieren
 - Ressourcen-Nutzung monitorieren
 - Proaktive Problem-Erkennung
 
-#### Wie kann ich das machen?
+#### Wie nutze ich System Health Dashboard?
 
 1. **Dashboard öffnen** - Navigieren Sie zum System Health Dashboard
 2. **Komponenten auswählen** - Wählen Sie welche Systemteile überwacht werden sollen
@@ -1219,14 +1247,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Performance Monitor
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Performance Monitor machen?
 
 - Detaillierte Performance-Analyse
 - Ladezeiten überwachen
 - Bottleneck-Identifikation
 - Performance-Trends tracken
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Performance Monitor?
 
 1. **Monitoring-Scope definieren** - Welche Services/Endpoints?
 2. **Performance-Metriken wählen** - Response Times, Throughput, Error Rates
@@ -1247,14 +1275,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Error Tracking System
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Error Tracking System machen?
 
 - Automatische Fehlererkennung und -verfolgung
 - Error-Analytics und Trends
 - Crash Reporting
 - Debugging-Unterstützung
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Error Tracking System?
 
 1. **Error-Quellen verbinden** - Applications, Services, APIs
 2. **Error-Kategorien definieren** - Critical, Warning, Info
@@ -1275,14 +1303,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### User Behavior Monitor
 
-#### Was kann ich damit machen?
+#### Was kann ich mit User Behavior Monitor machen?
 
 - User-Interaktionen tracken und analysieren
 - Customer Journey mapping
 - Usability-Probleme identifizieren
 - Conversion-Funnel Monitoring
 
-#### Wie kann ich das machen?
+#### Wie nutze ich User Behavior Monitor?
 
 1. **Tracking implementieren** - Code-Snippet in Application einbinden
 2. **User-Aktionen definieren** - Welche Interaktionen sollen getrackt werden?
@@ -1303,14 +1331,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Security Monitor
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Security Monitor machen?
 
 - Sicherheitsvorfälle in Echtzeit erkennen
 - Suspicious Activity monitoring
 - Compliance-Verletzungen tracken
 - Security-Audit Logging
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Security Monitor?
 
 1. **Security-Quellen verbinden** - Logs, APIs, System Events
 2. **Threat-Patterns definieren** - Was ist verdächtiges Verhalten?
@@ -1331,14 +1359,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Business Metrics Monitor
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Business Metrics Monitor machen?
 
 - Geschäftskennzahlen in Echtzeit überwachen
 - KPI-Tracking und -Visualisierung
 - Business Performance Monitoring
 - Zielerreichungs-Tracking
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Business Metrics Monitor?
 
 1. **Business-KPIs definieren** - Umsatz, Conversion, Customer Satisfaction
 2. **Datenquellen verbinden** - CRM, Analytics, Finance-Systeme
@@ -1359,14 +1387,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Infrastructure Monitor
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Infrastructure Monitor machen?
 
 - Komplette Infrastruktur-Überwachung
 - Server, Network, Storage Monitoring
 - Cloud Resource Utilization
 - Capacity Planning
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Infrastructure Monitor?
 
 1. **Infrastructure-Komponenten verbinden** - Server, DBs, Network Devices
 2. **Monitoring-Agents installieren** - Auf relevanten Systemen
@@ -1387,14 +1415,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### API Monitor
 
-#### Was kann ich damit machen?
+#### Was kann ich mit API Monitor machen?
 
 - API-Endpoints kontinuierlich überwachen
 - Response Time & Availability tracking
 - API-Error Monitoring
 - SLA-Überwachung
 
-#### Wie kann ich das machen?
+#### Wie nutze ich API Monitor?
 
 1. **APIs konfigurieren** - Endpoints, Methoden, Headers
 2. **Monitoring-Intervalle setzen** - Wie oft sollen Checks laufen?
@@ -1415,14 +1443,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Database Monitor
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Database Monitor machen?
 
 - Datenbank-Performance überwachen
 - Query Performance monitoring
 - Database Health Checks
 - Capacity & Growth tracking
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Database Monitor?
 
 1. **Datenbanken verbinden** - SQL, NoSQL, Data Warehouses
 2. **Performance-Metriken wählen** - Query Times, Connections, Locks
@@ -1443,14 +1471,14 @@ Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automa
 
 ### Network Monitor
 
-#### Was kann ich damit machen?
+#### Was kann ich mit Network Monitor machen?
 
 - Netzwerk-Performance überwachen
 - Connectivity Issues erkennen
 - Bandwidth Utilization monitoring
 - Network Security monitoring
 
-#### Wie kann ich das machen?
+#### Wie nutze ich Network Monitor?
 
 1. **Network Devices verbinden** - Router, Switches, Firewalls
 2. **Network-Metriken konfigurieren** - Latency, Packet Loss, Bandwidth

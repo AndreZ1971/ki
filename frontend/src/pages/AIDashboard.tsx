@@ -27,21 +27,16 @@ const AIDashboard: React.FC = () => {
   useEffect(() => {
     const fetchRealMetrics = async (isInitialLoad = false) => {
       try {
-        // Nur beim ersten Laden setze loading=true
         if (isInitialLoad) {
           setLoading(true);
         } else {
-          // Bei Background-Updates zeige sanften Refresh-Indikator
           setIsRefreshing(true);
         }
         setError(null);
-        
-        if (!import.meta.env.VITE_API_URL) {
-          throw new Error('VITE_API_URL is not set!');
-        }
-        const apiUrl = import.meta.env.VITE_API_URL;
-        const fullUrl = `${apiUrl}/api/analytics/metrics/dashboard`;
-        // Prüfe, ob die API-URL ein :3000 enthält (sollte bei HTTPS/Proxy nicht sein)
+
+        let base = (import.meta.env.VITE_API_URL || '').trim();
+        if (base.endsWith('/')) base = base.slice(0, -1);
+        const fullUrl = base ? `${base}/api/analytics/metrics/dashboard` : `/api/analytics/metrics/dashboard`;
         if (fullUrl.includes(':3000')) {
           console.warn('Warnung: API-URL enthält Port 3000. Bei HTTPS/Proxy sollte die URL ohne Port sein!');
         }
@@ -54,7 +49,6 @@ const AIDashboard: React.FC = () => {
             'Content-Type': 'application/json'
           }
         });
-        
         if (!response.ok) {
           throw new Error(`API Error: ${response.status}`);
         }

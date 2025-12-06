@@ -47,7 +47,12 @@ RUN groupadd -g 1001 nodejs && \
 USER nodeuser
 EXPOSE 3000
 
+# Entrypoint-Skript für sichere connection.json-Erstellung
+COPY backend/docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD node healthcheck.js
 
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["node", "dist/server.js"]
