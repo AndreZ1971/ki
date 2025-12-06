@@ -34,4 +34,5 @@ ls -l /app/backend/connection.json
 
 echo "[Entrypoint] Skript abgeschlossen: $(date)"
 
+
 exec "$@"
