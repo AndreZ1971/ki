@@ -1,16 +1,18 @@
+
 #!/bin/sh
 set -e
 
-
-
-# Sicherstellen, dass die nötigen Verzeichnisse existieren und Rechte korrekt sind
-mkdir -p /app/backend
-mkdir -p /app/data/dlq
-chown -R node:node /app/backend /app/data 2>/dev/null || true
-chmod 700 /app/backend /app/data /app/data/dlq 2>/dev/null || true
+echo "[Entrypoint] Starte Skript: $(date)"
+echo "[Entrypoint] Versuche Verzeichnisse anzulegen und Rechte zu setzen..."
+mkdir -p /app/backend || echo "[Entrypoint] Fehler beim Anlegen von /app/backend!"
+mkdir -p /app/data/dlq || echo "[Entrypoint] Fehler beim Anlegen von /app/data/dlq!"
+chown -R node:node /app/backend /app/data 2>/dev/null || echo "[Entrypoint] Fehler beim chown!"
+chmod 700 /app/backend /app/data /app/data/dlq 2>/dev/null || echo "[Entrypoint] Fehler beim chmod!"
+ls -ld /app/backend /app/data /app/data/dlq
 
 # Sicherstellen, dass connection.json existiert und mit Platzhaltern befüllt ist
 if [ ! -f /app/backend/connection.json ]; then
+  echo "[Entrypoint] connection.json nicht gefunden, lege Dummy-Datei an..."
   cat <<EOF > /app/backend/connection.json
 {
   "openai": {
@@ -23,8 +25,13 @@ if [ ! -f /app/backend/connection.json ]; then
   }
 }
 EOF
-  chown node:node /app/backend/connection.json 2>/dev/null || true
-  chmod 600 /app/backend/connection.json
+  chown node:node /app/backend/connection.json 2>/dev/null || echo "[Entrypoint] Fehler beim chown connection.json!"
+  chmod 600 /app/backend/connection.json || echo "[Entrypoint] Fehler beim chmod connection.json!"
+else
+  echo "[Entrypoint] connection.json existiert bereits."
 fi
+ls -l /app/backend/connection.json
+
+echo "[Entrypoint] Skript abgeschlossen: $(date)"
 
 exec "$@"
