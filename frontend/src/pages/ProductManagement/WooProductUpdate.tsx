@@ -29,16 +29,19 @@ const WooProductUpdate = () => {
     const loadProducts = React.useCallback(async () => {
       try {
         setLoadingProducts(true);
+        console.log('[WooProductUpdate] Requesting products from /api/products/woo/list');
         const response = await fetch('/api/products/woo/list');
+        console.log('[WooProductUpdate] Response:', response);
         const data = await response.json();
-      
+        console.log('[WooProductUpdate] Response JSON:', data);
         if (data.success && data.data) {
           setProducts(data.data);
-          // Alle Produkte standardmäßig auswählen
           setSelectedProducts(data.data.map((p: ProductItem) => p.id));
+        } else {
+          console.warn('[WooProductUpdate] API returned no products or success=false:', data);
         }
       } catch (err) {
-        console.error('Failed to load products:', err);
+        console.error('[WooProductUpdate] Failed to load products:', err);
         toast.error('Fehler beim Laden der Produkte');
       } finally {
         setLoadingProducts(false);

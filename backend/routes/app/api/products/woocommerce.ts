@@ -43,7 +43,7 @@ class WooCommerceClient {
 
   private validateConfig() {
     const isValid = !!(this.baseUrl && this.consumerKey && this.consumerSecret);
-    console.log(`[WooCommerce] Config Check - URL: ${!!this.baseUrl}, Key: ${!!this.consumerKey}, Secret: ${!!this.consumerSecret}`);
+    console.log(`[WooCommerce] Config Check - URL: ${this.baseUrl}, Key: ${this.consumerKey ? 'SET' : 'MISSING'}, Secret: ${this.consumerSecret ? 'SET' : 'MISSING'}`);
     if (!isValid) {
       console.warn('⚠️ WooCommerce API nicht korrekt konfiguriert - bitte Werte in connection.json setzen');
     } else {
@@ -53,6 +53,11 @@ class WooCommerceClient {
 
   private async makeRequest(endpoint: string, options: any = {}) {
     if (!this.baseUrl || !this.consumerKey || !this.consumerSecret) {
+      console.error('[WooCommerce] Fehlende Konfiguration:', {
+        baseUrl: this.baseUrl,
+        consumerKey: this.consumerKey,
+        consumerSecret: this.consumerSecret
+      });
       throw new Error('WooCommerce API nicht konfiguriert. Bitte Werte in connection.json setzen');
     }
     const url = `${this.baseUrl}${endpoint}`;
@@ -64,12 +69,18 @@ class WooCommerceClient {
         'Content-Type': 'application/json',
       },
     };
+    console.log(`[WooCommerce] Request:`, url, defaultOptions, options);
     try {
       const response = await fetch(url, { ...defaultOptions, ...options });
+      console.log(`[WooCommerce] Response Status:`, response.status);
       if (!response.ok) {
+        const text = await response.text();
+        console.error(`[WooCommerce] Fehlerhafte Antwort:`, text);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      return await response.json();
+      const json = await response.json();
+      console.log(`[WooCommerce] Response JSON:`, json);
+      return json;
     } catch (_error) {
       console.error(`Fehler bei WooCommerce Request ${endpoint}:`, _error);
       throw _error;
@@ -182,15 +193,18 @@ export default async function wooCommerceRoutes(server: FastifyInstance) {
   }, async (request: any) => {
     try {
       const { page, per_page, search, category } = request.query;
+      console.log('[Route] /woo/products called with:', { page, per_page, search, category });
       const products = await wooCommerce.getProducts({ 
         page, 
         per_page, 
         search,
         category 
       });
+      console.log('[Route] /woo/products result:', products);
       return { success: true, data: products };
     } catch (error: any) {
       server.log.error('Fehler beim Abrufen der Produkte:', error);
+      console.error('[Route] /woo/products error:', error);
       throw new Error(`Failed to fetch products: ${error.message}`);
     }
   });
