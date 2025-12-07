@@ -35,6 +35,7 @@ class WooCommerceClient {
 
   constructor() {
     const woo = config.woocommerce || {};
+    console.log('[WooCommerceClient] Initialisierte Daten:', woo);
     this.baseUrl = woo.url || '';
     this.consumerKey = woo.consumerKey || '';
     this.consumerSecret = woo.consumerSecret || '';
@@ -43,7 +44,11 @@ class WooCommerceClient {
 
   private validateConfig() {
     const isValid = !!(this.baseUrl && this.consumerKey && this.consumerSecret);
-    console.log(`[WooCommerce] Config Check - URL: ${this.baseUrl}, Key: ${this.consumerKey ? 'SET' : 'MISSING'}, Secret: ${this.consumerSecret ? 'SET' : 'MISSING'}`);
+    console.log('[WooCommerceClient] Config Check:', {
+      baseUrl: this.baseUrl,
+      consumerKey: this.consumerKey,
+      consumerSecret: this.consumerSecret ? 'SET' : 'MISSING'
+    });
     if (!isValid) {
       console.warn('⚠️ WooCommerce API nicht korrekt konfiguriert - bitte Werte in connection.json setzen');
     } else {
@@ -53,7 +58,7 @@ class WooCommerceClient {
 
   private async makeRequest(endpoint: string, options: any = {}) {
     if (!this.baseUrl || !this.consumerKey || !this.consumerSecret) {
-      console.error('[WooCommerce] Fehlende Konfiguration:', {
+      console.error('[WooCommerceClient] Fehlende Konfiguration:', {
         baseUrl: this.baseUrl,
         consumerKey: this.consumerKey,
         consumerSecret: this.consumerSecret

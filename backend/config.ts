@@ -9,6 +9,9 @@ let configData: any = {};
 if (fs.existsSync(configPath)) {
   configData = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
   console.log(`✅ [config.ts] connection.json geladen von: ${configPath}`);
+  console.log('[config.ts] Geladene WooCommerce-Daten:', configData.woocommerce);
+  console.log('[config.ts] Geladene WordPress-Daten:', configData.wordpress);
+  console.log('[config.ts] Geladene OpenAI-Daten:', configData.openAI);
   // Debug: Zeige OpenAI API-Key
   if (configData.openAI && configData.openAI.apiKey) {
     console.log(`[config.ts] OpenAI API-Key gefunden: ${configData.openAI.apiKey.substring(0, 8)}...`);
