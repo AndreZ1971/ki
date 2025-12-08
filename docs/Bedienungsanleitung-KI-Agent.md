@@ -1,3 +1,25 @@
+---
+
+### Auto Product Creator: KI-Bildgenerierung & Bild-SEO
+
+#### Was kann ich mit der KI-Bildgenerierung machen?
+
+- Automatisch hochwertige Produktbilder per KI (DALL·E, OpenAI) generieren
+- Bilder werden direkt beim Produkt-Setup erzeugt und zugewiesen
+- Automatische SEO-Optimierung (Alt-Text, Dateiname, Tags) für jedes Bild
+
+#### Wie nutze ich die KI-Bildgenerierung?
+
+1. **Auto Product Creator starten** – Wie gewohnt Produkte automatisch generieren lassen
+2. **KI-Bild wird erzeugt** – Für jedes neue Produkt wird ein passendes Bild per KI generiert
+3. **Bild-SEO erfolgt automatisch** – Alt-Text und Dateiname werden per KI-Analyse optimiert
+4. **Produkt ist sofort mit Bild & SEO online** – Kein manuelles Hochladen oder Bearbeiten nötig
+
+**Hinweis:**
+- Die KI-Bildgenerierung nutzt OpenAI DALL·E. Ein OpenAI API-Key muss in der `connection.json` hinterlegt sein.
+- Die SEO-Analyse erfolgt automatisch im Hintergrund. Bei Fehlern wird ein Standard-Alt-Text verwendet.
+
+---
 # 📚 AI Business Platform - Bedienungsanleitung
 
 Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automatisierungs-Plattform.

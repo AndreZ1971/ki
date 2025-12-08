@@ -41,27 +41,46 @@ export const MLAnalyticsGenerator: React.FC<MLAnalyticsGeneratorProps> = ({ metr
   };
 
   return (
-    <div className="ml-analytics-generator">
-      <button onClick={fetchInsights} disabled={loading}>
-        KI-Analytics-Insights generieren
+    <section className="ml-analytics-section">
+      <h3 className="ml-analytics-title">🚀 KI-gestützte Conversion-Analyse</h3>
+      <div className="ml-analytics-desc">
+        Erhalte datengetriebene Empfehlungen, Prognosen und Segmentierungen für deine Conversion-Optimierung.
+      </div>
+      <button
+        className="ml-analytics-btn"
+        onClick={fetchInsights}
+        disabled={loading}
+        title="KI-gestützte Insights für Conversion-Optimierung generieren"
+      >
+        <span role="img" aria-label="Rocket" style={{marginRight: 8, fontSize: '1.2em'}}>🚀</span>
+        KI-Conversion-Insights generieren
       </button>
-      {loading && <div>Generierung läuft...</div>}
-      {error && <div className="error">{error}</div>}
+      {loading && <div className="ml-analytics-loading">Generierung läuft...</div>}
+      {error && <div className="ml-analytics-error">{error}</div>}
       {insights.length > 0 && (
-        <div className="insights-list">
-          <h4>KI-Analytics-Insights</h4>
-          <ul>
-            {insights.map((insight, i) => (
-              <li key={i}>
-                <strong>{insight.type === 'forecast' ? 'Prognose' : insight.type === 'segment' ? 'Segmentierung' : insight.type === 'conversion' ? 'Conversion-Optimierung' : 'Anomalie'}</strong><br />
-                <span>{insight.value}</span><br />
-                {insight.score !== undefined && <span>Score: {Math.round(insight.score * 100)}%</span>}<br />
-                {insight.reason && <em>{insight.reason}</em>}
-              </li>
-            ))}
-          </ul>
+        <div className="ml-analytics-card-list">
+          {insights.map((insight, i) => (
+            <div className={`ml-analytics-card ml-analytics-type-${insight.type}`} key={i}>
+              <div className="ml-analytics-card-header">
+                <span className="ml-analytics-card-icon">
+                  {insight.type === 'forecast' && '📈'}
+                  {insight.type === 'segment' && '🧩'}
+                  {insight.type === 'conversion' && '🎯'}
+                  {insight.type === 'anomaly' && '⚠️'}
+                </span>
+                <span className="ml-analytics-card-title">
+                  {insight.type === 'forecast' ? 'Prognose' : insight.type === 'segment' ? 'Segmentierung' : insight.type === 'conversion' ? 'Conversion-Optimierung' : 'Anomalie'}
+                </span>
+                {insight.score !== undefined && (
+                  <span className="ml-analytics-card-score">{Math.round(insight.score * 100)}%</span>
+                )}
+              </div>
+              <div className="ml-analytics-card-value">{insight.value}</div>
+              {insight.reason && <div className="ml-analytics-card-reason">{insight.reason}</div>}
+            </div>
+          ))}
         </div>
       )}
-    </div>
+    </section>
   );
 };

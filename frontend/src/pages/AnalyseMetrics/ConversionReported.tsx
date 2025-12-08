@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './page.css';
@@ -13,15 +14,36 @@ interface ReportData {
   lastUpdated?: string;
 }
 
+interface Insight {
+  type: string;
+  title?: string;
+  value?: string;
+  detail?: string;
+  score?: number;
+}
+
+interface NextStep {
+  title?: string;
+  description?: string;
+  criticality?: string;
+}
+
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 const ConversionReported = () => {
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, _setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
   const [activeAction, setActiveAction] = useState<string | null>(null);
   const [exportFormat, setExportFormat] = useState('pdf');
   const [scheduleTime, setScheduleTime] = useState('08:00');
   const [emailRecipient, setEmailRecipient] = useState('');
   const [realTimeInterval, setRealTimeInterval] = useState('5min');
+  const [insights, setInsights] = useState<Insight[]>([]);
+  const [insightLoading, setInsightLoading] = useState(false);
+  const [insightError, setInsightError] = useState<string | null>(null);
+  const [nextSteps, setNextSteps] = useState<NextStep[]>([]);
+  const [summary, setSummary] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,6 +62,31 @@ const ConversionReported = () => {
       setLoading(false);
     }, 1000);
   }, []);
+
+  // KI/ML-Analyse: API-Call
+  const handleAnalyzeAI = async () => {
+    setInsightLoading(true);
+    setInsightError(null);
+    setInsights([]);
+    setNextSteps([]);
+    setSummary(null);
+    try {
+      // Beispiel-Endpunkt, Backend muss /api/analytics/ml/report-insights bereitstellen
+      const res = await fetch(`${API_URL}/api/analytics/ml/report-insights`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reportData })
+      });
+      const data = await res.json();
+      setInsights(data.insights || []);
+      setNextSteps(data.nextSteps || []);
+      setSummary(data.summary || null);
+    } catch (_err: any) {
+      setInsightError('Fehler bei der KI-Analyse');
+    } finally {
+      setInsightLoading(false);
+    }
+  };
 
   const handleBackToDashboard = () => {
     navigate('/');
@@ -164,7 +211,7 @@ const ConversionReported = () => {
 
       <div className="analytics-header">
         <h1>📋 Conversion Reported</h1>
-        <p>Automatische Conversion-Reports und Export</p>
+        <p>Automatische Conversion-Reports, Export und jetzt KI-gestützte Analyse!</p>
       </div>
 
       {/* 2x4 Grid Layout */}
@@ -174,43 +221,36 @@ const ConversionReported = () => {
           <div className="metric-label">Total Reports</div>
           <div className="metric-value">{reportData?.totalReports || 0}</div>
         </div>
-
         <div className="metric-card">
           <div className="metric-icon">🤖</div>
           <div className="metric-label">Automated Reports</div>
           <div className="metric-value">{reportData?.automatedReports || 0}</div>
         </div>
-
         <div className="metric-card">
           <div className="metric-icon">👨‍💼</div>
           <div className="metric-label">Manual Reports</div>
           <div className="metric-value">{reportData?.manualReports || 0}</div>
         </div>
-
         <div className="metric-card">
           <div className="metric-icon">📤</div>
           <div className="metric-label">Export Success</div>
           <div className="metric-value">{reportData?.exportSuccess || 0}%</div>
         </div>
-
         <div className="metric-card">
           <div className="metric-icon">⏰</div>
           <div className="metric-label">Scheduled Reports</div>
           <div className="metric-value">{reportData?.scheduledReports || 0}</div>
         </div>
-
         <div className="metric-card">
           <div className="metric-icon">⚡</div>
           <div className="metric-label">Real-time Reports</div>
           <div className="metric-value">{reportData?.realTimeReports || 0}</div>
         </div>
-
         <div className="metric-card">
           <div className="metric-icon">⏱️</div>
           <div className="metric-label">Avg Report Time</div>
           <div className="metric-value">{reportData?.avgReportTime || '0min'}</div>
         </div>
-
         <div className="metric-card last-updated">
           <div className="metric-icon">🕒</div>
           <div className="metric-label">Last Updated</div>
@@ -220,11 +260,82 @@ const ConversionReported = () => {
         </div>
       </div>
 
+      {/* KI/ML-Analyse Sektion */}
+      <div className="analysis-section">
+        <div className="metric-card full-width">
+          <h3>🧠 KI-gestützte Report-Analyse</h3>
+          <p style={{marginBottom: 18, color: '#2563eb', fontWeight: 500}}>
+            Nutze KI/ML, um Conversion-Reports automatisch zu analysieren, Trends zu erkennen und Optimierungspotenziale zu entdecken.
+          </p>
+          <button 
+            className="action-button primary"
+            onClick={handleAnalyzeAI}
+            disabled={insightLoading}
+            style={{marginBottom: 18}}
+          >
+            {insightLoading ? '⏳ KI-Analyse läuft...' : '🧠 KI-Analyse starten'}
+          </button>
+          {insightError && <div className="error-message">{insightError}</div>}
+
+          {/* Zusammenfassung */}
+          {summary && (
+            <div className="metric-card" style={{margin: '24px 0'}}>
+              <h4>📝 KI-Zusammenfassung</h4>
+              <div style={{fontSize: '1.1rem', color: '#2c3e50', marginBottom: 12}}>{summary}</div>
+            </div>
+          )}
+
+          {/* Insights Grid */}
+          {Array.isArray(insights) && insights.length > 0 && (
+            <div className="analytics-grid-2x4" style={{marginBottom: 32}}>
+              {insights.map((insight, i) => (
+                <div className="metric-card" key={i}>
+                  <div className="metric-icon" style={{fontSize: '2.2rem'}}>
+                    {insight.type === 'trend' && '📈'}
+                    {insight.type === 'segment' && '🧩'}
+                    {insight.type === 'forecast' && '🔮'}
+                    {insight.type === 'anomaly' && '⚠️'}
+                    {insight.type === 'conversion' && '🎯'}
+                    {insight.type === 'other' && '🔎'}
+                  </div>
+                  <div className="metric-label">{insight.title || insight.type}</div>
+                  <div className="metric-value" style={{fontSize: '1.3rem'}}>{insight.value}</div>
+                  {insight.detail && <div style={{color: '#6c757d', fontSize: '0.95rem', marginTop: 8}}>{insight.detail}</div>}
+                  {insight.score !== undefined && (
+                    <div style={{fontWeight: 700, color: '#2563eb', marginTop: 8}}>KI-Score: {Math.round(insight.score * 100)}%</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Next Steps / Empfehlungen */}
+          {Array.isArray(nextSteps) && nextSteps.length > 0 && (
+            <div className="next-steps" style={{marginBottom: 32}}>
+              <h4>🚀 Empfohlene Next Steps</h4>
+              {nextSteps.map((step, i) => (
+                <div className={`next-step ${step.criticality || 'good'}`} key={i}>
+                  <span className="step-icon">
+                    {step.criticality === 'critical' && '❗'}
+                    {step.criticality === 'warning' && '⚠️'}
+                    {step.criticality === 'good' && '✅'}
+                    {!step.criticality && '➡️'}
+                  </span>
+                  <div className="step-content">
+                    <strong>{step.title || 'Empfehlung'}</strong>
+                    <p>{step.description || ''}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Report Actions Sektion */}
       <div className="analysis-section">
         <div className="metric-card full-width">
           <h3>🚀 Report Actions</h3>
-          
           <div className="actions-grid">
             {/* Export Current Report */}
             <div className="action-group">
@@ -249,7 +360,6 @@ const ConversionReported = () => {
                 {activeAction === 'exporting' ? '⏳ Exporting...' : `📥 Export as ${exportFormat.toUpperCase()}`}
               </button>
             </div>
-
             {/* Schedule New Report */}
             <div className="action-group">
               <h4>⏰ Schedule New Report</h4>
@@ -270,7 +380,6 @@ const ConversionReported = () => {
                 {activeAction === 'scheduling' ? '⏳ Scheduling...' : '⏰ Schedule Report'}
               </button>
             </div>
-
             {/* Email Report */}
             <div className="action-group">
               <h4>📧 Email Report</h4>
@@ -292,7 +401,6 @@ const ConversionReported = () => {
                 {activeAction === 'emailing' ? '⏳ Sending...' : '📧 Send Report'}
               </button>
             </div>
-
             {/* Generate Real-time */}
             <div className="action-group">
               <h4>🔄 Generate Real-time</h4>

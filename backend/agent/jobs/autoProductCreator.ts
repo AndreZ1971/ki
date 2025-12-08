@@ -2,6 +2,9 @@
 import { trendAnalysisJob } from './trendAnalysis';
 import { TrendData } from './trendAnalysis';
 import { wooPost } from '../../tools/woo';
+import { getOpenAIClient, executeOpenAI } from '../../utils/openai';
+import { analyzeImage } from './image-analysis';
+import axios from 'axios';
 
 export interface AutoProductConfig {
   keyword: string;
@@ -118,6 +121,52 @@ async function createProductFromTrend(trend: TrendData, autoPublish: boolean = f
     const productId = (createdProduct as any).id;
     
     console.log(`✅ WOOCOMMERCE ERFOLG! Produkt #${productId} erstellt`);
+
+    // 2. KI-Bild generieren und zuweisen
+    try {
+      const imageUrl = await generateAIImageForProduct(trend);
+      if (imageUrl) {
+        // SEO-Analyse: Bild herunterladen und analysieren
+        let alt = productData.name;
+        let filename = '';
+        try {
+          const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+          const buffer = Buffer.from(response.data, 'binary');
+          const seo = await analyzeImageBuffer(buffer);
+          if (seo?.seo?.alt) alt = seo.seo.alt;
+          if (seo?.seo?.filename) filename = seo.seo.filename;
+        } catch (seoErr) {
+          console.warn('⚠️ SEO-Analyse für Bild fehlgeschlagen:', seoErr);
+        }
+        await wooPost(`/products/${productId}`, {
+          images: [{ src: imageUrl, alt, name: filename || productData.name }]
+        });
+        console.log(`🖼️ KI-Bild zugewiesen: ${imageUrl} (Alt: ${alt}, Name: ${filename || productData.name})`);
+      } else {
+        console.warn('⚠️ Kein KI-Bild generiert.');
+      }
+    } catch (imgErr) {
+      console.error('❌ Fehler bei KI-Bildgenerierung/Zuweisung:', imgErr);
+    }
+    /**
+     * Analysiert ein Bild aus Buffer für SEO (Alt-Text, Dateiname, Tags)
+     */
+    async function analyzeImageBuffer(buffer: Buffer) {
+      // Temporäre Datei für sharp-kompatible Analyse
+      const tmp = require('os').tmpdir();
+      const fs = require('fs');
+      const path = require('path');
+      const tmpFile = path.join(tmp, `img_${Date.now()}.png`);
+      fs.writeFileSync(tmpFile, buffer);
+      try {
+        const result = await analyzeImage(tmpFile);
+        fs.unlinkSync(tmpFile);
+        return result;
+      } catch (err) {
+        fs.unlinkSync(tmpFile);
+        throw err;
+      }
+    }
     
     return {
       name: productData.name,
@@ -128,6 +177,30 @@ async function createProductFromTrend(trend: TrendData, autoPublish: boolean = f
       source: 'woocommerce',
       categories: productData.categories
     };
+    /**
+     * Generiert ein KI-Bild (DALL·E) für das Produkt und gibt die Bild-URL zurück
+     */
+    async function generateAIImageForProduct(trend: TrendData): Promise<string | null> {
+      const openai = getOpenAIClient();
+      const prompt = `Erzeuge ein hochwertiges Produktbild für ein digitales Produkt im Bereich "${trend.niche}". Stil: modern, klar, ansprechend, ohne Text, geeignet für einen Onlineshop. Keywords: ${trend.keywords.join(", ")}`;
+      try {
+        const response = await executeOpenAI(
+          () => openai.images.generate({
+            prompt,
+            n: 1,
+            size: "1024x1024",
+            response_format: "url"
+          }),
+          'dalle-image-generation',
+          { trend: trend.niche }
+        );
+        const url = response?.data?.[0]?.url;
+        return typeof url === 'string' ? url : null;
+      } catch (err) {
+        console.error('❌ Fehler bei DALL·E-Generierung:', err);
+        return null;
+      }
+    }
     
   } catch (_error) {
     // 2. SICHERER FALLBACK

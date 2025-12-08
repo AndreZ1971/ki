@@ -17,7 +17,11 @@ const AutoProductCreator = () => {
     count: 5,
     category: 'all',
     productType: 'simple' as 'simple' | 'virtual' | 'downloadable',
-    optimization: 'high' as 'low' | 'medium' | 'high'
+    optimization: 'high' as 'low' | 'medium' | 'high',
+    seoOptimized: true,
+    keywords: '',
+    mlMarketAnalysis: true,
+    specializationPrompt: ''
   });
 
   // Lade WooCommerce Kategorien
@@ -68,11 +72,10 @@ const AutoProductCreator = () => {
         <p>Automatische Erstellung und Optimierung von Produkten</p>
       </div>
 
+
       <div className="metric-card full-width">
         <h3>📋 Produkt-Erstellung Konfiguration</h3>
-        
         <ErrorMessage message={error || ''} onClose={clearError} />
-
         <div className="config-section">
           <div className="config-item">
             <label>Anzahl der Produkte:</label>
@@ -119,6 +122,45 @@ const AutoProductCreator = () => {
               <option value="high">Hohe Optimierung</option>
             </select>
           </div>
+          <div className="config-item">
+            <label>
+              <input
+                type="checkbox"
+                checked={config.seoOptimized}
+                onChange={e => setConfig({ ...config, seoOptimized: e.target.checked })}
+              />
+              SEO-optimierte Produktbeschreibung
+            </label>
+          </div>
+          <div className="config-item">
+            <label>Schlagwörter (Komma getrennt):</label>
+            <input
+              type="text"
+              value={config.keywords}
+              onChange={e => setConfig({ ...config, keywords: e.target.value })}
+              placeholder="z.B. digital, modern, trendy"
+            />
+          </div>
+          <div className="config-item">
+            <label>
+              <input
+                type="checkbox"
+                checked={config.mlMarketAnalysis}
+                onChange={e => setConfig({ ...config, mlMarketAnalysis: e.target.checked })}
+              />
+              Nur relevante Produkte für meinen Shop (ML/KI-Marktanalyse)
+            </label>
+            <div className="config-hint">Die Produktauswahl basiert auf Shop-Daten und aktuellen Trends.</div>
+          </div>
+          <div className="config-item">
+            <label>Beschreibung (optional):</label>
+            <textarea
+              value={config.specializationPrompt}
+              onChange={e => setConfig({ ...config, specializationPrompt: e.target.value })}
+              placeholder="Beschreibe hier besondere Anforderungen, Zielgruppe oder Stilwünsche..."
+              rows={2}
+            />
+          </div>
         </div>
 
         {/* ML/AI Produktideen-Generator */}
@@ -127,7 +169,7 @@ const AutoProductCreator = () => {
         <LoadingButton
           onClick={handleCreateProducts}
           loading={loading}
-          loadingText="🔄 Erstelle Produkte..."
+          loadingText="🔄 Produkte werden erstellt..."
         >
           🚀 Produkte automatisch erstellen
         </LoadingButton>

@@ -39,23 +39,30 @@ export const MLProductIdeaGenerator: React.FC<MLProductIdeaGeneratorProps> = ({ 
 
   return (
     <div className="ml-product-idea-generator">
-      <button onClick={fetchIdeas} disabled={loading}>
+      <button
+        className="ml-idea-btn"
+        onClick={fetchIdeas}
+        disabled={loading}
+        title="KI-gestützte Produktideen für deinen Shop generieren"
+      >
+        <span role="img" aria-label="Glühbirne" style={{marginRight: 8, fontSize: '1.3em'}}>💡</span>
         KI-Produktideen generieren
       </button>
-      {loading && <div>Generierung läuft...</div>}
-      {error && <div className="error">{error}</div>}
+      {loading && <div className="ml-idea-loading">Generierung läuft...</div>}
+      {error && <div className="ml-idea-error">{error}</div>}
       {ideas.length > 0 && (
-        <div className="ideas-list">
+        <div className="ml-idea-list">
           <h4>KI-Produktideen</h4>
-          <ul>
+          <div className="ml-idea-cards">
             {ideas.map((idea, i) => (
-              <li key={i}>
-                <strong>{idea.title}</strong> ({idea.category}, €{idea.price})<br />
-                <span>{idea.description}</span><br />
-                <em>Score: {idea.score} – {idea.reason}</em>
-              </li>
+              <div className="ml-idea-card" key={i}>
+                <div className="ml-idea-title">{idea.title}</div>
+                <div className="ml-idea-meta">{idea.category} &nbsp;|&nbsp; <span>€{idea.price}</span></div>
+                <div className="ml-idea-desc">{idea.description}</div>
+                <div className="ml-idea-score">Score: <b>{idea.score}</b> <span className="ml-idea-reason">{idea.reason}</span></div>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       )}
     </div>

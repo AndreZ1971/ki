@@ -8,7 +8,7 @@
     "build": "tsc",
     "dev": "tsx watch src/server.ts",
     "dev:agent": "tsx watch src/agent/planner.ts",
-    "start": "node dist/server.js",
+    "start": "node backend/dist/server.js",
     "start:agent": "node dist/agent/planner.js",
     "start:jobs": "node dist/agent/jobs/index.js",
     "run:createFreebie": "tsx src/agent/jobs/runCreateFreebie.ts",

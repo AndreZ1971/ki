@@ -19,11 +19,10 @@
     "typeRoots": ["./node_modules/@types", "./types"],
     "sourceMap": true,
     "incremental": true,
-    "tsBuildInfoFile": "./dist/.tsbuildinfo"
-    ,"baseUrl": "."
-    // "ignoreDeprecations": "5.0" // Entfernt, da ungültig
-    ,"paths": {
-      "@config": ["config.ts"],
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+    
+    "paths": {
+      "@config": ["./config.ts"]
     }
   },
   "include": [

@@ -8,6 +8,88 @@ import { trendAggregator } from '../../../../services/trendAggregatorService';
 import { logger } from '../../../../logger';
 
 export const trendAggregatorRoutes: FastifyPluginAsync = async (fastify) => {
+    /**
+     * POST /api/trends/ai-report
+     * KI-basierte Zusammenfassung und Interpretation der Trenddaten
+     */
+    fastify.post<{
+      Body: { keywords: string[]; sources?: string[] };
+    }>('/ai-report', {
+      schema: {
+        description: 'KI-gestützte Trend-Auswertung und Report mit OpenAI',
+        tags: ['Trends', 'AI'],
+        body: {
+          type: 'object',
+          required: ['keywords'],
+          properties: {
+            keywords: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Array von Keywords für die Trendanalyse'
+            },
+            sources: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Optionale Quellen für die Analyse'
+            }
+          }
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              report: { type: 'string' },
+              summary: { type: 'object' },
+              raw: { type: 'array' }
+            }
+          }
+        }
+      },
+      async handler(_request, _reply) {
+        try {
+          const { keywords, sources } = _request.body;
+          if (!keywords || keywords.length === 0) {
+            _reply.code(400);
+            return { error: 'Keywords array is required' };
+          }
+          const results = await trendAggregator.batchAnalyze(keywords);
+          // Prompt für OpenAI generieren
+          const prompt = `Erstelle eine verständliche, datenbasierte Zusammenfassung und KI-Interpretation der folgenden Trenddaten. Gib Empfehlungen, Insights und erkennbare Muster. Daten:
+  ${JSON.stringify(results, null, 2)}`;
+          // OpenAI-Client holen
+          const { getOpenAIClient, executeOpenAI } = await import('../../../../utils/openai.js');
+          const openai = getOpenAIClient();
+          // GPT-4o-Completion holen
+          const completion = await executeOpenAI(
+            () => openai.chat.completions.create({
+              model: 'gpt-4o',
+              messages: [
+                { role: 'system', content: 'Du bist ein datengetriebener Trend-Analyst.' },
+                { role: 'user', content: prompt }
+              ],
+              max_tokens: 800,
+              temperature: 0.7
+            }),
+            'trend-ai-report',
+            { keywords, sources }
+          );
+          const report = completion.choices?.[0]?.message?.content || '';
+          return {
+            report,
+            summary: {
+              total: results.length,
+              topTrend: results[0]?.keyword || '',
+              avgScore: results.reduce((sum, r) => sum + r.overallScore, 0) / results.length
+            },
+            raw: results
+          };
+        } catch (error) {
+          logger.error({ error }, 'AI Trend Report failed');
+          _reply.code(500);
+          return { error: 'AI Trend Report failed' };
+        }
+      }
+    });
   
   /**
    * GET /api/trends/sources

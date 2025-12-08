@@ -1,0 +1,684 @@
+ot exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/tuple/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../tuple/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/tuple/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/tuple/index.d.ts@0.34.41'. ========
+======== Resolving module '../union/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/json.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/union/index', target file types: TypeScript, JavaScript, Declaration, JSON.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/union/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/union/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/union/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../union/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/union/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/union/index.d.ts@0.34.41'. ========
+======== Resolving module '../unknown/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/json.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/unknown/index', target file types: TypeScript, JavaScript, Declaration, JSON.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/unknown/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/unknown/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/unknown/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../unknown/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/unknown/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/unknown/index.d.ts@0.34.41'. ========
+======== Resolving module '../unsafe/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/json.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/unsafe/index', target file types: TypeScript, JavaScript, Declaration, JSON.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/unsafe/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/unsafe/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/unsafe/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../unsafe/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/unsafe/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/unsafe/index.d.ts@0.34.41'. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/package.json' does not exist according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/package.json' does not exist according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/package.json' does not exist according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/package.json' does not exist according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Resolving module './json' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/javascript.d.ts'. ========
+Resolution for module './json' was found in cache from location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type'.
+======== Module name './json' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/json.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/type/json.d.ts@0.34.41'. ========
+======== Resolving module '../argument/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/javascript.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/argument/index', target file types: TypeScript, JavaScript, Declaration, JSON.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/argument/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/argument/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/argument/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../argument/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/argument/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/argument/index.d.ts@0.34.41'. ========
+======== Resolving module '../async-iterator/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/javascript.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/async-iterator/index', target file types: TypeScript, JavaScript, Declaration, JSON.   
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/async-iterator/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/async-iterator/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/async-iterator/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../async-iterator/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/async-iterator/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/async-iterator/index.d.ts@0.34.41'. ========
+======== Resolving module '../awaited/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/javascript.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/awaited/index', target file types: TypeScript, JavaScript, Declaration, JSON.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/awaited/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/awaited/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/awaited/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../awaited/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/awaited/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/awaited/index.d.ts@0.34.41'. ========
+======== Resolving module '../bigint/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/javascript.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/bigint/index', target file types: TypeScript, JavaScript, Declaration, JSON.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/bigint/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/bigint/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/bigint/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../bigint/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/bigint/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/bigint/index.d.ts@0.34.41'. ========
+======== Resolving module '../constructor/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/javascript.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/constructor/index', target file types: TypeScript, JavaScript, Declaration, JSON.      
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/constructor/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/constructor/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/constructor/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../constructor/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/constructor/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/constructor/index.d.ts@0.34.41'. ========
+======== Resolving module '../constructor-parameters/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/javascript.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/constructor-parameters/index', target file types: TypeScript, JavaScript, Declaration, JSON.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/constructor-parameters/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/constructor-parameters/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/constructor-parameters/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../constructor-parameters/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/constructor-parameters/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/constructor-parameters/index.d.ts@0.34.41'. ========
+======== Resolving module '../date/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/javascript.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/date/index', target file types: TypeScript, JavaScript, Declaration, JSON.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/date/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/date/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/date/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../date/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/date/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/date/index.d.ts@0.34.41'. ========
+======== Resolving module '../function/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/javascript.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/function/index', target file types: TypeScript, JavaScript, Declaration, JSON.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/function/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/function/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/function/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../function/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/function/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/function/index.d.ts@0.34.41'. ========
+======== Resolving module '../instance-type/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/javascript.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/instance-type/index', target file types: TypeScript, JavaScript, Declaration, JSON.    
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/instance-type/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/instance-type/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/instance-type/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../instance-type/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/instance-type/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/instance-type/index.d.ts@0.34.41'. ========
+======== Resolving module '../instantiate/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/javascript.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/instantiate/index', target file types: TypeScript, JavaScript, Declaration, JSON.      
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/instantiate/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/instantiate/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/instantiate/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../instantiate/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/instantiate/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/instantiate/index.d.ts@0.34.41'. ========
+======== Resolving module '../iterator/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/javascript.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/iterator/index', target file types: TypeScript, JavaScript, Declaration, JSON.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/iterator/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/iterator/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/iterator/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../iterator/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/iterator/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/iterator/index.d.ts@0.34.41'. ========
+======== Resolving module '../parameters/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/javascript.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/parameters/index', target file types: TypeScript, JavaScript, Declaration, JSON.       
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/parameters/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/parameters/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/parameters/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../parameters/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/parameters/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/parameters/index.d.ts@0.34.41'. ========
+======== Resolving module '../promise/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/javascript.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/promise/index', target file types: TypeScript, JavaScript, Declaration, JSON.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/promise/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/promise/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/promise/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../promise/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/promise/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/promise/index.d.ts@0.34.41'. ========
+======== Resolving module '../regexp/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/javascript.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/regexp/index', target file types: TypeScript, JavaScript, Declaration, JSON.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/regexp/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/regexp/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/regexp/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../regexp/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/regexp/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/regexp/index.d.ts@0.34.41'. ========
+======== Resolving module '../return-type/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/javascript.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/return-type/index', target file types: TypeScript, JavaScript, Declaration, JSON.      
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/return-type/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/return-type/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/return-type/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../return-type/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/return-type/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/return-type/index.d.ts@0.34.41'. ========
+======== Resolving module '../schema/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/javascript.d.ts'. ========
+Resolution for module '../schema/index' was found in cache from location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type'.
+======== Module name '../schema/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/schema/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/schema/index.d.ts@0.34.41'. ========
+======== Resolving module '../symbol/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/javascript.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/symbol/index', target file types: TypeScript, JavaScript, Declaration, JSON.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/symbol/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/symbol/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/symbol/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../symbol/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/symbol/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/symbol/index.d.ts@0.34.41'. ========
+======== Resolving module '../uint8array/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/javascript.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/uint8array/index', target file types: TypeScript, JavaScript, Declaration, JSON.       
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/uint8array/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/uint8array/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/uint8array/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../uint8array/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/uint8array/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/uint8array/index.d.ts@0.34.41'. ========
+======== Resolving module '../undefined/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/javascript.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/undefined/index', target file types: TypeScript, JavaScript, Declaration, JSON.        
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/undefined/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/undefined/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/undefined/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../undefined/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/undefined/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/undefined/index.d.ts@0.34.41'. ========
+======== Resolving module '../void/index' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/type/javascript.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/void/index', target file types: TypeScript, JavaScript, Declaration, JSON.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/void/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/void/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/void/index.d.ts' exists - use it as a name resolution result.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/package.json' exists according to earlier cached lookups.
+======== Module name '../void/index' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@sinclair/typebox/build/cjs/type/void/index.d.ts' with Package ID '@sinclair/typebox/build/cjs/type/void/index.d.ts@0.34.41'. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/jest-mock/build/package.json' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/jest-mock/package.json' exists according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/json-schema/package.json' exists according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/json5/package.json' exists according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/jsonwebtoken/package.json' exists according to earlier cached lookups.
+======== Resolving type reference directive 'node', containing file 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/jsonwebtoken/index.d.ts', root directory 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types,C:/Entwicklung/neuer-git-ordner/ki/backend/types'. ========
+Resolving with primary search path 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types, C:/Entwicklung/neuer-git-ordner/ki/backend/types'.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/node.d.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/node/package.json' exists according to earlier cached lookups.
+'package.json' does not have a 'typings' field.
+'package.json' has 'types' field 'index.d.ts' that references 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/node/index.d.ts'.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/node/index.d.ts' exists - use it as a name resolution result.
+Resolving real path for 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/node/index.d.ts', result 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/node/index.d.ts'.
+======== Type reference directive 'node' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/node/index.d.ts' with Package ID '@types/node/index.d.ts@24.10.1', primary: true. ========
+======== Resolving module 'crypto' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/jsonwebtoken/index.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+'paths' option is specified, looking for a pattern to match module name 'crypto'.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/jsonwebtoken/package.json' exists according to earlier cached lookups.
+Loading module 'crypto' from 'node_modules' folder, target file types: TypeScript, JavaScript, Declaration, JSON.     
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Directory 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/jsonwebtoken/node_modules' does not exist, skipping all lookups in it.
+Resolution for module 'crypto' was found in cache from location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types'.
+======== Module name 'crypto' was not resolved. ========
+======== Resolving module 'ms' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/jsonwebtoken/index.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+'paths' option is specified, looking for a pattern to match module name 'ms'.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/jsonwebtoken/package.json' exists according to earlier cached lookups.
+Loading module 'ms' from 'node_modules' folder, target file types: TypeScript, JavaScript, Declaration, JSON.
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Directory 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/jsonwebtoken/node_modules' does not exist, skipping all lookups in it.
+Directory 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/node_modules' does not exist, skipping all lookups in it.
+Found 'package.json' at 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/ms/package.json'.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/ms.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/ms.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/ms.d.ts' does not exist.
+'package.json' does not have a 'typesVersions' field.
+'package.json' does not have a 'typings' field.
+'package.json' does not have a 'types' field.
+'package.json' has 'main' field './index' that references 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/ms/index'.
+Loading module as file / folder, candidate module location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/ms/index', target file types: TypeScript, Declaration.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/ms/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/ms/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/ms/index.d.ts' does not exist.
+Directory 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/ms/index' does not exist, skipping all lookups in it.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/ms/index.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/ms/index.tsx' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/ms/index.d.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/ms/package.json' exists according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/ms.d.ts' does not exist.
+'package.json' does not have a 'typings' field.
+'package.json' has 'types' field 'index.d.ts' that references 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/ms/index.d.ts'.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/ms/index.d.ts' exists - use it as a name resolution result.
+Resolving real path for 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/ms/index.d.ts', result 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/ms/index.d.ts'.
+======== Module name 'ms' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/ms/index.d.ts' with Package ID '@types/ms/index.d.ts@2.1.0'. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/ms/package.json' exists according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/multer/package.json' exists according to earlier cached lookups.
+======== Resolving module 'express' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/multer/index.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+'paths' option is specified, looking for a pattern to match module name 'express'.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/multer/package.json' exists according to earlier cached lookups.
+Loading module 'express' from 'node_modules' folder, target file types: TypeScript, JavaScript, Declaration, JSON.    
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Directory 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/multer/node_modules' does not exist, skipping all lookups in it.
+Directory 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/node_modules' does not exist, skipping all lookups in it.
+Resolution for module 'express' was found in cache from location 'C:/Entwicklung/neuer-git-ordner/ki/backend'.        
+======== Module name 'express' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/express/index.d.ts' with Package ID '@types/express/index.d.ts@5.0.5'. ========
+======== Resolving module 'stream' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/multer/index.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+'paths' option is specified, looking for a pattern to match module name 'stream'.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/multer/package.json' exists according to earlier cached lookups.
+Loading module 'stream' from 'node_modules' folder, target file types: TypeScript, JavaScript, Declaration, JSON.     
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Directory 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/multer/node_modules' does not exist, skipping all lookups in it.
+Resolution for module 'stream' was found in cache from location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types'.
+======== Module name 'stream' was not resolved. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/node-cron/package.json' exists according to earlier cached lookups.
+======== Resolving module 'events' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/node-cron/index.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+'paths' option is specified, looking for a pattern to match module name 'events'.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/node-cron/package.json' exists according to earlier cached lookups.
+Loading module 'events' from 'node_modules' folder, target file types: TypeScript, JavaScript, Declaration, JSON.     
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Directory 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/node-cron/node_modules' does not exist, skipping all lookups in it.
+Resolution for module 'events' was found in cache from location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types'.
+======== Module name 'events' was not resolved. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/sharp/package.json' exists according to earlier cached lookups.
+======== Resolving type reference directive 'node', containing file 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/sharp/index.d.ts', root directory 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types,C:/Entwicklung/neuer-git-ordner/ki/backend/types'. ========
+Resolving with primary search path 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types, C:/Entwicklung/neuer-git-ordner/ki/backend/types'.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/node.d.ts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/node/package.json' exists according to earlier cached lookups.
+'package.json' does not have a 'typings' field.
+'package.json' has 'types' field 'index.d.ts' that references 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/node/index.d.ts'.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/node/index.d.ts' exists - use it as a name resolution result.
+Resolving real path for 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/node/index.d.ts', result 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/node/index.d.ts'.
+======== Type reference directive 'node' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/node/index.d.ts' with Package ID '@types/node/index.d.ts@24.10.1', primary: true. ========
+======== Resolving module 'stream' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/sharp/index.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+'paths' option is specified, looking for a pattern to match module name 'stream'.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/sharp/package.json' exists according to earlier cached lookups.
+Loading module 'stream' from 'node_modules' folder, target file types: TypeScript, JavaScript, Declaration, JSON.     
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Directory 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/sharp/node_modules' does not exist, skipping all lookups in it.
+Resolution for module 'stream' was found in cache from location 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types'.
+======== Module name 'stream' was not resolved. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/stack-utils/package.json' exists according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/yargs/package.json' exists according to earlier cached lookups.
+======== Resolving module 'yargs-parser' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/yargs/index.d.ts'. ========
+Explicitly specified module resolution kind: 'Node16'.
+Resolving in CJS mode with conditions 'require', 'types', 'node'.
+'paths' option is specified, looking for a pattern to match module name 'yargs-parser'.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/yargs/package.json' exists according to earlier cached lookups.
+Loading module 'yargs-parser' from 'node_modules' folder, target file types: TypeScript, JavaScript, Declaration, JSON.
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Directory 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/yargs/node_modules' does not exist, skipping all lookups in it.
+Directory 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/node_modules' does not exist, skipping all lookups in it.
+Found 'package.json' at 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/yargs-parser/package.json'.
+Entering conditional exports.
+Saw non-matching condition 'import'.
+Matched 'exports' condition 'require'.
+Using 'exports' subpath '.' with target './build/index.cjs'.
+File name 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/yargs-parser/build/index.cjs' has a '.cjs' extension - stripping it.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/yargs-parser/build/index.cts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/yargs-parser/build/index.d.cts' does not exist.
+Failed to resolve under condition 'require'.
+Exiting conditional exports.
+Using 'exports' subpath '.' with target './build/index.cjs'.
+File name 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/yargs-parser/build/index.cjs' has a '.cjs' extension - stripping it.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/yargs-parser/build/index.cts' does not exist.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/yargs-parser/build/index.d.cts' does not exist.
+package.json scope 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/yargs-parser' has invalid type for target of specifier '.'
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/yargs-parser/package.json' exists according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/yargs-parser.d.ts' does not exist.
+'package.json' does not have a 'typings' field.
+'package.json' has 'types' field 'index.d.ts' that references 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/yargs-parser/index.d.ts'.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/yargs-parser/index.d.ts' exists - use it as a name resolution result.
+Resolving real path for 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/yargs-parser/index.d.ts', result 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/yargs-parser/index.d.ts'.
+======== Module name 'yargs-parser' was successfully resolved to 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/yargs-parser/index.d.ts' with Package ID '@types/yargs-parser/index.d.ts@21.0.3'. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/yargs-parser/package.json' exists according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/lib/package.json' does not exist according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/package.json' exists according to earlier cached lookups.
+======== Resolving module '@typescript/lib-es2022' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/__lib_node_modules_lookup_lib.es2022.d.ts__.ts'. ========
+Explicitly specified module resolution kind: 'Node10'.
+Loading module '@typescript/lib-es2022' from 'node_modules' folder, target file types: TypeScript, Declaration.       
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Scoped package detected, looking in 'typescript__lib-es2022'
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/typescript__lib-es2022.d.ts' does not exist.     
+Scoped package detected, looking in 'typescript__lib-es2022'
+File 'C:/Entwicklung/neuer-git-ordner/ki/node_modules/@types/typescript__lib-es2022.d.ts' does not exist.
+Scoped package detected, looking in 'typescript__lib-es2022'
+File 'C:/Entwicklung/neuer-git-ordner/node_modules/@types/typescript__lib-es2022.d.ts' does not exist.
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2022'
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2022'
+Loading module '@typescript/lib-es2022' from 'node_modules' folder, target file types: JavaScript.
+Searching all ancestor node_modules directories for fallback extensions: JavaScript.
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+======== Module name '@typescript/lib-es2022' was not resolved. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/lib/package.json' does not exist according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/package.json' exists according to earlier cached lookups.
+======== Resolving module '@typescript/lib-es2021' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/__lib_node_modules_lookup_lib.es2021.d.ts__.ts'. ========
+Explicitly specified module resolution kind: 'Node10'.
+Loading module '@typescript/lib-es2021' from 'node_modules' folder, target file types: TypeScript, Declaration.       
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Scoped package detected, looking in 'typescript__lib-es2021'
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/typescript__lib-es2021.d.ts' does not exist.     
+Scoped package detected, looking in 'typescript__lib-es2021'
+File 'C:/Entwicklung/neuer-git-ordner/ki/node_modules/@types/typescript__lib-es2021.d.ts' does not exist.
+Scoped package detected, looking in 'typescript__lib-es2021'
+File 'C:/Entwicklung/neuer-git-ordner/node_modules/@types/typescript__lib-es2021.d.ts' does not exist.
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2021'
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2021'
+Loading module '@typescript/lib-es2021' from 'node_modules' folder, target file types: JavaScript.
+Searching all ancestor node_modules directories for fallback extensions: JavaScript.
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+======== Module name '@typescript/lib-es2021' was not resolved. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/lib/package.json' does not exist according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/package.json' exists according to earlier cached lookups.
+======== Resolving module '@typescript/lib-es2021/promise' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/__lib_node_modules_lookup_lib.es2021.promise.d.ts__.ts'. ========
+Explicitly specified module resolution kind: 'Node10'.
+Loading module '@typescript/lib-es2021/promise' from 'node_modules' folder, target file types: TypeScript, Declaration.
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Scoped package detected, looking in 'typescript__lib-es2021/promise'
+Scoped package detected, looking in 'typescript__lib-es2021/promise'
+Scoped package detected, looking in 'typescript__lib-es2021/promise'
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2021/promise'
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2021/promise'
+Loading module '@typescript/lib-es2021/promise' from 'node_modules' folder, target file types: JavaScript.
+Searching all ancestor node_modules directories for fallback extensions: JavaScript.
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+======== Module name '@typescript/lib-es2021/promise' was not resolved. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/lib/package.json' does not exist according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/package.json' exists according to earlier cached lookups.
+======== Resolving module '@typescript/lib-es2021/string' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/__lib_node_modules_lookup_lib.es2021.string.d.ts__.ts'. ========
+Explicitly specified module resolution kind: 'Node10'.
+Loading module '@typescript/lib-es2021/string' from 'node_modules' folder, target file types: TypeScript, Declaration.
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Scoped package detected, looking in 'typescript__lib-es2021/string'
+Scoped package detected, looking in 'typescript__lib-es2021/string'
+Scoped package detected, looking in 'typescript__lib-es2021/string'
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2021/string'
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2021/string'
+Loading module '@typescript/lib-es2021/string' from 'node_modules' folder, target file types: JavaScript.
+Searching all ancestor node_modules directories for fallback extensions: JavaScript.
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+======== Module name '@typescript/lib-es2021/string' was not resolved. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/lib/package.json' does not exist according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/package.json' exists according to earlier cached lookups.
+======== Resolving module '@typescript/lib-es2021/weakref' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/__lib_node_modules_lookup_lib.es2021.weakref.d.ts__.ts'. ========
+Explicitly specified module resolution kind: 'Node10'.
+Loading module '@typescript/lib-es2021/weakref' from 'node_modules' folder, target file types: TypeScript, Declaration.
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Scoped package detected, looking in 'typescript__lib-es2021/weakref'
+Scoped package detected, looking in 'typescript__lib-es2021/weakref'
+Scoped package detected, looking in 'typescript__lib-es2021/weakref'
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2021/weakref'
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2021/weakref'
+Loading module '@typescript/lib-es2021/weakref' from 'node_modules' folder, target file types: JavaScript.
+Searching all ancestor node_modules directories for fallback extensions: JavaScript.
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+======== Module name '@typescript/lib-es2021/weakref' was not resolved. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/lib/package.json' does not exist according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/package.json' exists according to earlier cached lookups.
+======== Resolving module '@typescript/lib-es2021/intl' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/__lib_node_modules_lookup_lib.es2021.intl.d.ts__.ts'. ========
+Explicitly specified module resolution kind: 'Node10'.
+Loading module '@typescript/lib-es2021/intl' from 'node_modules' folder, target file types: TypeScript, Declaration.  
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Scoped package detected, looking in 'typescript__lib-es2021/intl'
+Scoped package detected, looking in 'typescript__lib-es2021/intl'
+Scoped package detected, looking in 'typescript__lib-es2021/intl'
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2021/intl'
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2021/intl'
+Loading module '@typescript/lib-es2021/intl' from 'node_modules' folder, target file types: JavaScript.
+Searching all ancestor node_modules directories for fallback extensions: JavaScript.
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+======== Module name '@typescript/lib-es2021/intl' was not resolved. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/lib/package.json' does not exist according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/package.json' exists according to earlier cached lookups.
+======== Resolving module '@typescript/lib-es2022/array' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/__lib_node_modules_lookup_lib.es2022.array.d.ts__.ts'. ========
+Explicitly specified module resolution kind: 'Node10'.
+Loading module '@typescript/lib-es2022/array' from 'node_modules' folder, target file types: TypeScript, Declaration. 
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Scoped package detected, looking in 'typescript__lib-es2022/array'
+Scoped package detected, looking in 'typescript__lib-es2022/array'
+Scoped package detected, looking in 'typescript__lib-es2022/array'
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2022/array'
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2022/array'
+Loading module '@typescript/lib-es2022/array' from 'node_modules' folder, target file types: JavaScript.
+Searching all ancestor node_modules directories for fallback extensions: JavaScript.
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+======== Module name '@typescript/lib-es2022/array' was not resolved. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/lib/package.json' does not exist according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/package.json' exists according to earlier cached lookups.
+======== Resolving module '@typescript/lib-es2022/error' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/__lib_node_modules_lookup_lib.es2022.error.d.ts__.ts'. ========
+Explicitly specified module resolution kind: 'Node10'.
+Loading module '@typescript/lib-es2022/error' from 'node_modules' folder, target file types: TypeScript, Declaration. 
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Scoped package detected, looking in 'typescript__lib-es2022/error'
+Scoped package detected, looking in 'typescript__lib-es2022/error'
+Scoped package detected, looking in 'typescript__lib-es2022/error'
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2022/error'
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2022/error'
+Loading module '@typescript/lib-es2022/error' from 'node_modules' folder, target file types: JavaScript.
+Searching all ancestor node_modules directories for fallback extensions: JavaScript.
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+======== Module name '@typescript/lib-es2022/error' was not resolved. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/lib/package.json' does not exist according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/package.json' exists according to earlier cached lookups.
+======== Resolving module '@typescript/lib-es2022/intl' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/__lib_node_modules_lookup_lib.es2022.intl.d.ts__.ts'. ========
+Explicitly specified module resolution kind: 'Node10'.
+Loading module '@typescript/lib-es2022/intl' from 'node_modules' folder, target file types: TypeScript, Declaration.  
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Scoped package detected, looking in 'typescript__lib-es2022/intl'
+Scoped package detected, looking in 'typescript__lib-es2022/intl'
+Scoped package detected, looking in 'typescript__lib-es2022/intl'
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2022/intl'
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2022/intl'
+Loading module '@typescript/lib-es2022/intl' from 'node_modules' folder, target file types: JavaScript.
+Searching all ancestor node_modules directories for fallback extensions: JavaScript.
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+======== Module name '@typescript/lib-es2022/intl' was not resolved. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/lib/package.json' does not exist according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/package.json' exists according to earlier cached lookups.
+======== Resolving module '@typescript/lib-es2022/object' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/__lib_node_modules_lookup_lib.es2022.object.d.ts__.ts'. ========
+Explicitly specified module resolution kind: 'Node10'.
+Loading module '@typescript/lib-es2022/object' from 'node_modules' folder, target file types: TypeScript, Declaration.
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Scoped package detected, looking in 'typescript__lib-es2022/object'
+Scoped package detected, looking in 'typescript__lib-es2022/object'
+Scoped package detected, looking in 'typescript__lib-es2022/object'
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2022/object'
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2022/object'
+Loading module '@typescript/lib-es2022/object' from 'node_modules' folder, target file types: JavaScript.
+Searching all ancestor node_modules directories for fallback extensions: JavaScript.
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+======== Module name '@typescript/lib-es2022/object' was not resolved. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/lib/package.json' does not exist according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/package.json' exists according to earlier cached lookups.
+======== Resolving module '@typescript/lib-es2022/regexp' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/__lib_node_modules_lookup_lib.es2022.regexp.d.ts__.ts'. ========
+Explicitly specified module resolution kind: 'Node10'.
+Loading module '@typescript/lib-es2022/regexp' from 'node_modules' folder, target file types: TypeScript, Declaration.
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Scoped package detected, looking in 'typescript__lib-es2022/regexp'
+Scoped package detected, looking in 'typescript__lib-es2022/regexp'
+Scoped package detected, looking in 'typescript__lib-es2022/regexp'
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2022/regexp'
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2022/regexp'
+Loading module '@typescript/lib-es2022/regexp' from 'node_modules' folder, target file types: JavaScript.
+Searching all ancestor node_modules directories for fallback extensions: JavaScript.
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+======== Module name '@typescript/lib-es2022/regexp' was not resolved. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/lib/package.json' does not exist according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/package.json' exists according to earlier cached lookups.
+======== Resolving module '@typescript/lib-es2022/string' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/__lib_node_modules_lookup_lib.es2022.string.d.ts__.ts'. ========
+Explicitly specified module resolution kind: 'Node10'.
+Loading module '@typescript/lib-es2022/string' from 'node_modules' folder, target file types: TypeScript, Declaration.
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Scoped package detected, looking in 'typescript__lib-es2022/string'
+Scoped package detected, looking in 'typescript__lib-es2022/string'
+Scoped package detected, looking in 'typescript__lib-es2022/string'
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2022/string'
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-es2022/string'
+Loading module '@typescript/lib-es2022/string' from 'node_modules' folder, target file types: JavaScript.
+Searching all ancestor node_modules directories for fallback extensions: JavaScript.
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+======== Module name '@typescript/lib-es2022/string' was not resolved. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/lib/package.json' does not exist according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/package.json' exists according to earlier cached lookups.
+======== Resolving module '@typescript/lib-dom' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/__lib_node_modules_lookup_lib.dom.d.ts__.ts'. ========
+Explicitly specified module resolution kind: 'Node10'.
+Loading module '@typescript/lib-dom' from 'node_modules' folder, target file types: TypeScript, Declaration.
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Scoped package detected, looking in 'typescript__lib-dom'
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/typescript__lib-dom.d.ts' does not exist.        
+Scoped package detected, looking in 'typescript__lib-dom'
+File 'C:/Entwicklung/neuer-git-ordner/ki/node_modules/@types/typescript__lib-dom.d.ts' does not exist.
+Scoped package detected, looking in 'typescript__lib-dom'
+File 'C:/Entwicklung/neuer-git-ordner/node_modules/@types/typescript__lib-dom.d.ts' does not exist.
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-dom'
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-dom'
+Loading module '@typescript/lib-dom' from 'node_modules' folder, target file types: JavaScript.
+Searching all ancestor node_modules directories for fallback extensions: JavaScript.
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+======== Module name '@typescript/lib-dom' was not resolved. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/lib/package.json' does not exist according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/package.json' exists according to earlier cached lookups.
+======== Resolving module '@typescript/lib-webworker/importscripts' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/__lib_node_modules_lookup_lib.webworker.importscripts.d.ts__.ts'. ========
+Explicitly specified module resolution kind: 'Node10'.
+Loading module '@typescript/lib-webworker/importscripts' from 'node_modules' folder, target file types: TypeScript, Declaration.
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Scoped package detected, looking in 'typescript__lib-webworker/importscripts'
+Scoped package detected, looking in 'typescript__lib-webworker/importscripts'
+Scoped package detected, looking in 'typescript__lib-webworker/importscripts'
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-webworker/importscripts'
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-webworker/importscripts'
+Loading module '@typescript/lib-webworker/importscripts' from 'node_modules' folder, target file types: JavaScript.   
+Searching all ancestor node_modules directories for fallback extensions: JavaScript.
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+======== Module name '@typescript/lib-webworker/importscripts' was not resolved. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/lib/package.json' does not exist according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/package.json' exists according to earlier cached lookups.
+======== Resolving module '@typescript/lib-scripthost' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/__lib_node_modules_lookup_lib.scripthost.d.ts__.ts'. ========
+Explicitly specified module resolution kind: 'Node10'.
+Loading module '@typescript/lib-scripthost' from 'node_modules' folder, target file types: TypeScript, Declaration.   
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Scoped package detected, looking in 'typescript__lib-scripthost'
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/@types/typescript__lib-scripthost.d.ts' does not exist. 
+Scoped package detected, looking in 'typescript__lib-scripthost'
+File 'C:/Entwicklung/neuer-git-ordner/ki/node_modules/@types/typescript__lib-scripthost.d.ts' does not exist.
+Scoped package detected, looking in 'typescript__lib-scripthost'
+File 'C:/Entwicklung/neuer-git-ordner/node_modules/@types/typescript__lib-scripthost.d.ts' does not exist.
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-scripthost'
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-scripthost'
+Loading module '@typescript/lib-scripthost' from 'node_modules' folder, target file types: JavaScript.
+Searching all ancestor node_modules directories for fallback extensions: JavaScript.
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+======== Module name '@typescript/lib-scripthost' was not resolved. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/lib/package.json' does not exist according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/package.json' exists according to earlier cached lookups.
+======== Resolving module '@typescript/lib-dom/iterable' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/__lib_node_modules_lookup_lib.dom.iterable.d.ts__.ts'. ========
+Explicitly specified module resolution kind: 'Node10'.
+Loading module '@typescript/lib-dom/iterable' from 'node_modules' folder, target file types: TypeScript, Declaration. 
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Scoped package detected, looking in 'typescript__lib-dom/iterable'
+Scoped package detected, looking in 'typescript__lib-dom/iterable'
+Scoped package detected, looking in 'typescript__lib-dom/iterable'
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-dom/iterable'
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-dom/iterable'
+Loading module '@typescript/lib-dom/iterable' from 'node_modules' folder, target file types: JavaScript.
+Searching all ancestor node_modules directories for fallback extensions: JavaScript.
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+======== Module name '@typescript/lib-dom/iterable' was not resolved. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/lib/package.json' does not exist according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/package.json' exists according to earlier cached lookups.
+======== Resolving module '@typescript/lib-dom/asynciterable' from 'C:/Entwicklung/neuer-git-ordner/ki/backend/__lib_node_modules_lookup_lib.dom.asynciterable.d.ts__.ts'. ========
+Explicitly specified module resolution kind: 'Node10'.
+Loading module '@typescript/lib-dom/asynciterable' from 'node_modules' folder, target file types: TypeScript, Declaration.
+Searching all ancestor node_modules directories for preferred extensions: TypeScript, Declaration.
+Scoped package detected, looking in 'typescript__lib-dom/asynciterable'
+Scoped package detected, looking in 'typescript__lib-dom/asynciterable'
+Scoped package detected, looking in 'typescript__lib-dom/asynciterable'
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-dom/asynciterable'
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+Scoped package detected, looking in 'typescript__lib-dom/asynciterable'
+Loading module '@typescript/lib-dom/asynciterable' from 'node_modules' folder, target file types: JavaScript.
+Searching all ancestor node_modules directories for fallback extensions: JavaScript.
+Directory 'C:/Entwicklung/node_modules' does not exist, skipping all lookups in it.
+Directory 'C:/node_modules' does not exist, skipping all lookups in it.
+======== Module name '@typescript/lib-dom/asynciterable' was not resolved. ========
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/lib/package.json' does not exist according to earlier cached lookups.
+File 'C:/Entwicklung/neuer-git-ordner/ki/backend/node_modules/typescript/package.json' exists according to earlier cached lookups.
+routes/app/api/marketing/image-analysis-routes.ts:7:30 - error TS2307: Cannot find module '../../../agent/jobs/image-analysis' or its corresponding type declarations.
+
+7 import { analyzeImage } from '../../../agent/jobs/image-analysis';
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Found 1 error in routes/app/api/marketing/image-analysis-routes.ts:7

@@ -1,3 +1,309 @@
+/* --- Stylisches UI für KI-Analytics-Insights (ConversionAnalysis) --- */
+.ml-analytics-section {
+  margin: 38px 0 0 0;
+  padding: 32px 28px 28px 28px;
+  background: rgba(255,255,255,0.97);
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(102,126,234,0.10);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+}
+.ml-analytics-title {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #2c3e50;
+  margin-bottom: 2px;
+}
+.ml-analytics-desc {
+  font-size: 1.08rem;
+  color: #764ba2;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+.ml-analytics-btn {
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  font-size: 1.13rem;
+  font-weight: 800;
+  padding: 15px 32px;
+  border-radius: 13px;
+  border: none;
+  box-shadow: 0 4px 18px rgba(102,126,234,0.18);
+  margin-bottom: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  letter-spacing: 0.01em;
+}
+.ml-analytics-btn:hover:not(:disabled) {
+  background: linear-gradient(90deg, #764ba2 0%, #667eea 100%);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 24px rgba(102,126,234,0.22);
+}
+.ml-analytics-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+.ml-analytics-loading {
+  color: #764ba2;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.ml-analytics-error {
+  color: #dc3545;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.ml-analytics-card-list {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 18px;
+  margin-top: 10px;
+}
+.ml-analytics-card {
+  background: rgba(255,255,255,0.99);
+  border-radius: 13px;
+  box-shadow: 0 2px 12px rgba(102,126,234,0.09);
+  padding: 18px 16px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  border-left: 5px solid #764ba2;
+  animation: fadeInUp 0.5s;
+}
+.ml-analytics-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+.ml-analytics-card-icon {
+  font-size: 1.3rem;
+  opacity: 0.85;
+}
+.ml-analytics-card-title {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #2c3e50;
+}
+.ml-analytics-card-score {
+  background: #f3f0fa;
+  color: #764ba2;
+  font-size: 0.98rem;
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 3px 10px;
+  margin-left: auto;
+}
+.ml-analytics-card-value {
+  font-size: 1.01rem;
+  color: #3a3a4a;
+  margin: 4px 0 2px 0;
+}
+.ml-analytics-card-reason {
+  font-size: 0.97rem;
+  color: #888;
+  margin-top: 2px;
+  font-style: italic;
+}
+/* --- Stylisches UI für KI-Produktideen-Button und Ergebnisliste --- */
+.ml-product-idea-generator {
+  margin: 32px 0 18px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.ml-idea-btn {
+  background: linear-gradient(90deg, #ffb347 0%, #ffcc33 100%);
+  color: #2c3e50;
+  font-size: 1.18rem;
+  font-weight: 800;
+  padding: 16px 34px;
+  border-radius: 14px;
+  border: none;
+  box-shadow: 0 4px 18px rgba(255, 204, 51, 0.18);
+  margin-bottom: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  letter-spacing: 0.01em;
+}
+.ml-idea-btn:hover:not(:disabled) {
+  background: linear-gradient(90deg, #ffcc33 0%, #ffb347 100%);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 24px rgba(255, 204, 51, 0.22);
+}
+.ml-idea-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.ml-idea-loading {
+  color: #764ba2;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.ml-idea-error {
+  color: #dc3545;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.ml-idea-list {
+  width: 100%;
+  margin-top: 10px;
+}
+.ml-idea-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+  margin-top: 10px;
+}
+.ml-idea-card {
+  background: rgba(255,255,255,0.97);
+  border-radius: 13px;
+  box-shadow: 0 2px 12px rgba(102,126,234,0.09);
+  padding: 18px 16px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  border-left: 5px solid #ffcc33;
+  animation: fadeInUp 0.5s;
+}
+.ml-idea-title {
+  font-size: 1.13rem;
+  font-weight: 800;
+  color: #2c3e50;
+  margin-bottom: 2px;
+}
+.ml-idea-meta {
+  font-size: 0.98rem;
+  color: #764ba2;
+  font-weight: 600;
+}
+.ml-idea-desc {
+  font-size: 1.01rem;
+  color: #3a3a4a;
+  margin: 4px 0 2px 0;
+}
+.ml-idea-score {
+  font-size: 0.97rem;
+  color: #888;
+  margin-top: 2px;
+}
+.ml-idea-reason {
+  color: #764ba2;
+  font-weight: 500;
+  margin-left: 8px;
+}
+/* --- Modernes Styling für AutoProductCreator Konfiguration --- */
+.config-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 28px 32px;
+  margin: 32px 0 18px 0;
+  padding: 18px 0 0 0;
+}
+
+.config-item {
+  background: rgba(255,255,255,0.85);
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(102,126,234,0.07);
+  padding: 22px 18px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+  min-height: 110px;
+  transition: box-shadow 0.2s;
+}
+
+.config-item label {
+  font-weight: 700;
+  color: #3a3a4a;
+  font-size: 1.08rem;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.config-item input[type="text"],
+.config-item textarea,
+.config-item select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e9ecef;
+  border-radius: 7px;
+  font-size: 1rem;
+  background: #f8f9fa;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  transition: border-color 0.2s;
+}
+
+.config-item input[type="text"]:focus,
+.config-item textarea:focus,
+.config-item select:focus {
+  outline: none;
+  border-color: #764ba2;
+}
+
+.config-item input[type="checkbox"] {
+  accent-color: #764ba2;
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.config-item .config-hint {
+  font-size: 0.92rem;
+  color: #764ba2;
+  margin-top: 6px;
+  margin-left: 2px;
+  font-weight: 500;
+}
+
+.config-item textarea {
+  min-height: 48px;
+  resize: vertical;
+}
+
+/* Icon für die Config-Items (optional, für noch mehr Pepp) */
+.config-item::before {
+  content: attr(data-icon);
+  font-size: 1.5rem;
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+/* Button noch auffälliger */
+.metric-card .loading-button {
+  margin-top: 30px;
+  font-size: 1.18rem;
+  font-weight: 800;
+  padding: 18px 38px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 18px rgba(102,126,234,0.18);
+  transition: background 0.2s, transform 0.2s;
+}
+.metric-card .loading-button:hover {
+  background: linear-gradient(90deg, #764ba2 0%, #667eea 100%);
+  transform: translateY(-2px) scale(1.03);
+}
 /* page.css - Analytics Page Styles */
 .analytics-page {
   max-width: 1400px;

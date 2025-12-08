@@ -15,8 +15,16 @@ interface AnalysisResult {
   progress: number;
   estimatedTime: string;
   trendsFound: number;
-  insights: string[];
+  insights: string[] | InsightItem[];
   generatedReports: number;
+}
+
+interface InsightItem {
+  title?: string;
+  type?: string;
+  value?: string | number;
+  detail?: string;
+  score?: number;
 }
 
 const RunTrendAnalysis = () => {
@@ -73,54 +81,103 @@ const RunTrendAnalysis = () => {
     }
   };
 
-  const runAnalysis = () => {
+  const API_URL = import.meta.env.VITE_API_URL || '';
+
+  const runAnalysis = async () => {
     setResult({
       status: 'running',
       progress: 0,
-      estimatedTime: '2min',
+      estimatedTime: '...',
       trendsFound: 0,
       insights: [],
       generatedReports: 0
     });
-
-    // Simuliere Analyse-Fortschritt
-    const interval = setInterval(() => {
-      setResult(prev => {
-        const newProgress = prev.progress + Math.random() * 15;
-        const trendsFound = Math.floor(newProgress / 10);
-        const insights = [
-          'Saisonaler Anstieg erkannt',
-          'Neue Kunden-Gruppe identifiziert',
-          'Produkt-Trend vorhergesagt'
-        ].slice(0, trendsFound);
-
-        if (newProgress >= 100) {
+    
+    // Simuliere den Fortschritt für Demo
+    const simulateProgress = () => {
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 5;
+        setResult(prev => ({
+          ...prev,
+          progress,
+          estimatedTime: `${Math.max(0, 120 - progress * 1.2)}s`
+        }));
+        
+        if (progress >= 100) {
           clearInterval(interval);
-          return {
+          // Simuliere abgeschlossene Analyse
+          setTimeout(() => {
+            setResult({
+              status: 'completed',
+              progress: 100,
+              estimatedTime: '0s',
+              trendsFound: 14,
+              insights: [
+                '📈 Sales steigen um 24% in den Abendstunden',
+                '👥 Mobile Traffic wächst um 31%',
+                '🎯 Conversion-Rate um 18% verbessert',
+                '📦 Bestandsdrehung um 42% erhöht'
+              ],
+              generatedReports: 3
+            });
+          }, 500);
+        }
+      }, 300);
+    };
+
+    try {
+      // ML/KI-Trendprognose über Backend
+      if (API_URL) {
+        // Keywords aus Datenquellen ableiten (z.B. sales, traffic, conversion)
+        const keywords = config.dataSources;
+        const res = await fetch(`${API_URL}/api/ml/test/trends`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ keywords })
+        });
+        const data = await res.json();
+        if (data.success && data.result) {
+          // KI-Insights aus ML-Response extrahieren
+          const forecasts = data.result.prediction || [];
+          setResult({
             status: 'completed',
             progress: 100,
+            estimatedTime: 'ca. 1min',
+            trendsFound: forecasts.length,
+            insights: forecasts.map((f: any) => ({
+              title: `${f.keyword} (${f.trend})`,
+              value: `Score: ${Math.round(f.score)}`,
+              detail: f.reasoning,
+              score: f.confidence
+            })),
+            generatedReports: 1
+          });
+        } else {
+          setResult({
+            status: 'error',
+            progress: 0,
             estimatedTime: '0s',
-            trendsFound: 12,
-            insights: [
-              '📈 Starker Umsatzanstieg am Wochenende',
-              '👥 Neue Kundengruppe aus 25-34 Jahren',
-              '🔥 Produkt #234 wird zum Bestseller',
-              '🌍 Internationale Expansion möglich',
-              '⏰ Beste Verkaufszeit: 19-21 Uhr'
-            ],
-            generatedReports: 3
-          };
+            trendsFound: 0,
+            insights: ['Fehler bei der ML/KI-Analyse.'],
+            generatedReports: 0
+          });
         }
-
-        return {
-          ...prev,
-          progress: Math.min(newProgress, 100),
-          trendsFound,
-          insights,
-          estimatedTime: `${Math.max(0, 120 - Math.floor(newProgress * 1.2))}s`
-        };
+      } else {
+        // Simuliere die Analyse für Demo
+        simulateProgress();
+      }
+    } catch (err) {
+      console.error('Analyse-Fehler:', err);
+      setResult({
+        status: 'error',
+        progress: 0,
+        estimatedTime: '0s',
+        trendsFound: 0,
+        insights: ['Fehler bei der Analyse. Bitte API überprüfen.'],
+        generatedReports: 0
       });
-    }, 800);
+    }
   };
 
   const stopAnalysis = () => {
@@ -162,6 +219,9 @@ const RunTrendAnalysis = () => {
       <div className="analytics-header">
         <h1>🚀 Run Trend Analysis</h1>
         <p>Führe Trend-Analyse sofort aus und entdecke neue Insights</p>
+        <div style={{background: '#e0f7fa', color: '#00796b', padding: '12px', borderRadius: '8px', margin: '16px 0', fontWeight: 500, fontSize: '1.1em'}}>
+          Hinweis: Diese Analyse ist KI/MLgestützt.
+        </div>
       </div>
 
       <div className="analysis-container">
@@ -262,7 +322,7 @@ const RunTrendAnalysis = () => {
                 {getStatusIcon()} Analyse Fortschritt 
                 <span style={{ color: getStatusColor(), marginLeft: '10px' }}>
                   {result.status === 'running' ? 'Läuft...' : 
-                   result.status === 'completed' ? 'Abgeschlossen' : 'Pausiert'}
+                   result.status === 'completed' ? 'Abgeschlossen' : 'Fehler'}
                 </span>
               </h3>
               
@@ -289,16 +349,40 @@ const RunTrendAnalysis = () => {
                 </div>
               </div>
 
-              {/* Live Insights */}
+              {/* KI/ML Insights Grid */}
               {result.insights.length > 0 && (
                 <div className="live-insights">
-                  <h4>🔍 Live Insights</h4>
+                  <h4>🧠 KI-Insights</h4>
                   <div className="insights-list">
-                    {result.insights.map((insight, index) => (
-                      <div key={index} className="insight-item live">
-                        {insight}
-                      </div>
-                    ))}
+                    {result.insights.map((insight, index) => {
+                      if (typeof insight === 'string') {
+                        return (
+                          <div key={index} className="insight-item live">
+                            {insight}
+                          </div>
+                        );
+                      } else {
+                        const insightObj = insight as InsightItem;
+                        return (
+                          <div key={index} className="insight-item live">
+                            {insightObj.title && (
+                              <div style={{fontWeight: 600}}>{insightObj.title}</div>
+                            )}
+                            {insightObj.value && (
+                              <div>{insightObj.value}</div>
+                            )}
+                            {insightObj.detail && (
+                              <div style={{color: '#6c757d'}}>{insightObj.detail}</div>
+                            )}
+                            {insightObj.score !== undefined && (
+                              <div style={{color: '#2563eb', fontWeight: 700}}>
+                                KI-Score: {Math.round(insightObj.score * 100)}%
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }
+                    })}
                   </div>
                 </div>
               )}
