@@ -1,4 +1,10 @@
-# System-Architektur - WooCommerce AI Agent
+## TODO: Feedback Analysis Route
+
+Die Route `/api/analytics/feedback` ist aktuell auskommentiert, da die Datei `tools/feedbackAnalysis.ts`/`.js` fehlt.
+
+**Wichtig:** Die Datei muss nachgereicht oder implementiert werden, damit die Feedback-Analyse wieder funktioniert.
+
+Siehe auch: Auskommentierung in `backend/server.ts`.# System-Architektur - WooCommerce AI Agent
 
 ## Übersicht
 

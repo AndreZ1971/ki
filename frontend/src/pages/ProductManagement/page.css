@@ -2628,3 +2628,73 @@
 }
 .analytics-grid-2x4 > *:nth-child(7) { animation-delay: 0.7s; }
 .analytics-grid-2x4 > *:nth-child(8) { animation-delay: 0.8s; }
+
+/* Product AI Analysis Styles */
+.product-ai-analysis {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+  padding: 32px;
+  margin: 32px auto;
+  max-width: 600px;
+}
+
+/* Product Analysis Component */
+.product-analysis button {
+  background: #eee;
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-bottom: 16px;
+  transition: background 0.2s;
+}
+
+.product-analysis button:disabled {
+  background: #ccc;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.analysis-result {
+  margin-top: 24px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.analysis-result h3 {
+  margin-top: 0;
+  color: #764ba2;
+  font-size: 1.4rem;
+}
+
+.analysis-result ul {
+  padding-left: 20px;
+}
+
+.analysis-result li {
+  margin-bottom: 6px;
+  color: #2c3e50;
+}
+
+.error {
+  color: #c0392b;
+  margin-top: 12px;
+}
+
+.ai-section {
+  margin-top: 18px;
+  background: #e9ecef;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.ai-section h4 {
+  margin-top: 0;
+  color: #667eea;
+  font-size: 1.1rem;
+}

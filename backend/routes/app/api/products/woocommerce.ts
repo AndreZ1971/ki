@@ -815,4 +815,57 @@ Entdecke die einzigartigen Vorteile und die herausragende Qualität dieses Produ
       throw new Error(`Failed to fetch customers: ${error.message}`);
     }
   });
+
+  // Bulk-Update für mehrere Produkte
+  server.put('/woo/products/update', {
+    schema: {
+      tags: ['woocommerce'],
+      summary: 'Bulk update products',
+      description: 'Update multiple products in WooCommerce store',
+      body: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            updateData: { type: 'object' }
+          },
+          required: ['id', 'updateData']
+        }
+      },
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            results: { type: 'array' }
+          }
+        },
+        500: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            error: { type: 'string' }
+          }
+        }
+      }
+    }
+  }, async (request: any, _reply: any) => {
+    try {
+      const updates = request.body;
+      const results = [];
+      for (const { id, updateData } of updates) {
+        try {
+          const product = await wooCommerce.updateProduct(id, updateData);
+          results.push({ id, success: true, product });
+        } catch (error: any) {
+          results.push({ id, success: false, error: error.message });
+        }
+      }
+      return { success: true, results };
+    } catch (error: any) {
+      server.log.error('Fehler beim Bulk-Update:', error);
+      return { success: false, error: error.message };
+    }
+  });
 }

@@ -21,8 +21,9 @@
     "incremental": true,
     "tsBuildInfoFile": "./dist/.tsbuildinfo"
     ,"baseUrl": "."
+    // "ignoreDeprecations": "5.0" // Entfernt, da ungültig
     ,"paths": {
-      "@config": ["config.ts"]
+      "@config": ["config.ts"],
     }
   },
   "include": [

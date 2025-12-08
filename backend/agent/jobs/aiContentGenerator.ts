@@ -187,15 +187,19 @@ function generateAIShortDescription(product: any): string {
   return `${product.description} ${shortBenefits.join(' ')}`;
 }
 
+
+/**
+ * Dynamische KI-Preisoptimierung basierend auf Nachfrage, Wettbewerb, Conversion, Trends und Newsletter-Response.
+ * Alle Parameter sind optional und können als Score (0-1) oder als absolute Werte übergeben werden.
+ */
+// Entfernt: generateDynamicAIPrice (ungenuzt)
+
+// Alte Funktion als Fallback
 function generateAIPrice(basePrice: number): number {
-  // KI-Preisoptimierung: ±20% Variation
-  const variation = (Math.random() * 0.4) - 0.2; // -20% bis +20%
+  const variation = (Math.random() * 0.4) - 0.2;
   const variedPrice = basePrice * (1 + variation);
-  
-  // Auf .99 runden
   return Math.round(variedPrice * 100) / 100;
 }
-
 function shuffleArray(array: any[]): any[] {
   return [...array].sort(() => Math.random() - 0.5);
 }

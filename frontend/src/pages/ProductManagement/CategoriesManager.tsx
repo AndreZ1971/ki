@@ -5,6 +5,7 @@ import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared
 import { ToastContainer } from '../../components/Toast/ToastContainer';
 import { categoryApi } from '../../services/productApi';
 import type { Category } from '../../types/product';
+import { MLCategorySuggester } from './MLCategorySuggester';
 import './page.css';
 
 const CategoriesManager = () => {
@@ -209,6 +210,12 @@ const CategoriesManager = () => {
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="category-ml-section">
+        <h3>KI-Kategorie-Vorschläge</h3>
+        {/* Beispielhafte Produktdaten, kann dynamisch ersetzt werden */}
+        <MLCategorySuggester productTitle="Beispielprodukt" productDescription="Dies ist eine Beispielbeschreibung für ein Produkt, das kategorisiert werden soll." />
       </div>
     </div>
   );

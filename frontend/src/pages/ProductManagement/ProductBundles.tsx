@@ -6,6 +6,7 @@ import { ToastContainer } from '../../components/Toast/ToastContainer';
 import { bundleApi } from '../../services/productApi';
 import type { Bundle } from '../../types/product';
 import './page.css';
+import ProductAIAnalysis from './ProductAIAnalysis';
 
 const ProductBundles = () => {
   const { handleBackToDashboard, loading, setLoading, error, setError, clearError } = useProductManagement();
@@ -169,6 +170,9 @@ const ProductBundles = () => {
           </div>
         </div>
       </div>
+
+      <h2>KI-Produktanalyse</h2>
+      <ProductAIAnalysis />
     </div>
   );
 };

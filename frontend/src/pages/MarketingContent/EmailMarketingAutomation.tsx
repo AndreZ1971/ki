@@ -5,6 +5,7 @@ import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
 import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
+import { MLMarketingGenerator } from './MLMarketingGenerator';
 import './page.css';
 
 const EmailMarketingAutomation: React.FC = () => {
@@ -206,6 +207,12 @@ const EmailMarketingAutomation: React.FC = () => {
             <p style={{ margin: 0 }}>Stats werden nach Kampagnen-Start angezeigt</p>
           </div>
         </motion.div>
+      </div>
+
+      <div className="marketing-ml-section">
+        <h3>KI-Marketing-Generator</h3>
+        {/* Beispielhafte Kampagnenziele und Zielgruppe, kann dynamisch ersetzt werden */}
+        <MLMarketingGenerator campaignGoal={campaignName || 'Mehr Verkäufe'} audience={targetSegment} />
       </div>
     </div>
   );

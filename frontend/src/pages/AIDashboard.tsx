@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { MLDashboardWidget } from '../components/ML/MLDashboardWidget';
+import { FloatingChatbot } from '../components/FloatingChatbot';
 import './AIDashboard.css';
 
 const AIDashboard: React.FC = () => {
@@ -44,8 +45,8 @@ const AIDashboard: React.FC = () => {
         const response = await fetch(fullUrl, {
           method: 'GET',
           headers: {
-            'x-woocommerce-key': import.meta.env.WOOCOMMERCE_CONSUMER_KEY,
-            'x-woocommerce-secret': import.meta.env.WOOCOMMERCE_CONSUMER_SECRET,
+            'x-woocommerce-key': import.meta.env.VITE_WOOCOMMERCE_CONSUMER_KEY || '',
+            'x-woocommerce-secret': import.meta.env.VITE_WOOCOMMERCE_CONSUMER_SECRET || '',
             'Content-Type': 'application/json'
           }
         });
@@ -125,15 +126,15 @@ const AIDashboard: React.FC = () => {
     try {
       setActiveTool(toolId);
       
-  if (!import.meta.env.VITE_API_URL) {
-    throw new Error('VITE_API_URL is not set!');
-  }
-  const apiUrl = import.meta.env.VITE_API_URL;
-  const response = await fetch(`${apiUrl}/${endpoint}`, {
+      if (!import.meta.env.VITE_API_URL) {
+        throw new Error('VITE_API_URL is not set!');
+      }
+      const apiUrl = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${apiUrl}/${endpoint}`, {
         method: 'POST',
         headers: {
-          'x-woocommerce-key': import.meta.env.WOOCOMMERCE_CONSUMER_KEY,
-          'x-woocommerce-secret': import.meta.env.WOOCOMMERCE_CONSUMER_SECRET,
+          'x-woocommerce-key': import.meta.env.VITE_WOOCOMMERCE_CONSUMER_KEY || '',
+          'x-woocommerce-secret': import.meta.env.VITE_WOOCOMMERCE_CONSUMER_SECRET || '',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
@@ -179,6 +180,14 @@ const AIDashboard: React.FC = () => {
           endpoint: 'analytics/conversion/analyze',
           icon: '📈',
           pageUrl: '/analytics/conversion-analysis'
+        },
+        {
+          id: 'feedback-analysis',
+          title: '💬 Feedback Analysis',
+          description: 'KI-gestützte Analyse von Kundenbewertungen und Support-Tickets',
+          endpoint: 'analytics/feedback/analyze',
+          icon: '💬',
+          pageUrl: '/analytics/feedback-analysis'
         },
         {
           id: 'conversion-reported',
@@ -504,6 +513,22 @@ const AIDashboard: React.FC = () => {
           endpoint: 'marketing/templates',
           icon: '🎨',
           pageUrl: '/marketing/kite-templates'
+        },
+        {
+          id: 'blogpost-generator',
+          title: '📝 Blogpost Generator',
+          description: 'Erstelle KI-basierte, SEO-optimierte Blogposts für dein Marketing',
+          endpoint: 'marketing/blogpost/generate',
+          icon: '📝',
+          pageUrl: '/marketing/BlogPostGenerator'
+        },
+        {
+          id: 'image-analyzer',
+          title: '🖼️ ImageAnalyzer',
+          description: 'KI-Bildbewertung, automatisches Tagging, Qualitätsprüfung & Bild-SEO',
+          endpoint: 'marketing/image/analyze',
+          icon: '🖼️',
+          pageUrl: '/marketing/image-analyzer'
         }
       ]
     },
@@ -559,6 +584,14 @@ const AIDashboard: React.FC = () => {
           endpoint: 'system/health',
           icon: '⚙️',
           pageUrl: '/advanced/system-health'
+        },
+        {
+          id: 'user-management',
+          title: '👤 User Management',
+          description: 'Verwalte und analysiere alle Nutzer im System',
+          endpoint: 'users',
+          icon: '👤',
+          pageUrl: '/users'
         }
       ]
     }
@@ -609,7 +642,6 @@ const AIDashboard: React.FC = () => {
 
   return (
     <div className={`dashboard ${isDark ? 'dark-theme' : 'light-theme'}`}>
-      {/* HEADER */}
       <motion.header 
         className="App-header"
         initial={{ opacity: 0, y: -50 }}
@@ -644,9 +676,14 @@ const AIDashboard: React.FC = () => {
               onClick={() => navigate('/settings')}
               className="theme-toggle"
               style={{
+                padding: '8px 16px',
                 background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                color: 'white',
                 border: 'none',
-                cursor: 'pointer'
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500'
               }}
             >
               ⚙️ Settings
@@ -656,6 +693,16 @@ const AIDashboard: React.FC = () => {
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsDark(!isDark)}
               className="theme-toggle"
+              style={{
+                padding: '8px 16px',
+                background: 'rgba(255,255,255,0.1)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500'
+              }}
             >
               {isDark ? '🌙 Dark' : '☀️ Light'}
             </motion.button>
@@ -887,7 +934,7 @@ const AIDashboard: React.FC = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-              opacity: activeTool === tool.id ? 0.7 : 1
+                opacity: activeTool === tool.id ? 0.7 : 1
               }}
               onClick={() => startAITool(tool.id, tool.endpoint, tool.pageUrl)}
             >
@@ -927,6 +974,14 @@ const AIDashboard: React.FC = () => {
           ))}
         </div>
       </motion.div>
+
+      <FloatingChatbot 
+  userRole="admin" 
+  botName="Ari" 
+  greetings={[
+    'Hi, ich bin Ari. 🤖 Ich bin dein neuer digitaler Mitarbeiter. Ich schlafe nie, mache keine Kaffeepausen und kenne deine Lagerbestände auswendig.'
+  ]} 
+/>
     </div>
   );
 };

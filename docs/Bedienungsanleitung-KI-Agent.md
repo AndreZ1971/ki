@@ -20,10 +20,6 @@ So startest du die KI-Agent-Plattform als Endnutzer ganz ohne Quellcode-Installa
 
 3. **Frontend öffnen**
    - Öffne deinen Browser und rufe `http://localhost:5173` auf.
-
-4. **Konfiguration prüfen**
-   - Gehe auf die Settings-Seite im Frontend.
-   - Lade die `connection.json` über die Import-Funktion hoch oder prüfe, ob alle Felder korrekt befüllt sind.
    - Speichere die Einstellungen.
 
 5. **System nutzen**
@@ -36,22 +32,12 @@ So startest du die KI-Agent-Plattform als Endnutzer ganz ohne Quellcode-Installa
 
 ### AnalyticRegioning
 
-#### Was kann ich mit AnalyticRegioning machen?
-
-- Regionale Performance-Analyse Ihrer Geschäftsaktivitäten
-- Geografische Verteilung von Kunden und Umsätzen
 - Identifikation von regionalen Wachstumsmöglichkeiten
-- Vergleich verschiedener Standorte oder Märkte
 
 #### Wie nutze ich AnalyticRegioning?
 
 1. **Datenquelle auswählen** - Wählen Sie die zu analysierenden Daten (Umsätze, Kunden, Conversions)
 2. **Regionen definieren** - Legen Sie geografische Bereiche fest (Länder, Bundesländer, Postleitzahlen)
-3. **Zeitraum wählen** - Wählen Sie den Analysezeitraum (letzte 30 Tage, Quartal, Jahr)
-4. **Metriken auswählen** - Bestimmen Sie die zu analysierenden Kennzahlen
-5. **Bericht generieren** - Klicken Sie auf "Analyse starten"
-6. **Ergebnisse interpretieren** - Nutzen Sie die visualisierten Karten und Diagramme
-
 #### Erweiterte Funktionen
 
 - Automatische Hotspot-Erkennung
@@ -64,23 +50,12 @@ So startest du die KI-Agent-Plattform als Endnutzer ganz ohne Quellcode-Installa
 
 #### Was kann ich mit ConversionAnalysis machen?
 
-- Detaillierte Analyse Ihrer Conversion-Raten
-- Identifikation von Conversion-Blockern
-- Optimierung von Verkaufsprozessen
-- Tracking der Customer Journey
-
 #### Wie nutze ich ConversionAnalysis?
-
 1. **Conversion-Ziel definieren** - Was ist eine erfolgreiche Conversion? (Kauf, Anmeldung, Download)
 2. **Datenquellen verbinden** - Google Analytics, Shop-System, CRM
 3. **Funnel erstellen** - Definieren Sie die einzelnen Schritte zum Ziel
 4. **Analysezeitraum festlegen** - Wählen Sie den zu analysierenden Zeitraum
 5. **Auswertung starten** - Klicken Sie auf "Conversion-Analyse starten"
-6. **Optimierungsvorschläge prüfen** - System erkennt automatisch Verbesserungspotentiale
-
-#### Wichtige Metriken für ShopMetrics
-
-- Gesamt-Conversion-Rate
 - Funnel-Abbruchquoten
 - Zeit bis zur Conversion
 - Wert pro Conversion
@@ -93,13 +68,7 @@ So startest du die KI-Agent-Plattform als Endnutzer ganz ohne Quellcode-Installa
 
 - Automatische Conversion-Reporting
 - Echtzeit-Benachrichtigungen bei Conversions
-- Performance-Tracking über mehrere Kanäle
-- ROI-Berechnung pro Marketing-Kanal
-
-#### Wie nutze ich ConversionReported?
-
 1. **Reporting-Ziele festlegen** - Welche Conversions sollen getrackt werden?
-2. **Benachrichtigungen einrichten** - E-Mail, Slack, Teams Benachrichtigungen
 3. **Berichtsvorlagen wählen** - Täglich, wöchentlich, monatlich
 4. **KPIs definieren** - Welche Kennzahlen sind wichtig?
 5. **Automation aktivieren** - "Automatisches Reporting aktivieren"

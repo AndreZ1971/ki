@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './page.css';
+import { MLAnalyticsGenerator } from './MLAnalyticsGenerator';
 
 interface ConversionData {
   overallRate?: number;
@@ -130,6 +131,13 @@ const ConversionAnalysis = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* ML-Analytics-Sektion */}
+      <div className="analytics-ml-section">
+        <h3>KI-Analytics-Generator</h3>
+        {/* Beispielhafte Metrik und Zeitraum, kann dynamisch ersetzt werden */}
+        <MLAnalyticsGenerator metric="conversion" period="30d" />
       </div>
     </div>
   );

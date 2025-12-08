@@ -6,6 +6,7 @@ import { ToastContainer } from '../../components/Toast/ToastContainer';
 import { freebieApi } from '../../services/productApi';
 import type { Freebie } from '../../types/product';
 import './page.css';
+import { MLFreebieGenerator } from './MLFreebieGenerator';
 
 const CreateFreebies = () => {
   const { handleBackToDashboard, loading, setLoading, error, setError, clearError } = useProductManagement();
@@ -158,6 +159,12 @@ const CreateFreebies = () => {
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="freebie-ml-section">
+        <h3>KI-Freebie-Ideen</h3>
+        {/* Beispielhafte Kategorie, kann dynamisch ersetzt werden */}
+        <MLFreebieGenerator category={freebieType} />
       </div>
     </div>
   );

@@ -117,14 +117,15 @@
     "jsonwebtoken": "^9.0.2",
     "knex": "^3.1.0",
     "minimist": "^1.2.8",
+    "module-alias": "^2.2.2",
     "node-cron": "^4.2.1",
+    "node-fetch": "^3.3.2",
     "nodemailer": "^7.0.10",
     "openai": "^6.6.0",
     "pino": "^10.0.0",
     "prom-client": "^15.0.0",
     "rss-parser": "^3.13.0",
-    "zod": "^4.1.12",
-    "module-alias": "^2.2.2"
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@eslint/js": "^9.37.0",

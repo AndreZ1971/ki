@@ -1,3 +1,4 @@
+import UserManagement from './pages/app/UserManagement';
 // src/App.tsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
@@ -38,6 +39,9 @@ import ContextGenerator from './pages/Advanced/ContextGenerator';
 import MemorySystem from './pages/Advanced/MemorySystem';
 import StringGenerator from './pages/Advanced/StringGenerator';
 import SystemHealth from './pages/Advanced/SystemHealth';
+
+// Feedback Analysis Page
+import FeedbackAnalysis from './pages/app/FeedbackAnalysis';
 import WooCommerceSync from './pages/Advanced/WooCommerceSync';
 
 // Marketing Content Pages
@@ -48,6 +52,8 @@ import GermanContentGenerator from './pages/MarketingContent/GermanContentGenera
 import KiteTemplates from './pages/MarketingContent/KiteTemplates';
 import SocialMediaAudio from './pages/MarketingContent/SocialMediaAudio';
 import SocialMediaPoster from './pages/MarketingContent/SocialMediaPoster';
+import BlogPostGenerator from './pages/marketing/BlogPostGenerator';
+import ImageAnalyzer from './pages/marketing/ImageAnalyzer';
 
 // Payment & Finances Pages
 import PaymentDelivery from './pages/PaymentFinances/PaymentDelivery';
@@ -75,6 +81,7 @@ function App() {
           <Route path="/" element={<AIDashboard />} />
           
           {/* Analytics Routes */}
+
           <Route path="/analytics/analytic-regioning" element={<AnalyticRegioning />} />
           <Route path="/analytics/conversion-analysis" element={<ConversionAnalysis />} />
           <Route path="/analytics/conversion-reported" element={<ConversionReported />} />
@@ -87,6 +94,8 @@ function App() {
           <Route path="/analytics/shop-metrics" element={<ShopMetrics />} />
           <Route path="/analytics/standard-audit" element={<StandardAudit />} />
           <Route path="/analytics/trend-analysis" element={<TrendAnalysis />} />
+          {/* Feedback Analysis Route */}
+          <Route path="/analytics/feedback-analysis" element={<FeedbackAnalysis />} />
           
           {/* Marketing Content Routes */}
           <Route path="/marketing/ai-email-generator" element={<AIEmailGenerator />} />
@@ -97,6 +106,8 @@ function App() {
           <Route path="/marketing/kite-templates" element={<KiteTemplates />} />
           <Route path="/marketing/social-audio" element={<SocialMediaAudio />} />
           <Route path="/marketing/social-poster" element={<SocialMediaPoster />} />
+          <Route path="/marketing/BlogPostGenerator" element={<BlogPostGenerator />} />
+          <Route path="/marketing/image-analyzer" element={<ImageAnalyzer />} />
           
           {/* Product Management Routes */}
           <Route path="/products/auto-creator" element={<AutoProductCreator />} />
@@ -136,6 +147,8 @@ function App() {
           {/* Settings Seiten */}
           <Route path="/settings" element={<Settings />} />
           <Route path="/settings/ml" element={<MLSettings />} />
+          {/* User Management Route */}
+          <Route path="/users" element={<UserManagement />} />
         </Routes>
       </Router>
     </div>

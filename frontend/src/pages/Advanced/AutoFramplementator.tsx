@@ -5,6 +5,7 @@ import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
 import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
+import { MLSupportGenerator } from './MLSupportGenerator';
 import './page.css';
 
 const AutoFramplementator: React.FC = () => {
@@ -165,6 +166,12 @@ export default App;` : `// ${framework.toUpperCase()} implementation`}
             </div>
           )}
         </motion.div>
+      </div>
+
+      <div className="support-ml-section">
+        <h3>KI-Support-Generator</h3>
+        {/* Beispielhafter Ticket-Text, kann dynamisch ersetzt werden */}
+        <MLSupportGenerator ticketText="Mein Produkt funktioniert nicht wie erwartet. Bitte helfen Sie mir!" />
       </div>
     </div>
   );

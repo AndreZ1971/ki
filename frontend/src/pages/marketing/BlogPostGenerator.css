@@ -1,0 +1,53 @@
+.blogpost-generator-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 24px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+}
+.blogpost-generator-container h2 {
+  margin-bottom: 18px;
+}
+.blogpost-generator-container label {
+  font-weight: 500;
+  margin-bottom: 6px;
+  display: block;
+}
+.blogpost-generator-container input,
+.blogpost-generator-container select,
+.blogpost-generator-container textarea {
+  margin-top: 4px;
+  margin-bottom: 16px;
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 1rem;
+}
+.blogpost-generator-container button {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 8px;
+}
+.blogpost-generator-container button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.blogpost-generator-container .back-btn {
+  background: none;
+  color: #3b82f6;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 18px;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}

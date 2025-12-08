@@ -1,3 +1,5 @@
+// 🔥 CHATBOT MESSAGE ROUTE
+  // Entfernt: chatbotMessageRoute (ungenuzt)
 // backend/server.ts - KOMPLETT KORRIGIERT
 require('module-alias/register');
 import cors from '@fastify/cors';
@@ -38,6 +40,11 @@ import marketingRoutes from './routes/app/api/marketing/marketing-routes';
 import emailMarketingRoutes from './routes/app/api/marketing/email-marketing';
 import conversionRoutes from './routes/app/api/marketing/conversion-routes';
 import contentRoutes from './routes/app/api/marketing/content-routes';
+// Entfernt: blogpostRoutes (ungenuzt)
+import imageAnalysisRoutes from './routes/app/api/marketing/image-analysis-routes';
+
+// 🔥 USER MANAGEMENT ROUTES
+import userRoutes from './routes/app/api/users';
 import templateRoutes from './routes/app/api/marketing/template-routes';
 
 // 🔥 SOCIAL MEDIA ROUTES
@@ -256,6 +263,15 @@ async function buildServer() {
     await server.register(reviewsRoutes, { prefix: '/api/analytics/reviews' });
     console.log('✅ Reviews Routes erfolgreich registriert');
 
+      // ✅ FEEDBACK ANALYSIS ROUTES
+      const feedbackRoutes = require('./routes/app/api/analytics/feedback').default;
+      await server.register(feedbackRoutes, { prefix: '/api/analytics/feedback' });
+      console.log('✅ Feedback Analysis Routes erfolgreich registriert');
+
+        // ✅ USER MANAGEMENT ROUTES
+        await server.register(userRoutes, { prefix: '/api' });
+        console.log('✅ User Management Routes erfolgreich registriert');
+
     await server.register(aiEmailRoutes, { prefix: '/api/ai/email' });
     console.log('✅ AI Email Routes erfolgreich registriert');
 
@@ -302,6 +318,8 @@ async function buildServer() {
     // 🔥 MARKETING ROUTES
     await server.register(marketingRoutes, { prefix: '/api/marketing' });
     console.log('✅ Marketing Routes erfolgreich registriert');
+    await server.register(imageAnalysisRoutes); // /api/marketing/image/analyze
+    console.log('✅ Image Analysis Routes erfolgreich registriert');
     
     await server.register(emailMarketingRoutes); // Already has full paths
     console.log('✅ Email Marketing Routes erfolgreich registriert');

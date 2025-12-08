@@ -5,6 +5,7 @@ import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
 import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
+import { MLPaymentAnalyzer } from './MLPaymentAnalyzer';
 import './page.css';
 
 interface TestResult { name: string; status: 'passed' | 'failed'; duration: string; }
@@ -108,6 +109,12 @@ const PaymentTester: React.FC = () => {
             </div>
           )}
         </motion.div>
+      </div>
+
+      <div className="payment-ml-section">
+        <h3>KI-Payment-Analyse</h3>
+        {/* Beispielhafte Payment-ID, kann dynamisch ersetzt werden */}
+        <MLPaymentAnalyzer paymentId="demo-payment-123" />
       </div>
     </div>
   );

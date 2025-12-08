@@ -5,6 +5,7 @@ import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared
 import { ToastContainer } from '../../components/Toast/ToastContainer';
 import { productApi, categoryApi } from '../../services/productApi';
 import type { ProductCreationResult, Category } from '../../types/product';
+import { MLProductIdeaGenerator } from './MLProductIdeaGenerator';
 import './page.css';
 
 const AutoProductCreator = () => {
@@ -119,6 +120,9 @@ const AutoProductCreator = () => {
             </select>
           </div>
         </div>
+
+        {/* ML/AI Produktideen-Generator */}
+        <MLProductIdeaGenerator count={config.count} category={config.category} />
 
         <LoadingButton
           onClick={handleCreateProducts}
