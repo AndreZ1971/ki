@@ -1,23 +1,9 @@
 ### **Dashboard-Kategorien**
-- Create Freebie
-- Auto Product Creator
-- Blogpost Generator
-- ImageAnalyzer
-- KI-Chatbot Ari (FloatingChatbot)
 ### **Marketing & Content**
-- 📝 Blogpost Generator (KI-basierte, SEO-optimierte Blogposts)
-- 🖼️ ImageAnalyzer (KI-Bildbewertung, automatisches Tagging, Qualitätsprüfung & Bild-SEO)
-- 📧 E-Mail Marketing Automation
-- 📊 Payment Success Tracking
-- 🔒 Payment Validation & Security
 
 # 🤖 KI-Chatbot Ari – Motivation & Support
 
 **Funktionen:**
-- Motivierende KI-Chat-Assistenz für Shop-Betreiber
-- Soforthilfe, Tipps, News, Status-Updates
-- Flexible Umschulung (z.B. auf neue Themen, Produktbereiche)
-- Integration in alle Dashboard-Seiten als FloatingChatbot
 
 **Bedienung:**
 1. Im Dashboard unten rechts auf das Chatbot-Icon klicken.
@@ -26,14 +12,8 @@
 4. News, Status und Motivation werden automatisch eingeblendet.
 
 **Technik:**
-- React-Komponente `FloatingChatbot`
-- Backend-Integration mit OpenAI GPT-4
 
 **Funktionen:**
-- Bild-Upload (JPG, PNG, WebP)
-- KI-gestützte Bildbewertung (Qualität, Schärfe, Auflösung)
-- Automatisches Tagging (Objekterkennung, Themen, Farben)
-- SEO-Optimierung (Alt-Text, Dateiname-Vorschlag)
 
 **Bedienung:**
 1. Im Dashboard unter „Marketing & Content“ das Tool „ImageAnalyzer“ auswählen.
@@ -45,32 +25,17 @@
 
 Das Dashboard bietet jetzt 50+ spezialisierte Tools plus den KI-Chatbot Ari:
 
-- Produktmanagement (Auto Product Creator, Create Freebie, ...)
-- Marketing & Content (Blogpost Generator, ImageAnalyzer, Email Marketing, ...)
-- Analytics & Reporting (ShopMetrics, ConversionAnalysis, ...)
-- Payment & Finanzen (PaymentSuccess, PaymentQuickCheck, ...)
-- Advanced AI (StringGenerator, AutoFramplementator, ...)
-- Social Media, Templates, Health, Settings, u.v.m.
-- **KI-Chatbot Ari** als universeller Assistent
 
 Alle Tools sind über das Dashboard erreichbar und können mit dem Chatbot kombiniert werden.
 
 **API:**
-- POST `/api/marketing/image/analyze` (FormData, Feld: `image`)
   - Response: `{ quality, tags, seo, description, metadata }`
 
-- **Frontend-API-URL:** Die API-URL wird im Frontend über die Datei `.env.production` (Variable `VITE_API_URL`) gesetzt. Diese Datei ist ebenfalls lokal und nicht im Repo.
-- **Import/Export:** Die Settings-UI bietet Import/Export für die `connection.json`.
 Ein vollständiges **AI Agent System** für WooCommerce/WordPress mit moderner React-Oberfläche:
 
-- 📧 E-Mail Marketing Automation
-- 📱 Responsive Design (Desktop + Mobile)
 ### **Marketing & Content**
 
-- 📊 Payment Success Tracking
-- 🔒 Payment Validation & Security
     "port": 465,
-- Automatisch via Vite (keine zusätzlichen Anforderungen)
 ## 🔧 Installation & Setup
 Erstelle eine `.env` im Projektroot:
 
@@ -107,11 +72,9 @@ npm run email-marketing  # E-Mail Kampagnen
 
 
 
-- Create Freebie
 
 
 
-- Auto Product Creator
 
 
 
@@ -119,15 +82,12 @@ npm run email-marketing  # E-Mail Kampagnen
 
 
 
-- String Generator
 
 
 
-- Auto Framplementator
 
 
 
-- WooCommerce Sync
 
 
 
@@ -156,7 +116,6 @@ npm run email-marketing  # E-Mail Kampagnen
 
 
 
-- Payment Issue Detector
 
 
 
@@ -187,7 +146,6 @@ npm run email-marketing  # E-Mail Kampagnen
 
 
 
-- Payment Quick Check
 
 
 
@@ -250,7 +208,6 @@ npm run email-marketing  # E-Mail Kampagnen
 
 
 
----
 
 
 
@@ -281,7 +238,6 @@ npm run email-marketing  # E-Mail Kampagnen
 5. ZIP & Cover öffnen
 6. Kategorie & Slug prüfen
 
----
 
 
 
@@ -313,7 +269,6 @@ npm run email-marketing  # E-Mail Kampagnen
 
 
 
----
 
 
 
@@ -329,23 +284,6 @@ npm run email-marketing  # E-Mail Kampagnen
 
 
 
-- **DB-Pass rotieren** und `wp-config.php` aktualisieren
-
-
-
-- **Application Password** neu erzeugen, alte deaktivieren
-
-
-
-- **Woo CK/CS** neu generieren, alte revoken
-
-
-
-- **WP Salts** erneuern
-
-
-
-- **.env** nie ins Repo!
 
 
 
@@ -353,7 +291,6 @@ npm run email-marketing  # E-Mail Kampagnen
 
 
 
-- **connection.json und .env.production** nie ins Repo!
 
 
 
@@ -361,7 +298,18 @@ npm run email-marketing  # E-Mail Kampagnen
 
 
 
----
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -553,7 +501,6 @@ docker stats ki-agent
 
 
 
----
 
 ## 🏗️ Architektur
 
@@ -651,7 +598,6 @@ docker stats ki-agent
 
 
 
----
 
 
 
@@ -830,7 +776,6 @@ pm2 show ki-agent
 
 
 
----
 
 
 
@@ -976,38 +921,20 @@ upload_max_filesize = 50M
 ## 📝 Changelog
 ## Version 1.8.0 (November 2025)
 
-- ✨ Komplettes React Frontend (46 Tool-Seiten)
-- 🎨 Framer Motion Animationen
-- 📱 Responsive Design für alle Seiten
-- 🔧 12 Payment & Finance Tools
-- 🧠 6 Advanced System-Tools
-- 📊 Erweiterte Analytics & Reporting
-- 🚀 Docker-Support optimiert
-- 📚 Umfassende README-Dokumentation
 
 ## Version 1.7.0
  🤖 AI-gestützte Content-Generierung
 
 
-- 🎨 DALL-E 3 Bild-Generator
  🛒 Auto Product Creator
 
 
-- 📧 E-Mail Marketing System
  💳 Payment-System mit Auto-Fix
 
 
  Made with ❤️ and ☕ for automated E-Commerce
-- 🛒 Auto Product Creator
-- 📊 Google Trends Integration
-- 💰 Conversion-Optimierung
-- 🩺 Shop Health Monitoring
 
 ## Version 1.5.0
-- 💳 Payment-System mit Auto-Fix
-- 🔍 Issue Detection
-- ✅ Payment Verification
-- 🚨 Emergency System
 
 
 # Feature-Branch erstellen
@@ -1034,17 +961,12 @@ style: Formatierung
 test: Tests hinzufügen
 chore: Build/Tools-Anpassungen
 ```
-- ✅ ESLint-Regeln befolgen
-- ✅ Keine Secrets committen
-- ✅ Aussagekräftige Commit-Messages
 
----
 
 ## 📄 Lizenz
 
 Proprietary - Alle Rechte vorbehalten
 
----
 
 ## 🆘 Support
 
@@ -1061,15 +983,9 @@ Proprietary - Alle Rechte vorbehalten
 5. API-URL im Frontend über .env.production setzen
 6. System testen und Shop verbinden
 
----
 
 ## 🙏 Danksagungen
 
-- **React Team** - Für das beste Frontend-Framework
-- **OpenAI** - Für die leistungsstarken AI-APIs
-- **WooCommerce** - Für die robuste E-Commerce-Plattform
-- **Framer Motion** - Für butterweiche Animationen
 
----
 
 **Made with ❤️ and ☕ for automated E-Commerce**

@@ -53,53 +53,37 @@ const TrendAnalysis = () => {
   useEffect(() => {
     // Simuliere Daten-Fetch basierend auf timeRange
     const fetchData = async () => {
-      try {
-    // const API_URL = import.meta.env.VITE_API_URL || ''; // entfernt
-        setError(null);
-        
-        // Simulierte Daten für Demo
-        setTimeout(() => {
-          const data = generateTrendData(timeRange);
-          setTrendData(data);
-          
-          // Demo-Metriken
-          const demoMetrics: Metric[] = [
-            { icon: '📈', label: 'Sales Growth', value: `${data.salesGrowth || 0}%`, detail: data.salesGrowth && data.salesGrowth > 0 ? 'Positive' : 'Negative' },
-            { icon: '👥', label: 'Customer Growth', value: `${data.customerGrowth || 0}%`, detail: data.customerGrowth && data.customerGrowth > 0 ? 'Wachsend' : 'Rückläufig' },
-            { icon: '🔥', label: 'Popular Products', value: data.popularProducts || 0, detail: 'Top-Performer' },
-            { icon: '📊', label: 'Seasonal Trend', value: `${data.seasonalTrend || 0}%`, detail: 'Saisonalität' },
-            { icon: '🎯', label: 'Prediction Accuracy', value: `${data.predictionAccuracy || 0}%`, detail: 'KI-Genauigkeit' },
-            { icon: '⚡', label: 'Trend Strength', value: `${data.trendStrength || 0}%`, detail: 'Trend-Stärke' },
-            { icon: '📱', label: 'Market Trend', value: data.marketTrend || 'Stabil', detail: 'Marktrichtung' },
-            { icon: '🔄', label: 'Last Updated', value: new Date(data.lastUpdated || '').toLocaleDateString(), detail: 'Aktualisiert' }
-          ];
-          
-          setMetrics(demoMetrics);
-          
-          // Demo Google Trends
-          setGoogleTrends([
-            { topic: 'AI Tools', score: '+85%' },
-            { topic: 'E-commerce', score: '+72%' },
-            { topic: 'Digital Marketing', score: '+68%' },
-            { topic: 'Remote Work', score: '+54%' }
-          ]);
-          
-          // Demo Reddit Trends
-          setRedditTrends([
-            { topic: 'ChatGPT', score: '4.2k posts' },
-            { topic: 'WebDev', score: '3.8k posts' },
-            { topic: 'Entrepreneur', score: '2.9k posts' },
-            { topic: 'SideProject', score: '2.1k posts' }
-          ]);
-          
-          setLoading(false);
-        }, 1000);
-        
-      } catch (_err) {
-        // Fehlerbehandlung entfernt, da error nicht genutzt wird
-      }
+      // Simulierte Daten für Demo
+      setTimeout(() => {
+        const data = generateTrendData(timeRange);
+        // Demo-Metriken
+        const demoMetrics: Metric[] = [
+          { icon: '📈', label: 'Sales Growth', value: `${data.salesGrowth || 0}%`, detail: data.salesGrowth && data.salesGrowth > 0 ? 'Positive' : 'Negative' },
+          { icon: '👥', label: 'Customer Growth', value: `${data.customerGrowth || 0}%`, detail: data.customerGrowth && data.customerGrowth > 0 ? 'Wachsend' : 'Rückläufig' },
+          { icon: '🔥', label: 'Popular Products', value: data.popularProducts || 0, detail: 'Top-Performer' },
+          { icon: '📊', label: 'Seasonal Trend', value: `${data.seasonalTrend || 0}%`, detail: 'Saisonalität' },
+          { icon: '🎯', label: 'Prediction Accuracy', value: `${data.predictionAccuracy || 0}%`, detail: 'KI-Genauigkeit' },
+          { icon: '⚡', label: 'Trend Strength', value: `${data.trendStrength || 0}%`, detail: 'Trend-Stärke' },
+          { icon: '📱', label: 'Market Trend', value: data.marketTrend || 'Stabil', detail: 'Marktrichtung' },
+          { icon: '🔄', label: 'Last Updated', value: new Date(data.lastUpdated || '').toLocaleDateString(), detail: 'Aktualisiert' }
+        ];
+        setMetrics(demoMetrics);
+        // Demo Google Trends
+        setGoogleTrends([
+          { topic: 'AI Tools', score: '+85%' },
+          { topic: 'E-commerce', score: '+72%' },
+          { topic: 'Digital Marketing', score: '+68%' },
+          { topic: 'Remote Work', score: '+54%' }
+        ]);
+        // Demo Reddit Trends
+        setRedditTrends([
+          { topic: 'ChatGPT', score: '4.2k posts' },
+          { topic: 'WebDev', score: '3.8k posts' },
+          { topic: 'Entrepreneur', score: '2.9k posts' },
+          { topic: 'SideProject', score: '2.1k posts' }
+        ]);
+      }, 1000);
     };
-    
     fetchData();
   }, [timeRange]);
 
@@ -135,8 +119,8 @@ const TrendAnalysis = () => {
   };
 
   const handleTimeRangeChange = (range: string) => {
-    setLoading(true);
     setTimeRange(range);
+    // setLoading(true) entfernt, da nicht mehr benötigt
   };
 
   // KI/ML-Analyse: API-Call

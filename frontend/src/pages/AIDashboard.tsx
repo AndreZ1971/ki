@@ -650,8 +650,8 @@ const AIDashboard: React.FC = () => {
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
           <div>
-            <h1>🚀 AI Powerpack Pro</h1>
-            <p>Real-time Analytics & AI Content Generation</p>
+            <h1>🚀 A.R.I. Artificial Retail Intelligence System</h1>
+            <p>Realtime Analytics & KI-Content-Generierung</p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             {error && (

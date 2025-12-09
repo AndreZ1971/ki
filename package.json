@@ -1,7 +1,7 @@
 {
-  "name": "ki",
+  "name": "ari-artificial-retail-intelligence-system",
   "version": "1.0.0",
-  "description": "AI Agent System with Memory Management and API",
+  "description": "A.R.I. Artificial Retail Intelligence System – Real-time Analytics & AI Content Generation",
   "main": "dist/server.js",
   "type": "commonjs",
   "scripts": {

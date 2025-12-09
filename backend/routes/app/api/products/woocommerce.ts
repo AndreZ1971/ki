@@ -94,68 +94,60 @@ class WooCommerceClient {
 
   async getProducts(params: any = {}) {
     const queryParams = new URLSearchParams();
-    
     if (params.page) queryParams.append('page', params.page.toString());
     if (params.per_page) queryParams.append('per_page', params.per_page.toString());
     if (params.search) queryParams.append('search', params.search);
     if (params.category) queryParams.append('category', params.category);
-    
-    const endpoint = `/products${queryParams.toString() ? `?${queryParams}` : ''}`;
+    const endpoint = `/wp-json/wc/v3/products${queryParams.toString() ? `?${queryParams}` : ''}`;
     return this.makeRequest(endpoint);
   }
 
   async getProduct(id: number) {
-    return this.makeRequest(`/products/${id}`);
+    return this.makeRequest(`/wp-json/wc/v3/products/${id}`);
   }
 
   async createProduct(productData: any) {
-    return this.makeRequest('/products', {
+    return this.makeRequest('/wp-json/wc/v3/products', {
       method: 'POST',
       body: JSON.stringify(productData)
     });
   }
 
   async updateProduct(id: number, updateData: any) {
-    return this.makeRequest(`/products/${id}`, {
+    return this.makeRequest(`/wp-json/wc/v3/products/${id}`, {
       method: 'PUT',
       body: JSON.stringify(updateData)
     });
   }
 
   async deleteProduct(id: number) {
-    return this.makeRequest(`/products/${id}`, {
+    return this.makeRequest(`/wp-json/wc/v3/products/${id}`, {
       method: 'DELETE'
     });
   }
 
   async getCategories(params: any = {}) {
     const queryParams = new URLSearchParams();
-    
     if (params.page) queryParams.append('page', params.page.toString());
     if (params.per_page) queryParams.append('per_page', params.per_page.toString());
-    
-    const endpoint = `/products/categories${queryParams.toString() ? `?${queryParams}` : ''}`;
+    const endpoint = `/wp-json/wc/v3/products/categories${queryParams.toString() ? `?${queryParams}` : ''}`;
     return this.makeRequest(endpoint);
   }
 
   async getOrders(params: any = {}) {
     const queryParams = new URLSearchParams();
-    
     if (params.page) queryParams.append('page', params.page.toString());
     if (params.per_page) queryParams.append('per_page', params.per_page.toString());
     if (params.status) queryParams.append('status', params.status);
-    
-    const endpoint = `/orders${queryParams.toString() ? `?${queryParams}` : ''}`;
+    const endpoint = `/wp-json/wc/v3/orders${queryParams.toString() ? `?${queryParams}` : ''}`;
     return this.makeRequest(endpoint);
   }
 
   async getCustomers(params: any = {}) {
     const queryParams = new URLSearchParams();
-    
     if (params.page) queryParams.append('page', params.page.toString());
     if (params.per_page) queryParams.append('per_page', params.per_page.toString());
-    
-    const endpoint = `/customers${queryParams.toString() ? `?${queryParams}` : ''}`;
+    const endpoint = `/wp-json/wc/v3/customers${queryParams.toString() ? `?${queryParams}` : ''}`;
     return this.makeRequest(endpoint);
   }
 }

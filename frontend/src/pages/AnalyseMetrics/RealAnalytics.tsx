@@ -1,3 +1,10 @@
+// KI Insight Typen
+interface KIInsight {
+  title: string;
+  value: string;
+  detail?: string;
+  score?: number;
+}
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './page.css';
@@ -14,82 +21,122 @@ interface RealTimeData {
 }
 
 const RealAnalytics = () => {
+  const [kiLoading, setKiLoading] = useState(false);
+  const [kiError, setKiError] = useState<string | null>(null);
+  const [kiInsights, setKiInsights] = useState<KIInsight[]>([]);
   const [realTimeData, setRealTimeData] = useState<RealTimeData | null>(null);
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [autoRefresh, setAutoRefresh] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchRealTimeData();
-    
-    let interval: number;
-    if (autoRefresh) {
-      interval = setInterval(fetchRealTimeData, 30000); // Alle 30 Sekunden
-    }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [autoRefresh]);
-
+  // Holt die aktuellen Shopdaten
   const fetchRealTimeData = async () => {
     setLoading(true);
     try {
-      // VERSUCHE ECHTE WOOCOMMERCE DATEN ZU HOLEN
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/analytics/metrics/dashboard`);
-      
+      let base = (import.meta.env.VITE_API_URL || '').trim();
+      if (base.endsWith('/')) base = base.slice(0, -1);
+      const apiUrl = base ? `${base}/api/analytics/metrics/dashboard` : `/api/analytics/metrics/dashboard`;
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'x-woocommerce-key': import.meta.env.VITE_WOOCOMMERCE_CONSUMER_KEY || '',
+          'x-woocommerce-secret': import.meta.env.VITE_WOOCOMMERCE_CONSUMER_SECRET || '',
+          'Content-Type': 'application/json'
+        }
+      });
       if (response.ok) {
         const data = await response.json();
-        
-        if (data.success) {
-          // VERWENDE DIE ECHTEN DATEN VOM BACKEND
+        if (data.success && data.data) {
           setRealTimeData({
             totalProducts: data.data.totalProducts || 0,
             totalOrders: data.data.totalOrders || 0,
             totalCustomers: data.data.totalCustomers || 0,
             todaySales: data.data.todaySales || 0,
             conversionRate: data.data.conversionRate || 0,
-            activeSessions: data.data.activeUsers || 0, // Falls verfügbar
+            activeSessions: data.data.activeUsers || data.data.activeSessions || 0,
             popularProduct: data.data.popularProduct || 'Nicht verfügbar',
             lastUpdated: data.data.lastUpdated || new Date().toISOString()
           });
+          // Speichere Daten in localStorage als Fallback
+          localStorage.setItem('totalProducts', (data.data.totalProducts || 0).toString());
+          localStorage.setItem('totalOrders', (data.data.totalOrders || 0).toString());
+          localStorage.setItem('totalCustomers', (data.data.totalCustomers || 0).toString());
+          localStorage.setItem('todaySales', (data.data.todaySales || 0).toString());
+          localStorage.setItem('conversionRate', (data.data.conversionRate || 0).toString());
+          if (data.data.popularProduct) {
+            localStorage.setItem('popularProduct', data.data.popularProduct);
+          }
         } else {
           throw new Error('API returned error');
         }
       } else {
-        // FALLBACK: Basis-Daten aus localStorage oder Default-Werte
-        const fallbackData = {
-          totalProducts: parseInt(localStorage.getItem('totalProducts') || '10'),
-          totalOrders: parseInt(localStorage.getItem('totalOrders') || '3'),
-          totalCustomers: parseInt(localStorage.getItem('totalCustomers') || '0'),
-          todaySales: parseFloat(localStorage.getItem('todaySales') || '0'),
-          conversionRate: parseFloat(localStorage.getItem('conversionRate') || '0.3'),
-          activeSessions: Math.floor(Math.random() * 5) + 1, // Geschätzte aktive Sessions
-          popularProduct: localStorage.getItem('popularProduct') || 'Produkt #1',
-          lastUpdated: new Date().toISOString()
-        };
-        setRealTimeData(fallbackData);
+        throw new Error(`API Error: ${response.status}`);
       }
-    } catch (_error) {
-      console.log('Keine Live-Daten verfügbar, verwende Standdard-Werte');
-      // VERWENDE DIE DATEN DIE WIR SICHER HABEN
-      const defaultData = {
-        totalProducts: 10,    // Aus deiner Datenbank
-        totalOrders: 3,       // Aus WooCommerce
-        totalCustomers: 0,    // Aus WooCommerce  
-        todaySales: 0,        // Heutiger Umsatz
-        conversionRate: 0.3,  // Basierend auf Besuchern/Orders
-        activeSessions: 1,    // Geschätzt
-        popularProduct: 'Nicht getrackt',
+    } catch (error) {
+      console.log('Keine Live-Daten verfügbar, verwende Fallback-Daten:', error);
+      // FALLBACK: Basis-Daten aus localStorage oder Default-Werte
+      const fallbackData = {
+        totalProducts: parseInt(localStorage.getItem('totalProducts') || '10'),
+        totalOrders: parseInt(localStorage.getItem('totalOrders') || '3'),
+        totalCustomers: parseInt(localStorage.getItem('totalCustomers') || '0'),
+        todaySales: parseFloat(localStorage.getItem('todaySales') || '0'),
+        conversionRate: parseFloat(localStorage.getItem('conversionRate') || '0.3'),
+        activeSessions: Math.floor(Math.random() * 5) + 1, // Geschätzte aktive Sessions
+        popularProduct: localStorage.getItem('popularProduct') || 'Produkt #1',
         lastUpdated: new Date().toISOString()
       };
-      setRealTimeData(defaultData);
+      setRealTimeData(fallbackData);
     } finally {
       setLastUpdate(new Date());
       setLoading(false);
     }
   };
+
+  // KI/ML-Analyse für Shopdaten
+  const runKIAnalysis = async () => {
+    if (!realTimeData) return;
+    setKiLoading(true);
+    setKiError(null);
+    setKiInsights([]);
+    try {
+      let base = (import.meta.env.VITE_API_URL || '').trim();
+      if (base.endsWith('/')) base = base.slice(0, -1);
+      const apiUrl = base ? `${base}/api/ml/real-analytics` : `/api/ml/real-analytics`;
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(realTimeData)
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && Array.isArray(data.insights)) {
+          setKiInsights(data.insights);
+        } else {
+          setKiError('Keine KI-Insights erhalten.');
+        }
+      } else {
+        setKiError('Fehler beim KI-Analyse-Request.');
+      }
+    } catch (_err) {
+      setKiError('Fehler bei der KI-Analyse.');
+    } finally {
+      setKiLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRealTimeData();
+    
+    let interval: number;
+    if (autoRefresh) {
+      interval = window.setInterval(fetchRealTimeData, 30000); // Alle 30 Sekunden
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [autoRefresh]);
 
   const handleBackToDashboard = () => {
     navigate('/');
@@ -98,7 +145,6 @@ const RealAnalytics = () => {
   const toggleAutoRefresh = () => {
     setAutoRefresh(!autoRefresh);
   };
-
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('de-DE', {
@@ -145,6 +191,17 @@ const RealAnalytics = () => {
         
         <div className="last-update">
           Letztes Update: {lastUpdate.toLocaleTimeString('de-DE')}
+        </div>
+        <div style={{marginTop: 16, marginBottom: 8}}>
+          <button
+            className="action-button primary"
+            onClick={runKIAnalysis}
+            disabled={kiLoading || !realTimeData}
+            style={{fontSize: '1.1em', padding: '10px 24px'}}
+          >
+            {kiLoading ? '⏳ KI-Analyse läuft...' : '🧠 KI-Analyse starten'}
+          </button>
+          {kiError && <div className="error-message" style={{marginTop: 8}}>{kiError}</div>}
         </div>
       </div>
 
@@ -272,6 +329,26 @@ const RealAnalytics = () => {
             Erweiterte Tracking-Funktionen können bei Bedarf integriert werden.
           </p>
         </div>
+        {/* KI/ML-Insights Sektion */}
+        {kiInsights.length > 0 && (
+          <div className="metric-card full-width" style={{marginTop: 24}}>
+            <h3>🧠 KI-Insights</h3>
+            <div className="insights-list">
+              {kiInsights.map((insight, idx) => (
+                <div key={idx} className="insight-item live" style={{marginBottom: 12}}>
+                  <div style={{fontWeight: 600}}>{insight.title}</div>
+                  <div>{insight.value}</div>
+                  {insight.detail && <div style={{color: '#6c757d'}}>{insight.detail}</div>}
+                  {insight.score !== undefined && (
+                    <div style={{color: '#2563eb', fontWeight: 700}}>
+                      KI-Score: {Math.round(insight.score * 100)}%
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

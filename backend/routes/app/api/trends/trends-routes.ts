@@ -263,8 +263,7 @@ export const trendAggregatorRoutes: FastifyPluginAsync = async (fastify) => {
       const { keywords } = _request.body;
 
       if (!keywords || keywords.length === 0) {
-        _reply.code(400);
-        return { error: 'Keywords array is required' };
+        return { results: [], summary: { total: 0, topTrend: '', avgScore: 0 } };
       }
 
       logger.info({ count: keywords.length }, 'Batch analyzing trends');
