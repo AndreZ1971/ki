@@ -1,6 +1,17 @@
 # Onboarding – Einstellungen für deinen KI-Agenten
 
+**Version:** 3.2.0
+
 Willkommen! Hier erfährst du, wie du deinen KI-Agenten als Shop-Besitzer beim ersten Mal einrichtest. Du brauchst keine technischen Vorkenntnisse – alles läuft direkt im Browser.
+
+---
+
+## 🎯 Schnellstart
+
+1. **Frontend öffnen**: `http://localhost:5173` (lokal) oder `http://your-server:5173` (Server)
+2. **Einstellungen ausfüllen**: Shop-URL, WooCommerce Schlüssel, OpenAI API-Key
+3. **Dashboard öffnen**: 50+ Tools sind jetzt nutzbar
+4. **Erste Tool testen**: Probiere z.B. "Content Monetized" aus
 
 ---
 
@@ -10,7 +21,7 @@ Nach der Freischaltung deines Agenten erhältst du einen Link zu deiner persönl
 
 1. Öffne den Link in deinem Browser.
 2. Melde dich ggf. mit deinen Zugangsdaten an.
-3. Klicke im Menü auf „Einstellungen“ oder „Settings“.
+3. Klicke im Menü auf „Einstellungen" oder „Settings".
 
 ---
 

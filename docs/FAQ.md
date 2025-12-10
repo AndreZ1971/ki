@@ -1,6 +1,27 @@
 # FAQ – KI-Agent Business Plattform
 
+**Aktuelle Version:** 3.2.0
+
 Hier findest du Antworten auf die häufigsten Fragen rund um die Nutzung, Einrichtung und Fehlerbehebung der KI-Agent Plattform.
+
+---
+
+## ✨ Neu in v3.2.0
+
+**Was ist Content Monetization?**
+Content Monetization ermöglicht dir, digitale Produkte zu erstellen und zu verkaufen. Neu sind drei KI-Features:
+- **KI-Preisvorschlag**: Intelligente Preisempfehlungen basierend auf Produkttyp & Strategie
+- **KI-Produkttext Generator**: Automatische Generierung von Marketing-Texten (Headline, Body, CTA)
+- **Revenue Forecast**: Prognose für Wochengewinne und Monatsumsätze
+
+**Wie nutze ich die neuen KI-Features?**
+Gehe zu **Marketing & Content** → **Content Monetized**:
+1. Fülle die Produktdetails aus
+2. Nutze optional den 🤖 **Preisvorschlag** Button
+3. Nutze optional den ⚡ **KI-Text generieren** Button
+4. Klicke **💸 Content Monetarisieren** zum Erstellen
+
+📖 **Vollständiger Guide:** [Content Monetization Guide](./CONTENT_MONETIZATION_GUIDE.md)
 
 ---
 

@@ -1,5 +1,22 @@
 # 🧪 Tool Functionality Check
 
+**Status:** v3.2.0 Release - Alle Core Features Getestet ✅
+
+## ✨ Neue Features in v3.2.0
+
+### Content Monetization Tools (NEU)
+- ✅ **KI-Preisvorschlag** - Intelligente Preisempfehlungen
+- ✅ **KI-Produkttext Generator** - Automatische Marketing-Texte
+- ✅ **Revenue Forecast** - Prognosen für Wochengewinne/Monatsumsätze
+
+### Getestete Endpoints
+- ✅ `/api/marketing/content/price-recommendation` - Preislogik validiert
+- ✅ `/api/marketing/content/generate-copy` - OpenAI Integration erfolgreich
+- ✅ `/api/marketing/content/revenue-forecast` - Forecast-Berechnung korrekt
+- ✅ `/api/marketing/content/create-digital-product` - WooCommerce Integration OK
+
+---
+
 ## Test Plan: Systematische Überprüfung aller 48 Frontend-Tools
 
 ### Test-Methode:
