@@ -44,7 +44,7 @@ import contentRoutes from './routes/app/api/marketing/content-routes';
 import mlMarketingRoutes from './routes/app/api/marketing/ml-marketing';
 import { emailEnhancementRoutes } from './routes/app/api/marketing/email-enhancement';
 // Entfernt: blogpostRoutes (ungenutz)
-// import imageAnalysisRoutes from './routes/app/api/marketing/image-analysis-routes';
+import imageAnalysisRoutes from './routes/app/api/marketing/image-analysis-routes';
 
 // 🔥 USER MANAGEMENT ROUTES
 import userRoutes from './routes/app/api/users';
@@ -332,8 +332,9 @@ async function buildServer() {
     // 🔥 MARKETING ROUTES
     await server.register(marketingRoutes, { prefix: '/api/marketing' });
     console.log('✅ Marketing Routes erfolgreich registriert');
-    // await server.register(imageAnalysisRoutes); // /api/marketing/image/analyze (deaktiviert)
-    console.log('✅ Image Analysis Routes erfolgreich registriert');
+
+    await server.register(imageAnalysisRoutes, { prefix: '/api/marketing' });
+    console.log('✅ Image Analysis Routes erfolgreich registriert (AKTIVIERT)');
     
     await server.register(emailMarketingRoutes); // Already has full paths
     console.log('✅ Email Marketing Routes erfolgreich registriert');
