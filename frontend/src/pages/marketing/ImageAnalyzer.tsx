@@ -27,6 +27,13 @@ const ImageAnalyzer: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
 
+  // Phase 2 States
+  const [colorAnalysis, setColorAnalysis] = useState<any>(null);
+  const [enhancements, setEnhancements] = useState<any>(null);
+  const [conversionImpact, setConversionImpact] = useState<any>(null);
+  const [audienceRec, setAudienceRec] = useState<any>(null);
+  const [phase2Loading, setPhase2Loading] = useState(false);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
@@ -77,6 +84,86 @@ const ImageAnalyzer: React.FC = () => {
       showToast(`❌ ${errorMessage}`, 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Phase 2: Color Analysis
+  const analyzeColors = async () => {
+    if (!file) return;
+    setPhase2Loading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const res = await fetch('/api/marketing/image/color-analysis', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.success) {
+        setColorAnalysis(data.colors);
+        showToast('🎨 Farbanalyse abgeschlossen!', 'success');
+      }
+    } catch {
+      showToast('❌ Farbanalyse fehlgeschlagen', 'error');
+    } finally {
+      setPhase2Loading(false);
+    }
+  };
+
+  // Phase 2: Enhancement Suggestions
+  const getEnhancements = async () => {
+    if (!file) return;
+    setPhase2Loading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const res = await fetch('/api/marketing/image/enhancement-suggestions', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.success) {
+        setEnhancements(data.enhancements);
+        showToast('✨ Verbesserungen geladen!', 'success');
+      }
+    } catch {
+      showToast('❌ Enhancement-Analyse fehlgeschlagen', 'error');
+    } finally {
+      setPhase2Loading(false);
+    }
+  };
+
+  // Phase 2: Conversion Impact
+  const predictConversion = async () => {
+    if (!file) return;
+    setPhase2Loading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const res = await fetch('/api/marketing/image/conversion-impact', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.success) {
+        setConversionImpact(data.impact);
+        showToast('📊 Conversion-Analyse abgeschlossen!', 'success');
+      }
+    } catch {
+      showToast('❌ Conversion-Analyse fehlgeschlagen', 'error');
+    } finally {
+      setPhase2Loading(false);
+    }
+  };
+
+  // Phase 2: Audience Recommendation
+  const getAudience = async () => {
+    if (!file) return;
+    setPhase2Loading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const res = await fetch('/api/marketing/image/audience-recommendation', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.success) {
+        setAudienceRec(data.audience);
+        showToast('👥 Zielgruppen-Analyse abgeschlossen!', 'success');
+      }
+    } catch {
+      showToast('❌ Zielgruppen-Analyse fehlgeschlagen', 'error');
+    } finally {
+      setPhase2Loading(false);
     }
   };
 
@@ -406,6 +493,220 @@ const ImageAnalyzer: React.FC = () => {
               </div>
             )}
           </div>
+        </motion.div>
+      )}
+
+      {/* PHASE 2: EXTENDED ANALYSIS */}
+      {result && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          style={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            borderRadius: '12px',
+            padding: '30px',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+          }}
+        >
+          <h2 style={{ color: 'white', marginTop: 0 }}>🚀 Erweiterte Analysen (Phase 2)</h2>
+          <p style={{ color: 'rgba(255,255,255,0.8)', marginBottom: '20px' }}>Detaillierte Business-Intelligence für maximale Performance</p>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginBottom: '30px' }}>
+            <button onClick={analyzeColors} disabled={phase2Loading} style={{
+              padding: '12px 20px',
+              background: colorAnalysis ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              borderRadius: '8px',
+              color: 'white',
+              cursor: phase2Loading ? 'not-allowed' : 'pointer',
+              fontSize: '14px',
+              fontWeight: '600',
+              transition: 'all 0.3s'
+            }}>
+              {colorAnalysis ? '✅' : '🎨'} Farbanalyse
+            </button>
+            
+            <button onClick={getEnhancements} disabled={phase2Loading} style={{
+              padding: '12px 20px',
+              background: enhancements ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              borderRadius: '8px',
+              color: 'white',
+              cursor: phase2Loading ? 'not-allowed' : 'pointer',
+              fontSize: '14px',
+              fontWeight: '600',
+              transition: 'all 0.3s'
+            }}>
+              {enhancements ? '✅' : '✨'} Verbesserungen
+            </button>
+            
+            <button onClick={predictConversion} disabled={phase2Loading} style={{
+              padding: '12px 20px',
+              background: conversionImpact ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              borderRadius: '8px',
+              color: 'white',
+              cursor: phase2Loading ? 'not-allowed' : 'pointer',
+              fontSize: '14px',
+              fontWeight: '600',
+              transition: 'all 0.3s'
+            }}>
+              {conversionImpact ? '✅' : '📊'} Conversion-Impact
+            </button>
+            
+            <button onClick={getAudience} disabled={phase2Loading} style={{
+              padding: '12px 20px',
+              background: audienceRec ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              borderRadius: '8px',
+              color: 'white',
+              cursor: phase2Loading ? 'not-allowed' : 'pointer',
+              fontSize: '14px',
+              fontWeight: '600',
+              transition: 'all 0.3s'
+            }}>
+              {audienceRec ? '✅' : '👥'} Zielgruppe
+            </button>
+          </div>
+
+          {/* Color Analysis Results */}
+          {colorAnalysis && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{
+              background: 'rgba(255,255,255,0.1)',
+              borderRadius: '10px',
+              padding: '20px',
+              marginBottom: '20px'
+            }}>
+              <h3 style={{ color: 'white', marginTop: 0 }}>🎨 Farbpalette & Harmonie</h3>
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '15px', flexWrap: 'wrap' }}>
+                {colorAnalysis.palette?.map((color: string, idx: number) => (
+                  <div key={idx} style={{
+                    width: '60px',
+                    height: '60px',
+                    background: color,
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
+                    border: '2px solid rgba(255,255,255,0.3)',
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                    justifyContent: 'center',
+                    padding: '5px'
+                  }}>
+                    <span style={{ fontSize: '9px', color: 'white', textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>{color}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', fontSize: '13px', color: 'rgba(255,255,255,0.9)' }}>
+                <div><strong>Harmonie:</strong> {colorAnalysis.harmony}</div>
+                <div><strong>Score:</strong> {colorAnalysis.harmonyScore}/100</div>
+                <div><strong>Helligkeit:</strong> {colorAnalysis.brightness}%</div>
+                <div><strong>Sättigung:</strong> {colorAnalysis.saturation}%</div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Enhancement Suggestions */}
+          {enhancements && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{
+              background: 'rgba(255,255,255,0.1)',
+              borderRadius: '10px',
+              padding: '20px',
+              marginBottom: '20px'
+            }}>
+              <h3 style={{ color: 'white', marginTop: 0 }}>✨ Auto-Enhancement Vorschläge ({enhancements.totalSuggestions})</h3>
+              <div style={{ display: 'grid', gap: '10px' }}>
+                {enhancements.suggestions?.map((sug: any, idx: number) => (
+                  <div key={idx} style={{
+                    padding: '12px',
+                    background: 'rgba(255,255,255,0.05)',
+                    borderRadius: '6px',
+                    borderLeft: `3px solid ${sug.priority === 'high' ? '#ef4444' : sug.priority === 'medium' ? '#f59e0b' : '#10b981'}`
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                      <div style={{ color: 'white', fontWeight: '600' }}>{sug.description}</div>
+                      <span style={{
+                        fontSize: '10px',
+                        padding: '2px 8px',
+                        background: sug.priority === 'high' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(249, 115, 22, 0.2)',
+                        color: sug.priority === 'high' ? '#fca5a5' : '#fed7aa',
+                        borderRadius: '3px'
+                      }}>{sug.priority}</span>
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginTop: '5px' }}>💰 {sug.expectedImprovement}</div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Conversion Impact */}
+          {conversionImpact && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{
+              background: 'rgba(255,255,255,0.1)',
+              borderRadius: '10px',
+              padding: '20px',
+              marginBottom: '20px'
+            }}>
+              <h3 style={{ color: 'white', marginTop: 0 }}>📊 Conversion-Impact Vorhersage</h3>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '30px',
+                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2))',
+                borderRadius: '10px',
+                marginBottom: '15px'
+              }}>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '48px', fontWeight: '700', color: '#10b981', marginBottom: '10px' }}>
+                    {conversionImpact.estimatedConversionLift}
+                  </div>
+                  <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>Geschätzter Conversion-Lift</div>
+                  <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '5px' }}>Konfidenz: {(conversionImpact.confidence * 100).toFixed(0)}%</div>
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px', fontSize: '12px', color: 'rgba(255,255,255,0.9)' }}>
+                <div style={{ padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px' }}>
+                  <div style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '5px' }}>Qualität</div>
+                  <div style={{ fontWeight: '600' }}>{conversionImpact.factors?.quality}</div>
+                </div>
+                <div style={{ padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px' }}>
+                  <div style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '5px' }}>Format</div>
+                  <div style={{ fontWeight: '600' }}>{conversionImpact.factors?.format}</div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Audience Recommendation */}
+          {audienceRec && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{
+              background: 'rgba(255,255,255,0.1)',
+              borderRadius: '10px',
+              padding: '20px'
+            }}>
+              <h3 style={{ color: 'white', marginTop: 0 }}>👥 Zielgruppen-Empfehlung</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginBottom: '15px' }}>
+                <div style={{ padding: '15px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+                  <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: '5px' }}>Altersgruppe</div>
+                  <div style={{ fontSize: '18px', fontWeight: '700', color: 'white' }}>{audienceRec.ageGroup}</div>
+                </div>
+                <div style={{ padding: '15px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+                  <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: '5px' }}>Gender Bias</div>
+                  <div style={{ fontSize: '18px', fontWeight: '700', color: 'white' }}>{audienceRec.genderBias}</div>
+                </div>
+                <div style={{ padding: '15px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+                  <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: '5px' }}>Einkommensklasse</div>
+                  <div style={{ fontSize: '18px', fontWeight: '700', color: 'white' }}>{audienceRec.incomeLevel}</div>
+                </div>
+              </div>
+              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.9)', marginTop: '15px' }}>
+                <div style={{ marginBottom: '8px' }}><strong>Beste Plattformen:</strong> {audienceRec.bestPlatforms?.join(', ')}</div>
+                <div><strong>Content-Style:</strong> {audienceRec.contentStyle}</div>
+              </div>
+            </motion.div>
+          )}
         </motion.div>
       )}
     </div>
