@@ -22,18 +22,29 @@ export const MLAnalyticsGenerator: React.FC<MLAnalyticsGeneratorProps> = ({ metr
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/analytics/ml/generate`, {
+      let base = (import.meta.env.VITE_API_URL || '').trim();
+      if (base.endsWith('/')) base = base.slice(0, -1);
+      const apiUrl = base ? `${base}/api/analytics/ml/generate` : `/api/analytics/ml/generate`;
+      
+      const res = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ metric, period })
       });
       const data = await res.json();
+      
+      console.log('API Response:', data);
+      
       if (data.success && data.insights) {
         setInsights(data.insights);
+      } else if (data.insights) {
+        // Fallback: insights direkt vorhanden
+        setInsights(data.insights);
       } else {
-        setError(data.error || 'Fehler bei der Analytics-Generierung');
+        setError(data.error || 'Keine Insights erhalten');
       }
     } catch (err: any) {
+      console.error('Fetch Error:', err);
       setError(err.message || 'Fehler bei der Analytics-Generierung');
     } finally {
       setLoading(false);

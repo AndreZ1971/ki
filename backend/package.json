@@ -104,6 +104,7 @@
     "@fastify/under-pressure": "^9.0.0",
     "@sinclair/typebox": "^0.34.41",
     "@woocommerce/woocommerce-rest-api": "^1.0.2",
+    "check-disk-space": "^3.3.1",
     "axios": "^1.12.2",
     "bcryptjs": "^3.0.2",
     "better-sqlite3": "^12.4.1",

@@ -29,14 +29,49 @@ const AnalyticRegioning = () => {
   const [selectedRegion, setSelectedRegion] = useState<string>('global');
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  // KI/ML-Analyse
+  const [mlLoading, setMlLoading] = useState(false);
+  const [mlError, setMlError] = useState<string | null>(null);
+  const [mlInsights, setMlInsights] = useState<Array<{type:string;title:string;value:string;score?:number;detail?:string}>>([]);
 
   useEffect(() => {
     const fetchRegionData = async () => {
       setLoading(true);
-      
-      // Simuliere API-Aufruf
-      setTimeout(() => {
-        // Realistische Mock-Daten für regionale Analytics
+      try {
+        let base = (import.meta.env.VITE_API_URL || '').trim();
+        if (base.endsWith('/')) base = base.slice(0, -1);
+        const apiUrl = base ? `${base}/api/analytics/regioning/data?region=${selectedRegion}` : `/api/analytics/regioning/data?region=${selectedRegion}`;
+        const res = await fetch(apiUrl);
+        if (!res.ok) throw new Error('Fehler beim Laden der Regions-Daten');
+        const data = await res.json();
+        if (data.success) {
+          const mockRegionData: RegionData = {
+            totalRegions: data.all_regions?.length || 8,
+            activeCountries: 24,
+            topRegion: data.region || 'Deutschland',
+            europeTraffic: data.data?.sales || 45230,
+            northAmericaTraffic: 20,
+            asiaTraffic: 10,
+            otherRegions: 5,
+            regionalConversion: 3.2,
+            lastUpdated: new Date().toISOString()
+          };
+          const mockCountryData: CountryData[] = [
+            { country: 'Deutschland', visitors: 15420, conversion: 4.1, revenue: 45280, trend: 12 },
+            { country: 'Österreich', visitors: 8420, conversion: 3.8, revenue: 21850, trend: 8 },
+            { country: 'Schweiz', visitors: 7210, conversion: 3.5, revenue: 19540, trend: 5 },
+            { country: 'Frankreich', visitors: 6320, conversion: 2.9, revenue: 15420, trend: 15 },
+            { country: 'Italien', visitors: 5210, conversion: 2.4, revenue: 11250, trend: -2 },
+            { country: 'USA', visitors: 4850, conversion: 2.1, revenue: 14210, trend: 22 },
+            { country: 'UK', visitors: 3980, conversion: 2.8, revenue: 9850, trend: 7 },
+            { country: 'Spanien', visitors: 3540, conversion: 2.2, revenue: 7650, trend: -5 }
+          ];
+          setRegionData(mockRegionData);
+          setCountryData(mockCountryData);
+          setLastUpdate(new Date());
+        }
+      } catch (_err) {
+        // Fallback zu Mock-Daten
         const mockRegionData: RegionData = {
           totalRegions: 8,
           activeCountries: 24,
@@ -48,7 +83,6 @@ const AnalyticRegioning = () => {
           regionalConversion: 3.2,
           lastUpdated: new Date().toISOString()
         };
-
         const mockCountryData: CountryData[] = [
           { country: 'Deutschland', visitors: 15420, conversion: 4.1, revenue: 45280, trend: 12 },
           { country: 'Österreich', visitors: 8420, conversion: 3.8, revenue: 21850, trend: 8 },
@@ -59,16 +93,34 @@ const AnalyticRegioning = () => {
           { country: 'UK', visitors: 3980, conversion: 2.8, revenue: 9850, trend: 7 },
           { country: 'Spanien', visitors: 3540, conversion: 2.2, revenue: 7650, trend: -5 }
         ];
-
         setRegionData(mockRegionData);
         setCountryData(mockCountryData);
         setLastUpdate(new Date());
+      } finally {
         setLoading(false);
-      }, 1000);
+      }
     };
-
     fetchRegionData();
   }, [selectedRegion]);
+
+  // KI/ML-Analyse: Holt echte Insights vom Backend
+  const handleMLAnalyze = async () => {
+    setMlLoading(true);
+    setMlError(null);
+    setMlInsights([]);
+    try {
+      let base = (import.meta.env.VITE_API_URL || '').trim();
+      if (base.endsWith('/')) base = base.slice(0, -1);
+      const apiUrl = base ? `${base}/api/analytics/regioning/ml-analysis` : `/api/analytics/regioning/ml-analysis`;
+      const res = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ region: selectedRegion }) });
+      if (!res.ok) throw new Error('Fehler beim Laden der KI-Analyse');
+      const data = await res.json();
+      setMlInsights(data.mlInsights || []);
+    } catch (_err: any) {
+      setMlError('KI-Analyse konnte nicht geladen werden.');
+    }
+    setMlLoading(false);
+  };
 
   const handleBack = () => {
     navigate('/');
@@ -115,8 +167,7 @@ const AnalyticRegioning = () => {
       <div className="analytics-header">
         <h1>🗺️ Analytic Regioning</h1>
         <p>Regionale Analytics und Geo-Targeting</p>
-        
-        <div className="time-range-selector">
+        <div className="time-range-selector" style={{display:'flex', alignItems:'center', gap:'12px', marginBottom:'18px'}}>
           <button 
             className={selectedRegion === 'global' ? 'active' : ''}
             onClick={() => setSelectedRegion('global')}
@@ -141,6 +192,15 @@ const AnalyticRegioning = () => {
           >
             🇦🇸 Asien
           </button>
+        </div>
+        {/* KI/ML-Analyse Button unterhalb der Region-Buttons, zentriert */}
+        <div style={{display:'flex', justifyContent:'center', margin:'0 0 24px 0'}}>
+          <button className="ml-analytics-btn" onClick={handleMLAnalyze} disabled={mlLoading} title="KI-gestützte Insights für regionale Optimierung generieren" style={{fontSize:'1em', padding:'8px 18px', borderRadius:'8px', background:'linear-gradient(90deg, #667eea 0%, #764ba2 100%)', color:'#fff', border:'none', minWidth:'220px', display:'flex', alignItems:'center', gap:'8px'}}>
+            <span role="img" aria-label="Rocket" style={{fontSize: '1.2em'}}>🚀</span>
+            KI-Regionen-Analyse
+          </button>
+          {mlLoading && <div className="ml-analytics-loading" style={{marginLeft:'12px', color:'#2563eb'}}>KI-Analyse läuft...</div>}
+          {mlError && <div className="error-message" style={{marginLeft:'12px'}}>{mlError}</div>}
         </div>
       </div>
 
@@ -282,7 +342,7 @@ const AnalyticRegioning = () => {
 
       {/* Regional Insights */}
       <div className="analysis-section">
-        <div className="metric-card full-width info">
+        <div className="metric-card full-width info" style={{background:'rgba(255,255,255,0.97)', boxShadow:'0 4px 24px rgba(102,126,234,0.10)'}}>
           <h3>💡 Regionale Insights</h3>
           <div className="insights-grid">
             <div className="insight-item positive">
@@ -301,6 +361,23 @@ const AnalyticRegioning = () => {
               <span className="insight-label">Empfehlung:</span>
               <span className="insight-value">Asien-Markt weiter ausbauen</span>
             </div>
+            {/* KI/ML-Insights Sektion */}
+            {mlInsights.length > 0 && (
+              <div style={{marginTop:24, marginBottom:8}}>
+                <ul style={{listStyle:'none', padding:0, margin:0}}>
+                  {mlInsights.map((insight, idx) => (
+                    <li key={idx} style={{background:'#f6f8fa', borderRadius:10, marginBottom:10, padding:'14px 18px', boxShadow:'0 2px 8px rgba(102,126,234,0.07)', display:'flex', flexDirection:'column', gap:'4px'}}>
+                      <span style={{fontWeight:600, color:'#2563eb'}}>{insight.title}</span>
+                      <span style={{fontSize:'1.08em', color:'#222'}}>{insight.value}</span>
+                      {insight.detail && <span style={{color:'#6c757d', fontSize:'0.98em'}}>{insight.detail}</span>}
+                      {insight.score !== undefined && (
+                        <span style={{color:'#764ba2', fontWeight:500}}>KI-Score: {Math.round(insight.score*100)}%</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
       </div>

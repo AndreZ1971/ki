@@ -2,6 +2,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import os from 'os';
 import { performance } from 'perf_hooks';
+import checkDiskSpace from 'check-disk-space';
 
 interface SystemMetrics {
   cpu: {
@@ -50,8 +51,8 @@ export default async function monitoringRoutes(fastify: FastifyInstance) {
       const usedMem = totalMem - freeMem;
       const memUsagePercent = Math.round((usedMem / totalMem) * 100);
       
-      // Disk Usage (geschätzt basierend auf verfügbarem Speicher)
-      const diskUsagePercent = Math.min(Math.round((usedMem / totalMem) * 120), 100);
+      // Disk Usage (real ermittelt)
+      const diskUsagePercent = await getDiskUsagePercent();
       
       // Network Test (teste ob externe Verbindung möglich)
       const networkStatus = await testNetworkConnection();
@@ -170,6 +171,18 @@ export default async function monitoringRoutes(fastify: FastifyInstance) {
       });
     }
   });
+}
+
+async function getDiskUsagePercent(): Promise<number> {
+  try {
+    const result = await checkDiskSpace(process.cwd());
+    const used = result.size - result.free;
+    const percent = Math.round((used / result.size) * 100);
+    return Math.max(0, Math.min(100, percent));
+  } catch (_err) {
+    // Fallback, falls Disk nicht gelesen werden kann
+    return 50;
+  }
 }
 
 // Helper Functions

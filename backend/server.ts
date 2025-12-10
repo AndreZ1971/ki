@@ -1,5 +1,3 @@
-// 🔥 CHATBOT MESSAGE ROUTE
-  // Entfernt: chatbotMessageRoute (ungenuzt)
 // backend/server.ts - KOMPLETT KORRIGIERT
 require('module-alias/register');
 import cors from '@fastify/cors';
@@ -10,6 +8,9 @@ import config from './config';
 import Fastify from 'fastify';
 import fs from 'fs';
 import path from 'path';
+
+// 🔥 CHATBOT MESSAGE ROUTE
+import chatbotMessageRoute from './routes/app/api/chatbot-message';
 
 // 🔥 ERROR HANDLING SYSTEM
 import { setupErrorHandling } from './error-handling';
@@ -38,7 +39,7 @@ import freebieRoutes from './routes/app/api/products/freebies';
 // 🔥 MARKETING ROUTES
 import marketingRoutes from './routes/app/api/marketing/marketing-routes';
 import emailMarketingRoutes from './routes/app/api/marketing/email-marketing';
-import conversionRoutes from './routes/app/api/marketing/conversion-routes';
+import conversionRoutesMarketing from './routes/app/api/marketing/conversion-routes';
 import contentRoutes from './routes/app/api/marketing/content-routes';
 // Entfernt: blogpostRoutes (ungenuzt)
 // import imageAnalysisRoutes from './routes/app/api/marketing/image-analysis-routes';
@@ -66,6 +67,17 @@ import connectionRoutes from './routes/app/api/settings/connection';
 // 🔥 MONITORING ROUTES
 import monitoringRoutes from './routes/app/api/monitoring/system';
 
+// AUDIT ROUTES
+import premiumAuditRoutes from './routes/app/api/audit/premium';
+import standardAuditRoutes from './routes/app/api/audit/standard';
+import miniAuditRoutes from './routes/app/api/audit/mini';
+
+// ANALYTICS ROUTES - NEUE ROUTES
+import conversionRoutes from './routes/app/api/analytics/conversion';
+import regioningRoutes from './routes/app/api/analytics/regioning';
+import mlInsightsRoutes from './routes/app/api/analytics/ml-insights';
+import trendsRoutes from './routes/app/api/analytics/trends';
+import realTimeRoutes from './routes/app/api/analytics/real-time';
 
 // Umgebungsvariablen laden mit erweiterter Fehlerbehandlung
 // Try multiple .env locations: backend/.env, root/.env, .env.production
@@ -324,7 +336,7 @@ async function buildServer() {
     await server.register(emailMarketingRoutes); // Already has full paths
     console.log('✅ Email Marketing Routes erfolgreich registriert');
     
-    await server.register(conversionRoutes); // Already has full paths
+    await server.register(conversionRoutesMarketing); // Already has full paths
     console.log('✅ Conversion Routes erfolgreich registriert');
     
     await server.register(contentRoutes); // Already has full paths
@@ -353,6 +365,38 @@ async function buildServer() {
     // 🔥 MONITORING ROUTES (System Health & Performance)
     await server.register(monitoringRoutes, { prefix: '/api/monitoring' });
     console.log('✅ Monitoring Routes erfolgreich registriert');
+
+    // 🔥 PREMIUM AUDIT ROUTES
+    await server.register(premiumAuditRoutes);
+    console.log('✅ Premium Audit Routes erfolgreich registriert');
+
+    // 🔥 STANDARD AUDIT ROUTES
+    await server.register(standardAuditRoutes);
+    console.log('✅ Standard Audit Routes erfolgreich registriert');
+
+    // 🔥 NEUE ANALYTICS ROUTES
+    await server.register(conversionRoutes, { prefix: '/api/analytics/conversion' });
+    console.log('✅ Conversion Analytics Routes erfolgreich registriert');
+
+    await server.register(regioningRoutes, { prefix: '/api/analytics/regioning' });
+    console.log('✅ Regioning Analytics Routes erfolgreich registriert');
+
+    await server.register(mlInsightsRoutes, { prefix: '/api/analytics/ml' });
+    console.log('✅ ML Insights Routes erfolgreich registriert');
+
+    await server.register(trendsRoutes, { prefix: '/api/analytics/trends' });
+    console.log('✅ Trends Analytics Routes erfolgreich registriert');
+
+    await server.register(realTimeRoutes, { prefix: '/api/analytics/real-time' });
+    console.log('✅ Real-Time Analytics Routes erfolgreich registriert');
+
+    // 🔥 CHATBOT ARI - Intelligente System-Diagnose
+    await server.register(chatbotMessageRoute, { prefix: '/api/chatbot' });
+    console.log('✅ Chatbot Ari Routes erfolgreich registriert');
+
+    // 🔥 MINI AUDIT ROUTE
+    await server.register(miniAuditRoutes, { prefix: '/api/audit/mini' });
+    console.log('✅ Mini Audit Routes erfolgreich registriert');
 
     // Global Error Handler
     server.setErrorHandler((error, request, reply) => {

@@ -37,16 +37,20 @@ const StandardAudit = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [scanInProgress, setScanInProgress] = useState(false);
 
-  const loadAuditData = React.useCallback(() => {
+  // Audit-Daten vom Backend laden
+  const loadAuditData = React.useCallback(async () => {
     setLoading(true);
-    // Simuliere Audit-Scan
-    setTimeout(() => {
-      const mockAuditChecks: AuditCheck[] = [
-        // ...existing code...
-      ];
-      setAuditChecks(mockAuditChecks);
-      setLoading(false);
-    }, 1000);
+    try {
+      const res = await fetch('/api/audit/standard');
+      if (!res.ok) throw new Error('Fehler beim Laden der Audit-Daten');
+      const data = await res.json();
+      setAuditChecks(data.checks || []);
+      calculateSummary(data.checks || []);
+    } catch (_e) {
+      setAuditChecks([]);
+      calculateSummary([]);
+    }
+    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -79,12 +83,18 @@ const StandardAudit = () => {
     navigate('/');
   };
 
-  const runQuickScan = () => {
+  // Scan auslösen und Daten neu laden
+  const runQuickScan = async () => {
     setScanInProgress(true);
-    setTimeout(() => {
-      loadAuditData();
-      setScanInProgress(false);
-    }, 3000);
+    try {
+      const res = await fetch('/api/audit/standard/scan', { method: 'POST' });
+      if (!res.ok) throw new Error('Scan konnte nicht gestartet werden');
+      await res.json();
+      await loadAuditData();
+    } catch (_e) {
+      // Fehlerhandling optional
+    }
+    setScanInProgress(false);
   };
 
   const getStatusColor = (status: string) => {

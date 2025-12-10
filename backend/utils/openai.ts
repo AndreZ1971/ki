@@ -11,8 +11,10 @@ export function getOpenAIClient() {
   if (!openAIClient) {
     const apiKey = config.openAI?.apiKey?.trim();
     if (!apiKey) {
+      console.error('❌ [OpenAI] API Key fehlt in connection.json!');
       throw new Error('OpenAI API Key nicht in connection.json konfiguriert');
     }
+    console.log('✅ [OpenAI] Client initialisiert mit Key:', apiKey.substring(0, 8) + '...');
     openAIClient = new OpenAI({ apiKey, timeout: 120000 }); // 2 Minuten Timeout für GPT-4/DALL-E
   }
   return openAIClient;
@@ -27,11 +29,18 @@ export async function executeOpenAI<T>(
   operationName: string,
   metadata?: Record<string, unknown>
 ): Promise<T> {
+  console.log(`🔄 [OpenAI] Starte Operation: ${operationName}`);
   try {
-    return await openAIRetry.execute(() =>
+    const result = await openAIRetry.execute(() =>
       openAIBreaker.execute(operation)
     );
+    console.log(`✅ [OpenAI] Operation erfolgreich: ${operationName}`);
+    return result;
   } catch (_error) {
+    console.error(`❌ [OpenAI] Operation fehlgeschlagen: ${operationName}`, {
+      error: _error instanceof Error ? _error.message : String(_error),
+      metadata
+    });
     await alertError(
       'OpenAI API Failed',
       `Operation ${operationName} failed after retries`,

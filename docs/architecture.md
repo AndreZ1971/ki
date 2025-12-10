@@ -305,9 +305,16 @@ executeOpenAI<T>(
 ```
 /app/api/
 ├── analytics/
+│   ├── conversion.ts             # Conversion-Analytics APIs
+│   ├── regioning.ts              # Regionale Analytics APIs
+│   ├── ml-insights.ts            # ML/KI Insights APIs
+│   ├── trends.ts                 # Trend-Analyse APIs
+│   ├── real-time.ts              # Echtzeit-Analytics APIs
 │   ├── metrics/
 │   │   └── shop-metrics.ts       # Shop-Metriken
 │   └── reviews.ts                # Review-Analysen
+├── audit/
+│   └── mini.ts                   # Mini-Audit APIs
 ├── products/
 │   ├── woocommerce.ts            # WooCommerce Products
 │   ├── product-management.ts     # Product Management
@@ -331,6 +338,41 @@ executeOpenAI<T>(
 └── woocommerce/
     └── customers.ts              # WooCommerce Kunden
 ```
+
+#### **Analytics API-Endpoints**
+
+**Conversion Analytics** (`/api/analytics/conversion`):
+- `GET /analysis` - Conversion-Raten und Funnel-Daten abrufen
+- `POST /analyze` - Detaillierte Conversion-Analyse durchführen
+- `GET /funnel` - Conversion-Funnel-Visualisierung mit Stufen-Daten
+
+**Regionale Analytics** (`/api/analytics/regioning`):
+- `GET /data?region={region}` - Regionale Performance-Daten nach Region
+- `POST /ml-analysis` - ML-basierte Insights für spezifische Region
+- `GET /comparison` - Multi-Region-Vergleich mit Benchmarks
+
+**ML/KI Insights** (`/api/analytics/ml`):
+- `GET /report` - ML-generierte Analytics-Reports abrufen
+- `POST /generate` - KI-basierte Analyse für Custom-Daten generieren
+- `POST /report-insights` - Detaillierte Insights aus Report-Daten extrahieren
+
+**Trend-Analyse** (`/api/analytics/trends`):
+- `GET /analyze/:keyword` - Trend-Score und Daten für einzelnes Keyword
+- `POST /analyze` - Batch-Trend-Analyse für mehrere Keywords
+- `GET /products` - Trending Produkte mit Trend-Scores identifizieren
+- `POST /report` - Umfassender Trend-Report mit Empfehlungen
+
+**Echtzeit-Analytics** (`/api/analytics/real-time`):
+- `GET /dashboard` - Real-Time Dashboard-Daten (Übersicht)
+- `GET /sales` - Aktuelle Verkäufe (letzte 24 Stunden)
+- `GET /visitors` - Aktuelle Besucher und Session-Daten
+- `GET /performance` - Performance-Metriken (Ladezeiten, Fehlerrate)
+- `GET /products` - Top-Produkte in Echtzeit mit Verkaufszahlen
+
+**Audit APIs** (`/api/audit/mini`):
+- `GET /` - Mini-Audit durchführen (schneller Shop-Health-Check)
+- `POST /scan` - Shop scannen und kritische Probleme identifizieren
+- `GET /summary` - Audit-Zusammenfassung mit priorisierten Empfehlungen
 
 ---
 

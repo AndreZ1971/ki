@@ -31,6 +31,65 @@ Alle Tools sind über das Dashboard erreichbar und können mit dem Chatbot kombi
 **API:**
   - Response: `{ quality, tags, seo, description, metadata }`
 
+---
+
+## 📡 API-Endpoints
+
+### **Analytics APIs**
+
+#### **Conversion Analytics** (`/api/analytics/conversion`)
+- `GET /analysis` - Conversion-Raten und Funnel-Daten
+- `POST /analyze` - Detaillierte Conversion-Analyse
+- `GET /funnel` - Conversion-Funnel-Visualisierung
+
+#### **Regionale Analytics** (`/api/analytics/regioning`)
+- `GET /data?region={region}` - Regionale Daten abrufen
+- `POST /ml-analysis` - ML-basierte Regions-Insights
+- `GET /comparison` - Regions-Vergleich mit Benchmarks
+
+#### **ML/KI Insights** (`/api/analytics/ml`)
+- `GET /report` - ML-generierte Reports
+- `POST /generate` - KI-Analyse generieren
+- `POST /report-insights` - Detaillierte Report-Insights
+
+#### **Trend-Analyse** (`/api/analytics/trends`)
+- `GET /analyze/:keyword` - Trend-Score für Keyword
+- `POST /analyze` - Batch-Trend-Analyse (mehrere Keywords)
+- `GET /products` - Trending Produkte identifizieren
+- `POST /report` - Umfassender Trend-Report
+
+#### **Echtzeit-Analytics** (`/api/analytics/real-time`)
+- `GET /dashboard` - Real-Time Dashboard-Daten
+- `GET /sales` - Aktuelle Verkäufe (letzte 24h)
+- `GET /visitors` - Aktuelle Besucher und Sessions
+- `GET /performance` - Performance-Metriken
+- `GET /products` - Top-Produkte in Echtzeit
+
+### **Audit APIs**
+
+#### **Mini-Audit** (`/api/audit/mini`)
+- `GET /` - Schneller Shop-Health-Check
+- `POST /scan` - Shop scannen und Probleme identifizieren
+- `GET /summary` - Audit-Zusammenfassung mit Empfehlungen
+
+### **Marketing APIs**
+
+#### **Conversion Campaigns** (`/api/marketing/conversion`)
+- `GET /campaigns` - Aktive Conversion-Kampagnen
+- `POST /campaigns` - Neue Kampagne erstellen
+- `PUT /campaigns/:id` - Kampagne aktualisieren
+- `DELETE /campaigns/:id` - Kampagne löschen
+
+### **Agent APIs**
+
+#### **Chat Interface** (`/api/agent`)
+- `POST /chat` - Mit AI Agent chatten
+- `GET /memory` - Konversations-Historie abrufen
+- `POST /memory/reset` - Kontext zurücksetzen
+- `GET /tools` - Verfügbare Tools auflisten
+
+---
+
 Ein vollständiges **AI Agent System** für WooCommerce/WordPress mit moderner React-Oberfläche:
 
 ### **Marketing & Content**

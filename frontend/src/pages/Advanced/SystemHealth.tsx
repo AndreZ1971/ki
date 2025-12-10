@@ -5,6 +5,7 @@ import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
 import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
+import { FloatingChatbot } from '../../components/FloatingChatbot';
 import './page.css';
 
 interface HealthStatus {
@@ -26,6 +27,7 @@ interface ServiceStatus {
 const SystemHealth: React.FC = () => {
   const { handleBackToDashboard, loading, setLoading, error, setError } = useProductManagement();
   const { toasts, showToast } = useToast();
+  const apiBase = import.meta.env.VITE_API_URL || '/api';
   
   const [monitoringEnabled, setMonitoringEnabled] = useState(true);
   const [alertThreshold, setAlertThreshold] = useState('80');
@@ -38,8 +40,7 @@ const SystemHealth: React.FC = () => {
 
     try {
       // ✅ Hole ECHTE System-Metriken vom Backend
-  const apiUrl = import.meta.env.VITE_API_URL;
-  const response = await fetch(`${apiUrl}/monitoring/system/metrics`);
+      const response = await fetch(`${apiBase}/monitoring/system/metrics`);
       
       if (!response.ok) {
         throw new Error('Konnte System-Metriken nicht laden');
@@ -63,8 +64,8 @@ const SystemHealth: React.FC = () => {
         status: metrics.status
       });
       
-      // Lade auch Services-Status
-  const servicesResponse = await fetch(`${apiUrl}/monitoring/services/status`);
+        // Lade auch Services-Status
+        const servicesResponse = await fetch(`${apiBase}/monitoring/services/status`);
       if (servicesResponse.ok) {
         const servicesData = await servicesResponse.json();
         if (servicesData.success) {
@@ -271,6 +272,14 @@ const SystemHealth: React.FC = () => {
           </div>
         </motion.div>
       )}
+
+      {/* Ari Chatbot kontextualisiert für System Health */}
+      <FloatingChatbot
+        userRole="admin"
+        botName="Ari"
+        context={{ page: 'system-health' }}
+        greetings={['Hi, ich bin Ari. Frag mich nach dem System-Status, Monitoring oder Fehlern.']}
+      />
     </div>
   );
 };

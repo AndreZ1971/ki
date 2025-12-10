@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './page.css';
 
@@ -46,75 +46,23 @@ export interface PerformanceReportResponse {
   timestamp: string;
 }
 
-// API Service für Shop Health - MIT MOCK DATA FÜR TEST
+// API Service für Shop Health - REAL DATA
 const shopHealthService = {
   async clearCache(): Promise<CacheClearResponse> {
-    // Mock Response für Cache Clear
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    return {
-      success: true,
-      message: 'Cache erfolgreich geleert',
-      clearedItems: ['Page-Cache', 'Object-Cache', 'Database-Cache', 'CDN-Cache'],
-      timestamp: new Date().toISOString()
-    };
+    const res = await fetch('/api/health/clear-cache', { method: 'POST' });
+    return await res.json();
   },
-
   async generatePerformanceReport(): Promise<PerformanceReportResponse> {
-    // Mock Response für Performance Report
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    return {
-      success: true,
-      reportId: 'PERF-' + Date.now(),
-      reportUrl: '/reports/performance-' + Date.now() + '.pdf',
-      metrics: {
-        loadTime: 1.2,
-        ttfb: 0.8,
-        fcp: 1.5,
-        lcp: 2.1
-      },
-      timestamp: new Date().toISOString()
-    };
+    const res = await fetch('/api/health/performance-report', { method: 'POST' });
+    return await res.json();
   },
-
   async runSecurityScan(): Promise<SecurityScanResponse> {
-    // Mock Response für Security Scan
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    return {
-      success: true,
-      vulnerabilities: {
-        critical: 1,
-        high: 3,
-        medium: 7,
-        low: 12
-      },
-      scannedAt: new Date().toISOString(),
-      details: [
-        { type: 'critical', message: 'Outdated WordPress version', fix: 'Update to latest version' },
-        { type: 'high', message: 'Weak admin password', fix: 'Enforce strong password policy' }
-      ]
-    };
+    const res = await fetch('/api/health/security-scan', { method: 'POST' });
+    return await res.json();
   },
-
   async analyzeSEO(): Promise<SEOAnalysisResponse> {
-    // Mock Response für SEO Analysis
-    await new Promise(resolve => setTimeout(resolve, 1800));
-    return {
-      success: true,
-      score: 82,
-      issues: [
-        { 
-          severity: 'high', 
-          message: 'Meta descriptions missing on product pages', 
-          suggestion: 'Add unique meta descriptions for all products' 
-        },
-        { 
-          severity: 'medium', 
-          message: 'Image alt tags missing', 
-          suggestion: 'Add descriptive alt tags to all product images' 
-        }
-      ],
-      analyzedAt: new Date().toISOString()
-    };
+    const res = await fetch('/api/health/seo-analysis', { method: 'POST' });
+    return await res.json();
   }
 };
 
@@ -163,43 +111,46 @@ const ShopHealthReport = () => {
     { id: 'seo-analysis', label: 'SEO-Analyse', type: 'success', icon: '📈', completed: false }
   ]);
 
-  useEffect(() => {
-    fetchHealthData();
+  // Fetch all health data from backend endpoints
+  const fetchHealthData = useCallback(async () => {
+    setLoading(true);
+    try {
+      // Run all health checks in parallel
+      const [perf, sec, seo] = await Promise.all([
+        shopHealthService.generatePerformanceReport(),
+        shopHealthService.runSecurityScan(),
+        shopHealthService.analyzeSEO()
+      ]);
+      // Compose healthData from real API responses
+      const metrics: HealthMetric[] = [
+        { name: 'Ladezeit', value: perf.metrics.loadTime, status: perf.metrics.loadTime < 2 ? 'excellent' : 'warning', target: 2.0, trend: 0 },
+        { name: 'TTFB', value: perf.metrics.ttfb, status: perf.metrics.ttfb < 1 ? 'excellent' : 'warning', target: 1.0, trend: 0 },
+        { name: 'FCP', value: perf.metrics.fcp, status: perf.metrics.fcp < 2 ? 'good' : 'warning', target: 2.0, trend: 0 },
+        { name: 'LCP', value: perf.metrics.lcp, status: perf.metrics.lcp < 2.5 ? 'good' : 'critical', target: 2.5, trend: 0 },
+        { name: 'SEO-Optimierung', value: seo.score, status: seo.score > 85 ? 'excellent' : seo.score > 70 ? 'good' : 'warning', target: 90, trend: 0 },
+        { name: 'Sicherheits-Updates', value: sec.vulnerabilities.critical === 0 ? 100 : 60, status: sec.vulnerabilities.critical === 0 ? 'excellent' : 'critical', target: 100, trend: 0 }
+      ];
+      setHealthData({
+        overallScore: Math.round((perf.metrics.loadTime < 2 ? 30 : 10) + (seo.score / 2) + (sec.vulnerabilities.critical === 0 ? 30 : 10)),
+        performance: Math.round((perf.metrics.loadTime < 2 ? 100 : 60)),
+        security: Math.round(sec.vulnerabilities.critical === 0 ? 100 : 60),
+        seo: seo.score,
+        inventory: 90, // TODO: Replace with real inventory data
+        lastScan: new Date().toISOString(),
+        issuesFound: sec.vulnerabilities.critical + sec.vulnerabilities.high + sec.vulnerabilities.medium + sec.vulnerabilities.low + seo.issues.length,
+        recommendations: seo.issues.length,
+        metrics
+      });
+      setLastUpdate(new Date());
+    } catch (_e) {
+      showErrorNotification('Fehler beim Laden der Shop-Daten');
+    }
+    setLoading(false);
   }, []);
 
-  const fetchHealthData = async () => {
-    setLoading(true);
-    
-    // Simuliere Health-Check Scan
-    setTimeout(() => {
-      const mockHealthData: ShopHealthData = {
-        overallScore: 87,
-        performance: 92,
-        security: 85,
-        seo: 78,
-        inventory: 91,
-        lastScan: new Date().toISOString(),
-        issuesFound: 12,
-        recommendations: 8,
-        metrics: [
-          { name: 'Ladezeit', value: 1.2, status: 'excellent', target: 2.0, trend: 15 },
-          { name: 'Uptime', value: 99.8, status: 'excellent', target: 99.5, trend: 0.2 },
-          { name: 'SSL-Zertifikat', value: 100, status: 'excellent', target: 100, trend: 0 },
-          { name: 'SEO-Optimierung', value: 78, status: 'good', target: 85, trend: -5 },
-          { name: 'Mobile Performance', value: 82, status: 'good', target: 90, trend: 8 },
-          { name: 'Bestandsgenauigkeit', value: 94, status: 'excellent', target: 95, trend: 2 },
-          { name: 'Sicherheits-Updates', value: 65, status: 'warning', target: 90, trend: -12 },
-          { name: 'Bild-Optimierung', value: 58, status: 'warning', target: 80, trend: -8 },
-          { name: 'Checkout-Abbruch', value: 42, status: 'critical', target: 30, trend: -15 },
-          { name: '404-Fehler', value: 23, status: 'good', target: 20, trend: -5 }
-        ]
-      };
-
-      setHealthData(mockHealthData);
-      setLastUpdate(new Date());
-      setLoading(false);
-    }, 2000);
-  };
+  useEffect(() => {
+    fetchHealthData();
+  }, [fetchHealthData]);
 
   const handleBack = () => {
     navigate('/');

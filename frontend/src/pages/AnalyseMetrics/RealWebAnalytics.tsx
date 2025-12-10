@@ -84,7 +84,7 @@ const RealWebAnalytics = () => {
       }
       let base = (import.meta.env.VITE_API_URL || '').trim();
       if (base.endsWith('/')) base = base.slice(0, -1);
-      const batchUrl = base ? `${base}/api/trends/batch` : `/api/trends/batch`;
+      const batchUrl = base ? `${base}/api/analytics/trends/analyze` : `/api/analytics/trends/analyze`;
       const batchRes = await fetch(batchUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -96,7 +96,7 @@ const RealWebAnalytics = () => {
         setError('Keine Trends für die aktuellen Produkte gefunden.');
       }
       // KI-Report für alle Produkte
-      const aiUrl = base ? `${base}/api/trends/ai-report` : `/api/trends/ai-report`;
+      const aiUrl = base ? `${base}/api/analytics/ml/report` : `/api/analytics/ml/report`;
       const aiRes = await fetch(aiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

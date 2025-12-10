@@ -13,12 +13,13 @@ Das WooCommerce AI Agent System bietet eine umfangreiche REST API für E-Commerc
 ## API-Kategorien
 
 1. **[Products](#products)** - WooCommerce Produkt-Management
-2. **[Analytics](#analytics)** - Shop-Metriken & Reporting
-3. **[Email](#email)** - Email-Versand & AI-Generierung
-4. **[Marketing](#marketing)** - Marketing-Automation
-5. **[System](#system)** - Health Checks & Memory Management
-6. **[Customers](#customers)** - Kundenverwaltung
-7. **[Agent](#agent)** - AI Agent Interaction
+2. **[Analytics](#analytics)** - Shop-Metriken & Reporting (inkl. Conversion, ML Insights, Trends, Real-Time)
+3. **[Audit](#audit)** - Shop Health Checks & Mini-Audits
+4. **[Email](#email)** - Email-Versand & AI-Generierung
+5. **[Marketing](#marketing)** - Marketing-Automation
+6. **[System](#system)** - Health Checks & Memory Management
+7. **[Customers](#customers)** - Kundenverwaltung
+8. **[Agent](#agent)** - AI Agent Interaction
 
 ---
 
@@ -498,7 +499,191 @@ Detaillierte Conversion-Funnel-Analyse.
 
 ---
 
-### Trend Analysis
+---
+
+### Analytics: Conversion
+
+#### GET /api/analytics/conversion/analysis
+Conversion-Raten und Funnel-Daten abrufen.
+
+**Response** (200 OK):
+```json
+{
+  "overallRate": 3.5,
+  "period": "last30Days",
+  "data": [
+    {
+      "date": "2025-12-01",
+      "rate": 3.2,
+      "visitors": 1000,
+      "conversions": 32
+    }
+  ]
+}
+```
+
+#### POST /api/analytics/conversion/analyze
+Detaillierte Conversion-Analyse für spezifischen Zeitraum.
+
+**Request Body**:
+```json
+{
+  "startDate": "2025-11-01",
+  "endDate": "2025-11-30",
+  "filters": {
+    "source": "organic",
+    "device": "mobile"
+  }
+}
+```
+
+#### GET /api/analytics/conversion/funnel
+Conversion-Funnel-Visualisierung mit Stufen-Daten.
+
+**Response** (200 OK):
+```json
+{
+  "funnel": [
+    { "stage": "Landing", "visitors": 10000, "rate": 100 },
+    { "stage": "Product View", "visitors": 5000, "rate": 50 },
+    { "stage": "Add to Cart", "visitors": 1000, "rate": 10 },
+    { "stage": "Checkout", "visitors": 400, "rate": 4 },
+    { "stage": "Purchase", "visitors": 320, "rate": 3.2 }
+  ]
+}
+```
+
+---
+
+### Analytics: Regionale Daten
+
+#### GET /api/analytics/regioning/data?region={region}
+Regionale Performance-Daten für spezifische Region.
+
+**Response** (200 OK):
+```json
+{
+  "region": "DE",
+  "sales": 25000,
+  "orders": 450,
+  "avgOrderValue": 55.56,
+  "topProducts": [
+    { "id": 123, "name": "Product A", "sales": 5000 }
+  ],
+  "growth": 15.5
+}
+```
+
+#### POST /api/analytics/regioning/ml-analysis
+ML-basierte Insights für spezifische Region.
+
+**Request Body**:
+```json
+{
+  "region": "DE",
+  "timeframe": "last90Days",
+  "includeForecasts": true
+}
+```
+
+#### GET /api/analytics/regioning/comparison
+Multi-Region-Vergleich mit Benchmarks.
+
+---
+
+### Analytics: ML/KI Insights
+
+#### GET /api/analytics/ml/report
+ML-generierte Analytics-Reports abrufen.
+
+#### POST /api/analytics/ml/generate
+KI-basierte Analyse für Custom-Daten generieren.
+
+**Request Body**:
+```json
+{
+  "dataType": "sales",
+  "timeframe": "last30Days",
+  "focus": ["trends", "anomalies", "predictions"]
+}
+```
+
+#### POST /api/analytics/ml/report-insights
+Detaillierte Insights aus Report-Daten extrahieren.
+
+---
+
+### Analytics: Trend-Analyse
+
+#### GET /api/analytics/trends/analyze/:keyword
+Trend-Score und Daten für einzelnes Keyword.
+
+**Response** (200 OK):
+```json
+{
+  "keyword": "sustainable fashion",
+  "trendScore": 85,
+  "searchVolume": 12000,
+  "competition": "medium",
+  "trend": "rising",
+  "relatedKeywords": ["eco friendly clothing"]
+}
+```
+
+#### POST /api/analytics/trends/analyze
+Batch-Trend-Analyse für mehrere Keywords.
+
+**Request Body**:
+```json
+{
+  "keywords": [
+    "sustainable fashion",
+    "organic cotton",
+    "recycled materials"
+  ]
+}
+```
+
+#### GET /api/analytics/trends/products
+Trending Produkte mit Trend-Scores identifizieren.
+
+#### POST /api/analytics/trends/report
+Umfassender Trend-Report mit Empfehlungen.
+
+---
+
+### Analytics: Echtzeit-Daten
+
+#### GET /api/analytics/real-time/dashboard
+Real-Time Dashboard-Daten (Übersicht).
+
+**Response** (200 OK):
+```json
+{
+  "currentVisitors": 245,
+  "activeSessions": 178,
+  "salesToday": 3500,
+  "ordersToday": 67,
+  "conversionRate": 3.2,
+  "timestamp": "2025-12-09T10:30:00Z"
+}
+```
+
+#### GET /api/analytics/real-time/sales
+Aktuelle Verkäufe (letzte 24 Stunden).
+
+#### GET /api/analytics/real-time/visitors
+Aktuelle Besucher und Session-Daten.
+
+#### GET /api/analytics/real-time/performance
+Performance-Metriken (Ladezeiten, Fehlerrate).
+
+#### GET /api/analytics/real-time/products
+Top-Produkte in Echtzeit mit Verkaufszahlen.
+
+---
+
+### Trend Analysis (Legacy)
 **GET** `/app/api/analytics/trend-analysis`
 
 Google Trends Integration für Keyword-Trends.
@@ -531,6 +716,97 @@ Google Trends Integration für Keyword-Trends.
     ],
     "recommendations": [
       "Keyword 'wordpress theme' zeigt steigende Nachfrage"
+    ]
+  }
+}
+```
+
+---
+
+---
+
+## Audit
+
+### Mini Audit
+**GET** `/api/audit/mini`
+
+Schneller Shop-Health-Check mit Basis-Metriken.
+
+**Response** (200 OK):
+```json
+{
+  "score": 78,
+  "status": "good",
+  "checks": [
+    {
+      "name": "SSL Certificate",
+      "status": "pass",
+      "message": "Valid SSL certificate"
+    },
+    {
+      "name": "Page Speed",
+      "status": "warning",
+      "message": "Average load time: 2.5s"
+    }
+  ],
+  "checkedAt": "2025-12-09T10:00:00Z"
+}
+```
+
+### Shop Scan
+**POST** `/api/audit/mini/scan`
+
+Detaillierter Shop-Scan mit Problemerkennung.
+
+**Request Body**:
+```json
+{
+  "depth": "full",
+  "includePlugins": true,
+  "checkSecurity": true
+}
+```
+
+**Response** (200 OK):
+```json
+{
+  "scan": {
+    "duration": "00:02:15",
+    "pagesScanned": 45,
+    "issuesFound": 8,
+    "issues": [
+      {
+        "severity": "critical",
+        "type": "security",
+        "message": "Outdated WooCommerce version",
+        "recommendation": "Update to latest version"
+      }
+    ]
+  }
+}
+```
+
+### Audit Summary
+**GET** `/api/audit/mini/summary`
+
+Audit-Zusammenfassung mit priorisierten Empfehlungen.
+
+**Response** (200 OK):
+```json
+{
+  "summary": {
+    "overallScore": 78,
+    "lastAudit": "2025-12-09T10:00:00Z",
+    "improvements": [
+      {
+        "priority": "high",
+        "area": "security",
+        "action": "Update WooCommerce to v8.5"
+      }
+    ],
+    "strengths": [
+      "Valid SSL certificate",
+      "Mobile-responsive design"
     ]
   }
 }

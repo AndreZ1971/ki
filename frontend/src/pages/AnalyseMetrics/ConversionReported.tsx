@@ -28,6 +28,12 @@ interface NextStep {
   criticality?: string;
 }
 
+interface SummaryDetails {
+  overallScore?: number;
+  trend?: string;
+  recommendation?: string;
+}
+
 const API_URL = import.meta.env.VITE_API_URL || '';
 
 const ConversionReported = () => {
@@ -44,6 +50,7 @@ const ConversionReported = () => {
   const [insightError, setInsightError] = useState<string | null>(null);
   const [nextSteps, setNextSteps] = useState<NextStep[]>([]);
   const [summary, setSummary] = useState<string | null>(null);
+  const [summaryDetails, setSummaryDetails] = useState<SummaryDetails | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -70,6 +77,7 @@ const ConversionReported = () => {
     setInsights([]);
     setNextSteps([]);
     setSummary(null);
+    setSummaryDetails(null);
     try {
       // Beispiel-Endpunkt, Backend muss /api/analytics/ml/report-insights bereitstellen
       const res = await fetch(`${API_URL}/api/analytics/ml/report-insights`, {
@@ -80,7 +88,8 @@ const ConversionReported = () => {
       const data = await res.json();
       setInsights(data.insights || []);
       setNextSteps(data.nextSteps || []);
-      setSummary(data.summary || null);
+      setSummary(typeof data.summary === 'string' ? data.summary : null);
+      setSummaryDetails(data.summaryDetails || null);
     } catch (_err: any) {
       setInsightError('Fehler bei der KI-Analyse');
     } finally {
@@ -214,129 +223,106 @@ const ConversionReported = () => {
         <p>Automatische Conversion-Reports, Export und jetzt KI-gestützte Analyse!</p>
       </div>
 
-      {/* 2x4 Grid Layout */}
-      <div className="analytics-grid-2x4">
-        <div className="metric-card">
-          <div className="metric-icon">📊</div>
-          <div className="metric-label">Total Reports</div>
-          <div className="metric-value">{reportData?.totalReports || 0}</div>
-        </div>
-        <div className="metric-card">
-          <div className="metric-icon">🤖</div>
-          <div className="metric-label">Automated Reports</div>
-          <div className="metric-value">{reportData?.automatedReports || 0}</div>
-        </div>
-        <div className="metric-card">
-          <div className="metric-icon">👨‍💼</div>
-          <div className="metric-label">Manual Reports</div>
-          <div className="metric-value">{reportData?.manualReports || 0}</div>
-        </div>
-        <div className="metric-card">
-          <div className="metric-icon">📤</div>
-          <div className="metric-label">Export Success</div>
-          <div className="metric-value">{reportData?.exportSuccess || 0}%</div>
-        </div>
-        <div className="metric-card">
-          <div className="metric-icon">⏰</div>
-          <div className="metric-label">Scheduled Reports</div>
-          <div className="metric-value">{reportData?.scheduledReports || 0}</div>
-        </div>
-        <div className="metric-card">
-          <div className="metric-icon">⚡</div>
-          <div className="metric-label">Real-time Reports</div>
-          <div className="metric-value">{reportData?.realTimeReports || 0}</div>
-        </div>
-        <div className="metric-card">
-          <div className="metric-icon">⏱️</div>
-          <div className="metric-label">Avg Report Time</div>
-          <div className="metric-value">{reportData?.avgReportTime || '0min'}</div>
-        </div>
-        <div className="metric-card last-updated">
-          <div className="metric-icon">🕒</div>
-          <div className="metric-label">Last Updated</div>
-          <div className="metric-value-small">
-            {reportData?.lastUpdated ? new Date(reportData.lastUpdated).toLocaleDateString('de-DE') : 'N/A'}
-          </div>
-        </div>
+      {/* Metriken 2x4 Grid */}
+      <div className="analytics-grid-2x4" style={{marginBottom: 24}}>
+        <div className="metric-card"><div className="metric-icon">📊</div><div className="metric-label">Total Reports</div><div className="metric-value">{reportData?.totalReports || 0}</div></div>
+        <div className="metric-card"><div className="metric-icon">🤖</div><div className="metric-label">Automated</div><div className="metric-value">{reportData?.automatedReports || 0}</div></div>
+        <div className="metric-card"><div className="metric-icon">👨‍💼</div><div className="metric-label">Manual</div><div className="metric-value">{reportData?.manualReports || 0}</div></div>
+        <div className="metric-card"><div className="metric-icon">📤</div><div className="metric-label">Export Success</div><div className="metric-value">{reportData?.exportSuccess || 0}%</div></div>
+        <div className="metric-card"><div className="metric-icon">⏰</div><div className="metric-label">Scheduled</div><div className="metric-value">{reportData?.scheduledReports || 0}</div></div>
+        <div className="metric-card"><div className="metric-icon">⚡</div><div className="metric-label">Real-time</div><div className="metric-value">{reportData?.realTimeReports || 0}</div></div>
+        <div className="metric-card"><div className="metric-icon">⏱️</div><div className="metric-label">Avg Time</div><div className="metric-value">{reportData?.avgReportTime || '0min'}</div></div>
+        <div className="metric-card last-updated"><div className="metric-icon">🕒</div><div className="metric-label">Last Updated</div><div className="metric-value-small">{reportData?.lastUpdated ? new Date(reportData.lastUpdated).toLocaleDateString('de-DE') : 'N/A'}</div></div>
       </div>
 
-      {/* KI/ML-Analyse Sektion */}
-      <div className="analysis-section">
-        <div className="metric-card full-width">
-          <h3>🧠 KI-gestützte Report-Analyse</h3>
-          <p style={{marginBottom: 18, color: '#2563eb', fontWeight: 500}}>
-            Nutze KI/ML, um Conversion-Reports automatisch zu analysieren, Trends zu erkennen und Optimierungspotenziale zu entdecken.
-          </p>
-          <button 
-            className="action-button primary"
-            onClick={handleAnalyzeAI}
-            disabled={insightLoading}
-            style={{marginBottom: 18}}
-          >
-            {insightLoading ? '⏳ KI-Analyse läuft...' : '🧠 KI-Analyse starten'}
-          </button>
-          {insightError && <div className="error-message">{insightError}</div>}
+      {/* KI Analyse unter den 8 Kacheln */}
+      <div className="metric-card full-width" style={{marginBottom: 20}}>
+        <h3 style={{fontSize: '1.3rem', marginBottom: 8}}>🧠 KI-Analyse</h3>
+        <p style={{marginBottom: 12, color: '#2563eb', fontSize: '0.95rem', lineHeight: '1.5'}}>
+          Analysiere Reports automatisch und erkenne Optimierungspotenziale.
+        </p>
+        <button 
+          className="action-button primary"
+          onClick={handleAnalyzeAI}
+          disabled={insightLoading}
+          style={{minWidth: 220}}
+        >
+          {insightLoading ? '⏳ Läuft...' : '🧠 Starten'}
+        </button>
+        {insightError && <div className="error-message" style={{fontSize: '0.9rem', marginTop: 10}}>{insightError}</div>}
 
-          {/* Zusammenfassung */}
-          {summary && (
-            <div className="metric-card" style={{margin: '24px 0'}}>
-              <h4>📝 KI-Zusammenfassung</h4>
-              <div style={{fontSize: '1.1rem', color: '#2c3e50', marginBottom: 12}}>{summary}</div>
-            </div>
-          )}
-
-          {/* Insights Grid */}
-          {Array.isArray(insights) && insights.length > 0 && (
-            <div className="analytics-grid-2x4" style={{marginBottom: 32}}>
-              {insights.map((insight, i) => (
-                <div className="metric-card" key={i}>
-                  <div className="metric-icon" style={{fontSize: '2.2rem'}}>
-                    {insight.type === 'trend' && '📈'}
-                    {insight.type === 'segment' && '🧩'}
-                    {insight.type === 'forecast' && '🔮'}
-                    {insight.type === 'anomaly' && '⚠️'}
-                    {insight.type === 'conversion' && '🎯'}
-                    {insight.type === 'other' && '🔎'}
-                  </div>
-                  <div className="metric-label">{insight.title || insight.type}</div>
-                  <div className="metric-value" style={{fontSize: '1.3rem'}}>{insight.value}</div>
-                  {insight.detail && <div style={{color: '#6c757d', fontSize: '0.95rem', marginTop: 8}}>{insight.detail}</div>}
-                  {insight.score !== undefined && (
-                    <div style={{fontWeight: 700, color: '#2563eb', marginTop: 8}}>KI-Score: {Math.round(insight.score * 100)}%</div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Next Steps / Empfehlungen */}
-          {Array.isArray(nextSteps) && nextSteps.length > 0 && (
-            <div className="next-steps" style={{marginBottom: 32}}>
-              <h4>🚀 Empfohlene Next Steps</h4>
-              {nextSteps.map((step, i) => (
-                <div className={`next-step ${step.criticality || 'good'}`} key={i}>
-                  <span className="step-icon">
-                    {step.criticality === 'critical' && '❗'}
-                    {step.criticality === 'warning' && '⚠️'}
-                    {step.criticality === 'good' && '✅'}
-                    {!step.criticality && '➡️'}
+        {summary && (
+          <div style={{marginTop: 14, padding: '12px', background: '#f8f9fa', borderRadius: 8, borderLeft: '3px solid #3498db'}}>
+            <div style={{fontSize: '0.95rem', color: '#2c3e50', lineHeight: '1.6', marginBottom: 8}}>{summary}</div>
+            {summaryDetails && (
+              <div style={{display: 'flex', gap: 10, flexWrap: 'wrap', fontSize: '0.85rem'}}>
+                {summaryDetails.overallScore !== undefined && (
+                  <span style={{background: '#e3f2fd', padding: '4px 8px', borderRadius: 4, fontWeight: 600}}>
+                    Score: {summaryDetails.overallScore}
                   </span>
-                  <div className="step-content">
-                    <strong>{step.title || 'Empfehlung'}</strong>
-                    <p>{step.description || ''}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+                )}
+                {summaryDetails.trend && (
+                  <span style={{background: '#e8f5e9', padding: '4px 8px', borderRadius: 4, fontWeight: 600}}>
+                    {summaryDetails.trend === 'positive' ? '📈 Positiv' : summaryDetails.trend === 'negative' ? '📉 Negativ' : '➡️ Neutral'}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* KI Insights */}
+      {Array.isArray(insights) && insights.length > 0 && (
+        <div className="analytics-grid-2x4" style={{marginBottom: 20}}>
+          {insights.map((insight: any, i) => (
+            <div className="metric-card" key={i}>
+              <div className="metric-icon" style={{fontSize: '2rem'}}>
+                {insight.type === 'trend' && '📈'}
+                {insight.type === 'segment' && '🧩'}
+                {insight.type === 'forecast' && '🔮'}
+                {insight.type === 'anomaly' && '⚠️'}
+                {insight.type === 'conversion' && '🎯'}
+                {!insight.type && '💡'}
+              </div>
+              <div className="metric-label" style={{fontSize: '1rem', fontWeight: 700}}>{insight.title || insight.type || 'Insight'}</div>
+              <div className="metric-value" style={{fontSize: '0.95rem', lineHeight: '1.5'}}>{insight.description || insight.value || insight.detail || ''}</div>
+              {(insight.confidence !== undefined || insight.score !== undefined) && (
+                <div style={{marginTop: 10, padding: '6px 10px', background: '#e8f4fd', borderRadius: 6, color: '#2563eb', fontSize: '0.85rem', fontWeight: 600}}>
+                  ✓ {insight.confidence || Math.round((insight.score || 0) * 100)}% Konfidenz
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Next Steps / Empfehlungen */}
+      {Array.isArray(nextSteps) && nextSteps.length > 0 && (
+        <div className="next-steps" style={{marginBottom: 20}}>
+          <h4>🚀 Empfohlene Next Steps</h4>
+          {nextSteps.map((step, i) => (
+            <div className={`next-step ${step.criticality || 'good'}`} key={i}>
+              <span className="step-icon">
+                {step.criticality === 'critical' && '❗'}
+                {step.criticality === 'warning' && '⚠️'}
+                {step.criticality === 'good' && '✅'}
+                {!step.criticality && '➡️'}
+              </span>
+              <div className="step-content">
+                <strong>{step.title || 'Empfehlung'}</strong>
+                <p>{step.description || ''}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Report Actions Sektion */}
       <div className="analysis-section">
         <div className="metric-card full-width">
           <h3>🚀 Report Actions</h3>
-          <div className="actions-grid">
+          <div className="actions-grid" style={{display: 'grid', gridTemplateColumns: 'repeat(2, minmax(260px, 1fr))', gap: 16}}>
             {/* Export Current Report */}
             <div className="action-group">
               <h4>📥 Export Current Report</h4>

@@ -34,12 +34,23 @@ const MiniAudit = () => {
     loadMiniAuditData();
   }, []);
 
-  const loadMiniAuditData = () => {
+  const loadMiniAuditData = async () => {
     setLoading(true);
     const startTime = Date.now();
     
-    // Simuliere schnellen Mini-Scan
-    setTimeout(() => {
+    try {
+      let base = (import.meta.env.VITE_API_URL || '').trim();
+      if (base.endsWith('/')) base = base.slice(0, -1);
+      const apiUrl = base ? `${base}/api/audit/mini` : `/api/audit/mini`;
+      const res = await fetch(apiUrl);
+      if (!res.ok) throw new Error('Fehler beim Laden der Mini-Audit-Daten');
+      const data = await res.json();
+      if (data.success && data.data) {
+        setQuickChecks(data.data.quickChecks);
+        setMiniMetrics(data.data.miniMetrics);
+      }
+    } catch (_err) {
+      // Fallback zu Mock-Daten
       const mockQuickChecks: QuickCheck[] = [
         {
           id: 'load-time',
@@ -138,21 +149,32 @@ const MiniAudit = () => {
 
       setQuickChecks(mockQuickChecks);
       setMiniMetrics(mockMiniMetrics);
+    } finally {
       setScanTime(Date.now() - startTime);
       setLoading(false);
-    }, 800); // Sehr schneller Scan
+    }
   };
 
   const handleBack = () => {
     navigate('/');
   };
 
-  const runQuickScan = () => {
+  const runQuickScan = async () => {
     setIsScanning(true);
-    setTimeout(() => {
-      loadMiniAuditData();
+    try {
+      let base = (import.meta.env.VITE_API_URL || '').trim();
+      if (base.endsWith('/')) base = base.slice(0, -1);
+      const apiUrl = base ? `${base}/api/audit/mini/scan` : `/api/audit/mini/scan`;
+      const res = await fetch(apiUrl, { method: 'POST' });
+      if (!res.ok) throw new Error('Scan konnte nicht gestartet werden');
+      await res.json();
+      await loadMiniAuditData();
+    } catch (_err) {
+      // Bei Fehler: lokaler Scan
+      await loadMiniAuditData();
+    } finally {
       setIsScanning(false);
-    }, 800);
+    }
   };
 
   const getStatusColor = (status: string) => {

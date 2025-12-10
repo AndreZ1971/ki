@@ -100,22 +100,67 @@ const FeedbackAnalysis: React.FC = () => {
       {/* Insights Grid */}
       {Array.isArray(analysis) && analysis.length > 0 && (
         <div className="analytics-grid-2x4" style={{marginBottom: 40}}>
-          {analysis.map((insight, i) => (
-            <div className="metric-card" key={i}>
-              <div className="metric-icon" style={{fontSize: '2.2rem'}}>
-                {insight.type === 'trend' && '📈'}
-                {insight.type === 'sentiment' && '💬'}
-                {insight.type === 'topic' && '🏷️'}
-                {insight.type === 'complaint' && '⚠️'}
-                {insight.type === 'praise' && '🌟'}
-                {insight.type === 'suggestion' && '💡'}
-                {insight.type === 'other' && '🔎'}
+          {analysis.map((insight, i) => {
+            // Map Backend-Format (category/finding) auf Frontend-Format
+            const category = insight.category || 'Other';
+            const finding = insight.finding || insight.value || '';
+            const recommendation = insight.recommendation || insight.detail || '';
+            const confidence = insight.confidence || 0;
+            const impact = insight.impact || 'medium';
+            
+            // Icon basierend auf Kategorie
+            let icon = '🔎';
+            if (category === 'Customer' || category === 'sentiment') icon = '💬';
+            if (category === 'Performance' || category === 'trend') icon = '📈';
+            if (category === 'Products' || category === 'topic') icon = '🏷️';
+            if (category === 'Traffic' || category === 'complaint') icon = '⚠️';
+            if (category === 'Conversion' || category === 'praise') icon = '🌟';
+            
+            // Impact-Badge
+            const impactColor = impact === 'high' ? '#e74c3c' : impact === 'medium' ? '#f39c12' : '#27ae60';
+            const impactText = impact === 'high' ? 'Hoch' : impact === 'medium' ? 'Mittel' : 'Niedrig';
+            
+            return (
+              <div className="metric-card" key={i}>
+                <div className="metric-icon" style={{fontSize: '2.2rem'}}>{icon}</div>
+                <div className="metric-label" style={{fontSize: '1.1rem', fontWeight: 700, color: '#2c3e50'}}>{category}</div>
+                <div className="metric-value" style={{fontSize: '0.95rem', lineHeight: '1.5', color: '#34495e', marginTop: 8}}>
+                  {finding}
+                </div>
+                {recommendation && (
+                  <div style={{
+                    background: '#f0f4ff', 
+                    padding: '8px 12px', 
+                    borderRadius: 6, 
+                    marginTop: 12, 
+                    fontSize: '0.9rem',
+                    color: '#2c3e50',
+                    borderLeft: '3px solid #3498db'
+                  }}>
+                    💡 <strong>Empfehlung:</strong> {recommendation}
+                  </div>
+                )}
+                <div style={{display: 'flex', gap: 12, marginTop: 12, alignItems: 'center'}}>
+                  <span style={{
+                    background: impactColor, 
+                    color: 'white', 
+                    padding: '4px 10px', 
+                    borderRadius: 12, 
+                    fontSize: '0.8rem',
+                    fontWeight: 600
+                  }}>
+                    Impact: {impactText}
+                  </span>
+                  <span style={{
+                    color: '#7f8c8d',
+                    fontSize: '0.85rem'
+                  }}>
+                    ✓ {confidence}% Konfidenz
+                  </span>
+                </div>
               </div>
-              <div className="metric-label">{insight.title || insight.type}</div>
-              <div className="metric-value" style={{fontSize: '1.3rem'}}>{insight.value}</div>
-              {insight.detail && <div style={{color: '#6c757d', fontSize: '0.95rem', marginTop: 8}}>{insight.detail}</div>}
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -140,41 +185,138 @@ const FeedbackAnalysis: React.FC = () => {
         </div>
       )}
 
-      {/* Bewertungen & Tickets als Card-Grid */}
-      <div className="mini-checks-grid" style={{marginBottom: 32}}>
-        <div className="mini-check-card">
-          <div className="check-header"><span className="check-icon">⭐</span><span className="check-name">Bewertungen</span></div>
-          <div className="check-value">{reviews.length}</div>
-          <div className="check-description">Anzahl geladener Kundenbewertungen</div>
-        </div>
-        <div className="mini-check-card">
-          <div className="check-header"><span className="check-icon">🎫</span><span className="check-name">Support-Tickets</span></div>
-          <div className="check-value">{tickets.length}</div>
-          <div className="check-description">Anzahl geladener Support-Tickets</div>
-        </div>
-      </div>
+      {/* Statistik-Kacheln mit erweiterten Infos */}
+      {(reviews.length > 0 || tickets.length > 0 || summary) && (
+        <div className="analytics-grid-2x4" style={{marginBottom: 32}}>
+          {/* Bewertungen Stats */}
+          {reviews.length > 0 && (
+            <div className="metric-card">
+              <div className="metric-icon" style={{fontSize: '2.5rem'}}>⭐</div>
+              <div className="metric-label">Kundenbewertungen</div>
+              <div className="metric-value" style={{fontSize: '2.5rem'}}>{reviews.length}</div>
+              {summary?.avgRating && (
+                <div style={{color: '#27ae60', fontWeight: 600, fontSize: '1.1rem', marginTop: 8}}>
+                  Ø {summary.avgRating} ★
+                </div>
+              )}
+            </div>
+          )}
 
-      {/* Optional: Rohdaten-Ansicht */}
-      {showRaw && (
-        <div style={{margin: '32px 0'}}>
-          <h3>🔎 Rohdaten</h3>
-          <div style={{display: 'flex', gap: 32, flexWrap: 'wrap'}}>
-            <div style={{flex: 1, minWidth: 320}}>
-              <h4>Bewertungen</h4>
-              <pre style={{background: '#f6f8fa', padding: 12, borderRadius: 8, fontSize: 13}}>{JSON.stringify(reviews, null, 2)}</pre>
+          {/* Tickets Stats */}
+          {tickets.length > 0 && (
+            <div className="metric-card">
+              <div className="metric-icon" style={{fontSize: '2.5rem'}}>🎫</div>
+              <div className="metric-label">Support-Tickets</div>
+              <div className="metric-value" style={{fontSize: '2.5rem'}}>{tickets.length}</div>
+              {summary?.openTickets !== undefined && (
+                <div style={{color: summary.openTickets > 0 ? '#e74c3c' : '#27ae60', fontWeight: 600, fontSize: '1.1rem', marginTop: 8}}>
+                  {summary.openTickets} offen
+                </div>
+              )}
             </div>
-            <div style={{flex: 1, minWidth: 320}}>
-              <h4>Support-Tickets</h4>
-              <pre style={{background: '#f6f8fa', padding: 12, borderRadius: 8, fontSize: 13}}>{JSON.stringify(tickets, null, 2)}</pre>
+          )}
+
+          {/* Sentiment */}
+          {summary?.sentiment && (
+            <div className="metric-card">
+              <div className="metric-icon" style={{fontSize: '2.5rem'}}>
+                {summary.sentiment === 'positive' ? '😊' : summary.sentiment === 'negative' ? '😟' : '😐'}
+              </div>
+              <div className="metric-label">Stimmung</div>
+              <div className="metric-value" style={{fontSize: '1.8rem', color: summary.sentiment === 'positive' ? '#27ae60' : summary.sentiment === 'negative' ? '#e74c3c' : '#f39c12'}}>
+                {summary.sentiment === 'positive' ? 'Positiv' : summary.sentiment === 'negative' ? 'Negativ' : 'Neutral'}
+              </div>
             </div>
-            <div style={{flex: 1, minWidth: 320}}>
-              <h4>Analyse</h4>
-              <pre style={{background: '#f6f8fa', padding: 12, borderRadius: 8, fontSize: 13}}>{JSON.stringify(analysis, null, 2)}</pre>
+          )}
+
+          {/* Resolution Time */}
+          {summary?.resolutionTime && (
+            <div className="metric-card">
+              <div className="metric-icon" style={{fontSize: '2.5rem'}}>⏱️</div>
+              <div className="metric-label">Bearbeitungszeit</div>
+              <div className="metric-value" style={{fontSize: '1.8rem'}}>{summary.resolutionTime}</div>
+              <div style={{color: '#7f8c8d', fontSize: '0.9rem', marginTop: 8}}>Durchschnittliche Lösung</div>
             </div>
-            <div style={{flex: 1, minWidth: 320}}>
-              <h4>Zusammenfassung</h4>
-              <pre style={{background: '#f6f8fa', padding: 12, borderRadius: 8, fontSize: 13}}>{JSON.stringify(summary, null, 2)}</pre>
-            </div>
+          )}
+        </div>
+      )}
+
+      {/* Bewertungen anzeigen */}
+      {reviews.length > 0 && showRaw && (
+        <div className="metric-card full-width" style={{marginBottom: 32}}>
+          <h3 style={{marginBottom: 20}}>⭐ Kundenbewertungen</h3>
+          <div style={{display: 'grid', gap: 16}}>
+            {reviews.map((review: any) => (
+              <div key={review.id} style={{
+                background: '#f8f9fa',
+                padding: '16px 20px',
+                borderRadius: 8,
+                borderLeft: '4px solid #ffc107'
+              }}>
+                <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: 8}}>
+                  <strong style={{color: '#2c3e50', fontSize: '1.05rem'}}>{review.author}</strong>
+                  <span style={{color: '#ffc107', fontSize: '1.1rem'}}>
+                    {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
+                  </span>
+                </div>
+                <p style={{color: '#34495e', lineHeight: '1.6', margin: '8px 0'}}>{review.text}</p>
+                <div style={{color: '#7f8c8d', fontSize: '0.85rem', marginTop: 8}}>📅 {review.date}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Support-Tickets anzeigen */}
+      {tickets.length > 0 && showRaw && (
+        <div className="metric-card full-width" style={{marginBottom: 32}}>
+          <h3 style={{marginBottom: 20}}>🎫 Support-Tickets</h3>
+          <div style={{display: 'grid', gap: 16}}>
+            {tickets.map((ticket: any) => {
+              const statusColor = ticket.status === 'closed' ? '#27ae60' : '#e74c3c';
+              const priorityColor = ticket.priority === 'high' ? '#e74c3c' : ticket.priority === 'medium' ? '#f39c12' : '#95a5a6';
+              return (
+                <div key={ticket.id} style={{
+                  background: '#f8f9fa',
+                  padding: '16px 20px',
+                  borderRadius: 8,
+                  borderLeft: `4px solid ${statusColor}`
+                }}>
+                  <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8}}>
+                    <strong style={{color: '#2c3e50', fontSize: '1.05rem'}}>{ticket.title}</strong>
+                    <div style={{display: 'flex', gap: 8}}>
+                      <span style={{
+                        background: priorityColor,
+                        color: 'white',
+                        padding: '3px 10px',
+                        borderRadius: 12,
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        textTransform: 'uppercase'
+                      }}>
+                        {ticket.priority}
+                      </span>
+                      <span style={{
+                        background: statusColor,
+                        color: 'white',
+                        padding: '3px 10px',
+                        borderRadius: 12,
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        textTransform: 'uppercase'
+                      }}>
+                        {ticket.status}
+                      </span>
+                    </div>
+                  </div>
+                  <p style={{color: '#34495e', lineHeight: '1.6', margin: '8px 0'}}>{ticket.description}</p>
+                  <div style={{display: 'flex', gap: 16, marginTop: 8, fontSize: '0.85rem', color: '#7f8c8d'}}>
+                    <span>📅 Erstellt: {ticket.created}</span>
+                    {ticket.resolved && <span>✅ Gelöst: {ticket.resolved}</span>}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

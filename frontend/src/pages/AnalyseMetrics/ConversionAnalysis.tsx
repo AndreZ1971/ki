@@ -21,20 +21,33 @@ const ConversionAnalysis = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Simuliere Daten-Fetch
-    setTimeout(() => {
-      setConversionData({
-        overallRate: 2.8,
-        cartAbandonment: 68,
-        checkoutCompletion: 32,
-        mobileRate: 1.9,
-        desktopRate: 3.5,
-        returningCustomers: 4.2,
-        newCustomers: 1.8,
-        lastUpdated: new Date().toISOString()
-      });
-      setLoading(false);
-    }, 1000);
+    const fetchConversionData = async () => {
+      try {
+        let base = (import.meta.env.VITE_API_URL || '').trim();
+        if (base.endsWith('/')) base = base.slice(0, -1);
+        const apiUrl = base ? `${base}/api/analytics/conversion/analysis` : `/api/analytics/conversion/analysis`;
+        const res = await fetch(apiUrl);
+        if (!res.ok) throw new Error('Fehler beim Laden der Conversion-Daten');
+        const data = await res.json();
+        if (data.success && data.data) {
+          setConversionData(data.data);
+        }
+      } catch (_err) {
+        setConversionData({
+          overallRate: 2.8,
+          cartAbandonment: 68,
+          checkoutCompletion: 32,
+          mobileRate: 1.9,
+          desktopRate: 3.5,
+          returningCustomers: 4.2,
+          newCustomers: 1.8,
+          lastUpdated: new Date().toISOString()
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchConversionData();
   }, []);
 
   const handleBackToDashboard = () => {
@@ -134,10 +147,10 @@ const ConversionAnalysis = () => {
       </div>
 
       {/* ML-Analytics-Sektion */}
-      <div className="analytics-ml-section">
-        <h3>KI-Analytics-Generator</h3>
-        {/* Beispielhafte Metrik und Zeitraum, kann dynamisch ersetzt werden */}
-        <MLAnalyticsGenerator metric="conversion" period="30d" />
+      <div className="analysis-section">
+        <div className="metric-card full-width ml-analytics-card">
+          <MLAnalyticsGenerator metric="conversion" period="30d" />
+        </div>
       </div>
     </div>
   );

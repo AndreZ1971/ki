@@ -30,168 +30,49 @@ const PremiumAudit = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [overallScore, setOverallScore] = useState(0);
 
+  // Audit-Daten laden
+  const fetchAudit = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/audit/premium');
+      if (!res.ok) throw new Error('Fehler beim Laden der Audit-Daten');
+      const data = await res.json();
+      setAuditData(data.categories || []);
+      setRecommendations(data.recommendations || []);
+      if (data.categories && data.categories.length > 0) {
+        const totalScore = data.categories.reduce((sum: number, cat: any) => sum + cat.score, 0) / data.categories.length;
+        setOverallScore(Math.round(totalScore));
+      } else {
+        setOverallScore(0);
+      }
+    } catch (_e) {
+      setAuditData([]);
+      setRecommendations([]);
+      setOverallScore(0);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
-    // Simuliere Audit-Daten laden
-    setTimeout(() => {
-      const mockAuditData: AuditCategory[] = [
-        {
-          id: 'performance',
-          name: '⚡ Performance',
-          score: 72,
-          status: 'warning',
-          recommendations: 8,
-          details: 'Ladezeiten und Core Web Vitals optimierungsbedürftig'
-        },
-        {
-          id: 'seo',
-          name: '🔍 SEO',
-          score: 65,
-          status: 'warning',
-          recommendations: 12,
-          details: 'Meta-Tags, Strukturierte Daten und Inhaltsoptimierung benötigt'
-        },
-        {
-          id: 'security',
-          name: '🛡️ Sicherheit',
-          score: 88,
-          status: 'good',
-          recommendations: 4,
-          details: 'Gute Sicherheitsbasis, kleine Verbesserungen möglich'
-        },
-        {
-          id: 'conversion',
-          name: '💰 Conversion',
-          score: 45,
-          status: 'critical',
-          recommendations: 15,
-          details: 'Hohe Abbruchraten, Checkout-Prozess optimierungsbedürftig'
-        },
-        {
-          id: 'mobile',
-          name: '📱 Mobile Experience',
-          score: 78,
-          status: 'good',
-          recommendations: 6,
-          details: 'Gute Mobile Performance, kleine Anpassungen empfohlen'
-        },
-        {
-          id: 'content',
-          name: '📝 Content Quality',
-          score: 82,
-          status: 'good',
-          recommendations: 5,
-          details: 'Hohe Inhaltsqualität, weitere Optimierung möglich'
-        },
-        {
-          id: 'technical',
-          name: '🔧 Technische Struktur',
-          score: 58,
-          status: 'warning',
-          recommendations: 9,
-          details: 'Code-Qualität und Architektur verbesserungsfähig'
-        },
-        {
-          id: 'ux',
-          name: '🎨 User Experience',
-          score: 71,
-          status: 'warning',
-          recommendations: 7,
-          details: 'Navigation und Benutzerführung können verbessert werden'
-        }
-      ];
-
-      const mockRecommendations: AuditRecommendation[] = [
-        {
-          id: 'conv-1',
-          category: 'conversion',
-          title: 'Checkout-Prozess optimieren',
-          description: 'Reduzieren Sie die Anzahl der Schritte im Checkout und fügen Sie Trust-Badges hinzu',
-          priority: 'high',
-          impact: 85,
-          effort: 'medium',
-          estimatedTime: '2-3 Wochen'
-        },
-        {
-          id: 'perf-1',
-          category: 'performance',
-          title: 'Bildkomprimierung implementieren',
-          description: 'Implementieren Sie WebP-Format und Lazy Loading für Produktbilder',
-          priority: 'high',
-          impact: 75,
-          effort: 'low',
-          estimatedTime: '1 Woche'
-        },
-        {
-          id: 'seo-1',
-          category: 'seo',
-          title: 'Strukturierte Daten hinzufügen',
-          description: 'Implementieren Sie Schema.org Markup für Produkte und Bewertungen',
-          priority: 'high',
-          impact: 70,
-          effort: 'medium',
-          estimatedTime: '2 Wochen'
-        },
-        {
-          id: 'seo-2',
-          category: 'seo',
-          title: 'Meta-Beschreibungen optimieren',
-          description: 'Erstellen Sie einzigartige Meta-Beschreibungen für alle Produktseiten',
-          priority: 'medium',
-          impact: 60,
-          effort: 'low',
-          estimatedTime: '1 Woche'
-        },
-        {
-          id: 'conv-2',
-          category: 'conversion',
-          title: 'Exit-Intent Popup implementieren',
-          description: 'Fangen Sie abspringende Besucher mit speziellen Angeboten ab',
-          priority: 'medium',
-          impact: 55,
-          effort: 'low',
-          estimatedTime: '3-4 Tage'
-        },
-        {
-          id: 'technical-1',
-          category: 'technical',
-          title: 'CSS und JavaScript minifizieren',
-          description: 'Reduzieren Sie die Dateigrößen durch Komprimierung und Bundling',
-          priority: 'medium',
-          impact: 65,
-          effort: 'low',
-          estimatedTime: '1 Woche'
-        },
-        {
-          id: 'ux-1',
-          category: 'ux',
-          title: 'Breadcrumb-Navigation hinzufügen',
-          description: 'Verbessern Sie die Navigation und SEO durch Breadcrumbs',
-          priority: 'medium',
-          impact: 50,
-          effort: 'low',
-          estimatedTime: '2-3 Tage'
-        },
-        {
-          id: 'security-1',
-          category: 'security',
-          title: 'Content Security Policy implementieren',
-          description: 'Erhöhen Sie die Sicherheit durch CSP-Header',
-          priority: 'low',
-          impact: 40,
-          effort: 'medium',
-          estimatedTime: '1 Woche'
-        }
-      ];
-
-      setAuditData(mockAuditData);
-      setRecommendations(mockRecommendations);
-      
-      // Berechne Gesamt-Score
-      const totalScore = mockAuditData.reduce((sum, category) => sum + category.score, 0) / mockAuditData.length;
-      setOverallScore(Math.round(totalScore));
-      setLoading(false);
-    }, 1500);
+    fetchAudit();
   }, []);
+
+  // Audit starten
+  const [scanLoading, setScanLoading] = useState(false);
+  const [scanError, setScanError] = useState<string|null>(null);
+  const startAuditScan = async () => {
+    setScanLoading(true);
+    setScanError(null);
+    try {
+      const res = await fetch('/api/audit/premium/scan', { method: 'POST' });
+      if (!res.ok) throw new Error('Audit konnte nicht gestartet werden');
+      await res.json();
+      await fetchAudit();
+    } catch (e: any) {
+      setScanError(e.message || 'Unbekannter Fehler');
+    }
+    setScanLoading(false);
+  };
 
   const handleBack = () => {
     navigate('/');
@@ -264,12 +145,15 @@ const PremiumAudit = () => {
       <div className="analytics-header">
         <h1>⭐ Premium Audit</h1>
         <p>Umfassender Shop-Audit mit detaillierten Optimierungsempfehlungen</p>
-        
-        <div className="header-controls">
+        <div className="header-controls" style={{display:'flex', gap:'16px'}}>
+          <button className="refresh-button" onClick={startAuditScan} disabled={scanLoading}>
+            {scanLoading ? '🔄 Audit läuft...' : '🔍 Audit jetzt starten'}
+          </button>
           <button className="refresh-button">
             📊 Audit-Report exportieren
           </button>
         </div>
+        {scanError && <div style={{color:'#e74c3c', marginTop:'8px'}}>{scanError}</div>}
       </div>
 
       {/* Overall Audit Score */}

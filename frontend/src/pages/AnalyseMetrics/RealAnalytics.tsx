@@ -10,12 +10,12 @@ import { useNavigate } from 'react-router-dom';
 import './page.css';
 
 interface RealTimeData {
-  totalProducts: number;
-  totalOrders: number;
-  totalCustomers: number;
-  todaySales: number;
-  conversionRate: number;
-  activeSessions: number;
+  totalProducts: number | null;
+  totalOrders: number | null;
+  totalCustomers: number | null;
+  todaySales: number | null;
+  conversionRate: number | null;
+  activeSessions: number | null;
   popularProduct: string;
   lastUpdated: string;
 }
@@ -28,15 +28,17 @@ const RealAnalytics = () => {
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [dataError, setDataError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   // Holt die aktuellen Shopdaten
   const fetchRealTimeData = async () => {
     setLoading(true);
+    setDataError(null);
     try {
       let base = (import.meta.env.VITE_API_URL || '').trim();
       if (base.endsWith('/')) base = base.slice(0, -1);
-      const apiUrl = base ? `${base}/api/analytics/metrics/dashboard` : `/api/analytics/metrics/dashboard`;
+      const apiUrl = base ? `${base}/api/analytics/real-time/dashboard` : `/api/analytics/real-time/dashboard`;
       const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
@@ -45,48 +47,28 @@ const RealAnalytics = () => {
           'Content-Type': 'application/json'
         }
       });
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.data) {
-          setRealTimeData({
-            totalProducts: data.data.totalProducts || 0,
-            totalOrders: data.data.totalOrders || 0,
-            totalCustomers: data.data.totalCustomers || 0,
-            todaySales: data.data.todaySales || 0,
-            conversionRate: data.data.conversionRate || 0,
-            activeSessions: data.data.activeUsers || data.data.activeSessions || 0,
-            popularProduct: data.data.popularProduct || 'Nicht verfügbar',
-            lastUpdated: data.data.lastUpdated || new Date().toISOString()
-          });
-          // Speichere Daten in localStorage als Fallback
-          localStorage.setItem('totalProducts', (data.data.totalProducts || 0).toString());
-          localStorage.setItem('totalOrders', (data.data.totalOrders || 0).toString());
-          localStorage.setItem('totalCustomers', (data.data.totalCustomers || 0).toString());
-          localStorage.setItem('todaySales', (data.data.todaySales || 0).toString());
-          localStorage.setItem('conversionRate', (data.data.conversionRate || 0).toString());
-          if (data.data.popularProduct) {
-            localStorage.setItem('popularProduct', data.data.popularProduct);
-          }
-        } else {
-          throw new Error('API returned error');
-        }
-      } else {
+      if (!response.ok) {
         throw new Error(`API Error: ${response.status}`);
       }
-    } catch (error) {
-      console.log('Keine Live-Daten verfügbar, verwende Fallback-Daten:', error);
-      // FALLBACK: Basis-Daten aus localStorage oder Default-Werte
-      const fallbackData = {
-        totalProducts: parseInt(localStorage.getItem('totalProducts') || '10'),
-        totalOrders: parseInt(localStorage.getItem('totalOrders') || '3'),
-        totalCustomers: parseInt(localStorage.getItem('totalCustomers') || '0'),
-        todaySales: parseFloat(localStorage.getItem('todaySales') || '0'),
-        conversionRate: parseFloat(localStorage.getItem('conversionRate') || '0.3'),
-        activeSessions: Math.floor(Math.random() * 5) + 1, // Geschätzte aktive Sessions
-        popularProduct: localStorage.getItem('popularProduct') || 'Produkt #1',
-        lastUpdated: new Date().toISOString()
-      };
-      setRealTimeData(fallbackData);
+      const data = await response.json();
+      if (!(data.success && data.data)) {
+        throw new Error(data?.error || 'API returned error');
+      }
+
+      setRealTimeData({
+        totalProducts: data.data.totalProducts ?? null,
+        totalOrders: data.data.totalOrders ?? null,
+        totalCustomers: data.data.totalCustomers ?? null,
+        todaySales: data.data.todaySales ?? null,
+        conversionRate: data.data.conversionRate ?? null,
+        activeSessions: data.data.activeUsers ?? data.data.activeSessions ?? null,
+        popularProduct: data.data.popularProduct || 'Keine Daten',
+        lastUpdated: data.data.lastUpdated || new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error('Keine Live-Daten verfügbar:', error);
+      setDataError(error?.message || 'Echtzeit-Daten konnten nicht geladen werden');
+      setRealTimeData(null);
     } finally {
       setLastUpdate(new Date());
       setLoading(false);
@@ -102,7 +84,7 @@ const RealAnalytics = () => {
     try {
       let base = (import.meta.env.VITE_API_URL || '').trim();
       if (base.endsWith('/')) base = base.slice(0, -1);
-      const apiUrl = base ? `${base}/api/ml/real-analytics` : `/api/ml/real-analytics`;
+      const apiUrl = base ? `${base}/api/analytics/ml/generate` : `/api/analytics/ml/generate`;
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -111,7 +93,17 @@ const RealAnalytics = () => {
       if (response.ok) {
         const data = await response.json();
         if (data.success && Array.isArray(data.insights)) {
-          setKiInsights(data.insights);
+          const normalized = data.insights.map((insight: any) => ({
+            title: insight.title || insight.category || 'Insight',
+            value: insight.value || insight.finding || insight.reason || '',
+            detail: insight.detail || insight.recommendation || insight.reason,
+            score: typeof insight.score === 'number'
+              ? insight.score
+              : typeof insight.confidence === 'number'
+                ? insight.confidence / 100
+                : undefined
+          }));
+          setKiInsights(normalized);
         } else {
           setKiError('Keine KI-Insights erhalten.');
         }
@@ -146,11 +138,17 @@ const RealAnalytics = () => {
     setAutoRefresh(!autoRefresh);
   };
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount: number | null | undefined) => {
+    if (amount === null || amount === undefined || Number.isNaN(amount)) return '–';
     return new Intl.NumberFormat('de-DE', {
       style: 'currency',
       currency: 'EUR'
     }).format(amount);
+  };
+
+  const formatNumber = (value: number | null | undefined) => {
+    if (value === null || value === undefined || Number.isNaN(value)) return '–';
+    return value;
   };
 
   if (loading && !realTimeData) {
@@ -167,32 +165,34 @@ const RealAnalytics = () => {
       </button>
 
       <div className="analytics-header">
-        <div className="header-top-row">
-          <div>
-            <h1>🔍 Real Analytics</h1>
-            <p>Echtzeit-Daten aus deinem WooCommerce Shop</p>
-          </div>
-          <div className="header-controls">
-            <button 
-              className={`refresh-button ${autoRefresh ? 'active' : ''}`}
-              onClick={toggleAutoRefresh}
-            >
-              {autoRefresh ? '🔄 Auto-Refresh ON' : '⏸️ Auto-Refresh OFF'}
-            </button>
-            <button 
-              className="refresh-button"
-              onClick={fetchRealTimeData}
-              disabled={loading}
-            >
-              {loading ? '⏳ Lade...' : '🔄 Aktualisieren'}
-            </button>
-          </div>
+        <h1>🔍 Real Analytics</h1>
+        <p>Echtzeit-Daten aus deinem WooCommerce Shop</p>
+        
+        <div className="header-controls">
+          <button 
+            className={`refresh-button ${autoRefresh ? 'active' : ''}`}
+            onClick={toggleAutoRefresh}
+          >
+            {autoRefresh ? '🔄 Auto-Refresh ON' : '⏸️ Auto-Refresh OFF'}
+          </button>
+          <button 
+            className="refresh-button"
+            onClick={fetchRealTimeData}
+            disabled={loading}
+          >
+            {loading ? '⏳ Lade...' : '🔄 Aktualisieren'}
+          </button>
         </div>
         
         <div className="last-update">
           Letztes Update: {lastUpdate.toLocaleTimeString('de-DE')}
         </div>
-        <div style={{marginTop: 16, marginBottom: 8}}>
+        {dataError && (
+          <div className="error-message" style={{marginTop: 12, textAlign: 'center'}}>
+            ⚠️ {dataError}
+          </div>
+        )}
+        <div style={{marginTop: 16, marginBottom: 8, textAlign: 'center'}}>
           <button
             className="action-button primary"
             onClick={runKIAnalysis}
@@ -201,7 +201,7 @@ const RealAnalytics = () => {
           >
             {kiLoading ? '⏳ KI-Analyse läuft...' : '🧠 KI-Analyse starten'}
           </button>
-          {kiError && <div className="error-message" style={{marginTop: 8}}>{kiError}</div>}
+          {kiError && <div className="error-message" style={{marginTop: 8, textAlign: 'center'}}>{kiError}</div>}
         </div>
       </div>
 
@@ -210,43 +210,43 @@ const RealAnalytics = () => {
         <div className="metric-card real-time">
           <div className="metric-icon">📦</div>
           <div className="metric-label">Produkte</div>
-          <div className="metric-value">{realTimeData?.totalProducts || 0}</div>
+          <div className="metric-value">{formatNumber(realTimeData?.totalProducts)}</div>
           <div className="real-time-indicator">
-            <span className="pulse">🟢</span> Verfügbar
+            <span className="pulse">🟢</span> {realTimeData ? 'Verfügbar' : 'Keine Daten'}
           </div>
         </div>
 
         <div className="metric-card real-time">
           <div className="metric-icon">🛒</div>
           <div className="metric-label">Bestellungen</div>
-          <div className="metric-value">{realTimeData?.totalOrders || 0}</div>
+          <div className="metric-value">{formatNumber(realTimeData?.totalOrders)}</div>
           <div className="trend-indicator positive">
-            Aus WooCommerce
+            {realTimeData ? 'Aus WooCommerce' : 'Keine Daten'}
           </div>
         </div>
 
         <div className="metric-card real-time">
           <div className="metric-icon">👥</div>
           <div className="metric-label">Kunden</div>
-          <div className="metric-value">{realTimeData?.totalCustomers || 0}</div>
+          <div className="metric-value">{formatNumber(realTimeData?.totalCustomers)}</div>
           <div className="real-time-indicator">
-            {realTimeData?.totalCustomers ? 'Registriert' : 'Noch keine'}
+            {realTimeData?.totalCustomers ? 'Registriert' : 'Keine Daten'}
           </div>
         </div>
 
         <div className="metric-card real-time">
           <div className="metric-icon">💰</div>
           <div className="metric-label">Heutiger Umsatz</div>
-          <div className="metric-value">{formatCurrency(realTimeData?.todaySales || 0)}</div>
+          <div className="metric-value">{formatCurrency(realTimeData?.todaySales)}</div>
           <div className="trend-indicator">
-            {realTimeData?.todaySales ? '📈 Verkäufe' : 'Noch keine'}
+            {realTimeData?.todaySales ? '📈 Verkäufe' : 'Keine Daten'}
           </div>
         </div>
 
         <div className="metric-card">
           <div className="metric-icon">🎯</div>
           <div className="metric-label">Conversion Rate</div>
-          <div className="metric-value">{realTimeData?.conversionRate || 0}%</div>
+          <div className="metric-value">{formatNumber(realTimeData?.conversionRate)}%</div>
           <div className="trend-indicator">
             Basierend auf Besuchern
           </div>
@@ -255,9 +255,9 @@ const RealAnalytics = () => {
         <div className="metric-card">
           <div className="metric-icon">🔥</div>
           <div className="metric-label">Aktive Sessions</div>
-          <div className="metric-value">{realTimeData?.activeSessions || 0}</div>
+          <div className="metric-value">{formatNumber(realTimeData?.activeSessions)}</div>
           <div className="trend-indicator">
-            Geschätzt
+            {realTimeData?.activeSessions ? 'Gemessen' : 'Nicht gemessen'}
           </div>
         </div>
 
@@ -288,7 +288,7 @@ const RealAnalytics = () => {
               <span className="source-icon">📦</span>
               <div>
                 <strong>Produkt-Daten</strong>
-                <p>{realTimeData?.totalProducts || 0} Produkte in Datenbank</p>
+                <p>{formatNumber(realTimeData?.totalProducts)} Produkte in Datenbank</p>
               </div>
             </div>
             
@@ -296,7 +296,7 @@ const RealAnalytics = () => {
               <span className="source-icon">🛒</span>
               <div>
                 <strong>Bestellungen</strong>
-                <p>{realTimeData?.totalOrders || 0} WooCommerce Bestellungen</p>
+                <p>{formatNumber(realTimeData?.totalOrders)} WooCommerce Bestellungen</p>
               </div>
             </div>
             
@@ -304,7 +304,7 @@ const RealAnalytics = () => {
               <span className="source-icon">👥</span>
               <div>
                 <strong>Kunden-Daten</strong>
-                <p>{realTimeData?.totalCustomers || 0} registrierte Kunden</p>
+                <p>{formatNumber(realTimeData?.totalCustomers)} registrierte Kunden</p>
               </div>
             </div>
             
@@ -312,7 +312,7 @@ const RealAnalytics = () => {
               <span className="source-icon">💰</span>
               <div>
                 <strong>Umsatz-Daten</strong>
-                <p>{formatCurrency(realTimeData?.todaySales || 0)} heutiger Umsatz</p>
+                <p>{formatCurrency(realTimeData?.todaySales)} heutiger Umsatz</p>
               </div>
             </div>
           </div>
