@@ -7,8 +7,18 @@ import fs from 'fs/promises';
 import sharp from 'sharp';
 import OpenAI from 'openai';
 
+import config from '../../../../config';
+
 const upload = multer({ dest: path.join(__dirname, '../../../../uploads/') });
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// Lazy initialization - OpenAI wird erst beim ersten API-Call initialisiert
+let openai: OpenAI | null = null;
+const getOpenAI = () => {
+  if (!openai) {
+    openai = new OpenAI({ apiKey: config.openAI?.apiKey || process.env.OPENAI_API_KEY });
+  }
+  return openai;
+};
 
 // Type Definitions
 interface AnalysisResult {
@@ -192,7 +202,7 @@ async function performVisionAnalysis(base64Image: string) {
   }
 
   try {
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAI().chat.completions.create({
       model: 'gpt-4-vision-preview',
       messages: [
         {
