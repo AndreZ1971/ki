@@ -497,7 +497,7 @@ const ImageAnalyzer: React.FC = () => {
       )}
 
       {/* PHASE 2: EXTENDED ANALYSIS */}
-      {result && (
+      {file && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
