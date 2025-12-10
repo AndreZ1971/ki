@@ -1,5 +1,33 @@
 ---
 
+# ✨ Was ist Neu in Version 3.2.0?
+
+## 🎯 Content Monetization – Digitale Produkte mit KI
+
+### Neue Features für Digital Product Revenue:
+
+#### 🤖 **KI-Preisvorschlag**
+- Intelligente Preisempfehlungen basierend auf Produkttyp & Strategie
+- Automatische Berechnung des optimalen Preisbereichs
+- Ein-Klick-Übernahme der Preisempfehlung
+
+#### ⚡ **KI-Produkttext Generator**
+- Automatische Generierung von Marketing-Texten
+- Erzeugt Überschrift, Body und Call-to-Action
+- Nutzt OpenAI GPT-4o-mini für hochwertige Inhalte
+
+#### 📊 **Revenue Forecast Badges**
+- Live-Prognose für Wochengewinne und Monatsumsätze
+- Basiert auf durchschnittlichen Tagesumsätzen der letzten 7 Tage
+- Automatische Aktualisierung
+
+**Wo finde ich diese Features?**
+- Gehe zu **Marketing & Content** → **Content Monetized**
+- Alle Features sind direkt im Interface integriert
+- Vollständige Anleitung siehe: [Content Monetization Guide](./CONTENT_MONETIZATION_GUIDE.md)
+
+---
+
 ### Auto Product Creator: KI-Bildgenerierung & Bild-SEO
 
 #### Was kann ich mit der KI-Bildgenerierung machen?

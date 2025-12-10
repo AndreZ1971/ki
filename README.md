@@ -1,1050 +1,295 @@
-### **Dashboard-Kategorien**
-### **Marketing & Content**
+# 🚀 ARI - Artificial Retail Intelligence System
 
-# 🤖 KI-Chatbot Ari – Motivation & Support
+**Version:** 3.2.0  
+**Status:** Production Ready ✅
 
-**Funktionen:**
-
-**Bedienung:**
-1. Im Dashboard unten rechts auf das Chatbot-Icon klicken.
-2. Frage, Problem oder Wunsch eingeben – Ari antwortet direkt und motivierend.
-3. Chatbot kann für alle Tools und Bereiche genutzt werden (z.B. Produktmanagement, Marketing, Analytics).
-4. News, Status und Motivation werden automatisch eingeblendet.
-
-**Technik:**
-
-**Funktionen:**
-
-**Bedienung:**
-1. Im Dashboard unter „Marketing & Content“ das Tool „ImageAnalyzer“ auswählen.
-2. Bilddatei hochladen und Analyse starten.
-3. Die Analyse zeigt Beschreibung, Tags, SEO-Alt-Text, Dateinamen-Vorschlag und Qualitätsmerkmale an.
-4. Ergebnisse können für Produktbilder, Blogposts oder Medienverwaltung übernommen werden.
-5. Zusätzlich steht der KI-Chatbot Ari jederzeit für Fragen und Motivation zur Verfügung.
-# 🛠️ Tool-Übersicht
-
-Das Dashboard bietet jetzt 50+ spezialisierte Tools plus den KI-Chatbot Ari:
-
-
-Alle Tools sind über das Dashboard erreichbar und können mit dem Chatbot kombiniert werden.
-
-**API:**
-  - Response: `{ quality, tags, seo, description, metadata }`
+Ein **AI-gestütztes Business Automation System** für WooCommerce/WordPress mit 50+ spezialisierten Tools, KI-Agent und modernem Dashboard.
 
 ---
 
-## 📡 API-Endpoints
+## ✨ Was ist neu in Version 3.2.0?
 
-### **Analytics APIs**
+### 🎯 Content Monetization Features
 
-#### **Conversion Analytics** (`/api/analytics/conversion`)
-- `GET /analysis` - Conversion-Raten und Funnel-Daten
-- `POST /analyze` - Detaillierte Conversion-Analyse
-- `GET /funnel` - Conversion-Funnel-Visualisierung
+#### 🤖 KI-Preisvorschlag
+- Intelligente Preisempfehlungen basierend auf Produkttyp & Strategie
+- Berechnet optimales Preisbereich automatisch
+- Ein-Klick-Übernahme der Empfehlung
 
-#### **Regionale Analytics** (`/api/analytics/regioning`)
-- `GET /data?region={region}` - Regionale Daten abrufen
-- `POST /ml-analysis` - ML-basierte Regions-Insights
-- `GET /comparison` - Regions-Vergleich mit Benchmarks
+#### ⚡ KI-Produkttext Generator  
+- Automatische Generierung von Marketing-Texten
+- Erzeugt Headline, Body-Text und Call-to-Action
+- Powered by OpenAI GPT-4o-mini
 
-#### **ML/KI Insights** (`/api/analytics/ml`)
-- `GET /report` - ML-generierte Reports
-- `POST /generate` - KI-Analyse generieren
-- `POST /report-insights` - Detaillierte Report-Insights
+#### 📊 Revenue Forecast Badges
+- Live-Prognosen für Wochengewinne & Monatsumsätze
+- Basiert auf Durchschnittswerten der letzten 7 Tage
+- Automatische Echtzeit-Aktualisierung
 
-#### **Trend-Analyse** (`/api/analytics/trends`)
-- `GET /analyze/:keyword` - Trend-Score für Keyword
-- `POST /analyze` - Batch-Trend-Analyse (mehrere Keywords)
-- `GET /products` - Trending Produkte identifizieren
-- `POST /report` - Umfassender Trend-Report
-
-#### **Echtzeit-Analytics** (`/api/analytics/real-time`)
-- `GET /dashboard` - Real-Time Dashboard-Daten
-- `GET /sales` - Aktuelle Verkäufe (letzte 24h)
-- `GET /visitors` - Aktuelle Besucher und Sessions
-- `GET /performance` - Performance-Metriken
-- `GET /products` - Top-Produkte in Echtzeit
-
-### **Audit APIs**
-
-#### **Mini-Audit** (`/api/audit/mini`)
-- `GET /` - Schneller Shop-Health-Check
-- `POST /scan` - Shop scannen und Probleme identifizieren
-- `GET /summary` - Audit-Zusammenfassung mit Empfehlungen
-
-### **Marketing APIs**
-
-#### **Conversion Campaigns** (`/api/marketing/conversion`)
-- `GET /campaigns` - Aktive Conversion-Kampagnen
-- `POST /campaigns` - Neue Kampagne erstellen
-- `PUT /campaigns/:id` - Kampagne aktualisieren
-- `DELETE /campaigns/:id` - Kampagne löschen
-
-### **Agent APIs**
-
-#### **Chat Interface** (`/api/agent`)
-- `POST /chat` - Mit AI Agent chatten
-- `GET /memory` - Konversations-Historie abrufen
-- `POST /memory/reset` - Kontext zurücksetzen
-- `GET /tools` - Verfügbare Tools auflisten
+**➡️ [Vollständiger Guide: Content Monetization](./docs/CONTENT_MONETIZATION_GUIDE.md)**
 
 ---
 
-Ein vollständiges **AI Agent System** für WooCommerce/WordPress mit moderner React-Oberfläche:
-
-### **Marketing & Content**
-
-    "port": 465,
-## 🔧 Installation & Setup
-Erstelle eine `.env` im Projektroot:
-
-
-
-
-```dotenv
-
-
-
-
-
-npm run start:agent      # Agent im Production-Mode
-
-
-
-npm run email-marketing  # E-Mail Kampagnen
-
-
-
-### **Docker**
-
-
-
-
-
-
-
-### **Dashboard-Kategorien**
-
-
-
-
-
-
-
-
-
-
-
-
-
-#### **🔧 Advanced (6 Seiten)**
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  - Ohne Permalinks: `https://example.com/index.php`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## E2E-Test (Shop)
-
-
-
-
-
-
-
-1. Freebie erzeugen
-
-
-
-
-
-
-3. Checkout (0,00 €)
-
-
-
-4. Download-Link in Bestellbestätigung
-5. ZIP & Cover öffnen
-6. Kategorie & Slug prüfen
-
-
-
-
-
-
-
-## Troubleshooting
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## Sicherheit
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## 🚀 Deployment
-
-
-
-
-
-
-
-### **Production mit PM2**
-
-
-
-
-
-
-
+## 🎯 Core Features
+
+### 📊 **50+ spezialisierte Marketing Tools**
+- Image Analyzer (Bild-Analyse mit KI)
+- Auto Product Creator (Produkt-Automatisierung)
+- Social Media Poster (Multi-Platform Publishing)
+- Conversion Analyzer (Funnel-Analyse)
+- Revenue Analytics (Echtzeitdaten)
+- Und viele mehr...
+
+### 🤖 **KI-Chatbot Ari**
+- Integrierter AI-Agent für alle Tools
+- Motivation & Support für Daily Tasks
+- Versteht Kontext über alle Bereiche
+
+### 📈 **Real-Time Analytics**
+- Live-Dashboard mit aktuellen Metriken
+- Conversion-Tracking & Funnel-Analyse
+- Regionale Performance-Vergleiche
+- Trend-Identifikation mit ML
+
+### 💳 **Digital Product Management**
+- Content Monetization Framework
+- Automatische WooCommerce-Integration
+- Multi-Channel Publishing
+- Payment Processing
+
+---
+
+## 🚀 Quick Start
+
+### Mit Docker (Empfohlen)
 ```bash
+# connection.json herunterladen & platzieren
+docker compose up -d
 
+# Frontend öffnen
+# http://localhost:5173
+```
 
+### Lokal mit Node.js
+```bash
+# Voraussetzungen
+- Node.js 18+
+- MySQL/MariaDB
+- connection.json
 
-# Backend bauen
-
-
-
-cd backend
-
-
-
+# Setup
+npm install
 npm run build
-
-
-
-
-
-
-
-# PM2 starten (ecosystem.config.cjs wird automatisch erkannt)
-
-
-
-pm2 start ecosystem.config.cjs
-
-
-
-
-
-
-
-# Logs überwachen
-
-
-
-pm2 logs ki-agent
-
-
-
-
-
-
-
-# Status prüfen
-
-
-
-pm2 status
-
-# Neustart
-pm2 restart ki-agent
-
-# Auto-Start beim Server-Reboot
-
-
-
-pm2 startup
-
-
-
-pm2 save
-
-
-
-
-
-
-
-# connection.json im Backend-Verzeichnis muss vorhanden und befüllt sein
-
-
-
-```bash
-
-
-
-
-
-
-
-### **Docker Deployment**
-
-
-
-
-
-
-
-```bash
-
-
-
-# Container bauen
-
-
-
-
-
-
-
-
-
-
-docker-compose up -d
-
-
-
-
-
-
-
-# Logs
-docker-compose logs -f ki-agent
-
-# Ressourcen-Monitoring
-docker stats ki-agent
-```text
-
-### **Empfohlene Server-Specs (Agent-Only)**
-
-| Komponente | Minimum | Empfohlen | Production |
-|------------|---------|-----------|------------|
-| vCPU | 2 | 3 | 4+ |
-| RAM | 2 GB | 4 GB | 8 GB |
-| Disk | 40 GB | 80 GB | 120 GB |
-| Uptime | 99% | 99.9% | 99.99% |
-
-**Hinweis:** WordPress/WooCommerce läuft auf separatem Server!
-
-### **Ressourcen-Limits (docker-compose.yml)**
-
-```yaml
-
-
-
-
-
-
-    limits:
-
-
-
-      cpus: '2'
-
-
-
-      memory: 2G
-
-
-
-    reservations:
-
-
-
-      cpus: '0.5'
-
-
-
-      memory: 512M
-
-
-
+npm run start
+
+# Frontend Dev
+cd frontend
+npm run dev
 ```
 
+---
 
+## 📋 Dokumentation
 
+| Dokument | Beschreibung |
+|----------|------------|
+| [Content Monetization Guide](./docs/CONTENT_MONETIZATION_GUIDE.md) | KI-Preisvorschlag, Text-Generator, Forecasts |
+| [Bedienungsanleitung](./docs/Bedienungsanleitung-KI-Agent.md) | Komplette Tool-Übersicht & How-To's |
+| [Backend AI Setup](./docs/BACKEND_AI_SETUP.md) | AI-Transformation & Social Media Integration |
+| [Deployment Guide](./docs/deployment.md) | Production-Setup & Troubleshooting |
+| [API-Reference](./docs/api/) | Vollständige API-Dokumentation |
 
+---
 
-## 🏗️ Architektur
-
-
-
+## 🏗️ System-Architektur
 
 ```
-
-
-
 ┌─────────────────────────────────────────────────────┐
-
-
-
-│                  React Frontend                     │
-
-
-
-│  (Dashboard, 46 Tool-Seiten, Framer Motion)        │
-
-
-
-└──────────────────┬──────────────────────────────────┘
-
-
-
-                   │ REST API
-
-
-
-┌──────────────────┴──────────────────────────────────┐
-
-
-
-│              Node.js Backend (Express)              │
-
-
-
-│  ├─ Agent System (Scheduler, Jobs, Memory)         │
-
-
-
-│  ├─ WooCommerce Client (REST API)                  │
-
-
-
-│  ├─ WordPress Client (REST API + Media Upload)     │
-
-
-
-│  ├─ OpenAI Integration (GPT-4, DALL-E 3)          │
-
-
-
-│  └─ Error Handling (Retry, Circuit Breaker)       │
-
-
-
-└──────────────────┬──────────────────────────────────┘
-
-
-
-                   │ REST API
-
-
-
-┌──────────────────┴──────────────────────────────────┐
-
-
-
-
-
-
-│  ├─ WooCommerce REST API (/wp-json/wc/v3)         │
-
-
-
-│  ├─ WordPress REST API (/wp-json/wp/v2)           │
-
-
-
-│  └─ Media Library Upload                           │
-
-
-
-└─────────────────────────────────────────────────────┘
-
-
-
+│  Frontend (React/Vite)                              │
+│  - Dashboard                                        │
+│  - Marketing Tools (50+)                            │
+│  - Analytics Dashboards                             │
+└────────────────┬────────────────────────────────────┘
+                 │
+        ┌────────▼─────────────┐
+        │  Fastify Backend     │
+        │  Port 3000           │
+        ├─────────────────────┤
+        │ - Marketing Routes  │
+        │ - Analytics Engine  │
+        │ - AI Integration    │
+        │ - WooCommerce API   │
+        └────────────┬────────┘
+                     │
+        ┌────────────┴────────────┐
+        │                         │
+    ┌───▼─────┐          ┌──────▼────┐
+    │ OpenAI  │          │ WooCommerce│
+    │ API     │          │ API        │
+    └─────────┘          └────────────┘
 ```
 
+---
 
+## 📡 API-Endpoints (Auszug)
 
-
-
-
-
-
-
-
-
-
-
-
-## 🔐 Sicherheit
-
-
-
-
-
-
-
-### **Best Practices**
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### **Secrets Rotation**
-
-
-
-
-
-
-
-# Alte Keys widerrufen, neue generieren
-
-
-
-
-
-
-
-# OpenAI API Key rotieren
-
-
-
+### Content Monetization (`/api/marketing/content`)
+```
+GET    /revenue-forecast          # Wochengewinne & Monatsprognose
+GET    /price-recommendation      # KI-Preisvorschlag
+POST   /generate-copy             # KI-Produkttext
+POST   /create-digital-product    # Produkt erstellen
 ```
 
-
-
-
-
-
-
-
-
-
-
-### **Logs Location**
-
-
-
-
-
-
-
-
-
-
-backend/logs/
-
-├── err.log          # Error-Log
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-curl http://localhost:3000/health
-
-
-
-
-
-
-
-
-
-
-docker inspect --format='{{.State.Health.Status}}' ki-agent
-
-
-
-
-
-
-
-
-
-
-## Performance Monitoring
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-pm2 show ki-agent
-
-
-
+### Marketing (`/api/marketing`)
+```
+POST   /social/webhook/post       # Social Media Publishing
+GET    /analytics/metrics         # Marketing Metriken
+POST   /conversion/campaigns      # Kampagnen
 ```
 
+### Analytics (`/api/analytics`)
+```
+GET    /real-time/dashboard       # Live-Metriken
+GET    /conversion/analysis       # Conversion Funnels
+GET    /trends/analyze            # Trend-Analyse
+```
 
+**➡️ [Vollständige API-Dokumentation](./docs/api/)**
 
+---
 
+## 🔧 Konfiguration
 
+### Erforderliche Umgebungsvariablen
 
+**connection.json:**
+```json
+{
+  "woocommerce": {
+    "url": "https://dein-shop.de",
+    "consumerKey": "ck_...",
+    "consumerSecret": "cs_..."
+  },
+  "openai": {
+    "apiKey": "sk-proj-...",
+    "model": "gpt-4o-mini"
+  },
+  "wordpress": {
+    "url": "https://dein-shop.de",
+    "username": "user",
+    "appPassword": "xxxx xxxx xxxx xxxx"
+  }
+}
+```
 
+**.env (Backend):**
+```env
+NODE_ENV=production
+PORT=3000
+DB_HOST=localhost
+DB_USER=root
+DB_PASS=password
+DB_NAME=wordpress
+```
 
+---
 
-
-
-
-
-
-
-
-
+## 🧪 Testing
 
 ```bash
+# Alle Tests
+npm run test
 
+# Unit Tests
+npm run test:unit
 
+# E2E Tests
+npm run test:e2e
 
-# Port bereits belegt?
-
-
-
-netstat -ano | findstr :3000
-
-
-
-
-
-
-
-# Dependencies installieren
-
-
-
-cd backend
-
-
-
-rm -rf node_modules package-lock.json
-
-
-
-npm install
-
-
-
-
-
-
-
-# TypeScript neu kompilieren
-
-
-
-npm run build
-
-
-
+# Linting
+npm run lint
 ```
 
+---
 
+## 📊 Monitoring & Debugging
 
-
-
-
-
-
-
-
-
-
-
-
-
-npm install
-
-
-
-
-
-
-
-
-
-
-401 Unauthorized
-
-
-
-
- Application Password prüfen
- User-Rolle überprüfen (Editor/Administrator)
-
-
-
-```nginx
-
-
-
-# nginx.conf
-
-
-
-client_max_body_size 50M;
-
-
-
+### Health Check
+```bash
+curl http://localhost:3000/health
 ```
 
+### API Documentation (Swagger)
+```
+http://localhost:3000/documentation
+```
 
+### System Logs
+```bash
+# Docker
+docker compose logs -f ki
 
+# Lokal
+npm run start 2>&1 | tee logs.txt
+```
 
+---
 
+## 🤝 Contribution
 
+Contributions sind willkommen! Bitte beachte:
 
-// php.ini
+1. Fork das Repository
+2. Erstelle einen Feature-Branch (`git checkout -b feature/xy`)
+3. Committe deine Änderungen (`git commit -m 'Add feature'`)
+4. Pushe zum Branch (`git push origin feature/xy`)
+5. Öffne einen Pull Request
 
+**Entwicklungs-Standards:**
+- TypeScript strict mode
+- ESLint + Prettier
+- Unit + E2E Tests erforderlich
+- Mindestens 80% Code Coverage
 
-
-upload_max_filesize = 50M
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+---
 
 ## 📝 Changelog
-## Version 1.8.0 (November 2025)
 
+### v3.2.0 (Dezember 2025)
+- ✨ KI-Preisvorschlag mit intelligenten Empfehlungen
+- ✨ KI-Produkttext Generator (Headline, Body, CTA)
+- ✨ Revenue Forecast Badges (Woche/Monat)
+- 🎨 Content Monetized Page zu 1x1 Grid optimiert
+- 🔧 WooCommerce Config Fallback zu connection.json
+- 🐛 9 ESLint Warnungen behoben
+- 📚 Umfassende Dokumentation aktualisiert
 
-## Version 1.7.0
- 🤖 AI-gestützte Content-Generierung
+### v3.1.0
+- Conversion Analytics Engine
+- Social Media Post Automation
+- Image Analysis mit KI
 
+### v3.0.0
+- Initial Release
+- Core Marketing Tools
+- Dashboard & Analytics
 
- 🛒 Auto Product Creator
+---
 
+## 📞 Support & Kontakt
 
- 💳 Payment-System mit Auto-Fix
+- **Dokumentation**: [/docs](./docs)
+- **Issues**: GitHub Issues
+- **Email**: support@kaufe-es.eu
+- **Chat**: KI-Agent Ari im Dashboard
 
-
- Made with ❤️ and ☕ for automated E-Commerce
-
-## Version 1.5.0
-
-
-# Feature-Branch erstellen
-git checkout -b feature/neue-funktion
-
-# Änderungen committen
-git add .
-
-# Tests & Linting
-npm run lint
-npm run type-check
-
-# Push & Pull Request
-git push origin feature/neue-funktion
-```
-
-### **Commit-Conventions**
-
-```
-feat: Neue Features
-fix: Bug-Fixes
-docs: Dokumentation
-style: Formatierung
-test: Tests hinzufügen
-chore: Build/Tools-Anpassungen
-```
-
+---
 
 ## 📄 Lizenz
 
-Proprietary - Alle Rechte vorbehalten
+Proprietär © 2025 Kaufe-es GmbH
 
+---
 
-## 🆘 Support
-
-**Issues:** GitHub Issues  
-**Dokumentation:** `/docs` Ordner  
-**API-Docs:** `/docs/api`
-
-## 🛠️ Onboarding / Erste Schritte
-
-1. Repository klonen und Abhängigkeiten installieren
-2. connection.json im Backend-Verzeichnis anlegen (leer oder mit Platzhaltern)
-3. Frontend und Backend bauen
-4. Settings-UI im Frontend öffnen, alle Zugangsdaten eintragen und speichern
-5. API-URL im Frontend über .env.production setzen
-6. System testen und Shop verbinden
-
-
-## 🙏 Danksagungen
-
-
-
-**Made with ❤️ and ☕ for automated E-Commerce**
+**Made with ❤️ for e-commerce automation**
