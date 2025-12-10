@@ -41,7 +41,9 @@ import marketingRoutes from './routes/app/api/marketing/marketing-routes';
 import emailMarketingRoutes from './routes/app/api/marketing/email-marketing';
 import conversionRoutesMarketing from './routes/app/api/marketing/conversion-routes';
 import contentRoutes from './routes/app/api/marketing/content-routes';
-// Entfernt: blogpostRoutes (ungenuzt)
+import mlMarketingRoutes from './routes/app/api/marketing/ml-marketing';
+import { emailEnhancementRoutes } from './routes/app/api/marketing/email-enhancement';
+// Entfernt: blogpostRoutes (ungenutz)
 // import imageAnalysisRoutes from './routes/app/api/marketing/image-analysis-routes';
 
 // 🔥 USER MANAGEMENT ROUTES
@@ -344,6 +346,14 @@ async function buildServer() {
     
     await server.register(templateRoutes); // Already has full paths
     console.log('✅ Template Routes erfolgreich registriert');
+
+    // 🔥 KI-GESTÜTZTE MARKETING ROUTES (OpenAI Integration)
+    await server.register(mlMarketingRoutes, { prefix: '/api/marketing/ml' });
+    console.log('✅ ML Marketing Routes erfolgreich registriert');
+
+    // 🔥 EMAIL ENHANCEMENT ROUTES (Smart Subject Lines, Segmentation, etc.)
+    await server.register(emailEnhancementRoutes, { prefix: '/api/marketing/email-enhancement' });
+    console.log('✅ Email Enhancement Routes erfolgreich registriert');
 
     // 🔥 SOCIAL MEDIA ROUTES (OAuth + Posting)
     await server.register(oauthRoutes, { prefix: '/api' }); // OAuth endpoints like /api/auth/facebook

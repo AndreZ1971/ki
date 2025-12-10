@@ -40,7 +40,7 @@ const SystemHealth: React.FC = () => {
 
     try {
       // ✅ Hole ECHTE System-Metriken vom Backend
-      const response = await fetch(`${apiBase}/monitoring/system/metrics`);
+      const response = await fetch(`${apiBase}/api/monitoring/system/metrics`);
       
       if (!response.ok) {
         throw new Error('Konnte System-Metriken nicht laden');
@@ -65,7 +65,7 @@ const SystemHealth: React.FC = () => {
       });
       
         // Lade auch Services-Status
-        const servicesResponse = await fetch(`${apiBase}/monitoring/services/status`);
+        const servicesResponse = await fetch(`${apiBase}/api/monitoring/services/status`);
       if (servicesResponse.ok) {
         const servicesData = await servicesResponse.json();
         if (servicesData.success) {

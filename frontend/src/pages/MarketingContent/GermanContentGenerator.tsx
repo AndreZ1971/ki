@@ -7,6 +7,18 @@ import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared
 import { ToastContainer } from '../../components/Toast/ToastContainer';
 import './page.css';
 
+type GeneratedResult = {
+  content: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  headlines?: string[];
+  faqs?: { question: string; answer: string }[];
+  ctas?: string[];
+  keywords?: string[];
+  wordCount?: number;
+  readTimeMinutes?: number;
+};
+
 const GermanContentGenerator: React.FC = () => {
   const { handleBackToDashboard, loading, setLoading, error, setError } = useProductManagement();
   const { toasts, showToast } = useToast();
@@ -15,7 +27,14 @@ const GermanContentGenerator: React.FC = () => {
   const [topic, setTopic] = useState('');
   const [targetAudience, setTargetAudience] = useState('');
   const [tone, setTone] = useState('professional');
-  const [generatedContent, setGeneratedContent] = useState<string | null>(null);
+  const [lengthMode, setLengthMode] = useState<'short' | 'medium' | 'long'>('medium');
+  const [formality, setFormality] = useState<'du' | 'sie'>('du');
+  const [includeSeo, setIncludeSeo] = useState(true);
+  const [includeFaqs, setIncludeFaqs] = useState(true);
+  const [includeCtas, setIncludeCtas] = useState(true);
+  const [keywords, setKeywords] = useState('');
+  const [avoidTerms, setAvoidTerms] = useState('');
+  const [generatedContent, setGeneratedContent] = useState<GeneratedResult | null>(null);
 
   const contentTypes = [
     { value: 'blog-post', label: 'Blog-Beitrag', icon: '📝', description: 'SEO-optimierte Artikel' },
@@ -50,14 +69,21 @@ const GermanContentGenerator: React.FC = () => {
           contentType,
           topic,
           targetAudience,
-          tone
+          tone,
+          lengthMode,
+          formality,
+          includeSeo,
+          includeFaqs,
+          includeCtas,
+          keywords,
+          avoidTerms
         })
       });
 
       if (!response.ok) throw new Error(`API Error: ${response.status}`);
 
       const result = await response.json();
-      setGeneratedContent(result.content || 'Content wurde generiert');
+      setGeneratedContent(result);
       showToast('Content erfolgreich generiert!', 'success');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten';
@@ -161,6 +187,21 @@ const GermanContentGenerator: React.FC = () => {
             />
           </div>
 
+            <div className="form-group" style={{ marginTop: '12px' }}>
+              <label>Länge & Formalität</label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginTop: '8px' }}>
+                <select className="form-input" value={lengthMode} onChange={(e) => setLengthMode(e.target.value as 'short' | 'medium' | 'long')}>
+                  <option value="short">Kurz</option>
+                  <option value="medium">Mittel</option>
+                  <option value="long">Lang</option>
+                </select>
+                <select className="form-input" value={formality} onChange={(e) => setFormality(e.target.value as 'du' | 'sie')}>
+                  <option value="du">Du</option>
+                  <option value="sie">Sie</option>
+                </select>
+              </div>
+            </div>
+
           {/* Ton Auswahl - Grid */}
           <div className="form-group">
             <label>Schreibstil wählen</label>
@@ -196,6 +237,46 @@ const GermanContentGenerator: React.FC = () => {
             </div>
           </div>
 
+            <div className="form-group" style={{ marginTop: '12px' }}>
+              <label>Keywords / USPs (optional)</label>
+              <textarea
+                value={keywords}
+                onChange={(e) => setKeywords(e.target.value)}
+                placeholder="Kommagetrennt: KI, Automatisierung, B2B"
+                className="form-input"
+                style={{ minHeight: '70px' }}
+              />
+            </div>
+
+            <div className="form-group" style={{ marginTop: '12px' }}>
+              <label>Zu vermeidende Begriffe (optional)</label>
+              <textarea
+                value={avoidTerms}
+                onChange={(e) => setAvoidTerms(e.target.value)}
+                placeholder="z.B. billig, kostenlos"
+                className="form-input"
+                style={{ minHeight: '60px' }}
+              />
+            </div>
+
+            <div className="form-group" style={{ marginTop: '12px' }}>
+              <label>Zusatz-Optionen</label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px', marginTop: '8px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'white', fontSize: '13px' }}>
+                  <input type="checkbox" checked={includeSeo} onChange={(e) => setIncludeSeo(e.target.checked)} />
+                  SEO-Elemente
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'white', fontSize: '13px' }}>
+                  <input type="checkbox" checked={includeFaqs} onChange={(e) => setIncludeFaqs(e.target.checked)} />
+                  FAQs
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'white', fontSize: '13px' }}>
+                  <input type="checkbox" checked={includeCtas} onChange={(e) => setIncludeCtas(e.target.checked)} />
+                  CTAs
+                </label>
+              </div>
+            </div>
+
           <div style={{ marginTop: '10px' }}>
             <LoadingButton
               onClick={handleGenerate}
@@ -219,27 +300,74 @@ const GermanContentGenerator: React.FC = () => {
           </h3>
 
           {generatedContent ? (
-            <>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div style={{
                 background: 'rgba(255,255,255,0.05)',
                 border: '1px solid rgba(255,255,255,0.1)',
                 borderRadius: '12px',
                 padding: '20px',
-                marginBottom: '15px',
-                maxHeight: '400px',
-                overflowY: 'auto',
                 color: 'white',
                 fontSize: '14px',
                 lineHeight: '1.6',
                 whiteSpace: 'pre-wrap'
               }}>
-                {generatedContent}
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>
+                  <span>~{generatedContent.readTimeMinutes || Math.max(1, Math.round((generatedContent.wordCount || 0)/180))} Min. Lesezeit</span>
+                  <span>{generatedContent.wordCount || '--'} Wörter</span>
+                </div>
+                {generatedContent.content}
               </div>
+
+              {generatedContent.metaTitle && (
+                <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px' }}>
+                  <strong>Meta Title:</strong> {generatedContent.metaTitle}
+                  <div style={{ marginTop: '6px' }}><strong>Meta Description:</strong> {generatedContent.metaDescription}</div>
+                </div>
+              )}
+
+              {(generatedContent.headlines && generatedContent.headlines.length > 0) && (
+                <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px' }}>
+                  <strong>Headlines:</strong>
+                  <ul style={{ margin: '8px 0 0 16px' }}>
+                    {generatedContent.headlines.map((h, idx) => <li key={idx}>{h}</li>)}
+                  </ul>
+                </div>
+              )}
+
+              {(generatedContent.faqs && generatedContent.faqs.length > 0) && (
+                <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px' }}>
+                  <strong>FAQs:</strong>
+                  <ul style={{ margin: '8px 0 0 16px' }}>
+                    {generatedContent.faqs.map((f, idx) => <li key={idx}><strong>{f.question}</strong><br />{f.answer}</li>)}
+                  </ul>
+                </div>
+              )}
+
+              {(generatedContent.ctas && generatedContent.ctas.length > 0) && (
+                <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px' }}>
+                  <strong>CTAs:</strong>
+                  <ul style={{ margin: '8px 0 0 16px' }}>
+                    {generatedContent.ctas.map((c, idx) => <li key={idx}>{c}</li>)}
+                  </ul>
+                </div>
+              )}
+
+              {(generatedContent.keywords && generatedContent.keywords.length > 0) && (
+                <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px' }}>
+                  <strong>Keywords:</strong>
+                  <div style={{ marginTop: '6px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                    {generatedContent.keywords.map((k, idx) => (
+                      <span key={idx} style={{ padding: '6px 10px', borderRadius: '999px', background: 'rgba(59,130,246,0.2)', border: '1px solid rgba(59,130,246,0.4)', fontSize: '12px' }}>{k}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div style={{ display: 'flex', gap: '10px' }}>
                 <motion.button
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
-                  onClick={() => copyToClipboard(generatedContent)}
+                  onClick={() => copyToClipboard(generatedContent.content)}
                   style={{
                     flex: 1,
                     padding: '12px',
@@ -273,7 +401,7 @@ const GermanContentGenerator: React.FC = () => {
                   🔄 Neu generieren
                 </motion.button>
               </div>
-            </>
+            </div>
           ) : (
             <div style={{ 
               textAlign: 'center', 

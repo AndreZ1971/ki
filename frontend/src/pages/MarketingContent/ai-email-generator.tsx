@@ -44,7 +44,7 @@ const AIEmailGenerator: React.FC = () => {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedCustomers, setSelectedCustomers] = useState<string[]>([]);
-  const [activeView, setActiveView] = useState<'generator' | 'templates' | 'subscribers'>('generator');
+  const [activeView, setActiveView] = useState<'generator' | 'templates' | 'subscribers' | 'subject-lines' | 'segments' | 'send-time' | 'forecast'>('generator');
   const [searchTerm, setSearchTerm] = useState('');
   const [apiStatus, setApiStatus] = useState<'connected' | 'disconnected' | 'loading'>('loading');
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
@@ -57,6 +57,17 @@ const AIEmailGenerator: React.FC = () => {
     brandVoice: '',
     templateName: ''
   });
+
+  // 🔥 KI/ML FEATURES STATES
+  const [subjectLines, setSubjectLines] = useState<any[]>([]);
+  const [customerSegments, setCustomerSegments] = useState<any[]>([]);
+  const [sendTimes, setSendTimes] = useState<any[]>([]);
+  const [performanceForecast, setPerformanceForecast] = useState<any>(null);
+  
+  const [loadingSubjectLines, setLoadingSubjectLines] = useState(false);
+  const [loadingSegments, setLoadingSegments] = useState(false);
+  const [loadingSendTimes, setLoadingSendTimes] = useState(false);
+  const [loadingForecast, setLoadingForecast] = useState(false);
 
   // Email-Typen
   const emailTypes = [
@@ -288,6 +299,137 @@ const AIEmailGenerator: React.FC = () => {
     showToast('Template geladen!', 'success');
   };
 
+  // 🔥 KI FEATURE 1: SMART SUBJECT LINES
+  const generateSmartSubjectLines = async () => {
+    if (!formData.productName.trim()) {
+      showToast('Bitte gib einen Produktnamen ein', 'error');
+      return;
+    }
+    
+    setLoadingSubjectLines(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/marketing/email-enhancement/subject-lines`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          emailType: formData.emailType,
+          productName: formData.productName,
+          targetAudience: 'E-Commerce Kunden',
+          brandVoice: formData.brandVoice || 'modern'
+        })
+      });
+      
+      const result = await response.json();
+      if (result.success) {
+        setSubjectLines(result.data);
+        showToast(`✨ ${result.data.length} Subject Lines generiert!`, 'success');
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error: any) {
+      showToast('Fehler beim Generieren der Subject Lines', 'error');
+      console.error('Subject Lines Error:', error);
+    } finally {
+      setLoadingSubjectLines(false);
+    }
+  };
+
+  // 🔥 KI FEATURE 2: KUNDENSEGMENTIERUNG
+  const generateCustomerSegments = async () => {
+    if (customers.length === 0) {
+      showToast('Keine Kunden vorhanden', 'error');
+      return;
+    }
+    
+    setLoadingSegments(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/marketing/email-enhancement/segment-customers`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customers })
+      });
+      
+      const result = await response.json();
+      if (result.success) {
+        setCustomerSegments(result.data);
+        showToast(`🔍 ${result.data.length} Kundensegmente identifiziert!`, 'success');
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error: any) {
+      showToast('Fehler beim Segmentieren', 'error');
+      console.error('Segmentation Error:', error);
+    } finally {
+      setLoadingSegments(false);
+    }
+  };
+
+  // 🔥 KI FEATURE 3: SEND TIME OPTIMIZATION
+  const optimizeSendTimes = async () => {
+    if (selectedCustomers.length === 0) {
+      showToast('Bitte wähle mindestens einen Kunden aus', 'error');
+      return;
+    }
+    
+    setLoadingSendTimes(true);
+    try {
+      const selectedData = customers.filter(c => selectedCustomers.includes(c.id));
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/marketing/email-enhancement/optimize-send-time`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customers: selectedData })
+      });
+      
+      const result = await response.json();
+      if (result.success) {
+        setSendTimes(result.data);
+        showToast(`⏰ Optimale Versandzeiten berechnet!`, 'success');
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error: any) {
+      showToast('Fehler beim Optimieren der Versandzeit', 'error');
+      console.error('SendTime Error:', error);
+    } finally {
+      setLoadingSendTimes(false);
+    }
+  };
+
+  // 🔥 KI FEATURE 4: PERFORMANCE FORECAST
+  const forecastEmailPerformance = async () => {
+    if (!formData.productName.trim() || selectedCustomers.length === 0) {
+      showToast('Produktname und Kunden erforderlich', 'error');
+      return;
+    }
+    
+    setLoadingForecast(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/marketing/email-enhancement/forecast-performance`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          emailType: formData.emailType,
+          segment: 'all',
+          subjectLine: subjectLines[0]?.variant || formData.productName,
+          recipientCount: selectedCustomers.length
+        })
+      });
+      
+      const result = await response.json();
+      if (result.success) {
+        setPerformanceForecast(result.data);
+        showToast(`📊 Performance-Prognose erstellt!`, 'success');
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error: any) {
+      showToast('Fehler bei der Performance-Prognose', 'error');
+      console.error('Forecast Error:', error);
+    } finally {
+      setLoadingForecast(false);
+    }
+  };
+
   const toggleCustomerSelection = (customerId: string) => {
     setSelectedCustomers(prev => 
       prev.includes(customerId) 
@@ -363,48 +505,114 @@ const AIEmailGenerator: React.FC = () => {
           </div>
           
           {/* VIEW TABS */}
-          <div style={{ display: 'flex', gap: '8px', background: 'rgba(255,255,255,0.05)', padding: '6px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+          <div style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.05)', padding: '4px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', flexWrap: 'wrap' }}>
             <motion.button
-              whileHover={{ scale: 1.03 }}
+              whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => setActiveView('generator')}
               style={{
-                padding: '10px 18px',
+                padding: '8px 14px',
                 background: activeView === 'generator' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'transparent',
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
-                fontSize: '14px',
+                fontSize: '12px',
                 fontWeight: activeView === 'generator' ? '600' : '500',
                 cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
+                transition: 'all 0.3s ease'
               }}
             >
-              <span>📧</span> Generator
+              📧 Generator
             </motion.button>
             <motion.button
-              whileHover={{ scale: 1.03 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setActiveView('subject-lines')}
+              style={{
+                padding: '8px 14px',
+                background: activeView === 'subject-lines' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'transparent',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '12px',
+                fontWeight: activeView === 'subject-lines' ? '600' : '500',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              ✨ Subject Lines
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setActiveView('segments')}
+              style={{
+                padding: '8px 14px',
+                background: activeView === 'segments' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'transparent',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '12px',
+                fontWeight: activeView === 'segments' ? '600' : '500',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              🔍 Segmente
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setActiveView('send-time')}
+              style={{
+                padding: '8px 14px',
+                background: activeView === 'send-time' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'transparent',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '12px',
+                fontWeight: activeView === 'send-time' ? '600' : '500',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              ⏰ Send Time
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setActiveView('forecast')}
+              style={{
+                padding: '8px 14px',
+                background: activeView === 'forecast' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'transparent',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '12px',
+                fontWeight: activeView === 'forecast' ? '600' : '500',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              📊 Forecast
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => setActiveView('templates')}
               style={{
-                padding: '10px 18px',
+                padding: '8px 14px',
                 background: activeView === 'templates' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'transparent',
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
-                fontSize: '14px',
+                fontSize: '12px',
                 fontWeight: activeView === 'templates' ? '600' : '500',
                 cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
+                transition: 'all 0.3s ease'
               }}
             >
-              <span>📁</span> Templates <span style={{ fontSize: '11px', opacity: 0.8 }}>({savedTemplates.length})</span>
+              📁 Templates
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.03 }}
@@ -438,7 +646,7 @@ const AIEmailGenerator: React.FC = () => {
           transition={{ delay: 0.2 }}
           style={{ 
             display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(368px, 1fr))', 
             gap: '20px',
             marginTop: '20px'
           }}
@@ -450,9 +658,10 @@ const AIEmailGenerator: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
+            style={{ minHeight: '320px', width: '105%', marginLeft: '-2.5%' }}
           >
-            <h3 style={{ marginBottom: '16px', fontSize: '18px', fontWeight: '600' }}>📨 Email-Typ</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
+            <h3 style={{ marginBottom: '20px', fontSize: '18px', fontWeight: '600' }}>📨 Email-Typ</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', overflow: 'visible' }}>
               {emailTypes.map(type => (
                 <motion.div
                   key={type.value}
@@ -460,7 +669,7 @@ const AIEmailGenerator: React.FC = () => {
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   style={{
-                    padding: '14px',
+                    padding: '14px 12px',
                     background: formData.emailType === type.value 
                       ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                       : 'rgba(255,255,255,0.05)',
@@ -472,13 +681,14 @@ const AIEmailGenerator: React.FC = () => {
                     transition: 'all 0.3s ease',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '10px'
+                    gap: '10px',
+                    overflow: 'visible'
                   }}
                 >
-                  <span style={{ fontSize: '24px' }}>{type.icon}</span>
+                  <span style={{ fontSize: '22px' }}>{type.icon}</span>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '2px' }}>{type.label}</div>
-                    <div style={{ fontSize: '11px', opacity: 0.7 }}>
+                    <div style={{ fontSize: '13px', fontWeight: '600', marginBottom: '2px' }}>{type.label}</div>
+                    <div style={{ fontSize: '10px', opacity: 0.7 }}>
                       {type.category === 'marketing' ? 'Marketing' : 'Transaktion'}
                     </div>
                   </div>
@@ -487,9 +697,9 @@ const AIEmailGenerator: React.FC = () => {
             </div>
 
             {/* Tone Selection - Inline */}
-            <div style={{ marginTop: '20px' }}>
-              <h3 style={{ marginBottom: '12px', fontSize: '18px', fontWeight: '600' }}>🎭 Tonfall</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
+            <div style={{ marginTop: '28px' }}>
+              <h3 style={{ marginBottom: '16px', fontSize: '18px', fontWeight: '600' }}>🎭 Tonfall</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '14px' }}>
                 {tones.map(tone => (
                   <motion.div
                     key={tone.value}
@@ -497,7 +707,7 @@ const AIEmailGenerator: React.FC = () => {
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                     style={{
-                      padding: '12px',
+                      padding: '14px 16px',
                       background: formData.tone === tone.value 
                         ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                         : 'rgba(255,255,255,0.05)',
@@ -509,7 +719,7 @@ const AIEmailGenerator: React.FC = () => {
                       transition: 'all 0.3s ease',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '10px'
+                      gap: '12px'
                     }}
                   >
                     <span style={{ fontSize: '20px' }}>{tone.icon}</span>
@@ -847,6 +1057,407 @@ const AIEmailGenerator: React.FC = () => {
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+        </motion.div>
+      )}
+
+      {/* Smart Subject Lines View */}
+      {activeView === 'subject-lines' && (
+        <motion.div 
+          className="glass-card"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 style={{ color: 'white', marginBottom: '30px' }}>✨ KI-Generierte Subject Lines</h2>
+          
+          {/* Produktname Input für Subject Lines */}
+          <div style={{ marginBottom: '20px', padding: '16px', background: 'rgba(102, 126, 234, 0.1)', borderRadius: '10px', border: '1px solid rgba(102, 126, 234, 0.3)' }}>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.9)', fontSize: '14px', fontWeight: '600' }}>📦 Produktname (erforderlich)</label>
+            <input
+              type="text"
+              value={formData.productName}
+              onChange={(e) => setFormData({...formData, productName: e.target.value})}
+              placeholder="z.B. Digital Marketing Masterclass"
+              className="glass-input"
+              style={{ marginBottom: '0' }}
+            />
+            <p style={{ margin: '8px 0 0 0', fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>
+              Der Produktname wird für die KI-Generierung verwendet, um passende Subject Lines zu erstellen.
+            </p>
+          </div>
+          
+          <motion.button
+            onClick={generateSmartSubjectLines}
+            disabled={loadingSubjectLines || !formData.productName.trim()}
+            className="glass-button"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            style={{ 
+              width: '100%',
+              padding: '16px',
+              fontSize: '16px',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              marginBottom: '30px',
+              opacity: (loadingSubjectLines || !formData.productName.trim()) ? 0.7 : 1
+            }}
+          >
+            {loadingSubjectLines ? '⏳ Wird generiert...' : '🚀 Subject Lines generieren'}
+          </motion.button>
+
+          {subjectLines.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: 'rgba(255,255,255,0.5)' }}>
+              <div style={{ fontSize: '64px', marginBottom: '20px' }}>✉️</div>
+              <p style={{ fontSize: '20px', margin: 0 }}>Keine Subject Lines generiert</p>
+              <p style={{ fontSize: '14px', margin: '8px 0 0 0' }}>Klicke auf den Button um KI-Vorschläge zu generieren</p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {subjectLines.map((subject: any, idx: number) => (
+                <motion.div
+                  key={idx}
+                  className="template-card"
+                  whileHover={{ scale: 1.02 }}
+                  style={{ padding: '20px', background: 'rgba(102, 126, 234, 0.1)', border: '1px solid rgba(102, 126, 234, 0.3)' }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                    <h3 style={{ color: 'white', margin: 0, fontSize: '16px', flex: 1 }}>{subject.variant}</h3>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', padding: '4px 12px', backgroundColor: 'rgba(34, 197, 94, 0.2)', color: '#22c55e', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold', marginLeft: '12px' }}>
+                      {subject.openRate}% 📊
+                    </span>
+                  </div>
+                  <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', margin: '0 0 12px 0' }}>
+                    <strong>Typ:</strong> {subject.type}
+                  </p>
+                  <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px', margin: '0 0 12px 0', fontStyle: 'italic' }}>
+                    💡 {subject.reason}
+                  </p>
+                  <motion.button
+                    onClick={() => {
+                      copyToClipboard(subject.variant);
+                      showToast('Subject Line kopiert! ✅', 'success');
+                    }}
+                    className="glass-button"
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    style={{ 
+                      width: '100%',
+                      padding: '10px',
+                      fontSize: '14px'
+                    }}
+                  >
+                    📋 Kopieren
+                  </motion.button>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </motion.div>
+      )}
+
+      {/* Customer Segments View */}
+      {activeView === 'segments' && (
+        <motion.div 
+          className="glass-card"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 style={{ color: 'white', marginBottom: '30px' }}>🔍 KI-Segmentierung</h2>
+          
+          <div style={{ marginBottom: '20px', padding: '16px', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '10px', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
+            <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: 'rgba(255,255,255,0.9)', fontWeight: '600' }}>
+              👥 Verfügbare Kunden: <strong style={{ color: '#3b82f6' }}>{customers.length}</strong>
+            </p>
+            <p style={{ margin: '0', fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>
+              Die KI analysiert die verfügbaren Kundendaten und erstellt automatische Segmente basierend auf Verhalten und demografischen Daten.
+            </p>
+          </div>
+          
+          <motion.button
+            onClick={generateCustomerSegments}
+            disabled={loadingSegments || customers.length === 0}
+            className="glass-button"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            style={{ 
+              width: '100%',
+              padding: '16px',
+              fontSize: '16px',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              marginBottom: '30px',
+              opacity: (loadingSegments || customers.length === 0) ? 0.7 : 1
+            }}
+          >
+            {loadingSegments ? '⏳ Wird analysiert...' : '🚀 Segmente analysieren'}
+          </motion.button>
+
+          {customerSegments.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: 'rgba(255,255,255,0.5)' }}>
+              <div style={{ fontSize: '64px', marginBottom: '20px' }}>👥</div>
+              <p style={{ fontSize: '20px', margin: 0 }}>Keine Segmente analysiert</p>
+              <p style={{ fontSize: '14px', margin: '8px 0 0 0' }}>Klicke auf den Button um Kundensegmente zu generieren</p>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+              {customerSegments.map((segment: any) => (
+                <motion.div
+                  key={segment.id}
+                  className="template-card"
+                  whileHover={{ scale: 1.02 }}
+                  style={{ padding: '20px', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)' }}
+                >
+                  <h3 style={{ color: 'white', margin: '0 0 12px 0', fontSize: '18px' }}>{segment.name || 'Unbekanntes Segment'}</h3>
+                  <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', margin: '0 0 12px 0' }}>
+                    {segment.description || 'Keine Beschreibung verfügbar'}
+                  </p>
+                  <div style={{ background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '8px', marginBottom: '12px' }}>
+                    <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px', margin: '0 0 8px 0' }}>
+                      👥 <strong>{segment.customerIds?.length || 0}</strong> Kunden
+                    </p>
+                    <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px', margin: 0 }}>
+                      ⭐ Score: <strong>{segment.engagementScore ?? 0}</strong>
+                    </p>
+                  </div>
+                  {segment.characteristics && (
+                    <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>
+                      <p style={{ margin: '8px 0', fontWeight: 'bold', color: 'rgba(255,255,255,0.8)' }}>Merkmale:</p>
+                      {typeof segment.characteristics === 'string' ? (
+                        <p style={{ margin: 0 }}>• {segment.characteristics}</p>
+                      ) : Array.isArray(segment.characteristics) ? (
+                        segment.characteristics.map((char: string, i: number) => (
+                          <p key={i} style={{ margin: '4px 0' }}>• {char}</p>
+                        ))
+                      ) : null}
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </motion.div>
+      )}
+
+      {/* Send Time Optimization View */}
+      {activeView === 'send-time' && (
+        <motion.div 
+          className="glass-card"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 style={{ color: 'white', marginBottom: '30px' }}>⏰ Optimale Versandzeiten</h2>
+          
+          <div style={{ marginBottom: '20px', padding: '16px', background: 'rgba(168, 85, 247, 0.1)', borderRadius: '10px', border: '1px solid rgba(168, 85, 247, 0.3)' }}>
+            <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: 'rgba(255,255,255,0.9)', fontWeight: '600' }}>
+              👥 Ausgewählte Kunden: <strong style={{ color: '#a855f7' }}>{selectedCustomers.length}</strong>
+            </p>
+            <p style={{ margin: '0', fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>
+              Wähle Kunden aus dem Generator-Tab und kehre hier zurück, um optimale Versandzeiten für diese Kunden zu berechnen.
+            </p>
+          </div>
+          
+          <motion.button
+            onClick={optimizeSendTimes}
+            disabled={loadingSendTimes || selectedCustomers.length === 0}
+            className="glass-button"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            style={{ 
+              width: '100%',
+              padding: '16px',
+              fontSize: '16px',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              marginBottom: '30px',
+              opacity: (loadingSendTimes || selectedCustomers.length === 0) ? 0.7 : 1
+            }}
+          >
+            {loadingSendTimes ? '⏳ Wird optimiert...' : '🚀 Versandzeiten optimieren'}
+          </motion.button>
+
+          {sendTimes.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: 'rgba(255,255,255,0.5)' }}>
+              <div style={{ fontSize: '64px', marginBottom: '20px' }}>⏰</div>
+              <p style={{ fontSize: '20px', margin: 0 }}>Keine Versandzeiten optimiert</p>
+              <p style={{ fontSize: '14px', margin: '8px 0 0 0' }}>Klicke auf den Button um optimale Versandzeiten zu generieren</p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {sendTimes.map((time: any, idx: number) => (
+                <motion.div
+                  key={idx}
+                  className="template-card"
+                  whileHover={{ scale: 1.02 }}
+                  style={{ padding: '20px', background: 'rgba(168, 85, 247, 0.1)', border: '1px solid rgba(168, 85, 247, 0.3)' }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                    <div>
+                      <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '14px', margin: 0 }}>📧 {time.email || 'unknown@email.com'}</p>
+                      {time.customerId && (
+                        <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px', margin: '4px 0 0 0' }}>ID: {time.customerId}</p>
+                      )}
+                    </div>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', padding: '4px 12px', backgroundColor: 'rgba(168, 85, 247, 0.2)', color: '#a855f7', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' }}>
+                      {time.confidence ?? 0}% 🎯
+                    </span>
+                  </div>
+                  <div style={{ background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '8px', marginBottom: '12px' }}>
+                    <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '14px', margin: '0 0 8px 0', fontWeight: 'bold' }}>
+                      🕐 {time.time || time.recommendedTime || '09:00'}
+                    </p>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '13px', color: 'rgba(255,255,255,0.7)' }}>
+                      <div>
+                        <p style={{ margin: 0 }}>📍 Zeitzone:</p>
+                        <p style={{ margin: '4px 0 0 0', color: 'white', fontWeight: 'bold' }}>{time.timezone || 'Europe/Berlin'}</p>
+                      </div>
+                      <div>
+                        <p style={{ margin: 0 }}>📅 Wochentag:</p>
+                        <p style={{ margin: '4px 0 0 0', color: 'white', fontWeight: 'bold' }}>{time.dayOfWeek || 'Tuesday'}</p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </motion.div>
+      )}
+
+      {/* Performance Forecast View */}
+      {activeView === 'forecast' && (
+        <motion.div 
+          className="glass-card"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 style={{ color: 'white', marginBottom: '30px' }}>📊 Performance Prognose</h2>
+          
+          <div style={{ marginBottom: '20px', padding: '16px', background: 'rgba(251, 146, 60, 0.1)', borderRadius: '10px', border: '1px solid rgba(251, 146, 60, 0.3)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '12px' }}>
+              <div>
+                <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>📦 Produktname</p>
+                <p style={{ margin: '0', fontSize: '14px', color: '#fb923c', fontWeight: '600' }}>
+                  {formData.productName || '— noch nicht eingegeben'}
+                </p>
+              </div>
+              <div>
+                <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>👥 Ausgewählte Kunden</p>
+                <p style={{ margin: '0', fontSize: '14px', color: '#fb923c', fontWeight: '600' }}>
+                  {selectedCustomers.length > 0 ? `${selectedCustomers.length} Kunden` : '— noch keine ausgewählt'}
+                </p>
+              </div>
+            </div>
+            <p style={{ margin: '0', fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>
+              Gib einen Produktnamen ein und wähle Kunden aus dem Generator-Tab aus, um eine Performance-Prognose zu erstellen.
+            </p>
+          </div>
+          
+          <motion.button
+            onClick={forecastEmailPerformance}
+            disabled={loadingForecast || !formData.productName.trim() || selectedCustomers.length === 0}
+            className="glass-button"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            style={{ 
+              width: '100%',
+              padding: '16px',
+              fontSize: '16px',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              marginBottom: '30px',
+              opacity: (loadingForecast || !formData.productName.trim() || selectedCustomers.length === 0) ? 0.7 : 1
+            }}
+          >
+            {loadingForecast ? '⏳ Wird berechnet...' : '🚀 Performance prognostizieren'}
+          </motion.button>
+
+          {!performanceForecast ? (
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: 'rgba(255,255,255,0.5)' }}>
+              <div style={{ fontSize: '64px', marginBottom: '20px' }}>📈</div>
+              <p style={{ fontSize: '20px', margin: 0 }}>Keine Prognose berechnet</p>
+              <p style={{ fontSize: '14px', margin: '8px 0 0 0' }}>Klicke auf den Button um eine Performance-Prognose zu erhalten</p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {/* Metrics Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                <motion.div
+                  className="template-card"
+                  whileHover={{ scale: 1.02 }}
+                  style={{ padding: '20px', background: 'rgba(34, 197, 94, 0.1)', border: '1px solid rgba(34, 197, 94, 0.3)', textAlign: 'center' }}
+                >
+                  <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '13px', margin: '0 0 12px 0', textTransform: 'uppercase', fontWeight: '600' }}>📧 Open Rate</p>
+                  <p style={{ color: '#22c55e', fontSize: '28px', margin: 0, fontWeight: 'bold' }}>{performanceForecast?.openRate ?? 0}%</p>
+                </motion.div>
+                <motion.div
+                  className="template-card"
+                  whileHover={{ scale: 1.02 }}
+                  style={{ padding: '20px', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)', textAlign: 'center' }}
+                >
+                  <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '13px', margin: '0 0 12px 0', textTransform: 'uppercase', fontWeight: '600' }}>🖱️ Click Rate</p>
+                  <p style={{ color: '#3b82f6', fontSize: '28px', margin: 0, fontWeight: 'bold' }}>{performanceForecast?.clickRate ?? 0}%</p>
+                </motion.div>
+                <motion.div
+                  className="template-card"
+                  whileHover={{ scale: 1.02 }}
+                  style={{ padding: '20px', background: 'rgba(168, 85, 247, 0.1)', border: '1px solid rgba(168, 85, 247, 0.3)', textAlign: 'center' }}
+                >
+                  <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '13px', margin: '0 0 12px 0', textTransform: 'uppercase', fontWeight: '600' }}>💰 Conversion Rate</p>
+                  <p style={{ color: '#a855f7', fontSize: '28px', margin: 0, fontWeight: 'bold' }}>{performanceForecast?.conversionRate ?? 0}%</p>
+                </motion.div>
+                <motion.div
+                  className="template-card"
+                  whileHover={{ scale: 1.02 }}
+                  style={{ padding: '20px', background: 'rgba(251, 146, 60, 0.1)', border: '1px solid rgba(251, 146, 60, 0.3)', textAlign: 'center' }}
+                >
+                  <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '13px', margin: '0 0 12px 0', textTransform: 'uppercase', fontWeight: '600' }}>💵 Geschätzter Umsatz</p>
+                  <p style={{ color: '#fb923c', fontSize: '28px', margin: 0, fontWeight: 'bold' }}>€{performanceForecast?.estimatedRevenue ?? 0}</p>
+                </motion.div>
+              </div>
+
+              {/* Confidence & Recommendations */}
+              <motion.div
+                className="template-card"
+                whileHover={{ scale: 1.02 }}
+                style={{ padding: '20px', background: 'rgba(102, 126, 234, 0.1)', border: '1px solid rgba(102, 126, 234, 0.3)' }}
+              >
+                <div style={{ marginBottom: '16px' }}>
+                  <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '14px', margin: '0 0 8px 0', fontWeight: 'bold' }}>
+                    🎯 Konfidenz Level
+                  </p>
+                  <div style={{ background: 'rgba(0,0,0,0.3)', borderRadius: '8px', overflow: 'hidden', height: '8px' }}>
+                    <div 
+                      style={{ 
+                        height: '100%', 
+                        background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+                        width: `${performanceForecast?.confidence ?? 0}%`
+                      }} 
+                    />
+                  </div>
+                  <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px', margin: '8px 0 0 0' }}>
+                    {performanceForecast?.confidence ?? 0}% Konfidenz
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* Recommendations */}
+              {performanceForecast?.recommendations && performanceForecast.recommendations.length > 0 && (
+                <motion.div
+                  className="template-card"
+                  whileHover={{ scale: 1.02 }}
+                  style={{ padding: '20px', background: 'rgba(34, 197, 94, 0.1)', border: '1px solid rgba(34, 197, 94, 0.3)' }}
+                >
+                  <p style={{ color: 'white', fontSize: '16px', margin: '0 0 12px 0', fontWeight: 'bold' }}>💡 Empfehlungen</p>
+                  <ul style={{ margin: 0, paddingLeft: '20px', color: 'rgba(255,255,255,0.8)' }}>
+                    {performanceForecast.recommendations.map((rec: string, idx: number) => (
+                      <li key={idx} style={{ margin: '8px 0', fontSize: '14px' }}>
+                        {rec}
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+              )}
             </div>
           )}
         </motion.div>

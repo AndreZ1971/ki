@@ -29,6 +29,34 @@ interface ShopCredentials {
   enableAnalytics: boolean;
   enableAutoProducts: boolean;
   enableEmailMarketing: boolean;
+
+  // Social Media Accounts
+  linkedinEnabled: boolean;
+  linkedinAccessToken: string;
+  linkedinRefreshToken: string;
+
+  facebookEnabled: boolean;
+  facebookAccessToken: string;
+  facebookPageId: string;
+
+  instagramEnabled: boolean;
+  instagramAccessToken: string;
+  instagramBusinessAccountId: string;
+
+  twitterEnabled: boolean;
+  twitterApiKey: string;
+  twitterApiSecret: string;
+  twitterAccessToken: string;
+  twitterAccessTokenSecret: string;
+
+  tiktokEnabled: boolean;
+  tiktokAccessToken: string;
+  tiktokRefreshToken: string;
+
+  youtubeEnabled: boolean;
+  youtubeAccessToken: string;
+  youtubeRefreshToken: string;
+  youtubeChannelId: string;
 }
 
 const connectionRoutes: FastifyPluginAsync = async (fastify) => {
@@ -59,7 +87,29 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
             jobIntervalMs: 900000,
             enableAnalytics: true,
             enableAutoProducts: true,
-            enableEmailMarketing: true
+            enableEmailMarketing: true,
+            // Social Media Defaults
+            linkedinEnabled: false,
+            linkedinAccessToken: '',
+            linkedinRefreshToken: '',
+            facebookEnabled: false,
+            facebookAccessToken: '',
+            facebookPageId: '',
+            instagramEnabled: false,
+            instagramAccessToken: '',
+            instagramBusinessAccountId: '',
+            twitterEnabled: false,
+            twitterApiKey: '',
+            twitterApiSecret: '',
+            twitterAccessToken: '',
+            twitterAccessTokenSecret: '',
+            tiktokEnabled: false,
+            tiktokAccessToken: '',
+            tiktokRefreshToken: '',
+            youtubeEnabled: false,
+            youtubeAccessToken: '',
+            youtubeRefreshToken: '',
+            youtubeChannelId: ''
           };
         }
         return {

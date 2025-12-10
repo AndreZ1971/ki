@@ -1,5 +1,6 @@
 // backend/routes/app/api/marketing/conversion-routes.ts
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import config from '../../../../config.js';
 
 interface CreateCampaignBody {
   userSegment: 'inactive' | 'one-time' | 'abandoned-cart' | 'low-value';
@@ -12,10 +13,14 @@ export default async function conversionRoutes(server: FastifyInstance) {
   server.get('/api/marketing/conversion/segments', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
       const wooConfig = {
-        url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
-        consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
-        consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
+        url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL || config.woocommerce?.url,
+        consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY || config.woocommerce?.consumerKey,
+        consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET || config.woocommerce?.consumerSecret,
       };
+
+      if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
+        throw new Error('WooCommerce Konfiguration fehlt (url/consumerKey/consumerSecret). Bitte .env oder connection.json prüfen.');
+      }
 
       const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
 

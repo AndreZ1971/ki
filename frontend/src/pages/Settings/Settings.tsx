@@ -58,6 +58,34 @@ interface ShopCredentials {
   enableAnalytics: boolean;
   enableAutoProducts: boolean;
   enableEmailMarketing: boolean;
+
+  // Social Media Accounts
+  linkedinEnabled: boolean;
+  linkedinAccessToken: string;
+  linkedinRefreshToken: string;
+
+  facebookEnabled: boolean;
+  facebookAccessToken: string;
+  facebookPageId: string;
+
+  instagramEnabled: boolean;
+  instagramAccessToken: string;
+  instagramBusinessAccountId: string;
+
+  twitterEnabled: boolean;
+  twitterApiKey: string;
+  twitterApiSecret: string;
+  twitterAccessToken: string;
+  twitterAccessTokenSecret: string;
+
+  tiktokEnabled: boolean;
+  tiktokAccessToken: string;
+  tiktokRefreshToken: string;
+
+  youtubeEnabled: boolean;
+  youtubeAccessToken: string;
+  youtubeRefreshToken: string;
+  youtubeChannelId: string;
 }
 
 interface Specialization {
@@ -112,12 +140,35 @@ const defaultCredentials: ShopCredentials = {
   mlEmailDefaultTime: '09:00',
   mlMaxInferenceTime: 5000,
   mlCacheResults: true,
-  mlCacheTtl: 3600
+  mlCacheTtl: 3600,
+  
+  // Social Media Defaults
+  linkedinEnabled: false,
+  linkedinAccessToken: '',
+  linkedinRefreshToken: '',
+  facebookEnabled: false,
+  facebookAccessToken: '',
+  facebookPageId: '',
+  instagramEnabled: false,
+  instagramAccessToken: '',
+  instagramBusinessAccountId: '',
+  twitterEnabled: false,
+  twitterApiKey: '',
+  twitterApiSecret: '',
+  twitterAccessToken: '',
+  twitterAccessTokenSecret: '',
+  tiktokEnabled: false,
+  tiktokAccessToken: '',
+  tiktokRefreshToken: '',
+  youtubeEnabled: false,
+  youtubeAccessToken: '',
+  youtubeRefreshToken: '',
+  youtubeChannelId: ''
 };
 
 const Settings = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'connection' | 'specialization' | 'license'>('connection');
+  const [activeTab, setActiveTab] = useState<'connection' | 'specialization' | 'license' | 'social'>('connection');
   const [testingConnection, setTestingConnection] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [connectionMessage, setConnectionMessage] = useState('');
@@ -191,7 +242,29 @@ const Settings = () => {
           mlEmailDefaultTime: data.ml?.emailDefaultTime || '09:00',
           mlMaxInferenceTime: data.ml?.maxInferenceTime ?? 5000,
           mlCacheResults: data.ml?.cacheResults ?? true,
-          mlCacheTtl: data.ml?.cacheTtl ?? 3600
+          mlCacheTtl: data.ml?.cacheTtl ?? 3600,
+          // Social Media
+          linkedinEnabled: data.socialMedia?.linkedin?.enabled ?? false,
+          linkedinAccessToken: data.socialMedia?.linkedin?.accessToken || '',
+          linkedinRefreshToken: data.socialMedia?.linkedin?.refreshToken || '',
+          facebookEnabled: data.socialMedia?.facebook?.enabled ?? false,
+          facebookAccessToken: data.socialMedia?.facebook?.accessToken || '',
+          facebookPageId: data.socialMedia?.facebook?.pageId || '',
+          instagramEnabled: data.socialMedia?.instagram?.enabled ?? false,
+          instagramAccessToken: data.socialMedia?.instagram?.accessToken || '',
+          instagramBusinessAccountId: data.socialMedia?.instagram?.businessAccountId || '',
+          twitterEnabled: data.socialMedia?.twitter?.enabled ?? false,
+          twitterApiKey: data.socialMedia?.twitter?.apiKey || '',
+          twitterApiSecret: data.socialMedia?.twitter?.apiSecret || '',
+          twitterAccessToken: data.socialMedia?.twitter?.accessToken || '',
+          twitterAccessTokenSecret: data.socialMedia?.twitter?.accessTokenSecret || '',
+          tiktokEnabled: data.socialMedia?.tiktok?.enabled ?? false,
+          tiktokAccessToken: data.socialMedia?.tiktok?.accessToken || '',
+          tiktokRefreshToken: data.socialMedia?.tiktok?.refreshToken || '',
+          youtubeEnabled: data.socialMedia?.youtube?.enabled ?? false,
+          youtubeAccessToken: data.socialMedia?.youtube?.accessToken || '',
+          youtubeRefreshToken: data.socialMedia?.youtube?.refreshToken || '',
+          youtubeChannelId: data.socialMedia?.youtube?.channelId || ''
         };
         setCredentials({ ...defaultCredentials, ...mapped });
         setConnectionMessage('✅ Konfiguration geladen. Jetzt speichern, um sie zu übernehmen.');
@@ -283,7 +356,8 @@ const Settings = () => {
       
       // Backend sends masked credentials, keep them for display
       if (data.success && data.credentials) {
-        setCredentials(data.credentials);
+        // Merge mit defaults um fehlende neue Properties zu füllen
+        setCredentials(_prev => ({ ...defaultCredentials, ...data.credentials }));
       }
     } catch (error) {
       console.warn('Hinweis: Einstellungen noch nicht ausgefüllt.', error);
@@ -518,6 +592,22 @@ const Settings = () => {
               }}
             >
               🔑 Lizenz
+            </button>
+            <button
+              onClick={() => setActiveTab('social')}
+              style={{
+                padding: '12px 24px',
+                background: activeTab === 'social' ? 'rgba(59, 130, 246, 0.3)' : 'transparent',
+                border: activeTab === 'social' ? '2px solid #3b82f6' : '2px solid transparent',
+                borderRadius: '8px',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: activeTab === 'social' ? 'bold' : 'normal',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              📱 Social Media
             </button>
             <button
               onClick={() => navigate('/settings/ml')}
@@ -1309,6 +1399,434 @@ const Settings = () => {
                   </div>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* TAB 4: Social Media */}
+          {activeTab === 'social' && (
+            <div>
+              <h3>📱 Social Media Konten verbinden</h3>
+              <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '30px' }}>
+                Verbinde deine Social-Media-Konten, um KI-generierte Posts direkt zu veröffentlichen
+              </p>
+
+              {/* Social Media Grid */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                gap: '20px',
+                marginBottom: '40px'
+              }}>
+                {/* LinkedIn */}
+                <div style={{
+                  background: 'rgba(0, 119, 181, 0.1)',
+                  border: '2px solid rgba(0, 119, 181, 0.3)',
+                  borderRadius: '12px',
+                  padding: '20px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
+                    <span style={{ fontSize: '32px', marginRight: '15px' }}>💼</span>
+                    <div>
+                      <h4 style={{ margin: '0 0 5px 0', color: 'white' }}>LinkedIn</h4>
+                      <small style={{ color: 'rgba(255,255,255,0.6)' }}>
+                        {credentials.linkedinEnabled ? '✅ Verbunden' : '⏸️ Nicht verbunden'}
+                      </small>
+                    </div>
+                  </div>
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)', fontSize: '12px' }}>
+                      Access Token:
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="LinkedIn Access Token"
+                      value={credentials.linkedinAccessToken}
+                      onChange={(e) => handleCredentialChange('linkedinAccessToken', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        background: 'rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: 'white',
+                        fontSize: '13px'
+                      }}
+                    />
+                  </div>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={credentials.linkedinEnabled}
+                      onChange={(e) => handleCredentialChange('linkedinEnabled', e.target.checked)}
+                      style={{ cursor: 'pointer' }}
+                    />
+                    <span style={{ color: 'rgba(255,255,255,0.8)' }}>Aktiviert</span>
+                  </label>
+                </div>
+
+                {/* Facebook */}
+                <div style={{
+                  background: 'rgba(59, 89, 152, 0.1)',
+                  border: '2px solid rgba(59, 89, 152, 0.3)',
+                  borderRadius: '12px',
+                  padding: '20px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
+                    <span style={{ fontSize: '32px', marginRight: '15px' }}>👍</span>
+                    <div>
+                      <h4 style={{ margin: '0 0 5px 0', color: 'white' }}>Facebook</h4>
+                      <small style={{ color: 'rgba(255,255,255,0.6)' }}>
+                        {credentials.facebookEnabled ? '✅ Verbunden' : '⏸️ Nicht verbunden'}
+                      </small>
+                    </div>
+                  </div>
+                  <div style={{ marginBottom: '10px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)', fontSize: '12px' }}>
+                      Access Token:
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="Facebook Access Token"
+                      value={credentials.facebookAccessToken}
+                      onChange={(e) => handleCredentialChange('facebookAccessToken', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        background: 'rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: 'white',
+                        fontSize: '13px',
+                        marginBottom: '10px'
+                      }}
+                    />
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)', fontSize: '12px' }}>
+                      Page ID:
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Facebook Page ID"
+                      value={credentials.facebookPageId}
+                      onChange={(e) => handleCredentialChange('facebookPageId', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        background: 'rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: 'white',
+                        fontSize: '13px'
+                      }}
+                    />
+                  </div>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={credentials.facebookEnabled}
+                      onChange={(e) => handleCredentialChange('facebookEnabled', e.target.checked)}
+                      style={{ cursor: 'pointer' }}
+                    />
+                    <span style={{ color: 'rgba(255,255,255,0.8)' }}>Aktiviert</span>
+                  </label>
+                </div>
+
+                {/* Instagram */}
+                <div style={{
+                  background: 'rgba(217, 45, 143, 0.1)',
+                  border: '2px solid rgba(217, 45, 143, 0.3)',
+                  borderRadius: '12px',
+                  padding: '20px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
+                    <span style={{ fontSize: '32px', marginRight: '15px' }}>📸</span>
+                    <div>
+                      <h4 style={{ margin: '0 0 5px 0', color: 'white' }}>Instagram</h4>
+                      <small style={{ color: 'rgba(255,255,255,0.6)' }}>
+                        {credentials.instagramEnabled ? '✅ Verbunden' : '⏸️ Nicht verbunden'}
+                      </small>
+                    </div>
+                  </div>
+                  <div style={{ marginBottom: '10px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)', fontSize: '12px' }}>
+                      Access Token:
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="Instagram Access Token"
+                      value={credentials.instagramAccessToken}
+                      onChange={(e) => handleCredentialChange('instagramAccessToken', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        background: 'rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: 'white',
+                        fontSize: '13px',
+                        marginBottom: '10px'
+                      }}
+                    />
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)', fontSize: '12px' }}>
+                      Business Account ID:
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Instagram Business Account ID"
+                      value={credentials.instagramBusinessAccountId}
+                      onChange={(e) => handleCredentialChange('instagramBusinessAccountId', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        background: 'rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: 'white',
+                        fontSize: '13px'
+                      }}
+                    />
+                  </div>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={credentials.instagramEnabled}
+                      onChange={(e) => handleCredentialChange('instagramEnabled', e.target.checked)}
+                      style={{ cursor: 'pointer' }}
+                    />
+                    <span style={{ color: 'rgba(255,255,255,0.8)' }}>Aktiviert</span>
+                  </label>
+                </div>
+
+                {/* Twitter */}
+                <div style={{
+                  background: 'rgba(29, 155, 240, 0.1)',
+                  border: '2px solid rgba(29, 155, 240, 0.3)',
+                  borderRadius: '12px',
+                  padding: '20px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
+                    <span style={{ fontSize: '32px', marginRight: '15px' }}>🐦</span>
+                    <div>
+                      <h4 style={{ margin: '0 0 5px 0', color: 'white' }}>Twitter/X</h4>
+                      <small style={{ color: 'rgba(255,255,255,0.6)' }}>
+                        {credentials.twitterEnabled ? '✅ Verbunden' : '⏸️ Nicht verbunden'}
+                      </small>
+                    </div>
+                  </div>
+                  <div style={{ marginBottom: '10px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)', fontSize: '12px' }}>
+                      API Key:
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="Twitter API Key"
+                      value={credentials.twitterApiKey}
+                      onChange={(e) => handleCredentialChange('twitterApiKey', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        background: 'rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: 'white',
+                        fontSize: '13px',
+                        marginBottom: '10px'
+                      }}
+                    />
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)', fontSize: '12px' }}>
+                      API Secret:
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="Twitter API Secret"
+                      value={credentials.twitterApiSecret}
+                      onChange={(e) => handleCredentialChange('twitterApiSecret', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        background: 'rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: 'white',
+                        fontSize: '13px'
+                      }}
+                    />
+                  </div>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={credentials.twitterEnabled}
+                      onChange={(e) => handleCredentialChange('twitterEnabled', e.target.checked)}
+                      style={{ cursor: 'pointer' }}
+                    />
+                    <span style={{ color: 'rgba(255,255,255,0.8)' }}>Aktiviert</span>
+                  </label>
+                </div>
+
+                {/* TikTok */}
+                <div style={{
+                  background: 'rgba(0, 0, 0, 0.2)',
+                  border: '2px solid rgba(255,255,255,0.2)',
+                  borderRadius: '12px',
+                  padding: '20px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
+                    <span style={{ fontSize: '32px', marginRight: '15px' }}>🎵</span>
+                    <div>
+                      <h4 style={{ margin: '0 0 5px 0', color: 'white' }}>TikTok</h4>
+                      <small style={{ color: 'rgba(255,255,255,0.6)' }}>
+                        {credentials.tiktokEnabled ? '✅ Verbunden' : '⏸️ Nicht verbunden'}
+                      </small>
+                    </div>
+                  </div>
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)', fontSize: '12px' }}>
+                      Access Token:
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="TikTok Access Token"
+                      value={credentials.tiktokAccessToken}
+                      onChange={(e) => handleCredentialChange('tiktokAccessToken', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        background: 'rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: 'white',
+                        fontSize: '13px'
+                      }}
+                    />
+                  </div>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={credentials.tiktokEnabled}
+                      onChange={(e) => handleCredentialChange('tiktokEnabled', e.target.checked)}
+                      style={{ cursor: 'pointer' }}
+                    />
+                    <span style={{ color: 'rgba(255,255,255,0.8)' }}>Aktiviert</span>
+                  </label>
+                </div>
+
+                {/* YouTube */}
+                <div style={{
+                  background: 'rgba(255, 0, 0, 0.1)',
+                  border: '2px solid rgba(255, 0, 0, 0.3)',
+                  borderRadius: '12px',
+                  padding: '20px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
+                    <span style={{ fontSize: '32px', marginRight: '15px' }}>📺</span>
+                    <div>
+                      <h4 style={{ margin: '0 0 5px 0', color: 'white' }}>YouTube</h4>
+                      <small style={{ color: 'rgba(255,255,255,0.6)' }}>
+                        {credentials.youtubeEnabled ? '✅ Verbunden' : '⏸️ Nicht verbunden'}
+                      </small>
+                    </div>
+                  </div>
+                  <div style={{ marginBottom: '10px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)', fontSize: '12px' }}>
+                      Access Token:
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="YouTube Access Token"
+                      value={credentials.youtubeAccessToken}
+                      onChange={(e) => handleCredentialChange('youtubeAccessToken', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        background: 'rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: 'white',
+                        fontSize: '13px',
+                        marginBottom: '10px'
+                      }}
+                    />
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)', fontSize: '12px' }}>
+                      Channel ID:
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="YouTube Channel ID"
+                      value={credentials.youtubeChannelId}
+                      onChange={(e) => handleCredentialChange('youtubeChannelId', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        background: 'rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: 'white',
+                        fontSize: '13px'
+                      }}
+                    />
+                  </div>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={credentials.youtubeEnabled}
+                      onChange={(e) => handleCredentialChange('youtubeEnabled', e.target.checked)}
+                      style={{ cursor: 'pointer' }}
+                    />
+                    <span style={{ color: 'rgba(255,255,255,0.8)' }}>Aktiviert</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Info Box */}
+              <div style={{
+                background: 'rgba(59, 130, 246, 0.1)',
+                border: '2px solid rgba(59, 130, 246, 0.3)',
+                borderRadius: '12px',
+                padding: '20px',
+                marginBottom: '20px'
+              }}>
+                <h4 style={{ margin: '0 0 10px 0', color: '#60a5fa' }}>ℹ️ Anleitung zum Verbinden</h4>
+                <ul style={{ margin: '0', paddingLeft: '20px', color: 'rgba(255,255,255,0.7)', fontSize: '14px', lineHeight: '1.6' }}>
+                  <li>Rufe die Entwicklerportal deiner Plattform auf (z.B. developer.linkedin.com)</li>
+                  <li>Erstelle eine neue App/Integration für A.r.I.</li>
+                  <li>Kopiere die Access Tokens und IDs in die entsprechenden Felder</li>
+                  <li>Aktiviere die Plattform mit dem Checkbox</li>
+                  <li>Speichere die Konfiguration</li>
+                </ul>
+              </div>
+
+              {/* Save Button */}
+              <button
+                onClick={saveConfiguration}
+                disabled={saving}
+                style={{
+                  padding: '15px 40px',
+                  background: saving 
+                    ? 'rgba(100,100,100,0.3)' 
+                    : 'linear-gradient(135deg, #10b981, #059669)',
+                  border: 'none',
+                  borderRadius: '8px',
+                  color: 'white',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  cursor: saving ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                {saving ? '⏳ Speichern...' : '💾 Speichern'}
+              </button>
+
+              {connectionMessage && (
+                <div style={{
+                  marginTop: '20px',
+                  padding: '15px',
+                  background: connectionStatus === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(220, 53, 69, 0.1)',
+                  border: `2px solid ${connectionStatus === 'success' ? '#22c55e' : '#dc3545'}`,
+                  borderRadius: '8px',
+                  color: connectionStatus === 'success' ? '#86efac' : '#f87171'
+                }}>
+                  {connectionMessage}
+                </div>
+              )}
             </div>
           )}
         </div>
