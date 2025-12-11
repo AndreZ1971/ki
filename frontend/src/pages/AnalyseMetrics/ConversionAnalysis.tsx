@@ -82,7 +82,7 @@ const ConversionAnalysis = () => {
       if (!res.ok) throw new Error('ML-Analyse fehlgeschlagen');
       const result = await res.json();
       setMlInsights(result.mlInsights || []);
-    } catch (err) {
+    } catch (_err) {
       const mockInsights: MLInsight[] = [];
       if (conversionData?.overallRate && conversionData.overallRate < 2.5) {
         mockInsights.push({
