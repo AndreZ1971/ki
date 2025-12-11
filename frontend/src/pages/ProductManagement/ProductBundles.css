@@ -1,0 +1,337 @@
+/* ========== Bundle-Specific Styles ========== */
+
+.bundle-config {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.config-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.config-group label {
+  font-weight: 600;
+  color: #1e3c72;
+  font-size: 14px;
+}
+
+.config-group input,
+.config-group select {
+  padding: 10px 12px;
+  border: 2px solid #e0e7ff;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.config-group input:focus,
+.config-group select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* ========== Bundle Idea Card Details ========== */
+
+.bundle-idea-details {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.products-list {
+  background: rgba(102, 126, 234, 0.05);
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.products-list strong {
+  color: #1e3c72;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.products-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.products-list li {
+  padding: 6px 0;
+  padding-left: 20px;
+  position: relative;
+  color: #4b5563;
+  font-size: 14px;
+}
+
+.products-list li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #667eea;
+  font-weight: bold;
+}
+
+/* ========== Pricing Info ========== */
+
+.pricing-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  border-radius: 6px;
+  border-left: 4px solid #667eea;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.original-price {
+  color: #6b7280;
+  text-decoration: line-through;
+  font-size: 14px;
+}
+
+.discount-badge {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bundle-price {
+  color: #1e3c72;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.savings {
+  color: #10b981;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ========== Performance Metrics ========== */
+
+.performance-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(16, 185, 129, 0.05);
+  border-radius: 6px;
+}
+
+.metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.metric-label {
+  color: #4b5563;
+  font-size: 13px;
+  flex: 1;
+}
+
+.metric-value {
+  color: #1e3c72;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* ========== Bundle List Items ========== */
+
+.bundles-list {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.bundle-item {
+  background: white;
+  border: 2px solid #e0e7ff;
+  border-radius: 10px;
+  padding: 16px;
+  transition: all 0.3s ease;
+}
+
+.bundle-item:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+  transform: translateY(-2px);
+}
+
+.bundle-item.inactive {
+  opacity: 0.6;
+  border-color: #d1d5db;
+}
+
+.bundle-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.bundle-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e3c72;
+}
+
+.status {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status.active {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.status.inactive {
+  background: rgba(107, 114, 128, 0.1);
+  color: #6b7280;
+}
+
+.bundle-products {
+  color: #4b5563;
+  font-size: 14px;
+  margin-bottom: 12px;
+  padding-left: 8px;
+}
+
+.bundle-products strong {
+  color: #1e3c72;
+}
+
+.bundle-pricing {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.bundle-pricing .price {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e3c72;
+}
+
+.bundle-pricing .discount {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bundle-pricing .savings {
+  color: #10b981;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.bundle-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e0e7ff;
+}
+
+.edit-button,
+.toggle-button {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #667eea;
+  border-radius: 6px;
+  background: white;
+  color: #667eea;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-button:hover,
+.toggle-button:hover {
+  background: #667eea;
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* ========== Performance Stats ========== */
+
+.performance-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.performance-stats .stat {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+}
+
+.performance-stats .stat:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.performance-stats .stat .value {
+  display: block;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.performance-stats .stat .label {
+  display: block;
+  font-size: 13px;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ========== Responsive ========== */
+
+@media (max-width: 768px) {
+  .bundle-config {
+    grid-template-columns: 1fr;
+  }
+
+  .bundle-pricing {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .performance-stats {
+    grid-template-columns: 1fr;
+  }
+}

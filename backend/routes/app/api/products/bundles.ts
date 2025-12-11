@@ -247,6 +247,114 @@ export default async function bundleRoutes(server: FastifyInstance) {
     }
   );
 
+  // ML: Generate Bundle Ideas
+  server.get(
+    '/ml/generate',
+    {
+      schema: {
+        tags: ['bundles', 'ml'],
+        description: 'Generiert KI-basierte Bundle-Ideen mit Performance-Scoring',
+        querystring: {
+          type: 'object',
+          properties: {
+            category: { type: 'string' },
+            priceRange: { type: 'string' },
+            targetAudience: { type: 'string' }
+          }
+        }
+      }
+    },
+    async (request: FastifyRequest<{ Querystring: { category?: string; priceRange?: string; targetAudience?: string } }>, reply: FastifyReply) => {
+      try {
+        const { category = 'all', priceRange = '50-200', targetAudience = 'B2B & Selbstständige' } = request.query;
+        console.log('🤖 Generating bundle ideas:', { category, priceRange, targetAudience });
+
+        const { getOpenAIClient, executeOpenAI } = await import('../../../../utils/openai.js');
+        const openai = getOpenAIClient();
+
+        const prompt = `Generiere 4-5 intelligente Produkt-Bundle-Vorschläge für einen E-Commerce Shop.
+
+Kontext:
+- Zielgruppe: ${targetAudience}
+- Kategorie: ${category}
+- Preisspanne: ${priceRange}€
+
+Produktkatalog (Beispiele):
+- E-Books (SEO, Marketing, E-Commerce)
+- WordPress Themes & Plugins
+- Design Templates (Email, Social Media)
+- Online-Kurse & Video-Tutorials
+- Checklisten & Guides
+
+Anforderungen:
+1. Kombiniere 2-4 Produkte die sich natürlich ergänzen
+2. Berechne realistischen Gesamtpreis
+3. Schlage sinnvollen Rabatt vor (10-30%)
+4. Begründe warum diese Kombination funktioniert
+5. Definiere klare Zielgruppe
+6. Schätze Conversion-Rate (0-1, z.B. 0.75 = 75%)
+7. Schätze monatliche Umsatzerwartung in €
+
+Wichtig: Bundles müssen echten Mehrwert bieten und logisch zusammenpassen!
+
+Antworte mit einem JSON Array im Format:
+[
+  {
+    "name": "Bundle-Name",
+    "products": ["Produkt 1", "Produkt 2", "Produkt 3"],
+    "suggestedPrice": 149.99,
+    "originalPrice": 199.99,
+    "suggestedDiscount": 25,
+    "conversionScore": 0.78,
+    "reason": "Warum diese Kombination stark ist",
+    "targetAudience": "Spezifische Zielgruppe",
+    "expectedRevenue": 2500
+  }
+]`;
+
+        const completion = await executeOpenAI(
+          () => openai.chat.completions.create({
+            model: 'gpt-4o-mini',
+            temperature: 0.8,
+            messages: [
+              { role: 'system', content: 'Du bist E-Commerce Bundle-Experte mit 10+ Jahren Erfahrung in Conversion-Optimierung und Produktbundling.' },
+              { role: 'user', content: prompt }
+            ]
+          }),
+          'generate-bundle-ideas'
+        );
+
+        const responseText = completion.choices[0]?.message?.content || '[]';
+        let ideas = JSON.parse(responseText);
+        
+        // Validierung & Normalisierung
+        ideas = ideas.map((idea: any) => ({
+          ...idea,
+          conversionScore: Math.max(0, Math.min(1, idea.conversionScore || 0.5)),
+          suggestedPrice: parseFloat(idea.suggestedPrice || 0),
+          originalPrice: parseFloat(idea.originalPrice || idea.suggestedPrice * 1.2),
+          suggestedDiscount: Math.max(5, Math.min(50, idea.suggestedDiscount || 15)),
+          expectedRevenue: parseFloat(idea.expectedRevenue || 1000)
+        }));
+
+        console.log(`✅ Generated ${ideas.length} bundle ideas`);
+
+        return reply.send({
+          success: true,
+          data: ideas,
+          count: ideas.length,
+          filters: { category, priceRange, targetAudience }
+        });
+      } catch (error) {
+        console.error('❌ ML Bundle generation error:', error);
+        return reply.status(500).send({
+          success: false,
+          error: error instanceof Error ? error.message : 'Bundle-Ideen konnten nicht generiert werden'
+        });
+      }
+    }
+  );
+
   // Update Bundle
   server.put<{ Params: { id: string }; Body: UpdateBundleBody }>(
     '/:id',

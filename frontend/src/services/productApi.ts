@@ -2,6 +2,7 @@ import type {
   Product,
   Category,
   Bundle,
+  BundleIdea,
   Freebie,
   ProductCreationResult,
   ApiResponse,
@@ -166,6 +167,21 @@ export const bundleApi = {
       method: 'PUT',
       body: JSON.stringify(bundleData),
     });
+  },
+
+  /**
+   * Generiert KI-basierte Bundle-Ideen mit Performance-Scoring
+   */
+  generateBundleIdeas: async (filters?: {
+    category?: string;
+    priceRange?: string;
+    targetAudience?: string;
+  }): Promise<ApiResponse<BundleIdea[]>> => {
+    const query = new URLSearchParams();
+    if (filters?.category) query.set('category', filters.category);
+    if (filters?.priceRange) query.set('priceRange', filters.priceRange);
+    if (filters?.targetAudience) query.set('targetAudience', filters.targetAudience);
+    return apiRequest<BundleIdea[]>(`/api/bundles/ml/generate?${query.toString()}`);
   },
 };
 

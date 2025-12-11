@@ -47,6 +47,18 @@ export interface Bundle {
   createdAt?: string;
 }
 
+export interface BundleIdea {
+  name: string;
+  products: string[];
+  suggestedPrice: number;
+  originalPrice: number;
+  suggestedDiscount: number;
+  conversionScore: number;
+  reason: string;
+  targetAudience: string;
+  expectedRevenue: number;
+}
+
 export interface Freebie {
   id: number;
   name: string;

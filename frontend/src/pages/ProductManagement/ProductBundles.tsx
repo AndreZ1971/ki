@@ -4,8 +4,10 @@ import { useToast } from '../../hooks/useToast';
 import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
 import { bundleApi } from '../../services/productApi';
-import type { Bundle } from '../../types/product';
+import type { Bundle, BundleIdea } from '../../types/product';
 import './page.css';
+import './CreateFreebies.css';
+import './ProductBundles.css';
 import ProductAIAnalysis from './ProductAIAnalysis';
 
 const ProductBundles = () => {
@@ -13,6 +15,17 @@ const ProductBundles = () => {
   const toast = useToast();
   const [bundles, setBundles] = useState<Bundle[]>([]);
   const [_initialLoading, setInitialLoading] = useState(true);
+  
+  // ML State
+  const [bundleIdeas, setBundleIdeas] = useState<BundleIdea[]>([]);
+  const [ideasLoading, setIdeasLoading] = useState(false);
+  const [_selectedIdea, setSelectedIdea] = useState<BundleIdea | null>(null);
+  const [expandedIdeas, setExpandedIdeas] = useState<Set<number>>(new Set());
+  const [filters, setFilters] = useState({
+    category: 'all',
+    priceRange: '50-200',
+    targetAudience: 'B2B & Selbstständige'
+  });
 
   // Load bundles on mount
   React.useEffect(() => {
@@ -41,24 +54,45 @@ const ProductBundles = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleCreateBundle = async () => {
+  const handleGenerateBundleIdeas = async () => {
+    try {
+      setIdeasLoading(true);
+      const response = await bundleApi.generateBundleIdeas(filters);
+
+      if (response.success && response.data) {
+        setBundleIdeas(response.data);
+        toast.success(`✅ ${response.data.length} Bundle-Ideen generiert`);
+      } else {
+        throw new Error(response.error || 'Bundle-Ideen konnten nicht generiert werden');
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unbekannter Fehler';
+      toast.error(errorMessage);
+    } finally {
+      setIdeasLoading(false);
+    }
+  };
+
+  const handleCreateFromIdea = async (idea: BundleIdea) => {
     try {
       setLoading(true);
       clearError();
 
       const newBundleData: Partial<Bundle> = {
-        name: `Premium Bundle #${bundles.length + 1}`,
-        products: ['Product A', 'Product B', 'Bonus'],
-        price: 99.99,
-        discount: 15,
-        active: true
+        name: idea.name,
+        products: idea.products,
+        price: idea.suggestedPrice,
+        discount: idea.suggestedDiscount,
+        active: true,
+        description: `${idea.reason} | Zielgruppe: ${idea.targetAudience}`
       };
 
       const response = await bundleApi.createBundle(newBundleData);
 
       if (response.success && response.data) {
-        setBundles([...bundles, response.data]);
-        toast.success('Produkt-Bundle erfolgreich erstellt!');
+        setBundles([response.data, ...bundles]);
+        toast.success(`Bundle "${idea.name}" erfolgreich erstellt!`);
+        setSelectedIdea(null);
       } else {
         throw new Error(response.error || 'Fehler beim Erstellen');
       }
@@ -86,38 +120,132 @@ const ProductBundles = () => {
       </div>
 
       <div className="metric-card full-width">
-        <h3>🎁 Bundle erstellen</h3>
+        <h3>🤖 KI-gestützte Bundle-Erstellung</h3>
         
         <ErrorMessage message={error || ''} onClose={clearError} />
         
         <div className="bundle-config">
           <div className="config-group">
-            <label>Bundle-Name:</label>
-            <input type="text" placeholder="z.B. Complete Marketing Bundle" />
-          </div>
-          <div className="config-group">
-            <label>Rabatt (%):</label>
-            <input type="number" defaultValue="15" min="5" max="50" />
-          </div>
-          <div className="config-group">
-            <label>Enthaltene Produkte:</label>
-            <select multiple>
-              <option value="theme">Premium Theme</option>
-              <option value="plugin">SEO Plugin</option>
-              <option value="ebook">Marketing Ebook</option>
-              <option value="template">Email Templates</option>
+            <label>Kategorie:</label>
+            <select value={filters.category} onChange={(e) => setFilters({ ...filters, category: e.target.value })}>
+              <option value="all">Alle Kategorien</option>
+              <option value="digital">Digitale Produkte</option>
+              <option value="marketing">Marketing</option>
+              <option value="design">Design & Templates</option>
+              <option value="education">Kurse & Schulungen</option>
             </select>
+          </div>
+          <div className="config-group">
+            <label>Preisspanne (€):</label>
+            <select value={filters.priceRange} onChange={(e) => setFilters({ ...filters, priceRange: e.target.value })}>
+              <option value="25-75">25-75€</option>
+              <option value="50-200">50-200€</option>
+              <option value="100-300">100-300€</option>
+              <option value="200-500">200-500€</option>
+            </select>
+          </div>
+          <div className="config-group">
+            <label>Zielgruppe:</label>
+            <input 
+              type="text" 
+              value={filters.targetAudience}
+              onChange={(e) => setFilters({ ...filters, targetAudience: e.target.value })}
+              placeholder="z.B. B2B, Freelancer, Startups"
+            />
           </div>
         </div>
 
         <LoadingButton
-          onClick={handleCreateBundle}
-          loading={loading}
-          loadingText="🔄 Erstelle Bundle..."
+          onClick={handleGenerateBundleIdeas}
+          loading={ideasLoading}
+          loadingText="🔄 KI generiert Bundle-Ideen..."
         >
-          📦 Bundle erstellen
+          ✨ Bundle-Ideen mit KI generieren
         </LoadingButton>
       </div>
+
+      {bundleIdeas.length > 0 && (
+        <div className="metric-card ideas-section">
+          <h3>📋 KI-generierte Bundle-Vorschläge</h3>
+          <div className="ideas-grid">
+            {bundleIdeas
+              .sort((a, b) => b.conversionScore - a.conversionScore)
+              .map((idea, idx) => (
+                <div
+                  key={`${idea.name}-${idx}`}
+                  className={`idea-card ${expandedIdeas.has(idx) ? 'expanded' : ''}`}
+                >
+                  <div className="idea-header">
+                    <h4>{idea.name}</h4>
+                    <span className="conversion-badge">
+                      📊 {(idea.conversionScore * 100).toFixed(0)}%
+                    </span>
+                  </div>
+
+                  <div className="bundle-idea-details">
+                    <div className="products-list">
+                      <strong>Enthält:</strong>
+                      <ul>
+                        {idea.products.map((prod, i) => (
+                          <li key={i}>{prod}</li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="pricing-info">
+                      <div className="price-row">
+                        <span className="original-price">Regulär: €{idea.originalPrice.toFixed(2)}</span>
+                        <span className="discount-badge">-{idea.suggestedDiscount}%</span>
+                      </div>
+                      <div className="bundle-price">Bundle-Preis: €{idea.suggestedPrice.toFixed(2)}</div>
+                      <div className="savings">💰 Ersparnis: €{(idea.originalPrice - idea.suggestedPrice).toFixed(2)}</div>
+                    </div>
+
+                    <div className="performance-metrics">
+                      <div className="metric">
+                        <span className="metric-label">🎯 Zielgruppe:</span>
+                        <span className="metric-value">{idea.targetAudience}</span>
+                      </div>
+                      <div className="metric">
+                        <span className="metric-label">💵 Erwarteter Umsatz/Monat:</span>
+                        <span className="metric-value">€{idea.expectedRevenue.toFixed(0)}</span>
+                      </div>
+                    </div>
+
+                    <div className="idea-reason">
+                      <small>💡 {idea.reason}</small>
+                    </div>
+                  </div>
+
+                  <div className="idea-actions">
+                    <button
+                      className="expand-btn"
+                      onClick={() => {
+                        const newExpanded = new Set(expandedIdeas);
+                        if (newExpanded.has(idx)) {
+                          newExpanded.delete(idx);
+                        } else {
+                          newExpanded.add(idx);
+                        }
+                        setExpandedIdeas(newExpanded);
+                        setSelectedIdea(idea);
+                      }}
+                    >
+                      {expandedIdeas.has(idx) ? '−' : '+'} Details
+                    </button>
+                    <button
+                      className="create-idea-btn"
+                      onClick={() => handleCreateFromIdea(idea)}
+                      disabled={loading}
+                    >
+                      {loading ? '⏳' : '→'} Bundle erstellen
+                    </button>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
 
       <div className="metric-card">
         <h3>📊 Meine Bundles</h3>
