@@ -1,17 +1,12 @@
 // ProductAnalyzer.tsx - Standalone Product Analysis Tool
-import React, { useState, useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useCallback } from 'react';
 import { useProductManagement } from '../../hooks/useProductManagement';
-import { useToast } from '../../hooks/useToast';
-import { BackButton, ErrorMessage } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
 import { ProductAnalysis } from '../app/ProductAnalysis';
 import './page.css';
 
 const ProductAnalyzer: React.FC = () => {
-  const navigate = useNavigate();
   const { handleBackToDashboard } = useProductManagement();
-  const { toasts } = useToast();
   
   const [selectedProductId, setSelectedProductId] = useState<number>(1);
   const [productIdInput, setProductIdInput] = useState<string>('1');
