@@ -263,7 +263,6 @@ const PaymentTester: React.FC = () => {
       )}
 
       <div className="payment-ml-section">
-        <h3>KI-Payment-Analyse</h3>
         {/* Beispielhafte Payment-ID, kann dynamisch ersetzt werden */}
         <MLPaymentAnalyzer paymentId="demo-payment-123" />
       </div>

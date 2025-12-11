@@ -37,7 +37,7 @@ export const MLPaymentAnalyzer: React.FC<MLPaymentAnalyzerProps> = ({ paymentId 
   return (
     <div className="ml-payment-analyzer">
       <button onClick={fetchInsights} disabled={loading}>
-        KI-Payment-Analyse starten
+        
       </button>
       {loading && <div>Analyse läuft...</div>}
       {error && <div className="error">{error}</div>}
