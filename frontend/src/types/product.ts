@@ -84,6 +84,16 @@ export interface UxAuditResult {
   recommendedFlow: string;
 }
 
+export interface PaymentTestScenario {
+  title: string;
+  riskLevel: 'low' | 'medium' | 'high';
+  priority: 'P1' | 'P2' | 'P3';
+  successProbability: number; // 0-1
+  steps: string[];
+  focusArea: string;
+  expectedImpact: string;
+}
+
 export interface Freebie {
   id: number;
   name: string;

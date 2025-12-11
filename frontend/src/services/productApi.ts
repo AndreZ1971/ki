@@ -11,7 +11,8 @@ import type {
   FreebieIdea,
   FraudAnalysis,
   AmountSuggestion,
-  UxAuditResult
+  UxAuditResult,
+  PaymentTestScenario
 } from '../types/product';
 
 let API_BASE_URL = (import.meta.env.VITE_API_URL || '').trim();
@@ -305,6 +306,20 @@ export const paymentApi = {
     flowType?: 'one-page' | 'multi-step';
   }): Promise<ApiResponse<UxAuditResult>> => {
     return apiRequest<UxAuditResult>('/api/payments/ml/ux-check', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * KI-generierter Testplan für Payments
+   */
+  generateTestPlan: async (data: {
+    testType: string;
+    target: string;
+    riskTolerance?: 'low' | 'medium' | 'high';
+  }): Promise<ApiResponse<PaymentTestScenario[]>> => {
+    return apiRequest<PaymentTestScenario[]>('/api/payments/ml/test-plan', {
       method: 'POST',
       body: JSON.stringify(data),
     });

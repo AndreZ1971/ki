@@ -19,6 +19,12 @@ interface UxCheckBody {
   flowType?: 'one-page' | 'multi-step';
 }
 
+interface TestPlanBody {
+  testType: string;
+  target: string;
+  riskTolerance?: 'low' | 'medium' | 'high';
+}
+
 export default async function paymentRoutes(server: FastifyInstance) {
   
   // ML: Fraud Detection
@@ -367,6 +373,93 @@ Antworte als JSON-Objekt:
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'UX-Check fehlgeschlagen'
+        });
+      }
+    }
+  );
+
+  // ML: Payment Test Plan Generation
+  server.post<{ Body: TestPlanBody }>(
+    '/ml/test-plan',
+    {
+      schema: {
+        tags: ['payments', 'ml'],
+        description: 'KI-generierter Testplan für Payments (Risikobasiert)',
+        body: {
+          type: 'object',
+          required: ['testType', 'target'],
+          properties: {
+            testType: { type: 'string' },
+            target: { type: 'string' },
+            riskTolerance: { type: 'string', enum: ['low', 'medium', 'high'] }
+          }
+        }
+      }
+    },
+    async (request: FastifyRequest<{ Body: TestPlanBody }>, reply: FastifyReply) => {
+      try {
+        const { testType, target, riskTolerance = 'medium' } = request.body;
+        const { getOpenAIClient, executeOpenAI } = await import('../../../utils/openai.js');
+        const openai = getOpenAIClient();
+
+        const prompt = `Erstelle einen Testplan für Payment-Checks.
+
+Test-Typ: ${testType}
+Target: ${target}
+Risikotoleranz: ${riskTolerance}
+
+Liefere 5 Szenarien als JSON Array:
+[
+  {
+    "title": "Happy Path Checkout",
+    "riskLevel": "low|medium|high",
+    "priority": "P1|P2|P3",
+    "successProbability": 0.0-1.0,
+    "steps": ["Schritt 1", "Schritt 2"],
+    "focusArea": "Gateway|Webhook|Retry|3DS|Refund",
+    "expectedImpact": "Kurzbeschreibung"
+  }
+]
+
+Regeln:
+- P1 wenn Ausfall Umsatz-kritisch ist
+- mind. 1 Szenario für Refund/Chargeback
+- mind. 1 Szenario für 3DS / SCA falls relevant
+- successProbability realistisch zwischen 0.6 und 0.95
+`;
+
+        const completion = await executeOpenAI(
+          () => openai.chat.completions.create({
+            model: 'gpt-4o-mini',
+            temperature: 0.45,
+            messages: [
+              { role: 'system', content: 'Du bist QA-Lead für Payment, antworte nur mit JSON.' },
+              { role: 'user', content: prompt }
+            ]
+          }),
+          'payment-test-plan'
+        );
+
+        const responseText = completion.choices[0]?.message?.content || '[]';
+        const parsed = JSON.parse(responseText);
+        const scenarios = Array.isArray(parsed) ? parsed : [];
+
+        const normalized = scenarios.map((s: any) => ({
+          title: s.title || 'Unbenanntes Szenario',
+          riskLevel: s.riskLevel === 'high' || s.riskLevel === 'medium' ? s.riskLevel : 'low',
+          priority: ['P1', 'P2', 'P3'].includes(s.priority) ? s.priority : 'P2',
+          successProbability: Math.max(0, Math.min(1, s.successProbability ?? 0.8)),
+          steps: Array.isArray(s.steps) ? s.steps : [],
+          focusArea: s.focusArea || 'checkout',
+          expectedImpact: s.expectedImpact || 'Stabilität erhöhen'
+        }));
+
+        return reply.send({ success: true, data: normalized });
+      } catch (error) {
+        console.error('❌ Test plan error:', error);
+        return reply.status(500).send({
+          success: false,
+          error: error instanceof Error ? error.message : 'Testplan konnte nicht generiert werden'
         });
       }
     }

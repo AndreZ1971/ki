@@ -6,6 +6,8 @@ import { useToast } from '../../hooks/useToast';
 import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
 import { MLPaymentAnalyzer } from './MLPaymentAnalyzer';
+import { paymentApi } from '../../services/productApi';
+import type { PaymentTestScenario } from '../../types/product';
 import './page.css';
 
 interface TestResult { name: string; status: 'passed' | 'failed'; duration: string; }
@@ -16,12 +18,22 @@ const PaymentTester: React.FC = () => {
   
   const [testType, setTestType] = useState('full');
   const [testResults, setTestResults] = useState<TestResult[]>([]);
+  const [testTarget, setTestTarget] = useState('checkout-api');
+  const [riskTolerance, setRiskTolerance] = useState<'low' | 'medium' | 'high'>('medium');
+  const [scenarios, setScenarios] = useState<PaymentTestScenario[]>([]);
+  const [loadingPlan, setLoadingPlan] = useState(false);
 
   const tests = [
     { value: 'full', label: 'Vollständig', icon: '🧪' },
     { value: 'smoke', label: 'Smoke Test', icon: '💨' },
     { value: 'integration', label: 'Integration', icon: '🔗' },
     { value: 'load', label: 'Last-Test', icon: '⚡' }
+  ];
+
+  const riskOptions = [
+    { value: 'low', label: 'Niedrig', icon: '🟢' },
+    { value: 'medium', label: 'Mittel', icon: '🟡' },
+    { value: 'high', label: 'Hoch', icon: '🔴' },
   ];
 
   const handleRunTests = async () => {
@@ -50,6 +62,39 @@ const PaymentTester: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGeneratePlan = async () => {
+    setLoadingPlan(true);
+    try {
+      const res = await paymentApi.generateTestPlan({
+        testType,
+        target: testTarget,
+        riskTolerance,
+      });
+      if (res.success && res.data) {
+        setScenarios(res.data);
+        showToast(`✨ ${res.data.length} KI-Szenarien geladen`, 'success');
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Testplan-Generierung fehlgeschlagen';
+      showToast(errorMessage, 'error');
+    } finally {
+      setLoadingPlan(false);
+    }
+  };
+
+  const applyScenario = (scenario: PaymentTestScenario) => {
+    // Simuliere Resultate basierend auf successProbability
+    const successProb = scenario.successProbability ?? 0.8;
+    const simulated: TestResult[] = scenario.steps.map((step, idx) => ({
+      name: `${scenario.title} – Schritt ${idx + 1}`,
+      status: Math.random() < successProb ? 'passed' : 'failed',
+      duration: `${Math.floor(Math.random() * 800)}ms`
+    }));
+    setTestResults(simulated);
+    const failed = simulated.filter(t => t.status === 'failed').length;
+    showToast(failed === 0 ? 'Szenario erfolgreich simuliert' : `${failed} Schritte fehlgeschlagen`, failed === 0 ? 'success' : 'error');
   };
 
   return (
@@ -82,8 +127,40 @@ const PaymentTester: React.FC = () => {
             </div>
           </div>
 
+          <div className="form-group">
+            <label>Ziel / Endpoint</label>
+            <input type="text" value={testTarget} onChange={(e) => setTestTarget(e.target.value)} placeholder="checkout-api" className="form-input" />
+          </div>
+
+          <div className="form-group">
+            <label>Risikotoleranz</label>
+            <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+              {riskOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setRiskTolerance(opt.value as typeof riskTolerance)}
+                  style={{
+                    flex: 1,
+                    padding: '10px',
+                    borderRadius: '10px',
+                    border: riskTolerance === opt.value ? '2px solid rgba(102,126,234,0.6)' : '1px solid rgba(255,255,255,0.1)',
+                    background: riskTolerance === opt.value ? 'rgba(102,126,234,0.15)' : 'rgba(255,255,255,0.05)',
+                    color: 'white',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {opt.icon} {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div style={{ marginTop: '20px' }}>
             <LoadingButton onClick={handleRunTests} loading={loading} loadingText="Teste...">🧪 Tests Ausführen</LoadingButton>
+          </div>
+
+          <div style={{ marginTop: '12px' }}>
+            <LoadingButton onClick={handleGeneratePlan} loading={loadingPlan} loadingText="Generiere...">✨ KI Testplan</LoadingButton>
           </div>
         </motion.div>
 
@@ -110,6 +187,80 @@ const PaymentTester: React.FC = () => {
           )}
         </motion.div>
       </div>
+
+      {scenarios.length > 0 && (
+        <div className="result-container" style={{ marginTop: '20px' }}>
+          <h3 style={{ color: 'white', marginBottom: '12px' }}>✨ KI-generierte Szenarien</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '12px' }}>
+            {scenarios.map((scenario, idx) => (
+              <div key={idx} style={{
+                background: 'rgba(0,0,0,0.3)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '12px',
+                padding: '14px',
+                display: 'grid',
+                gap: '8px'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ color: 'white', fontWeight: 700, fontSize: '13px' }}>{scenario.title}</div>
+                  <div style={{
+                    fontSize: '12px',
+                    padding: '4px 8px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    background: scenario.riskLevel === 'high' ? 'rgba(255,59,48,0.15)' : scenario.riskLevel === 'medium' ? 'rgba(255,159,10,0.15)' : 'rgba(52,199,89,0.15)',
+                    color: 'white'
+                  }}>
+                    {scenario.riskLevel.toUpperCase()} • {scenario.priority}
+                  </div>
+                </div>
+
+                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>Focus: {scenario.focusArea}</div>
+
+                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>
+                  Erfolgschance: {(scenario.successProbability * 100).toFixed(0)}%
+                </div>
+
+                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>
+                  Impact: {scenario.expectedImpact}
+                </div>
+
+                {scenario.steps?.length > 0 && (
+                  <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.85)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    {scenario.steps.map((step, sidx) => (
+                      <div key={sidx} style={{
+                        background: 'rgba(255,255,255,0.04)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '8px',
+                        padding: '6px'
+                      }}>
+                        • {step}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <button
+                  onClick={() => applyScenario(scenario)}
+                  style={{
+                    marginTop: '6px',
+                    padding: '10px',
+                    width: '100%',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    border: 'none',
+                    borderRadius: '10px',
+                    color: 'white',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  ▶️ Szenario simulieren
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="payment-ml-section">
         <h3>KI-Payment-Analyse</h3>
