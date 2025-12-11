@@ -23,6 +23,15 @@ import type {
    ExpansionStrategyResult,
    ContextGenerationResult
  } from '../types/product';
+
+  export interface WooSyncResult {
+    products: number;
+    orders: number;
+    customers: number;
+    lastSync: string;
+    durationMs: number;
+    type: 'full' | 'products' | 'orders' | 'customers';
+  }
 let API_BASE_URL = (import.meta.env.VITE_API_URL || '').trim();
 // Wenn leer, nutze relativen Pfad
 if (!API_BASE_URL) {
@@ -255,6 +264,17 @@ export const freebieApi = {
     query.set('type', type);
     if (keywords) query.set('keywords', keywords);
     return apiRequest<FreebieIdea[]>(`/api/freebies/ml/generate?${query.toString()}`);
+  },
+};
+
+// ==================== WOOCOMMERCE SYNC ====================
+
+export const wooCommerceSyncApi = {
+  sync: async (payload: { type: 'full' | 'products' | 'orders' | 'customers' }): Promise<ApiResponse<WooSyncResult>> => {
+    return apiRequest<WooSyncResult>('/api/woocommerce/sync', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
   },
 };
 

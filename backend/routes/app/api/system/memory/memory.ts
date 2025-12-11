@@ -12,7 +12,7 @@ interface AgentMemory {
   addMessages: (messages: MemoryMessage[]) => void;
   getMessages: () => MemoryMessage[];
   clearMessages: () => void;
-  getStats: () => { totalMessages: number; memorySize: number };
+  getStats: () => { totalMessages: number; memorySize: number; lastCleared: number | null };
 }
 
 // Simple in-memory implementation of AgentMemory.
@@ -20,6 +20,7 @@ interface AgentMemory {
 // we mutate the array in-place instead of reassigning it.
 const agentMemory: AgentMemory = (() => {
   const messages: MemoryMessage[] = [];
+  let lastCleared: number | null = null;
 
   const addMessage = (role: string, content: string) => {
     messages.push({
@@ -42,12 +43,13 @@ const agentMemory: AgentMemory = (() => {
 
   const clearMessages = () => {
     messages.length = 0;
+    lastCleared = Date.now();
   };
 
   const getStats = () => {
     const totalMessages = messages.length;
     const memorySize = Buffer.byteLength(JSON.stringify(messages), 'utf8');
-    return { totalMessages, memorySize };
+    return { totalMessages, memorySize, lastCleared };
   };
 
   return { messages, addMessage, addMessages, getMessages, clearMessages, getStats };
@@ -194,6 +196,51 @@ export default async function memoryRoutes(server: FastifyInstance, _options: Fa
     } catch (error: any) {
       server.log.error('Fehler beim Abrufen der Memory Stats:', error);
       throw new Error(`Failed to fetch memory stats: ${error.message}`);
+    }
+  });
+
+  // Optimize memory: apply TTL + maxEntries
+  server.post('/memory/optimize', {
+    schema: {
+      tags: ['memory'],
+      body: {
+        type: 'object',
+        properties: {
+          maxEntries: { type: 'number', minimum: 1 },
+          ttlSeconds: { type: 'number', minimum: 1 }
+        }
+      }
+    }
+  }, async (request: any, reply) => {
+    try {
+      const { maxEntries, ttlSeconds } = request.body || {};
+      const now = Date.now();
+
+      if (ttlSeconds && Number.isFinite(ttlSeconds)) {
+        const cutoff = now - ttlSeconds * 1000;
+        const filtered = agentMemory.getMessages().filter(m => m.timestamp >= cutoff);
+        agentMemory.clearMessages();
+        agentMemory.addMessages(filtered);
+      }
+
+      if (maxEntries && Number.isFinite(maxEntries)) {
+        const all = agentMemory.getMessages();
+        if (all.length > maxEntries) {
+          const trimmed = all.slice(all.length - maxEntries);
+          agentMemory.clearMessages();
+          agentMemory.addMessages(trimmed);
+        }
+      }
+
+      const stats = agentMemory.getStats();
+      return {
+        success: true,
+        data: stats,
+        message: 'Memory optimiert'
+      };
+    } catch (error: any) {
+      server.log.error('Fehler bei Memory Optimize:', error);
+      reply.status(500).send({ success: false, error: error.message || 'Optimize fehlgeschlagen' });
     }
   });
 }

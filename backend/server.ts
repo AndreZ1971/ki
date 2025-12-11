@@ -27,6 +27,7 @@ import aiEmailRoutes from './routes/app/api/ai/email/ai-email';
 
 // 🔥 NEUE IMPORTS FÜR CUSTOMERS UND EMAIL
 import customersRoutes from './routes/app/api/woocommerce/customers';
+import wooSyncRoutes from './routes/app/api/woocommerce/sync';
 import emailSenderRoutes from './routes/app/api/email/email-sender';
 import emailTestRoutes from './routes/emailTest';
 import healthRoutes from './routes/app/api/health';
@@ -304,6 +305,7 @@ async function buildServer() {
 
     // 🔥 NEUE ROUTES REGISTRIEREN
     await server.register(customersRoutes, { prefix: '/api/woocommerce' });
+    await server.register(wooSyncRoutes, { prefix: '/api/woocommerce' });
     console.log('✅ Customers Routes erfolgreich registriert');
 
     // 🔥 FIX: Email Routes in korrekter Reihenfolge registrieren

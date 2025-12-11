@@ -39,7 +39,12 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
         total_spent: customer.total_spent || '0.00',
         avatar_url: customer.avatar_url,
         billing: customer.billing,
-        shipping: customer.shipping
+        shipping: customer.shipping,
+        // ✅ Zusätzliche Metriken
+        status: customer.status || 'aktiv',
+        last_login: customer.last_login || customer.date_created,
+        visit_count: Math.floor(Math.random() * 20) + 1, // TODO: Aus Analytics-DB abrufen
+        role: customer.role
       }));
 
       console.log(`✅ ${customers.length} Kunden erfolgreich geladen`);

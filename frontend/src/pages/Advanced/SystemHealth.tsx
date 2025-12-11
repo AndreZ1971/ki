@@ -1,5 +1,5 @@
 // src/pages/Advanced/SystemHealth.tsx
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
@@ -27,12 +27,26 @@ interface ServiceStatus {
 const SystemHealth: React.FC = () => {
   const { handleBackToDashboard, loading, setLoading, error, setError } = useProductManagement();
   const { toasts, showToast } = useToast();
-  const apiBase = import.meta.env.VITE_API_URL || '/api';
+  const apiBase = useMemo(() => {
+    const raw = (import.meta.env.VITE_API_URL || '').trim().replace(/\/$/, '');
+    return raw || '';
+  }, []);
   
   const [monitoringEnabled, setMonitoringEnabled] = useState(true);
   const [alertThreshold, setAlertThreshold] = useState('80');
   const [healthStatus, setHealthStatus] = useState<HealthStatus | null>(null);
   const [services, setServices] = useState<ServiceStatus[]>([]);
+  const [lastUpdated, setLastUpdated] = useState<string>('');
+
+  const buildUrl = (path: string) => {
+    const base = apiBase.endsWith('/api') && path.startsWith('/api')
+      ? apiBase.replace(/\/api$/, '')
+      : apiBase;
+    if (!path.startsWith('/')) {
+      return `${base}/${path}`;
+    }
+    return `${base}${path}`;
+  };
 
   const handleCheckHealth = async () => {
     setLoading(true);
@@ -40,7 +54,7 @@ const SystemHealth: React.FC = () => {
 
     try {
       // ✅ Hole ECHTE System-Metriken vom Backend
-      const response = await fetch(`${apiBase}/api/monitoring/system/metrics`);
+      const response = await fetch(buildUrl('/api/monitoring/system/metrics'));
       
       if (!response.ok) {
         throw new Error('Konnte System-Metriken nicht laden');
@@ -64,13 +78,21 @@ const SystemHealth: React.FC = () => {
         status: metrics.status
       });
       
-        // Lade auch Services-Status
-        const servicesResponse = await fetch(`${apiBase}/api/monitoring/services/status`);
+      // Lade auch Services-Status
+      const servicesResponse = await fetch(buildUrl('/api/monitoring/services/status'));
       if (servicesResponse.ok) {
         const servicesData = await servicesResponse.json();
         if (servicesData.success) {
           setServices(servicesData.services);
         }
+      }
+
+      setLastUpdated(new Date().toLocaleString('de-DE'));
+
+      const threshold = Number(alertThreshold) || 80;
+      const overThreshold = metrics.cpu.usage > threshold || metrics.memory.usagePercent > threshold || metrics.disk.usagePercent > threshold;
+      if (monitoringEnabled && overThreshold) {
+        showToast(`Alert: Ressourcen über ${threshold}%`, 'error');
       }
       
       showToast(`System-Status: ${metrics.status === 'healthy' ? 'Gesund ✅' : metrics.status === 'warning' ? 'Warnung ⚠️' : 'Kritisch 🚨'}`, metrics.status === 'healthy' ? 'success' : 'error');
@@ -204,6 +226,12 @@ const SystemHealth: React.FC = () => {
                   <span>⏱️ Uptime:</span>
                   <span style={{ fontWeight: 'bold' }}>{healthStatus.uptime}</span>
                 </div>
+                {lastUpdated && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '10px', fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>
+                    <span>Aktualisiert:</span>
+                    <span>{lastUpdated}</span>
+                  </div>
+                )}
               </div>
             </div>
           ) : (

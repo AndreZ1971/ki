@@ -1,18 +1,13 @@
 // src/pages/Advanced/MemorySystem.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
 import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
+import { memoryApi } from '../../services/memoryApi';
+import type { MemoryStats, MemoryMessage } from '../../services/memoryApi';
 import './page.css';
-
-interface MemoryStats {
-  totalEntries: number;
-  cacheSize: string;
-  hitRate: number;
-  lastCleared: string;
-}
 
 const MemorySystem: React.FC = () => {
   const { handleBackToDashboard, loading, setLoading, error, setError } = useProductManagement();
@@ -22,6 +17,11 @@ const MemorySystem: React.FC = () => {
   const [maxEntries, setMaxEntries] = useState('1000');
   const [ttl, setTtl] = useState('3600');
   const [memoryStats, setMemoryStats] = useState<MemoryStats | null>(null);
+  const [messages, setMessages] = useState<MemoryMessage[]>([]);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+
+  const ttlSeconds = useMemo(() => Math.max(60, Math.min(86400, Number(ttl) || 0)), [ttl]);
+  const maxEntriesNum = useMemo(() => Math.max(100, Math.min(10000, Number(maxEntries) || 0)), [maxEntries]);
 
   const memoryTypes = [
     { value: 'short-term', label: 'Kurzzeit', icon: '⚡', description: 'Session Memory' },
@@ -30,21 +30,33 @@ const MemorySystem: React.FC = () => {
     { value: 'cache', label: 'Cache', icon: '🗄️', description: 'Fast Access' }
   ];
 
+  const loadStats = async () => {
+    const res = await memoryApi.getStats();
+    if (res.success && res.data) {
+      setMemoryStats(res.data);
+    } else if (res.error) {
+      showToast(res.error, 'error');
+    }
+  };
+
+  const loadMessages = async () => {
+    setLoadingMessages(true);
+    const res = await memoryApi.getMessages(5, 0);
+    if (res.success && (res as any).data?.messages) {
+      setMessages((res as any).data.messages);
+    }
+    setLoadingMessages(false);
+  };
+
   const handleOptimize = async () => {
     setLoading(true);
     setError(null);
-
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      setMemoryStats({
-        totalEntries: Math.floor(Math.random() * 5000) + 1000,
-        cacheSize: `${(Math.random() * 100 + 50).toFixed(2)} MB`,
-        hitRate: Math.floor(Math.random() * 30) + 70,
-        lastCleared: new Date().toLocaleString('de-DE')
-      });
-      
-      showToast('Memory System optimiert!', 'success');
+      const res = await memoryApi.optimize({ maxEntries: maxEntriesNum, ttlSeconds });
+      if (!res.success || !res.data) throw new Error(res.error || 'Optimierung fehlgeschlagen');
+      setMemoryStats(res.data);
+      showToast('Memory optimiert', 'success');
+      await loadMessages();
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Optimierungsfehler';
       setError(errorMessage);
@@ -54,10 +66,40 @@ const MemorySystem: React.FC = () => {
     }
   };
 
-  const handleClearCache = () => {
-    setMemoryStats(null);
-    showToast('Cache geleert!', 'success');
+  const handleClearCache = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await memoryApi.clear();
+      if (!res.success) throw new Error(res.error || 'Konnte Memory nicht leeren');
+      setMemoryStats({ totalMessages: 0, memorySize: 0, lastCleared: Date.now() });
+      setMessages([]);
+      showToast('Memory geleert', 'success');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Fehler beim Leeren';
+      setError(errorMessage);
+      showToast(errorMessage, 'error');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    loadStats();
+    loadMessages();
+  }, []);
+
+  const formatBytes = (bytes: number) => {
+    if (!bytes) return '0 B';
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), sizes.length - 1);
+    const value = bytes / Math.pow(1024, i);
+    return `${value.toFixed(1)} ${sizes[i]}`;
+  };
+
+  const lastClearedDisplay = memoryStats?.lastCleared
+    ? new Date(memoryStats.lastCleared).toLocaleString('de-DE')
+    : '–';
 
   return (
     <div className="page-container">
@@ -114,23 +156,30 @@ const MemorySystem: React.FC = () => {
           {memoryStats ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
               <div style={{ background: 'rgba(102, 126, 234, 0.1)', border: '1px solid rgba(102, 126, 234, 0.3)', borderRadius: '12px', padding: '20px' }}>
-                <div style={{ fontSize: '14px', opacity: 0.7, color: 'white', marginBottom: '8px' }}>Gesamt-Einträge</div>
-                <div style={{ fontSize: '32px', fontWeight: 'bold', color: 'white' }}>{memoryStats.totalEntries.toLocaleString()}</div>
+                <div style={{ fontSize: '14px', opacity: 0.7, color: 'white', marginBottom: '8px' }}>Gesamt-Messages</div>
+                <div style={{ fontSize: '32px', fontWeight: 'bold', color: 'white' }}>{memoryStats.totalMessages.toLocaleString()}</div>
               </div>
               <div style={{ background: 'rgba(102, 126, 234, 0.1)', border: '1px solid rgba(102, 126, 234, 0.3)', borderRadius: '12px', padding: '20px' }}>
-                <div style={{ fontSize: '14px', opacity: 0.7, color: 'white', marginBottom: '8px' }}>Cache-Größe</div>
-                <div style={{ fontSize: '32px', fontWeight: 'bold', color: 'white' }}>{memoryStats.cacheSize}</div>
-              </div>
-              <div style={{ background: 'rgba(102, 126, 234, 0.1)', border: '1px solid rgba(102, 126, 234, 0.3)', borderRadius: '12px', padding: '20px' }}>
-                <div style={{ fontSize: '14px', opacity: 0.7, color: 'white', marginBottom: '8px' }}>Hit Rate</div>
-                <div style={{ fontSize: '32px', fontWeight: 'bold', color: 'white' }}>{memoryStats.hitRate}%</div>
-                <div style={{ width: '100%', height: '8px', background: 'rgba(0,0,0,0.3)', borderRadius: '4px', marginTop: '10px', overflow: 'hidden' }}>
-                  <div style={{ width: `${memoryStats.hitRate}%`, height: '100%', background: 'linear-gradient(90deg, #667eea, #764ba2)', transition: 'width 0.5s' }} />
-                </div>
+                <div style={{ fontSize: '14px', opacity: 0.7, color: 'white', marginBottom: '8px' }}>Speicher</div>
+                <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'white' }}>{formatBytes(memoryStats.memorySize)}</div>
               </div>
               <div style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '15px' }}>
                 <div style={{ fontSize: '12px', opacity: 0.7, color: 'white', marginBottom: '5px' }}>Zuletzt geleert</div>
-                <div style={{ fontSize: '14px', fontWeight: '600', color: 'white' }}>{memoryStats.lastCleared}</div>
+                <div style={{ fontSize: '14px', fontWeight: '600', color: 'white' }}>{lastClearedDisplay}</div>
+                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', marginTop: '4px' }}>Limit: {maxEntriesNum} • TTL: {ttlSeconds}s</div>
+              </div>
+              <div style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '14px' }}>
+                <div style={{ fontSize: '12px', opacity: 0.8, color: 'white', marginBottom: '6px' }}>Zuletzt gespeicherte Nachrichten</div>
+                {loadingMessages ? <div style={{ color: 'rgba(255,255,255,0.7)' }}>Lade…</div> : messages.length ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {messages.map((msg, idx) => (
+                      <div key={idx} style={{ padding: '8px', borderRadius: '8px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                        <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)' }}>{msg.role} • {new Date(msg.timestamp).toLocaleString('de-DE')}</div>
+                        <div style={{ color: 'white', fontSize: '12px' }}>{msg.content}</div>
+                      </div>
+                    ))}
+                  </div>
+                ) : <div style={{ color: 'rgba(255,255,255,0.7)' }}>Keine Nachrichten vorhanden</div>}
               </div>
             </div>
           ) : (
