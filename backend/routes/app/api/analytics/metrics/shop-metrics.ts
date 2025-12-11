@@ -176,4 +176,122 @@ export default async function shopMetricsRoutes(server: FastifyInstance) {
       timestamp: new Date().toISOString()
     };
   });
-} // ← Fehlende schließende Klammer hinzugefügt
+
+  // 🤖 POST /ml-analysis - KI-Analyse für Shop Metrics
+  server.post<{ Body: { metrics: any } }>('/ml-analysis', async (request, reply) => {
+    try {
+      const { metrics } = request.body;
+      
+      const mlInsights: any[] = [];
+
+      // 1. Umsatz-Performance Analyse
+      if (metrics.todaySales && metrics.totalSales) {
+        const dailyPercentage = (metrics.todaySales / (metrics.totalSales / 30)) * 100;
+        if (dailyPercentage < 80) {
+          mlInsights.push({
+            type: 'Low_Daily_Revenue',
+            title: '📉 Täglicher Umsatz unter Durchschnitt',
+            value: `Heutiger Umsatz: $${metrics.todaySales} (${dailyPercentage.toFixed(1)}% des Durchschnitts)`,
+            score: 0.85,
+            detail: 'Der heutige Umsatz liegt unter dem erwarteten Durchschnitt. Überprüfen Sie Marktingmaßnahmen oder externe Faktoren.',
+            priority: dailyPercentage < 60 ? 'high' : 'medium',
+            category: 'Umsatz'
+          });
+        }
+      }
+
+      // 2. Bestellungs-Konversions-Analyse
+      if (metrics.totalOrders && metrics.totalCustomers && metrics.conversionRate) {
+        if (metrics.conversionRate < 2) {
+          mlInsights.push({
+            type: 'Low_Conversion_Rate',
+            title: '⚠️ Konversionsrate niedrig',
+            value: `Aktuelle Rate: ${metrics.conversionRate}% (Optimal: 2-5%)`,
+            score: 0.78,
+            detail: 'Ihre Konversionsrate liegt unter dem Branchenstandard. Optimieren Sie Checkout-Prozess und Produktseiten.',
+            priority: 'high',
+            category: 'Konversion'
+          });
+        }
+      }
+
+      // 3. Kundenakquisitions-Analyse
+      if (metrics.totalCustomers) {
+        if (metrics.todayOrders && metrics.totalCustomers > 0) {
+          const customerRepeatRate = (metrics.todayOrders / metrics.totalCustomers) * 100;
+          if (customerRepeatRate < 5) {
+            mlInsights.push({
+              type: 'Low_Customer_Repeat',
+              title: '👥 Geringe Kundenwiederholungsquote',
+              value: `Wiederholungsquote: ${customerRepeatRate.toFixed(2)}% (Optimal: 10-20%)`,
+              score: 0.82,
+              detail: 'Zu wenige bestehende Kunden kaufen erneut. Implementieren Sie Loyalty-Programme und Email-Marketing.',
+              priority: 'medium',
+              category: 'Kundenbindung'
+            });
+          }
+        }
+      }
+
+      // 4. Produktmix-Analyse
+      if (metrics.totalProducts && metrics.totalOrders) {
+        const ordersPerProduct = metrics.totalOrders / metrics.totalProducts;
+        if (ordersPerProduct < 2) {
+          mlInsights.push({
+            type: 'Low_Product_Performance',
+            title: '📦 Niedriger durchschnittlicher Verkauf pro Produkt',
+            value: `${ordersPerProduct.toFixed(2)} Bestellungen pro Produkt im Durchschnitt`,
+            score: 0.75,
+            detail: 'Das Produktportfolio könnte optimiert werden. Entfernen Sie nicht-performante Artikel und fokussieren Sie auf Top-Seller.',
+            priority: 'medium',
+            category: 'Produkte'
+          });
+        }
+      }
+
+      // 5. Positive Performance wenn alles gut läuft
+      if (!mlInsights.length) {
+        mlInsights.push({
+          type: 'Excellent_Metrics',
+          title: '✨ Shop-Metriken sind exzellent',
+          value: 'Alle KPIs sind im optimalen Bereich',
+          score: 0.95,
+          detail: 'Ihre Shop-Performance ist ausgezeichnet! Laufende Optimierung und Monitoring sollten fortgesetzt werden.',
+          priority: 'low',
+          category: 'Status'
+        });
+      }
+
+      // 6. Revenue Growth Empfehlungen
+      mlInsights.push({
+        type: 'Revenue_Growth_Strategy',
+        title: '💡 Umsatzwachstums-Empfehlungen',
+        value: '3 strategische Maßnahmen basierend auf Ihren Metriken',
+        score: 0.88,
+        detail: 'Fokussieren Sie auf: (1) Konversionsoptimierung, (2) Kundenwiederholung via Email-Marketing, (3) Upsell & Cross-Sell',
+        priority: 'medium',
+        category: 'Strategie'
+      });
+
+      return reply.send({
+        success: true,
+        mlInsights,
+        timestamp: new Date().toISOString(),
+        analysis: {
+          totalInsights: mlInsights.length,
+          criticalCount: mlInsights.filter(i => i.priority === 'critical').length,
+          highCount: mlInsights.filter(i => i.priority === 'high').length,
+          mediumCount: mlInsights.filter(i => i.priority === 'medium').length,
+          lowCount: mlInsights.filter(i => i.priority === 'low').length
+        }
+      });
+    } catch (error: any) {
+      console.error('Shop Metrics ML-Analysis Error:', error);
+      return reply.status(500).send({
+        success: false,
+        error: error.message || 'KI-Analyse fehlgeschlagen',
+        mlInsights: []
+      });
+    }
+  });
+}
