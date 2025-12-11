@@ -8,7 +8,9 @@ import type {
   ApiResponse,
   ProductUpdateRequest,
   CategorySuggestion,
-  FreebieIdea
+  FreebieIdea,
+  FraudAnalysis,
+  AmountSuggestion
 } from '../types/product';
 
 let API_BASE_URL = (import.meta.env.VITE_API_URL || '').trim();
@@ -239,6 +241,56 @@ export const jobApi = {
     return apiRequest<any>('/api/jobs/trigger', {
       method: 'POST',
       body: JSON.stringify({ jobName, params }),
+    });
+  },
+};
+
+// ==================== PAYMENTS ====================
+
+export const paymentApi = {
+  /**
+   * KI-basierte Betrugserkennung für Payments
+   */
+  checkFraud: async (data: {
+    amount: number;
+    currency: string;
+    customerEmail: string;
+    ipAddress?: string;
+  }): Promise<ApiResponse<FraudAnalysis>> => {
+    return apiRequest<FraudAnalysis>('/api/payments/ml/fraud-check', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * KI-basierte Betrags-Empfehlungen
+   */
+  suggestAmounts: async (filters?: {
+    currency?: string;
+    category?: string;
+  }): Promise<ApiResponse<AmountSuggestion[]>> => {
+    const query = new URLSearchParams();
+    if (filters?.currency) query.set('currency', filters.currency);
+    if (filters?.category) query.set('category', filters.category);
+    return apiRequest<AmountSuggestion[]>(`/api/payments/ml/suggest-amounts?${query.toString()}`);
+  },
+
+  /**
+   * Vorhersage der Payment-Erfolgswahrscheinlichkeit
+   */
+  predictSuccess: async (data: {
+    amount: number;
+    currency: string;
+    customerEmail: string;
+  }): Promise<ApiResponse<{
+    successProbability: number;
+    factors: string[];
+    recommendation: string;
+  }>> => {
+    return apiRequest('/api/payments/ml/predict-success', {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
   },
 };

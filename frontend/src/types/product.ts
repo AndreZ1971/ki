@@ -59,6 +59,24 @@ export interface BundleIdea {
   expectedRevenue: number;
 }
 
+export interface FraudAnalysis {
+  riskScore: number;
+  riskLevel: 'low' | 'medium' | 'high' | 'critical';
+  flags: string[];
+  recommendation: string;
+  confidence: number;
+  reasoning: string;
+  analyzedAt: string;
+}
+
+export interface AmountSuggestion {
+  amount: number;
+  reason: string;
+  conversionScore: number;
+  targetAudience: string;
+  psychologicalEffect: string;
+}
+
 export interface Freebie {
   id: number;
   name: string;

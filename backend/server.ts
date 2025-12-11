@@ -37,6 +37,9 @@ import categoryRoutes from './routes/app/api/products/categories';
 import bundleRoutes from './routes/app/api/products/bundles';
 import freebieRoutes from './routes/app/api/products/freebies';
 
+// 🔥 PAYMENT ROUTES
+import paymentRoutes from './routes/app/api/payments';
+
 // 🔥 MARKETING ROUTES
 import marketingRoutes from './routes/app/api/marketing/marketing-routes';
 import emailMarketingRoutes from './routes/app/api/marketing/email-marketing';
@@ -325,6 +328,9 @@ async function buildServer() {
 
     await server.register(freebieRoutes, { prefix: '/api/freebies' });
     console.log('✅ Freebie Routes erfolgreich registriert');
+
+    await server.register(paymentRoutes, { prefix: '/api/payments' });
+    console.log('✅ Payment Routes erfolgreich registriert');
 
     // 🔥 ML CONFIGURATION ROUTES
     await server.register(mlConfigRoutes, { prefix: '/api/ml' });
