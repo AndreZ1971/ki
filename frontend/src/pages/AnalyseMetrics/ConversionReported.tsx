@@ -79,14 +79,17 @@ const ConversionReported = () => {
     setSummary(null);
     setSummaryDetails(null);
     try {
-      // Beispiel-Endpunkt, Backend muss /api/analytics/ml/report-insights bereitstellen
-      const res = await fetch(`${API_URL}/api/analytics/ml/report-insights`, {
+      let base = (import.meta.env.VITE_API_URL || '').trim();
+      if (base.endsWith('/')) base = base.slice(0, -1);
+      const apiUrl = base ? `${base}/api/analytics/conversion/ml/report-analysis` : `/api/analytics/conversion/ml/report-analysis`;
+      const res = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reportData })
       });
+      if (!res.ok) throw new Error('API request failed');
       const data = await res.json();
-      setInsights(data.insights || []);
+      setInsights(data.mlInsights || []);
       setNextSteps(data.nextSteps || []);
       setSummary(typeof data.summary === 'string' ? data.summary : null);
       setSummaryDetails(data.summaryDetails || null);
