@@ -5,7 +5,6 @@ import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
 import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
-import { MLSupportGenerator } from './MLSupportGenerator';
 import './page.css';
 
 type FrameworkKey = 'react' | 'vue' | 'angular' | 'svelte';

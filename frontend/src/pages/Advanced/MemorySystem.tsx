@@ -87,7 +87,7 @@ const MemorySystem: React.FC = () => {
   useEffect(() => {
     loadStats();
     loadMessages();
-  }, []);
+  }, [loadStats, loadMessages]);
 
   const formatBytes = (bytes: number) => {
     if (!bytes) return '0 B';

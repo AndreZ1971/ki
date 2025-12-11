@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './page.css';
 import { MLPersonalization } from './MLPersonalization';
@@ -45,10 +45,9 @@ const UserManagement: React.FC = () => {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [sortBy, setSortBy] = useState<'name' | 'revenue' | 'date'>('name');
 	const [selectedUser, setSelectedUser] = useState<Customer | null>(null);
-	const [personalizationUserId, setPersonalizationUserId] = useState<number | null>(null);
 
 	// 🔗 Normalisierte API-URL
-	const buildUrl = (path: string) => {
+	const buildUrl = useCallback((path: string) => {
 		const base = apiBase.endsWith('/api') && path.startsWith('/api')
 			? apiBase.replace(/\/api$/, '')
 			: apiBase;
@@ -56,7 +55,7 @@ const UserManagement: React.FC = () => {
 			return `${base}/${path}`;
 		}
 		return `${base}${path}`;
-	};
+	}, [apiBase]);
 
 	// ✅ Kundendaten laden
 	useEffect(() => {
@@ -90,7 +89,7 @@ const UserManagement: React.FC = () => {
 		};
 		
 		fetchCustomers();
-	}, [apiBase, buildUrl]);
+	}, [buildUrl]);
 
 	// 📊 Berechnete Statistiken
 	const stats = useMemo((): CustomerStats => {
@@ -110,7 +109,7 @@ const UserManagement: React.FC = () => {
 
 	// 🔍 Gefilterte und sortierte Kundenliste
 	const filteredCustomers = useMemo(() => {
-		let result = customers.filter(c =>
+		const result = customers.filter(c =>
 			c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
 			c.email.toLowerCase().includes(searchTerm.toLowerCase())
 		);
@@ -129,7 +128,6 @@ const UserManagement: React.FC = () => {
 
 	const closeModal = () => {
 		setSelectedUser(null);
-		setPersonalizationUserId(null);
 	};
 
 	return (
