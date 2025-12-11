@@ -6,7 +6,7 @@ import { useToast } from '../../hooks/useToast';
 import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
 import { paymentApi } from '../../services/productApi';
-import type { AmountSuggestion } from '../../types/product';
+import type { AmountSuggestion, UxAuditResult } from '../../types/product';
 import './page.css';
 
 const PaymentSimplified: React.FC = () => {
@@ -21,6 +21,8 @@ const PaymentSimplified: React.FC = () => {
   const [predictionRecommendation, setPredictionRecommendation] = useState<string>('');
   const [suggestedAmounts, setSuggestedAmounts] = useState<AmountSuggestion[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const [uxAudit, setUxAudit] = useState<UxAuditResult | null>(null);
+  const [loadingUx, setLoadingUx] = useState(false);
 
   const handleSimplify = async () => {
     if (!amount || !productName) {
@@ -77,6 +79,32 @@ const PaymentSimplified: React.FC = () => {
     showToast(`✅ ${suggestion.amount} ${currency} übernommen`, 'success');
     // Optional: direkt neue Prognose anstoßen
     setTimeout(() => handleSimplify(), 200);
+  };
+
+  const handleUxCheck = async () => {
+    if (!amount || !productName) {
+      showToast('Bitte Produktname und Preis angeben', 'error');
+      return;
+    }
+
+    setLoadingUx(true);
+    try {
+      const response = await paymentApi.uxCheck({
+        productName,
+        amount: parseFloat(amount),
+        currency,
+        flowType: 'one-page'
+      });
+      if (response.success && response.data) {
+        setUxAudit(response.data);
+        showToast('🧠 UX Quick Wins geladen', 'success');
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'UX-Check fehlgeschlagen';
+      showToast(errorMessage, 'error');
+    } finally {
+      setLoadingUx(false);
+    }
   };
 
   return (
@@ -185,6 +213,27 @@ const PaymentSimplified: React.FC = () => {
             </div>
           </div>
 
+          <div style={{ marginTop: '12px' }}>
+            <button
+              onClick={handleUxCheck}
+              disabled={loadingUx}
+              style={{
+                width: '100%',
+                background: 'linear-gradient(135deg, #0ba360 0%, #3cba92 100%)',
+                border: 'none',
+                borderRadius: '12px',
+                padding: '12px',
+                color: 'white',
+                fontWeight: '600',
+                cursor: loadingUx ? 'not-allowed' : 'pointer',
+                opacity: loadingUx ? 0.75 : 1,
+                transition: 'all 0.2s'
+              }}
+            >
+              {loadingUx ? '🔎 Analysiere UX...' : '🧠 UX Quick Wins'}
+            </button>
+          </div>
+
           <div style={{ marginTop: '20px' }}>
             <LoadingButton onClick={handleSimplify} loading={loading} loadingText="Optimiere...">🎯 Prozess Vereinfachen</LoadingButton>
           </div>
@@ -222,6 +271,74 @@ const PaymentSimplified: React.FC = () => {
                 <div style={{ background: 'rgba(102, 126, 234, 0.12)', border: '1px solid rgba(102, 126, 234, 0.4)', borderRadius: '12px', padding: '16px' }}>
                   <div style={{ fontSize: '12px', fontWeight: '700', color: 'white', marginBottom: '8px' }}>KI-Empfehlung</div>
                   <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.9)' }}>💡 {predictionRecommendation}</div>
+                </div>
+              )}
+
+              {uxAudit && (
+                <div style={{ background: 'rgba(11, 163, 96, 0.08)', border: '1px solid rgba(11, 163, 96, 0.3)', borderRadius: '12px', padding: '18px', display: 'grid', gap: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ color: 'white', fontWeight: 700, fontSize: '13px' }}>UX Quick Wins</div>
+                    <div style={{
+                      background: 'rgba(52, 199, 89, 0.15)',
+                      border: '1px solid rgba(52, 199, 89, 0.4)',
+                      borderRadius: '10px',
+                      padding: '6px 10px',
+                      color: 'white',
+                      fontSize: '12px',
+                      fontWeight: 700
+                    }}>
+                      🚀 Lift ~{Math.round((uxAudit.expectedLift ?? 0) * 100)}%
+                    </div>
+                  </div>
+
+                  {uxAudit.quickWins?.length > 0 && (
+                    <div>
+                      <div style={{ fontSize: '12px', fontWeight: 600, color: 'white', marginBottom: '8px' }}>Quick Wins</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px', color: 'rgba(255,255,255,0.9)' }}>
+                        {uxAudit.quickWins.map((w, idx) => (
+                          <div key={idx} style={{
+                            background: 'rgba(255,255,255,0.05)',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            borderRadius: '8px',
+                            padding: '8px'
+                          }}>
+                            ✅ {w}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {uxAudit.issues?.length > 0 && (
+                    <div>
+                      <div style={{ fontSize: '12px', fontWeight: 600, color: 'white', marginBottom: '8px' }}>Risiken</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px', color: 'rgba(255,255,255,0.9)' }}>
+                        {uxAudit.issues.map((i, idx) => (
+                          <div key={idx} style={{
+                            background: 'rgba(255, 159, 10, 0.12)',
+                            border: '1px solid rgba(255, 159, 10, 0.4)',
+                            borderRadius: '8px',
+                            padding: '8px'
+                          }}>
+                            ⚠️ {i}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {uxAudit.recommendedFlow && (
+                    <div style={{
+                      background: 'rgba(11, 163, 96, 0.12)',
+                      border: '1px solid rgba(11, 163, 96, 0.35)',
+                      borderRadius: '10px',
+                      padding: '10px',
+                      color: 'rgba(255,255,255,0.9)',
+                      fontSize: '12px'
+                    }}>
+                      🧭 Empfohlener Flow: {uxAudit.recommendedFlow}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

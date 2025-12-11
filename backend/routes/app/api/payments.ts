@@ -12,6 +12,13 @@ interface AmountSuggestionQuery {
   category?: string;
 }
 
+interface UxCheckBody {
+  productName: string;
+  amount: number;
+  currency: string;
+  flowType?: 'one-page' | 'multi-step';
+}
+
 export default async function paymentRoutes(server: FastifyInstance) {
   
   // ML: Fraud Detection
@@ -280,6 +287,86 @@ Antworte mit JSON Array:
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Vorhersage fehlgeschlagen'
+        });
+      }
+    }
+  );
+
+  // ML: UX Quick Wins & Conversion Lift
+  server.post<{ Body: UxCheckBody }>(
+    '/ml/ux-check',
+    {
+      schema: {
+        tags: ['payments', 'ml'],
+        description: 'KI-Empfehlungen für Checkout-UX und erwarteten Conversion-Lift',
+        body: {
+          type: 'object',
+          required: ['productName', 'amount', 'currency'],
+          properties: {
+            productName: { type: 'string' },
+            amount: { type: 'number' },
+            currency: { type: 'string' },
+            flowType: { type: 'string', enum: ['one-page', 'multi-step'] }
+          }
+        }
+      }
+    },
+    async (request: FastifyRequest<{ Body: UxCheckBody }>, reply: FastifyReply) => {
+      try {
+        const { productName, amount, currency, flowType = 'one-page' } = request.body;
+        const { getOpenAIClient, executeOpenAI } = await import('../../../utils/openai.js');
+        const openai = getOpenAIClient();
+
+        const prompt = `Gib UX-Empfehlungen für einen Checkout.
+
+Produkt: ${productName}
+Betrag: ${amount} ${currency}
+Flow-Typ: ${flowType}
+
+Ziele:
+- Abbrüche reduzieren
+- Vertrauen erhöhen
+- Geschwindigkeit steigern
+
+Antworte als JSON-Objekt:
+{
+  "expectedLift": 0.0-1.0, // erwarteter relativer Conversion-Lift
+  "quickWins": ["stichpunktartige Quick Wins"],
+  "issues": ["potenzielle UX-Probleme"],
+  "recommendedFlow": "kurze Empfehlung zum Flow"
+}`;
+
+        const completion = await executeOpenAI(
+          () => openai.chat.completions.create({
+            model: 'gpt-4o-mini',
+            temperature: 0.4,
+            messages: [
+              {
+                role: 'system',
+                content: 'Du bist Conversion-Rate-Optimization (CRO) Experte für Checkouts. Antworte kompakt in JSON.'
+              },
+              { role: 'user', content: prompt }
+            ]
+          }),
+          'ux-check'
+        );
+
+        const responseText = completion.choices[0]?.message?.content || '{}';
+        const parsed = JSON.parse(responseText);
+
+        const normalized = {
+          expectedLift: Math.max(0, Math.min(1, parsed.expectedLift ?? 0.08)),
+          quickWins: Array.isArray(parsed.quickWins) ? parsed.quickWins : [],
+          issues: Array.isArray(parsed.issues) ? parsed.issues : [],
+          recommendedFlow: parsed.recommendedFlow || 'One-Page mit Gast-Checkout und Auto-Fill'
+        };
+
+        return reply.send({ success: true, data: normalized });
+      } catch (error) {
+        console.error('❌ UX check error:', error);
+        return reply.status(500).send({
+          success: false,
+          error: error instanceof Error ? error.message : 'UX-Check fehlgeschlagen'
         });
       }
     }

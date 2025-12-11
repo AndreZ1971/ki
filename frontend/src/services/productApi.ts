@@ -10,7 +10,8 @@ import type {
   CategorySuggestion,
   FreebieIdea,
   FraudAnalysis,
-  AmountSuggestion
+  AmountSuggestion,
+  UxAuditResult
 } from '../types/product';
 
 let API_BASE_URL = (import.meta.env.VITE_API_URL || '').trim();
@@ -289,6 +290,21 @@ export const paymentApi = {
     recommendation: string;
   }>> => {
     return apiRequest('/api/payments/ml/predict-success', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * UX Quick Wins & erwarteter Lift
+   */
+  uxCheck: async (data: {
+    productName: string;
+    amount: number;
+    currency: string;
+    flowType?: 'one-page' | 'multi-step';
+  }): Promise<ApiResponse<UxAuditResult>> => {
+    return apiRequest<UxAuditResult>('/api/payments/ml/ux-check', {
       method: 'POST',
       body: JSON.stringify(data),
     });

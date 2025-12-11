@@ -77,6 +77,13 @@ export interface AmountSuggestion {
   psychologicalEffect: string;
 }
 
+export interface UxAuditResult {
+  expectedLift: number; // 0-1
+  quickWins: string[];
+  issues: string[];
+  recommendedFlow: string;
+}
+
 export interface Freebie {
   id: number;
   name: string;
