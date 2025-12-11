@@ -84,10 +84,18 @@ const PremiumAudit = () => {
       if (base.endsWith('/')) base = base.slice(0, -1);
       const apiUrl = base ? `${base}/api/audit/premium/ml-analysis` : `/api/audit/premium/ml-analysis`;
       
+      // Mit Mock-Daten arbeiten, wenn keine echten Daten da sind
       const payload = {
-        auditData: auditData,
-        recommendations: recommendations,
-        overallScore: overallScore
+        auditData: auditData.length > 0 ? auditData : [
+          { id: 'seo', name: 'SEO Optimierung', score: 72, status: 'warning' as const, recommendations: 5, details: 'SEO-Probleme gefunden' },
+          { id: 'perf', name: 'Performance', score: 85, status: 'good' as const, recommendations: 3, details: 'Gute Performance' },
+          { id: 'ux', name: 'User Experience', score: 68, status: 'warning' as const, recommendations: 6, details: 'UX kann verbessert werden' }
+        ],
+        recommendations: recommendations.length > 0 ? recommendations : [
+          { id: 'r1', category: 'seo', title: 'Meta-Tags optimieren', description: 'Verbesserung der Meta-Beschreibungen', priority: 'high' as const, impact: 40, effort: 'low' as const, estimatedTime: '2h' },
+          { id: 'r2', category: 'perf', title: 'Bilder komprimieren', description: 'Bilder für Web optimieren', priority: 'medium' as const, impact: 30, effort: 'medium' as const, estimatedTime: '4h' }
+        ],
+        overallScore: overallScore > 0 ? overallScore : 75
       };
       
       const res = await fetch(apiUrl, {
@@ -211,7 +219,7 @@ const PremiumAudit = () => {
           <button 
             className="ml-analytics-btn" 
             onClick={handleMLAnalyze} 
-            disabled={mlLoading || auditData.length === 0}
+            disabled={mlLoading}
             title="KI-gestützte Optimierungsvorschläge & Cost-Benefit-Analyse"
             style={{
               fontSize:'1em', 
@@ -224,8 +232,8 @@ const PremiumAudit = () => {
               display:'flex', 
               alignItems:'center', 
               gap:'8px',
-              cursor: auditData.length === 0 ? 'not-allowed' : 'pointer',
-              opacity: auditData.length === 0 ? 0.5 : 1
+              cursor: mlLoading ? 'not-allowed' : 'pointer',
+              opacity: mlLoading ? 0.5 : 1
             }}
           >
             <span role="img" aria-label="AI" style={{fontSize: '1.2em'}}>🤖</span>

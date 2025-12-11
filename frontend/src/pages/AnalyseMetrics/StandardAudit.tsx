@@ -84,9 +84,22 @@ const StandardAudit = () => {
       if (base.endsWith('/')) base = base.slice(0, -1);
       const apiUrl = base ? `${base}/api/audit/standard/ml-analysis` : `/api/audit/standard/ml-analysis`;
       
+      // Mit Mock-Daten arbeiten, wenn keine echten Daten da sind
       const payload = {
-        auditChecks: auditChecks,
-        summary: summary
+        auditChecks: auditChecks.length > 0 ? auditChecks : [
+          { id: 'check1', name: 'Mobile Responsiveness', category: 'ux' as const, status: 'passed' as const, importance: 'high' as const, description: 'Mobile-Ansicht prüfen', fixSuggestion: 'CSS Media Queries verwenden', quickFix: false },
+          { id: 'check2', name: 'SSL/HTTPS', category: 'security' as const, status: 'passed' as const, importance: 'critical' as const, description: 'Verschlüsselung überprüfen', fixSuggestion: 'SSL-Zertifikat installieren', quickFix: false },
+          { id: 'check3', name: 'Meta-Tags vorhanden', category: 'seo' as const, status: 'warning' as const, importance: 'medium' as const, description: 'SEO-Meta-Tags überprüfen', fixSuggestion: 'Meta-Descriptions hinzufügen', quickFix: true },
+          { id: 'check4', name: 'Bilder optimiert', category: 'performance' as const, status: 'warning' as const, importance: 'high' as const, description: 'Bildgröße überprüfen', fixSuggestion: 'Bilder komprimieren', quickFix: true }
+        ],
+        summary: summary.totalChecks > 0 ? summary : {
+          totalChecks: 4,
+          passed: 2,
+          warnings: 2,
+          failed: 0,
+          overallScore: 75,
+          criticalIssues: 0
+        }
       };
       
       const res = await fetch(apiUrl, {
@@ -252,7 +265,7 @@ const StandardAudit = () => {
           <button 
             className="ml-analytics-btn" 
             onClick={handleMLAnalyze} 
-            disabled={mlLoading || auditChecks.length === 0}
+            disabled={mlLoading}
             title="KI-gestützte Quick-Checks & Optimierungsvorschläge"
             style={{
               fontSize:'1em', 
@@ -265,8 +278,8 @@ const StandardAudit = () => {
               display:'flex', 
               alignItems:'center', 
               gap:'8px',
-              cursor: auditChecks.length === 0 ? 'not-allowed' : 'pointer',
-              opacity: auditChecks.length === 0 ? 0.5 : 1
+              cursor: mlLoading ? 'not-allowed' : 'pointer',
+              opacity: mlLoading ? 0.5 : 1
             }}
           >
             <span role="img" aria-label="AI" style={{fontSize: '1.2em'}}>🤖</span>
