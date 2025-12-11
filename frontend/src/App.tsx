@@ -14,6 +14,7 @@ import AutoProductCreator from './pages/ProductManagement/AutoProductCreator';
 import CategoriesManager from './pages/ProductManagement/CategoriesManager';
 import CreateFreebies from './pages/ProductManagement/CreateFreebies';
 import ProductBundles from './pages/ProductManagement/ProductBundles';
+import ProductAnalyzer from './pages/ProductManagement/ProductAnalyzer';
 import RunAutoProductCreator from './pages/ProductManagement/RunAutoProductCreator';
 import RunCreateFreebies from './pages/ProductManagement/RunCreateFreebies';
 import WooProductCreate from './pages/ProductManagement/WooProductCreate';
@@ -111,6 +112,7 @@ function App() {
           
           {/* Product Management Routes */}
           <Route path="/products/auto-creator" element={<AutoProductCreator />} />
+          <Route path="/products/analyzer" element={<ProductAnalyzer />} />
           <Route path="/products/categories-manager" element={<CategoriesManager />} />
           <Route path="/products/create-freebies" element={<CreateFreebies />} />
           <Route path="/products/bundles" element={<ProductBundles />} />

@@ -8,7 +8,6 @@ import type { Bundle, BundleIdea } from '../../types/product';
 import './page.css';
 import './CreateFreebies.css';
 import './ProductBundles.css';
-import ProductAIAnalysis from './ProductAIAnalysis';
 
 const ProductBundles = () => {
   const { handleBackToDashboard, loading, setLoading, error, setError, clearError } = useProductManagement();
@@ -298,9 +297,6 @@ const ProductBundles = () => {
           </div>
         </div>
       </div>
-
-      <h2>KI-Produktanalyse</h2>
-      <ProductAIAnalysis />
     </div>
   );
 };

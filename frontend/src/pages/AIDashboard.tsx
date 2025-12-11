@@ -309,6 +309,14 @@ const AIDashboard: React.FC = () => {
           pageUrl: '/products/woo-update'
         },
         {
+          id: 'product-analysis',
+          title: '🔍 Product Analyzer',
+          description: 'KI-gestützte Produktanalyse mit Optimierungsvorschlägen',
+          endpoint: 'products/analyzer',
+          icon: '🔍',
+          pageUrl: '/products/analyzer'
+        },
+        {
           id: 'categories-manager',
           title: '📑 Categories Manager',
           description: 'Automatische Kategorie-Verwaltung und Optimierung',
