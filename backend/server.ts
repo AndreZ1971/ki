@@ -30,7 +30,7 @@ import customersRoutes from './routes/app/api/woocommerce/customers';
 import wooSyncRoutes from './routes/app/api/woocommerce/sync';
 import emailSenderRoutes from './routes/app/api/email/email-sender';
 import emailTestRoutes from './routes/emailTest';
-import { registerHealthRoutes } from './routes/health';
+import healthRoutes from './routes/health';
 
 // 🔥 PRODUCT MANAGEMENT ROUTES
 import productManagementRoutes from './routes/app/api/products/product-management';
@@ -315,10 +315,6 @@ async function buildServer() {
     await server.register(emailTestRoutes, { prefix: '/api/email' });
     console.log('✅ Email Test Routes erfolgreich registriert');
 
-    // 🔥 Health Routes für Shop Health Report
-    await server.register(healthRoutes, { prefix: '/api/health' });
-    console.log('✅ Health Routes erfolgreich registriert');
-
     // 🔥 PRODUCT MANAGEMENT ROUTES
     await server.register(productManagementRoutes, { prefix: '/api/products' });
     console.log('✅ Product Management Routes erfolgreich registriert');
@@ -435,7 +431,7 @@ async function buildServer() {
     console.log('✅ Mini Audit Routes erfolgreich registriert');
 
     // 🔥 HEALTH ROUTES - Shop Health KI-Analyse
-    await registerHealthRoutes(server);
+    await server.register(healthRoutes, { prefix: '/api/health' });
     console.log('✅ Health Routes erfolgreich registriert');
 
     // Global Error Handler

@@ -31,11 +31,11 @@ interface MLInsight {
   category?: string;
 }
 
-// Health KI-Analysis Routes
-export async function registerHealthRoutes(fastify: FastifyInstance) {
-  // POST: /api/health/ml-analysis - KI-Analyse für Shop Health
+// Health KI-Analysis Routes - als Plugin exportiert
+export default async function registerHealthRoutes(fastify: FastifyInstance) {
+  // POST: /ml-analysis - KI-Analyse für Shop Health
   fastify.post<{ Body: { healthData: ShopHealthData; metrics: HealthMetric[] } }>(
-    '/api/health/ml-analysis',
+    '/ml-analysis',
     async (request: FastifyRequest<{ Body: { healthData: ShopHealthData; metrics: HealthMetric[] } }>, reply: FastifyReply) => {
       try {
         const { healthData, metrics } = request.body;
@@ -201,7 +201,7 @@ export async function registerHealthRoutes(fastify: FastifyInstance) {
   );
 
   // POST: /api/health/clear-cache
-  fastify.post('/api/health/clear-cache', async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/clear-cache', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       // Simuliere Cache-Clear
       const clearedItems = ['HTML Cache', 'Database Cache', 'Image Cache', 'Static Assets'];
@@ -221,7 +221,7 @@ export async function registerHealthRoutes(fastify: FastifyInstance) {
   });
 
   // POST: /api/health/performance-report
-  fastify.post('/api/health/performance-report', async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/performance-report', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       return reply.send({
         success: true,
@@ -245,7 +245,7 @@ export async function registerHealthRoutes(fastify: FastifyInstance) {
   });
 
   // POST: /api/health/security-scan
-  fastify.post('/api/health/security-scan', async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/security-scan', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       return reply.send({
         success: true,
@@ -271,7 +271,7 @@ export async function registerHealthRoutes(fastify: FastifyInstance) {
   });
 
   // POST: /api/health/seo-analysis
-  fastify.post('/api/health/seo-analysis', async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/seo-analysis', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       return reply.send({
         success: true,
