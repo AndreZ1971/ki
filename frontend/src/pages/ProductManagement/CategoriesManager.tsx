@@ -84,7 +84,7 @@ const CategoriesManager = () => {
       });
 
       if (response.success && response.data) {
-        setSuggestions(prev => ({ ...prev, [category.id]: response.data }));
+        setSuggestions(prev => ({ ...prev, [category.id]: response.data || [] }));
         toast.success(`KI-Vorschläge für "${category.name}" geladen`);
       } else {
         throw new Error(response.error || 'Vorschläge fehlgeschlagen');
