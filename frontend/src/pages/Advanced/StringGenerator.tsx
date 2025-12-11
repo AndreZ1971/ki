@@ -1,5 +1,5 @@
 // src/pages/Advanced/StringGenerator.tsx
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
@@ -14,7 +14,9 @@ const StringGenerator: React.FC = () => {
   const [stringType, setStringType] = useState('id');
   const [length, setLength] = useState('16');
   const [format, setFormat] = useState('alphanumeric');
-  const [generatedString, setGeneratedString] = useState<string | null>(null);
+  const [count, setCount] = useState(1);
+  const [includeSymbols, setIncludeSymbols] = useState(true);
+  const [generatedStrings, setGeneratedStrings] = useState<Array<{ value: string; entropy: number }>>([]);
 
   const stringTypes = [
     { value: 'id', label: 'Unique ID', icon: '🆔', description: 'UUID/GUID' },
@@ -30,36 +32,74 @@ const StringGenerator: React.FC = () => {
     { value: 'hexadecimal', label: 'Hexadezimal', icon: '⬡' }
   ];
 
+  const baseCharSet = useMemo(() => {
+    if (format === 'numeric') return '0123456789';
+    if (format === 'hexadecimal') return '0123456789abcdef';
+    if (format === 'alphabetic') return 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    if (includeSymbols && (stringType === 'password' || stringType === 'token')) {
+      chars += '!@#$%^&*()-_=+[]{};:,.?/';
+    }
+    return chars;
+  }, [format, includeSymbols, stringType]);
+
+  const secureRandomString = (len: number, charset: string) => {
+    if (len <= 0) return '';
+    if (charset.length === 0) return '';
+    const array = new Uint32Array(len);
+    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+      crypto.getRandomValues(array);
+    } else {
+      // Fallback auf Math.random nur wenn nötig
+      for (let i = 0; i < len; i++) {
+        array[i] = Math.floor(Math.random() * 0xffffffff);
+      }
+    }
+    let out = '';
+    for (let i = 0; i < len; i++) {
+      out += charset[array[i] % charset.length];
+    }
+    return out;
+  };
+
+  const toUuidLike = (raw: string) => {
+    const padded = (raw + secureRandomString(32, baseCharSet)).slice(0, 32);
+    return `${padded.slice(0, 8)}-${padded.slice(8, 12)}-${padded.slice(12, 16)}-${padded.slice(16, 20)}-${padded.slice(20)}`;
+  };
+
+  const slugify = (raw: string) => raw.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
   const handleGenerate = async () => {
+    const len = Math.min(Math.max(parseInt(length, 10) || 0, 4), 128);
+    if (Number.isNaN(len) || len < 4) {
+      showToast('Bitte eine Länge zwischen 4 und 128 wählen', 'error');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      let generated = '';
-      const len = parseInt(length) || 16;
-      
-      if (format === 'numeric') {
-        generated = Math.random().toString().slice(2, 2 + len);
-      } else if (format === 'hexadecimal') {
-        generated = Array.from({length: len}, () => Math.floor(Math.random() * 16).toString(16)).join('');
-      } else if (format === 'alphabetic') {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-        generated = Array.from({length: len}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-      } else {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        generated = Array.from({length: len}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+      await new Promise(resolve => setTimeout(resolve, 120));
+
+      const results: Array<{ value: string; entropy: number }> = [];
+      const iterations = Math.min(Math.max(count, 1), 5);
+
+      for (let i = 0; i < iterations; i++) {
+        let raw = secureRandomString(len, baseCharSet);
+
+        if (stringType === 'id') {
+          raw = toUuidLike(raw);
+        } else if (stringType === 'slug') {
+          raw = slugify(raw).slice(0, len);
+        }
+
+        const entropy = Math.round(len * Math.log2(baseCharSet.length) * 100) / 100;
+        results.push({ value: raw, entropy });
       }
 
-      if (stringType === 'id') {
-        generated = `${generated.slice(0,8)}-${generated.slice(8,12)}-${generated.slice(12,16)}-${generated.slice(16)}`;
-      } else if (stringType === 'slug') {
-        generated = generated.toLowerCase().replace(/[^a-z0-9]/g, '-');
-      }
-
-      setGeneratedString(generated);
-      showToast('String erfolgreich generiert!', 'success');
+      setGeneratedStrings(results);
+      showToast(`${results.length} String(s) generiert`, 'success');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten';
       setError(errorMessage);
@@ -105,9 +145,15 @@ const StringGenerator: React.FC = () => {
             </div>
           </div>
 
-          <div className="form-group">
-            <label>Länge</label>
-            <input type="number" value={length} onChange={(e) => setLength(e.target.value)} min="4" max="128" className="form-input" />
+          <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            <div>
+              <label>Länge</label>
+              <input type="number" value={length} onChange={(e) => setLength(e.target.value)} min="4" max="128" className="form-input" />
+            </div>
+            <div>
+              <label>Anzahl</label>
+              <input type="number" value={count} onChange={(e) => setCount(Number(e.target.value))} min={1} max={5} className="form-input" />
+            </div>
           </div>
 
           <div className="form-group">
@@ -124,25 +170,37 @@ const StringGenerator: React.FC = () => {
             </div>
           </div>
 
+          {(stringType === 'password' || stringType === 'token') && (
+            <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <input id="symbols" type="checkbox" checked={includeSymbols} onChange={(e) => setIncludeSymbols(e.target.checked)} />
+              <label htmlFor="symbols" style={{ color: 'white' }}>Sonderzeichen hinzufügen</label>
+            </div>
+          )}
+
           <div style={{ marginTop: '20px' }}>
             <LoadingButton onClick={handleGenerate} loading={loading} loadingText="Generiere...">🔤 String Generieren</LoadingButton>
           </div>
         </motion.div>
 
         <motion.div className="result-container" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-          <h3 style={{ color: 'white', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>📋 Generierter String</h3>
-          {generatedString ? (
-            <div style={{ position: 'relative' }}>
-              <motion.button onClick={() => copyToClipboard(generatedString)} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                style={{ position: 'absolute', top: '10px', right: '10px', padding: '8px 16px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  border: 'none', borderRadius: '8px', color: 'white', cursor: 'pointer', fontSize: '14px', fontWeight: '500', zIndex: 10 }}>📋 Kopieren</motion.button>
-              <div style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '20px', color: 'white',
-                fontFamily: 'monospace', fontSize: '16px', wordBreak: 'break-all' }}>{generatedString}</div>
+          <h3 style={{ color: 'white', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>📋 Generierte Strings</h3>
+          {generatedStrings.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {generatedStrings.map((item, idx) => (
+                <div key={idx} style={{ position: 'relative', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>Entropy: {item.entropy} bits</div>
+                    <motion.button onClick={() => copyToClipboard(item.value)} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                      style={{ padding: '6px 12px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', border: 'none', borderRadius: '6px', color: 'white', cursor: 'pointer', fontSize: '12px', fontWeight: '500' }}>📋 Kopieren</motion.button>
+                  </div>
+                  <div style={{ color: 'white', fontFamily: 'monospace', fontSize: '16px', wordBreak: 'break-all' }}>{item.value}</div>
+                </div>
+              ))}
             </div>
           ) : (
             <div style={{ background: 'rgba(255,255,255,0.03)', border: '2px dashed rgba(255,255,255,0.1)', borderRadius: '12px', padding: '40px', textAlign: 'center', color: 'rgba(255,255,255,0.5)' }}>
               <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔤</div>
-              <p>Hier erscheint der generierte String</p>
+              <p>Hier erscheinen die generierten Strings</p>
             </div>
           )}
         </motion.div>
