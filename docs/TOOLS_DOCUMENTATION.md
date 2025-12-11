@@ -11,11 +11,11 @@
 
 | Kategorie | Tools | ML/KI | Status |
 |-----------|-------|--------|--------|
-| **Analytics** | 11 Tools | 🟡 Teilweise | In Arbeit |
+| **Analytics** | 10 Tools | 🟡 Teilweise | In Arbeit |
 | **Product Management** | 8 Tools | 🟢 Ja | Abgeschlossen |
 | **Payment & Finances** | 13 Tools | 🟢 Ja | Abgeschlossen |
 | **Marketing & Content** | 10 Tools | 🟢 Ja | Abgeschlossen |
-| **Advanced AI** | 10 Tools | 🟢 Ja | Abgeschlossen |
+| **Advanced AI** | 11 Tools | 🟢 Ja | Abgeschlossen |
 | **GESAMT** | **52 Tools** | | |
 
 ---
@@ -204,9 +204,23 @@
 - **Features**: Multi-Region Selection, ML-Loading States, Error Handling, Structured Insights Rendering
 - **UI**: Region Selector (Global/Europa/Amerika/Asien), Stats Cards, Traffic Distribution Bars, Top Countries Table, KI-Insights Display
 
+#### ⭐ **Premium Audit** `frontend/src/pages/AnalyseMetrics/PremiumAudit.tsx`
+- **ML-Features**:
+  - KI-gestützte Shop-Optimierung mit GPT-basierter Analyse
+  - ML-Insights für Audit-Kategorien (type, title, value, score, detail, priority, category)
+  - Cost-Benefit-Analyse mit KI-Confidence-Scoring
+  - Automatische Prioritätsvergabe (critical/high/medium/low)
+  - Category-spezifische Optimierungsvorschläge
+  - Dynamische ML-Recommendations basierend auf Audit-Daten
+- **API**: `/api/audit/premium/ml-analysis` (POST)
+- **Status**: ✅ Vollständig mit ML/KI integriert
+- **Capabilities**: Audit Score Calculation, Category Analysis, Priority-based Recommendations, Timeline Planning
+- **Features**: ML-Button mit Loading States, Error Handling, Priority-colored Insights, Category Filtering
+- **UI**: KI-Optimierung Button, Insights mit Priority-Badges, Confidence-Score-Anzeige, Category-Tags
+
 ---
 
-### 🟡 Teilweise integrierte Tools - Analytics (12 Tools)
+### 🟡 Teilweise integrierte Tools - Analytics (9 Tools)
 
 Diese Tools haben Basic-APIs aber begrenzte ML/KI-Features:
 
