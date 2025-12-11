@@ -5,26 +5,22 @@
 ---
 
 ## 📊 Aktuelle Statistik
-- **Tools Gesamt**: 51
-- **Vollständig integriert**: 25 (49%) ✅
-- **Teilweise integriert**: 13 (26%) 🟡
+- **Tools Gesamt**: 52
+- **Vollständig integriert**: 26 (50%) ✅
+- **Teilweise integriert**: 12 (23%) 🟡
 - **Minimal integriert**: 13 (25%) 🟠
 
 ---
 
 ## 🚀 NÄCHSTE AUFGABEN - Nach Priorität geordnet
 
-### 🔥 PRIORITÄT 1: Analytics Tools Upgrade (13 Tools)
+### 🔥 PRIORITÄT 1: Analytics Tools Upgrade (12 Tools)
 **Grund**: Häufig benutzt, großer Impact auf Verkaufsanalyse  
-**Geschätzter Aufwand**: 3-5 Tage
+**Geschätzter Aufwand**: 2-4 Tage
 
-#### Phase 1.1 - Feedback Analysis Enhancement
-- [ ] **FeedbackAnalysis.tsx**: Sentiment-Analyse mit LLM
-  - Kundenbewertungen automatisch kategorisieren (positive/negative/neutral)
-  - Häufige Probleme extrahieren
-  - Actionable Recommendations generieren
-  - API-Endpoint: `/api/analytics/feedback/analyze` erweitern
+**NOTE**: FeedbackAnalysis wurde entfernt - sie ist bereits vollständig ML/KI-integriert! ✅
 
+#### Phase 1.1 - Conversion Analysis Enhancement
 - [ ] **ConversionAnalysis.tsx**: AI-gestützte Recommendations
   - Warum Conversions sinken/steigen → KI-Analyse
   - Schwachstellen identifizieren
@@ -165,7 +161,7 @@
 - [x] MemorySystem.tsx React Hook Fixes
 
 ### Abgeschlossen in letzten Tagen
-- [x] Advanced AI Tools (7/7) - Vollständig ML/KI integriert
+- [x] Advanced AI Tools (8/8) - Vollständig ML/KI integriert (inkl. FeedbackAnalysis)
 - [x] Product Management Tools (8/8) - Vollständig ML/KI integriert
 - [x] Marketing & Content Tools (10/10) - Vollständig ML/KI integriert
 - [x] ML Settings - Funktional
@@ -176,8 +172,8 @@
 ## 💡 EMPFOHLENE REIHENFOLGE ZUM ABARBEITEN
 
 ### Week 1 (Diese Woche)
-1. **FeedbackAnalysis upgrade** - Sentiment Analysis hinzufügen
-2. **ConversionAnalysis upgrade** - AI Recommendations
+1. **ConversionAnalysis upgrade** - AI Recommendations
+2. **TrendAnalysis upgrade** - Predictive Features hinzufügen
 3. **Tests schreiben** für neue Features
 
 ### Week 2
@@ -196,10 +192,9 @@
 
 ```
 frontend/src/pages/
-├── AnalyseMetrics/          (13 Tools - 🟡 UPGRADE NÖTIG)
+├── AnalyseMetrics/          (12 Tools - 🟡 UPGRADE NÖTIG)
 │   ├── ShopMetrics.tsx
 │   ├── ConversionAnalysis.tsx       ← Priority 1.1
-│   ├── FeedbackAnalysis.tsx         ← Priority 1.1
 │   ├── TrendAnalysis.tsx            ← Priority 1.2
 │   ├── RunTrendAnalysis.tsx         ← Priority 1.2
 │   ├── PremiumAudit.tsx             ← Priority 1.3
@@ -215,10 +210,10 @@ frontend/src/pages/
 │
 ├── ProductManagement/       (8 Tools - ✅ FERTIG)
 ├── MarketingContent/        (10 Tools - ✅ FERTIG)
-├── Advanced/                (7 Tools - ✅ FERTIG)
-├── app/                     (Sub-Tools - ✅ FERTIG)
+├── Advanced/                (8 Tools - ✅ FERTIG)
+├── app/                     (2 Tools - ✅ FERTIG)
 │   ├── UserManagement.tsx   ✅ Refactored
-│   └── FeedbackAnalysis.tsx
+│   └── FeedbackAnalysis.tsx ✅ Full ML/KI (Sentiment, Categorization, Recommendations)
 └── Settings/                (ML Config - ✅ FERTIG)
 ```
 

@@ -15,8 +15,8 @@
 | **Product Management** | 8 Tools | 🟢 Ja | Abgeschlossen |
 | **Payment & Finances** | 13 Tools | 🟠 Gering | Zu upgr. |
 | **Marketing & Content** | 10 Tools | 🟢 Ja | Abgeschlossen |
-| **Advanced AI** | 7 Tools | 🟢 Ja | Abgeschlossen |
-| **GESAMT** | **51 Tools** | | |
+| **Advanced AI** | 8 Tools | 🟢 Ja | Abgeschlossen |
+| **GESAMT** | **52 Tools** | | |
 
 ---
 
@@ -119,7 +119,7 @@
 
 ---
 
-### Advanced AI (7/7 Tools)
+### Advanced AI (8/8 Tools)
 
 #### 🧠 **Context Generator** `frontend/src/pages/Advanced/ContextGenerator.tsx`
 - **ML-Features**: KI-Kontext-Generierung
@@ -164,9 +164,22 @@
 - **Features**: Stats-Cards (Gesamtumsatz, Ø-Warenkorbwert, aktive Kunden, Top Kunde)
 - **Data Extended**: customer status, last_login, visit_count, role fields
 
+#### 💬 **Feedback Analysis** `frontend/src/pages/app/FeedbackAnalysis.tsx`
+- **ML-Features**: 
+  - Sentiment-Analyse (positive/negative/neutral) mit Confidence-Scores
+  - Automatische Kategorisierung (Customer, Performance, Products, Traffic, Conversion)
+  - Impact-Bewertung (high/medium/low) für jedes Insight
+  - KI-generierte Recommendations für Optimierungen
+  - Next Steps mit Criticality-Levels
+- **API**: `/api/analytics/feedback/reviews`, `/api/analytics/feedback/tickets`, `/api/analytics/feedback/analyze`
+- **Status**: ✅ Vollständig mit ML/KI integriert
+- **Capabilities**: Reviews + Tickets Analyse, Sentiment Detection, Pattern Recognition
+- **Features**: Stats-Cards (Bewertungen, Tickets, Sentiment, Resolution Time), Insight-Grid mit Recommendations, Next Steps Display
+- **UI**: Glassmorphism, Color-coded Impact/Status, Expandable Rohdaten
+
 ---
 
-## 🟡 Teilweise integrierte Tools - Analytics (13 Tools)
+### 🟡 Teilweise integrierte Tools - Analytics (12 Tools)
 
 Diese Tools haben Basic-APIs aber begrenzte ML/KI-Features:
 
@@ -176,7 +189,6 @@ Diese Tools haben Basic-APIs aber begrenzte ML/KI-Features:
 |------|------|-----------|---------|
 | 📊 Shop Metrics | ShopMetrics.tsx | 🟡 API-only | Metrics-Anzeige, keine KI-Analyse |
 | 📈 Conversion Analysis | ConversionAnalysis.tsx | 🟡 Basic | Daten-Anzeige, minimal KI |
-| 💬 Feedback Analysis | FeedbackAnalysis.tsx | 🟡 Basic | Sentiment-Analyse minimal |
 | 📋 Conversion Reported | ConversionReported.tsx | 🟡 Reporting | Auto-Reports, keine ML |
 | 📊 Trend Analysis | TrendAnalysis.tsx | 🟡 Basic | Trend-Detection, begrenzt |
 | 🚀 Run Trend Analysis | RunTrendAnalysis.tsx | 🟡 API-Call | Test-Endpoint: `/api/ml/test/trends` |
@@ -189,6 +201,8 @@ Diese Tools haben Basic-APIs aber begrenzte ML/KI-Features:
 | 🔎 Mini Audit | MiniAudit.tsx | 🟡 Quick-Check | Schnell-Audit, minimal |
 
 **ML-Integration Status**: Zeigen Daten und Metriken, aber keine echte AI-Analyse oder Recommendations
+
+**Note**: Feedback Analysis wurde aus dieser Kategorie entfernt - sie ist bereits vollständig ML/KI-integriert und unter "Advanced AI" dokumentiert!
 
 ---
 
@@ -248,10 +262,10 @@ Alle Payment-Tools haben bare Minimum KI-Integration:
 ### ✅ ABGESCHLOSSEN & FERTIG
 - **Product Management**: 8/8 Tools (100% mit ML/KI)
 - **Marketing & Content**: 10/10 Tools (100% mit ML/KI)
-- **Advanced AI**: 7/7 Tools (100% mit ML/KI)
+- **Advanced AI**: 8/8 Tools (100% mit ML/KI)
 - **ML Settings**: Funktional
 
-**Summe**: 25/51 Tools mit voller ML/KI-Integration (49%)
+**Summe**: 26/51 Tools mit voller ML/KI-Integration (51%)
 
 ### 🟡 TEILWEISE - Bedarf Upgrade
 - **Analytics**: 13 Tools (0% echte ML/KI - nur Daten-Anzeige)
