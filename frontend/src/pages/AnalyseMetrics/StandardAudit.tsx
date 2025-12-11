@@ -49,6 +49,10 @@ const StandardAudit = () => {
     priority?: 'critical' | 'high' | 'medium' | 'low';
     category?: string;
   }>>([]);
+  
+  // Details Modal States
+  const [selectedCheck, setSelectedCheck] = useState<AuditCheck | null>(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   // Audit-Daten vom Backend laden
   const loadAuditData = React.useCallback(async () => {
@@ -123,6 +127,17 @@ const StandardAudit = () => {
 
   const handleBack = () => {
     navigate('/');
+  };
+
+  // Details Modal Handler
+  const openDetailsModal = (check: AuditCheck) => {
+    setSelectedCheck(check);
+    setShowDetailsModal(true);
+  };
+
+  const closeDetailsModal = () => {
+    setShowDetailsModal(false);
+    setTimeout(() => setSelectedCheck(null), 300);
   };
 
   // Scan auslösen und Daten neu laden
@@ -451,7 +466,10 @@ const StandardAudit = () => {
                       🔧 Schnell-Fix
                     </button>
                   )}
-                  <button className="action-button secondary small">
+                  <button 
+                    className="action-button secondary small"
+                    onClick={() => openDetailsModal(check)}
+                  >
                     📋 Details
                   </button>
                 </div>
@@ -533,8 +551,186 @@ const StandardAudit = () => {
           </div>
         </div>
       </div>
+
+      {/* Details Modal */}
+      {showDetailsModal && selectedCheck && (
+        <div 
+          className="modal-overlay"
+          onClick={closeDetailsModal}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            animation: 'fadeIn 0.3s ease-in'
+          }}
+        >
+          <div 
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: '#fff',
+              borderRadius: 12,
+              padding: 32,
+              maxWidth: 600,
+              maxHeight: 80 + 'vh',
+              overflow: 'auto',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+              animation: 'slideUp 0.3s ease-out'
+            }}
+          >
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 24}}>
+              <div>
+                <h2 style={{margin: 0, marginBottom: 8, color: '#2c3e50', fontSize: '1.5em'}}>
+                  {selectedCheck.name}
+                </h2>
+                <span 
+                  style={{
+                    display: 'inline-block',
+                    padding: '4px 12px',
+                    borderRadius: 6,
+                    fontSize: '0.85em',
+                    fontWeight: 600,
+                    background: getImportanceColor(selectedCheck.importance),
+                    color: '#fff',
+                    marginRight: 8
+                  }}
+                >
+                  {selectedCheck.importance.toUpperCase()}
+                </span>
+                <span 
+                  style={{
+                    display: 'inline-block',
+                    padding: '4px 12px',
+                    borderRadius: 6,
+                    fontSize: '0.85em',
+                    fontWeight: 600,
+                    background: getStatusColor(selectedCheck.status),
+                    color: '#fff'
+                  }}
+                >
+                  {getStatusIcon(selectedCheck.status)} {selectedCheck.status.toUpperCase()}
+                </span>
+              </div>
+              <button
+                onClick={closeDetailsModal}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '1.5em',
+                  cursor: 'pointer',
+                  padding: 0,
+                  color: '#6c757d',
+                  transition: 'color 0.2s'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{marginBottom: 24}}>
+              <h3 style={{margin: '0 0 12px 0', color: '#2c3e50'}}>📝 Beschreibung</h3>
+              <p style={{margin: 0, color: '#555', lineHeight: 1.6}}>{selectedCheck.description}</p>
+            </div>
+
+            <div style={{marginBottom: 24}}>
+              <h3 style={{margin: '0 0 12px 0', color: '#2c3e50'}}>🔧 Lösung</h3>
+              <p style={{margin: 0, color: '#555', lineHeight: 1.6}}>{selectedCheck.fixSuggestion}</p>
+            </div>
+
+            <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24}}>
+              <div style={{background: '#f8f9fa', padding: 16, borderRadius: 8}}>
+                <div style={{color: '#6c757d', fontSize: '0.9em', marginBottom: 4}}>Kategorie</div>
+                <div style={{fontSize: '1.1em', fontWeight: 600, color: '#2c3e50'}}>
+                  {selectedCheck.category.charAt(0).toUpperCase() + selectedCheck.category.slice(1)}
+                </div>
+              </div>
+              <div style={{background: '#f8f9fa', padding: 16, borderRadius: 8}}>
+                <div style={{color: '#6c757d', fontSize: '0.9em', marginBottom: 4}}>Quick-Fix verfügbar</div>
+                <div style={{fontSize: '1.1em', fontWeight: 600, color: selectedCheck.quickFix ? '#27ae60' : '#e74c3c'}}>
+                  {selectedCheck.quickFix ? '✅ Ja' : '❌ Nein'}
+                </div>
+              </div>
+            </div>
+
+            <div style={{display: 'flex', gap: 12}}>
+              {selectedCheck.quickFix && selectedCheck.status !== 'passed' && (
+                <button 
+                  className="action-button primary"
+                  onClick={() => {
+                    applyQuickFix(selectedCheck.id);
+                    closeDetailsModal();
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '12px 20px',
+                    background: '#27ae60',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 8,
+                    cursor: 'pointer',
+                    fontSize: '1em',
+                    fontWeight: 600,
+                    transition: 'background 0.2s'
+                  }}
+                >
+                  🔧 Quick-Fix anwenden
+                </button>
+              )}
+              <button 
+                onClick={closeDetailsModal}
+                style={{
+                  flex: 1,
+                  padding: '12px 20px',
+                  background: '#95a5a6',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 8,
+                  cursor: 'pointer',
+                  fontSize: '1em',
+                  fontWeight: 600,
+                  transition: 'background 0.2s'
+                }}
+              >
+                Schließen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default StandardAudit;
+
+// Animationen für Modal
+if (typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideUp {
+      from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0); 
+      }
+    }
+  `;
+  if (!document.head.querySelector('style[data-standard-audit-modal]')) {
+    style.setAttribute('data-standard-audit-modal', 'true');
+    document.head.appendChild(style);
+  }
+}

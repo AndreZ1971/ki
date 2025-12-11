@@ -43,6 +43,10 @@ const PremiumAudit = () => {
     category?: string;
   }>>([]);
 
+  // Details Modal States
+  const [selectedRecommendation, setSelectedRecommendation] = useState<AuditRecommendation | null>(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+
   // Audit-Daten laden
   const fetchAudit = async () => {
     setLoading(true);
@@ -120,6 +124,17 @@ const PremiumAudit = () => {
 
   const handleBack = () => {
     navigate('/');
+  };
+
+  // Details Modal Handler
+  const openDetailsModal = (recommendation: AuditRecommendation) => {
+    setSelectedRecommendation(recommendation);
+    setShowDetailsModal(true);
+  };
+
+  const closeDetailsModal = () => {
+    setShowDetailsModal(false);
+    setTimeout(() => setSelectedRecommendation(null), 300);
   };
 
   const getStatusColor = (status: string) => {
@@ -405,7 +420,12 @@ const PremiumAudit = () => {
                   </div>
                 </div>
                 <div className="rec-actions">
-                  <button className="action-button primary">Jetzt umsetzen</button>
+                  <button 
+                    className="action-button primary"
+                    onClick={() => openDetailsModal(recommendation)}
+                  >
+                    📋 Details
+                  </button>
                   <button className="action-button secondary">Später erinnern</button>
                 </div>
               </div>
@@ -471,8 +491,179 @@ const PremiumAudit = () => {
           </div>
         </div>
       </div>
+
+      {/* Details Modal */}
+      {showDetailsModal && selectedRecommendation && (
+        <div 
+          className="modal-overlay"
+          onClick={closeDetailsModal}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            animation: 'fadeIn 0.3s ease-in'
+          }}
+        >
+          <div 
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: '#fff',
+              borderRadius: 12,
+              padding: 32,
+              maxWidth: 600,
+              maxHeight: 80 + 'vh',
+              overflow: 'auto',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+              animation: 'slideUp 0.3s ease-out'
+            }}
+          >
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 24}}>
+              <div>
+                <h2 style={{margin: 0, marginBottom: 8, color: '#2c3e50', fontSize: '1.5em'}}>
+                  {selectedRecommendation.title}
+                </h2>
+                <span 
+                  style={{
+                    display: 'inline-block',
+                    padding: '4px 12px',
+                    borderRadius: 6,
+                    fontSize: '0.85em',
+                    fontWeight: 600,
+                    background: getPriorityColor(selectedRecommendation.priority),
+                    color: '#fff',
+                    marginRight: 8
+                  }}
+                >
+                  {selectedRecommendation.priority.toUpperCase()}
+                </span>
+              </div>
+              <button
+                onClick={closeDetailsModal}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '1.5em',
+                  cursor: 'pointer',
+                  padding: 0,
+                  color: '#6c757d',
+                  transition: 'color 0.2s'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{marginBottom: 24}}>
+              <h3 style={{margin: '0 0 12px 0', color: '#2c3e50'}}>📝 Beschreibung</h3>
+              <p style={{margin: 0, color: '#555', lineHeight: 1.6}}>{selectedRecommendation.description}</p>
+            </div>
+
+            <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24}}>
+              <div style={{background: '#f8f9fa', padding: 16, borderRadius: 8}}>
+                <div style={{color: '#6c757d', fontSize: '0.9em', marginBottom: 4}}>Impact</div>
+                <div style={{fontSize: '1.3em', fontWeight: 600, color: getPriorityColor(selectedRecommendation.priority)}}>
+                  {selectedRecommendation.impact}%
+                </div>
+              </div>
+              <div style={{background: '#f8f9fa', padding: 16, borderRadius: 8}}>
+                <div style={{color: '#6c757d', fontSize: '0.9em', marginBottom: 4}}>Aufwand</div>
+                <div style={{fontSize: '1.1em', fontWeight: 600, color: getEffortColor(selectedRecommendation.effort)}}>
+                  {selectedRecommendation.effort.toUpperCase()}
+                </div>
+              </div>
+            </div>
+
+            <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24}}>
+              <div style={{background: '#f8f9fa', padding: 16, borderRadius: 8}}>
+                <div style={{color: '#6c757d', fontSize: '0.9em', marginBottom: 4}}>Kategorie</div>
+                <div style={{fontSize: '1.1em', fontWeight: 600, color: '#2c3e50'}}>
+                  {auditData.find(cat => cat.id === selectedRecommendation.category)?.name || 'N/A'}
+                </div>
+              </div>
+              <div style={{background: '#f8f9fa', padding: 16, borderRadius: 8}}>
+                <div style={{color: '#6c757d', fontSize: '0.9em', marginBottom: 4}}>Geschätzter Aufwand</div>
+                <div style={{fontSize: '1.1em', fontWeight: 600, color: '#2c3e50'}}>
+                  {selectedRecommendation.estimatedTime}
+                </div>
+              </div>
+            </div>
+
+            <div style={{display: 'flex', gap: 12}}>
+              <button 
+                onClick={() => {
+                  closeDetailsModal();
+                }}
+                style={{
+                  flex: 1,
+                  padding: '12px 20px',
+                  background: '#27ae60',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 8,
+                  cursor: 'pointer',
+                  fontSize: '1em',
+                  fontWeight: 600,
+                  transition: 'background 0.2s'
+                }}
+              >
+                ✅ Jetzt umsetzen
+              </button>
+              <button 
+                onClick={closeDetailsModal}
+                style={{
+                  flex: 1,
+                  padding: '12px 20px',
+                  background: '#95a5a6',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 8,
+                  cursor: 'pointer',
+                  fontSize: '1em',
+                  fontWeight: 600,
+                  transition: 'background 0.2s'
+                }}
+              >
+                Schließen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default PremiumAudit;
+
+// Animationen für Modal
+if (typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideUp {
+      from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0); 
+      }
+    }
+  `;
+  if (!document.head.querySelector('style[data-premium-audit-modal]')) {
+    style.setAttribute('data-premium-audit-modal', 'true');
+    document.head.appendChild(style);
+  }
+}
