@@ -30,6 +30,20 @@ const MiniAudit = () => {
   const [scanTime, setScanTime] = useState<number>(0);
   const [isScanning, setIsScanning] = useState(false);
 
+  // KI/ML-Analyse States
+  interface MLInsight {
+    type: string;
+    title: string;
+    value: string;
+    score?: number;
+    detail?: string;
+    priority?: 'critical' | 'high' | 'medium' | 'low';
+    category?: string;
+  }
+  const [mlLoading, setMlLoading] = useState(false);
+  const [mlError, setMlError] = useState<string | null>(null);
+  const [mlInsights, setMlInsights] = useState<MLInsight[]>([]);
+
   useEffect(() => {
     loadMiniAuditData();
   }, []);
@@ -159,6 +173,43 @@ const MiniAudit = () => {
     navigate('/');
   };
 
+  // KI/ML-Analyse: Mini-Audit mit KI-Insights
+  const handleMLAnalyze = async () => {
+    setMlLoading(true);
+    setMlError(null);
+    setMlInsights([]);
+    try {
+      let base = (import.meta.env.VITE_API_URL || '').trim();
+      if (base.endsWith('/')) base = base.slice(0, -1);
+      const apiUrl = base ? `${base}/api/audit/mini/ml-analysis` : `/api/audit/mini/ml-analysis`;
+      
+      const payload = {
+        quickChecks: quickChecks.length > 0 ? quickChecks : [
+          { id: 'load-time', name: 'Ladezeit', icon: '⚡', status: 'good' as const, value: '1.8s', trend: 12, description: 'Seiten-Geschwindigkeit' },
+          { id: 'mobile-score', name: 'Mobile', icon: '📱', status: 'warning' as const, value: '72/100', trend: -5, description: 'Mobile Performance' },
+          { id: 'seo-basic', name: 'SEO Basis', icon: '🔍', status: 'good' as const, value: '85/100', trend: 3, description: 'Grundlegende SEO' }
+        ],
+        miniMetrics: miniMetrics.length > 0 ? miniMetrics : [
+          { id: 'conversion', name: 'Conversion Rate', value: 2.3, target: 3.0, unit: '%', status: 'warning' as const },
+          { id: 'bounce-rate', name: 'Absprungrate', value: 42, target: 35, unit: '%', status: 'critical' as const }
+        ]
+      };
+      
+      const res = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!res.ok) throw new Error('Fehler beim Laden der KI-Analyse');
+      const data = await res.json();
+      setMlInsights(data.mlInsights || []);
+    } catch (err: any) {
+      setMlError(err.message || 'KI-Analyse konnte nicht geladen werden.');
+    }
+    setMlLoading(false);
+  };
+
   const runQuickScan = async () => {
     setIsScanning(true);
     try {
@@ -257,7 +308,7 @@ const MiniAudit = () => {
           <p>Schneller Check der wichtigsten Shop-Kennzahlen</p>
         </div>
         
-        <div className="header-controls">
+        <div className="header-controls" style={{display:'flex', gap:'16px', alignItems:'center', flexWrap:'wrap'}}>
           <div className="scan-info">
             <span className="scan-time">⏱️ {scanTime}ms</span>
             <span className="scan-status">{isScanning ? 'Scannt...' : 'Bereit'}</span>
@@ -269,7 +320,30 @@ const MiniAudit = () => {
           >
             {isScanning ? '⚡ Scannt...' : '🔎 Schnell-Check'}
           </button>
+          <button 
+            className="ml-analytics-btn" 
+            onClick={handleMLAnalyze} 
+            disabled={mlLoading}
+            title="KI-gestützte Mini-Audit Analyse"
+            style={{
+              fontSize:'1em', 
+              padding:'8px 16px', 
+              borderRadius:'8px', 
+              background:'linear-gradient(90deg, #667eea 0%, #764ba2 100%)', 
+              color:'#fff', 
+              border:'none', 
+              display:'flex', 
+              alignItems:'center', 
+              gap:'8px',
+              cursor: mlLoading ? 'not-allowed' : 'pointer',
+              opacity: mlLoading ? 0.5 : 1
+            }}
+          >
+            <span role="img" aria-label="AI" style={{fontSize: '1.2em'}}>🤖</span>
+            {mlLoading ? 'KI analysiert...' : 'KI-Insights'}
+          </button>
         </div>
+        {mlError && <div style={{color:'#e74c3c', marginTop:'8px'}}>{mlError}</div>}
       </div>
 
       {/* Quick Overview */}
@@ -295,6 +369,74 @@ const MiniAudit = () => {
           </div>
         </div>
       </div>
+
+      {/* KI-Insights Sektion */}
+      {mlInsights.length > 0 && (
+        <div className="analysis-section">
+          <div style={{marginBottom: 24, padding: '20px', background: 'rgba(102,126,234,0.05)', borderRadius: 12, border: '2px solid rgba(102,126,234,0.2)'}}>
+            <h4 style={{marginBottom: 16, color: '#667eea', display: 'flex', alignItems: 'center', gap: 8}}>
+              <span role="img" aria-label="AI">🤖</span>
+              KI-Audit-Analyse
+            </h4>
+            <ul style={{listStyle:'none', padding:0, margin:0}}>
+              {mlInsights.map((insight: MLInsight, idx: number) => (
+                <li 
+                  key={idx} 
+                  style={{
+                    background: insight.priority === 'critical' ? 'rgba(231,76,60,0.1)' : 
+                               insight.priority === 'high' ? 'rgba(230,126,34,0.1)' :
+                               insight.priority === 'medium' ? 'rgba(241,196,15,0.08)' : '#f6f8fa',
+                    borderLeft: `4px solid ${
+                      insight.priority === 'critical' ? '#e74c3c' :
+                      insight.priority === 'high' ? '#e67e22' :
+                      insight.priority === 'medium' ? '#f1c40f' : '#2563eb'
+                    }`,
+                    borderRadius: 8,
+                    marginBottom: 12,
+                    padding: '16px 18px',
+                    boxShadow: '0 2px 8px rgba(102,126,234,0.08)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 6
+                  }}
+                >
+                  <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4}}>
+                    <span style={{fontWeight: 600, color: '#667eea', fontSize: '1.05em'}}>{insight.title}</span>
+                    {insight.priority && (
+                      <span style={{
+                        padding: '4px 10px',
+                        borderRadius: 6,
+                        fontSize: '0.85em',
+                        fontWeight: 600,
+                        background: insight.priority === 'critical' ? '#e74c3c' :
+                                   insight.priority === 'high' ? '#e67e22' :
+                                   insight.priority === 'medium' ? '#f1c40f' : '#27ae60',
+                        color: '#fff'
+                      }}>
+                        {insight.priority.toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+                  <span style={{fontSize: '1.08em', color: '#222', lineHeight: 1.5}}>{insight.value}</span>
+                  {insight.detail && (
+                    <span style={{color: '#6c757d', fontSize: '0.95em', marginTop: 4}}>{insight.detail}</span>
+                  )}
+                  {insight.category && (
+                    <span style={{color: '#764ba2', fontSize: '0.9em', fontWeight: 500}}>
+                      📂 {insight.category}
+                    </span>
+                  )}
+                  {insight.score !== undefined && (
+                    <span style={{color: '#764ba2', fontWeight: 600, fontSize: '0.95em'}}>
+                      KI-Confidence: {Math.round(insight.score * 100)}%
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
 
       {/* Quick Checks Grid */}
       <div className="analysis-section">
