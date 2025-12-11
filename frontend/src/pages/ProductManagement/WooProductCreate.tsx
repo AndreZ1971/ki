@@ -118,7 +118,7 @@ const WooProductCreate = () => {
         setQualityScore(data.data);
         toast.success(`📊 Qualitäts-Score: ${data.data.overallScore}%`);
       }
-    } catch (err: any) {
+    } catch (_err: any) {
       toast.error('Fehler bei Quality-Score');
     } finally {
       setAiLoading(false);
@@ -149,7 +149,7 @@ const WooProductCreate = () => {
         setSeoSuggestions(data.data);
         toast.success('🔍 SEO-Vorschläge geladen');
       }
-    } catch (err: any) {
+    } catch (_err: any) {
       toast.error('Fehler bei SEO-Optimierung');
     } finally {
       setAiLoading(false);
@@ -182,7 +182,7 @@ const WooProductCreate = () => {
         toast.success('🎨 Produktbild generiert!');
         window.open(data.data.imageUrl, '_blank');
       }
-    } catch (err: any) {
+    } catch (_err: any) {
       toast.error('Fehler bei Bildgenerierung');
     } finally {
       setAiLoading(false);
@@ -213,7 +213,7 @@ const WooProductCreate = () => {
         setProductData({ ...productData, price: data.data.suggestedPrice });
         toast.success(`💰 Empfohlener Preis: ${data.data.suggestedPrice}€ (Konfidenz: ${data.data.confidence}%)`);
       }
-    } catch (err: any) {
+    } catch (_err: any) {
       toast.error('Fehler bei Preis-Vorschlag');
     } finally {
       setAiLoading(false);
