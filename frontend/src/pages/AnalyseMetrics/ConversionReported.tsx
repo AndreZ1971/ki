@@ -34,8 +34,6 @@ interface SummaryDetails {
   recommendation?: string;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || '';
-
 const ConversionReported = () => {
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(true);
