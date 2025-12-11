@@ -11,11 +11,11 @@
 
 | Kategorie | Tools | ML/KI | Status |
 |-----------|-------|--------|--------|
-| **Analytics** | 13 Tools | 🟡 Teilweise | In Arbeit |
+| **Analytics** | 11 Tools | 🟡 Teilweise | In Arbeit |
 | **Product Management** | 8 Tools | 🟢 Ja | Abgeschlossen |
-| **Payment & Finances** | 13 Tools | 🟠 Gering | Zu upgr. |
+| **Payment & Finances** | 13 Tools | 🟢 Ja | Abgeschlossen |
 | **Marketing & Content** | 10 Tools | 🟢 Ja | Abgeschlossen |
-| **Advanced AI** | 9 Tools | 🟢 Ja | Abgeschlossen |
+| **Advanced AI** | 10 Tools | 🟢 Ja | Abgeschlossen |
 | **GESAMT** | **52 Tools** | | |
 
 ---
@@ -190,6 +190,20 @@
 - **Features**: Trend Scoring, Source-Level Breakdown, KI-Insights, Average Score Tracking
 - **UI**: Time-Range Selector, Product List, Trend-Liste mit Confidence, KI-Report Display
 
+#### 🗺️ **Analytic Regioning** `frontend/src/pages/AnalyseMetrics/AnalyticRegioning.tsx`
+- **ML-Features**:
+  - KI-Regionen-Analyse mit GPT-basierter Optimierung
+  - ML-Insights für regionale Performance (type, title, value, score, detail)
+  - KI-Score Anzeige (Confidence-Scoring in %)
+  - Regionen-spezifische Analyse (Global/Europa/Amerika/Asien)
+  - Automatische Identifikation von Top-Performern & Optimierungsbedarf
+  - Dynamische ML-Insights vom Backend
+- **API**: `/api/analytics/regioning/ml-analysis` (POST)
+- **Status**: ✅ Vollständig mit ML/KI integriert
+- **Capabilities**: Regional Traffic Distribution, Country Performance Ranking, Trend Detection per Region
+- **Features**: Multi-Region Selection, ML-Loading States, Error Handling, Structured Insights Rendering
+- **UI**: Region Selector (Global/Europa/Amerika/Asien), Stats Cards, Traffic Distribution Bars, Top Countries Table, KI-Insights Display
+
 ---
 
 ### 🟡 Teilweise integrierte Tools - Analytics (12 Tools)
@@ -342,6 +356,22 @@ Diese Tools haben Basic-APIs aber begrenzte ML/KI-Features:
 - `GET /api/memory/messages` - Memory-Messages
 - `GET /api/monitoring/system/metrics` - System-Health
 - `GET /api/ml/config` - ML-Konfiguration
+
+---
+
+## 📊 Statistik
+
+- **Gesamt**: 52 Tools
+- **Vollständig ML/KI-integriert**: 41 Tools (79%)
+- **Teilweise integriert**: 10 Tools (19%)
+- **Minimal/Keine Integration**: 1 Tool (2%)
+
+### Kategorie-Übersicht:
+- ✅ **Product Management**: 8/8 Tools (100%)
+- ✅ **Marketing & Content**: 10/10 Tools (100%)
+- ✅ **Payment & Finances**: 13/13 Tools (100%)
+- ✅ **Advanced AI**: 10/10 Tools (100%)
+- 🟡 **Analytics & Metrics**: 10 Tools teilweise, 1 minimal
 
 ---
 
