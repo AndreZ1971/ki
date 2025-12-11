@@ -1,5 +1,5 @@
 // src/pages/Advanced/MemorySystem.tsx
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
@@ -30,23 +30,23 @@ const MemorySystem: React.FC = () => {
     { value: 'cache', label: 'Cache', icon: '🗄️', description: 'Fast Access' }
   ];
 
-  const loadStats = async () => {
+  const loadStats = useCallback(async () => {
     const res = await memoryApi.getStats();
     if (res.success && res.data) {
       setMemoryStats(res.data);
     } else if (res.error) {
       showToast(res.error, 'error');
     }
-  };
+  }, [showToast]);
 
-  const loadMessages = async () => {
+  const loadMessages = useCallback(async () => {
     setLoadingMessages(true);
     const res = await memoryApi.getMessages(5, 0);
     if (res.success && (res as any).data?.messages) {
       setMessages((res as any).data.messages);
     }
     setLoadingMessages(false);
-  };
+  }, []);
 
   const handleOptimize = async () => {
     setLoading(true);
