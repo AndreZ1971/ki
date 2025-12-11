@@ -25,10 +25,11 @@ interface MLStats {
 
 export const MLDashboardWidget: React.FC = () => {
     const apiUrl = import.meta.env.VITE_API_URL;
+    const baseApi = (apiUrl || '').trim();
 
     const fetchMLStatus = React.useCallback(async () => {
       try {
-        const response = await fetch(`${apiUrl}/api/ml/status`);
+        const response = await fetch(`${baseApi}/api/ml/status`);
         if (!response.ok) {
           throw new Error(`API Error: ${response.status}`);
         }
@@ -38,13 +39,30 @@ export const MLDashboardWidget: React.FC = () => {
         setError('Fehler beim Laden des ML-Status. Bitte API prüfen.');
         console.error('Failed to fetch ML status:', _error);
       }
-    }, [apiUrl]);
+    }, [baseApi]);
   const [mlStatus, setMlStatus] = useState<MLStatus | null>(null);
   const [mlStats, setMlStats] = useState<MLStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // ...existing code...
+  const fetchMLStats = React.useCallback(async () => {
+    try {
+      const response = await fetch(`${baseApi}/api/ml/stats`);
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status}`);
+      }
+      const data = await response.json();
+      if (!data?.success || !data?.data) {
+        throw new Error(data?.error || 'Ungültige Antwort von /api/ml/stats');
+      }
+      setMlStats(data.data as MLStats);
+    } catch (_error) {
+      setError('Fehler beim Laden der ML-Statistiken.');
+      console.error('Failed to fetch ML stats:', _error);
+    } finally {
+      setLoading(false);
+    }
+  }, [baseApi]);
 
   useEffect(() => {
     fetchMLStatus();
@@ -56,29 +74,7 @@ export const MLDashboardWidget: React.FC = () => {
       fetchMLStats();
     }, 30000);
     return () => clearInterval(interval);
-  }, [fetchMLStatus]);
-
-// ...existing code...
-  const fetchMLStats = async () => {
-    try {
-      // Mock stats for now - replace with real API call later
-      setMlStats({
-        predictions: {
-          total: 127,
-          today: 23,
-          success: 118,
-          failed: 9
-        },
-        avgConfidence: 0.82,
-        lastPrediction: new Date().toISOString()
-      });
-    } catch (_error) {
-      setError('Fehler beim Laden der ML-Statistiken.');
-      console.error('Failed to fetch ML stats:', _error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [fetchMLStatus, fetchMLStats]);
 
   if (loading) {
     return (
@@ -149,6 +145,27 @@ export const MLDashboardWidget: React.FC = () => {
     ? ((mlStats.predictions.success / mlStats.predictions.total) * 100).toFixed(1)
     : '0';
 
+  const featureLabels: Record<string, string> = {
+    productRecommendations: '🛒 Empfehlungen',
+    trendForecasting: '📈 Trends',
+    dynamicPricing: '⚖️ Dynamic Pricing',
+    emailOptimization: '📧 E-Mail Timing',
+    churnPrediction: '🔄 Churn Prediction',
+    sentimentAnalysis: '💬 Sentiment',
+    fraudDetection: '🛡️ Fraud Detection',
+  };
+
+  const statusFeatures = (mlStatus.activeFeatures || []).map((key) => featureLabels[key] || key);
+  const paymentFeatures = [
+    '💳 Payment Success Prediction',
+    '💰 Amount Suggestions',
+    '🧭 Checkout UX Quick Wins',
+    '🧪 Testplan & Diagnose',
+    '✅ Payment Verification'
+  ];
+
+  const activeFeatureBadges = Array.from(new Set([...statusFeatures, ...paymentFeatures]));
+
   return (
     <motion.div
       className="ml-widget"
@@ -171,7 +188,7 @@ export const MLDashboardWidget: React.FC = () => {
           <div>
             <h3 style={{ color: 'white', margin: 0, fontSize: '18px' }}>Machine Learning</h3>
             <p style={{ color: 'rgba(255,255,255,0.5)', margin: 0, fontSize: '12px' }}>
-              {mlStatus.featureCount} Feature{mlStatus.featureCount !== 1 ? 's' : ''} aktiv
+              {activeFeatureBadges.length} Feature{activeFeatureBadges.length !== 1 ? 's' : ''} aktiv
             </p>
           </div>
         </div>
@@ -259,42 +276,21 @@ export const MLDashboardWidget: React.FC = () => {
           Aktive Features:
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-          {mlStatus.models.productRecommendation.enabled && (
-            <span style={{
-              background: 'rgba(139, 92, 246, 0.2)',
-              border: '1px solid rgba(139, 92, 246, 0.5)',
-              borderRadius: '8px',
-              padding: '4px 10px',
-              fontSize: '11px',
-              color: '#a78bfa'
-            }}>
-              🛒 Empfehlungen
+          {activeFeatureBadges.map((label) => (
+            <span
+              key={label}
+              style={{
+                background: 'rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                borderRadius: '8px',
+                padding: '4px 10px',
+                fontSize: '11px',
+                color: 'white'
+              }}
+            >
+              {label}
             </span>
-          )}
-          {mlStatus.models.trendForecasting.enabled && (
-            <span style={{
-              background: 'rgba(59, 130, 246, 0.2)',
-              border: '1px solid rgba(59, 130, 246, 0.5)',
-              borderRadius: '8px',
-              padding: '4px 10px',
-              fontSize: '11px',
-              color: '#60a5fa'
-            }}>
-              📈 Trends
-            </span>
-          )}
-          {mlStatus.models.emailSendTime.enabled && (
-            <span style={{
-              background: 'rgba(16, 185, 129, 0.2)',
-              border: '1px solid rgba(16, 185, 129, 0.5)',
-              borderRadius: '8px',
-              padding: '4px 10px',
-              fontSize: '11px',
-              color: '#34d399'
-            }}>
-              📧 E-Mail Timing
-            </span>
-          )}
+          ))}
         </div>
       </div>
 

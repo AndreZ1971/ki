@@ -23,11 +23,23 @@ interface PredictionHistory {
   responseTime: number;
 }
 
+interface MLStats {
+  predictions: {
+    total: number;
+    today: number;
+    success: number;
+    failed: number;
+  };
+  avgConfidence: number;
+  lastPrediction: string | null;
+}
+
 const MLDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [mlStatus, setMlStatus] = useState<MLStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [predictionHistory, setPredictionHistory] = useState<PredictionHistory[]>([]);
+  const [mlStats, setMlStats] = useState<MLStats | null>(null);
 
   useEffect(() => {
     fetchMLData();
@@ -35,22 +47,21 @@ const MLDashboard: React.FC = () => {
 
   const fetchMLData = async () => {
     try {
-      // Fetch ML status
-  const statusResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/ml/status`);
+      const baseApi = (import.meta.env.VITE_API_URL || '').trim();
+
+      const statusResponse = await fetch(`${baseApi}/api/ml/status`);
+      if (!statusResponse.ok) throw new Error(`Status API Error: ${statusResponse.status}`);
       const statusData = await statusResponse.json();
       setMlStatus(statusData);
 
-      // Mock prediction history - replace with real API later
-      const mockHistory: PredictionHistory[] = [
-        { timestamp: '10:30', feature: 'recommendations', confidence: 0.87, success: true, responseTime: 2.1 },
-        { timestamp: '10:25', feature: 'trends', confidence: 0.92, success: true, responseTime: 3.4 },
-        { timestamp: '10:20', feature: 'recommendations', confidence: 0.78, success: true, responseTime: 1.8 },
-        { timestamp: '10:15', feature: 'trends', confidence: 0.65, success: false, responseTime: 4.2 },
-        { timestamp: '10:10', feature: 'recommendations', confidence: 0.91, success: true, responseTime: 2.3 },
-        { timestamp: '10:05', feature: 'recommendations', confidence: 0.83, success: true, responseTime: 2.0 },
-        { timestamp: '10:00', feature: 'trends', confidence: 0.88, success: true, responseTime: 3.1 },
-      ];
-      setPredictionHistory(mockHistory);
+      const statsResponse = await fetch(`${baseApi}/api/ml/stats`);
+      if (!statsResponse.ok) throw new Error(`Stats API Error: ${statsResponse.status}`);
+      const statsData = await statsResponse.json();
+      if (!statsData?.success || !statsData?.data) throw new Error(statsData?.error || 'Ungültige ML-Stats');
+      setMlStats(statsData.data as MLStats);
+
+      // Bis echte Verlaufsdaten verfügbar sind, zeigen wir keine Dummy-Historie
+      setPredictionHistory([]);
     } catch (error) {
       console.error('Failed to fetch ML data:', error);
     } finally {
@@ -111,11 +122,13 @@ const MLDashboard: React.FC = () => {
   }
 
   // Calculate statistics
-  const totalPredictions = predictionHistory.length;
-  const successfulPredictions = predictionHistory.filter(p => p.success).length;
-  const successRate = totalPredictions > 0 ? (successfulPredictions / totalPredictions * 100).toFixed(1) : '0';
-  const avgConfidence = predictionHistory.reduce((sum, p) => sum + p.confidence, 0) / totalPredictions;
-  const avgResponseTime = predictionHistory.reduce((sum, p) => sum + p.responseTime, 0) / totalPredictions;
+  const totalPredictions = mlStats?.predictions.total || 0;
+  const successfulPredictions = mlStats?.predictions.success || 0;
+  const successRate = totalPredictions > 0 ? ((successfulPredictions / totalPredictions) * 100).toFixed(1) : '0';
+  const avgConfidence = mlStats?.avgConfidence || 0;
+  const avgResponseTime = predictionHistory.length
+    ? predictionHistory.reduce((sum, p) => sum + p.responseTime, 0) / predictionHistory.length
+    : 0;
 
   // Chart data
   const confidenceData = predictionHistory.map((p) => ({
@@ -124,16 +137,28 @@ const MLDashboard: React.FC = () => {
     feature: p.feature
   }));
 
-  const featureDistribution = [
-    { name: 'Empfehlungen', value: predictionHistory.filter(p => p.feature === 'recommendations').length, color: '#8b5cf6' },
-    { name: 'Trends', value: predictionHistory.filter(p => p.feature === 'trends').length, color: '#3b82f6' },
-    { name: 'E-Mail', value: predictionHistory.filter(p => p.feature === 'email').length, color: '#10b981' }
-  ];
+  const featureLabel = (key: string) => {
+    switch (key) {
+      case 'productRecommendations': return 'Empfehlungen';
+      case 'trendForecasting': return 'Trends';
+      case 'emailOptimization': return 'E-Mail';
+      case 'dynamicPricing': return 'Dynamic Pricing';
+      case 'churnPrediction': return 'Churn';
+      case 'sentimentAnalysis': return 'Sentiment';
+      case 'fraudDetection': return 'Fraud Detection';
+      default: return key;
+    }
+  };
 
-  const performanceData = predictionHistory.map(p => ({
-    name: p.timestamp,
-    responseTime: p.responseTime.toFixed(1)
+  const palette = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#a855f7'];
+
+  const featureDistribution = (mlStatus?.activeFeatures || []).map((f, idx) => ({
+    name: featureLabel(f),
+    value: 1,
+    color: palette[idx % palette.length]
   }));
+
+  const performanceData: Array<{ name: string; responseTime: number }> = [];
 
   return (
     <div className="analytics-page">
@@ -242,22 +267,26 @@ const MLDashboard: React.FC = () => {
           <h3 style={{ marginBottom: '20px', color: '#2c3e50', fontSize: '1.5rem', fontWeight: '800' }}>
             📈 Konfidenz-Verlauf
           </h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={confidenceData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-              <XAxis dataKey="name" stroke="rgba(255,255,255,0.6)" style={{ fontSize: '12px' }} />
-              <YAxis stroke="rgba(255,255,255,0.6)" style={{ fontSize: '12px' }} />
-              <Tooltip
-                contentStyle={{
-                  background: 'rgba(0,0,0,0.9)',
-                  border: '1px solid rgba(139, 92, 246, 0.5)',
-                  borderRadius: '8px',
-                  color: 'white'
-                }}
-              />
-              <Line type="monotone" dataKey="confidence" stroke="#8b5cf6" strokeWidth={3} dot={{ fill: '#8b5cf6', r: 4 }} />
-            </LineChart>
-          </ResponsiveContainer>
+          {confidenceData.length ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={confidenceData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                <XAxis dataKey="name" stroke="rgba(255,255,255,0.6)" style={{ fontSize: '12px' }} />
+                <YAxis stroke="rgba(255,255,255,0.6)" style={{ fontSize: '12px' }} />
+                <Tooltip
+                  contentStyle={{
+                    background: 'rgba(0,0,0,0.9)',
+                    border: '1px solid rgba(139, 92, 246, 0.5)',
+                    borderRadius: '8px',
+                    color: 'white'
+                  }}
+                />
+                <Line type="monotone" dataKey="confidence" stroke="#8b5cf6" strokeWidth={3} dot={{ fill: '#8b5cf6', r: 4 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div style={{ padding: '16px', color: 'rgba(255,255,255,0.6)' }}>Keine Verlaufsdaten vorhanden</div>
+          )}
         </motion.div>
 
         {/* Performance Timeline */}
@@ -271,22 +300,26 @@ const MLDashboard: React.FC = () => {
           <h3 style={{ marginBottom: '20px', color: '#2c3e50', fontSize: '1.5rem', fontWeight: '800' }}>
             ⚡ Performance-Verlauf
           </h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={performanceData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-              <XAxis dataKey="name" stroke="rgba(255,255,255,0.6)" style={{ fontSize: '12px' }} />
-              <YAxis stroke="rgba(255,255,255,0.6)" style={{ fontSize: '12px' }} />
-              <Tooltip
-                contentStyle={{
-                  background: 'rgba(0,0,0,0.9)',
-                  border: '1px solid rgba(59, 130, 246, 0.5)',
-                  borderRadius: '8px',
-                  color: 'white'
-                }}
-              />
-              <Bar dataKey="responseTime" fill="#3b82f6" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          {performanceData.length ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={performanceData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                <XAxis dataKey="name" stroke="rgba(255,255,255,0.6)" style={{ fontSize: '12px' }} />
+                <YAxis stroke="rgba(255,255,255,0.6)" style={{ fontSize: '12px' }} />
+                <Tooltip
+                  contentStyle={{
+                    background: 'rgba(0,0,0,0.9)',
+                    border: '1px solid rgba(59, 130, 246, 0.5)',
+                    borderRadius: '8px',
+                    color: 'white'
+                  }}
+                />
+                <Bar dataKey="responseTime" fill="#3b82f6" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div style={{ padding: '16px', color: 'rgba(255,255,255,0.6)' }}>Keine Performance-Daten vorhanden</div>
+          )}
         </motion.div>
       </div>
 
@@ -303,32 +336,36 @@ const MLDashboard: React.FC = () => {
           <h3 style={{ marginBottom: '20px', color: '#2c3e50', fontSize: '1.5rem', fontWeight: '800' }}>
             🎯 Feature-Verteilung
           </h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <PieChart>
-              <Pie
-                data={featureDistribution}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={(entry) => `${entry.name} (${entry.value})`}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {featureDistribution.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip
-                contentStyle={{
-                  background: 'rgba(0,0,0,0.9)',
-                  border: '1px solid rgba(139, 92, 246, 0.5)',
-                  borderRadius: '8px',
-                  color: 'white'
-                }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+          {featureDistribution.length ? (
+            <ResponsiveContainer width="100%" height={250}>
+              <PieChart>
+                <Pie
+                  data={featureDistribution}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={(entry) => `${entry.name} (${entry.value})`}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {featureDistribution.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{
+                    background: 'rgba(0,0,0,0.9)',
+                    border: '1px solid rgba(139, 92, 246, 0.5)',
+                    borderRadius: '8px',
+                    color: 'white'
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <div style={{ padding: '12px', color: 'rgba(255,255,255,0.6)' }}>Keine aktiven Features gemeldet</div>
+          )}
         </motion.div>
 
         {/* Recent Predictions */}
@@ -339,9 +376,14 @@ const MLDashboard: React.FC = () => {
           className="metric-card"
         >
           <h3 style={{ marginBottom: '20px', color: '#2c3e50', fontSize: '1.5rem', fontWeight: '800' }}>
-            � Letzte Predictions
+            🕒 Letzte Predictions
           </h3>
           <div style={{ maxHeight: '280px', overflowY: 'auto' }}>
+            {predictionHistory.length === 0 && (
+              <div style={{ padding: '12px', color: 'rgba(255,255,255,0.6)' }}>
+                Keine Prediction-Historie verfügbar
+              </div>
+            )}
             {predictionHistory.slice(0, 5).map((pred, index) => (
               <div
                 key={index}

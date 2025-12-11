@@ -1,4 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { recordMlEvent, getMlEvents } from '../../../services/mlStats.js';
 
 interface FraudCheckBody {
   amount: number;
@@ -29,6 +30,22 @@ interface TestDiagnoseBody {
   failureLogs: string[];
   environment?: string;
   testType?: string;
+}
+
+interface VerifyPaymentBody {
+  transactionId: string;
+  amount: number;
+  currency: string;
+  customerEmail: string;
+  ipAddress?: string;
+  paymentMethod?: string;
+  signature?: string;
+  payload?: string;
+  environment?: 'prod' | 'staging' | 'dev';
+}
+
+interface SuccessMetricsBody {
+  timeRange: 'today' | 'week' | 'month' | 'year';
 }
 
 export default async function paymentRoutes(server: FastifyInstance) {
@@ -129,6 +146,8 @@ Scoring:
           analyzedAt: new Date().toISOString()
         };
 
+        recordMlEvent('payments.fraud-check', true, normalizedAnalysis.confidence);
+
         console.log(`✅ Fraud analysis: Risk=${normalizedAnalysis.riskScore}, Level=${normalizedAnalysis.riskLevel}`);
 
         return reply.send({
@@ -137,6 +156,7 @@ Scoring:
         });
       } catch (error) {
         console.error('❌ Fraud check error:', error);
+        recordMlEvent('payments.fraud-check', false, 0);
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Fraud-Check fehlgeschlagen'
@@ -215,7 +235,13 @@ Antworte mit JSON Array:
           conversionScore: Math.max(0, Math.min(1, s.conversionScore || 0.5))
         }));
 
+        const avgConfidence = suggestions.length
+          ? suggestions.reduce((sum: number, s: any) => sum + (s.conversionScore || 0.5), 0) / suggestions.length
+          : 0.6;
+
         console.log(`✅ Generated ${suggestions.length} amount suggestions`);
+
+        recordMlEvent('payments.suggest-amounts', true, avgConfidence);
 
         return reply.send({
           success: true,
@@ -225,6 +251,7 @@ Antworte mit JSON Array:
         });
       } catch (error) {
         console.error('❌ Amount suggestion error:', error);
+        recordMlEvent('payments.suggest-amounts', false, 0);
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Betrags-Empfehlung fehlgeschlagen'
@@ -284,6 +311,8 @@ Antworte mit JSON Array:
 
         successProbability = Math.max(0, Math.min(1, successProbability));
 
+        recordMlEvent('payments.predict-success', true, successProbability);
+
         return reply.send({
           success: true,
           data: {
@@ -296,6 +325,7 @@ Antworte mit JSON Array:
         });
       } catch (error) {
         console.error('❌ Success prediction error:', error);
+        recordMlEvent('payments.predict-success', false, 0);
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Vorhersage fehlgeschlagen'
@@ -373,12 +403,142 @@ Antworte als JSON-Objekt:
           recommendedFlow: parsed.recommendedFlow || 'One-Page mit Gast-Checkout und Auto-Fill'
         };
 
+        recordMlEvent('payments.ux-check', true, normalized.expectedLift || 0.1);
+
         return reply.send({ success: true, data: normalized });
       } catch (error) {
         console.error('❌ UX check error:', error);
+        recordMlEvent('payments.ux-check', false, 0);
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'UX-Check fehlgeschlagen'
+        });
+      }
+    }
+  );
+
+  // ML: Payment Verification & Risk Assessment
+  server.post<{ Body: VerifyPaymentBody }>(
+    '/ml/verify',
+    {
+      schema: {
+        tags: ['payments', 'ml'],
+        description: 'Validierung einer Payment-Transaktion inkl. Risikoanalyse',
+        body: {
+          type: 'object',
+          required: ['transactionId', 'amount', 'currency', 'customerEmail'],
+          properties: {
+            transactionId: { type: 'string' },
+            amount: { type: 'number' },
+            currency: { type: 'string' },
+            customerEmail: { type: 'string' },
+            ipAddress: { type: 'string' },
+            paymentMethod: { type: 'string' },
+            signature: { type: 'string' },
+            payload: { type: 'string' },
+            environment: { type: 'string', enum: ['prod', 'staging', 'dev'] }
+          }
+        }
+      }
+    },
+    async (request: FastifyRequest<{ Body: VerifyPaymentBody }>, reply: FastifyReply) => {
+      try {
+        const {
+          transactionId,
+          amount,
+          currency,
+          customerEmail,
+          ipAddress = 'unknown',
+          paymentMethod = 'card',
+          signature = 'not-provided',
+          payload = 'not-provided',
+          environment = 'prod'
+        } = request.body;
+
+        const { getOpenAIClient, executeOpenAI } = await import('../../../utils/openai.js');
+        const openai = getOpenAIClient();
+
+        const emailDomain = customerEmail.split('@')[1] || 'unknown';
+        const prompt = `Pruefe eine Payment-Transaktion auf Validitaet und Risiko.
+
+Transaktion:
+- Transaction ID: ${transactionId}
+- Amount: ${amount} ${currency}
+- Customer Email: ${customerEmail}
+- Email Domain: ${emailDomain}
+- IP: ${ipAddress}
+- Payment Method: ${paymentMethod}
+- Environment: ${environment}
+- Signature: ${signature}
+- Payload snippet (max 500 chars): ${payload?.slice(0, 500)}
+
+Aufgaben:
+1) Validitaet der Daten plausibilisieren (IDs/Signatur/Email/IP/Method).
+2) Betrugsrisiko bewerten (Score 0-100) und Level (low|medium|high|critical).
+3) Technische und fachliche Flags ausgeben (z.B. fehlende Signatur, ungültiges Format, Domain-Risiko, Betragsspitze, Duplikatsverdacht).
+4) Empfohlene Aktion: approve | manual-review | reject.
+5) Liste der Checks mit Status und kurzer Begründung.
+
+Antwort nur als JSON:
+{
+  "valid": true|false,
+  "riskScore": 0-100,
+  "riskLevel": "low"|"medium"|"high"|"critical",
+  "flags": ["..."],
+  "recommendedAction": "approve"|"manual-review"|"reject",
+  "reasoning": "kurze Zusammenfassung",
+  "checks": [
+    { "name": "Signature", "status": "pass|fail|warn", "detail": "..." },
+    { "name": "Email", "status": "pass|fail|warn", "detail": "..." },
+    { "name": "Amount", "status": "pass|fail|warn", "detail": "..." }
+  ]
+}`;
+
+        const completion = await executeOpenAI(
+          () => openai.chat.completions.create({
+            model: 'gpt-4o-mini',
+            temperature: 0.28,
+            messages: [
+              {
+                role: 'system',
+                content: 'Du bist Payment-Risk- und SRE-Experte. Antworte strikt in JSON, kompakt, ohne Freitext.'
+              },
+              { role: 'user', content: prompt }
+            ]
+          }),
+          'payment-verify'
+        );
+
+        const responseText = completion.choices[0]?.message?.content || '{}';
+        const parsed = JSON.parse(responseText);
+
+        const normalized = {
+          valid: Boolean(parsed.valid),
+          riskScore: Math.max(0, Math.min(100, parsed.riskScore ?? 50)),
+          riskLevel: ['low', 'medium', 'high', 'critical'].includes(parsed.riskLevel) ? parsed.riskLevel : 'medium',
+          flags: Array.isArray(parsed.flags) ? parsed.flags : [],
+          recommendedAction: ['approve', 'manual-review', 'reject'].includes(parsed.recommendedAction)
+            ? parsed.recommendedAction
+            : 'manual-review',
+          reasoning: parsed.reasoning || 'Automatische Verifikation',
+          checks: Array.isArray(parsed.checks)
+            ? parsed.checks.map((c: any) => ({
+                name: c.name || 'Check',
+                status: ['pass', 'fail', 'warn'].includes(c.status) ? c.status : 'warn',
+                detail: c.detail || 'Ohne Detail'
+              }))
+            : []
+        };
+
+        recordMlEvent('payments.verify', normalized.valid, 1 - normalized.riskScore / 100);
+
+        return reply.send({ success: true, data: normalized });
+      } catch (error) {
+        console.error('❌ Payment verify error:', error);
+        recordMlEvent('payments.verify', false, 0);
+        return reply.status(500).send({
+          success: false,
+          error: error instanceof Error ? error.message : 'Verifikation fehlgeschlagen'
         });
       }
     }
@@ -460,9 +620,16 @@ Regeln:
           expectedImpact: s.expectedImpact || 'Stabilität erhöhen'
         }));
 
+        const avgConfidence = normalized.length
+          ? normalized.reduce((sum, s) => sum + (s.successProbability ?? 0.8), 0) / normalized.length
+          : 0.7;
+
+        recordMlEvent('payments.test-plan', true, avgConfidence);
+
         return reply.send({ success: true, data: normalized });
       } catch (error) {
         console.error('❌ Test plan error:', error);
+        recordMlEvent('payments.test-plan', false, 0);
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Testplan konnte nicht generiert werden'
@@ -533,13 +700,87 @@ Liefere JSON:
           recommendedOwners: Array.isArray(parsed.recommendedOwners) ? parsed.recommendedOwners : [],
         };
 
+        recordMlEvent('payments.test-diagnose', true, normalized.confidence);
+
         return reply.send({ success: true, data: normalized });
       } catch (error) {
         console.error('❌ Test diagnose error:', error);
+        recordMlEvent('payments.test-diagnose', false, 0);
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Test-Diagnose fehlgeschlagen'
         });
+      }
+    }
+  );
+
+  // ML: Payment Success Metrics (real events only)
+  server.post<{ Body: SuccessMetricsBody }>(
+    '/ml/success-metrics',
+    {
+      schema: {
+        tags: ['payments', 'ml'],
+        description: 'Aggregierte Erfolgsmetriken für Payment-ML Events (Verifikation/Fraud/Test)',
+        body: {
+          type: 'object',
+          required: ['timeRange'],
+          properties: {
+            timeRange: { type: 'string', enum: ['today', 'week', 'month', 'year'] }
+          }
+        }
+      }
+    },
+    async (request: FastifyRequest<{ Body: SuccessMetricsBody }>, reply: FastifyReply) => {
+      try {
+        const { timeRange } = request.body;
+        const now = new Date();
+        const start = new Date(now);
+        if (timeRange === 'today') {
+          start.setHours(0, 0, 0, 0);
+        } else if (timeRange === 'week') {
+          const day = start.getDay();
+          const diff = start.getDate() - day + (day === 0 ? -6 : 1); // Montag als Wochenstart
+          start.setDate(diff);
+          start.setHours(0, 0, 0, 0);
+        } else if (timeRange === 'month') {
+          start.setDate(1);
+          start.setHours(0, 0, 0, 0);
+        } else if (timeRange === 'year') {
+          start.setMonth(0, 1);
+          start.setHours(0, 0, 0, 0);
+        }
+
+        const events = getMlEvents().filter((e) => e.timestamp >= start.getTime());
+        const relevant = events.filter((e) => e.feature.startsWith('payments.'));
+
+        const total = relevant.length;
+        const valid = relevant.filter((e) => e.feature === 'payments.verify' ? e.success : true).length;
+        const successRate = total > 0 ? valid / total : 0;
+        const avgConfidence = relevant.length
+          ? relevant.reduce((sum, e) => sum + e.confidence, 0) / relevant.length
+          : 0;
+
+        const byFeature = relevant.reduce<Record<string, number>>((acc, e) => {
+          acc[e.feature] = (acc[e.feature] || 0) + 1;
+          return acc;
+        }, {});
+
+        const lastEvent = relevant.length ? new Date(relevant[relevant.length - 1].timestamp).toISOString() : null;
+
+        return reply.send({
+          success: true,
+          data: {
+            total,
+            valid,
+            successRate,
+            avgConfidence,
+            byFeature,
+            lastEvent
+          }
+        });
+      } catch (error) {
+        console.error('❌ Success metrics error:', error);
+        return reply.status(500).send({ success: false, error: error instanceof Error ? error.message : 'Metriken konnten nicht berechnet werden' });
       }
     }
   );

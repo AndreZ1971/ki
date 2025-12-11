@@ -102,6 +102,31 @@ export interface TestDiagnosis {
   recommendedOwners: string[];
 }
 
+export interface PaymentSuccessMetrics {
+  total: number;
+  valid: number;
+  successRate: number; // 0-1
+  avgConfidence: number; // 0-1
+  byFeature: Record<string, number>;
+  lastEvent: string | null;
+}
+
+export interface PaymentVerificationCheck {
+  name: string;
+  status: 'pass' | 'fail' | 'warn';
+  detail: string;
+}
+
+export interface PaymentVerificationResult {
+  valid: boolean;
+  riskScore: number;
+  riskLevel: 'low' | 'medium' | 'high' | 'critical';
+  flags: string[];
+  recommendedAction: 'approve' | 'manual-review' | 'reject';
+  reasoning: string;
+  checks: PaymentVerificationCheck[];
+}
+
 export interface Freebie {
   id: number;
   name: string;

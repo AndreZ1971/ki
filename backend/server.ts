@@ -62,6 +62,7 @@ import webhookRoutes from './routes/app/api/social/webhook-routes';
 
 // 🔥 ML CONFIGURATION ROUTES
 import mlConfigRoutes from './routes/app/api/ml/config';
+import mlStatsRoutes from './routes/app/api/ml/stats';
 import mlTestRoutes from './routes/app/api/ml/test';
 
 // 🔥 TREND AGGREGATOR ROUTES
@@ -335,6 +336,9 @@ async function buildServer() {
     // 🔥 ML CONFIGURATION ROUTES
     await server.register(mlConfigRoutes, { prefix: '/api/ml' });
     console.log('✅ ML Config Routes erfolgreich registriert');
+
+    await server.register(mlStatsRoutes, { prefix: '/api/ml' });
+    console.log('✅ ML Stats Routes erfolgreich registriert');
 
     // 🧪 ML TEST ROUTES (Development/Testing)
     await server.register(mlTestRoutes, { prefix: '/api/ml/test' });

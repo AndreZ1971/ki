@@ -12,10 +12,11 @@ import type {
   FraudAnalysis,
   AmountSuggestion,
   UxAuditResult,
-  PaymentTestScenario,
-  TestDiagnosis
-} from '../types/product';
-
+   PaymentTestScenario,
+   TestDiagnosis,
+   PaymentVerificationResult,
+   PaymentSuccessMetrics
+ } from '../types/product';
 let API_BASE_URL = (import.meta.env.VITE_API_URL || '').trim();
 // Wenn leer, nutze relativen Pfad
 if (!API_BASE_URL) {
@@ -339,4 +340,34 @@ export const paymentApi = {
       body: JSON.stringify(data),
     });
   },
-};
+
+  /**
+   * KI-gestützte Payment-Verifikation & Risikoanalyse
+   */
+  verifyTransaction: async (data: {
+     transactionId: string;
+     amount: number;
+     currency: string;
+     customerEmail: string;
+     ipAddress?: string;
+     paymentMethod?: string;
+     signature?: string;
+     payload?: string;
+     environment?: 'prod' | 'staging' | 'dev';
+   }): Promise<ApiResponse<PaymentVerificationResult>> => {
+     return apiRequest<PaymentVerificationResult>('/api/payments/ml/verify', {
+       method: 'POST',
+       body: JSON.stringify(data),
+     });
+   },
+
+  /**
+   * Aggregierte Payment-ML Erfolgsmetriken
+   */
+  successMetrics: async (timeRange: 'today' | 'week' | 'month' | 'year'): Promise<ApiResponse<PaymentSuccessMetrics>> => {
+    return apiRequest<PaymentSuccessMetrics>('/api/payments/ml/success-metrics', {
+      method: 'POST',
+      body: JSON.stringify({ timeRange }),
+    });
+  },
+ };
