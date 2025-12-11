@@ -4,7 +4,7 @@ import { useToast } from '../../hooks/useToast';
 import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
 import { categoryApi } from '../../services/productApi';
-import type { Category } from '../../types/product';
+import type { Category, CategorySuggestion } from '../../types/product';
 import { MLCategorySuggester } from './MLCategorySuggester';
 import './page.css';
 
@@ -13,6 +13,8 @@ const CategoriesManager = () => {
   const toast = useToast();
   const [categories, setCategories] = useState<Category[]>([]);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [suggestions, setSuggestions] = useState<Record<number, CategorySuggestion[]>>({});
+  const [suggestLoading, setSuggestLoading] = useState<Record<number, boolean>>({});
 
   const loadCategories = async () => {
     try {
@@ -70,6 +72,39 @@ const CategoriesManager = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSuggestForCategory = async (category: Category) => {
+    try {
+      setSuggestLoading(prev => ({ ...prev, [category.id]: true }));
+      const response = await categoryApi.suggestCategories({
+        title: category.name,
+        description: category.description || '',
+        maxSuggestions: 5
+      });
+
+      if (response.success && response.data) {
+        setSuggestions(prev => ({ ...prev, [category.id]: response.data }));
+        toast.success(`KI-Vorschläge für "${category.name}" geladen`);
+      } else {
+        throw new Error(response.error || 'Vorschläge fehlgeschlagen');
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Unbekannter Fehler';
+      toast.error(msg);
+    } finally {
+      setSuggestLoading(prev => ({ ...prev, [category.id]: false }));
+    }
+  };
+
+  const handleApplySuggestion = (category: Category, suggestion: CategorySuggestion) => {
+    // Aktuell nur UI-State: setzt needsOptimization auf false und zeigt Übernahme an.
+    // Backend-Update könnte hier ergänzt werden (WooCommerce PUT), falls gewünscht.
+    setCategories(prev => prev.map(cat => cat.id === category.id
+      ? { ...cat, name: suggestion.name, needsOptimization: false }
+      : cat
+    ));
+    toast.success(`Vorschlag "${suggestion.name}" übernommen`);
   };
 
   const handleCreateCategory = async () => {
@@ -205,8 +240,37 @@ const CategoriesManager = () => {
                 {category.needsOptimization && (
                   <span className="optimization-badge">⚠️ Optimieren</span>
                 )}
-                <button className="edit-button">✏️</button>
+                <button
+                  className="edit-button"
+                  onClick={() => handleSuggestForCategory(category)}
+                  disabled={suggestLoading[category.id]}
+                >
+                  {suggestLoading[category.id] ? '…' : '🤖 Vorschläge'}
+                </button>
               </div>
+
+              {suggestions[category.id]?.length ? (
+                <div className="suggestions-inline">
+                  <div className="suggestions-header">KI-Vorschläge</div>
+                  <ul>
+                    {suggestions[category.id].map((s, idx) => (
+                      <li key={idx} className="suggestion-row">
+                        <div>
+                          <strong>{s.name}</strong>
+                          <span className="confidence">{Math.round(s.confidence * 100)}%</span>
+                        </div>
+                        <div className="reason">{s.reason}</div>
+                        <button
+                          className="apply-button"
+                          onClick={() => handleApplySuggestion(category, s)}
+                        >
+                          Übernehmen
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
             </div>
           ))}
         </div>

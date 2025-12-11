@@ -1,6 +1,7 @@
 
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import config from '../../../../config';
+import { getOpenAIClient, executeOpenAI } from '../../../../utils/openai';
 
 interface Category {
   id: number;
@@ -21,6 +22,57 @@ interface CreateCategoryBody {
   description?: string;
 }
 
+interface CategorySuggestRequest {
+  title: string;
+  description: string;
+  maxSuggestions?: number;
+}
+
+interface CategorySuggestion {
+  name: string;
+  confidence: number;
+  reason: string;
+}
+
+async function fetchWooCategories() {
+  const wooConfig = {
+    url: config.woocommerce?.url || '',
+    consumerKey: config.woocommerce?.consumerKey || '',
+    consumerSecret: config.woocommerce?.consumerSecret || '',
+  };
+
+  if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
+    throw new Error('WooCommerce API nicht konfiguriert');
+  }
+
+  const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
+
+  const response = await fetch(`${wooConfig.url}/wp-json/wc/v3/products/categories?per_page=100`, {
+    headers: {
+      'Authorization': `Basic ${auth}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`WooCommerce API Error: ${response.status}`);
+  }
+
+  const wooCategories = await response.json() as any[];
+
+  const categories: Category[] = wooCategories.map(cat => ({
+    id: cat.id,
+    name: cat.name,
+    slug: cat.slug,
+    productCount: cat.count || 0,
+    needsOptimization: cat.count > 0 && !cat.description,
+    parentId: cat.parent || undefined,
+    description: cat.description || undefined
+  }));
+
+  return categories;
+}
+
 export default async function categoryRoutes(server: FastifyInstance) {
   
   // Get All Categories
@@ -32,44 +84,9 @@ export default async function categoryRoutes(server: FastifyInstance) {
         description: 'Holt alle Kategorien'
       }
     },
-    async (request: FastifyRequest, reply: FastifyReply) => {
+    async (_request: FastifyRequest, reply: FastifyReply) => {
       try {
-        // WooCommerce-Konfiguration aus zentraler config
-        const wooConfig = {
-          url: config.woocommerce?.url || '',
-          consumerKey: config.woocommerce?.consumerKey || '',
-          consumerSecret: config.woocommerce?.consumerSecret || '',
-        };
-
-        if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
-          throw new Error('WooCommerce API nicht konfiguriert');
-        }
-
-        const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
-
-        const response = await fetch(`${wooConfig.url}/wp-json/wc/v3/products/categories?per_page=100`, {
-          headers: {
-            'Authorization': `Basic ${auth}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`WooCommerce API Error: ${response.status}`);
-        }
-
-        const wooCategories = await response.json() as any[];
-
-        // Transformiere WooCommerce-Format zu unserem Format
-        const categories: Category[] = wooCategories.map(cat => ({
-          id: cat.id,
-          name: cat.name,
-          slug: cat.slug,
-          productCount: cat.count || 0,
-          needsOptimization: cat.count > 0 && !cat.description, // Optimierung nötig wenn Produkte aber keine Beschreibung
-          parentId: cat.parent || undefined,
-          description: cat.description || undefined
-        }));
+        const categories = await fetchWooCategories();
 
         return reply.send({
           success: true,
@@ -161,6 +178,97 @@ export default async function categoryRoutes(server: FastifyInstance) {
           message: 'Kategorie erfolgreich in WooCommerce erstellt'
         });
       } catch (_error) {
+        return reply.status(500).send({
+          success: false,
+          error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
+        });
+      }
+    }
+  );
+
+  // ML Category Suggestion
+  server.post<{ Body: CategorySuggestRequest }>(
+    '/ml/suggest',
+    {
+      schema: {
+        tags: ['categories'],
+        description: 'Schlägt Kategorien auf Basis von Titel und Beschreibung vor',
+        body: {
+          type: 'object',
+          required: ['title', 'description'],
+          properties: {
+            title: { type: 'string' },
+            description: { type: 'string' },
+            maxSuggestions: { type: 'number', minimum: 1, maximum: 10 }
+          }
+        }
+      }
+    },
+    async (request: FastifyRequest<{ Body: CategorySuggestRequest }>, reply: FastifyReply) => {
+      try {
+        const { title, description, maxSuggestions = 5 } = request.body;
+
+        if (!title?.trim() || !description?.trim()) {
+          return reply.code(400).send({ success: false, error: 'Titel und Beschreibung sind erforderlich' });
+        }
+
+        const categories = await fetchWooCategories();
+        const categoryNames = categories.map(cat => cat.name).slice(0, 100); // begrenze Kontext
+
+        const openai = getOpenAIClient();
+
+        const completion = await executeOpenAI(
+          async () => {
+            return openai.chat.completions.create({
+              model: 'gpt-4o-mini',
+              temperature: 0.2,
+              response_format: { type: 'json_object' },
+              messages: [
+                {
+                  role: 'system',
+                  content: 'Du bist ein präziser Produkt-Kategorisierer für WooCommerce. Antworte nur mit JSON.'
+                },
+                {
+                  role: 'user',
+                  content: [
+                    'Finde die besten Kategorien für folgendes Produkt. Nutze nur die bekannten Kategorien.',
+                    `Produkt: ${title}`,
+                    `Beschreibung: ${description}`,
+                    `Bekannte Kategorien (${categoryNames.length}): ${categoryNames.join(', ')}`,
+                    'Gib maximal ' + maxSuggestions + ' Vorschläge zurück.',
+                    'Antwortformat: { "suggestions": [ { "name": string, "confidence": 0-1, "reason": string } ] }',
+                    'Nutze nur Kategorienamen aus der Liste, erfinde keine neuen.'
+                  ].join('\n')
+                }
+              ]
+            });
+          },
+          'category-ml-suggest',
+          { title, maxSuggestions }
+        );
+
+        const rawContent = completion.choices[0]?.message?.content || '';
+
+        let parsed: { suggestions?: CategorySuggestion[] } = {};
+        try {
+          parsed = JSON.parse(rawContent);
+        } catch (_parseError) {
+          console.warn('⚠️ [CategorySuggest] Konnte JSON nicht direkt parsen, sende Fallback', _parseError);
+        }
+
+        const suggestions = (parsed.suggestions || []).filter(s => s.name).slice(0, maxSuggestions).map(s => ({
+          name: s.name,
+          confidence: Math.min(Math.max(s.confidence ?? 0.5, 0), 1),
+          reason: s.reason || 'Automatisch vorgeschlagen'
+        }));
+
+        if (suggestions.length === 0) {
+          return reply.code(502).send({ success: false, error: 'Keine gültigen Vorschläge erhalten' });
+        }
+
+        return reply.send({ success: true, suggestions });
+      } catch (_error) {
+        console.error('Category ML Suggest Error:', _error);
         return reply.status(500).send({
           success: false,
           error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'

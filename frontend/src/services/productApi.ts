@@ -5,7 +5,8 @@ import type {
   Freebie,
   ProductCreationResult,
   ApiResponse,
-  ProductUpdateRequest
+  ProductUpdateRequest,
+  CategorySuggestion
 } from '../types/product';
 
 let API_BASE_URL = (import.meta.env.VITE_API_URL || '').trim();
@@ -120,6 +121,18 @@ export const categoryApi = {
   optimizeCategories: async (): Promise<ApiResponse<void>> => {
     return apiRequest<void>('/api/categories/optimize', {
       method: 'POST',
+    });
+  },
+
+  /**
+   * Holt ML-basierte Kategorie-Vorschläge
+   */
+  suggestCategories: async (
+    payload: { title: string; description: string; maxSuggestions?: number }
+  ): Promise<ApiResponse<CategorySuggestion[]>> => {
+    return apiRequest<CategorySuggestion[]>('/api/categories/ml/suggest', {
+      method: 'POST',
+      body: JSON.stringify(payload),
     });
   },
 };

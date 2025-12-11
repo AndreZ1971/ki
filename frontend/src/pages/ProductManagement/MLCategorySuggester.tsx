@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
-
-interface MLCategorySuggestion {
-  name: string;
-  confidence: number;
-  reason: string;
-}
+import { categoryApi } from '../../services/productApi';
+import type { CategorySuggestion } from '../../types/product';
 
 interface MLCategorySuggesterProps {
   productTitle: string;
@@ -12,7 +8,7 @@ interface MLCategorySuggesterProps {
 }
 
 export const MLCategorySuggester: React.FC<MLCategorySuggesterProps> = ({ productTitle, productDescription }) => {
-  const [suggestions, setSuggestions] = useState<MLCategorySuggestion[]>([]);
+  const [suggestions, setSuggestions] = useState<CategorySuggestion[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,16 +16,16 @@ export const MLCategorySuggester: React.FC<MLCategorySuggesterProps> = ({ produc
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/categories/ml/suggest`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: productTitle, description: productDescription })
+      const response = await categoryApi.suggestCategories({
+        title: productTitle,
+        description: productDescription,
+        maxSuggestions: 5
       });
-      const data = await res.json();
-      if (data.success && data.suggestions) {
-        setSuggestions(data.suggestions);
+
+      if (response.success && response.data) {
+        setSuggestions(response.data);
       } else {
-        setError(data.error || 'Fehler bei der Kategorie-Vorschlag-Generierung');
+        setError(response.error || 'Fehler bei der Kategorie-Vorschlag-Generierung');
       }
     } catch (err: any) {
       setError(err.message || 'Fehler bei der Kategorie-Vorschlag-Generierung');

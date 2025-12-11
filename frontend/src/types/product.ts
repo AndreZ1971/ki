@@ -23,6 +23,12 @@ export interface Category {
   description?: string;
 }
 
+export interface CategorySuggestion {
+  name: string;
+  confidence: number;
+  reason: string;
+}
+
 export interface Bundle {
   id: number;
   name: string;
