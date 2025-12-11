@@ -15,7 +15,12 @@ import type {
    PaymentTestScenario,
    TestDiagnosis,
    PaymentVerificationResult,
-   PaymentSuccessMetrics
+   PaymentSuccessMetrics,
+   IssueDetectionResult,
+   UserPaymentPreferences,
+   DeliveryOptimizationResult,
+   EmergencyAnalysisResult,
+   ExpansionStrategyResult
  } from '../types/product';
 let API_BASE_URL = (import.meta.env.VITE_API_URL || '').trim();
 // Wenn leer, nutze relativen Pfad
@@ -342,6 +347,38 @@ export const paymentApi = {
   },
 
   /**
+   * KI-gestützte Issue Detection für Payment-System
+   */
+  detectIssues: async (data: {
+    scanDepth?: 'quick' | 'standard' | 'deep';
+    timeRange?: string;
+  }): Promise<ApiResponse<IssueDetectionResult>> => {
+    return apiRequest<IssueDetectionResult>('/api/payments/ml/detect-issues', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * KI-gestützte User Payment Preferences Analyse
+   */
+  analyzeUserPreferences: async (data: {
+    customerId: string;
+    customerEmail?: string;
+    purchaseHistory?: Array<{
+      amount: number;
+      currency: string;
+      paymentMethod: string;
+      timestamp: string;
+    }>;
+  }): Promise<ApiResponse<UserPaymentPreferences>> => {
+    return apiRequest<UserPaymentPreferences>('/api/payments/ml/user-preferences', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
    * KI-gestützte Payment-Verifikation & Risikoanalyse
    */
   verifyTransaction: async (data: {
@@ -368,6 +405,60 @@ export const paymentApi = {
     return apiRequest<PaymentSuccessMetrics>('/api/payments/ml/success-metrics', {
       method: 'POST',
       body: JSON.stringify({ timeRange }),
+    });
+  },
+
+  /**
+   * KI-gestützte Delivery Optimization
+   */
+  optimizeDelivery: async (data: {
+    orderId: string;
+    destination: {
+      country: string;
+      city: string;
+      postalCode: string;
+    };
+    items: Array<{
+      productType: string;
+      weight: number;
+      value: number;
+    }>;
+    urgency?: 'standard' | 'express' | 'overnight';
+  }): Promise<ApiResponse<DeliveryOptimizationResult>> => {
+    return apiRequest<DeliveryOptimizationResult>('/api/payments/ml/delivery-optimization', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * KI-gestützte Emergency Analysis
+   */
+  analyzeEmergency: async (data: {
+    issueType: string;
+    description: string;
+    affectedCustomers?: number;
+    financialImpact?: number;
+    systemsAffected?: string[];
+  }): Promise<ApiResponse<EmergencyAnalysisResult>> => {
+    return apiRequest<EmergencyAnalysisResult>('/api/payments/ml/emergency-analysis', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * KI-gestützte Expansion Strategy
+   */
+  expansionStrategy: async (data: {
+    targetRegion: 'eu' | 'us' | 'asia' | 'global';
+    currentRevenue?: number;
+    currentMarkets?: number;
+    priority?: 'speed' | 'balanced' | 'compliance-first';
+  }): Promise<ApiResponse<ExpansionStrategyResult>> => {
+    return apiRequest<ExpansionStrategyResult>('/api/payments/ml/expansion-strategy', {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
   },
  };

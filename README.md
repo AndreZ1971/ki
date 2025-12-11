@@ -59,6 +59,38 @@ Ein **AI-gestütztes Business Automation System** für WooCommerce/WordPress mit
 
 ---
 
+## 🔒 Datenschutz-Informationen
+
+### KI-Datenverarbeitung
+Dieses System verwendet **GPT-4o-mini** für verschiedene Analyse- und Optimierungsfunktionen:
+
+- **Payment User Favor**: Personalisierte Payment-Optimierung
+- **Payment Issued Detector**: Proaktive System-Anomalieerkennung
+- **Payment Validation**: Transaktions-Anomalieerkennung
+- **Payment Success**: Conversion-Optimierung
+
+### Datenspeicherung
+- ✅ **Keine dauerhafte Speicherung**: Alle KI-Analysedaten werden nur temporär im RAM verarbeitet
+- ✅ **Automatische Löschung**: Max. 5000 Events im Speicher, älteste werden automatisch entfernt
+- ✅ **Server-Neustart**: Alle temporären Daten werden beim Neustart gelöscht
+- ✅ **Session-basiert**: Frontend-Daten existieren nur während der Browsersitzung
+
+### OpenAI-API Datenverarbeitung
+- ⚠️ **API-Calls**: Analysedaten werden an OpenAI GPT-4o-mini übermittelt
+- ⚠️ **Retention**: OpenAI speichert API-Daten gemäß deren Datenschutzrichtlinien (30-Tage-Retention für Abuse-Monitoring)
+- ⚠️ **Keine Trainingsdaten**: API-Daten werden **nicht** für Model-Training verwendet (per OpenAI Enterprise Agreement)
+
+### DSGVO-Empfehlungen
+**Wichtig**: Als Betreiber dieser Software sollten Sie:
+1. ✅ KI-Analyse in Ihrer **Datenschutzerklärung** erwähnen
+2. ✅ Nutzer über **OpenAI-Datenverarbeitung** informieren
+3. ✅ Optional: Consent-Banner für KI-Features implementieren
+4. ✅ Verweis auf [OpenAI Privacy Policy](https://openai.com/policies/privacy-policy)
+
+**Hinweis**: Die in der UI angezeigten Datenschutz-Banner erfüllen **keine** rechtliche Informationspflicht. Sie müssen die KI-Verarbeitung in Ihrer eigenen Datenschutzerklärung dokumentieren.
+
+---
+
 ## 🚀 Quick Start
 
 ### Mit Docker (Empfohlen)

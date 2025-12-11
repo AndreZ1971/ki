@@ -111,6 +111,173 @@ export interface PaymentSuccessMetrics {
   lastEvent: string | null;
 }
 
+export interface PaymentIssue {
+  type: 'Gateway-Timeout' | 'Validation' | 'Retry' | 'Fraud' | 'Integration' | 'RateLimit' | 'Configuration' | 'Unknown';
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  confidence: number; // 0-1
+  description: string;
+  affectedArea: string;
+  suggestedFix: string;
+  impact: string;
+}
+
+export interface UserPaymentPreferences {
+  preferredPaymentMethods: string[];
+  preferredCurrency: string;
+  preferredLanguage: string;
+  checkoutFlowRecommendation: 'one-page' | 'multi-step';
+  confidence: number; // 0-1
+  personalizations: {
+    showSavedCards: boolean;
+    suggestInstallments: boolean;
+    highlightTrustBadges: boolean;
+    showSecurityFeatures: boolean;
+  };
+  conversionOptimizations: string[];
+  riskProfile: 'low' | 'medium' | 'high';
+  lifetimeValue: number;
+  nextBestAction: string;
+  metadata: {
+    customerId: string;
+    totalPurchases: number;
+    avgAmount: number;
+    analyzedAt: string;
+  };
+}
+
+export interface IssueDetectionResult {
+  issues: PaymentIssue[];
+  systemHealth: 'healthy' | 'degraded' | 'critical';
+  overallConfidence: number; // 0-1
+  recommendedActions: string[];
+  scanMetadata: {
+    scanDepth: string;
+    timeRange: string;
+    scannedEvents: number;
+    currentFailureRate: number;
+    timestamp: string;
+  };
+}
+
+export interface DeliveryCarrier {
+  name: string;
+  reason?: string;
+  estimatedDays: number;
+  cost: number;
+  reliability: number; // 0-100
+}
+
+export interface DeliveryRisk {
+  risk: string;
+  probability: 'low' | 'medium' | 'high';
+  mitigation: string;
+}
+
+export interface DeliveryOptimizationResult {
+  orderId: string;
+  recommendedCarrier: DeliveryCarrier;
+  alternativeCarriers: DeliveryCarrier[];
+  deliveryRisks: DeliveryRisk[];
+  routeOptimization: {
+    fastestRoute: string;
+    cheapestRoute: string;
+    recommended: 'fastest' | 'cheapest' | 'balanced';
+  };
+  estimatedDelivery: {
+    best: string;
+    likely: string;
+    worst: string;
+  };
+  specialInstructions: string[];
+  confidence: number; // 0-1
+  metadata: {
+    destination: string;
+    totalWeight: number;
+    totalValue: number;
+    urgency: string;
+    analyzedAt: string;
+  };
+}
+
+export interface EmergencyImmediateAction {
+  action: string;
+  owner: string;
+  eta: string;
+}
+
+export interface EmergencyCommunicationTemplate {
+  internal: string;
+  customer: string;
+  stakeholder: string;
+}
+
+export interface EmergencyAnalysisResult {
+  ticketId: string;
+  severity: 'P0' | 'P1' | 'P2' | 'P3';
+  priority: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+  estimatedImpact: {
+    customersFacing: number;
+    revenueAtRisk: number;
+    slaViolation: boolean;
+    uptimeImpact: string;
+  };
+  rootCauseHypothesis: string[];
+  immediateActions: EmergencyImmediateAction[];
+  escalationPath: string[];
+  runbookUrl: string | null;
+  communicationTemplate: EmergencyCommunicationTemplate;
+  slaDeadline: string | null;
+  mitigationSteps: string[];
+  preventionRecommendations: string[];
+  confidence: number; // 0-1
+  metadata: {
+    issueType: string;
+    affectedCustomers: number;
+    financialImpact: number;
+    systemsAffected: string[];
+    reportedAt: string;
+  };
+}
+
+export interface ExpansionTimelinePhase {
+  phase: string;
+  durationWeeks: number;
+  milestones: string[];
+}
+
+export interface ExpansionRisk {
+  risk: string;
+  probability: 'low' | 'medium' | 'high';
+  action: string;
+}
+
+export interface ExpansionStrategyResult {
+  targetRegion: 'eu' | 'us' | 'asia' | 'global';
+  marketsToEnter: Array<{ country: string; reason: string; expectedLift?: number }>;
+  revenueProjection: { best: number; likely: number; worst: number };
+  timeline: ExpansionTimelinePhase[];
+  riskMitigation: ExpansionRisk[];
+  complianceChecklist: string[];
+  paymentStack: {
+    psp: string[];
+    paymentMethods: string[];
+    fraud?: string;
+  };
+  localization: {
+    currencies: string[];
+    languages: string[];
+    tax?: string;
+  };
+  logisticsNotes: string[];
+  confidence: number;
+  metadata: {
+    currentRevenue: number;
+    currentMarkets: number;
+    priority: string;
+    analyzedAt: string;
+  };
+}
+
 export interface PaymentVerificationCheck {
   name: string;
   status: 'pass' | 'fail' | 'warn';
