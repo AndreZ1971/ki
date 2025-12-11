@@ -1,7 +1,11 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { AnalyticsMLService } from '../../../../services/analyticsMLService';
+import { registerConversionMLAnalysis } from './conversion/ml-analysis';
 
 export default async function conversionRoutes(fastify: FastifyInstance) {
+  // Registriere ML-Analysis Sub-Routes
+  await fastify.register(registerConversionMLAnalysis, { prefix: '/ml' });
+
   // GET /api/analytics/conversion/analysis
   fastify.get('/analysis', async (_request: FastifyRequest, reply: FastifyReply) => {
     // Dummy-Daten für Conversion Analysis
