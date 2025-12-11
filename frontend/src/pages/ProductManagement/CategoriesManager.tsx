@@ -323,12 +323,6 @@ const CategoriesManager = () => {
         </div>
       </div>
 
-      <div className="category-ml-section">
-        <h3>KI-Kategorie-Vorschläge</h3>
-        {/* Beispielhafte Produktdaten, kann dynamisch ersetzt werden */}
-        <MLCategorySuggester productTitle="Beispielprodukt" productDescription="Dies ist eine Beispielbeschreibung für ein Produkt, das kategorisiert werden soll." />
-      </div>
-
       {showCreateModal && (
         <div className="modal-overlay" onClick={() => !loading && setShowCreateModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
