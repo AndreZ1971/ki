@@ -7,6 +7,7 @@ import { categoryApi } from '../../services/productApi';
 import type { Category, CategorySuggestion } from '../../types/product';
 import { MLCategorySuggester } from './MLCategorySuggester';
 import './page.css';
+import './CategoriesManager.css';
 
 const CategoriesManager = () => {
   const { handleBackToDashboard, loading, setLoading, error, setError, clearError } = useProductManagement();
@@ -15,6 +16,9 @@ const CategoriesManager = () => {
   const [initialLoading, setInitialLoading] = useState(true);
   const [suggestions, setSuggestions] = useState<Record<number, CategorySuggestion[]>>({});
   const [suggestLoading, setSuggestLoading] = useState<Record<number, boolean>>({});
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [expandedSuggestions, setExpandedSuggestions] = useState<Set<number>>(new Set());
 
   const loadCategories = async () => {
     try {
@@ -107,9 +111,13 @@ const CategoriesManager = () => {
     toast.success(`Vorschlag "${suggestion.name}" übernommen`);
   };
 
-  const handleCreateCategory = async () => {
-    const name = prompt('Neue Kategorie Name:');
-    if (!name) return;
+  const handleCreateCategorySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const name = newCategoryName.trim();
+    if (!name) {
+      toast.error('Kategoriename ist erforderlich');
+      return;
+    }
 
     try {
       setLoading(true);
@@ -117,7 +125,9 @@ const CategoriesManager = () => {
 
       if (response.success && response.data) {
         setCategories([...categories, response.data]);
-        toast.success(`Kategorie "${name}" erstellt!`);
+        toast.success(`✅ Kategorie "${name}" erstellt!`);
+        setNewCategoryName('');
+        setShowCreateModal(false);
       } else {
         throw new Error(response.error || 'Fehler beim Erstellen');
       }
@@ -126,6 +136,18 @@ const CategoriesManager = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const toggleSuggestionsExpanded = (categoryId: number) => {
+    setExpandedSuggestions(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(categoryId)) {
+        newSet.delete(categoryId);
+      } else {
+        newSet.add(categoryId);
+      }
+      return newSet;
+    });
   };
 
   // Loading State
@@ -218,7 +240,7 @@ const CategoriesManager = () => {
             ⚡ Alle optimieren
           </LoadingButton>
           <LoadingButton
-            onClick={handleCreateCategory}
+            onClick={() => setShowCreateModal(true)}
             loading={loading}
             variant="secondary"
           >
@@ -231,44 +253,69 @@ const CategoriesManager = () => {
         <h3>📋 Kategorie-Liste</h3>
         <div className="categories-list">
           {categories.map(category => (
-            <div key={category.id} className="category-item">
-              <div className="category-info">
-                <span className="category-name">{category.name}</span>
-                <span className="product-count">{category.productCount} Produkte</span>
-              </div>
-              <div className="category-actions">
-                {category.needsOptimization && (
-                  <span className="optimization-badge">⚠️ Optimieren</span>
-                )}
-                <button
-                  className="edit-button"
-                  onClick={() => handleSuggestForCategory(category)}
-                  disabled={suggestLoading[category.id]}
-                >
-                  {suggestLoading[category.id] ? '…' : '🤖 Vorschläge'}
-                </button>
+            <div key={category.id} className={`category-card ${category.needsOptimization ? 'needs-optimization' : ''}`}>
+              <div className="category-card-header">
+                <div className="category-card-info">
+                  <h4 className="category-card-title">{category.name}</h4>
+                  <div className="category-card-meta">
+                    <span className="product-count">📦 {category.productCount} Produkte</span>
+                    {category.description && <span className="description">{category.description}</span>}
+                  </div>
+                </div>
+                <div className="category-card-badges">
+                  {category.needsOptimization && (
+                    <span className="badge optimization-badge" title="Diese Kategorie benötigt eine Beschreibung">
+                      ⚠️ Optimierung nötig
+                    </span>
+                  )}
+                </div>
               </div>
 
+              <button
+                className="suggest-button"
+                onClick={() => handleSuggestForCategory(category)}
+                disabled={suggestLoading[category.id]}
+              >
+                {suggestLoading[category.id] ? (
+                  <><span className="spinner">⏳</span> KI analysiert...</>
+                ) : (
+                  <><span>🤖</span> KI-Vorschläge laden</>
+                )}
+              </button>
+
               {suggestions[category.id]?.length ? (
-                <div className="suggestions-inline">
-                  <div className="suggestions-header">KI-Vorschläge</div>
-                  <ul>
-                    {suggestions[category.id].map((s, idx) => (
-                      <li key={idx} className="suggestion-row">
-                        <div>
-                          <strong>{s.name}</strong>
-                          <span className="confidence">{Math.round(s.confidence * 100)}%</span>
+                <div className="suggestions-container">
+                  <button
+                    className="suggestions-toggle"
+                    onClick={() => toggleSuggestionsExpanded(category.id)}
+                  >
+                    <span className="toggle-icon">{expandedSuggestions.has(category.id) ? '▼' : '▶'}</span>
+                    <span>{suggestions[category.id].length} KI-Vorschlag{suggestions[category.id].length > 1 ? 'e' : ''}</span>
+                  </button>
+
+                  {expandedSuggestions.has(category.id) && (
+                    <div className="suggestions-list">
+                      {suggestions[category.id].map((s, idx) => (
+                        <div key={idx} className="suggestion-item">
+                          <div className="suggestion-content">
+                            <div className="suggestion-header">
+                              <strong className="suggestion-name">{s.name}</strong>
+                              <span className={`confidence-badge confidence-${Math.round(s.confidence * 100)}`}>
+                                {Math.round(s.confidence * 100)}%
+                              </span>
+                            </div>
+                            <p className="suggestion-reason">{s.reason}</p>
+                          </div>
+                          <button
+                            className="apply-button"
+                            onClick={() => handleApplySuggestion(category, s)}
+                          >
+                            ✓ Übernehmen
+                          </button>
                         </div>
-                        <div className="reason">{s.reason}</div>
-                        <button
-                          className="apply-button"
-                          onClick={() => handleApplySuggestion(category, s)}
-                        >
-                          Übernehmen
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ) : null}
             </div>
@@ -281,6 +328,51 @@ const CategoriesManager = () => {
         {/* Beispielhafte Produktdaten, kann dynamisch ersetzt werden */}
         <MLCategorySuggester productTitle="Beispielprodukt" productDescription="Dies ist eine Beispielbeschreibung für ein Produkt, das kategorisiert werden soll." />
       </div>
+
+      {showCreateModal && (
+        <div className="modal-overlay" onClick={() => !loading && setShowCreateModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>📝 Neue Kategorie erstellen</h2>
+              <button className="modal-close" onClick={() => setShowCreateModal(false)} disabled={loading}>✕</button>
+            </div>
+
+            <form onSubmit={handleCreateCategorySubmit} className="category-form">
+              <div className="form-group">
+                <label htmlFor="category-name">Kategoriename</label>
+                <input
+                  id="category-name"
+                  type="text"
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  placeholder="z.B. Elektronik, Mode, Haushalt..."
+                  maxLength={100}
+                  disabled={loading}
+                  autoFocus
+                />
+              </div>
+
+              <div className="form-actions">
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => setShowCreateModal(false)}
+                  disabled={loading}
+                >
+                  Abbrechen
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  disabled={loading}
+                >
+                  {loading ? '⏳ Erstelle...' : '✓ Kategorie erstellen'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
