@@ -5,7 +5,6 @@ import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared
 import { ToastContainer } from '../../components/Toast/ToastContainer';
 import { categoryApi } from '../../services/productApi';
 import type { Category, CategorySuggestion } from '../../types/product';
-import { MLCategorySuggester } from './MLCategorySuggester';
 import './page.css';
 import './CategoriesManager.css';
 
