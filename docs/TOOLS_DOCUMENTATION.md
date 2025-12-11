@@ -11,11 +11,11 @@
 
 | Kategorie | Tools | ML/KI | Status |
 |-----------|-------|--------|--------|
-| **Analytics** | 10 Tools | 🟡 Teilweise | In Arbeit |
+| **Analytics** | 9 Tools | 🟡 Teilweise | In Arbeit |
 | **Product Management** | 8 Tools | 🟢 Ja | Abgeschlossen |
 | **Payment & Finances** | 13 Tools | 🟢 Ja | Abgeschlossen |
 | **Marketing & Content** | 10 Tools | 🟢 Ja | Abgeschlossen |
-| **Advanced AI** | 11 Tools | 🟢 Ja | Abgeschlossen |
+| **Advanced AI** | 12 Tools | 🟢 Ja | Abgeschlossen |
 | **GESAMT** | **52 Tools** | | |
 
 ---
@@ -218,9 +218,23 @@
 - **Features**: ML-Button mit Loading States, Error Handling, Priority-colored Insights, Category Filtering
 - **UI**: KI-Optimierung Button, Insights mit Priority-Badges, Confidence-Score-Anzeige, Category-Tags
 
+#### 🔧 **Standard Audit** `frontend/src/pages/AnalyseMetrics/StandardAudit.tsx`
+- **ML-Features**:
+  - KI-gestützte Quick-Checks mit GPT-basierter Analyse
+  - ML-Insights für Basis-Audit-Checks (type, title, value, score, detail, priority, category)
+  - Schnelle KI-Optimierungsvorschläge
+  - Automatische Prioritätsvergabe (critical/high/medium/low)
+  - Category-spezifische Quick-Checks (performance/seo/security/ux/content)
+  - Confidence-Scoring für Empfehlungen
+- **API**: `/api/audit/standard/ml-analysis` (POST)
+- **Status**: ✅ Vollständig mit ML/KI integriert
+- **Capabilities**: Quick-Fix Detection, Importance-based Checks, Progress Tracking, Next Steps Generation
+- **Features**: KI-Quick-Check Button, ML-Loading States, Error Handling, Priority-colored Insights
+- **UI**: KI-Quick-Check Button, Insights mit Priority-Badges, Confidence-Score-Anzeige, Category-Filter
+
 ---
 
-### 🟡 Teilweise integrierte Tools - Analytics (9 Tools)
+### 🟡 Teilweise integrierte Tools - Analytics (8 Tools)
 
 Diese Tools haben Basic-APIs aber begrenzte ML/KI-Features:
 

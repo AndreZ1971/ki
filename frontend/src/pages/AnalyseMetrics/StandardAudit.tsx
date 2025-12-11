@@ -36,6 +36,19 @@ const StandardAudit = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [scanInProgress, setScanInProgress] = useState(false);
+  
+  // KI/ML-Analyse States
+  const [mlLoading, setMlLoading] = useState(false);
+  const [mlError, setMlError] = useState<string | null>(null);
+  const [mlInsights, setMlInsights] = useState<Array<{
+    type: string;
+    title: string;
+    value: string;
+    score?: number;
+    detail?: string;
+    priority?: 'critical' | 'high' | 'medium' | 'low';
+    category?: string;
+  }>>([]);
 
   // Audit-Daten vom Backend laden
   const loadAuditData = React.useCallback(async () => {
@@ -57,6 +70,35 @@ const StandardAudit = () => {
     loadAuditData();
   }, [loadAuditData]);
 
+  // KI/ML-Analyse: Schnelle KI-Checks mit GPT
+  const handleMLAnalyze = async () => {
+    setMlLoading(true);
+    setMlError(null);
+    setMlInsights([]);
+    try {
+      let base = (import.meta.env.VITE_API_URL || '').trim();
+      if (base.endsWith('/')) base = base.slice(0, -1);
+      const apiUrl = base ? `${base}/api/audit/standard/ml-analysis` : `/api/audit/standard/ml-analysis`;
+      
+      const payload = {
+        auditChecks: auditChecks,
+        summary: summary
+      };
+      
+      const res = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!res.ok) throw new Error('Fehler beim Laden der KI-Analyse');
+      const data = await res.json();
+      setMlInsights(data.mlInsights || []);
+    } catch (err: any) {
+      setMlError(err.message || 'KI-Analyse konnte nicht geladen werden.');
+    }
+    setMlLoading(false);
+  };
 
   const calculateSummary = (checks: AuditCheck[]) => {
     const total = checks.length;
@@ -184,7 +226,7 @@ const StandardAudit = () => {
         <h1>🔧 Standard Audit</h1>
         <p>Basis-Audit für schnelle Shop-Optimierung</p>
         
-        <div className="header-controls">
+        <div className="header-controls" style={{display:'flex', gap:'16px', flexWrap:'wrap'}}>
           <button 
             className={`refresh-button ${scanInProgress ? 'scanning' : ''}`}
             onClick={runQuickScan}
@@ -192,7 +234,31 @@ const StandardAudit = () => {
           >
             {scanInProgress ? '🔄 Scannt...' : '🔍 Schnell-Scan starten'}
           </button>
+          <button 
+            className="ml-analytics-btn" 
+            onClick={handleMLAnalyze} 
+            disabled={mlLoading || auditChecks.length === 0}
+            title="KI-gestützte Quick-Checks & Optimierungsvorschläge"
+            style={{
+              fontSize:'1em', 
+              padding:'8px 18px', 
+              borderRadius:'8px', 
+              background:'linear-gradient(90deg, #667eea 0%, #764ba2 100%)', 
+              color:'#fff', 
+              border:'none', 
+              minWidth:'200px', 
+              display:'flex', 
+              alignItems:'center', 
+              gap:'8px',
+              cursor: auditChecks.length === 0 ? 'not-allowed' : 'pointer',
+              opacity: auditChecks.length === 0 ? 0.5 : 1
+            }}
+          >
+            <span role="img" aria-label="AI" style={{fontSize: '1.2em'}}>🤖</span>
+            {mlLoading ? 'KI prüft...' : 'KI-Quick-Check'}
+          </button>
         </div>
+        {mlError && <div className="error-message" style={{marginTop:'8px', color:'#e74c3c'}}>{mlError}</div>}
       </div>
 
       {/* Audit Summary */}
@@ -252,6 +318,74 @@ const StandardAudit = () => {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* KI-Insights Sektion */}
+      {mlInsights.length > 0 && (
+        <div className="analysis-section">
+          <div className="metric-card full-width" style={{background: 'rgba(102,126,234,0.05)', border: '2px solid rgba(102,126,234,0.2)'}}>
+            <h4 style={{marginBottom: 16, color: '#667eea', display: 'flex', alignItems: 'center', gap: 8}}>
+              <span role="img" aria-label="AI">🤖</span>
+              KI-Quick-Check Ergebnisse
+            </h4>
+            <ul style={{listStyle:'none', padding:0, margin:0}}>
+              {mlInsights.map((insight, idx) => (
+                <li 
+                  key={idx} 
+                  style={{
+                    background: insight.priority === 'critical' ? 'rgba(231,76,60,0.1)' : 
+                               insight.priority === 'high' ? 'rgba(230,126,34,0.1)' :
+                               insight.priority === 'medium' ? 'rgba(241,196,15,0.08)' : '#f6f8fa',
+                    borderLeft: `4px solid ${
+                      insight.priority === 'critical' ? '#e74c3c' :
+                      insight.priority === 'high' ? '#e67e22' :
+                      insight.priority === 'medium' ? '#f1c40f' : '#2563eb'
+                    }`,
+                    borderRadius: 8,
+                    marginBottom: 12,
+                    padding: '16px 18px',
+                    boxShadow: '0 2px 8px rgba(102,126,234,0.08)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 6
+                  }}
+                >
+                  <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4}}>
+                    <span style={{fontWeight: 600, color: '#2563eb', fontSize: '1.05em'}}>{insight.title}</span>
+                    {insight.priority && (
+                      <span style={{
+                        padding: '4px 10px',
+                        borderRadius: 6,
+                        fontSize: '0.85em',
+                        fontWeight: 600,
+                        background: insight.priority === 'critical' ? '#e74c3c' :
+                                   insight.priority === 'high' ? '#e67e22' :
+                                   insight.priority === 'medium' ? '#f1c40f' : '#27ae60',
+                        color: '#fff'
+                      }}>
+                        {insight.priority.toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+                  <span style={{fontSize: '1.08em', color: '#222', lineHeight: 1.5}}>{insight.value}</span>
+                  {insight.detail && (
+                    <span style={{color: '#6c757d', fontSize: '0.95em', marginTop: 4}}>{insight.detail}</span>
+                  )}
+                  {insight.category && (
+                    <span style={{color: '#764ba2', fontSize: '0.9em', fontWeight: 500}}>
+                      📂 {insight.category}
+                    </span>
+                  )}
+                  {insight.score !== undefined && (
+                    <span style={{color: '#764ba2', fontWeight: 600, fontSize: '0.95em'}}>
+                      KI-Confidence: {Math.round(insight.score * 100)}%
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       )}
