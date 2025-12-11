@@ -239,6 +239,19 @@ export interface EmergencyAnalysisResult {
   };
 }
 
+export interface ContextGenerationResult {
+  context: string;
+  summary: string;
+  keyPoints: string[];
+  promptTemplate: string;
+  guardrails: string[];
+  metadata: {
+    confidence: number;
+    model: string;
+    generatedAt: string;
+  };
+}
+
 export interface ExpansionTimelinePhase {
   phase: string;
   durationWeeks: number;

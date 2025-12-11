@@ -20,7 +20,8 @@ import type {
    UserPaymentPreferences,
    DeliveryOptimizationResult,
    EmergencyAnalysisResult,
-   ExpansionStrategyResult
+   ExpansionStrategyResult,
+   ContextGenerationResult
  } from '../types/product';
 let API_BASE_URL = (import.meta.env.VITE_API_URL || '').trim();
 // Wenn leer, nutze relativen Pfad
@@ -106,6 +107,23 @@ export const productApi = {
       body: JSON.stringify(updateRequest),
     });
   },
+
+  /**
+   * KI-Kontext-Generator
+   */
+  generateContext: async (data: {
+    contextType: 'technical' | 'marketing' | 'educational' | 'creative';
+    topic: string;
+    targetAudience?: string;
+    detailLevel?: 'basic' | 'medium' | 'detailed' | 'expert';
+    tone?: 'neutral' | 'friendly' | 'authoritative' | 'playful';
+  }): Promise<ApiResponse<ContextGenerationResult>> => {
+    return apiRequest<ContextGenerationResult>('/api/ai/context/generate', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
 };
 
 // ==================== CATEGORIES ====================
@@ -461,4 +479,4 @@ export const paymentApi = {
       body: JSON.stringify(data),
     });
   },
- };
+};

@@ -5,6 +5,8 @@ import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
 import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
+import { productApi } from '../../services/productApi';
+import type { ContextGenerationResult } from '../../types/product';
 import './page.css';
 
 const ContextGenerator: React.FC = () => {
@@ -15,7 +17,7 @@ const ContextGenerator: React.FC = () => {
   const [topic, setTopic] = useState('');
   const [targetAudience, setTargetAudience] = useState('');
   const [detailLevel, setDetailLevel] = useState('medium');
-  const [generatedContext, setGeneratedContext] = useState<string | null>(null);
+  const [generatedContext, setGeneratedContext] = useState<ContextGenerationResult | null>(null);
 
   const contextTypes = [
     { value: 'technical', label: 'Technisch', icon: '⚙️', description: 'Code & Dokumentation' },
@@ -41,12 +43,19 @@ const ContextGenerator: React.FC = () => {
     setError(null);
 
     try {
-      // Simuliere API-Call (später durch echten Endpoint ersetzen)
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const mockContext = `# KI-Kontext für: ${topic}\n\n## Kontext-Typ: ${contextType}\n## Zielgruppe: ${targetAudience || 'Allgemein'}\n## Detail-Level: ${detailLevel}\n\n### Generierter Kontext:\n\nDieser Kontext wurde speziell für "${topic}" erstellt und optimiert die KI-Antworten für eine ${targetAudience ? targetAudience + '-Zielgruppe' : 'allgemeine Zielgruppe'}.\n\n**Wichtige Aspekte:**\n- Fokus auf ${contextType}-Inhalte\n- Optimiert für ${detailLevel}-Detailgrad\n- Strukturierte Informationsaufbereitung\n- Kontextrelevante Beispiele\n\n**Empfohlene Nutzung:**\nVerwende diesen Kontext als Basis für KI-Prompts, um konsistente und präzise Ergebnisse zu erzielen.`;
+      const response = await productApi.generateContext({
+        contextType: contextType as any,
+        topic,
+        targetAudience,
+        detailLevel: detailLevel as any,
+        tone: 'neutral'
+      });
 
-      setGeneratedContext(mockContext);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Kontext konnte nicht generiert werden');
+      }
+
+      setGeneratedContext(response.data);
       showToast('Kontext erfolgreich generiert!', 'success');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten';
@@ -210,7 +219,7 @@ const ContextGenerator: React.FC = () => {
           {generatedContext ? (
             <div style={{ position: 'relative' }}>
               <motion.button
-                onClick={() => copyToClipboard(generatedContext)}
+                onClick={() => copyToClipboard(generatedContext.context)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 style={{
@@ -242,7 +251,69 @@ const ContextGenerator: React.FC = () => {
                 maxHeight: '500px',
                 overflowY: 'auto'
               }}>
-                {generatedContext}
+                {/* Summary cards */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '14px' }}>
+                  <div style={{ background: 'rgba(52,199,89,0.1)', border: '1px solid rgba(52,199,89,0.4)', borderRadius: '10px', padding: '12px' }}>
+                    <div style={{ fontSize: '12px', opacity: 0.7, color: 'white' }}>Kurzfassung</div>
+                    <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.85)' }}>{generatedContext.summary || '—'}</div>
+                  </div>
+                  <div style={{ background: 'rgba(0,122,255,0.1)', border: '1px solid rgba(0,122,255,0.4)', borderRadius: '10px', padding: '12px' }}>
+                    <div style={{ fontSize: '12px', opacity: 0.7, color: 'white' }}>Confidence</div>
+                    <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'white' }}>{Math.round((generatedContext.metadata?.confidence || 0) * 100)}%</div>
+                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.6)' }}>{generatedContext.metadata?.model}</div>
+                  </div>
+                  <div style={{ background: 'rgba(255,149,0,0.1)', border: '1px solid rgba(255,149,0,0.5)', borderRadius: '10px', padding: '12px' }}>
+                    <div style={{ fontSize: '12px', opacity: 0.7, color: 'white' }}>Zeitstempel</div>
+                    <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.85)' }}>
+                      {generatedContext.metadata?.generatedAt ? new Date(generatedContext.metadata.generatedAt).toLocaleString() : '—'}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Key points + guardrails */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px', marginBottom: '14px' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px' }}>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: 'white', marginBottom: '8px' }}>Kernpunkte</div>
+                    <ul style={{ margin: 0, paddingLeft: '16px', display: 'flex', flexDirection: 'column', gap: '6px', color: 'rgba(255,255,255,0.85)', fontSize: '12px' }}>
+                      {(generatedContext.keyPoints || []).map((point, idx) => (
+                        <li key={idx}>{point}</li>
+                      ))}
+                      {(generatedContext.keyPoints || []).length === 0 && <li>Keine Kernpunkte geliefert</li>}
+                    </ul>
+                  </div>
+                  <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px' }}>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: 'white', marginBottom: '8px' }}>Guardrails</div>
+                    <ul style={{ margin: 0, paddingLeft: '16px', display: 'flex', flexDirection: 'column', gap: '6px', color: 'rgba(255,255,255,0.85)', fontSize: '12px' }}>
+                      {(generatedContext.guardrails || []).map((rule, idx) => (
+                        <li key={idx}>{rule}</li>
+                      ))}
+                      {(generatedContext.guardrails || []).length === 0 && <li>Keine Guardrails geliefert</li>}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Prompt template */}
+                <div style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '14px', marginBottom: '14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <div style={{ fontSize: '13px', color: 'white', fontWeight: 700 }}>Prompt-Vorlage</div>
+                    <motion.button
+                      onClick={() => copyToClipboard(generatedContext.promptTemplate)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      style={{ padding: '6px 12px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', cursor: 'pointer', fontSize: '12px' }}
+                    >
+                      📋 Prompt kopieren
+                    </motion.button>
+                  </div>
+                  <div style={{ fontFamily: 'monospace', fontSize: '12px', whiteSpace: 'pre-wrap', color: 'rgba(255,255,255,0.9)' }}>
+                    {generatedContext.promptTemplate || 'Keine Vorlage vorhanden'}
+                  </div>
+                </div>
+
+                {/* Context markdown */}
+                <div style={{ fontSize: '14px', lineHeight: '1.6', color: 'white', whiteSpace: 'pre-wrap' }}>
+                  {generatedContext.context}
+                </div>
               </div>
             </div>
           ) : (
