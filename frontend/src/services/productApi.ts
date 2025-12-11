@@ -12,7 +12,8 @@ import type {
   FraudAnalysis,
   AmountSuggestion,
   UxAuditResult,
-  PaymentTestScenario
+  PaymentTestScenario,
+  TestDiagnosis
 } from '../types/product';
 
 let API_BASE_URL = (import.meta.env.VITE_API_URL || '').trim();
@@ -320,6 +321,20 @@ export const paymentApi = {
     riskTolerance?: 'low' | 'medium' | 'high';
   }): Promise<ApiResponse<PaymentTestScenario[]>> => {
     return apiRequest<PaymentTestScenario[]>('/api/payments/ml/test-plan', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * KI-Diagnose für fehlgeschlagene Tests
+   */
+  diagnoseTests: async (data: {
+    failureLogs: string[];
+    environment?: string;
+    testType?: string;
+  }): Promise<ApiResponse<TestDiagnosis>> => {
+    return apiRequest<TestDiagnosis>('/api/payments/ml/test-diagnose', {
       method: 'POST',
       body: JSON.stringify(data),
     });

@@ -94,6 +94,14 @@ export interface PaymentTestScenario {
   expectedImpact: string;
 }
 
+export interface TestDiagnosis {
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  confidence: number; // 0-1
+  rootCauses: string[];
+  fixes: string[];
+  recommendedOwners: string[];
+}
+
 export interface Freebie {
   id: number;
   name: string;

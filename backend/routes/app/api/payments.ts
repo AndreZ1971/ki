@@ -25,6 +25,12 @@ interface TestPlanBody {
   riskTolerance?: 'low' | 'medium' | 'high';
 }
 
+interface TestDiagnoseBody {
+  failureLogs: string[];
+  environment?: string;
+  testType?: string;
+}
+
 export default async function paymentRoutes(server: FastifyInstance) {
   
   // ML: Fraud Detection
@@ -460,6 +466,79 @@ Regeln:
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Testplan konnte nicht generiert werden'
+        });
+      }
+    }
+  );
+
+  // ML: Diagnose fehlgeschlagener Tests
+  server.post<{ Body: TestDiagnoseBody }>(
+    '/ml/test-diagnose',
+    {
+      schema: {
+        tags: ['payments', 'ml'],
+        description: 'Root-Cause-Analyse für fehlgeschlagene Payment-Tests',
+        body: {
+          type: 'object',
+          required: ['failureLogs'],
+          properties: {
+            failureLogs: { type: 'array', items: { type: 'string' } },
+            environment: { type: 'string' },
+            testType: { type: 'string' }
+          }
+        }
+      }
+    },
+    async (request: FastifyRequest<{ Body: TestDiagnoseBody }>, reply: FastifyReply) => {
+      try {
+        const { failureLogs, environment = 'staging', testType = 'unknown' } = request.body;
+        const { getOpenAIClient, executeOpenAI } = await import('../../../utils/openai.js');
+        const openai = getOpenAIClient();
+
+        const prompt = `Analysiere fehlgeschlagene Payment-Tests.
+Environment: ${environment}
+Test-Typ: ${testType}
+Logs:
+${failureLogs.slice(0, 10).join('\n')}
+
+Liefere JSON:
+{
+  "severity": "low|medium|high|critical",
+  "confidence": 0.0-1.0,
+  "rootCauses": ["..."],
+  "fixes": ["..."],
+  "recommendedOwners": ["payments", "backend", "devops", "fraud"]
+}`;
+
+        const completion = await executeOpenAI(
+          () => openai.chat.completions.create({
+            model: 'gpt-4o-mini',
+            temperature: 0.35,
+            messages: [
+              { role: 'system', content: 'Du bist ein SRE/QA Lead. Antworte kompakt in JSON, keine Erklärtexte.' },
+              { role: 'user', content: prompt }
+            ]
+          }),
+          'test-diagnose'
+        );
+
+        const responseText = completion.choices[0]?.message?.content || '{}';
+        const parsed = JSON.parse(responseText);
+
+        const normalized = {
+          severity: ['low', 'medium', 'high', 'critical'].includes(parsed.severity) ? parsed.severity : 'medium',
+          confidence: Math.max(0, Math.min(1, parsed.confidence ?? 0.6)),
+          rootCauses: Array.isArray(parsed.rootCauses) ? parsed.rootCauses : [],
+          fixes: Array.isArray(parsed.fixes) ? parsed.fixes : [],
+          recommendedOwners: Array.isArray(parsed.recommendedOwners) ? parsed.recommendedOwners : [],
+        };
+
+        return reply.send({ success: true, data: normalized });
+      } catch (error) {
+        console.error('❌ Test diagnose error:', error);
+        return reply.status(500).send({
+          success: false,
+          error: error instanceof Error ? error.message : 'Test-Diagnose fehlgeschlagen'
         });
       }
     }

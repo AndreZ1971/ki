@@ -7,7 +7,7 @@ import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared
 import { ToastContainer } from '../../components/Toast/ToastContainer';
 import { MLPaymentAnalyzer } from './MLPaymentAnalyzer';
 import { paymentApi } from '../../services/productApi';
-import type { PaymentTestScenario } from '../../types/product';
+import type { PaymentTestScenario, TestDiagnosis } from '../../types/product';
 import './page.css';
 
 interface TestResult { name: string; status: 'passed' | 'failed'; duration: string; }
@@ -22,6 +22,9 @@ const PaymentTester: React.FC = () => {
   const [riskTolerance, setRiskTolerance] = useState<'low' | 'medium' | 'high'>('medium');
   const [scenarios, setScenarios] = useState<PaymentTestScenario[]>([]);
   const [loadingPlan, setLoadingPlan] = useState(false);
+  const [failureLogs, setFailureLogs] = useState('');
+  const [diagnosis, setDiagnosis] = useState<TestDiagnosis | null>(null);
+  const [loadingDiag, setLoadingDiag] = useState(false);
 
   const tests = [
     { value: 'full', label: 'Vollständig', icon: '🧪' },
@@ -97,6 +100,31 @@ const PaymentTester: React.FC = () => {
     showToast(failed === 0 ? 'Szenario erfolgreich simuliert' : `${failed} Schritte fehlgeschlagen`, failed === 0 ? 'success' : 'error');
   };
 
+  const handleDiagnose = async () => {
+    if (!failureLogs.trim()) {
+      showToast('Bitte Log- oder Fehlermeldungen einfügen', 'error');
+      return;
+    }
+    setLoadingDiag(true);
+    try {
+      const lines = failureLogs.split('\n').filter(l => l.trim()).slice(0, 50);
+      const res = await paymentApi.diagnoseTests({
+        failureLogs: lines,
+        environment: 'staging',
+        testType,
+      });
+      if (res.success && res.data) {
+        setDiagnosis(res.data);
+        showToast('🩺 Diagnose erstellt', 'success');
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Diagnose fehlgeschlagen';
+      showToast(errorMessage, 'error');
+    } finally {
+      setLoadingDiag(false);
+    }
+  };
+
   return (
     <div className="page-container">
       <BackButton onClick={handleBackToDashboard} />
@@ -161,6 +189,21 @@ const PaymentTester: React.FC = () => {
 
           <div style={{ marginTop: '12px' }}>
             <LoadingButton onClick={handleGeneratePlan} loading={loadingPlan} loadingText="Generiere...">✨ KI Testplan</LoadingButton>
+          </div>
+
+          <div className="form-group" style={{ marginTop: '18px' }}>
+            <label>Fehler-Logs (für Diagnose)</label>
+            <textarea
+              value={failureLogs}
+              onChange={(e) => setFailureLogs(e.target.value)}
+              placeholder="Stacktraces, HTTP 500, Gateway Errors..."
+              rows={6}
+              className="form-input"
+              style={{ resize: 'vertical' }}
+            />
+            <div style={{ marginTop: '10px' }}>
+              <LoadingButton onClick={handleDiagnose} loading={loadingDiag} loadingText="Analysiere...">🩺 KI-Diagnose</LoadingButton>
+            </div>
           </div>
         </motion.div>
 
@@ -258,6 +301,74 @@ const PaymentTester: React.FC = () => {
                 </button>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {diagnosis && (
+        <div className="result-container" style={{ marginTop: '20px' }}>
+          <h3 style={{ color: 'white', marginBottom: '12px' }}>🩺 KI-Diagnose</h3>
+          <div style={{ display: 'grid', gap: '10px' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              color: 'white'
+            }}>
+              <span style={{
+                padding: '6px 10px',
+                borderRadius: '10px',
+                border: '1px solid rgba(255,255,255,0.1)',
+                background: diagnosis.severity === 'critical' ? 'rgba(255,59,48,0.18)' : diagnosis.severity === 'high' ? 'rgba(255,99,71,0.18)' : diagnosis.severity === 'medium' ? 'rgba(255,159,10,0.18)' : 'rgba(52,199,89,0.18)',
+                fontWeight: 700,
+                fontSize: '12px'
+              }}>
+                {diagnosis.severity.toUpperCase()}
+              </span>
+              <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>Konfidenz: {(diagnosis.confidence * 100).toFixed(0)}%</span>
+            </div>
+
+            {diagnosis.rootCauses?.length > 0 && (
+              <div>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: 'white', marginBottom: '6px' }}>Ursachen</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px', color: 'rgba(255,255,255,0.9)' }}>
+                  {diagnosis.rootCauses.map((c, idx) => (
+                    <div key={idx} style={{
+                      background: 'rgba(255,255,255,0.04)',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      borderRadius: '8px',
+                      padding: '8px'
+                    }}>
+                      ⚠️ {c}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {diagnosis.fixes?.length > 0 && (
+              <div>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: 'white', marginBottom: '6px' }}>Fix-Vorschläge</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px', color: 'rgba(255,255,255,0.9)' }}>
+                  {diagnosis.fixes.map((f, idx) => (
+                    <div key={idx} style={{
+                      background: 'rgba(52,199,89,0.12)',
+                      border: '1px solid rgba(52,199,89,0.3)',
+                      borderRadius: '8px',
+                      padding: '8px'
+                    }}>
+                      ✅ {f}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {diagnosis.recommendedOwners?.length > 0 && (
+              <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.85)' }}>
+                Zuständig: {diagnosis.recommendedOwners.join(', ')}
+              </div>
+            )}
           </div>
         </div>
       )}
