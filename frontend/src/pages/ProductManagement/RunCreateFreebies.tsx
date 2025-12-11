@@ -3,17 +3,10 @@ import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
 import { BackButton, LoadingButton } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
+import { freebieApi } from '../../services/productApi';
+import type { Freebie, FreebieIdea } from '../../types/product';
 import './page.css';
-
-interface Freebie {
-  id: number;
-  name: string;
-  type: string;
-  downloads: number;
-  created: string;
-  description?: string;
-  fileUrl?: string;
-}
+import './CreateFreebies.css';
 
 interface AutoCreateResponse {
   success: boolean;
@@ -23,14 +16,21 @@ interface AutoCreateResponse {
   permalink?: string;
   timestamp?: string;
   error?: string;
+  idea?: FreebieIdea;
 }
 
 const RunCreateFreebies = () => {
   const { handleBackToDashboard } = useProductManagement();
   const toast = useToast();
-  const [loading, setLoading] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [recentFreebies, setRecentFreebies] = useState<Freebie[]>([]);
   const [lastCreated, setLastCreated] = useState<AutoCreateResponse | null>(null);
+  const [freebieType, setFreebieType] = useState<'ebook' | 'checklist' | 'templates'>('ebook');
+  const [keywords, setKeywords] = useState('');
+  const [ideas, setIdeas] = useState<FreebieIdea[]>([]);
+  const [ideasLoading, setIdeasLoading] = useState(false);
+  const [selectedIdea, setSelectedIdea] = useState<FreebieIdea | null>(null);
+  const [autoPickBest, setAutoPickBest] = useState(true);
 
   // Lade existierende Freebies beim Start
   useEffect(() => {
@@ -49,41 +49,85 @@ const RunCreateFreebies = () => {
     }
   };
 
-  const handleRunCreator = async () => {
-    setLoading(true);
-    setLastCreated(null);
-
+  const handleGenerateIdeas = async (): Promise<FreebieIdea[]> => {
     try {
-      // Rufe Auto-Create Freebie Endpoint auf (rotierend durch Typen)
-      const types = ['ebook', 'checklist', 'templates', 'guide'];
-      const randomType = types[Math.floor(Math.random() * types.length)];
+      setIdeasLoading(true);
+      const response = await freebieApi.generateIdeas(freebieType, keywords || undefined);
 
-      const response = await fetch('/api/freebies/auto-create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type: randomType
-        })
+      if (response.success && response.data) {
+        setIdeas(response.data);
+        toast.success(`✅ ${response.data.length} KI-Ideen generiert`);
+        if (autoPickBest && response.data.length > 0) {
+          const best = response.data.reduce((top, idea) =>
+            idea.conversionScore > top.conversionScore ? idea : top
+          , response.data[0]);
+          setSelectedIdea(best);
+        }
+        return response.data;
+      } else {
+        throw new Error(response.error || 'KI-Ideen konnten nicht geladen werden');
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unbekannter Fehler';
+      toast.error(errorMessage);
+      return [];
+    } finally {
+      setIdeasLoading(false);
+    }
+  };
+
+  const handleCreateFromIdea = async (idea: FreebieIdea) => {
+    try {
+      setCreating(true);
+      const response = await freebieApi.createFreebie({
+        name: idea.title,
+        type: freebieType,
+        downloads: 0,
+        created: new Date().toISOString().split('T')[0],
+        description: idea.description
       });
 
-      const data: AutoCreateResponse = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Fehler bei der Freebie-Erstellung');
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Fehler bei der Freebie-Erstellung');
       }
 
-      setLastCreated(data);
-      toast.success(`Freebie "${data.data?.name}" erfolgreich erstellt!`);
-      
-      // Lade Freebies neu
+      const payload: AutoCreateResponse = {
+        success: true,
+        data: response.data,
+        idea,
+        message: 'Freebie mit KI-Idee erstellt'
+      };
+
+      setLastCreated(payload);
+      toast.success(`Freebie "${response.data.name}" erfolgreich erstellt!`);
       await loadFreebies();
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unbekannter Fehler';
       toast.error(errorMessage);
     } finally {
-      setLoading(false);
+      setCreating(false);
+    }
+  };
+
+  const handleRunCreator = async () => {
+    setLastCreated(null);
+
+    try {
+      const generated = ideas.length === 0 ? await handleGenerateIdeas() : ideas;
+
+      const sourceIdeas = generated.length > 0 ? generated : selectedIdea ? [selectedIdea] : [];
+      if (sourceIdeas.length === 0) {
+        throw new Error('Keine KI-Ideen verfügbar. Bitte erneut generieren.');
+      }
+
+      const best = autoPickBest
+        ? sourceIdeas.reduce((top, idea) => idea.conversionScore > top.conversionScore ? idea : top, sourceIdeas[0])
+        : (selectedIdea || sourceIdeas[0]);
+
+      await handleCreateFromIdea(best);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unbekannter Fehler';
+      toast.error(errorMessage);
     }
   };
 
@@ -116,14 +160,125 @@ const RunCreateFreebies = () => {
           </div>
         </div>
 
+        <div className="freebie-type-selector" style={{ marginTop: '16px' }}>
+          <label>
+            <input
+              type="radio"
+              name="type"
+              value="ebook"
+              checked={freebieType === 'ebook'}
+              onChange={(e) => setFreebieType(e.target.value as typeof freebieType)}
+            />
+            <span>📘 Ebook</span>
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="type"
+              value="checklist"
+              checked={freebieType === 'checklist'}
+              onChange={(e) => setFreebieType(e.target.value as typeof freebieType)}
+            />
+            <span>📑 Checklist</span>
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="type"
+              value="templates"
+              checked={freebieType === 'templates'}
+              onChange={(e) => setFreebieType(e.target.value as typeof freebieType)}
+            />
+            <span>🎨 Templates</span>
+          </label>
+        </div>
+
+        <div className="metric-card" style={{ marginTop: '12px' }}>
+          <div className="form-group">
+            <label>🔍 Keywords / Zielgruppe (optional)</label>
+            <input
+              type="text"
+              value={keywords}
+              onChange={(e) => setKeywords(e.target.value)}
+              placeholder="z.B. E-Commerce, Conversion, B2B"
+            />
+          </div>
+
+          <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <input
+              type="checkbox"
+              id="autoPickBest"
+              checked={autoPickBest}
+              onChange={(e) => setAutoPickBest(e.target.checked)}
+            />
+            <label htmlFor="autoPickBest" style={{ margin: 0 }}>Beste Idee automatisch wählen</label>
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <button
+              className="ai-generate-btn"
+              onClick={handleGenerateIdeas}
+              disabled={ideasLoading}
+            >
+              {ideasLoading ? '⏳ KI-Ideen werden generiert...' : '✨ KI-Ideen generieren'}
+            </button>
+            {selectedIdea && (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#1e3c72' }}>
+                Aktuell gewählt: <strong>{selectedIdea.title}</strong>
+              </span>
+            )}
+          </div>
+        </div>
+
         <LoadingButton
           onClick={handleRunCreator}
-          loading={loading}
-          loadingText="🔄 Erstelle Freebie mit AI..."
+          loading={creating}
+          loadingText="🔄 Erstelle Freebie mit KI-Idee..."
           className="large"
         >
-          🚀 FREEBIE JETZT ERSTELLEN
+          🚀 Freebie mit bester KI-Idee erstellen
         </LoadingButton>
+
+        {ideas.length > 0 && (
+          <div className="metric-card ideas-section">
+            <h3>📋 KI-Ideen (nach Score sortiert)</h3>
+            <div className="ideas-grid">
+              {ideas
+                .slice()
+                .sort((a, b) => b.conversionScore - a.conversionScore)
+                .map((idea, idx) => (
+                  <div
+                    key={`${idea.title}-${idx}`}
+                    className={`idea-card ${selectedIdea?.title === idea.title ? 'expanded' : ''}`}
+                  >
+                    <div className="idea-header">
+                      <h4>{idea.title}</h4>
+                      <span className="conversion-badge">📊 {(idea.conversionScore * 100).toFixed(0)}%</span>
+                    </div>
+                    <p className="idea-description">{idea.description}</p>
+                    <div className="idea-reason">
+                      <small>💡 {idea.reason}</small>
+                    </div>
+                    <div className="idea-actions">
+                      <button
+                        className="expand-btn"
+                        onClick={() => setSelectedIdea(idea)}
+                      >
+                        {selectedIdea?.title === idea.title ? 'Gewählt' : 'Wählen'}
+                      </button>
+                      <button
+                        className="create-idea-btn"
+                        onClick={() => handleCreateFromIdea(idea)}
+                        disabled={creating}
+                      >
+                        {creating ? '⏳' : '→'} Erstellen
+                      </button>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
 
         {lastCreated && lastCreated.success && (
           <div className="result-section">
@@ -133,6 +288,13 @@ const RunCreateFreebies = () => {
               <div><strong>Name:</strong> {lastCreated.data?.name}</div>
               <div><strong>Typ:</strong> {lastCreated.data?.type}</div>
               <div><strong>WooCommerce ID:</strong> {lastCreated.woocommerceId}</div>
+              {lastCreated.idea && (
+                <>
+                  <div><strong>KI-Idee:</strong> {lastCreated.idea.title}</div>
+                  <div><strong>Score:</strong> {(lastCreated.idea.conversionScore * 100).toFixed(0)}%</div>
+                  <div><strong>Grund:</strong> {lastCreated.idea.reason}</div>
+                </>
+              )}
               {lastCreated.permalink && (
                 <div>
                   <a href={lastCreated.permalink} target="_blank" rel="noopener noreferrer">
