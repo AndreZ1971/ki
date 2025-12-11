@@ -19,6 +19,12 @@ const WooProductCreate = () => {
     type: 'simple'
   });
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  
+  // 🤖 AI Assistant States
+  const [aiLoading, setAiLoading] = useState(false);
+  const [showAiPanel, setShowAiPanel] = useState(false);
+  const [qualityScore, setQualityScore] = useState<any>(null);
+  const [seoSuggestions, setSeoSuggestions] = useState<any>(null);
 
   // Lade WooCommerce Kategorien
   useEffect(() => {
@@ -52,6 +58,168 @@ const WooProductCreate = () => {
     return errors.length === 0;
   };
 
+  // ✍️ AI Description Generator
+  const generateAiDescription = async () => {
+    if (!productData.name) {
+      toast.error('Bitte gib zuerst einen Produktnamen ein');
+      return;
+    }
+
+    try {
+      setAiLoading(true);
+      const response = await fetch('/api/products/ai/generate-description', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productName: productData.name,
+          category: productData.category,
+          tone: 'professional',
+          length: 'medium'
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setProductData({ ...productData, description: data.data.description });
+        toast.success(`✨ KI-Beschreibung generiert (${data.data.metadata.wordCount} Wörter)`);
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Fehler bei KI-Beschreibung');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  // 📊 Quality Score Check
+  const checkQualityScore = async () => {
+    if (!productData.name || !productData.description) {
+      toast.error('Name und Beschreibung erforderlich');
+      return;
+    }
+
+    try {
+      setAiLoading(true);
+      const response = await fetch('/api/products/ai/quality-score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productName: productData.name,
+          description: productData.description,
+          price: productData.price || 0,
+          category: productData.category,
+          images: 0
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setQualityScore(data.data);
+        toast.success(`📊 Qualitäts-Score: ${data.data.overallScore}%`);
+      }
+    } catch (err: any) {
+      toast.error('Fehler bei Quality-Score');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  // 🔍 SEO Optimize
+  const optimizeSeo = async () => {
+    if (!productData.name || !productData.description) {
+      toast.error('Name und Beschreibung erforderlich');
+      return;
+    }
+
+    try {
+      setAiLoading(true);
+      const response = await fetch('/api/products/ai/seo-optimize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productName: productData.name,
+          description: productData.description,
+          category: productData.category
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setSeoSuggestions(data.data);
+        toast.success('🔍 SEO-Vorschläge geladen');
+      }
+    } catch (err: any) {
+      toast.error('Fehler bei SEO-Optimierung');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  // 🎨 Image Generation
+  const generateProductImage = async () => {
+    if (!productData.name) {
+      toast.error('Produktname erforderlich');
+      return;
+    }
+
+    try {
+      setAiLoading(true);
+      toast.info('🎨 Generiere Produktbild... (dauert 10-15 Sek.)');
+      
+      const response = await fetch('/api/products/ai/generate-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productName: productData.name,
+          description: productData.description,
+          style: 'professional'
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        toast.success('🎨 Produktbild generiert!');
+        window.open(data.data.imageUrl, '_blank');
+      }
+    } catch (err: any) {
+      toast.error('Fehler bei Bildgenerierung');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  // 💰 Dynamic Pricing
+  const suggestPrice = async () => {
+    if (!productData.name || !productData.category) {
+      toast.error('Name und Kategorie erforderlich');
+      return;
+    }
+
+    try {
+      setAiLoading(true);
+      const response = await fetch('/api/products/ai/suggest-pricing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productName: productData.name,
+          category: productData.category,
+          description: productData.description
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setProductData({ ...productData, price: data.data.suggestedPrice });
+        toast.success(`💰 Empfohlener Preis: ${data.data.suggestedPrice}€ (Konfidenz: ${data.data.confidence}%)`);
+      }
+    } catch (err: any) {
+      toast.error('Fehler bei Preis-Vorschlag');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   const handleCreate = async () => {
     if (!validateForm()) {
       toast.error('Bitte fülle alle Pflichtfelder aus');
@@ -74,6 +242,8 @@ const WooProductCreate = () => {
           category: '',
           type: 'simple'
         });
+        setQualityScore(null);
+        setSeoSuggestions(null);
       } else {
         throw new Error(response.error || 'Fehler beim Erstellen');
       }
@@ -122,7 +292,27 @@ const WooProductCreate = () => {
           </div>
 
           <div className="form-group">
-            <label>Beschreibung</label>
+            <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>Beschreibung</span>
+              <button 
+                type="button"
+                onClick={generateAiDescription}
+                disabled={aiLoading || !productData.name}
+                style={{
+                  padding: '6px 12px',
+                  background: 'linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%)',
+                  border: 'none',
+                  borderRadius: '6px',
+                  color: 'white',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  cursor: aiLoading || !productData.name ? 'not-allowed' : 'pointer',
+                  opacity: aiLoading || !productData.name ? 0.6 : 1
+                }}
+              >
+                {aiLoading ? '⏳ Generiere...' : '✨ KI-Beschreibung'}
+              </button>
+            </label>
             <textarea 
               value={productData.description || ''}
               onChange={(e) => setProductData({...productData, description: e.target.value})}
@@ -176,15 +366,200 @@ const WooProductCreate = () => {
           </div>
         </div>
 
-        <LoadingButton
-          onClick={handleCreate}
-          loading={loading}
-          loadingText="🔄 Erstelle Produkt..."
-          disabled={!productData.name || !productData.price}
-        >
-          🛒 In WooCommerce erstellen
-        </LoadingButton>
+        <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+          <button
+            type="button"
+            onClick={() => setShowAiPanel(!showAiPanel)}
+            style={{
+              flex: 1,
+              padding: '12px',
+              background: 'rgba(139, 92, 246, 0.1)',
+              border: '1px solid rgba(139, 92, 246, 0.3)',
+              borderRadius: '8px',
+              color: '#a78bfa',
+              fontWeight: '600',
+              cursor: 'pointer'
+            }}
+          >
+            {showAiPanel ? '▼' : '▶'} 🤖 KI-Assistent
+          </button>
+          
+          <div style={{ flex: 2 }}>
+            <LoadingButton
+              onClick={handleCreate}
+              loading={loading}
+              loadingText="🔄 Erstelle Produkt..."
+              disabled={!productData.name || !productData.price}
+            >
+              🛒 In WooCommerce erstellen
+            </LoadingButton>
+          </div>
+        </div>
       </div>
+
+      {showAiPanel && (
+        <div className="metric-card" style={{ marginTop: '20px', background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1))', borderLeft: '4px solid #8b5cf6' }}>
+          <h3>🤖 KI-Assistent für Produkterstellung</h3>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px', marginBottom: '20px' }}>
+            <button
+              onClick={checkQualityScore}
+              disabled={aiLoading || !productData.name || !productData.description}
+              style={{
+                padding: '12px',
+                background: 'rgba(16, 185, 129, 0.1)',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                borderRadius: '8px',
+                color: 'white',
+                fontWeight: '600',
+                cursor: aiLoading || !productData.name || !productData.description ? 'not-allowed' : 'pointer',
+                opacity: aiLoading || !productData.name || !productData.description ? 0.5 : 1,
+                fontSize: '13px'
+              }}
+            >
+              📊 Quality Score
+            </button>
+            
+            <button
+              onClick={optimizeSeo}
+              disabled={aiLoading || !productData.name || !productData.description}
+              style={{
+                padding: '12px',
+                background: 'rgba(59, 130, 246, 0.1)',
+                border: '1px solid rgba(59, 130, 246, 0.3)',
+                borderRadius: '8px',
+                color: 'white',
+                fontWeight: '600',
+                cursor: aiLoading || !productData.name || !productData.description ? 'not-allowed' : 'pointer',
+                opacity: aiLoading || !productData.name || !productData.description ? 0.5 : 1,
+                fontSize: '13px'
+              }}
+            >
+              🔍 SEO-Check
+            </button>
+
+            <button
+              onClick={generateProductImage}
+              disabled={aiLoading || !productData.name}
+              style={{
+                padding: '12px',
+                background: 'rgba(168, 85, 247, 0.1)',
+                border: '1px solid rgba(168, 85, 247, 0.3)',
+                borderRadius: '8px',
+                color: 'white',
+                fontWeight: '600',
+                cursor: aiLoading || !productData.name ? 'not-allowed' : 'pointer',
+                opacity: aiLoading || !productData.name ? 0.5 : 1,
+                fontSize: '13px'
+              }}
+            >
+              🎨 Bild (DALL-E)
+            </button>
+
+            <button
+              onClick={suggestPrice}
+              disabled={aiLoading || !productData.name || !productData.category}
+              style={{
+                padding: '12px',
+                background: 'rgba(249, 115, 22, 0.1)',
+                border: '1px solid rgba(249, 115, 22, 0.3)',
+                borderRadius: '8px',
+                color: 'white',
+                fontWeight: '600',
+                cursor: aiLoading || !productData.name || !productData.category ? 'not-allowed' : 'pointer',
+                opacity: aiLoading || !productData.name || !productData.category ? 0.5 : 1,
+                fontSize: '13px'
+              }}
+            >
+              💰 Preis-KI
+            </button>
+          </div>
+
+          {qualityScore && (
+            <div style={{ padding: '20px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', marginBottom: '15px' }}>
+              <h4 style={{ marginTop: 0, color: 'white', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                📊 Qualitäts-Analyse
+                <span style={{ 
+                  fontSize: '24px', 
+                  fontWeight: '700', 
+                  color: qualityScore.overallScore >= 80 ? '#10b981' : qualityScore.overallScore >= 60 ? '#f59e0b' : '#ef4444' 
+                }}>
+                  {qualityScore.overallScore}%
+                </span>
+              </h4>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '15px' }}>
+                <div style={{ padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px' }}>
+                  <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)' }}>Name</div>
+                  <div style={{ fontSize: '18px', fontWeight: '700', color: '#60a5fa' }}>{Math.round(qualityScore.breakdown.nameQuality)}%</div>
+                </div>
+                <div style={{ padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px' }}>
+                  <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)' }}>Beschreibung</div>
+                  <div style={{ fontSize: '18px', fontWeight: '700', color: '#60a5fa' }}>{Math.round(qualityScore.breakdown.descriptionQuality)}%</div>
+                </div>
+                <div style={{ padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px' }}>
+                  <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)' }}>SEO</div>
+                  <div style={{ fontSize: '18px', fontWeight: '700', color: '#60a5fa' }}>{Math.round(qualityScore.breakdown.seoScore)}%</div>
+                </div>
+              </div>
+
+              {qualityScore.recommendations && qualityScore.recommendations.length > 0 && (
+                <div>
+                  <div style={{ fontSize: '12px', fontWeight: '600', color: 'rgba(255,255,255,0.8)', marginBottom: '8px' }}>💡 Verbesserungen:</div>
+                  {qualityScore.recommendations.map((rec: string, idx: number) => (
+                    <div key={idx} style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', marginBottom: '4px', paddingLeft: '10px' }}>
+                      • {rec}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {seoSuggestions && (
+            <div style={{ padding: '20px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px' }}>
+              <h4 style={{ marginTop: 0, color: 'white' }}>🔍 SEO-Optimierungen</h4>
+              
+              <div style={{ display: 'grid', gap: '12px', fontSize: '13px' }}>
+                <div>
+                  <div style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '4px' }}>Meta Title:</div>
+                  <div style={{ color: 'white', fontWeight: '600' }}>{seoSuggestions.metaTitle}</div>
+                </div>
+                
+                <div>
+                  <div style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '4px' }}>Meta Description:</div>
+                  <div style={{ color: 'white' }}>{seoSuggestions.metaDescription}</div>
+                </div>
+                
+                <div>
+                  <div style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '4px' }}>URL Slug:</div>
+                  <div style={{ color: '#60a5fa', fontFamily: 'monospace' }}>{seoSuggestions.urlSlug}</div>
+                </div>
+                
+                {seoSuggestions.focusKeywords && seoSuggestions.focusKeywords.length > 0 && (
+                  <div>
+                    <div style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '6px' }}>Focus Keywords:</div>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                      {seoSuggestions.focusKeywords.map((kw: string, idx: number) => (
+                        <span key={idx} style={{
+                          padding: '4px 10px',
+                          background: 'rgba(139, 92, 246, 0.2)',
+                          border: '1px solid rgba(139, 92, 246, 0.4)',
+                          borderRadius: '12px',
+                          fontSize: '11px',
+                          color: '#d8b4fe'
+                        }}>
+                          {kw}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="metric-card">
         <h3>📝 Schnell-Erstellung</h3>

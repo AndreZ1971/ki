@@ -1,15 +1,11 @@
 // backend/routes/app/api/marketing/image-analysis-routes.ts
 // API-Route für KI-Bildanalyse mit Vision, Quality Score, SEO, Optimization
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import multer from 'fastify-multer';
-import path from 'path';
-import fs from 'fs/promises';
+import { MultipartFile } from '@fastify/multipart';
 import sharp from 'sharp';
 import OpenAI from 'openai';
 
 import config from '../../../../config';
-
-const upload = multer({ dest: path.join(__dirname, '../../../../uploads/') });
 
 // Lazy initialization - OpenAI wird erst beim ersten API-Call initialisiert
 let openai: OpenAI | null = null;
@@ -81,19 +77,18 @@ interface PerformanceMetrics {
 }
 
 export default async function imageAnalysisRoutes(fastify: FastifyInstance) {
-  // POST /api/marketing/image/analyze - KI-Bildanalyse mit allen Features
+  // POST /image/analyze - KI-Bildanalyse mit allen Features (prefix gesetzt in server.ts)
   fastify.post<{ Body: any }>(
-    '/api/marketing/image/analyze',
-    { preHandler: upload.single('image') },
+    '/image/analyze',
     async (request: FastifyRequest<{ Body: any }>, reply: FastifyReply) => {
-      const file = (request as any).file;
+      const file: MultipartFile | undefined = await (request as any).file();
       if (!file) {
         return reply.status(400).send({ success: false, error: 'Kein Bild hochgeladen' });
       }
 
       try {
-        const imagePath = file.path;
-        const image = sharp(imagePath);
+        const buffer = await file.toBuffer();
+        const image = sharp(buffer);
         const metadata = await image.metadata();
 
         // 1️⃣ QUALITY SCORE
@@ -102,8 +97,8 @@ export default async function imageAnalysisRoutes(fastify: FastifyInstance) {
         // 2️⃣ VISION ANALYSE (Tags, Description, SEO)
         let imageBase64 = '';
         if ((metadata.width || 0) < 2000 && (metadata.height || 0) < 2000) {
-          const buffer = await image.resize(512, 512, { fit: 'inside' }).toBuffer();
-          imageBase64 = buffer.toString('base64');
+          const resized = await sharp(buffer).resize(512, 512, { fit: 'inside' }).toBuffer();
+          imageBase64 = resized.toString('base64');
         }
 
         const visionAnalysis = await performVisionAnalysis(imageBase64);
@@ -121,7 +116,7 @@ export default async function imageAnalysisRoutes(fastify: FastifyInstance) {
         const classification = classifyImage(visionAnalysis, metadata);
 
         // 7️⃣ PERFORMANCE METRICS
-        const performance = calculatePerformanceMetrics(file, metadata);
+        const performance = calculatePerformanceMetrics({ size: buffer.length }, metadata);
 
         const result: AnalysisResult = {
           quality: qualityScore,
@@ -133,12 +128,8 @@ export default async function imageAnalysisRoutes(fastify: FastifyInstance) {
           success: true
         };
 
-        // Cleanup
-        await fs.unlink(imagePath).catch(() => {});
-
         return reply.send(result);
       } catch (_error) {
-        await fs.unlink((file as any).path).catch(() => {});
         return reply.status(500).send({
           success: false,
           error: _error instanceof Error ? _error.message : 'Bildanalyse fehlgeschlagen'
@@ -395,21 +386,28 @@ function classifyImage(vision: any, metadata: any): ImageClassification {
 
   // ========== PHASE 2: IMAGE COMPARISON ==========
   fastify.post<{ Body: any }>(
-    '/api/marketing/image/compare',
-    { preHandler: upload.array('images', 2) },
+    '/image/compare',
     async (request: FastifyRequest<{ Body: any }>, reply: FastifyReply) => {
-      const files = (request as any).files;
-      if (!files || files.length !== 2) {
+      const files: MultipartFile[] = [];
+      for await (const part of (request as any).files()) {
+        files.push(part);
+        if (files.length === 2) break;
+      }
+
+      if (files.length !== 2) {
         return reply.status(400).send({ success: false, error: 'Genau 2 Bilder erforderlich' });
       }
+
       try {
         const [file1, file2] = files;
-        const img1 = sharp(file1.path);
-        const img2 = sharp(file2.path);
+        const buf1 = await file1.toBuffer();
+        const buf2 = await file2.toBuffer();
+        const img1 = sharp(buf1);
+        const img2 = sharp(buf2);
         const meta1 = await img1.metadata();
         const meta2 = await img2.metadata();
 
-        const sizeRatio = Math.abs((file1.size - file2.size) / Math.max(file1.size, file2.size));
+        const sizeRatio = Math.abs((buf1.length - buf2.length) / Math.max(buf1.length, buf2.length));
         const dimensionMatch = meta1.width === meta2.width && meta1.height === meta2.height;
         const formatMatch = meta1.format === meta2.format;
         
@@ -417,8 +415,6 @@ function classifyImage(vision: any, metadata: any): ImageClassification {
         if (dimensionMatch) similarityScore += 25;
         if (formatMatch) similarityScore += 15;
         if (sizeRatio < 0.1) similarityScore += 10;
-
-        await Promise.all([fs.unlink(file1.path), fs.unlink(file2.path)]).catch(() => {});
 
         return reply.send({
           success: true,
@@ -436,16 +432,15 @@ function classifyImage(vision: any, metadata: any): ImageClassification {
 
   // ========== PHASE 2: COLOR ANALYSIS ==========
   fastify.post<{ Body: any }>(
-    '/api/marketing/image/color-analysis',
-    { preHandler: upload.single('image') },
+    '/image/color-analysis',
     async (request: FastifyRequest<{ Body: any }>, reply: FastifyReply) => {
-      const file = (request as any).file;
+      const file: MultipartFile | undefined = await (request as any).file();
       if (!file) return reply.status(400).send({ success: false, error: 'Kein Bild hochgeladen' });
 
       try {
-        const image = sharp(file.path);
+        const bufferImage = await file.toBuffer();
+        const image = sharp(bufferImage);
         const buffer = await image.resize(100, 100).raw().toBuffer();
-        const _colors: string[] = [];
         const colorMap = new Map<string, number>();
         
         for (let i = 0; i < buffer.length; i += 3) {
@@ -457,8 +452,6 @@ function classifyImage(vision: any, metadata: any): ImageClassification {
           .sort((a, b) => b[1] - a[1])
           .slice(0, 5)
           .map(([c]) => c);
-
-        await fs.unlink(file.path).catch(() => {});
 
         return reply.send({
           success: true,
@@ -479,23 +472,21 @@ function classifyImage(vision: any, metadata: any): ImageClassification {
 
   // ========== PHASE 2: ENHANCEMENT SUGGESTIONS ==========
   fastify.post<{ Body: any }>(
-    '/api/marketing/image/enhancement-suggestions',
-    { preHandler: upload.single('image') },
+    '/image/enhancement-suggestions',
     async (request: FastifyRequest<{ Body: any }>, reply: FastifyReply) => {
-      const file = (request as any).file;
+      const file: MultipartFile | undefined = await (request as any).file();
       if (!file) return reply.status(400).send({ success: false, error: 'Kein Bild hochgeladen' });
 
       try {
-        const image = sharp(file.path);
-        const _metadata = await image.metadata();
+        const buffer = await file.toBuffer();
+        const image = sharp(buffer);
+        await image.metadata();
 
         const suggestions = [
           { type: 'brightness', priority: 'medium', description: 'Helligkeit optimieren', expectedImprovement: '+10-15%' },
           { type: 'saturation', priority: 'medium', description: 'Sättigung erhöhen', expectedImprovement: '+8-12%' },
           { type: 'crop', priority: 'low', description: 'Rule of Thirds Zuschnitt', expectedImprovement: '+5-10%' }
         ];
-
-        await fs.unlink(file.path).catch(() => {});
 
         return reply.send({
           success: true,
@@ -509,21 +500,19 @@ function classifyImage(vision: any, metadata: any): ImageClassification {
 
   // ========== PHASE 2: CONVERSION IMPACT PREDICTION ==========
   fastify.post<{ Body: any }>(
-    '/api/marketing/image/conversion-impact',
-    { preHandler: upload.single('image') },
+    '/image/conversion-impact',
     async (request: FastifyRequest<{ Body: any }>, reply: FastifyReply) => {
-      const file = (request as any).file;
+      const file: MultipartFile | undefined = await (request as any).file();
       if (!file) return reply.status(400).send({ success: false, error: 'Kein Bild hochgeladen' });
 
       try {
-        const image = sharp(file.path);
+        const buffer = await file.toBuffer();
+        const image = sharp(buffer);
         const metadata = await image.metadata();
 
         let baseScore = 1.5;
         const area = (metadata.width || 0) * (metadata.height || 0);
         if (area > 1000000) baseScore *= 1.3;
-
-        await fs.unlink(file.path).catch(() => {});
 
         return reply.send({
           success: true,
@@ -541,16 +530,15 @@ function classifyImage(vision: any, metadata: any): ImageClassification {
 
   // ========== PHASE 2: TARGET AUDIENCE RECOMMENDATION ==========
   fastify.post<{ Body: any }>(
-    '/api/marketing/image/audience-recommendation',
-    { preHandler: upload.single('image') },
+    '/image/audience-recommendation',
     async (request: FastifyRequest<{ Body: any }>, reply: FastifyReply) => {
-      const file = (request as any).file;
+      const file: MultipartFile | undefined = await (request as any).file();
       if (!file) return reply.status(400).send({ success: false, error: 'Kein Bild hochgeladen' });
 
       try {
-        const image = sharp(file.path);
+        const buffer = await file.toBuffer();
+        const image = sharp(buffer);
         await image.metadata();
-        await fs.unlink(file.path).catch(() => {});
 
         return reply.send({
           success: true,

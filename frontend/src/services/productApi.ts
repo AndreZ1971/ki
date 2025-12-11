@@ -60,7 +60,7 @@ export const productApi = {
     category: string;
     optimization: 'low' | 'medium' | 'high';
   }): Promise<ApiResponse<ProductCreationResult>> => {
-    return apiRequest<ProductCreationResult>('/products/auto-create', {
+    return apiRequest<ProductCreationResult>('/api/products/auto-create', {
       method: 'POST',
       body: JSON.stringify(config),
     });
@@ -70,14 +70,14 @@ export const productApi = {
    * Holt alle Produkte
    */
   getProducts: async (): Promise<ApiResponse<Product[]>> => {
-    return apiRequest<Product[]>('/products');
+    return apiRequest<Product[]>('/api/products');
   },
 
   /**
    * Erstellt ein neues WooCommerce Produkt
    */
   createWooProduct: async (productData: Partial<Product>): Promise<ApiResponse<Product>> => {
-    return apiRequest<Product>('/products/woo/create', {
+    return apiRequest<Product>('/api/products/woo/create', {
       method: 'POST',
       body: JSON.stringify(productData),
     });
@@ -87,7 +87,7 @@ export const productApi = {
    * Aktualisiert WooCommerce Produkte
    */
   updateWooProducts: async (updateRequest: ProductUpdateRequest): Promise<ApiResponse<void>> => {
-    return apiRequest<void>('/products/woo/update', {
+    return apiRequest<void>('/api/products/woo/update', {
       method: 'PUT',
       body: JSON.stringify(updateRequest),
     });
@@ -101,14 +101,14 @@ export const categoryApi = {
    * Holt alle Kategorien
    */
   getCategories: async (): Promise<ApiResponse<Category[]>> => {
-    return apiRequest<Category[]>('/categories');
+    return apiRequest<Category[]>('/api/categories');
   },
 
   /**
    * Erstellt eine neue Kategorie
    */
   createCategory: async (categoryData: Partial<Category>): Promise<ApiResponse<Category>> => {
-    return apiRequest<Category>('/categories', {
+    return apiRequest<Category>('/api/categories', {
       method: 'POST',
       body: JSON.stringify(categoryData),
     });
@@ -118,7 +118,7 @@ export const categoryApi = {
    * Optimiert alle Kategorien
    */
   optimizeCategories: async (): Promise<ApiResponse<void>> => {
-    return apiRequest<void>('/categories/optimize', {
+    return apiRequest<void>('/api/categories/optimize', {
       method: 'POST',
     });
   },
@@ -131,14 +131,14 @@ export const bundleApi = {
    * Holt alle Bundles
    */
   getBundles: async (): Promise<ApiResponse<Bundle[]>> => {
-    return apiRequest<Bundle[]>('/bundles');
+    return apiRequest<Bundle[]>('/api/bundles');
   },
 
   /**
    * Erstellt ein neues Bundle
    */
   createBundle: async (bundleData: Partial<Bundle>): Promise<ApiResponse<Bundle>> => {
-    return apiRequest<Bundle>('/bundles', {
+    return apiRequest<Bundle>('/api/bundles', {
       method: 'POST',
       body: JSON.stringify(bundleData),
     });
@@ -148,7 +148,7 @@ export const bundleApi = {
    * Aktualisiert ein Bundle
    */
   updateBundle: async (id: number, bundleData: Partial<Bundle>): Promise<ApiResponse<Bundle>> => {
-    return apiRequest<Bundle>(`/bundles/${id}`, {
+    return apiRequest<Bundle>(`/api/bundles/${id}`, {
       method: 'PUT',
       body: JSON.stringify(bundleData),
     });
@@ -162,14 +162,14 @@ export const freebieApi = {
    * Holt alle Freebies
    */
   getFreebies: async (): Promise<ApiResponse<Freebie[]>> => {
-    return apiRequest<Freebie[]>('/freebies');
+    return apiRequest<Freebie[]>('/api/freebies');
   },
 
   /**
    * Erstellt ein neues Freebie
    */
   createFreebie: async (freebieData: Partial<Freebie>): Promise<ApiResponse<Freebie>> => {
-    return apiRequest<Freebie>('/freebies', {
+    return apiRequest<Freebie>('/api/freebies', {
       method: 'POST',
       body: JSON.stringify(freebieData),
     });
@@ -179,7 +179,7 @@ export const freebieApi = {
    * Erstellt automatisch ein optimiertes Freebie
    */
   createAutoFreebie: async (type: Freebie['type']): Promise<ApiResponse<Freebie>> => {
-    return apiRequest<Freebie>('/freebies/auto-create', {
+    return apiRequest<Freebie>('/api/freebies/auto-create', {
       method: 'POST',
       body: JSON.stringify({ type }),
     });
@@ -193,7 +193,7 @@ export const jobApi = {
    * Triggert einen Backend Job
    */
   triggerJob: async (jobName: string, params?: any): Promise<ApiResponse<any>> => {
-    return apiRequest<any>('/jobs/trigger', {
+    return apiRequest<any>('/api/jobs/trigger', {
       method: 'POST',
       body: JSON.stringify({ jobName, params }),
     });

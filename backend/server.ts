@@ -3,6 +3,7 @@ require('module-alias/register');
 import cors from '@fastify/cors';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
+import fastifyMultipart from '@fastify/multipart';
 import dotenv from 'dotenv';
 import config from './config';
 import Fastify from 'fastify';
@@ -73,6 +74,9 @@ import monitoringRoutes from './routes/app/api/monitoring/system';
 import premiumAuditRoutes from './routes/app/api/audit/premium';
 import standardAuditRoutes from './routes/app/api/audit/standard';
 import miniAuditRoutes from './routes/app/api/audit/mini';
+
+// 🤖 AI PRODUCT ASSISTANT ROUTES
+import aiProductAssistantRoutes from './routes/app/api/ai/ai-product-assistant';
 
 // ANALYTICS ROUTES - NEUE ROUTES
 import conversionRoutes from './routes/app/api/analytics/conversion';
@@ -161,6 +165,11 @@ async function buildServer() {
     },
     // Body Limit erhöhen
     bodyLimit: 1048576 * 10, // 10MB
+  });
+
+  // Multipart/Form-Data Parser für Uploads (z.B. Image Analyzer)
+  await server.register(fastifyMultipart, {
+    limits: { fileSize: 10 * 1024 * 1024 }
   });
 
     // Globaler Auth-Hook für alle /api-Routen (nur für Nicht-OPTIONS)
@@ -384,6 +393,10 @@ async function buildServer() {
     // 🔥 STANDARD AUDIT ROUTES
     await server.register(standardAuditRoutes);
     console.log('✅ Standard Audit Routes erfolgreich registriert');
+
+    // 🤖 AI PRODUCT ASSISTANT ROUTES
+    await server.register(aiProductAssistantRoutes, { prefix: '/api/products' });
+    console.log('✅ AI Product Assistant Routes erfolgreich registriert');
 
     // 🔥 NEUE ANALYTICS ROUTES
     await server.register(conversionRoutes, { prefix: '/api/analytics/conversion' });

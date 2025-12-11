@@ -365,6 +365,83 @@ Antworte mit einem JSON Objekt im Format: {"products": [...]}`;
     }
   );
 
+  // Update Single WooCommerce Product (für AI-Updates)
+  server.put<{ 
+    Params: { productId: string };
+    Body: { regular_price?: string; description?: string; stock_quantity?: number } 
+  }>(
+    '/woo/update-single/:productId',
+    {
+      schema: {
+        tags: ['products'],
+        description: 'Aktualisiert ein einzelnes WooCommerce Produkt',
+        params: {
+          type: 'object',
+          properties: {
+            productId: { type: 'string' }
+          }
+        },
+        body: {
+          type: 'object',
+          properties: {
+            regular_price: { type: 'string' },
+            description: { type: 'string' },
+            stock_quantity: { type: 'number' }
+          }
+        }
+      }
+    },
+    async (request, reply) => {
+      try {
+        const { productId } = request.params;
+        const updatePayload = request.body;
+
+        console.log(`🔄 Updating single product ${productId} with AI values:`, updatePayload);
+
+        const wooConfig = {
+          url: config.woocommerce?.url || '',
+          consumerKey: config.woocommerce?.consumerKey || '',
+          consumerSecret: config.woocommerce?.consumerSecret || '',
+        };
+
+        if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
+          throw new Error('WooCommerce-Konfiguration fehlt');
+        }
+
+        const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
+
+        const response = await fetch(`${wooConfig.url}/wp-json/wc/v3/products/${productId}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Basic ${auth}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatePayload)
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`WooCommerce API Error: ${errorText}`);
+        }
+
+        const updatedProduct = await response.json();
+        console.log(`✅ Product ${productId} updated successfully`);
+
+        return reply.send({
+          success: true,
+          data: updatedProduct
+        });
+
+      } catch (_error) {
+        console.error('❌ Error updating single product:', _error);
+        return reply.status(500).send({
+          success: false,
+          error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
+        });
+      }
+    }
+  );
+
   // Update WooCommerce Products
   server.put<{ Body: UpdateProductBody }>(
     '/woo/update',
