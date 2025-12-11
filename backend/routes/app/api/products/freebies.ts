@@ -24,6 +24,18 @@ interface AutoCreateBody {
   type: 'ebook' | 'checklist' | 'templates' | 'guide';
 }
 
+interface FreebieIdea {
+  title: string;
+  description: string;
+  conversionScore: number;
+  reason: string;
+}
+
+interface MLGenerateQuery {
+  type: string;
+  keywords?: string;
+}
+
 export default async function freebieRoutes(server: FastifyInstance) {
   
   // Get All Freebies
@@ -229,6 +241,98 @@ export default async function freebieRoutes(server: FastifyInstance) {
         });
       } catch (_error) {
         console.error('❌ Freebie creation error:', _error);
+        return reply.status(500).send({
+          success: false,
+          error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
+        });
+      }
+    }
+  );
+
+  // ML Generate Freebie Ideas
+  server.get<{ Querystring: MLGenerateQuery }>(
+    '/ml/generate',
+    {
+      schema: {
+        tags: ['freebies'],
+        description: 'Generiert AI-basierte Freebie-Ideen mit Conversion-Score'
+      }
+    },
+    async (request: FastifyRequest<{ Querystring: MLGenerateQuery }>, reply: FastifyReply) => {
+      try {
+        const { type, keywords } = request.query;
+        console.log('🎁 Generating freebie ideas for type:', type);
+
+        const { getOpenAIClient, executeOpenAI } = await import('../../../../utils/openai.js');
+        const openai = getOpenAIClient();
+
+        const typeNames: Record<string, string> = {
+          'ebook': 'E-Book',
+          'checklist': 'Checkliste',
+          'templates': 'Vorlagen-Set',
+          'guide': 'Schritt-für-Schritt Anleitung'
+        };
+
+        const keywordContext = keywords ? `\nSchwerpunkt-Keywords: ${keywords}` : '';
+
+        const prompt = `Du bist ein Expert für Lead-Magnets und Freebie-Strategien. Generiere 4 kreative und hochkonvertierende Ideen für ein kostenloses ${typeNames[type]}.${keywordContext}
+
+Antworte mit JSON-Array im exakten Format:
+[
+  {
+    "title": "Aussagekräftiger Titel",
+    "description": "Kurze überzeugende Beschreibung mit Mehrwert",
+    "conversionScore": 0.85,
+    "reason": "Warum das hochkonvertieren wird"
+  }
+]
+
+Achte auf Spezifität, emotionale Titel und realistische Scores 0.6-0.95.`;
+
+        const completion = await executeOpenAI(
+          async () => {
+            return openai.chat.completions.create({
+              model: 'gpt-4o-mini',
+              temperature: 0.8,
+              response_format: { type: 'json_object' },
+              messages: [
+                {
+                  role: 'user',
+                  content: prompt
+                }
+              ]
+            });
+          },
+          'freebie-ml-generate',
+          { type, keywords }
+        );
+
+        const rawContent = completion.choices[0]?.message?.content || '[]';
+        let parsedIdeas: FreebieIdea[] = [];
+        
+        try {
+          const parsed = JSON.parse(rawContent);
+          parsedIdeas = (Array.isArray(parsed) ? parsed : parsed.ideas || []).slice(0, 5);
+        } catch (_parseError) {
+          console.warn('⚠️ JSON parse error', _parseError);
+          return reply.status(502).send({ success: false, error: 'Fehler beim Parsen der KI-Antwort' });
+        }
+
+        if (parsedIdeas.length === 0) {
+          return reply.status(502).send({ success: false, error: 'Keine gültigen Ideen erhalten' });
+        }
+
+        return reply.send({
+          success: true,
+          ideas: parsedIdeas.map(idea => ({
+            title: idea.title || 'Untitled',
+            description: idea.description || '',
+            conversionScore: Math.min(Math.max(idea.conversionScore ?? 0.7, 0), 1),
+            reason: idea.reason || 'AI-generiert'
+          }))
+        });
+      } catch (_error) {
+        console.error('Freebie ML Generate Error:', _error);
         return reply.status(500).send({
           success: false,
           error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'

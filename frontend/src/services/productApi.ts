@@ -6,7 +6,8 @@ import type {
   ProductCreationResult,
   ApiResponse,
   ProductUpdateRequest,
-  CategorySuggestion
+  CategorySuggestion,
+  FreebieIdea
 } from '../types/product';
 
 let API_BASE_URL = (import.meta.env.VITE_API_URL || '').trim();
@@ -196,6 +197,19 @@ export const freebieApi = {
       method: 'POST',
       body: JSON.stringify({ type }),
     });
+  },
+
+  /**
+   * Generiert KI-basierte Freebie-Ideen mit Conversion-Score
+   */
+  generateIdeas: async (
+    type: string,
+    keywords?: string
+  ): Promise<ApiResponse<FreebieIdea[]>> => {
+    const query = new URLSearchParams();
+    query.set('type', type);
+    if (keywords) query.set('keywords', keywords);
+    return apiRequest<FreebieIdea[]>(`/api/freebies/ml/generate?${query.toString()}`);
   },
 };
 

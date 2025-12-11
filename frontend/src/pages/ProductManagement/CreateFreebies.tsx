@@ -1,18 +1,23 @@
 import React, { useState } from 'react';
 import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
-import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
+import { BackButton, ErrorMessage } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
 import { freebieApi } from '../../services/productApi';
-import type { Freebie } from '../../types/product';
+import type { Freebie, FreebieIdea } from '../../types/product';
 import './page.css';
-import { MLFreebieGenerator } from './MLFreebieGenerator';
+import './CreateFreebies.css';
 
 const CreateFreebies = () => {
   const { handleBackToDashboard, loading, setLoading, error, setError, clearError } = useProductManagement();
   const toast = useToast();
   const [freebieType, setFreebieType] = useState<Freebie['type']>('ebook');
   const [freebies, setFreebies] = useState<Freebie[]>([]);
+  const [ideas, setIdeas] = useState<Record<string, FreebieIdea[]>>({});
+  const [ideasLoading, setIdeasLoading] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [selectedIdea, setSelectedIdea] = useState<FreebieIdea | null>(null);
+  const [expandedIdeas, setExpandedIdeas] = useState<Set<number>>(new Set());
   const [_initialLoading, setInitialLoading] = useState(true);
 
   // Load freebies on mount
@@ -42,30 +47,53 @@ const CreateFreebies = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleCreateFreebie = async () => {
+  const handleGenerateIdeas = async () => {
+    try {
+      setIdeasLoading(true);
+      const response = await freebieApi.generateIdeas(freebieType);
+
+      if (response.success && response.data) {
+        setIdeas(prev => ({ ...prev, [freebieType]: response.data || [] }));
+        toast.success(`✅ ${response.data.length} Freebie-Ideen generiert!`);
+      } else {
+        throw new Error(response.error || 'Generierung fehlgeschlagen');
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Unbekannter Fehler';
+      toast.error(msg);
+    } finally {
+      setIdeasLoading(false);
+    }
+  };
+
+  const handleCreateFromIdea = (idea: FreebieIdea) => {
+    setSelectedIdea(idea);
+    setShowCreateModal(true);
+  };
+
+  const handleCreateFromSelectedIdea = async () => {
+    if (!selectedIdea) return;
     try {
       setLoading(true);
-      clearError();
-
       const response = await freebieApi.createFreebie({
-        name: `${freebieType === 'ebook' ? 'Kostenloses Ebook' : 
-               freebieType === 'checklist' ? 'Premium Checklist' : 
-               'Social Media Templates'} #${freebies.length + 1}`,
+        name: selectedIdea.title,
         type: freebieType,
         downloads: 0,
-        created: new Date().toISOString().split('T')[0]
+        created: new Date().toISOString().split('T')[0],
+        description: selectedIdea.description
       });
 
       if (response.success && response.data) {
         setFreebies([response.data, ...freebies]);
-        toast.success('Gratis-Produkt erfolgreich erstellt!');
+        toast.success(`✅ "${selectedIdea.title}" erstellt!`);
+        setShowCreateModal(false);
+        setSelectedIdea(null);
       } else {
         throw new Error(response.error || 'Fehler beim Erstellen');
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unbekannter Fehler';
-      setError(errorMessage);
-      toast.error(errorMessage);
+      const msg = err instanceof Error ? err.message : 'Unbekannter Fehler';
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -116,13 +144,13 @@ const CreateFreebies = () => {
           </label>
         </div>
 
-        <LoadingButton
-          onClick={handleCreateFreebie}
-          loading={loading}
-          loadingText="🔄 Erstelle..."
+        <button 
+          onClick={handleGenerateIdeas}
+          disabled={ideasLoading}
+          className="ai-generate-btn"
         >
-          🎁 Gratis-Produkt erstellen
-        </LoadingButton>
+          {ideasLoading ? '⏳ Ideen werden generiert...' : '✨ KI-Ideen generieren'}
+        </button>
       </div>
 
       <div className="metric-card">
@@ -161,11 +189,83 @@ const CreateFreebies = () => {
         </div>
       </div>
 
-      <div className="freebie-ml-section">
-        <h3>KI-Freebie-Ideen</h3>
-        {/* Beispielhafte Kategorie, kann dynamisch ersetzt werden */}
-        <MLFreebieGenerator category={freebieType} />
-      </div>
+      {ideas[freebieType] && ideas[freebieType].length > 0 && (
+        <div className="metric-card ideas-section">
+          <h3>📋 Generierte Ideen</h3>
+          <div className="ideas-grid">
+            {ideas[freebieType].map((idea, idx) => (
+              <div 
+                key={idx}
+                className={`idea-card ${expandedIdeas.has(idx) ? 'expanded' : ''}`}
+              >
+                <div className="idea-header">
+                  <h4>{idea.title}</h4>
+                  <div className="idea-score">
+                    <span className="conversion-badge">
+                      📊 {(idea.conversionScore * 100).toFixed(0)}%
+                    </span>
+                  </div>
+                </div>
+                
+                <p className="idea-description">{idea.description}</p>
+                
+                <div className="idea-reason">
+                  <small>💡 {idea.reason}</small>
+                </div>
+
+                <div className="idea-actions">
+                  <button
+                    onClick={() => setExpandedIdeas(prev => 
+                      new Set(prev.has(idx) ? [...prev].filter(i => i !== idx) : [...prev, idx])
+                    )}
+                    className="expand-btn"
+                  >
+                    {expandedIdeas.has(idx) ? '−' : '+'}
+                  </button>
+                  <button
+                    onClick={() => handleCreateFromIdea(idea)}
+                    disabled={loading}
+                    className="create-idea-btn"
+                  >
+                    {loading ? '⏳' : '→'} Erstellen
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {showCreateModal && selectedIdea && (
+        <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Freebie aus Idee erstellen</h2>
+              <button className="close-btn" onClick={() => setShowCreateModal(false)}>✕</button>
+            </div>
+            <div className="modal-body">
+              <div className="form-group">
+                <label>Titel:</label>
+                <input type="text" value={selectedIdea.title} disabled className="disabled-input" />
+              </div>
+              <div className="form-group">
+                <label>Beschreibung:</label>
+                <textarea value={selectedIdea.description} disabled className="disabled-input" rows={3} />
+              </div>
+              <div className="form-group">
+                <label>Konversionsrate:</label>
+                <div className="conversion-display">{(selectedIdea.conversionScore * 100).toFixed(0)}%</div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button onClick={() => setShowCreateModal(false)} className="cancel-btn">Abbrechen</button>
+              <button onClick={handleCreateFromSelectedIdea} disabled={loading} className="confirm-btn">
+                {loading ? '⏳ Wird erstellt...' : '✓ Jetzt erstellen'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

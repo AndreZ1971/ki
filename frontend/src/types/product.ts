@@ -29,6 +29,13 @@ export interface CategorySuggestion {
   reason: string;
 }
 
+export interface FreebieIdea {
+  title: string;
+  description: string;
+  conversionScore: number;
+  reason: string;
+}
+
 export interface Bundle {
   id: number;
   name: string;
