@@ -5,6 +5,8 @@ import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
 import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
+import { paymentApi } from '../../services/productApi';
+import type { AmountSuggestion } from '../../types/product';
 import './page.css';
 
 const PaymentSimplified: React.FC = () => {
@@ -12,8 +14,13 @@ const PaymentSimplified: React.FC = () => {
   const { toasts, showToast } = useToast();
   
   const [amount, setAmount] = useState('');
+  const [currency, setCurrency] = useState('EUR');
   const [productName, setProductName] = useState('');
   const [conversionRate, setConversionRate] = useState<number | null>(null);
+  const [predictionFactors, setPredictionFactors] = useState<string[]>([]);
+  const [predictionRecommendation, setPredictionRecommendation] = useState<string>('');
+  const [suggestedAmounts, setSuggestedAmounts] = useState<AmountSuggestion[]>([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
 
   const handleSimplify = async () => {
     if (!amount || !productName) {
@@ -25,9 +32,21 @@ const PaymentSimplified: React.FC = () => {
     setError(null);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setConversionRate(Math.floor(Math.random() * 30) + 70);
-      showToast('Payment-Prozess optimiert!', 'success');
+      const prediction = await paymentApi.predictSuccess({
+        amount: parseFloat(amount),
+        currency,
+        customerEmail: 'noreply@example.com'
+      });
+
+      if (prediction.success && prediction.data) {
+        const rate = Math.round(prediction.data.successProbability * 100);
+        setConversionRate(rate);
+        setPredictionFactors(prediction.data.factors || []);
+        setPredictionRecommendation(prediction.data.recommendation || '');
+        showToast(`🚀 Prognose aktualisiert: ${rate}%`, 'success');
+      } else {
+        showToast('Keine Prognosedaten erhalten', 'warning');
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Optimierungsfehler';
       setError(errorMessage);
@@ -35,6 +54,29 @@ const PaymentSimplified: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLoadSuggestions = async () => {
+    setLoadingSuggestions(true);
+    try {
+      const response = await paymentApi.suggestAmounts({ currency });
+      if (response.success && response.data) {
+        setSuggestedAmounts(response.data);
+        showToast(`✨ ${response.data.length} Betragsempfehlungen geladen`, 'success');
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Empfehlungen fehlgeschlagen';
+      showToast(errorMessage, 'error');
+    } finally {
+      setLoadingSuggestions(false);
+    }
+  };
+
+  const handleSelectSuggestion = (suggestion: AmountSuggestion) => {
+    setAmount(suggestion.amount.toString());
+    showToast(`✅ ${suggestion.amount} ${currency} übernommen`, 'success');
+    // Optional: direkt neue Prognose anstoßen
+    setTimeout(() => handleSimplify(), 200);
   };
 
   return (
@@ -58,10 +100,80 @@ const PaymentSimplified: React.FC = () => {
             <input type="text" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="z.B. Premium Paket" className="form-input" />
           </div>
 
-          <div className="form-group">
-            <label>Preis *</label>
-            <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="99.99" step="0.01" className="form-input" />
+          <div className="form-group" style={{ display: 'grid', gap: '10px' }}>
+            <div>
+              <label>Preis *</label>
+              <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="99.99" step="0.01" className="form-input" />
+            </div>
+            <div>
+              <label>Währung</label>
+              <select value={currency} onChange={(e) => setCurrency(e.target.value)} className="form-input">
+                {['EUR', 'USD', 'GBP', 'CHF'].map(curr => <option key={curr} value={curr}>{curr}</option>)}
+              </select>
+            </div>
           </div>
+
+          <div style={{ marginBottom: '15px' }}>
+            <button
+              onClick={handleLoadSuggestions}
+              disabled={loadingSuggestions}
+              style={{
+                width: '100%',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                border: 'none',
+                borderRadius: '12px',
+                padding: '12px',
+                color: 'white',
+                fontWeight: '600',
+                cursor: loadingSuggestions ? 'not-allowed' : 'pointer',
+                opacity: loadingSuggestions ? 0.7 : 1,
+                transition: 'all 0.2s'
+              }}
+            >
+              {loadingSuggestions ? '⏳ Lade Empfehlungen...' : '✨ Smarte Betragsempfehlungen'}
+            </button>
+          </div>
+
+          {suggestedAmounts.length > 0 && (
+            <div style={{ marginBottom: '15px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {suggestedAmounts.map((suggestion, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleSelectSuggestion(suggestion)}
+                  style={{
+                    background: 'rgba(102, 126, 234, 0.12)',
+                    border: '1px solid rgba(102, 126, 234, 0.5)',
+                    borderRadius: '20px',
+                    padding: '8px 14px',
+                    color: 'white',
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(102, 126, 234, 0.2)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(102, 126, 234, 0.12)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  {suggestion.amount} {currency}
+                  <span style={{
+                    marginLeft: '8px',
+                    fontSize: '11px',
+                    opacity: 0.8,
+                    background: 'rgba(52, 199, 89, 0.2)',
+                    padding: '2px 6px',
+                    borderRadius: '8px'
+                  }}>
+                    📊 {suggestion.conversionScore}%
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
 
           <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '12px', padding: '15px', marginTop: '15px' }}>
             <h4 style={{ color: 'white', fontSize: '13px', marginBottom: '10px' }}>🎯 Optimierungen</h4>
@@ -85,17 +197,33 @@ const PaymentSimplified: React.FC = () => {
               <div style={{ background: 'rgba(52, 199, 89, 0.1)', border: '1px solid rgba(52, 199, 89, 0.5)', borderRadius: '12px', padding: '30px', textAlign: 'center' }}>
                 <div style={{ fontSize: '64px', marginBottom: '15px' }}>📈</div>
                 <div style={{ fontSize: '48px', fontWeight: 'bold', color: 'white', marginBottom: '10px' }}>{conversionRate}%</div>
-                <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)' }}>Erwartete Conversion Rate</div>
+                <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)' }}>Erwartete Conversion Rate (KI)</div>
               </div>
-              <div style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '20px' }}>
-                <div style={{ fontSize: '12px', fontWeight: '600', color: 'white', marginBottom: '15px' }}>Optimierungs-Schritte:</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '12px', color: 'white' }}>
-                  <div>✅ Formular auf 3 Felder reduziert</div>
-                  <div>✅ Express-Checkout aktiviert</div>
-                  <div>✅ Ablenkungen entfernt</div>
-                  <div>✅ Trust-Signale hinzugefügt</div>
+
+              {predictionFactors.length > 0 && (
+                <div style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '20px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: '600', color: 'white', marginBottom: '12px' }}>Einflussfaktoren:</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px', color: 'white' }}>
+                    {predictionFactors.map((factor, idx) => (
+                      <div key={idx} style={{
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '8px',
+                        padding: '8px 10px'
+                      }}>
+                        • {factor}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {predictionRecommendation && (
+                <div style={{ background: 'rgba(102, 126, 234, 0.12)', border: '1px solid rgba(102, 126, 234, 0.4)', borderRadius: '12px', padding: '16px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: '700', color: 'white', marginBottom: '8px' }}>KI-Empfehlung</div>
+                  <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.9)' }}>💡 {predictionRecommendation}</div>
+                </div>
+              )}
             </div>
           ) : (
             <div style={{ background: 'rgba(255,255,255,0.03)', border: '2px dashed rgba(255,255,255,0.1)', borderRadius: '12px', padding: '40px', textAlign: 'center', color: 'rgba(255,255,255,0.5)' }}>
