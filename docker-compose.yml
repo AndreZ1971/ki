@@ -19,7 +19,9 @@ services:
       - kaufe-es-network
 
   nginx:
-    image: nginx:latest
+    build:
+      context: ./frontend
+    image: my-frontend
     container_name: woo-nginx
     ports:
       - "80:80"
