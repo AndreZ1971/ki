@@ -1,6 +1,12 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 
 // ✅ Typen für Produktanalyse
+interface Product {
+  id: number;
+  name: string;
+  price: string;
+}
+
 interface ProductAnalysisProps {
   productId: number;
 }
@@ -53,25 +59,50 @@ interface ApiResponse<T> {
 
 export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({ productId }) => {
   const apiBase = useMemo(() => {
-    const raw = (import.meta.env.VITE_API_URL || '').trim().replace(/\/$/, '');
-    return raw || '';
+    const raw = (import.meta.env.VITE_API_URL || 'http://localhost:3000').trim().replace(/\/$/, '');
+    return raw;
   }, []);
 
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expandedIssue, setExpandedIssue] = useState<number | null>(null);
+  const [restockForm, setRestockForm] = useState({ targetStock: 50, safetyStock: 8, leadTimeDays: 7 });
+  const [priceForm, setPriceForm] = useState({ price: '', salePrice: '' });
+  const [steeringAction, setSteeringAction] = useState<'promote' | 'deprioritize' | 'bundle' | 'block' | 'clearance'>('promote');
+  const [actionMessage, setActionMessage] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [_products, _setProducts] = useState<Product[]>([]);
+  const [_productsLoading, _setProductsLoading] = useState(true);
 
   // 🔗 Normalisierte API-URL
   const buildUrl = useCallback((path: string) => {
-    const base = apiBase.endsWith('/api') && path.startsWith('/api')
-      ? apiBase.replace(/\/api$/, '')
-      : apiBase;
-    if (!path.startsWith('/')) {
-      return `${base}/${path}`;
-    }
-    return `${base}${path}`;
+    return apiBase + (path.startsWith('/') ? path : '/' + path);
   }, [apiBase]);
+
+  // 📦 Produktliste laden
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch(buildUrl('/api/products/woo/products?per_page=50'));
+        if (!res.ok) throw new Error('Produkte konnten nicht geladen werden');
+        const data = await res.json();
+        if (data.success && Array.isArray(data.data)) {
+          const mapped = data.data.map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            price: p.price || '0'
+          }));
+          _setProducts(mapped);
+        }
+      } catch (err) {
+        console.error('Fehler beim Laden der Produkte:', err);
+      } finally {
+        _setProductsLoading(false);
+      }
+    };
+    fetchProducts();
+  }, [buildUrl]);
 
   // 🎯 Analyse starten
   const fetchAnalysis = useCallback(async () => {
@@ -104,6 +135,61 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({ productId }) =
       setLoading(false);
     }
   }, [productId, buildUrl]);
+
+  const runAction = useCallback(async (action: 'restock' | 'price' | 'steering') => {
+    setActionLoading(true);
+    setActionMessage(null);
+
+    try {
+      let path = '';
+      let payload: any = {};
+
+      if (action === 'restock') {
+        path = buildUrl(`/api/products/optimizer/actions/restock/${productId}`);
+        payload = {
+          targetStock: restockForm.targetStock,
+          safetyStock: restockForm.safetyStock,
+          leadTimeDays: restockForm.leadTimeDays
+        };
+      }
+
+      if (action === 'price') {
+        path = buildUrl(`/api/products/optimizer/actions/price/${productId}`);
+        payload = {
+          price: parseFloat(priceForm.price || '0'),
+          salePrice: priceForm.salePrice ? parseFloat(priceForm.salePrice) : undefined
+        };
+      }
+
+      if (action === 'steering') {
+        path = buildUrl(`/api/products/optimizer/actions/steering/${productId}`);
+        payload = { action: steeringAction };
+      }
+
+      const res = await fetch(path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || 'Aktion fehlgeschlagen');
+      }
+
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Aktion fehlgeschlagen');
+      }
+
+      setActionMessage(data.message || 'Aktion erfolgreich ausgeführt');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Aktion fehlgeschlagen';
+      setActionMessage(`⚠️ ${message}`);
+    } finally {
+      setActionLoading(false);
+    }
+  }, [buildUrl, productId, restockForm, priceForm, steeringAction]);
 
   // 🎨 Score-Farbe basierend auf Wert
   const getScoreColor = (score: number) => {
@@ -474,6 +560,174 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({ productId }) =
               </div>
             </div>
           )}
+
+          {/* Action Board */}
+          <div style={{
+            background: 'rgba(255,255,255,0.02)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: '12px',
+            padding: '20px',
+            display: 'grid',
+            gap: '16px'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ fontSize: '14px', fontWeight: '700', textTransform: 'uppercase' }}>🚀 Aktionen & Steuerung</h3>
+              {actionMessage && (
+                <span style={{ fontSize: '12px', color: actionMessage.startsWith('⚠️') ? '#ff3b30' : '#34c759' }}>
+                  {actionMessage}
+                </span>
+              )}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '12px' }}>
+              {/* Restock */}
+              <div style={{
+                border: '1px solid rgba(52,199,89,0.35)',
+                background: 'linear-gradient(135deg, rgba(52,199,89,0.08), rgba(52,199,89,0.02))',
+                borderRadius: '10px',
+                padding: '14px',
+                display: 'grid',
+                gap: '8px'
+              }}>
+                <div style={{ fontWeight: 700, display: 'flex', justifyContent: 'space-between' }}>
+                  <span>📦 Restock</span>
+                  <small style={{ color: 'rgba(255,255,255,0.6)' }}>Lead + Safety</small>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  <label style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>
+                    Zielbestand
+                    <input
+                      type="number"
+                      value={restockForm.targetStock}
+                      onChange={(e) => setRestockForm({ ...restockForm, targetStock: Number(e.target.value) })}
+                      style={{ width: '100%', marginTop: '4px', padding: '8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(0,0,0,0.25)', color: '#fff' }}
+                    />
+                  </label>
+                  <label style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>
+                    Safety Stock
+                    <input
+                      type="number"
+                      value={restockForm.safetyStock}
+                      onChange={(e) => setRestockForm({ ...restockForm, safetyStock: Number(e.target.value) })}
+                      style={{ width: '100%', marginTop: '4px', padding: '8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(0,0,0,0.25)', color: '#fff' }}
+                    />
+                  </label>
+                </div>
+                <label style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>
+                  Lieferzeit (Tage)
+                  <input
+                    type="number"
+                    value={restockForm.leadTimeDays}
+                    onChange={(e) => setRestockForm({ ...restockForm, leadTimeDays: Number(e.target.value) })}
+                    style={{ width: '100%', marginTop: '4px', padding: '8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(0,0,0,0.25)', color: '#fff' }}
+                  />
+                </label>
+                <button
+                  disabled={actionLoading}
+                  onClick={() => runAction('restock')}
+                  style={{
+                    padding: '10px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(52,199,89,0.6)',
+                    background: 'linear-gradient(135deg, rgba(52,199,89,0.4), rgba(52,199,89,0.2))',
+                    color: '#d1fae5',
+                    cursor: actionLoading ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  {actionLoading ? '…' : 'Restock ausführen'}
+                </button>
+              </div>
+
+              {/* Pricing */}
+              <div style={{
+                border: '1px solid rgba(0,122,255,0.35)',
+                background: 'linear-gradient(135deg, rgba(0,122,255,0.08), rgba(0,122,255,0.02))',
+                borderRadius: '10px',
+                padding: '14px',
+                display: 'grid',
+                gap: '8px'
+              }}>
+                <div style={{ fontWeight: 700, display: 'flex', justifyContent: 'space-between' }}>
+                  <span>💰 Pricing</span>
+                  <small style={{ color: 'rgba(255,255,255,0.6)' }}>Live Update</small>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  <label style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>
+                    Preis
+                    <input
+                      type="number"
+                      value={priceForm.price}
+                      onChange={(e) => setPriceForm({ ...priceForm, price: e.target.value })}
+                      style={{ width: '100%', marginTop: '4px', padding: '8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(0,0,0,0.25)', color: '#fff' }}
+                    />
+                  </label>
+                  <label style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>
+                    Sale-Preis
+                    <input
+                      type="number"
+                      value={priceForm.salePrice}
+                      onChange={(e) => setPriceForm({ ...priceForm, salePrice: e.target.value })}
+                      style={{ width: '100%', marginTop: '4px', padding: '8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(0,0,0,0.25)', color: '#fff' }}
+                    />
+                  </label>
+                </div>
+                <button
+                  disabled={actionLoading}
+                  onClick={() => runAction('price')}
+                  style={{
+                    padding: '10px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(0,122,255,0.6)',
+                    background: 'linear-gradient(135deg, rgba(0,122,255,0.35), rgba(0,122,255,0.15))',
+                    color: '#e0f2fe',
+                    cursor: actionLoading ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  {actionLoading ? '…' : 'Preis anwenden'}
+                </button>
+              </div>
+
+              {/* Steering */}
+              <div style={{
+                border: '1px solid rgba(234,88,12,0.35)',
+                background: 'linear-gradient(135deg, rgba(234,88,12,0.08), rgba(234,88,12,0.02))',
+                borderRadius: '10px',
+                padding: '14px',
+                display: 'grid',
+                gap: '8px'
+              }}>
+                <div style={{ fontWeight: 700, display: 'flex', justifyContent: 'space-between' }}>
+                  <span>🎛️ Steuerung</span>
+                  <small style={{ color: 'rgba(255,255,255,0.6)' }}>Tags + Meta</small>
+                </div>
+                <select
+                  value={steeringAction}
+                  onChange={(e) => setSteeringAction(e.target.value as any)}
+                  style={{ padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(0,0,0,0.25)', color: '#fff' }}
+                >
+                  <option value="promote">Promote</option>
+                  <option value="deprioritize">De-priorisieren</option>
+                  <option value="bundle">Bundle</option>
+                  <option value="block">Blockieren</option>
+                  <option value="clearance">Sale/Clearance</option>
+                </select>
+                <button
+                  disabled={actionLoading}
+                  onClick={() => runAction('steering')}
+                  style={{
+                    padding: '10px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(234,88,12,0.6)',
+                    background: 'linear-gradient(135deg, rgba(234,88,12,0.35), rgba(234,88,12,0.12))',
+                    color: '#ffedd5',
+                    cursor: actionLoading ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  {actionLoading ? '…' : 'Steuerung setzen'}
+                </button>
+              </div>
+            </div>
+          </div>
 
           {/* Timestamp */}
           <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', textAlign: 'center', paddingTop: '16px' }}>
