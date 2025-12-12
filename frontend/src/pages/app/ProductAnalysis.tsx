@@ -111,25 +111,34 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({ productId }) =
     setResult(null);
 
     try {
-      const res = await fetch(buildUrl(`/api/products/optimizer/analyze/${productId}`), {
+      const url = buildUrl(`/api/products/adviser/analyze/${productId}`);
+      console.log('📤 Sende Analyze Request zu:', url);
+      
+      const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
 
-      if (!res.ok) {
-        throw new Error(`Fehler ${res.status}: ${res.statusText}`);
-      }
+      console.log('📥 Response Status:', res.status, res.statusText);
+      
+      const data = await res.json();
+      console.log('📋 Response Data:', data);
 
-      const data: ApiResponse<AnalysisResult> = await res.json();
+      if (!res.ok) {
+        const errorMsg = data?.error || data?.message || `HTTP ${res.status}`;
+        throw new Error(`Fehler ${res.status}: ${errorMsg}`);
+      }
 
       if (data.success && (data.analysis || data.data)) {
         const analysisData = data.analysis || data.data;
         setResult(analysisData as AnalysisResult);
+        console.log('✅ Analyse erfolgreich:', analysisData);
       } else {
         throw new Error(data.error || 'Analyse fehlgeschlagen');
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unbekannter Fehler';
+      console.error('❌ Analyse-Fehler:', err);
       setError(`Produkt konnte nicht analysiert werden: ${message}`);
     } finally {
       setLoading(false);
@@ -145,7 +154,7 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({ productId }) =
       let payload: any = {};
 
       if (action === 'restock') {
-        path = buildUrl(`/api/products/optimizer/actions/restock/${productId}`);
+        path = buildUrl(`/api/products/adviser/actions/restock/${productId}`);
         payload = {
           targetStock: restockForm.targetStock,
           safetyStock: restockForm.safetyStock,
@@ -154,7 +163,7 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({ productId }) =
       }
 
       if (action === 'price') {
-        path = buildUrl(`/api/products/optimizer/actions/price/${productId}`);
+        path = buildUrl(`/api/products/adviser/actions/price/${productId}`);
         payload = {
           price: parseFloat(priceForm.price || '0'),
           salePrice: priceForm.salePrice ? parseFloat(priceForm.salePrice) : undefined
@@ -162,7 +171,7 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({ productId }) =
       }
 
       if (action === 'steering') {
-        path = buildUrl(`/api/products/optimizer/actions/steering/${productId}`);
+        path = buildUrl(`/api/products/adviser/actions/steering/${productId}`);
         payload = { action: steeringAction };
       }
 
