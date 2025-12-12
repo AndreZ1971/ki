@@ -62,7 +62,7 @@ export class SpecializationService {
       logger.info(`✅ Signatur gültig für Spezialisierung: ${signedSpec.data.name}`);
       return true;
     } catch (error) {
-      logger.error('❌ Fehler bei Signatur-Validierung:', error);
+      logger.error({ err: error }, '❌ Fehler bei Signatur-Validierung');
       return false;
     }
   }
@@ -117,7 +117,7 @@ export class SpecializationService {
       await this.saveMetadata(userId, stored);
       return stored;
     } catch (error) {
-      logger.error('❌ Fehler beim Verschlüsseln/Speichern:', error);
+      logger.error({ err: error }, '❌ Fehler beim Verschlüsseln/Speichern');
       throw error;
     }
   }
@@ -143,7 +143,7 @@ export class SpecializationService {
 
       return JSON.parse(decrypted);
     } catch (error) {
-      logger.error('❌ Fehler beim Entschlüsseln:', error);
+      logger.error({ err: error }, '❌ Fehler beim Entschlüsseln');
       throw error;
     }
   }
@@ -226,7 +226,7 @@ export class SpecializationService {
         contextInstructions: data.contextInstructions
       };
     } catch (error) {
-      logger.error('❌ Fehler beim Laden der aktiven Spezialisierung:', error);
+      logger.error({ err: error }, '❌ Fehler beim Laden der aktiven Spezialisierung');
       return null;
     }
   }

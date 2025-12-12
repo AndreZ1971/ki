@@ -288,8 +288,8 @@ async function buildServer() {
     });
     console.log('✅ Memory Routes erfolgreich registriert');
 
-    await server.register(productOptimizerRoutes, { prefix: '/api/products/optimizer' });
-    console.log('✅ Product Optimizer Routes erfolgreich registriert');
+    await server.register(productOptimizerRoutes, { prefix: '/api/products/adviser' });
+    console.log('✅ Product Adviser Routes erfolgreich registriert');
 
     await server.register(reviewsRoutes, { prefix: '/api/analytics/reviews' });
     console.log('✅ Reviews Routes erfolgreich registriert');

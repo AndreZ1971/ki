@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import OpenAI from 'openai';
+import { wooCache } from '../../../../utils/woo-cache';
 
 // ✅ Korrekte lazy Initialisierung
 let openai: OpenAI | null = null;
@@ -9,7 +10,6 @@ function initializeOpenAI() {
   
   try {
     const apiKey = process.env.OPENAI_API_KEY; // ✅ Jetzt ist process.env geladen!
-    
     if (!apiKey || apiKey.trim() === '' || !apiKey.startsWith('sk-')) {
       console.warn('⚠️ OpenAI API Key nicht konfiguriert');
       openai = null;
@@ -27,6 +27,7 @@ function initializeOpenAI() {
 
 // Einfache WooCommerce Client Implementierung
 import config from '../../../../config';
+import { Agent } from 'undici';
 
 class WooCommerceClient {
   private baseUrl: string;
@@ -67,28 +68,56 @@ class WooCommerceClient {
     }
     const url = `${this.baseUrl}${endpoint}`;
     const auth = Buffer.from(`${this.consumerKey}:${this.consumerSecret}`).toString('base64');
-    const defaultOptions = {
+    const defaultOptions: any = {
       method: 'GET',
       headers: {
         'Authorization': `Basic ${auth}`,
         'Content-Type': 'application/json',
+        'User-Agent': 'ARI-Adviser/1.0'
       },
+      // 30s Timeout für langsame Woo-Instanzen
+      signal: AbortSignal.timeout(30000),
+      // Erhöhe Undici Connect Timeout explizit
+      dispatcher: new Agent({ connect: { timeout: 30000 } })
     };
     console.log(`[WooCommerce] Request:`, url, defaultOptions, options);
-    try {
-      const response = await fetch(url, { ...defaultOptions, ...options });
-      console.log(`[WooCommerce] Response Status:`, response.status);
-      if (!response.ok) {
-        const text = await response.text();
-        console.error(`[WooCommerce] Fehlerhafte Antwort:`, text);
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const json = await response.json();
-      console.log(`[WooCommerce] Response JSON:`, json);
-      return json;
-    } catch (_error) {
-      console.error(`Fehler bei WooCommerce Request ${endpoint}:`, _error);
-      throw _error;
+     
+     // Versuche Cache zuerst
+     const cacheKey = `woo_${endpoint}`;
+     const cached = wooCache.get(cacheKey);
+     if (cached) {
+       console.log(`[WooCommerce] Cache HIT für ${endpoint}`);
+       return cached;
+     }
+     
+     try {
+       const response = await fetch(url, { ...defaultOptions, ...options });
+       console.log(`[WooCommerce] Response Status:`, response.status);
+       if (!response.ok) {
+         const text = await response.text();
+         console.error(`[WooCommerce] Fehlerhafte Antwort:`, text);
+         throw new Error(`HTTP error! status: ${response.status}`);
+       }
+       const json = await response.json();
+       console.log(`[WooCommerce] Response JSON:`, json);
+       
+       // Cache erfolgreiche Antwort (60s)
+       wooCache.set(cacheKey, json, 60);
+       
+       return json;
+     } catch (_error) {
+       console.error(`Fehler bei WooCommerce Request ${endpoint}:`, _error);
+       
+       // Fallback zu Cache auch bei Fehler
+       const cachedFallback = wooCache.get(cacheKey);
+       if (cachedFallback) {
+         console.log(`[WooCommerce] Cache FALLBACK für ${endpoint} (wegen Fehler)`);
+         return cachedFallback;
+       }
+       
+      // Liefere einen klaren Fehlertext für Upstream-Handler
+      const message = _error instanceof Error ? _error.message : 'Unbekannter Fehler';
+      throw new Error(message);
     }
   }
 
@@ -102,21 +131,52 @@ class WooCommerceClient {
     return this.makeRequest(endpoint);
   }
 
+
+  // Produkt laden inkl. Meta-Felder extrahieren
   async getProduct(id: number) {
-    return this.makeRequest(`/wp-json/wc/v3/products/${id}`);
+    const product = await this.makeRequest(`/wp-json/wc/v3/products/${id}`);
+    // Meta-Felder extrahieren (falls vorhanden)
+    if (product && Array.isArray(product.meta_data)) {
+      const meta = Object.fromEntries(
+        product.meta_data
+          .filter((m: any) => ["lagerort", "lagerplatz", "notiz"].includes(m.key))
+          .map((m: any) => [m.key, m.value])
+      );
+      return { ...product, ...meta };
+    }
+    return product;
   }
 
+
+  // Produkt anlegen inkl. Meta-Felder
   async createProduct(productData: any) {
+    const metaKeys = ["lagerort", "lagerplatz", "notiz"];
+    const meta_data = metaKeys
+      .filter((key) => productData[key])
+      .map((key) => ({ key, value: productData[key] }));
+    const data = { ...productData };
+    if (meta_data.length > 0) data.meta_data = meta_data;
+    // Meta-Felder nicht doppelt im Root
+    metaKeys.forEach((key) => delete data[key]);
     return this.makeRequest('/wp-json/wc/v3/products', {
       method: 'POST',
-      body: JSON.stringify(productData)
+      body: JSON.stringify(data)
     });
   }
 
+
+  // Produkt aktualisieren inkl. Meta-Felder
   async updateProduct(id: number, updateData: any) {
+    const metaKeys = ["lagerort", "lagerplatz", "notiz"];
+    const meta_data = metaKeys
+      .filter((key) => updateData[key])
+      .map((key) => ({ key, value: updateData[key] }));
+    const data = { ...updateData };
+    if (meta_data.length > 0) data.meta_data = meta_data;
+    metaKeys.forEach((key) => delete data[key]);
     return this.makeRequest(`/wp-json/wc/v3/products/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(updateData)
+      body: JSON.stringify(data)
     });
   }
 
@@ -175,7 +235,11 @@ export default async function wooCommerceRoutes(server: FastifyInstance) {
           type: 'object',
           properties: {
             success: { type: 'boolean' },
-            data: { type: 'array' }
+            data: {
+              type: 'array',
+              items: { type: 'object', additionalProperties: true },
+              additionalProperties: true
+            }
           }
         },
         500: {
@@ -184,25 +248,42 @@ export default async function wooCommerceRoutes(server: FastifyInstance) {
             success: { type: 'boolean' },
             error: { type: 'string' }
           }
+        },
+        504: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            error: { type: 'string' }
+          }
         }
       }
     }
-  }, async (request: any) => {
+  }, async (request: any, reply) => {
     try {
       const { page, per_page, search, category } = request.query;
-      console.log('[Route] /woo/products called with:', { page, per_page, search, category });
+      server.log.info('[Route] /woo/products called');
       const products = await wooCommerce.getProducts({ 
         page, 
         per_page, 
         search,
         category 
       });
-      console.log('[Route] /woo/products result:', products);
+      server.log.info(`[Route] /woo/products loaded ${products?.length} products`);
       return { success: true, data: products };
     } catch (error: any) {
-      server.log.error('Fehler beim Abrufen der Produkte:', error);
-      console.error('[Route] /woo/products error:', error);
-      throw new Error(`Failed to fetch products: ${error.message}`);
+      const errorMsg = error?.message || 'unknown error';
+      server.log.error('[Route] /woo/products error: ' + errorMsg);
+      const status = error?.message?.includes('timeout') ? 504 : 500;
+      const message = errorMsg.includes('nicht konfiguriert') 
+        ? 'WooCommerce ist nicht konfiguriert. Bitte WooCommerce-Daten in connection.json setzen.'
+        : `Failed to fetch products: ${errorMsg}`;
+      reply.code(status);
+      return { 
+        success: false, 
+        error: message,
+        statusCode: status,
+        debug: process.env.NODE_ENV === 'development' ? errorMsg : undefined
+      };
     }
   });
 
@@ -224,10 +305,24 @@ export default async function wooCommerceRoutes(server: FastifyInstance) {
           type: 'object',
           properties: {
             success: { type: 'boolean' },
-            data: { type: 'object' }
+            data: { type: 'object', additionalProperties: true }
           }
         },
         404: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            error: { type: 'string' }
+          }
+        },
+        503: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            error: { type: 'string' }
+          }
+        },
+        504: {
           type: 'object',
           properties: {
             success: { type: 'boolean' },
@@ -248,8 +343,15 @@ export default async function wooCommerceRoutes(server: FastifyInstance) {
       
       return { success: true, data: product };
     } catch (error: any) {
-      server.log.error('Fehler beim Abrufen des Produkts:', error);
-      throw new Error(`Failed to fetch product: ${error.message}`);
+      const errorMsg = error?.message || 'unknown error';
+      server.log.error('Fehler beim Abrufen des Produkts:', errorMsg);
+      const status = errorMsg.includes('timeout') ? 504 : 503;
+      reply.code(status);
+      return {
+        success: false,
+        error: `Failed to fetch product: ${errorMsg}`,
+        statusCode: status
+      };
     }
   });
 

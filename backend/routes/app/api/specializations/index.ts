@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { SpecializationService } from '../../../services/specializationService';
-import { SignedSpecialization } from '../../../types/specialization';
-import { logger } from '../../../logger';
+import { SpecializationService } from '../../../../services/specializationService';
+import { SignedSpecialization } from '../../../../types/specialization';
+import { logger } from '../../../../logger';
 
 /**
  * Spezialisierungs-Routen
@@ -54,7 +54,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
         specializations
       });
     } catch (error) {
-      logger.error('❌ Fehler beim Laden der Spezialisierungen:', error);
+      logger.error({ err: error }, '❌ Fehler beim Laden der Spezialisierungen');
       return reply.status(500).send({
         success: false,
         error: 'Fehler beim Laden der Spezialisierungen'
@@ -135,7 +135,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
         }
       });
     } catch (error) {
-      logger.error('❌ Fehler beim Upload:', error);
+      logger.error({ err: error }, '❌ Fehler beim Upload');
       return reply.status(500).send({
         success: false,
         error: 'Fehler beim Installieren der Spezialisierung'
@@ -181,7 +181,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
         message: `Spezialisierung aktiviert`
       });
     } catch (error) {
-      logger.error('❌ Fehler beim Aktivieren:', error);
+      logger.error({ err: error }, '❌ Fehler beim Aktivieren');
       return reply.status(500).send({
         success: false,
         error: error instanceof Error ? error.message : 'Fehler beim Aktivieren'
@@ -226,7 +226,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
         message: 'Spezialisierung gelöscht'
       });
     } catch (error) {
-      logger.error('❌ Fehler beim Löschen:', error);
+      logger.error({ err: error }, '❌ Fehler beim Löschen');
       return reply.status(500).send({
         success: false,
         error: error instanceof Error ? error.message : 'Fehler beim Löschen'
@@ -271,7 +271,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
         specialization: active
       });
     } catch (error) {
-      logger.error('❌ Fehler beim Laden der aktiven Spezialisierung:', error);
+      logger.error({ err: error }, '❌ Fehler beim Laden der aktiven Spezialisierung');
       return reply.status(500).send({
         success: false,
         error: 'Fehler beim Laden'

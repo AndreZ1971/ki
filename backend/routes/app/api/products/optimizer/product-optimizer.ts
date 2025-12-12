@@ -205,7 +205,7 @@ export default async function productOptimizerRoutes(_server: FastifyInstance) {
   // 🔥 NEUE ANALYSE-ROUTE mit korrekter Pfad-Struktur
   _server.post('/analyze/:id', {
     schema: {
-      tags: ['product-optimizer'],
+      tags: ['product-adviser'],
       summary: 'Analyze product using AI',
       description: 'Analyze product data and provide optimization suggestions',
       params: {
@@ -220,9 +220,18 @@ export default async function productOptimizerRoutes(_server: FastifyInstance) {
           type: 'object',
           properties: {
             success: { type: 'boolean' },
-            analysis: { type: 'object' },
+            analysis: { type: 'object', additionalProperties: true },
             suggestions: { type: 'array', items: { type: 'string' } },
             error: { type: 'string' }
+          }
+        },
+        400: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            error: { type: 'string' },
+            received: { type: 'string' },
+            parsed: { type: 'number' }
           }
         },
         500: {
@@ -243,29 +252,41 @@ export default async function productOptimizerRoutes(_server: FastifyInstance) {
       }
     }
   }, async (_request: any, _reply) => {
-    const { id } = _request.params;
-    const productId = parseInt(id);
-    
-    // ✅ Erst HIER wird initialisiert
-    const openAIClient = initializeOpenAI();
-    console.log(`[Product Optimizer] Starte Produkt-Analyse für ID: ${productId}`);
-    console.log(`[Product Optimizer] OpenAI verfügbar: ${!!openAIClient}`);
-    
-    // Prüfe ob WooCommerce verfügbar ist
-    if (!wooCommerceService.isReady()) {
-      return _reply.status(503).send({ 
-        success: false,
-        error: 'WooCommerce Service nicht verfügbar',
-        message: 'Bitte WooCommerce Konfiguration prüfen'
-      });
-    }
-    
     try {
+      const { id } = _request.params;
+      const productId = parseInt(id);
+      
+      if (!id || isNaN(productId)) {
+        console.error('[Product Optimizer] Invalid productId:', { id, productId });
+        return _reply.status(400).send({ 
+          success: false,
+          error: 'Invalid product ID',
+          received: id,
+          parsed: productId
+        });
+      }
+      
+      // ✅ Erst HIER wird initialisiert
+      const openAIClient = initializeOpenAI();
+      console.log(`[Product Optimizer] Starte Produkt-Analyse für ID: ${productId}`);
+      console.log(`[Product Optimizer] OpenAI verfügbar: ${!!openAIClient}`);
+      
+      // Prüfe ob WooCommerce verfügbar ist
+      if (!wooCommerceService.isReady()) {
+        console.warn('[Product Optimizer] WooCommerce nicht bereit');
+        return _reply.status(503).send({ 
+          success: false,
+          error: 'WooCommerce Service nicht verfügbar',
+          message: 'Bitte WooCommerce Konfiguration prüfen'
+        });
+      }
+      
       _server.log.info(`Starte Produkt-Analyse für ID: ${productId}`);
       const analysis = await analyzeProduct(productId, _server);
       _server.log.info(`✅ Produkt-Analyse abgeschlossen für ID: ${productId}`);
       return { success: true, analysis, suggestions: analysis.recommendations };
     } catch (error: any) {
+      console.error('[Product Optimizer] Fehler:', error);
       _server.log.error('Analyse fehlgeschlagen:', error.message);
       return _reply.status(500).send({ 
         success: false,
@@ -278,7 +299,7 @@ export default async function productOptimizerRoutes(_server: FastifyInstance) {
   // 🔥 STATUS ENDPOINT hinzugefügt
   _server.get('/status', {
     schema: {
-      tags: ['product-optimizer'],
+      tags: ['product-adviser'],
       summary: 'Get optimizer status',
       description: 'Check if product optimizer is available'
     }
@@ -457,6 +478,181 @@ RESPONSE IN JSON FORMAT:
     }
   });
 
+    // 🚚 Restock / Bestellvorschlag
+    _server.post('/actions/restock/:id', {
+      schema: {
+        tags: ['product-optimizer'],
+        summary: 'Restock / Lager auffüllen',
+        description: 'Berechnet einen Bestellvorschlag und aktualisiert WooCommerce Lagerbestand',
+        params: {
+          type: 'object',
+          properties: { id: { type: 'integer' } },
+          required: ['id']
+        },
+        body: {
+          type: 'object',
+          required: ['targetStock'],
+          properties: {
+            targetStock: { type: 'integer' },
+            safetyStock: { type: 'integer', default: 5 },
+            leadTimeDays: { type: 'integer', default: 7 },
+            currentStock: { type: 'integer' }
+          }
+        }
+      }
+    }, async (_request: any, _reply) => {
+      const { id } = _request.params;
+      const productId = parseInt(id);
+      const { targetStock, safetyStock = 5, leadTimeDays = 7, currentStock } = _request.body || {};
+
+      if (!wooCommerceService.isReady()) {
+        return _reply.status(503).send({ success: false, error: 'WooCommerce Service nicht verfügbar' });
+      }
+
+      try {
+        const product = await wooCommerceService.getProduct(productId, _server);
+        const onHand = typeof currentStock === 'number' ? currentStock : (product.stock_quantity || 0);
+
+        const forecastPerDay = Math.max(1, Math.round(((product.total_sales || 0) / 30) || 1));
+        const projectedNeed = forecastPerDay * leadTimeDays + safetyStock;
+        const orderQty = Math.max(0, targetStock - onHand + projectedNeed - safetyStock);
+
+        const updatePayload = {
+          manage_stock: true,
+          stock_quantity: onHand + orderQty,
+          stock_status: 'instock'
+        };
+
+        const updated = await wooCommerceService.updateProduct(productId, updatePayload, _server);
+
+        return {
+          success: true,
+          message: 'Bestellvorschlag berechnet und Lager aktualisiert',
+          data: {
+            recommendedOrder: orderQty,
+            projectedDailySales: forecastPerDay,
+            leadTimeDays,
+            safetyStock,
+            newStockQuantity: updated.stock_quantity
+          }
+        };
+      } catch (error: any) {
+        _server.log.error('Restock fehlgeschlagen:', error.message);
+        return _reply.status(500).send({ success: false, error: error.message || 'Restock fehlgeschlagen' });
+      }
+    });
+
+    // 💰 Preis-/Promo-Steuerung
+    _server.post('/actions/price/:id', {
+      schema: {
+        tags: ['product-optimizer'],
+        summary: 'Preis aktualisieren',
+        description: 'Setzt neuen Preis/Sale-Preis in WooCommerce',
+        params: {
+          type: 'object',
+          properties: { id: { type: 'integer' } },
+          required: ['id']
+        },
+        body: {
+          type: 'object',
+          required: ['price'],
+          properties: {
+            price: { type: 'number' },
+            salePrice: { type: 'number' },
+            reason: { type: 'string' }
+          }
+        }
+      }
+    }, async (_request: any, _reply) => {
+      const { id } = _request.params;
+      const productId = parseInt(id);
+      const { price, salePrice, reason } = _request.body || {};
+
+      if (!wooCommerceService.isReady()) {
+        return _reply.status(503).send({ success: false, error: 'WooCommerce Service nicht verfügbar' });
+      }
+
+      try {
+        const payload: any = { regular_price: price?.toString() };
+        if (salePrice) {
+          payload.sale_price = salePrice.toString();
+        }
+
+        const updated = await wooCommerceService.updateProduct(productId, payload, _server);
+
+        return {
+          success: true,
+          message: 'Preis aktualisiert',
+          data: {
+            price: updated.price,
+            sale_price: updated.sale_price,
+            reason: reason || 'Preisupdate'
+          }
+        };
+      } catch (error: any) {
+        _server.log.error('Preisupdate fehlgeschlagen:', error.message);
+        return _reply.status(500).send({ success: false, error: error.message || 'Preisupdate fehlgeschlagen' });
+      }
+    });
+
+    // 🎛️ Produkt-Steuerung (Promote, Depriorisieren, Bundle etc.)
+    _server.post('/actions/steering/:id', {
+      schema: {
+        tags: ['product-optimizer'],
+        summary: 'Produkt-Steuerung',
+        description: 'Promote, de-priorisieren oder Aktionen markieren',
+        params: {
+          type: 'object',
+          properties: { id: { type: 'integer' } },
+          required: ['id']
+        },
+        body: {
+          type: 'object',
+          required: ['action'],
+          properties: {
+            action: { type: 'string', enum: ['promote', 'deprioritize', 'bundle', 'block', 'clearance'] },
+            note: { type: 'string' }
+          }
+        }
+      }
+    }, async (_request: any, _reply) => {
+      const { id } = _request.params;
+      const productId = parseInt(id);
+      const { action, note } = _request.body || {};
+
+      if (!wooCommerceService.isReady()) {
+        return _reply.status(503).send({ success: false, error: 'WooCommerce Service nicht verfügbar' });
+      }
+
+      try {
+        const product = await wooCommerceService.getProduct(productId, _server);
+        const existingTags: string[] = (product.tags || []).map((t: any) => t.name);
+        const newTag = `opt-${action}`;
+
+        const payload = {
+          tags: Array.from(new Set([...existingTags, newTag])).map(name => ({ name })),
+          meta_data: [
+            ...(product.meta_data || []),
+            { key: 'optimizer_action', value: action },
+            { key: 'optimizer_note', value: note || '' }
+          ]
+        };
+
+        const updated = await wooCommerceService.updateProduct(productId, payload, _server);
+
+        return {
+          success: true,
+          message: `Aktion '${action}' gesetzt`,
+          data: {
+            tags: updated.tags,
+            meta_data: updated.meta_data
+          }
+        };
+      } catch (error: any) {
+        _server.log.error('Steering fehlgeschlagen:', error.message);
+        return _reply.status(500).send({ success: false, error: error.message || 'Steering fehlgeschlagen' });
+      }
+    });
   // 🔄 AUTO-UPDATE WOOCOMMERCE MIT SEO OPTIMIERUNGEN
   _server.post('/woo/products/:id/seo-apply', {
     schema: {

@@ -2,6 +2,7 @@
 
 import { FastifyInstance } from 'fastify';
 import config from '../../../../../config';
+import { wooCache } from '../../../../../utils/woo-cache';
 
 interface WooCommerceOrder {
   id: number;
@@ -42,14 +43,13 @@ export default async function shopMetricsRoutes(server: FastifyInstance) {
 
   // Dashboard Metrics Endpoint - Wird unter /api/analytics/metrics/dashboard aufgerufen
   server.get('/dashboard', async () => {
+    const wooCommerceConfig = {
+      url: config.woocommerce?.url || '',
+      consumerKey: config.woocommerce?.consumerKey || '',
+      consumerSecret: config.woocommerce?.consumerSecret || '',
+    };
+
     try {
-
-      const wooCommerceConfig = {
-        url: config.woocommerce?.url || '',
-        consumerKey: config.woocommerce?.consumerKey || '',
-        consumerSecret: config.woocommerce?.consumerSecret || '',
-      };
-
       // Validate WooCommerce configuration
       if (!wooCommerceConfig.url || !wooCommerceConfig.consumerKey || !wooCommerceConfig.consumerSecret) {
         return {
@@ -62,35 +62,48 @@ export default async function shopMetricsRoutes(server: FastifyInstance) {
       // Basic Auth für WooCommerce API
       const auth = Buffer.from(`${wooCommerceConfig.consumerKey}:${wooCommerceConfig.consumerSecret}`).toString('base64');
 
+      const fetchJson = async (url: string) => {
+        // Versuche Cache zuerst
+        const cacheKey = `woo_dashboard_${url}`;
+        const cached = wooCache.get(cacheKey);
+        if (cached) {
+          console.log(`[Shop Metrics] Cache HIT für ${url}`);
+          return cached;
+        }
+
+        const res = await fetch(url, {
+          headers: {
+            'Authorization': `Basic ${auth}`,
+            'Content-Type': 'application/json',
+          },
+          // 30s Timeout für langsame Woo-Instanzen
+          signal: AbortSignal.timeout(30000)
+        });
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status} for ${url}`);
+        }
+        const json = await res.json();
+        
+        // Cache erfolgreiche Antwort (60s)
+        wooCache.set(cacheKey, json, 60);
+        
+        return json;
+      };
+
       // Parallel alle Daten von WooCommerce abrufen
-      const [ordersResponse, customersResponse, productsResponse] = await Promise.all([
-        fetch(`${wooCommerceConfig.url}/wp-json/wc/v3/orders?status=completed&per_page=100`, {
-          headers: {
-            'Authorization': `Basic ${auth}`,
-            'Content-Type': 'application/json',
-          },
-        }),
-        fetch(`${wooCommerceConfig.url}/wp-json/wc/v3/customers?per_page=100&role=all`, {
-          headers: {
-            'Authorization': `Basic ${auth}`,
-            'Content-Type': 'application/json',
-          },
-        }),
-        fetch(`${wooCommerceConfig.url}/wp-json/wc/v3/products?per_page=100`, {
-          headers: {
-            'Authorization': `Basic ${auth}`,
-            'Content-Type': 'application/json',
-          },
-        })
+      const [orders, customers, products] = await Promise.all([
+        fetchJson(`${wooCommerceConfig.url}/wp-json/wc/v3/orders?status=completed&per_page=100`),
+        fetchJson(`${wooCommerceConfig.url}/wp-json/wc/v3/customers?per_page=100&role=all`),
+        fetchJson(`${wooCommerceConfig.url}/wp-json/wc/v3/products?per_page=100`)
       ]);
 
-      if (!ordersResponse.ok || !customersResponse.ok || !productsResponse.ok) {
-        throw new Error(`WooCommerce API Error: Orders: ${ordersResponse.status}, Customers: ${customersResponse.status}, Products: ${productsResponse.status}`);
-      }
+      const ordersTyped: WooCommerceOrder[] = orders as WooCommerceOrder[];
+      const customersTyped: WooCommerceCustomer[] = customers as WooCommerceCustomer[];
+      const productsTyped: WooCommerceProduct[] = products as WooCommerceProduct[];
 
-      const orders: WooCommerceOrder[] = await ordersResponse.json();
-      const customers: WooCommerceCustomer[] = await customersResponse.json();
-      const products: WooCommerceProduct[] = await productsResponse.json();
+      console.log(`📊 Shop Metrics - Customers found: ${customersTyped.length}`);
+      console.log(`📊 Shop Metrics - Orders found: ${ordersTyped.length}`);
+      console.log(`📊 Shop Metrics - Products found: ${productsTyped.length}`);
 
       console.log(`📊 Shop Metrics - Customers found: ${customers.length}`);
       console.log(`📊 Shop Metrics - Orders found: ${orders.length}`);
@@ -98,24 +111,24 @@ export default async function shopMetricsRoutes(server: FastifyInstance) {
 
       // Heutige Daten berechnen
       const today = new Date().toISOString().split('T')[0];
-      const todayOrders = orders.filter(order => order.date_created.startsWith(today));
-      const todayCustomers = customers.filter(customer => customer.date_created.startsWith(today));
+      const todayOrders = ordersTyped.filter((order: WooCommerceOrder) => order.date_created.startsWith(today));
+      const todayCustomers = customersTyped.filter((customer: WooCommerceCustomer) => customer.date_created.startsWith(today));
 
       // Metrics berechnen
-      const totalSales = orders.reduce((sum, order) => sum + parseFloat(order.total), 0);
-      const todaySales = todayOrders.reduce((sum, order) => sum + parseFloat(order.total), 0);
+      const totalSales = ordersTyped.reduce((sum: number, order: WooCommerceOrder) => sum + parseFloat(order.total), 0);
+      const todaySales = todayOrders.reduce((sum: number, order: WooCommerceOrder) => sum + parseFloat(order.total), 0);
       
       // Conversion Rate (verbesserte Version)
-      const conversionRate = customers.length > 0 ? (orders.length / customers.length * 100) : 0;
+      const conversionRate = customersTyped.length > 0 ? (ordersTyped.length / customersTyped.length * 100) : 0;
 
       const metrics = {
         totalSales: parseFloat(totalSales.toFixed(2)),
         todaySales: parseFloat(todaySales.toFixed(2)),
-        totalOrders: orders.length,
+        totalOrders: ordersTyped.length,
         todayOrders: todayOrders.length,
-        totalCustomers: customers.length,
+        totalCustomers: customersTyped.length,
         todayCustomers: todayCustomers.length,
-        totalProducts: products.length,
+        totalProducts: productsTyped.length,
         conversionRate: parseFloat(conversionRate.toFixed(1)),
         lastUpdated: new Date().toISOString()
       };
@@ -127,10 +140,51 @@ export default async function shopMetricsRoutes(server: FastifyInstance) {
 
     } catch (error) {
       console.error('Shop Metrics Error:', error);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      
+      // Fallback: Versuche gecachte Daten zu nutzen
+      try {
+        const cachedOrders = wooCache.get(`woo_dashboard_${wooCommerceConfig.url}/wp-json/wc/v3/orders?status=completed&per_page=100`);
+        const cachedCustomers = wooCache.get(`woo_dashboard_${wooCommerceConfig.url}/wp-json/wc/v3/customers?per_page=100&role=all`);
+        const cachedProducts = wooCache.get(`woo_dashboard_${wooCommerceConfig.url}/wp-json/wc/v3/products?per_page=100`);
+        
+        if (cachedOrders && cachedCustomers && cachedProducts) {
+          console.log('Using cached shop metrics due to error');
+          const ordersTyped = cachedOrders as WooCommerceOrder[];
+          const customersTyped = cachedCustomers as WooCommerceCustomer[];
+          const productsTyped = cachedProducts as WooCommerceProduct[];
+          
+          const today = new Date().toISOString().split('T')[0];
+          const todayOrders = ordersTyped.filter(order => order.date_created.startsWith(today));
+          const todayCustomers = customersTyped.filter(customer => customer.date_created.startsWith(today));
+          const totalSales = ordersTyped.reduce((sum, order) => sum + parseFloat(order.total), 0);
+          const todaySales = todayOrders.reduce((sum, order) => sum + parseFloat(order.total), 0);
+          const conversionRate = customersTyped.length > 0 ? (ordersTyped.length / customersTyped.length * 100) : 0;
+          
+          return {
+            success: true,
+            data: {
+              totalSales: parseFloat(totalSales.toFixed(2)),
+              todaySales: parseFloat(todaySales.toFixed(2)),
+              totalOrders: ordersTyped.length,
+              todayOrders: todayOrders.length,
+              totalCustomers: customersTyped.length,
+              todayCustomers: todayCustomers.length,
+              totalProducts: productsTyped.length,
+              conversionRate: parseFloat(conversionRate.toFixed(1)),
+              lastUpdated: new Date().toISOString(),
+              cached: true
+            }
+          };
+        }
+      } catch (_e) {
+        // Fallback failed, return error
+      }
+      
       return {
         success: false,
         error: 'Failed to fetch shop metrics',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        details: message,
         timestamp: new Date().toISOString()
       };
     }
