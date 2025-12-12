@@ -8,8 +8,8 @@
 #   Kombiniertes Image (API + statische Dateien):
 #     docker build -t my-full-app .
 
-# Stage 1: Build Frontend
-FROM node:20-alpine AS frontend-builder
+# Stage 1: Build Frontend (second build, renamed to avoid duplicate)
+FROM node:20-alpine AS frontend-builder2
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm ci
@@ -17,7 +17,7 @@ COPY frontend/ ./
 RUN npm run build
 
 # Stage 2: Build Backend
-FROM node:20-alpine AS backend-builder
+FROM node:20-alpine AS backend-builder2
 WORKDIR /app/backend
 COPY backend/package*.json ./
 RUN npm ci --ignore-scripts
@@ -36,10 +36,10 @@ COPY backend/package*.json ./
 RUN npm ci  --ignore-scripts
 
 # Copy built backend
-COPY --from=backend-builder /app/backend/dist ./dist
+COPY --from=backend-builder2 /app/backend/dist ./dist
 
 # Copy built frontend (wird vom Backend als static files geserved)
-COPY --from=frontend-builder /app/frontend/dist ./public
+COPY --from=frontend-builder2 /app/frontend/dist ./public
 
 # Copy health check
 COPY healthcheck.js ./
