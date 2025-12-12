@@ -50,12 +50,6 @@ interface AnalysisResult {
   analyzedAt: string;
 }
 
-interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  analysis?: T;
-  error?: string;
-}
 
 export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({ productId }) => {
   const apiBase = useMemo(() => {
@@ -115,8 +109,7 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({ productId }) =
       console.log('📤 Sende Analyze Request zu:', url);
       
       const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        method: 'POST'
       });
 
       console.log('📥 Response Status:', res.status, res.statusText);

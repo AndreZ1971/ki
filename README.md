@@ -1,23 +1,34 @@
 # 🚀 ARI - Artificial Retail Intelligence System
 
-**Version:** 3.6.0  
+**Version:** 3.7.0  
 **Status:** Production Ready ✅
 
 Ein **AI-gestütztes Business Automation System** für WooCommerce/WordPress mit 50+ spezialisierten Tools, KI-Agent und modernem Dashboard.
 
 ---
 
-## ✨ Was ist neu in Version 3.6.0?
+## ✨ Was ist neu in Version 3.7.0?
 
-### 🎨 Settings- & Dashboard-UX
+### 🔍 Product Analyzer & Optimizer
 
-- Shop-Verbindung: Deutlich höherer Kontrast (helle Inputs, klare Labels/Helper), Social-Style-Farbkacheln für alle Bereiche.
-- Hinweise über Feldern aufgehellt; lese-optimierte Karten für WordPress, WooCommerce, Reddit, E-Mail, AI/Jobs.
-- Dashboard: Light/Dark-Umschalter entfernt, fixes Light-Theme für einheitlichen Look.
+- **Intelligentes Modal**: Vollständige Produktdetails mit scrollbarem Layout
+- **KI-Analyse Integration**: Produktanalyse mit Score, Metriken und personalisierten Empfehlungen
+- **Dropdown-Selection**: Benutzerfreundliche Produktauswahl mit Live-Daten
+- **Action Board**: Direkte Maßnahmen (Restock, Pricing, Steering) aus der Analyse heraus
+- **Light Theme**: Optimiert für Lesbarkeit mit weißem Hintergrund und dunkler Schrift
 
-### ⚙️ Stabilität
+### ⚡ Performance & Resilience
 
-- Frontend-Builds geprüft (Vite/TS); keine weiteren Codeänderungen notwendig.
+- **30s Timeout**: Großzügigere Timeouts für langsame WooCommerce-Instanzen
+- **60s Cache**: Intelligente Caching-Schicht für Shop-Metriken und Produktdaten
+- **Fallback-System**: Zeigt gecachte Daten bei temporären Verbindungsproblemen
+- **Error Handling**: Klare Fehlermeldungen statt silent failures
+
+### 🛠️ Backend-Verbesserungen
+
+- **WooCommerce Service**: Zentralisierte Credentials-Verwaltung (Env + connection.json)
+- **Shop Metrics Cache**: Resiliente Metriken auch bei Shop-Ausfällen
+- **Type Safety**: Vollständige TypeScript-Typisierung für WooCommerce-Entities
 
 ---
 

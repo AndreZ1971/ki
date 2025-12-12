@@ -7,6 +7,64 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [3.7.0] - 2025-01-XX
+
+### ✨ Added (Neue Features)
+
+#### **Product Analyzer mit KI-Integration**
+- 🔍 **Produktauswahl & Details**: Scrollbare Liste aller WooCommerce-Produkte
+  - Automatisches Laden beim Öffnen
+  - Detailansicht mit Bild, Name, Preis, Lagerbestand
+  - Vollständige Produktbeschreibung (scrollbar)
+  
+- 🤖 **KI-Analyse**: Intelligente Produktbewertung mit GPT-4
+  - Analyse-Score (0-100) mit Farbcodierung
+  - Kategorie-basierte Empfehlungen
+  - Strategische Vorschläge (Preis, Beschreibung, Marketing)
+  - Scrollbare Analyseergebnisse
+
+- 📋 **Action Board**: Kategorisierte Aktionsempfehlungen
+  - Restock-Empfehlungen (niedrige Lagerbestände)
+  - Pricing-Aktionen (Preisanpassungen)
+  - Steering-Empfehlungen (Marketing & Optimierung)
+  - Direkte Verlinkung zu Produkten
+
+- 🎨 **Modern Light Theme UI**: Optimierte Benutzeroberfläche
+  - Scrollbares Modal-Layout (max 90vh)
+  - Separate Scroll-Container für Details und Analyse
+  - Responsive Design mit maxHeight-Constraints
+  - Verbesserte Error-States mit Debug-Informationen
+
+#### **WooCommerce Resilience Layer**
+- ⚡ **Performance & Zuverlässigkeit**:
+  - 30s Timeout für alle WooCommerce-Requests (erhöht von 10s)
+  - 60s In-Memory Cache für API-Responses
+  - Automatische Fallbacks bei Connectivity-Issues
+  - Cache-Busting für frische Daten bei Bedarf
+
+- 🛡️ **Error Handling**:
+  - Graceful Degradation: Cached Data bei Shop-Ausfällen
+  - Detaillierte Error-Messages mit Status-Codes
+  - Debug-JSON-View für Entwickler
+  - Shop-Metrics mit Fallback-Logik
+
+### 🔧 Fixed (Bugfixes)
+
+- **Fastify Schema Serialization**: `additionalProperties: true` für WooCommerce-Felder
+- **TypeScript Compilation**: Import-Pfade und Type-Annotations korrigiert
+- **ESLint Warnings**: Unused Variables korrekt gekennzeichnet
+- **WooCommerce Service**: Credentials aus env + connection.json
+
+### 🏗️ Technical Improvements
+
+- Neue Datei: `backend/utils/woo-cache.ts` (Cache-Utility mit TTL)
+- Updated: `backend/routes/app/api/products/woocommerce.ts` (Cache-Integration)
+- Updated: `backend/routes/app/api/analytics/metrics/shop-metrics.ts` (Fallback-Logik)
+- Updated: `frontend/src/pages/ProductManagement/ProductAnalyzer.tsx` (Modal UI)
+- Updated: `frontend/src/pages/app/ProductAnalysis.tsx` (Action Board)
+
+---
+
 ## [2.1.0-ai-features] - 2025-12-11
 
 ### ✨ Added (Neue Features)
