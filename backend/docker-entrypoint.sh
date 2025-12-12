@@ -10,10 +10,10 @@ chmod 700 /app/backend /app/data /app/data/dlq 2>/dev/null || echo "[Entrypoint]
 ls -ld /app/backend /app/data /app/data/dlq
 
 
-# Sicherstellen, dass connection.json im richtigen Pfad existiert und mit Platzhaltern befüllt ist
-if [ ! -f /app/connection.json ]; then
-  echo "[Entrypoint] connection.json nicht gefunden, lege Dummy-Datei an..."
-  cat <<EOF > /app/connection.json
+
+# connection.json immer neu erzeugen (mit Platzhalterdaten)
+echo "[Entrypoint] connection.json wird immer neu erzeugt..."
+cat <<EOF > /app/connection.json
 {
   "openai": {
     "apiKey": "PLEASE_SET_YOUR_OPENAI_KEY"
@@ -25,11 +25,8 @@ if [ ! -f /app/connection.json ]; then
   }
 }
 EOF
-  chown node:node /app/connection.json 2>/dev/null || echo "[Entrypoint] Fehler beim chown connection.json!"
-  chmod 600 /app/connection.json || echo "[Entrypoint] Fehler beim chmod connection.json!"
-else
-  echo "[Entrypoint] connection.json existiert bereits."
-fi
+chown node:node /app/connection.json 2>/dev/null || echo "[Entrypoint] Fehler beim chown connection.json!"
+chmod 600 /app/connection.json || echo "[Entrypoint] Fehler beim chmod connection.json!"
 ls -l /app/connection.json
 
 echo "[Entrypoint] Skript abgeschlossen: $(date)"
