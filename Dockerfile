@@ -39,8 +39,10 @@ COPY --from=frontend-builder /app/frontend/dist ./public
 COPY healthcheck.js ./
 
 
-# Create non-root user (Debian/Ubuntu syntax)
-RUN groupadd -g 1001 nodejs && \
+
+# Tools für useradd/groupadd installieren (nur für Debian/Ubuntu nötig)
+RUN apk add --no-cache shadow && \
+  groupadd -g 1001 nodejs && \
   useradd -m -u 1001 -g nodejs nodeuser && \
   mkdir -p /app/data /app/data/dlq /app/logs /app/backend && \
   chown -R nodeuser:nodejs /app /app/data /app/logs /app/backend
