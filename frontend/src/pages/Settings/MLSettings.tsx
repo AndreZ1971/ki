@@ -80,9 +80,9 @@ export default function MLSettings() {
 
   if (loading) {
     return (
-      <div className="analytics-page">
-        <div className="analytics-header">
-          <h1>Lade ML-Konfiguration...</h1>
+      <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1a1f36 50%, #0f172a 100%)', color: '#e5e7eb' }}>
+        <div style={{ padding: '60px 40px' }}>
+          <h1 style={{ margin: 0 }}>Lade ML-Konfiguration...</h1>
         </div>
       </div>
     );
@@ -90,55 +90,78 @@ export default function MLSettings() {
 
   if (!config) {
     return (
-      <div className="analytics-page">
-        <div className="analytics-header">
-          <h1>Fehler beim Laden</h1>
+      <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1a1f36 50%, #0f172a 100%)', color: '#e5e7eb' }}>
+        <div style={{ padding: '60px 40px' }}>
+          <h1 style={{ margin: 0 }}>Fehler beim Laden</h1>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="analytics-page">
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #0f172a 0%, #1a1f36 50%, #0f172a 100%)',
+      color: '#e5e7eb',
+      paddingBottom: '40px'
+    }}>
       <button className="back-button floating-back" onClick={handleBack}>
         ← Zurück
       </button>
 
-      <div className="analytics-header">
-        <h1>Machine Learning Einstellungen</h1>
-        <p>KI-Features mit automatischen Fallbacks für deinen Shop</p>
+      <div style={{
+        background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.05))',
+        borderBottom: '1px solid rgba(255,255,255,0.1)',
+        padding: '60px 40px 40px',
+        backdropFilter: 'blur(10px)',
+        marginTop: '0'
+      }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+          <h1 style={{
+            fontSize: '42px',
+            fontWeight: 700,
+            margin: '0 0 10px',
+            background: 'linear-gradient(135deg, #60a5fa 0%, #8b5cf6 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}>
+            🧠 Machine Learning Einstellungen
+          </h1>
+          <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.88)', margin: 0 }}>
+            KI-Features mit automatischen Fallbacks für deinen Shop
+          </p>
+        </div>
       </div>
 
-      {message && (
-        <div className="analysis-section">
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '30px 20px' }}>
+        {message && (
           <div 
-            className="metric-card full-width"
             style={{
-              background: message.type === 'success' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+              background: message.type === 'success' ? 'rgba(34, 197, 94, 0.18)' : 'rgba(239, 68, 68, 0.18)',
               border: `2px solid ${message.type === 'success' ? '#22c55e' : '#ef4444'}`,
               padding: '15px',
+              borderRadius: '10px',
               marginBottom: '20px'
             }}
           >
-            <p style={{ margin: 0, fontSize: '16px' }}>{message.text}</p>
+            <p style={{ margin: 0, fontSize: '16px', color: '#e5e7eb' }}>{message.text}</p>
           </div>
-        </div>
-      )}
+        )}
 
-      <div className="analysis-section">
-        <div className="metric-card full-width">
-          <h3 style={{ marginBottom: '20px' }}>Global ML Steuerung</h3>
+        <div style={{ background: 'rgba(255,255,255,0.06)', padding: '20px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', marginBottom: '20px' }}>
+          <h3 style={{ marginBottom: '16px' }}>Global ML Steuerung</h3>
           <div style={{ 
             display: 'flex', 
             justifyContent: 'space-between', 
             alignItems: 'center',
             background: 'rgba(255,255,255,0.05)',
-            padding: '20px',
-            borderRadius: '8px',
-            border: config.enabled ? '2px solid #8b5cf6' : '2px solid rgba(255,255,255,0.1)'
+            padding: '18px',
+            borderRadius: '10px',
+            border: config.enabled ? '2px solid #8b5cf6' : '1px solid rgba(255,255,255,0.12)'
           }}>
             <div>
-              <h4 style={{ marginBottom: '5px', fontSize: '18px' }}>Machine Learning Status</h4>
+              <h4 style={{ marginBottom: '6px', fontSize: '18px' }}>Machine Learning Status</h4>
               <p style={{ color: 'rgba(255,255,255,0.7)', margin: 0 }}>
                 {config.enabled ? 'KI-Features sind aktiviert und einsatzbereit' : 'KI-Features sind deaktiviert'}
               </p>
@@ -146,7 +169,7 @@ export default function MLSettings() {
             <label style={{ display: 'flex', alignItems: 'center', gap: '15px', cursor: 'pointer' }}>
               <span style={{ 
                 fontSize: '16px', 
-                fontWeight: 'bold',
+                fontWeight: 700,
                 color: config.enabled ? '#8b5cf6' : 'rgba(255,255,255,0.5)'
               }}>
                 {config.enabled ? 'AKTIV' : 'INAKTIV'}

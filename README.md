@@ -1,32 +1,23 @@
 # 🚀 ARI - Artificial Retail Intelligence System
 
-**Version:** 3.2.0  
+**Version:** 3.6.0  
 **Status:** Production Ready ✅
 
 Ein **AI-gestütztes Business Automation System** für WooCommerce/WordPress mit 50+ spezialisierten Tools, KI-Agent und modernem Dashboard.
 
 ---
 
-## ✨ Was ist neu in Version 3.2.0?
+## ✨ Was ist neu in Version 3.6.0?
 
-### 🎯 Content Monetization Features
+### 🎨 Settings- & Dashboard-UX
 
-#### 🤖 KI-Preisvorschlag
-- Intelligente Preisempfehlungen basierend auf Produkttyp & Strategie
-- Berechnet optimales Preisbereich automatisch
-- Ein-Klick-Übernahme der Empfehlung
+- Shop-Verbindung: Deutlich höherer Kontrast (helle Inputs, klare Labels/Helper), Social-Style-Farbkacheln für alle Bereiche.
+- Hinweise über Feldern aufgehellt; lese-optimierte Karten für WordPress, WooCommerce, Reddit, E-Mail, AI/Jobs.
+- Dashboard: Light/Dark-Umschalter entfernt, fixes Light-Theme für einheitlichen Look.
 
-#### ⚡ KI-Produkttext Generator  
-- Automatische Generierung von Marketing-Texten
-- Erzeugt Headline, Body-Text und Call-to-Action
-- Powered by OpenAI GPT-4o-mini
+### ⚙️ Stabilität
 
-#### 📊 Revenue Forecast Badges
-- Live-Prognosen für Wochengewinne & Monatsumsätze
-- Basiert auf Durchschnittswerten der letzten 7 Tage
-- Automatische Echtzeit-Aktualisierung
-
-**➡️ [Vollständiger Guide: Content Monetization](./docs/CONTENT_MONETIZATION_GUIDE.md)**
+- Frontend-Builds geprüft (Vite/TS); keine weiteren Codeänderungen notwendig.
 
 ---
 

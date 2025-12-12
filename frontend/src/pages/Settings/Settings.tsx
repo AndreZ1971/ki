@@ -95,6 +95,7 @@ interface Specialization {
   price: number;
   icon: string;
   isActive: boolean;
+  image: string;
   features: string[];
 }
 
@@ -288,6 +289,7 @@ const Settings = () => {
       price: 99,
       icon: '🔒',
       isActive: true,
+      image: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g1" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%233b82f6"/%3E%3Cstop offset="100%25" stop-color="%2310b981"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g1)"/%3E%3Ccircle cx="120" cy="110" r="80" fill="rgba(255,255,255,0.16)"/%3E%3Ccircle cx="420" cy="260" r="120" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
       features: [
         'DSGVO-konforme Produkttexte',
         'EU-rechtskonforme Beschreibungen',
@@ -303,6 +305,7 @@ const Settings = () => {
       price: 149,
       icon: '✈️',
       isActive: false,
+      image: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g2" x1="0%25" y1="0%25" x2="100%25" y2="0%25"%3E%3Cstop offset="0%25" stop-color="%238b5cf6"/%3E%3Cstop offset="100%25" stop-color="%233b82f6"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g2)"/%3E%3Cpath d="M0 280 Q150 200 300 280 T600 280 V400 H0 Z" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
       features: [
         'Reisebeschreibungen',
         'Hotel & Unterkunft Marketing',
@@ -318,6 +321,7 @@ const Settings = () => {
       price: 129,
       icon: '🖨️',
       isActive: false,
+      image: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g3" x1="0%25" y1="100%25" x2="100%25" y2="0%25"%3E%3Cstop offset="0%25" stop-color="%23256f9c"/%3E%3Cstop offset="100%25" stop-color="%233b82f6"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g3)"/%3E%3Crect x="80" y="60" width="140" height="220" rx="24" fill="rgba(255,255,255,0.14)"/%3E%3Crect x="260" y="120" width="240" height="160" rx="30" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
       features: [
         'Technische Spezifikationen',
         'Material-Beschreibungen',
@@ -333,6 +337,7 @@ const Settings = () => {
       price: 119,
       icon: '👗',
       isActive: false,
+      image: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g4" x1="0%25" y1="0%25" x2="0%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%23ec4899"/%3E%3Cstop offset="100%25" stop-color="%238b5cf6"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g4)"/%3E%3Ccircle cx="180" cy="160" r="90" fill="rgba(255,255,255,0.13)"/%3E%3Ccircle cx="400" cy="260" r="130" fill="rgba(255,255,255,0.1)"/%3E%3C/svg%3E',
       features: [
         'Produkt-Styling Texte',
         'Größentabellen',
@@ -340,8 +345,106 @@ const Settings = () => {
         'Trend-Analysen',
         'Lookbook-Content'
       ]
+    },
+    {
+      id: 'beauty',
+      name: 'Beauty & Kosmetik',
+      description: 'Pflege, Make-up und Wellness-Produkte',
+      price: 109,
+      icon: '💄',
+      isActive: false,
+      image: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g5" x1="100%25" y1="0%25" x2="0%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%23f59e0b"/%3E%3Cstop offset="100%25" stop-color="%23ef4444"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g5)"/%3E%3Cpath d="M0 220 Q140 140 280 210 T600 230 V400 H0 Z" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
+      features: [
+        'INCI-konforme Beschreibungen',
+        'Hauttyp-Empfehlungen',
+        'Routine-Vorschläge',
+        'Social Media Hooks',
+        'Gift Guide Texte'
+      ]
+    },
+    {
+      id: 'sport-fitness',
+      name: 'Sport & Fitness',
+      description: 'Equipment, Wearables und Supplements',
+      price: 119,
+      icon: '🏋️',
+      isActive: false,
+      image: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g6" x1="0%25" y1="50%25" x2="100%25" y2="50%25"%3E%3Cstop offset="0%25" stop-color="%2322c55e"/%3E%3Cstop offset="100%25" stop-color="%2310b981"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g6)"/%3E%3Crect x="60" y="90" width="480" height="220" rx="48" fill="rgba(255,255,255,0.1)"/%3E%3C/svg%3E',
+      features: [
+        'Workout-Beschreibungen',
+        'Material- und Größenberatung',
+        'Zielgruppen-Tonality',
+        'PDP-SEO Optimierung',
+        'Upsell Bundles'
+      ]
+    },
+    {
+      id: 'electronics',
+      name: 'Elektronik & Gadgets',
+      description: 'Smartphones, Smart-Home und Zubehör',
+      price: 139,
+      icon: '📱',
+      isActive: false,
+      image: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g7" x1="0%25" y1="0%25" x2="100%25" y2="0%25"%3E%3Cstop offset="0%25" stop-color="%231f2937"/%3E%3Cstop offset="100%25" stop-color="%233b82f6"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g7)"/%3E%3Ccircle cx="480" cy="130" r="90" fill="rgba(255,255,255,0.1)"/%3E%3Ccircle cx="200" cy="260" r="130" fill="rgba(255,255,255,0.08)"/%3E%3C/svg%3E',
+      features: [
+        'Technische Specs',
+        'Vergleichstabellen',
+        'Warranty-Hinweise',
+        'Accessory Cross-Sell',
+        'Setup-Guides'
+      ]
+    },
+    {
+      id: 'pet-supplies',
+      name: 'Haustierbedarf',
+      description: 'Futter, Pflege und Zubehör für Haustiere',
+      price: 89,
+      icon: '🐾',
+      isActive: false,
+      image: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g8" x1="0%25" y1="100%25" x2="100%25" y2="0%25"%3E%3Cstop offset="0%25" stop-color="%23f472b6"/%3E%3Cstop offset="100%25" stop-color="%23fb7185"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g8)"/%3E%3Cpath d="M-20 260 Q180 200 320 260 T640 260 V420 H-20 Z" fill="rgba(255,255,255,0.14)"/%3E%3C/svg%3E',
+      features: [
+        'Fütterungsempfehlungen',
+        'Rasse-spezifische Hinweise',
+        'Pflege-Tipps',
+        'Abo-Modelle',
+        'Safety-Hinweise'
+      ]
+    },
+    {
+      id: 'gourmet',
+      name: 'Lebensmittel & Feinkost',
+      description: 'Delikatessen, Getränke und Meal Kits',
+      price: 99,
+      icon: '🍷',
+      isActive: false,
+      image: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g9" x1="100%25" y1="0%25" x2="0%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%23f97316"/%3E%3Cstop offset="100%25" stop-color="%23ea580c"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g9)"/%3E%3Ccircle cx="180" cy="220" r="120" fill="rgba(255,255,255,0.1)"/%3E%3Ccircle cx="420" cy="150" r="80" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
+      features: [
+        'Geschmacksprofile',
+        'Pairing-Empfehlungen',
+        'Lagerhinweise',
+        'Rezept-Ideen',
+        'Abo/Bundle Vorschläge'
+      ]
+    },
+    {
+      id: 'home-living',
+      name: 'Home & Living',
+      description: 'Möbel, Deko und Haushaltswaren',
+      price: 119,
+      icon: '🏠',
+      isActive: false,
+      image: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g10" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%236b7280"/%3E%3Cstop offset="100%25" stop-color="%239ca3af"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g10)"/%3E%3Crect x="80" y="110" width="440" height="180" rx="32" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
+      features: [
+        'Stilwelten & Looks',
+        'Material- & Pflegehinweise',
+        'Maßangaben sauber erklärt',
+        'Roomset Storytelling',
+        'Cross-Selling Sets'
+      ]
     }
   ]);
+
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
   const handleBack = () => {
     navigate('/');
@@ -369,6 +472,14 @@ const Settings = () => {
 
   const handleCredentialChange = (field: keyof ShopCredentials, value: string | number | boolean) => {
     setCredentials(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSpecializationUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    // TODO: Implement real upload/parse logic
+    console.log('📤 Spezialisierungs-Upload gestartet:', file.name);
+    setConnectionMessage(`📂 Upload gestartet: ${file.name}`);
   };
 
   const testConnection = async () => {
@@ -524,108 +635,101 @@ const Settings = () => {
   };
 
   return (
-    <div className="analytics-page">
-      {/* Floating Back Button */}
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #0f172a 0%, #1a1f36 50%, #0f172a 100%)',
+      paddingBottom: '40px',
+      color: '#e5e7eb'
+    }}>
+      {/* Floating Back Button (global style for consistency) */}
       <button className="back-button floating-back" onClick={handleBack}>
         ← Zurück
       </button>
 
-      <div className="analytics-header">
-        <h1>⚙️ Konfiguration & Einstellungen</h1>
-        <p>Shop-Verbindung, Spezialisierung und Lizenz-Verwaltung</p>
+      {/* Hero Header */}
+      <div style={{
+        background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.05))',
+        borderBottom: '1px solid rgba(255,255,255,0.1)',
+        padding: '60px 40px 40px',
+        backdropFilter: 'blur(10px)',
+        marginTop: '0'
+      }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+          <h1 style={{
+            fontSize: '42px',
+            fontWeight: '700',
+            margin: '0 0 10px',
+            background: 'linear-gradient(135deg, #60a5fa 0%, #8b5cf6 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}>
+            ⚙️ Einstellungen & Konfiguration
+          </h1>
+          <p style={{
+            fontSize: '16px',
+            color: 'rgba(255,255,255,0.88)',
+            margin: '0'
+          }}>
+            Verwalte deine Shop-Verbindung, Spezialisierungen und Integrationen
+          </p>
+        </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="analysis-section">
-        <div className="metric-card full-width">
-          <div className="tab-navigation" style={{ 
-            display: 'flex', 
-            gap: '10px', 
-            marginBottom: '30px',
-            borderBottom: '2px solid rgba(255,255,255,0.1)',
-            paddingBottom: '10px'
-          }}>
+      {/* Main Content */}
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '40px 20px' }}>
+        {/* Tab Navigation */}
+        <div style={{
+          display: 'flex',
+          gap: '12px',
+          marginBottom: '40px',
+          flexWrap: 'wrap'
+        }}>
+          {[
+            { id: 'connection', label: '🔌 Shop-Verbindung', color: '#3b82f6' },
+            { id: 'specialization', label: '🎯 Spezialisierung', color: '#8b5cf6' },
+            { id: 'license', label: '🔑 Lizenz', color: '#10b981' },
+            { id: 'social', label: '📱 Social Media', color: '#f59e0b' }
+          ].map((tab) => (
             <button
-              onClick={() => setActiveTab('connection')}
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
               style={{
                 padding: '12px 24px',
-                background: activeTab === 'connection' ? 'rgba(59, 130, 246, 0.3)' : 'transparent',
-                border: activeTab === 'connection' ? '2px solid #3b82f6' : '2px solid transparent',
-                borderRadius: '8px',
-                color: 'white',
+                background: activeTab === tab.id ? `${tab.color}20` : 'transparent',
+                border: activeTab === tab.id ? `2px solid ${tab.color}` : '2px solid rgba(255,255,255,0.1)',
+                borderRadius: '20px',
+                color: activeTab === tab.id ? tab.color : 'rgba(255,255,255,0.7)',
                 cursor: 'pointer',
-                fontSize: '16px',
-                fontWeight: activeTab === 'connection' ? 'bold' : 'normal',
-                transition: 'all 0.3s ease'
+                fontSize: '15px',
+                fontWeight: activeTab === tab.id ? '600' : '500',
+                transition: 'all 0.3s ease',
+                backdropFilter: 'blur(10px)'
               }}
             >
-              🔌 Shop-Verbindung
+              {tab.label}
             </button>
-            <button
-              onClick={() => setActiveTab('specialization')}
-              style={{
-                padding: '12px 24px',
-                background: activeTab === 'specialization' ? 'rgba(59, 130, 246, 0.3)' : 'transparent',
-                border: activeTab === 'specialization' ? '2px solid #3b82f6' : '2px solid transparent',
-                borderRadius: '8px',
-                color: 'white',
-                cursor: 'pointer',
-                fontSize: '16px',
-                fontWeight: activeTab === 'specialization' ? 'bold' : 'normal',
-                transition: 'all 0.3s ease'
-              }}
-            >
-              🎯 Spezialisierung
-            </button>
-            <button
-              onClick={() => setActiveTab('license')}
-              style={{
-                padding: '12px 24px',
-                background: activeTab === 'license' ? 'rgba(59, 130, 246, 0.3)' : 'transparent',
-                border: activeTab === 'license' ? '2px solid #3b82f6' : '2px solid transparent',
-                borderRadius: '8px',
-                color: 'white',
-                cursor: 'pointer',
-                fontSize: '16px',
-                fontWeight: activeTab === 'license' ? 'bold' : 'normal',
-                transition: 'all 0.3s ease'
-              }}
-            >
-              🔑 Lizenz
-            </button>
-            <button
-              onClick={() => setActiveTab('social')}
-              style={{
-                padding: '12px 24px',
-                background: activeTab === 'social' ? 'rgba(59, 130, 246, 0.3)' : 'transparent',
-                border: activeTab === 'social' ? '2px solid #3b82f6' : '2px solid transparent',
-                borderRadius: '8px',
-                color: 'white',
-                cursor: 'pointer',
-                fontSize: '16px',
-                fontWeight: activeTab === 'social' ? 'bold' : 'normal',
-                transition: 'all 0.3s ease'
-              }}
-            >
-              📱 Social Media
-            </button>
-            <button
-              onClick={() => navigate('/settings/ml')}
-              style={{
-                padding: '12px 24px',
-                background: 'rgba(139, 92, 246, 0.2)',
-                border: '2px solid #8b5cf6',
-                borderRadius: '8px',
-                color: 'white',
-                cursor: 'pointer',
-                fontSize: '16px',
-                fontWeight: 'bold',
-                transition: 'all 0.3s ease'
-              }}
-            >
-              🧠 Machine Learning
-            </button>
-          </div>
+          ))}
+          
+          <button
+            onClick={() => navigate('/settings/ml')}
+            style={{
+              padding: '12px 24px',
+              background: '#8b5cf620',
+              border: '2px solid #8b5cf6',
+              borderRadius: '20px',
+              color: '#8b5cf6',
+              cursor: 'pointer',
+              fontSize: '15px',
+              fontWeight: '600',
+              transition: 'all 0.3s ease',
+              backdropFilter: 'blur(10px)',
+              marginLeft: 'auto'
+            }}
+          >
+            🧠 Machine Learning
+          </button>
+        </div>
 
           {/* TAB 1: Shop-Verbindung */}
           {activeTab === 'connection' && (
@@ -639,7 +743,7 @@ const Settings = () => {
               {!loading && (
                 <>
                   <h3>🔌 Shop-Verbindung einrichten</h3>
-                  <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '30px' }}>
+                  <p style={{ color: 'rgba(255,255,255,0.9)', marginBottom: '30px' }}>
                     Verbinde dein WooCommerce/WordPress Shop mit dem AI-Agent
                   </p>
 
@@ -671,11 +775,11 @@ const Settings = () => {
 
                   <div style={{ display: 'grid', gap: '20px', marginBottom: '30px' }}>
                 {/* WordPress Credentials */}
-                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
+                <div style={{ background: 'rgba(59, 130, 246, 0.12)', padding: '20px', borderRadius: '12px', border: '2px solid rgba(59, 130, 246, 0.35)' }}>
                   <h4 style={{ marginBottom: '15px' }}>📝 WordPress Zugangsdaten</h4>
                   
                   <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: '#ffffff' }}>
                       WordPress URL:
                     </label>
                     <input
@@ -686,17 +790,17 @@ const Settings = () => {
                       style={{
                         width: '100%',
                         padding: '12px',
-                        background: 'rgba(0,0,0,0.3)',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        borderRadius: '6px',
-                        color: 'white',
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.35)',
+                        borderRadius: '8px',
+                        color: '#f8fafc',
                         fontSize: '14px'
                       }}
                     />
                   </div>
 
                   <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: '#ffffff' }}>
                       Username/Email:
                     </label>
                     <input
@@ -707,17 +811,17 @@ const Settings = () => {
                       style={{
                         width: '100%',
                         padding: '12px',
-                        background: 'rgba(0,0,0,0.3)',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        borderRadius: '6px',
-                        color: 'white',
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.35)',
+                        borderRadius: '8px',
+                        color: '#f8fafc',
                         fontSize: '14px'
                       }}
                     />
                   </div>
 
                   <div>
-                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: '#ffffff' }}>
                       Application Password:
                     </label>
                     <input
@@ -728,25 +832,25 @@ const Settings = () => {
                       style={{
                         width: '100%',
                         padding: '12px',
-                        background: 'rgba(0,0,0,0.3)',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        borderRadius: '6px',
-                        color: 'white',
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.35)',
+                        borderRadius: '8px',
+                        color: '#f8fafc',
                         fontSize: '14px'
                       }}
                     />
-                    <small style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>
+                    <small style={{ color: 'rgba(255,255,255,0.85)', fontSize: '12px' }}>
                       💡 Erstelle ein Application Password in WordPress unter Benutzer → Profil
                     </small>
                   </div>
                 </div>
 
                 {/* WooCommerce Credentials */}
-                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
+                <div style={{ background: 'rgba(139, 92, 246, 0.12)', padding: '20px', borderRadius: '12px', border: '2px solid rgba(139, 92, 246, 0.35)' }}>
                   <h4 style={{ marginBottom: '15px' }}>🛒 WooCommerce API Keys</h4>
                   
                   <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: '#ffffff' }}>
                       WooCommerce API URL:
                     </label>
                     <input
@@ -757,17 +861,17 @@ const Settings = () => {
                       style={{
                         width: '100%',
                         padding: '12px',
-                        background: 'rgba(0,0,0,0.3)',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        borderRadius: '6px',
-                        color: 'white',
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.35)',
+                        borderRadius: '8px',
+                        color: '#f8fafc',
                         fontSize: '14px'
                       }}
                     />
                   </div>
 
                   <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: '#ffffff' }}>
                       Consumer Key:
                     </label>
                     <input
@@ -778,17 +882,17 @@ const Settings = () => {
                       style={{
                         width: '100%',
                         padding: '12px',
-                        background: 'rgba(0,0,0,0.3)',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        borderRadius: '6px',
-                        color: 'white',
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.35)',
+                        borderRadius: '8px',
+                        color: '#f8fafc',
                         fontSize: '14px'
                       }}
                     />
                   </div>
 
                   <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: '#ffffff' }}>
                       Consumer Secret:
                     </label>
                     <input
@@ -799,21 +903,21 @@ const Settings = () => {
                       style={{
                         width: '100%',
                         padding: '12px',
-                        background: 'rgba(0,0,0,0.3)',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        borderRadius: '6px',
-                        color: 'white',
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.35)',
+                        borderRadius: '8px',
+                        color: '#f8fafc',
                         fontSize: '14px'
                       }}
                     />
-                    <small style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>
+                    <small style={{ color: 'rgba(255,255,255,0.85)', fontSize: '12px' }}>
                       💡 Erstelle API-Keys in WooCommerce → Einstellungen → Erweitert → REST API
                     </small>
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                     <div>
-                      <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                      <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.94)' }}>
                         Auth Mode:
                       </label>
                       <select
@@ -822,10 +926,10 @@ const Settings = () => {
                         style={{
                           width: '100%',
                           padding: '12px',
-                          background: 'rgba(0,0,0,0.3)',
-                          border: '1px solid rgba(255,255,255,0.2)',
-                          borderRadius: '6px',
-                          color: 'white',
+                          background: 'rgba(255,255,255,0.08)',
+                          border: '1px solid rgba(255,255,255,0.35)',
+                          borderRadius: '8px',
+                          color: '#f8fafc',
                           fontSize: '14px'
                         }}
                       >
@@ -835,7 +939,7 @@ const Settings = () => {
                     </div>
 
                     <div>
-                      <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                      <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.94)' }}>
                         Timeout (ms):
                       </label>
                       <input
@@ -845,10 +949,10 @@ const Settings = () => {
                         style={{
                           width: '100%',
                           padding: '12px',
-                          background: 'rgba(0,0,0,0.3)',
-                          border: '1px solid rgba(255,255,255,0.2)',
-                          borderRadius: '6px',
-                          color: 'white',
+                          background: 'rgba(255,255,255,0.08)',
+                          border: '1px solid rgba(255,255,255,0.35)',
+                          borderRadius: '8px',
+                          color: '#f8fafc',
                           fontSize: '14px'
                         }}
                       />
@@ -857,10 +961,10 @@ const Settings = () => {
                 </div>
 
                 {/* Reddit Credentials */}
-                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
+                <div style={{ background: 'rgba(234, 88, 12, 0.12)', padding: '20px', borderRadius: '12px', border: '2px solid rgba(234, 88, 12, 0.35)' }}>
                   <h4 style={{ marginBottom: '15px' }}>👽 Reddit API</h4>
                   <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.94)' }}>
                       Reddit Client ID:
                     </label>
                     <input
@@ -868,11 +972,11 @@ const Settings = () => {
                       placeholder="Reddit Client ID"
                       value={credentials.redditClientId || ''}
                       onChange={(e) => handleCredentialChange('redditClientId', e.target.value)}
-                      style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
+                      style={{ width: '100%', padding: '12px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.35)', borderRadius: '8px', color: '#f8fafc', fontSize: '14px' }}
                     />
                   </div>
                   <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.94)' }}>
                       Reddit Client Secret:
                     </label>
                     <input
@@ -880,16 +984,16 @@ const Settings = () => {
                       placeholder="Reddit Client Secret"
                       value={credentials.redditClientSecret || ''}
                       onChange={(e) => handleCredentialChange('redditClientSecret', e.target.value)}
-                      style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
+                      style={{ width: '100%', padding: '12px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.35)', borderRadius: '8px', color: '#f8fafc', fontSize: '14px' }}
                     />
                   </div>
                 </div>
 
                 {/* E-Mail Konfiguration */}
-                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
+                <div style={{ background: 'rgba(13, 148, 136, 0.12)', padding: '20px', borderRadius: '12px', border: '2px solid rgba(13, 148, 136, 0.35)' }}>
                   <h4 style={{ marginBottom: '15px' }}>📧 E-Mail Konfiguration</h4>
                   <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.94)' }}>
                       SMTP Host:
                     </label>
                     <input
@@ -897,11 +1001,11 @@ const Settings = () => {
                       placeholder="SMTP Host"
                       value={credentials.smtpHost || ''}
                       onChange={(e) => handleCredentialChange('smtpHost', e.target.value)}
-                      style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
+                      style={{ width: '100%', padding: '12px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.35)', borderRadius: '8px', color: '#f8fafc', fontSize: '14px' }}
                     />
                   </div>
                   <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.94)' }}>
                       SMTP Port:
                     </label>
                     <input
@@ -909,24 +1013,24 @@ const Settings = () => {
                       placeholder="465"
                       value={credentials.smtpPort ?? 0}
                       onChange={(e) => handleCredentialChange('smtpPort', Number(e.target.value) || 0)}
-                      style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
+                      style={{ width: '100%', padding: '12px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.35)', borderRadius: '8px', color: '#f8fafc', fontSize: '14px' }}
                     />
                   </div>
                   <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.94)' }}>
                       SMTP Secure:
                     </label>
                     <select
                       value={credentials.smtpSecure ? 'true' : 'false'}
                       onChange={(e) => handleCredentialChange('smtpSecure', e.target.value === 'true')}
-                      style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
+                      style={{ width: '100%', padding: '12px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.35)', borderRadius: '8px', color: '#f8fafc', fontSize: '14px' }}
                     >
                       <option value="true">True</option>
                       <option value="false">False</option>
                     </select>
                   </div>
                   <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.94)' }}>
                       SMTP User:
                     </label>
                     <input
@@ -934,11 +1038,11 @@ const Settings = () => {
                       placeholder="info@kaufe-es.eu"
                       value={credentials.smtpUser || ''}
                       onChange={(e) => handleCredentialChange('smtpUser', e.target.value)}
-                      style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
+                      style={{ width: '100%', padding: '12px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.35)', borderRadius: '8px', color: '#f8fafc', fontSize: '14px' }}
                     />
                   </div>
                   <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.94)' }}>
                       SMTP Password:
                     </label>
                     <input
@@ -946,11 +1050,11 @@ const Settings = () => {
                       placeholder="SMTP Passwort"
                       value={credentials.smtpPassword || ''}
                       onChange={(e) => handleCredentialChange('smtpPassword', e.target.value)}
-                      style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
+                      style={{ width: '100%', padding: '12px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.35)', borderRadius: '8px', color: '#f8fafc', fontSize: '14px' }}
                     />
                   </div>
                   <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.94)' }}>
                       SMTP From:
                     </label>
                     <input
@@ -958,17 +1062,17 @@ const Settings = () => {
                       placeholder="info@kaufe-es.eu"
                       value={credentials.smtpFrom || ''}
                       onChange={(e) => handleCredentialChange('smtpFrom', e.target.value)}
-                      style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', color: 'white', fontSize: '14px' }}
+                      style={{ width: '100%', padding: '12px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.35)', borderRadius: '8px', color: '#f8fafc', fontSize: '14px' }}
                     />
                   </div>
                 </div>
 
                 {/* AI & Services Configuration */}
-                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
+                <div style={{ background: 'rgba(99, 102, 241, 0.12)', padding: '20px', borderRadius: '12px', border: '2px solid rgba(99, 102, 241, 0.35)' }}>
                   <h4 style={{ marginBottom: '15px' }}>🤖 AI & Services</h4>
                   
                   <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.94)' }}>
                       OpenAI API Key:
                     </label>
                     <input
@@ -979,20 +1083,20 @@ const Settings = () => {
                       style={{
                         width: '100%',
                         padding: '12px',
-                        background: 'rgba(0,0,0,0.3)',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        borderRadius: '6px',
-                        color: 'white',
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.35)',
+                        borderRadius: '8px',
+                        color: '#f8fafc',
                         fontSize: '14px'
                       }}
                     />
-                    <small style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>
+                    <small style={{ color: 'rgba(255,255,255,0.85)', fontSize: '12px' }}>
                       💡 Benötigt für AI-Features (Content-Generierung, Optimierung, etc.)
                     </small>
                   </div>
 
                   <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.94)' }}>
                       OpenAI Model:
                     </label>
                     <select
@@ -1001,10 +1105,10 @@ const Settings = () => {
                       style={{
                         width: '100%',
                         padding: '12px',
-                        background: 'rgba(0,0,0,0.3)',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        borderRadius: '6px',
-                        color: 'white',
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.35)',
+                        borderRadius: '8px',
+                        color: '#f8fafc',
                         fontSize: '14px'
                       }}
                     >
@@ -1018,11 +1122,11 @@ const Settings = () => {
                 </div>
 
                 {/* Job Configuration */}
-                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
+                <div style={{ background: 'rgba(34, 197, 94, 0.12)', padding: '20px', borderRadius: '12px', border: '2px solid rgba(34, 197, 94, 0.35)' }}>
                   <h4 style={{ marginBottom: '15px' }}>⚙️ Job-Konfiguration</h4>
                   
                   <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.94)' }}>
                       Job Mode:
                     </label>
                     <select
@@ -1031,23 +1135,23 @@ const Settings = () => {
                       style={{
                         width: '100%',
                         padding: '12px',
-                        background: 'rgba(0,0,0,0.3)',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        borderRadius: '6px',
-                        color: 'white',
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.35)',
+                        borderRadius: '8px',
+                        color: '#f8fafc',
                         fontSize: '14px'
                       }}
                     >
                       <option value="once">Einmalig (Once)</option>
                       <option value="interval">Intervall (Wiederkehrend)</option>
                     </select>
-                    <small style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>
+                    <small style={{ color: 'rgba(255,255,255,0.85)', fontSize: '12px' }}>
                       💡 Legt fest, ob Jobs einmalig oder wiederkehrend ausgeführt werden
                     </small>
                   </div>
 
                   <div>
-                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.8)' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.94)' }}>
                       Job Intervall (ms):
                     </label>
                     <input
@@ -1057,21 +1161,21 @@ const Settings = () => {
                       style={{
                         width: '100%',
                         padding: '12px',
-                        background: 'rgba(0,0,0,0.3)',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        borderRadius: '6px',
-                        color: 'white',
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.35)',
+                        borderRadius: '8px',
+                        color: '#f8fafc',
                         fontSize: '14px'
                       }}
                     />
-                    <small style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>
+                    <small style={{ color: 'rgba(255,255,255,0.85)', fontSize: '12px' }}>
                       💡 Standard: 900000ms (15 Minuten) - Nur relevant bei "Intervall"-Modus
                     </small>
                   </div>
                 </div>
 
                 {/* Feature Toggles */}
-                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px' }}>
+                <div style={{ background: 'rgba(255,255,255,0.12)', padding: '20px', borderRadius: '8px' }}>
                   <h4 style={{ marginBottom: '15px' }}>🎛️ Feature-Aktivierung</h4>
                   
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -1216,99 +1320,154 @@ const Settings = () => {
           {activeTab === 'specialization' && (
             <div>
               <h3>🎯 Agent-Spezialisierung wählen</h3>
-              <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '30px' }}>
+              <p style={{ color: 'rgba(255,255,255,0.9)', marginBottom: '30px' }}>
                 Wähle eine Branche, um den AI-Agent optimal auf deine Produkte zu trainieren
               </p>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(220px, 1fr))', gap: '18px' }}>
                 {specializations.map((spec) => (
                   <div
                     key={spec.id}
-                    style={{
-                      background: spec.isActive 
-                        ? 'linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.05))'
-                        : 'rgba(255,255,255,0.05)',
-                      border: spec.isActive ? '2px solid #22c55e' : '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '12px',
-                      padding: '24px',
-                      position: 'relative',
-                      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                      cursor: 'pointer'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-5px)';
-                      e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.3)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
+                    style={{ perspective: '1200px', height: '280px' }}
+                    onMouseEnter={() => setHoveredCard(spec.id)}
+                    onMouseLeave={() => setHoveredCard(null)}
                   >
-                    {spec.isActive && (
-                      <div style={{
-                        position: 'absolute',
-                        top: '10px',
-                        right: '10px',
-                        background: '#22c55e',
-                        color: 'white',
-                        padding: '4px 12px',
-                        borderRadius: '20px',
-                        fontSize: '12px',
-                        fontWeight: 'bold'
-                      }}>
-                        ✓ AKTIV
-                      </div>
-                    )}
-
-                    <div style={{ fontSize: '48px', marginBottom: '15px' }}>{spec.icon}</div>
-                    <h4 style={{ marginBottom: '10px', fontSize: '20px' }}>{spec.name}</h4>
-                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', marginBottom: '20px' }}>
-                      {spec.description}
-                    </p>
-
-                    <div style={{ marginBottom: '20px' }}>
-                      <strong style={{ color: 'rgba(255,255,255,0.9)', fontSize: '14px' }}>Features:</strong>
-                      <ul style={{ 
-                        marginTop: '10px', 
-                        paddingLeft: '20px', 
-                        fontSize: '13px',
-                        color: 'rgba(255,255,255,0.7)'
-                      }}>
-                        {spec.features.map((feature, idx) => (
-                          <li key={idx} style={{ marginBottom: '5px' }}>✓ {feature}</li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <div style={{ 
-                      display: 'flex', 
-                      justifyContent: 'space-between', 
-                      alignItems: 'center',
-                      marginTop: 'auto'
-                    }}>
-                      <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#3b82f6' }}>
-                        {spec.price}€
-                      </div>
-                      {!spec.isActive && (
-                        <button
-                          onClick={() => purchaseSpecialization(spec)}
-                          style={{
-                            padding: '10px 20px',
-                            background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
-                            border: 'none',
-                            borderRadius: '8px',
-                            color: 'white',
-                            cursor: 'pointer',
-                            fontSize: '14px',
-                            fontWeight: 'bold'
-                          }}
-                        >
-                          🛒 Jetzt kaufen
-                        </button>
+                    <div
+                      style={{
+                        position: 'relative',
+                        width: '100%',
+                        height: '100%',
+                        borderRadius: '14px',
+                        transformStyle: 'preserve-3d',
+                        transition: 'transform 0.6s ease',
+                        boxShadow: hoveredCard === spec.id ? '0 18px 40px rgba(0,0,0,0.45)' : '0 10px 25px rgba(0,0,0,0.2)',
+                        transform: hoveredCard === spec.id ? 'rotateY(180deg)' : 'rotateY(0deg)'
+                      }}
+                    >
+                      {spec.isActive && (
+                        <div style={{
+                          position: 'absolute',
+                          top: '12px',
+                          right: '12px',
+                          background: '#22c55e',
+                          color: 'white',
+                          padding: '6px 12px',
+                          borderRadius: '999px',
+                          fontSize: '12px',
+                          fontWeight: 700,
+                          zIndex: 3
+                        }}>
+                          ✓ AKTIV
+                        </div>
                       )}
+
+                      {/* Front */}
+                      <div
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          backfaceVisibility: 'hidden',
+                          borderRadius: '14px',
+                          overflow: 'hidden',
+                          backgroundImage: `linear-gradient(120deg, rgba(0,0,0,0.35), rgba(0,0,0,0.05)), url(${spec.image})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                          display: 'flex',
+                          alignItems: 'flex-end'
+                        }}
+                      >
+                        <div style={{
+                          width: '100%',
+                          padding: '18px',
+                          background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 100%)'
+                        }}>
+                          <div style={{ fontSize: '36px', marginBottom: '6px' }}>{spec.icon}</div>
+                          <h4 style={{ margin: 0, fontSize: '18px', color: 'white' }}>{spec.name}</h4>
+                        </div>
+                      </div>
+
+                      {/* Back */}
+                      <div
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          backfaceVisibility: 'hidden',
+                          transform: 'rotateY(180deg)',
+                          borderRadius: '14px',
+                          background: 'rgba(15, 23, 42, 0.92)',
+                          border: spec.isActive ? '2px solid #22c55e' : '1px solid rgba(255,255,255,0.12)',
+                          padding: '18px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '10px'
+                        }}
+                      >
+                        <h4 style={{ margin: 0, fontSize: '18px', color: 'white' }}>{spec.name}</h4>
+                        <p style={{ color: 'rgba(255,255,255,0.82)', fontSize: '14px', margin: 0 }}>
+                          {spec.description}
+                        </p>
+                        <ul style={{
+                          margin: '0',
+                          paddingLeft: '18px',
+                          color: 'rgba(255,255,255,0.75)',
+                          fontSize: '13px',
+                          lineHeight: 1.5
+                        }}>
+                          {spec.features.slice(0, 3).map((feature, idx) => (
+                            <li key={idx}>✓ {feature}</li>
+                          ))}
+                        </ul>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
+                          <span style={{ fontSize: '22px', fontWeight: 700, color: '#3b82f6' }}>{spec.price}€</span>
+                          {!spec.isActive && (
+                            <button
+                              onClick={() => purchaseSpecialization(spec)}
+                              style={{
+                                padding: '10px 16px',
+                                background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                                border: 'none',
+                                borderRadius: '8px',
+                                color: 'white',
+                                cursor: 'pointer',
+                                fontSize: '13px',
+                                fontWeight: 700
+                              }}
+                            >
+                              🛒 Aktivieren
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
+              </div>
+
+              {/* Upload Routine unter den Kacheln */}
+              <div style={{
+                marginTop: '28px',
+                padding: '16px',
+                borderRadius: '12px',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px dashed rgba(255,255,255,0.2)'
+              }}>
+                <h4 style={{ margin: '0 0 10px 0' }}>📂 Upload für Trainingsdaten</h4>
+                <p style={{ margin: '0 0 12px 0', color: 'rgba(255,255,255,0.8)' }}>
+                  Lade Produkt- oder Content-Daten hoch, damit die gewählte Spezialisierung schneller trainiert wird.
+                </p>
+                <label style={{
+                  display: 'inline-block',
+                  padding: '12px 20px',
+                  background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                  color: 'white',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontWeight: 700,
+                  border: 'none'
+                }}>
+                  Datei wählen (CSV/JSON)
+                  <input type="file" accept=".json,.csv" onChange={handleSpecializationUpload} style={{ display: 'none' }} />
+                </label>
               </div>
             </div>
           )}
@@ -1317,11 +1476,11 @@ const Settings = () => {
           {activeTab === 'license' && (
             <div>
               <h3>🔑 Lizenz-Verwaltung</h3>
-              <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '30px' }}>
+              <p style={{ color: 'rgba(255,255,255,0.9)', marginBottom: '30px' }}>
                 Aktiviere deine gekaufte Spezialisierung mit einem Lizenzschlüssel
               </p>
 
-              <div style={{ background: 'rgba(255,255,255,0.05)', padding: '30px', borderRadius: '12px', maxWidth: '600px' }}>
+              <div style={{ background: 'rgba(255,255,255,0.12)', padding: '30px', borderRadius: '12px', maxWidth: '600px' }}>
                 <div style={{ marginBottom: '20px' }}>
                   <label style={{ display: 'block', marginBottom: '10px', color: 'rgba(255,255,255,0.9)', fontSize: '16px' }}>
                     Lizenzschlüssel eingeben:
@@ -1406,7 +1565,7 @@ const Settings = () => {
           {activeTab === 'social' && (
             <div>
               <h3>📱 Social Media Konten verbinden</h3>
-              <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '30px' }}>
+              <p style={{ color: 'rgba(255,255,255,0.9)', marginBottom: '30px' }}>
                 Verbinde deine Social-Media-Konten, um KI-generierte Posts direkt zu veröffentlichen
               </p>
 
@@ -1831,7 +1990,6 @@ const Settings = () => {
           )}
         </div>
       </div>
-    </div>
   );
 };
 

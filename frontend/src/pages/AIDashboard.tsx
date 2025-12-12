@@ -8,7 +8,6 @@ import { FloatingChatbot } from '../components/FloatingChatbot';
 import './AIDashboard.css';
 
 const AIDashboard: React.FC = () => {
-  const [isDark, setIsDark] = useState(false);
   const [metrics, setMetrics] = useState({
     sales: 0,
     orders: 0,
@@ -615,7 +614,7 @@ const AIDashboard: React.FC = () => {
   // LOADING COMPONENT
   if (loading) {
     return (
-      <div className={`dashboard ${isDark ? 'dark-theme' : 'light-theme'}`}>
+      <div className="dashboard light-theme">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -649,7 +648,7 @@ const AIDashboard: React.FC = () => {
   }
 
   return (
-    <div className={`dashboard ${isDark ? 'dark-theme' : 'light-theme'}`}>
+    <div className="dashboard light-theme">
       <motion.header 
         className="App-header"
         initial={{ opacity: 0, y: -50 }}
@@ -695,24 +694,6 @@ const AIDashboard: React.FC = () => {
               }}
             >
               ⚙️ Settings
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setIsDark(!isDark)}
-              className="theme-toggle"
-              style={{
-                padding: '8px 16px',
-                background: 'rgba(255,255,255,0.1)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '500'
-              }}
-            >
-              {isDark ? '🌙 Dark' : '☀️ Light'}
             </motion.button>
           </div>
         </div>

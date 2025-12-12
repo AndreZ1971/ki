@@ -2,6 +2,13 @@
 
 # Update-Planung: Settings-UI & Konfigurationsmanagement
 
+## Stand 12.12.2025
+
+- Shop-Verbindung Tab überarbeitet: höherer Kontrast, helle Eingabeflächen, Social-Style-Kartenfarben je Abschnitt.
+- Hinweis-Texte aufgehellt (WordPress/WooCommerce/AI/Job), einheitliche Lesbarkeit.
+- Dashboard: Light/Dark-Umschalter entfernt, festes Light-Theme für konsistenten Header.
+- Frontend-Build geprüft (Vite/TS) nach UI-Anpassungen.
+
 ## Geplante Features
 
 ### 1. Download der aktuellen Konfiguration

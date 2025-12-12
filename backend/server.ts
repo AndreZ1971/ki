@@ -48,6 +48,9 @@ import conversionRoutesMarketing from './routes/app/api/marketing/conversion-rou
 import contentRoutes from './routes/app/api/marketing/content-routes';
 import mlMarketingRoutes from './routes/app/api/marketing/ml-marketing';
 import { emailEnhancementRoutes } from './routes/app/api/marketing/email-enhancement';
+
+// 🔥 SPECIALIZATIONS ROUTES
+import specializationRoutes from './routes/app/api/specializations';
 // Entfernt: blogpostRoutes (ungenutz)
 import imageAnalysisRoutes from './routes/app/api/marketing/image-analysis-routes';
 
@@ -372,6 +375,10 @@ async function buildServer() {
     // 🔥 EMAIL ENHANCEMENT ROUTES (Smart Subject Lines, Segmentation, etc.)
     await server.register(emailEnhancementRoutes, { prefix: '/api/marketing/email-enhancement' });
     console.log('✅ Email Enhancement Routes erfolgreich registriert');
+
+    // 🔥 SPECIALIZATIONS ROUTES (Upload, Manage, Activate)
+    await server.register(specializationRoutes);
+    console.log('✅ Specialization Routes erfolgreich registriert');
 
     // 🔥 SOCIAL MEDIA ROUTES (OAuth + Posting)
     await server.register(oauthRoutes, { prefix: '/api' }); // OAuth endpoints like /api/auth/facebook
