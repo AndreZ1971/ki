@@ -1,18 +1,19 @@
 #!/bin/sh
 set -e
 
-echo "[Entrypoint] Starte Skript: $(date)"
-echo "[Entrypoint] Versuche Verzeichnisse anzulegen und Rechte zu setzen..."
-mkdir -p /app/backend || echo "[Entrypoint] Fehler beim Anlegen von /app/backend!"
-mkdir -p /app/data/dlq || echo "[Entrypoint] Fehler beim Anlegen von /app/data/dlq!"
-chown -R node:node /app/backend /app/data 2>/dev/null || echo "[Entrypoint] Fehler beim chown!"
-chmod 700 /app/backend /app/data /app/data/dlq 2>/dev/null || echo "[Entrypoint] Fehler beim chmod!"
-ls -ld /app/backend /app/data /app/data/dlq
+echo "[Entrypoint] Starte A.R.I. Backend Container: $(date)"
+echo "[Entrypoint] Benutzer: $(id -un) UID: $(id -u) GID: $(id -g)"
 
+# 1. Verzeichnisse erstellen
+echo "[Entrypoint] Erstelle benötigte Verzeichnisse..."
+mkdir -p /app/data/dlq /app/logs 2>/dev/null || true
 
+# 2. Rechte setzen
+echo "[Entrypoint] Setze korrekte Rechte..."
+chown -R nodeuser:nodejs /app/data /app/logs 2>/dev/null || echo "[Entrypoint] Hinweis: Rechte bereits korrekt"
 
-# connection.json immer neu erzeugen (mit Platzhalterdaten)
-echo "[Entrypoint] connection.json wird immer neu erzeugt..."
+# 3. connection.json IMMER neu erstellen (für frisches Onboarding)
+echo "[Entrypoint] Erstelle frische connection.json mit Platzhaltern..."
 cat <<EOF > /app/connection.json
 {
   "openai": {
@@ -25,11 +26,19 @@ cat <<EOF > /app/connection.json
   }
 }
 EOF
-chown node:node /app/connection.json 2>/dev/null || echo "[Entrypoint] Fehler beim chown connection.json!"
-chmod 600 /app/connection.json || echo "[Entrypoint] Fehler beim chmod connection.json!"
-ls -l /app/connection.json
 
-echo "[Entrypoint] Skript abgeschlossen: $(date)"
+# 4. Rechte für connection.json (Schreibzugriff für Onboarding)
+chown nodeuser:nodejs /app/connection.json
+chmod 600 /app/connection.json
 
+# 5. Verifizierung
+echo "[Entrypoint] Verifiziere Setup:"
+ls -la /app/connection.json
+ls -ld /app/data /app/logs
+echo "[Entrypoint] Backend Dateien: $(ls -la /app/dist/ | wc -l)"
+
+echo "[Entrypoint] ✅ A.R.I. Backend Container bereit!"
+echo "[Entrypoint] 🔗 API unter Port 3000 verfügbar"
+echo "[Entrypoint] 📝 Nginx (Frontend) wird auf User-Actions warten"
 
 exec "$@"
