@@ -1,0 +1,314 @@
+Dockerfile (Root - für Backend)
+
+# ===========================
+# Dockerfile für Backend (woo-app)
+# Frontend wird separat gebaut und via nginx geserved
+# ===========================
+
+# Stage 1: Build Backend
+FROM node:20-alpine AS builder
+WORKDIR /app/backend
+COPY backend/package*.json ./
+RUN npm ci --only=production --ignore-scripts
+COPY backend/ ./
+RUN npm run build
+
+# Stage 2: Production Image
+FROM node:20-alpine
+WORKDIR /app
+
+# HUSKY deaktivieren
+ENV HUSKY=0
+
+# 1. Backend Dependencies installieren
+COPY --from=builder /app/backend/package*.json ./
+RUN npm ci --only=production --ignore-scripts
+
+# 2. Gebautes Backend kopieren
+COPY --from=builder /app/backend/dist ./dist
+
+# 3. Healthcheck
+COPY backend/healthcheck.js ./
+
+# 4. Non-root User erstellen
+RUN addgroup -g 1001 nodejs && \
+    adduser -u 1001 -S nodeuser -G nodejs && \
+    mkdir -p /app/data /app/data/dlq /app/logs && \
+    chown -R nodeuser:nodejs /app
+
+# 5. connection.json mit Platzhaltern (für Onboarding)
+RUN echo '{"openai":{"apiKey":"PLEASE_SET_YOUR_OPENAI_KEY"},"woocommerce":{"url":"PLEASE_SET_WOOCOMMERCE_URL","consumerKey":"PLEASE_SET_WOOCOMMERCE_KEY","consumerSecret":"PLEASE_SET_WOOCOMMERCE_SECRET"}}' > /app/connection.json && \
+    chown nodeuser:nodejs /app/connection.json && \
+    chmod 600 /app/connection.json
+
+# 6. Entrypoint-Skript kopieren
+COPY --chown=nodeuser:nodejs --chmod=755 docker-entrypoint.sh /usr/local/bin/
+
+USER nodeuser
+EXPOSE 3000
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["node", "dist/server.js"]
+
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+frontend/Dockerfile (für nginx Container)
+
+
+# ===========================
+# Dockerfile für Frontend (nginx)
+# ===========================
+
+# Stage 1: Build Frontend
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY frontend/package*.json ./
+RUN npm ci --only=production
+COPY frontend/ ./
+RUN npm run build
+
+# Stage 2: Production nginx
+FROM nginx:alpine
+WORKDIR /usr/share/nginx/html
+
+# Frontend kopieren
+COPY --from=builder /app/dist ./
+
+# Nginx Konfiguration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Healthcheck für nginx
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
+
+EXPOSE 80 443
+
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+docker-entrypoint.sh (für Backend Container)
+
+
+
+#!/bin/sh
+set -e
+
+echo "[Entrypoint] Starte A.R.I. Backend Container: $(date)"
+echo "[Entrypoint] Benutzer: $(id -un) UID: $(id -u) GID: $(id -g)"
+
+# 1. Verzeichnisse erstellen
+echo "[Entrypoint] Erstelle benötigte Verzeichnisse..."
+mkdir -p /app/data/dlq /app/logs 2>/dev/null || true
+
+# 2. Rechte setzen
+echo "[Entrypoint] Setze korrekte Rechte..."
+chown -R nodeuser:nodejs /app/data /app/logs 2>/dev/null || echo "[Entrypoint] Hinweis: Rechte bereits korrekt"
+
+# 3. connection.json IMMER neu erstellen (für frisches Onboarding)
+echo "[Entrypoint] Erstelle frische connection.json mit Platzhaltern..."
+cat <<EOF > /app/connection.json
+{
+  "openai": {
+    "apiKey": "PLEASE_SET_YOUR_OPENAI_KEY"
+  },
+  "woocommerce": {
+    "url": "PLEASE_SET_WOOCOMMERCE_URL",
+    "consumerKey": "PLEASE_SET_WOOCOMMERCE_KEY",
+    "consumerSecret": "PLEASE_SET_WOOCOMMERCE_SECRET"
+  }
+}
+EOF
+
+# 4. Rechte für connection.json (Schreibzugriff für Onboarding)
+chown nodeuser:nodejs /app/connection.json
+chmod 600 /app/connection.json
+
+# 5. Verifizierung
+echo "[Entrypoint] Verifiziere Setup:"
+ls -la /app/connection.json
+ls -ld /app/data /app/logs
+echo "[Entrypoint] Backend Dateien: $(ls -la /app/dist/ | wc -l)"
+
+echo "[Entrypoint] ✅ A.R.I. Backend Container bereit!"
+echo "[Entrypoint] 🔗 API unter Port 3000 verfügbar"
+echo "[Entrypoint] 📝 Nginx (Frontend) wird auf User-Actions warten"
+
+exec "$@"
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+ddocker-compose.yml (3 separate Services)
+
+
+version: '3.8'
+
+services:
+  # Backend Service (Node.js API)
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: woo-app
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - backend_data:/app/data:rw
+      - connection_json:/app/connection.json:rw
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "node", "/app/healthcheck.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend Service (nginx mit statischen Files)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: woo-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  # Watchtower für Auto-Updates
+  watchtower:
+    image: containrrr/watchtower
+    container_name: ki-watchtower-1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 300 --cleanup
+    restart: unless-stopped
+    networks:
+      - app-network
+
+volumes:
+  backend_data:
+  connection_json:
+
+networks:
+  app-network:
+    driver: bridge
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+nginx.conf (für Frontend Container)
+
+
+server {
+    listen 80;
+    server_name my-working-space.de www.my-working-space.de;
+
+    # Redirect all HTTP traffic to HTTPS
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name my-working-space.de www.my-working-space.de;
+
+    # SSL Zertifikate
+    ssl_certificate /etc/letsencrypt/live/my-working-space.de/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/my-working-space.de/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    # SSL Optimierungen
+    ssl_protocols TLSv1.2 TLSv1.3;
+
+    # Security headers
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+
+    # Frontend - serve static files from nginx
+    location / {
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+        try_files $uri $uri/ /index.html;
+        
+        # Cache for static assets
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+        }
+    }
+
+    # Backend API - proxy to backend container
+    location /api/ {
+        proxy_pass http://woo-app:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        proxy_redirect off;
+        
+        # Timeout settings
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    # Health check
+    location /health {
+        proxy_pass http://woo-app:3000/health;
+        proxy_set_header Host $host;
+        access_log off;
+    }
+}
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Build & Deploy Befehle
+
+
+# 1. Beide Images bauen
+docker-compose build
+
+# 2. Oder einzeln bauen
+cd /root/project
+docker build -t woo-backend:latest .
+
+cd /root/project/frontend
+docker build -t woo-frontend:latest .
+
+# 3. Alles starten
+docker-compose up -d
+
+# 4. Status prüfen
+docker-compose ps
+docker-compose logs -f backend
+
+# 5. Rechte prüfen
+docker exec woo-app ls -la /app/connection.json
+docker exec woo-app cat /app/connection.json
