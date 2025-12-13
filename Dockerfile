@@ -38,16 +38,14 @@ COPY --from=frontend-builder /app/frontend/dist ./public
 # Copy health check
 COPY healthcheck.js ./
 
-
 # Create non-root user (Debian/Ubuntu syntax)
 RUN groupadd -g 1001 nodejs && \
   useradd -m -u 1001 -g nodejs nodeuser && \
   mkdir -p /app/data /app/data/dlq /app/logs /app/backend && \
-  chown -R nodeuser:nodejs /app /app/data /app/logs /app/backend
+  chown -R nodeuser:nodejs /app
 
 USER nodeuser
 EXPOSE 3000
-
 
 # Entrypoint-Skript für sichere connection.json-Erstellung
 COPY --chmod=755 backend/docker-entrypoint.sh /usr/local/bin/

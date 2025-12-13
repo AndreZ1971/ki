@@ -71,7 +71,9 @@ import PaymentValidation from './pages/PaymentFinances/PaymentValidation';
 import PaymentVerifier from './pages/PaymentFinances/PaymentVerifier';
 
 // Styles
+
 import './App.css';
+
 
 function App() {
   return (

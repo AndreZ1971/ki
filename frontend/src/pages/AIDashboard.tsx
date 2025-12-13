@@ -6,6 +6,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { MLDashboardWidget } from '../components/ML/MLDashboardWidget';
 import { FloatingChatbot } from '../components/FloatingChatbot';
 import './AIDashboard.css';
+import DashboardLanguageSwitcher from '../components/DashboardLanguageSwitcher';
 
 const AIDashboard: React.FC = () => {
   const [metrics, setMetrics] = useState({
@@ -695,6 +696,7 @@ const AIDashboard: React.FC = () => {
             >
               ⚙️ Settings
             </motion.button>
+            <DashboardLanguageSwitcher />
           </div>
         </div>
       </motion.header>
