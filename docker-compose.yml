@@ -1,47 +1,38 @@
+
 services:
-  # Backend Service (Node.js API)
-  backend:
+  app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: woo-app
     restart: unless-stopped
+    ports:
+      - "3000:3000"
     env_file:
       - .env.production
     environment:
       - NODE_ENV=production
     volumes:
-      - backend_data:/app/data:rw
-      - connection_json:/app/connection.json:rw
+      - ./backend/data:/app/data:rw
+      - ./.env.production:/app/.env.production:ro
     networks:
-      - app-network
-    healthcheck:
-      test: ["CMD", "node", "/app/healthcheck.js"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      - kaufe-es-network
 
-  # Frontend Service (nginx mit statischen Files)
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+  nginx:
+    image: nginx:latest
     container_name: woo-nginx
-    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
+      - ./frontend/dist:/app/public:ro
     depends_on:
-      backend:
-        condition: service_healthy
+      - app
     networks:
-      - app-network
+      - kaufe-es-network
 
-  # Watchtower für Auto-Updates
   watchtower:
     image: containrrr/watchtower
     container_name: ki-watchtower-1
@@ -50,12 +41,8 @@ services:
     command: --interval 300 --cleanup
     restart: unless-stopped
     networks:
-      - app-network
-
-volumes:
-  backend_data:
-  connection_json:
+      - kaufe-es-network
 
 networks:
-  app-network:
+  kaufe-es-network:
     driver: bridge
