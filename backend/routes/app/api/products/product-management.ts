@@ -185,7 +185,7 @@ export default async function productRoutes(server: FastifyInstance) {
               status: 'publish'
             };
 
-            // Bild hinzufügen wenn vorhanden
+            // Bild hinzufügen wenn vorhanden (aber nicht zwingend erforderlich)
             if (imageUrl) {
               wooPayload.images = [{ src: imageUrl }];
             }
@@ -204,8 +204,34 @@ export default async function productRoutes(server: FastifyInstance) {
               createdProducts.push(created);
               console.log(`✅ Created product: ${created.name} (ID: ${created.id})`);
             } else {
-              const errorText = await response.text();
-              errors.push(`${productIdea.name}: ${errorText}`);
+              const errorData = await response.json().catch(() => ({}));
+              
+              // Wenn Bild-Upload fehlschlägt, versuche ohne Bild
+              if (errorData.code === 'woocommerce_product_image_upload_error' && imageUrl) {
+                console.log(`⚠️ Image upload failed for ${productIdea.name}, retrying without image...`);
+                delete wooPayload.images;
+                
+                const retryResponse = await fetch(`${wooConfig.url}/wp-json/wc/v3/products`, {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Basic ${auth}`,
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(wooPayload)
+                });
+                
+                if (retryResponse.ok) {
+                  const created = await retryResponse.json();
+                  createdProducts.push(created);
+                  console.log(`✅ Created product without image: ${created.name} (ID: ${created.id})`);
+                } else {
+                  const errorText = await retryResponse.text();
+                  errors.push(`${productIdea.name}: ${errorText}`);
+                }
+              } else {
+                const errorText = JSON.stringify(errorData);
+                errors.push(`${productIdea.name}: ${errorText}`);
+              }
             }
           } catch (err) {
             errors.push(`${productIdea.name}: ${err instanceof Error ? err.message : 'Unknown error'}`);
