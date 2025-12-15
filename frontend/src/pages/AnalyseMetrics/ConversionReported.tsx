@@ -37,7 +37,7 @@ interface SummaryDetails {
 const ConversionReported = () => {
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [activeAction, setActiveAction] = useState<string | null>(null);
   const [exportFormat, setExportFormat] = useState('pdf');
   const [scheduleTime, setScheduleTime] = useState('08:00');
@@ -52,20 +52,39 @@ const ConversionReported = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Simuliere Daten-Fetch
-    setTimeout(() => {
-      setReportData({
-        totalReports: 156,
-        automatedReports: 128,
-        manualReports: 28,
-        exportSuccess: 94,
-        scheduledReports: 45,
-        realTimeReports: 23,
-        avgReportTime: "2.3min",
-        lastUpdated: new Date().toISOString()
-      });
-      setLoading(false);
-    }, 1000);
+    const fetchReportData = async () => {
+      try {
+        let base = (import.meta.env.VITE_API_URL || '').trim();
+        if (base.endsWith('/')) base = base.slice(0, -1);
+        const apiUrl = base ? `${base}/api/analytics/conversion/ml/report-analysis` : `/api/analytics/conversion/ml/report-analysis`;
+        
+        const res = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'getReportStats' })
+        });
+        
+        if (!res.ok) throw new Error('Failed to fetch report data');
+        const data = await res.json();
+        
+        setReportData({
+          totalReports: data.totalReports || 0,
+          automatedReports: data.automatedReports || 0,
+          manualReports: data.manualReports || 0,
+          exportSuccess: data.exportSuccess || 0,
+          scheduledReports: data.scheduledReports || 0,
+          realTimeReports: data.realTimeReports || 0,
+          avgReportTime: data.avgReportTime || '0min',
+          lastUpdated: new Date().toISOString()
+        });
+      } catch (_err) {
+        setError('Fehler beim Laden der Report-Daten');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchReportData();
   }, []);
 
   // KI/ML-Analyse: API-Call
@@ -102,80 +121,77 @@ const ConversionReported = () => {
     navigate('/');
   };
 
-  // ECHTER Datei-Download
-  const handleExport = (format: string) => {
+  // ECHTER Datei-Download mit echten Daten vom Backend
+  const handleExport = async (format: string) => {
+    if (!reportData) {
+      alert('Keine Report-Daten verfügbar');
+      return;
+    }
+    
     setActiveAction('exporting');
     
-    // Simuliere Daten für den Report
-    const reportData = {
-      title: "Conversion Report",
-      date: new Date().toLocaleDateString('de-DE'),
-      metrics: {
-        totalSales: 12500,
-        conversionRate: 2.8,
-        totalOrders: 156,
-        successfulConversions: 42
-      }
-    };
-
-    setTimeout(() => {
-      let content, mimeType, filename;
+    try {
+      let base = (import.meta.env.VITE_API_URL || '').trim();
+      if (base.endsWith('/')) base = base.slice(0, -1);
+      const apiUrl = base ? `${base}/api/analytics/conversion/ml/report-analysis` : `/api/analytics/conversion/ml/report-analysis`;
       
-      switch (format) {
-        case 'pdf':
-          // Für echte PDFs bräuchten wir eine Library wie jsPDF
-          content = `Conversion Report\nDatum: ${reportData.date}\nUmsatz: $${reportData.metrics.totalSales}\nConversion Rate: ${reportData.metrics.conversionRate}%`;
-          mimeType = 'application/pdf';
-          filename = `conversion-report-${new Date().toISOString().split('T')[0]}.pdf`;
-          break;
-        case 'excel':
-          // Einfache CSV für Excel
-          content = `Datum,Umsatz,Conversion Rate,Bestellungen\n${reportData.date},${reportData.metrics.totalSales},${reportData.metrics.conversionRate},${reportData.metrics.totalOrders}`;
-          mimeType = 'application/vnd.ms-excel';
-          filename = `conversion-report-${new Date().toISOString().split('T')[0]}.xls`;
-          break;
-        case 'csv':
-          content = `Datum,Umsatz,Conversion Rate,Bestellungen\n${reportData.date},${reportData.metrics.totalSales},${reportData.metrics.conversionRate},${reportData.metrics.totalOrders}`;
-          mimeType = 'text/csv';
-          filename = `conversion-report-${new Date().toISOString().split('T')[0]}.csv`;
-          break;
-        case 'json':
-          content = JSON.stringify(reportData, null, 2);
-          mimeType = 'application/json';
-          filename = `conversion-report-${new Date().toISOString().split('T')[0]}.json`;
-          break;
-        default:
-          content = 'Report data';
-          mimeType = 'text/plain';
-          filename = `report-${new Date().toISOString().split('T')[0]}.txt`;
-      }
-
-      // Erstelle einen Download-Link
-      const blob = new Blob([content], { type: mimeType });
+      const res = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'export', format, reportData })
+      });
+      
+      if (!res.ok) throw new Error('Export fehlgeschlagen');
+      
+      const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = filename;
+      link.download = `conversion-report-${new Date().toISOString().split('T')[0]}.${format === 'excel' ? 'xls' : format}`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-
+      
+      alert('✅ Report erfolgreich exportiert!');
+    } catch (_err) {
+      alert('❌ Fehler beim Export');
+    } finally {
       setActiveAction(null);
-    }, 1000);
+    }
   };
 
-  const handleScheduleReport = () => {
+  // Schedule Report mit echtem Backend
+  const handleScheduleReport = async () => {
     setActiveAction('scheduling');
-    setTimeout(() => {
-      // Simuliere Backend-Call
-      console.log(`Report scheduled for ${scheduleTime}`);
-      setActiveAction(null);
+    
+    try {
+      let base = (import.meta.env.VITE_API_URL || '').trim();
+      if (base.endsWith('/')) base = base.slice(0, -1);
+      const apiUrl = base ? `${base}/api/analytics/conversion/ml/schedule` : `/api/analytics/conversion/ml/schedule`;
+      
+      const res = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          scheduleTime,
+          frequency: 'daily',
+          nextRun: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+        })
+      });
+      
+      if (!res.ok) throw new Error('Scheduling fehlgeschlagen');
+      
       alert(`✅ Report wurde für ${scheduleTime} Uhr täglich geplant!`);
-    }, 1500);
+      setActiveAction(null);
+    } catch (_err) {
+      setError('Fehler beim Erstellen der Planung');
+      setActiveAction(null);
+    }
   };
 
-  const handleEmailReport = () => {
+  // Email Report mit echtem Backend
+  const handleEmailReport = async () => {
     if (!emailRecipient) {
       alert('Bitte E-Mail Adresse eingeben!');
       return;
@@ -187,23 +203,61 @@ const ConversionReported = () => {
     }
 
     setActiveAction('emailing');
-    setTimeout(() => {
-      // Simuliere Backend-Call
-      console.log(`Report sent to ${emailRecipient}`);
-      setActiveAction(null);
-      setEmailRecipient('');
+    
+    try {
+      let base = (import.meta.env.VITE_API_URL || '').trim();
+      if (base.endsWith('/')) base = base.slice(0, -1);
+      const apiUrl = base ? `${base}/api/analytics/conversion/ml/email` : `/api/analytics/conversion/ml/email`;
+      
+      const res = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          recipient: emailRecipient, 
+          reportData,
+          timestamp: new Date().toISOString()
+        })
+      });
+      
+      if (!res.ok) throw new Error('Email-Versand fehlgeschlagen');
+      
       alert(`✅ Report wurde an ${emailRecipient} gesendet!`);
-    }, 1500);
+      setEmailRecipient('');
+      setActiveAction(null);
+    } catch (_err) {
+      setError('Fehler beim E-Mail-Versand');
+      setActiveAction(null);
+    }
   };
 
-  const handleGenerateRealTime = () => {
+  // Real-Time Generierung mit echtem Backend
+  const handleGenerateRealTime = async () => {
     setActiveAction('generating');
-    setTimeout(() => {
-      // Simuliere Backend-Call
-      console.log(`Real-time report generated with interval ${realTimeInterval}`);
-      setActiveAction(null);
+    
+    try {
+      let base = (import.meta.env.VITE_API_URL || '').trim();
+      if (base.endsWith('/')) base = base.slice(0, -1);
+      const apiUrl = base ? `${base}/api/analytics/conversion/ml/generate-realtime` : `/api/analytics/conversion/ml/generate-realtime`;
+      
+      const res = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          interval: realTimeInterval,
+          includeAI: true
+        })
+      });
+      
+      if (!res.ok) throw new Error('Real-Time Generierung fehlgeschlagen');
+      
+      const newReport = await res.json();
+      setReportData(newReport);
       alert(`✅ Echtzeit-Report wurde generiert (Intervall: ${realTimeInterval})!`);
-    }, 1500);
+      setActiveAction(null);
+    } catch (_err) {
+      setError('Fehler bei Real-Time Generierung');
+      setActiveAction(null);
+    }
   };
 
   if (loading) return <div className="loading-spinner">📋 Loading Reports...</div>;
@@ -416,27 +470,29 @@ const ConversionReported = () => {
         </div>
       </div>
 
-      {/* Recent Reports Sektion */}
+      {/* Recent Reports Sektion - ECHTE DATEN VOM BACKEND */}
       <div className="analysis-section">
         <div className="metric-card full-width">
           <h3>📈 Recent Reports</h3>
-          <div className="reports-list">
-            <div className="report-item">
-              <span className="report-name">Monthly Conversion Summary</span>
-              <span className="report-date">01.11.2025</span>
-              <span className="report-status completed">✅ Completed</span>
+          {reportData && (
+            <div className="reports-list">
+              {reportData.recentReports && reportData.recentReports.length > 0 ? (
+                reportData.recentReports.map((report: any, idx: number) => (
+                  <div className="report-item" key={idx}>
+                    <span className="report-name">{report.title || report.name || `Report ${idx + 1}`}</span>
+                    <span className="report-date">{new Date(report.createdAt || report.date).toLocaleDateString('de-DE')}</span>
+                    <span className={`report-status ${report.status === 'live' ? 'live' : 'completed'}`}>
+                      {report.status === 'live' ? '🟢 Live' : '✅ ' + (report.status || 'Completed')}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div style={{padding: '20px', textAlign: 'center', color: '#999'}}>
+                  📭 Keine bisherigen Reports vorhanden. Erstellen Sie den ersten Report!
+                </div>
+              )}
             </div>
-            <div className="report-item">
-              <span className="report-name">Weekly Performance</span>
-              <span className="report-date">25.10.2025</span>
-              <span className="report-status completed">✅ Completed</span>
-            </div>
-            <div className="report-item">
-              <span className="report-name">Real-time Dashboard</span>
-              <span className="report-date">Live</span>
-              <span className="report-status live">🟢 Live</span>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
