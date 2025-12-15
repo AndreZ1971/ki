@@ -51,16 +51,9 @@ const TrendAnalysis = () => {
   
   const navigate = useNavigate();
 
-  // Letzte Analysen beim Mount laden
+  // Alte persistierte Historie löschen, damit keine festen Daten angezeigt werden
   useEffect(() => {
-    const saved = localStorage.getItem('trendAnalysisHistory');
-    if (saved) {
-      try {
-        setLastAnalyses(JSON.parse(saved));
-      } catch (_e) {
-        // Fehler beim Parsen ignorieren
-      }
-    }
+    localStorage.removeItem('trendAnalysisHistory');
   }, []);
 
   useEffect(() => {
@@ -167,7 +160,7 @@ const TrendAnalysis = () => {
         })));
         setSummary(data.analysis.next_steps.join(', '));
         
-        // Speichere diese Analyse in der Historie
+        // Speichere nur die letzte Analyse im aktuellen Zustand (keine Persistenz)
         const analysis = {
           timeRange,
           timestamp: new Date().toISOString(),
@@ -175,22 +168,14 @@ const TrendAnalysis = () => {
           insightsCount: data.analysis.insights.length,
           insights: data.analysis.insights.slice(0, 8)
         };
-        const updated = [analysis, ...lastAnalyses].slice(0, 10); // Max 10 Analysen speichern
-        setLastAnalyses(updated);
-        localStorage.setItem('trendAnalysisHistory', JSON.stringify(updated));
+        setLastAnalyses([analysis]);
       }
     } catch (_err) {
-      // Fallback zu Mock-Daten
-      setInsights([
-        { type: 'trend', title: 'E-Commerce Boom', value: '+42%', detail: 'Online-Verkäufe steigen stark', score: 0.92 },
-        { type: 'segment', title: 'Mobile Conversion', value: '+28%', detail: 'Mobile Nutzer konvertieren besser', score: 0.87 },
-        { type: 'forecast', title: 'Q4 Prognose', value: '+65%', detail: 'Starker Weihnachtsverkauf erwartet', score: 0.78 },
-        { type: 'anomaly', title: 'Abend-Käufe', value: '+31%', detail: 'Mehr Verkäufe nach 18 Uhr', score: 0.65 },
-        { type: 'conversion', title: 'Checkout-Optimierung', value: '+18%', detail: 'Potenzial bei Checkout', score: 0.82 },
-        { type: 'reddit', title: 'AI Diskussion', value: '4.2k posts', detail: 'Hohe Engagement-Rate', score: 0.91 },
-        { type: 'google', title: 'Marketing-Trends', value: '+72%', detail: 'Suchvolumen steigt', score: 0.88 },
-        { type: 'other', title: 'Kundenzufriedenheit', value: '4.8/5', detail: 'Sehr positive Bewertungen', score: 0.95 }
-      ]);
+      // Keine Mock-Daten – im Fehlerfall leeren und Fehler anzeigen
+      setInsights([]);
+      setNextSteps([]);
+      setSummary(null);
+      setLastAnalyses([]);
       setInsightError('KI-Analyse nicht verfügbar. Überprüfe die Backend-Verbindung.');
     } finally {
       setInsightLoading(false);
