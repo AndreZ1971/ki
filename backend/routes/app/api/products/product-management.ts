@@ -654,7 +654,7 @@ Antworte mit einem JSON Array im Format:
         }
 
         // Generiere Score für jede Idee wenn nicht vorhanden
-        ideas = ideas.map((idea, idx) => ({
+        ideas = ideas.map((idea) => ({
           ...idea,
           score: idea.score || Math.floor(70 + Math.random() * 25),
           reason: idea.reason || 'Trending im Markt'
