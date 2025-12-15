@@ -144,33 +144,25 @@ const RunAutoProductCreator = () => {
       setCurrentStatus('💾 Speichere Produkte...');
       setProgress(95);
 
-      // Sicherere Berechnung der Statistiken, um irreführende 0-Werte zu vermeiden
+      // Sicherere Berechnung der Statistiken, jetzt mit echten Backend-Werten
       const successCount = resultData.productsCreated || 0;
       const totalAttempted = config.count;
       const failureCount = Math.max(totalAttempted - successCount, 0);
 
-      // Durchschnittliche Qualität aus erzeugten Produkten ableiten, falls vorhanden
-      const qualityScores = Array.isArray(resultData.products)
-        ? resultData.products
-            .map((p: any) => (typeof p.qualityScore === 'number' ? p.qualityScore : null))
-            .filter((v: number | null) => typeof v === 'number') as number[]
-        : [];
-      const avgQualityScore = qualityScores.length > 0
-        ? qualityScores.reduce((a, b) => a + b, 0) / qualityScores.length
-        : NaN; // NaN bedeutet: nicht verfügbar
-
-      // Zeit pro Produkt aus geschätzter Gesamtzeit ableiten (z.B. "3 Minuten")
-      const estimatedTimeText: string | undefined = resultData.estimatedTime;
-      const estimatedMinutes = estimatedTimeText
-        ? parseInt(String(estimatedTimeText).replace(/[^0-9]/g, ''), 10)
-        : NaN;
-      const avgProcessTimeSeconds = successCount > 0 && Number.isFinite(estimatedMinutes)
-        ? Math.max(Math.round((estimatedMinutes * 60) / successCount), 1)
+      // Nutze aggregierte Qualität direkt vom Backend
+      const avgQualityScore = typeof resultData.avgQualityScore === 'number' && resultData.avgQualityScore > 0
+        ? resultData.avgQualityScore
         : NaN;
 
-      // Einfache ROI-Schätzung: Erfolgsquote als Prozentwert, nur Anzeigezweck
-      const successRate = totalAttempted > 0 ? (successCount / totalAttempted) * 100 : NaN;
-      const estimatedROI = Number.isFinite(successRate) ? successRate : NaN;
+      // Nutze tatsächliche durchschnittliche Verarbeitungszeit vom Backend
+      const avgProcessTimeSeconds = typeof resultData.avgProcessTime === 'number' && resultData.avgProcessTime > 0
+        ? resultData.avgProcessTime
+        : NaN;
+
+      // Nutze echte ROI-Schätzung vom Backend
+      const estimatedROI = typeof resultData.avgROI === 'number' && resultData.avgROI >= 0
+        ? resultData.avgROI
+        : NaN;
 
       const calculatedStats: CreationStats = {
         totalAttempted,

@@ -140,7 +140,68 @@ export default async function productRoutes(server: FastifyInstance) {
         
         console.log(`✅ Generated ${productsData.length} product ideas`);
 
+        // Hilfsfunktion: Berechne Qualitätsscore für ein Produkt
+        const calculateQualityScore = (product: any, idea: any): number => {
+          let score = 50; // Basispunkte
+          
+          // Beschreibung: je länger, desto besser (max +20 Punkte)
+          if (product.description) {
+            const wordCount = product.description.split(/\s+/).length;
+            score += Math.min((wordCount / 100) * 20, 20);
+          }
+          
+          // Bild vorhanden: +15 Punkte
+          if (product.images && product.images.length > 0) {
+            score += 15;
+          }
+          
+          // Kategorie gesetzt: +10 Punkte
+          if (product.categories && product.categories.length > 0) {
+            score += 10;
+          }
+          
+          // Preis realistisch (nicht 0, nicht extrem hoch): +5 Punkte
+          const price = parseFloat(product.regular_price || 0);
+          if (price > 5 && price < 10000) {
+            score += 5;
+          }
+          
+          // Optimierungsgrad berücksichtigen
+          if (optimization === 'high') {
+            score += 10;
+          } else if (optimization === 'medium') {
+            score += 5;
+          }
+          
+          return Math.min(score, 100);
+        };
+
+        // Hilfsfunktion: Berechne ROI-Schätzung
+        const calculateEstimatedROI = (product: any): number => {
+          // ROI = (Marge / Kosten) * 100
+          // Vereinfachte Annahmen:
+          // - Herstellungskosten: ~25% des Verkaufspreises
+          // - Conversion Rate: 2-5% je nach Qualität
+          const price = parseFloat(product.regular_price || 0);
+          
+          if (price <= 0) return 0;
+          
+          // Geschätzter Gewinn pro Verkauf (40% Marge, 35% Kosten, 25% für Betrieb)
+          const estimatedMargin = price * 0.4;
+          
+          // Erwartete Verkäufe pro Monat basierend auf Optimierungsgrad
+          const baseConversions = optimization === 'high' ? 5 : optimization === 'medium' ? 3 : 1;
+          const monthlyRevenue = estimatedMargin * baseConversions;
+          
+          // ROI = (monatlicher Gewinn / initiale Kosten) * 100
+          // Annahme: initiale Kosten = Produktpreis
+          const roi = (monthlyRevenue / price) * 100;
+          
+          return Math.min(Math.round(roi), 300); // Cap bei 300%
+        };
+
         // Erstelle Produkte in WooCommerce
+        const startTime = Date.now();
         for (const productIdea of productsData) {
           try {
             // Type Mapping
@@ -216,8 +277,18 @@ export default async function productRoutes(server: FastifyInstance) {
 
             if (response.ok) {
               const created = await response.json();
+              
+              // Berechne Qualität und ROI für dieses Produkt
+              const qualityScore = calculateQualityScore(created, productIdea);
+              const estimatedROI = calculateEstimatedROI(created);
+              
+              // Füge erweiterte Metadaten hinzu
+              created.qualityScore = qualityScore;
+              created.estimatedROI = estimatedROI;
+              created.processingTime = Math.round((Date.now() - startTime) / 1000);
+              
               createdProducts.push(created);
-              console.log(`✅ Created product: ${created.name} (ID: ${created.id})`);
+              console.log(`✅ Created product: ${created.name} (ID: ${created.id}, Quality: ${qualityScore}%, ROI: ${estimatedROI}%)`);
             } else {
               const errorData = await response.json().catch(() => ({}));
               
@@ -237,8 +308,17 @@ export default async function productRoutes(server: FastifyInstance) {
                 
                 if (retryResponse.ok) {
                   const created = await retryResponse.json();
+                  
+                  // Berechne Qualität und ROI für dieses Produkt
+                  const qualityScore = calculateQualityScore(created, productIdea);
+                  const estimatedROI = calculateEstimatedROI(created);
+                  
+                  created.qualityScore = qualityScore;
+                  created.estimatedROI = estimatedROI;
+                  created.processingTime = Math.round((Date.now() - startTime) / 1000);
+                  
                   createdProducts.push(created);
-                  console.log(`✅ Created product without image: ${created.name} (ID: ${created.id})`);
+                  console.log(`✅ Created product without image: ${created.name} (ID: ${created.id}, Quality: ${qualityScore}%, ROI: ${estimatedROI}%)`);
                 } else {
                   const errorText = await retryResponse.text();
                   errors.push(`${productIdea.name}: ${errorText}`);
@@ -254,7 +334,21 @@ export default async function productRoutes(server: FastifyInstance) {
         }
         
         const now = new Date();
-        const estimatedMinutes = Math.ceil(count * 0.5);
+        const totalTime = Date.now() - startTime;
+        const estimatedMinutes = Math.ceil(totalTime / 60000);
+        
+        // Berechne aggregierte Statistiken
+        const avgQualityScore = createdProducts.length > 0
+          ? createdProducts.reduce((sum, p) => sum + (p.qualityScore || 0), 0) / createdProducts.length
+          : 0;
+        
+        const avgROI = createdProducts.length > 0
+          ? createdProducts.reduce((sum, p) => sum + (p.estimatedROI || 0), 0) / createdProducts.length
+          : 0;
+        
+        const avgProcessTime = createdProducts.length > 0
+          ? Math.round(totalTime / createdProducts.length / 1000)
+          : 0;
         
         return reply.send({
           success: true,
@@ -263,6 +357,9 @@ export default async function productRoutes(server: FastifyInstance) {
             message: `${createdProducts.length} von ${count} Produkten erfolgreich erstellt`,
             productsCreated: createdProducts.length,
             estimatedTime: `${estimatedMinutes} Minuten`,
+            avgQualityScore: Math.round(avgQualityScore),
+            avgROI: Math.round(avgROI),
+            avgProcessTime: avgProcessTime,
             errors: errors.length > 0 ? errors : undefined,
             timestamp: now.toISOString(),
             products: createdProducts
