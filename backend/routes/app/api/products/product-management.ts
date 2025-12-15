@@ -141,7 +141,7 @@ export default async function productRoutes(server: FastifyInstance) {
         console.log(`✅ Generated ${productsData.length} product ideas`);
 
         // Hilfsfunktion: Berechne Qualitätsscore für ein Produkt
-        const calculateQualityScore = (product: any, idea: any): number => {
+        const calculateQualityScore = (product: any, _idea: any): number => {
           let score = 50; // Basispunkte
           
           // Beschreibung: je länger, desto besser (max +20 Punkte)
