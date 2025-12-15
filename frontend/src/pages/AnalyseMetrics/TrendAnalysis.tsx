@@ -46,9 +46,22 @@ const TrendAnalysis = () => {
   const [metrics, setMetrics] = useState<Metric[]>([]);
   const [googleTrends, setGoogleTrends] = useState<TrendItem[]>([]);
   const [redditTrends, setRedditTrends] = useState<TrendItem[]>([]);
+  // Letzte Analysen
+  const [lastAnalyses, setLastAnalyses] = useState<any[]>([]);
   
   const navigate = useNavigate();
-  // const API_URL = import.meta.env.VITE_API_URL || ''; // entfernt
+
+  // Letzte Analysen beim Mount laden
+  useEffect(() => {
+    const saved = localStorage.getItem('trendAnalysisHistory');
+    if (saved) {
+      try {
+        setLastAnalyses(JSON.parse(saved));
+      } catch (_e) {
+        // Fehler beim Parsen ignorieren
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -153,6 +166,18 @@ const TrendAnalysis = () => {
           criticality: 'good'
         })));
         setSummary(data.analysis.next_steps.join(', '));
+        
+        // Speichere diese Analyse in der Historie
+        const analysis = {
+          timeRange,
+          timestamp: new Date().toISOString(),
+          summary: data.analysis.next_steps.join(', '),
+          insightsCount: data.analysis.insights.length,
+          insights: data.analysis.insights.slice(0, 8)
+        };
+        const updated = [analysis, ...lastAnalyses].slice(0, 10); // Max 10 Analysen speichern
+        setLastAnalyses(updated);
+        localStorage.setItem('trendAnalysisHistory', JSON.stringify(updated));
       }
     } catch (_err) {
       // Fallback zu Mock-Daten
@@ -338,6 +363,65 @@ const TrendAnalysis = () => {
           )}
         </div>
       </div>
+
+      {/* Letzte Analysen */}
+      {lastAnalyses.length > 0 && (
+        <div className="analysis-section">
+          <div className="metric-card full-width">
+            <h3>📚 Letzte Analysen</h3>
+            <div style={{display: 'flex', flexDirection: 'column', gap: 12}}>
+              {lastAnalyses.map((analysis, idx) => (
+                <div 
+                  key={idx}
+                  style={{
+                    padding: '12px 16px',
+                    background: idx === 0 ? '#e8f4fd' : '#f8f9fa',
+                    border: idx === 0 ? '2px solid #2563eb' : '1px solid #e0e0e0',
+                    borderRadius: 8,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'}}>
+                    <div>
+                      <div style={{fontWeight: 700, color: '#2c3e50', marginBottom: 4}}>
+                        {analysis.timeRange === '7d' && '📅 7-Tage Analyse'}
+                        {analysis.timeRange === '30d' && '📅 30-Tage Analyse'}
+                        {analysis.timeRange === '90d' && '📅 90-Tage Analyse'}
+                        {analysis.timeRange === '1y' && '📅 1-Jahr Analyse'}
+                        {!analysis.timeRange && '📅 Analyse'}
+                        {idx === 0 && ' (aktuell)'}
+                      </div>
+                      <div style={{color: '#6c757d', fontSize: '0.85rem', marginBottom: 8}}>
+                        {new Date(analysis.timestamp).toLocaleString('de-DE')}
+                      </div>
+                      <div style={{color: '#2c3e50', fontSize: '0.95rem', lineHeight: '1.4'}}>
+                        {analysis.summary?.substring(0, 120)}...
+                      </div>
+                    </div>
+                    <div style={{textAlign: 'right', minWidth: 80}}>
+                      <div style={{fontSize: '1.2rem', fontWeight: 700, color: '#2563eb'}}>
+                        {analysis.insightsCount}
+                      </div>
+                      <div style={{color: '#6c757d', fontSize: '0.85rem'}}>
+                        Insights
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
