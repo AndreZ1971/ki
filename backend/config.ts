@@ -39,6 +39,18 @@ export interface Config {
     username?: string;
     appPassword?: string;
   };
+  support?: {
+    // Bevorzugter REST-Endpunkt für Support-Tickets. Kann relativ ("/wp-json/.../tickets") oder absolut sein.
+    ticketsEndpoint?: string;
+    // Anzahl Tickets pro Seite für REST-Aufruf
+    perPage?: number;
+    // Ticket-Provider: auto | awesome-support | wp-cpt | woo-order-notes | none
+    provider?: 'auto' | 'awesome-support' | 'wp-cpt' | 'woo-order-notes' | 'none';
+    // Für wp-cpt: Slug des Ticket-CPT (z.B. 'wpas_ticket')
+    cptSlug?: string;
+    // Optional: Fallback auf Woo-Bestellnotizen als "Tickets" erlauben (default: false)
+    allowOrderNotesFallback?: boolean;
+  };
   // ...weitere Bereiche nach Bedarf
 }
 
@@ -47,6 +59,7 @@ const config: Config = {
   openAI: configData.openAI || {},
   woocommerce: configData.woocommerce || {},
   wordpress: configData.wordpress || {},
+  support: configData.support || {},
   // ...weitere Bereiche nach Bedarf
 };
 

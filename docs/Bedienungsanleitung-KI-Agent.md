@@ -613,7 +613,116 @@ So startest du die KI-Agent-Plattform als Endnutzer ganz ohne Quellcode-Installa
 
 ---
 
-## 💰 Payment & Finances Tools
+## � Kunden-Feedback-Analyse
+
+### Feedback Analysis – Kundenbewertungen & Support-Tickets mit KI
+
+#### Was kann ich mit Feedback Analysis machen?
+
+- **Kundenbewertungen analysieren** (WooCommerce Reviews) – Automatische Sentiment-Analyse
+- **Support-Tickets einsehen** (from Awesome Support Plugin) – Probleme und Lösungszeiten tracken
+- **KI-Insights erhalten** – Automatische Kategorisierung und Empfehlungen
+- **Stimmungsanalyse** – Positive/negative/neutrale Kundenfeedbacks erkennen
+- **Impact-Bewertung** – High/Medium/Low Prioritäten für jedes Insight
+- **Next Steps** – Konkrete, priorisierte Maßnahmen ableiten
+
+#### Wie nutze ich Feedback Analysis?
+
+1. **Feedback Analysis öffnen** – Navigiere zu "App" → "Kunden-Feedback-Analyse"
+2. **Bewertungen laden** – Klicke auf "⭐ Bewertungen laden"
+   - Lädt alle echten WooCommerce Produktbewertungen
+   - Zeigt Kundennamen, Ratings, Texte und Datum
+3. **Support-Tickets laden** – Klicke auf "🎫 Support-Tickets laden"
+   - Lädt echte Tickets aus Awesome Support 6.3.6
+   - Zeigt Titel, Beschreibung, Status (offen/bearbeitet/gelöst), Priorität
+4. **KI-Analyse starten** – Klicke auf "🧠 Feedback analysieren"
+   - Sendet Bewertungen + Tickets an KI-Backend
+   - Analysezeit: 10–30 Sekunden
+5. **Ergebnisse prüfen**:
+   - **Zusammenfassung**: KI-generierte Übersicht mit Gesamtstimmung
+   - **Insights Grid**: Kategorisierte Erkenntnisse (Customer, Performance, Products, etc.)
+   - **Next Steps**: Konkrete Maßnahmen mit Criticality-Levels
+6. **Rohdaten anschauen** – Klicke auf "🔎 Rohdaten anzeigen" für Details
+
+#### Wichtige Infos zu Tickets – PLUGIN-ANFORDERUNG ⚠️
+
+**Das Feedback-System nutzt echte Support-Tickets. Dafür wird folgendes Plugin vorausgesetzt:**
+
+**Plugin**: Welcome to Awesome Support 6.3.6 (oder kompatible Version)
+- **REST-Endpunkt**: `/wp-json/wpas-api/v1/tickets`
+- **Authentifizierung**: WordPress App Password (Basic Auth)
+- **Daten**: Echte Support-Tickets mit Titel, Beschreibung, Status, Priorität
+
+**Setup für Tickets:**
+1. Installiere "Welcome to Awesome Support 6.3.6" in WordPress
+2. Aktiviere das Plugin
+3. Stelle sicher, dass WordPress mit Application Passwords läuft
+4. Setze diese Umgebungsvariablen beim Backend-Start:
+   - `WORDPRESS_URL` = deine WordPress-URL (z. B. `https://mein-shop.de`)
+   - `WORDPRESS_USER` = WordPress-Benutzername (z. B. `admin`)
+   - `WORDPRESS_APP_PASSWORD` = WordPress Application Password
+5. Starte den Backend erneut
+6. Feedback Analysis versucht jetzt, Tickets zu laden
+
+**Was passiert, wenn das Plugin fehlt?**
+- **Bewertungen-Analyse**: Funktioniert trotzdem (kommt von WooCommerce)
+- **Tickets-Laden**: Zeigt eine klare Fehlermeldung
+- **Keine Mock-Daten**: Das System zeigt ausdrücklich KEINE erfundenen Tickets
+
+#### Dashboard-Metriken
+
+| Metrik | Erklärung |
+|--------|-----------|
+| **Kundenbewertungen** | Anzahl eingegangener WooCommerce Reviews |
+| **Support-Tickets** | Anzahl offener/bearbeiteter Awesome-Support-Tickets |
+| **Stimmung** | 😊 Positiv / 😐 Neutral / 😟 Negativ (KI-Analyse) |
+| **Bearbeitungszeit** | Durchschnitt: Zeit von Erstellung bis Lösung |
+
+#### Insight-Kategorien (KI-Analyse)
+
+| Kategorie | Beispiel |
+|-----------|----------|
+| **Customer** | "Kunden berichten von langen Lieferzeiten" |
+| **Performance** | "Produktseite lädt zu langsam laut Feedback" |
+| **Products** | "Bestseller-Produkt hat hohe Zufriedenheit" |
+| **Traffic** | "Viele Fragen zum Checkout-Prozess" |
+| **Conversion** | "Rückgabequote steigt, weil Beschreibungen unklar" |
+
+#### Impact & Criticality
+
+- **Impact: High** 🔴 – Betrifft viele Kunden oder Umsatz
+- **Impact: Medium** 🟡 – Betrifft einige Kunden oder Prozesse
+- **Impact: Low** 🟢 – Kleinere Anpassungen
+- **Criticality: Critical** ❗ – Sofort handeln erforderlich
+- **Criticality: Warning** ⚠️ – In den nächsten Tagen adressieren
+- **Criticality: Good** ✅ – Zur Kenntnis, keine sofortige Action nötig
+
+#### Next Steps (Beispiele)
+
+- "Produktbeschreibungen überarbeiten → Impact: High"
+- "Checkout-Prozess testen → Impact: Medium"
+- "Lieferzeiten mit Logistik abstimmen → Impact: High"
+- "Customer Support-Zeit reduzieren → Criticality: Critical"
+
+#### Fehlerbehandlung
+
+| Fehler | Lösung |
+|--------|--------|
+| "Bewertungen laden schlägt fehl" | Prüfe, ob WooCommerce API Keys aktiv sind |
+| "Support-Tickets laden schlägt fehl" | Plugin fehlend oder falsche App-Password. Siehe "Setup für Tickets" oben. |
+| "KI-Analyse schlägt fehl" | Prüfe OpenAI API Key in Backend-Config |
+
+#### Best Practices
+
+- **Regelmäßig analysieren**: Wöchentlich oder nach größeren Änderungen
+- **Prioritäten-Fokus**: Beginne mit "Critical"-Maßnahmen
+- **Trends verfolgen**: Nutze die Stimmung zur Verlaufskontrolle
+- **Team-Feedback**: Teile Next Steps mit deinem Team
+- **Aktionen dokumentieren**: Speichere umgesetzte Maßnahmen für Follow-up
+
+---
+
+## �💰 Payment & Finances Tools
 
 ### Payment Fast
 

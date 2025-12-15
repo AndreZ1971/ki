@@ -171,11 +171,38 @@
   - Impact-Bewertung (high/medium/low) für jedes Insight
   - KI-generierte Recommendations für Optimierungen
   - Next Steps mit Criticality-Levels
-- **API**: `/api/analytics/feedback/reviews`, `/api/analytics/feedback/tickets`, `/api/analytics/feedback/analyze`
+- **API**: 
+  - `/api/analytics/feedback/reviews` (WooCommerce Reviews via REST)
+  - `/api/analytics/feedback/tickets` (Support-Tickets via Plugin-REST-API)
+  - `/api/analytics/feedback/analyze` (KI-Analyse)
 - **Status**: ✅ Vollständig mit ML/KI integriert
 - **Capabilities**: Reviews + Tickets Analyse, Sentiment Detection, Pattern Recognition
 - **Features**: Stats-Cards (Bewertungen, Tickets, Sentiment, Resolution Time), Insight-Grid mit Recommendations, Next Steps Display
 - **UI**: Glassmorphism, Color-coded Impact/Status, Expandable Rohdaten
+
+**⚠️ PLUGIN-ANFORDERUNG - Awesome Support 6.3.6**
+
+Die Kunden-Feedback-Analyse nutzt echte Support-Tickets aus deinem WordPress-System. Dafür wird das folgende Plugin empfohlen und vorausgesetzt:
+
+- **Plugin**: Welcome to Awesome Support (Version 6.3.6 oder kompatibel)
+- **REST-Endpunkt**: `/wp-json/wpas-api/v1/tickets`
+- **Authentifizierung**: WordPress Application Passwords (Basis-Auth)
+- **Ticket-Daten**: Abrufen von echten Support-Tickets mit Titeln, Beschreibungen, Status, Priorität, Erstellungs- und Lösungsdatum
+
+**Setup:**
+1. Installiere das Plugin "Welcome to Awesome Support 6.3.6" in WordPress
+2. Aktiviere das Plugin
+3. Stelle sicher, dass WordPress Application Passwords aktiviert sind (oder nutze einen Admin-User mit App-Passwort)
+4. Setze folgende Umgebungsvariablen beim Backend-Start:
+   - `WORDPRESS_URL` = deine WordPress-Installation (z. B. `https://kaufe-es.eu`)
+   - `WORDPRESS_USER` = WordPress-Benutzername
+   - `WORDPRESS_APP_PASSWORD` = WordPress Application Password
+5. Das System versucht automatisch, Tickets von `/wp-json/wpas-api/v1/tickets` abzurufen
+
+**Falls das Plugin nicht verfügbar ist:**
+- A.R.I. zeigt beim Ticket-Abruf eine aussagekräftige Fehlermeldung an
+- Review-Analyse funktioniert weiterhin, da diese von WooCommerce kommen
+- Das System zeigt keine Mock-Daten oder Fallback-Tickets
 
 #### 🌐 **Real Web Analytics** `frontend/src/pages/AnalyseMetrics/RealWebAnalytics.tsx`
 - **ML-Features**:

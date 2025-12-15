@@ -1,49 +1,26 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { AnalyticsMLService } from '../../../../services/analyticsMLService';
+import config from '../../../../config';
+import { getTickets } from '../../../../services/supportTickets';
 
 export default async function feedbackRoutes(fastify: FastifyInstance) {
-  // GET /api/analytics/feedback/reviews - Lade Sample-Bewertungen
+  // GET /api/analytics/feedback/reviews - WooCommerce Produktbewertungen
   fastify.get('/reviews', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
-      // Mock-Daten: echte WooCommerce Reviews würden hier geladen
-      const reviews = [
-        {
-          id: 1,
-          author: 'Maria K.',
-          rating: 5,
-          text: 'Ausgezeichnetes Produkt! Sehr schnelle Lieferung und toller Kundenservice.',
-          date: '2025-12-08'
-        },
-        {
-          id: 2,
-          author: 'Thomas M.',
-          rating: 4,
-          text: 'Gutes Produkt, aber die Verpackung könnte besser sein.',
-          date: '2025-12-07'
-        },
-        {
-          id: 3,
-          author: 'Anna S.',
-          rating: 5,
-          text: 'Perfekt! Genau das, was ich gesucht habe. Würde wieder bestellen.',
-          date: '2025-12-06'
-        },
-        {
-          id: 4,
-          author: 'Klaus W.',
-          rating: 3,
-          text: 'Mittelmäßig. Das Produkt erfüllt die Anforderungen, aber nicht mehr.',
-          date: '2025-12-05'
-        },
-        {
-          id: 5,
-          author: 'Sandra R.',
-          rating: 5,
-          text: 'Sehr zufrieden! Der beste Kauf dieses Jahres.',
-          date: '2025-12-04'
-        }
-      ];
-
+      const wooConfig = {
+        url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL || config.woocommerce?.url,
+        consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY || config.woocommerce?.consumerKey,
+        consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET || config.woocommerce?.consumerSecret,
+      };
+      if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
+        throw new Error('WooCommerce Konfiguration fehlt (url/consumerKey/consumerSecret).');
+      }
+      const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
+      // WooCommerce Reviews abrufen
+      const res = await fetch(`${wooConfig.url}/wp-json/wc/v3/products/reviews?per_page=20`, {
+        headers: { 'Authorization': `Basic ${auth}`, 'Content-Type': 'application/json' }
+      });
+      if (!res.ok) throw new Error('WooCommerce API Error (Reviews)');
+      const reviews = await res.json();
       return reply.send({
         success: true,
         reviews,
@@ -51,160 +28,61 @@ export default async function feedbackRoutes(fastify: FastifyInstance) {
         timestamp: new Date().toISOString()
       });
     } catch (error) {
-      console.error('Feedback Reviews Error:', error);
-      return reply.send({
+      return reply.status(404).send({
         success: false,
         reviews: [],
-        error: 'Fehler beim Laden der Bewertungen'
+        error: error instanceof Error ? error.message : 'Unbekannter Fehler'
       });
     }
   });
 
-  // GET /api/analytics/feedback/tickets - Lade Sample-Support-Tickets
+  // GET /api/analytics/feedback/tickets - Tickets via Provider (auto/konfiguriert)
   fastify.get('/tickets', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
-      // Mock-Daten: echte Support-Tickets würden hier geladen
-      const tickets = [
-        {
-          id: 1,
-          title: 'Versand-Problem gelöst',
-          description: 'Paket kam beschädigt an, aber schnell ersetzt worden.',
-          status: 'closed',
-          priority: 'high',
-          created: '2025-12-07',
-          resolved: '2025-12-08'
-        },
-        {
-          id: 2,
-          title: 'Produktfrage beantwortet',
-          description: 'Frage zur Kompatibilität schnell beantwortet.',
-          status: 'closed',
-          priority: 'medium',
-          created: '2025-12-06',
-          resolved: '2025-12-06'
-        },
-        {
-          id: 3,
-          title: 'Rückgabe in Bearbeitung',
-          description: 'Kundenrückgabe wird gerade verarbeitet.',
-          status: 'open',
-          priority: 'high',
-          created: '2025-12-08',
-          resolved: null
-        },
-        {
-          id: 4,
-          title: 'Feature-Request: Mengenrabatt',
-          description: 'Kunde möchte Mengenrabatte ab 10 Stück.',
-          status: 'open',
-          priority: 'low',
-          created: '2025-12-05',
-          resolved: null
-        }
-      ];
-
-      return reply.send({
-        success: true,
-        tickets,
-        total: tickets.length,
-        timestamp: new Date().toISOString()
-      });
+      const tickets = await getTickets();
+      return reply.send({ success: true, tickets, total: tickets.length, timestamp: new Date().toISOString() });
     } catch (error) {
-      console.error('Feedback Tickets Error:', error);
-      return reply.send({
+      return reply.status(404).send({
         success: false,
         tickets: [],
-        error: 'Fehler beim Laden der Tickets'
+        error: error instanceof Error ? error.message : 'Unbekannter Fehler'
       });
     }
   });
 
-  // POST /api/analytics/feedback/analyze - Analysiere Feedback mit KI
+  // POST /api/analytics/feedback/analyze - Analysiert nur echte Feedbackdaten (aktuell keine angebunden)
   fastify.post('/analyze', async (request: FastifyRequest, reply: FastifyReply) => {
-    const { reviews = [], tickets = [] } = request.body as { 
-      reviews?: any[]; 
-      tickets?: any[];
-    };
+    // Noch keine echte Datenquelle angebunden
+    return reply.status(404).send({
+      success: false,
+      analysis: [],
+      summary: null,
+      error: 'Keine echten Feedbackdaten angebunden.'
+    });
+  });
 
+  // GET /api/analytics/feedback/tickets/health - Ermittelt verfügbare WP REST-Namespaces und mögliche Ticket-Routen
+  fastify.get('/tickets/health', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
-      // Vorbereite Daten für KI-Analyse
-      const feedbackText = [
-        ...reviews.map((r: any) => `Bewertung ${r.rating}★: ${r.text}`),
-        ...tickets.map((t: any) => `Ticket [${t.status}]: ${t.title} - ${t.description}`)
-      ].join('\n\n');
-
-      // Rufe KI-Service auf
-      const insights = await AnalyticsMLService.generateInsights({
-        metrics: ['feedback', 'sentiment', 'trends'],
-        shopData: {
-          reviews: reviews.length,
-          tickets: tickets.length,
-          avgRating: reviews.length > 0 
-            ? (reviews.reduce((sum: number, r: any) => sum + (r.rating || 0), 0) / reviews.length).toFixed(1)
-            : 0,
-          feedback: feedbackText.substring(0, 500) // Limit für API
-        },
-        timeframe: '30days'
-      });
-
-      // Generiere Zusammenfassung
-      const summary = {
-        text: `Analysiert: ${reviews.length} Bewertungen, ${tickets.length} Support-Tickets`,
-        sentiment: reviews.length > 0 
-          ? (reviews.reduce((sum: number, r: any) => sum + (r.rating || 0), 0) / reviews.length) >= 4 
-            ? 'positive' 
-            : 'negative'
-          : 'neutral',
-        avgRating: reviews.length > 0 
-          ? (reviews.reduce((sum: number, r: any) => sum + (r.rating || 0), 0) / reviews.length).toFixed(1)
-          : 0,
-        openTickets: tickets.filter((t: any) => t.status === 'open').length,
-        resolutionTime: 'Ø 1.2 Tage'
-      };
-
+      const wpUrl = process.env.WORDPRESS_URL || config.wordpress?.url;
+      if (!wpUrl) {
+        return reply.status(400).send({ success: false, error: 'WORDPRESS_URL fehlt in Konfiguration.' });
+      }
+      const indexRes = await fetch(`${wpUrl.replace(/\/$/, '')}/wp-json/`);
+      const indexJson: any = indexRes.ok ? await indexRes.json() : null;
+      const namespaces: string[] = Array.isArray(indexJson?.namespaces) ? indexJson.namespaces : [];
+      const routesObj = indexJson?.routes || {};
+      const allRoutes = Object.keys(routesObj);
+      const candidates = allRoutes.filter((r: string) => /ticket|awesome|support/i.test(r));
       return reply.send({
         success: true,
-        analysis: insights.insights,
-        summary,
-        confidence_score: insights.confidence_score,
-        next_steps: insights.next_steps,
-        timestamp: new Date().toISOString()
+        wordpressUrl: wpUrl,
+        namespaces,
+        candidates,
+        exampleQueries: candidates.slice(0, 10).map((r: string) => `${wpUrl.replace(/\/$/, '')}${r.includes('?') ? r : r + '?per_page=5'}`)
       });
-    } catch (error) {
-      console.error('Feedback Analysis Error:', error);
-      // Fallback bei Fehler
-      return reply.send({
-        success: true,
-        analysis: [
-          {
-            category: 'Sentiment',
-            finding: 'Überwiegend positive Kundenbewertungen',
-            impact: 'high',
-            recommendation: 'Positive Bewertungen in Marketing nutzen',
-            confidence: 85
-          },
-          {
-            category: 'Support',
-            finding: 'Support-Tickets schnell gelöst',
-            impact: 'high',
-            recommendation: 'Aktuelles Support-Level beibehalten',
-            confidence: 80
-          }
-        ],
-        summary: {
-          text: 'Kundenfeedback zeigt hohe Zufriedenheit.',
-          sentiment: 'positive',
-          avgRating: 4.4,
-          openTickets: 2,
-          resolutionTime: 'Ø 1.2 Tage'
-        },
-        confidence_score: 82,
-        next_steps: [
-          'Kundenfeedback in Produktentwicklung einbeziehen',
-          'Support-Prozesse dokumentieren und optimieren'
-        ],
-        timestamp: new Date().toISOString()
-      });
+    } catch (e) {
+      return reply.status(500).send({ success: false, error: e instanceof Error ? e.message : 'Unbekannter Fehler' });
     }
   });
 }

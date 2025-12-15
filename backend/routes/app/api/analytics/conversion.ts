@@ -1,7 +1,8 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { AnalyticsMLService } from '../../../../services/analyticsMLService';
+
 import { registerConversionMLAnalysis } from './conversion/ml-analysis';
 import { registerConversionReportMLAnalysis } from './conversion/ml-report-analysis';
+import config from '../../../../config';
 
 export default async function conversionRoutes(fastify: FastifyInstance) {
   // Registriere ML-Analysis Sub-Routes
@@ -10,87 +11,74 @@ export default async function conversionRoutes(fastify: FastifyInstance) {
 
   // GET /api/analytics/conversion/analysis
   fastify.get('/analysis', async (_request: FastifyRequest, reply: FastifyReply) => {
-    // Dummy-Daten für Conversion Analysis
-    return reply.send({
-      success: true,
-      data: {
-        overallRate: 2.8,
-        cartAbandonment: 68,
-        checkoutCompletion: 32,
-        mobileRate: 1.9,
-        desktopRate: 3.5,
-        returningCustomers: 4.2,
-        newCustomers: 1.8,
-        lastUpdated: new Date().toISOString()
+    try {
+      const wooConfig = {
+        url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL || config.woocommerce?.url,
+        consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY || config.woocommerce?.consumerKey,
+        consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET || config.woocommerce?.consumerSecret,
+      };
+
+      if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
+        throw new Error('WooCommerce Konfiguration fehlt (url/consumerKey/consumerSecret). Bitte .env oder connection.json prüfen.');
       }
-    });
+
+      const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
+      // Bestellungen der letzten 30 Tage abrufen
+      const now = new Date();
+      const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const ordersResponse = await fetch(`${wooConfig.url}/wp-json/wc/v3/orders?per_page=100&status=completed&after=${thirtyDaysAgo.toISOString()}`,
+        { headers: { 'Authorization': `Basic ${auth}`, 'Content-Type': 'application/json' } });
+      if (!ordersResponse.ok) {
+        throw new Error('WooCommerce API Error');
+      }
+      const orders: any[] = await ordersResponse.json();
+      // Kunden extrahieren
+      const customerMap = new Map<string, { email: string; orders: any[] }>();
+      orders.forEach((order: any) => {
+        const email = order.billing?.email;
+        if (!email) return;
+        if (customerMap.has(email)) {
+          customerMap.get(email)!.orders.push(order);
+        } else {
+          customerMap.set(email, { email, orders: [order] });
+        }
+      });
+      const customers = Array.from(customerMap.values());
+      // Conversion-Kennzahlen berechnen
+      const totalOrders = orders.length;
+      const totalCustomers = customers.length;
+      const totalSales = orders.reduce((sum: number, o: any) => sum + parseFloat(o.total), 0);
+      const avgOrderValue = totalOrders > 0 ? totalSales / totalOrders : 0;
+      // Conversion-Rate: Anteil Kunden, die bestellt haben (vereinfachte Logik)
+      const conversionRate = totalCustomers > 0 ? (totalOrders / totalCustomers) * 100 : 0;
+      return reply.send({
+        success: true,
+        data: {
+          totalOrders,
+          totalCustomers,
+          totalSales: Math.round(totalSales * 100) / 100,
+          avgOrderValue: Math.round(avgOrderValue * 100) / 100,
+          conversionRate: Math.round(conversionRate * 10) / 10,
+          period: 'last30Days',
+          lastUpdated: new Date().toISOString()
+        }
+      });
+    } catch (error) {
+      console.error('Conversion Analysis Error:', error);
+      return reply.status(500).send({
+        success: false,
+        error: error instanceof Error ? error.message : 'Unbekannter Fehler'
+      });
+    }
   });
 
   // POST /api/analytics/conversion/analyze
   fastify.post('/analyze', async (request: FastifyRequest, reply: FastifyReply) => {
-    const { timeframe = '30days' } = request.body as { timeframe?: string };
-    
-    try {
-      // Basis-Conversion-Daten
-      const conversionData = {
-        overallRate: 2.8,
-        cartAbandonment: 68,
-        checkoutCompletion: 32,
-        mobileRate: 1.9,
-        desktopRate: 3.5,
-        timeframe
-      };
-
-      // ✅ KI-basierte Conversion-Analyse
-      const aiInsights = await AnalyticsMLService.analyzeConversion(conversionData);
-
-      return reply.send({
-        success: true,
-        analysis: {
-          timeframe,
-          totalSessions: 5420,
-          totalConversions: 152,
-          conversionRate: 2.8,
-          averageOrderValue: 82.5,
-          cartAbandonment: 68,
-          checkoutCompletion: 32,
-          mobileConversions: 45,
-          desktopConversions: 107,
-          returningCustomers: 4.2,
-          newCustomers: 1.8,
-          topConvertingProducts: [
-            { id: 1, name: 'Product A', conversions: 45, rate: 8.5 },
-            { id: 2, name: 'Product B', conversions: 32, rate: 6.2 },
-            { id: 3, name: 'Product C', conversions: 28, rate: 5.1 }
-          ],
-          trends: {
-            daily: [
-              { date: '2025-12-01', rate: 2.5 },
-              { date: '2025-12-02', rate: 2.7 },
-              { date: '2025-12-03', rate: 2.8 },
-              { date: '2025-12-04', rate: 2.9 },
-              { date: '2025-12-05', rate: 2.8 }
-            ]
-          },
-          ai_insights: aiInsights
-        },
-        timestamp: new Date().toISOString()
-      });
-    } catch (error) {
-      console.error('Conversion Analysis failed:', error);
-      // Fallback bei Fehler
-      return reply.send({
-        success: true,
-        analysis: {
-          timeframe,
-          totalSessions: 5420,
-          totalConversions: 152,
-          conversionRate: 2.8,
-          recommendations: ['KI-Analyse temporär nicht verfügbar']
-        },
-        timestamp: new Date().toISOString()
-      });
-    }
+    // Keine echten Datenquelle angebunden
+    return reply.status(404).send({
+      success: false,
+      error: 'Keine Conversion-Datenquelle angebunden.'
+    });
   });
 
   // GET /api/analytics/conversion/funnel

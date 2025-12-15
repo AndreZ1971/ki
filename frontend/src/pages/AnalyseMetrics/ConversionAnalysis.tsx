@@ -46,16 +46,7 @@ const ConversionAnalysis = () => {
           setConversionData(data.data);
         }
       } catch (_err) {
-        setConversionData({
-          overallRate: 2.8,
-          cartAbandonment: 68,
-          checkoutCompletion: 32,
-          mobileRate: 1.9,
-          desktopRate: 3.5,
-          returningCustomers: 4.2,
-          newCustomers: 1.8,
-          lastUpdated: new Date().toISOString()
-        });
+        setConversionData(null);
       } finally {
         setLoading(false);
       }
@@ -73,7 +64,7 @@ const ConversionAnalysis = () => {
     try {
       let base = (import.meta.env.VITE_API_URL || '').trim();
       if (base.endsWith('/')) base = base.slice(0, -1);
-      const apiUrl = base ? `${base}/api/analytics/conversion/ml-analysis` : `/api/analytics/conversion/ml-analysis`;
+      const apiUrl = base ? `${base}/api/analytics/conversion/ml/ml-analysis` : `/api/analytics/conversion/ml/ml-analysis`;
       const res = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
