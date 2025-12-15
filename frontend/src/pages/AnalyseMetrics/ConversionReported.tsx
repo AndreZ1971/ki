@@ -12,6 +12,13 @@ interface ReportData {
   realTimeReports?: number;
   avgReportTime?: string;
   lastUpdated?: string;
+  recentReports?: Array<{
+    title?: string;
+    name?: string;
+    createdAt?: string;
+    date?: string;
+    status?: string;
+  }>;
 }
 
 interface Insight {
