@@ -7,6 +7,10 @@ interface CreateProductBody {
   category: string;
   productType?: 'simple' | 'virtual' | 'downloadable';
   optimization: 'low' | 'medium' | 'high';
+  keywords?: string;
+  seoOptimized?: boolean;
+  mlMarketAnalysis?: boolean;
+  specializationPrompt?: string;
 }
 
 interface WooProductBody {
@@ -47,8 +51,17 @@ export default async function productRoutes(server: FastifyInstance) {
     },
     async (request: FastifyRequest<{ Body: CreateProductBody }>, reply: FastifyReply) => {
       try {
-        const { count, category, productType = 'simple', optimization } = request.body;
-        console.log('🤖 Auto-creating products:', { count, category, productType, optimization });
+        const { 
+          count, 
+          category, 
+          productType = 'simple', 
+          optimization,
+          keywords = '',
+          seoOptimized = true,
+          mlMarketAnalysis = true,
+          specializationPrompt = ''
+        } = request.body;
+        console.log('🤖 Auto-creating products:', { count, category, productType, optimization, keywords, seoOptimized, mlMarketAnalysis });
 
 
         // WooCommerce Config aus zentraler config.json
@@ -74,17 +87,35 @@ export default async function productRoutes(server: FastifyInstance) {
         const errors: string[] = [];
 
         // Generiere Produktideen mit OpenAI
-        const prompt = `Generiere ${count} kreative Produktideen für einen WooCommerce Shop.
-Kategorie-ID: ${category}
-Produkttyp: ${productType}
-                const openai = new OpenAI({
-                  apiKey: config.openAI?.apiKey || ''
-                });
-- name: Produktname (kreativ, einzigartig)
-- description: Detaillierte Beschreibung (${optimization === 'high' ? '200-300' : optimization === 'medium' ? '100-150' : '50-80'} Wörter)
-- price: Preis in Euro (realistisch, zwischen 9.99 und 299.99)
+        const keywordsText = keywords?.trim() ? `Schlagwörter/Keywords: ${keywords}` : 'Schlagwörter/Keywords: generiere passende Begriffe basierend auf Thema und Trenddaten';
+        const specializationText = specializationPrompt?.trim() ? `Spezielle Anforderungen oder Stil: ${specializationPrompt}` : 'Keine speziellen Anforderungen angegeben, nutze Best Practices für diesen Shoptyp.';
+        const seoText = seoOptimized ? 'SEO-optimierte Titel und Beschreibungen (natürlich klingend, keine Keyword-Stuffing).' : 'Keine explizite SEO-Optimierung gefordert.';
+        const mlFilterText = mlMarketAnalysis ? 'Nutze Markt-/Trendwissen und ähnliche Shops, um nur passende Produkte vorzuschlagen.' : 'Kein ML-Filter, aber bleibe thematisch konsistent.';
 
-Antworte mit einem JSON Objekt im Format: {"products": [...]}`;
+        const prompt = `Generiere ${count} hochrelevante Produktideen für einen WooCommerce Shop.
+      Shop-URL: ${config.wordpress?.url || 'unbekannt'}
+      Kategorie-ID: ${category}
+      Produkttyp: ${productType}
+      Optimierungsgrad: ${optimization}
+      ${keywordsText}
+      ${specializationText}
+      ${seoText}
+      ${mlFilterText}
+
+      Für jede Idee liefere Felder:
+      - name: Produktname (kreativ, einzigartig, thematisch passend)
+      - description: ${optimization === 'high' ? '200-300' : optimization === 'medium' ? '120-180' : '60-90'} Wörter, klarer Nutzen, Zielgruppe, USPs, ggf. SEO-Keywords natürlich integriert
+      - price: realistischer Preis in Euro (9.99 bis 299.99) passend zur Kategorie und Positionierung
+      - category: kurzbezeichneter Kategoriename (nicht nur ID)
+      - features: 3-5 Bullet Points (USP, Material, Einsatz)
+      - keywords: 5-8 relevante Keywords
+
+      Wichtige Regeln:
+      - Passe Ideen strikt an Shop-Thema/Kategorie an.
+      - Keine generischen Standardprodukte; meide Wiederholungen.
+      - Für Produkttyp ${productType}: bei virtual/downloadable keine physischen Versanddetails.
+      - Schreibe in Deutsch.
+      - Antworte als JSON: {"products": [ ... ]}.`;
 
         const completion = await openai.chat.completions.create({
           model: 'gpt-4o-mini',
@@ -612,7 +643,7 @@ Antworte mit einem JSON Objekt im Format: {"products": [...]}`;
           throw new Error('OpenAI API Key nicht konfiguriert');
         }
 
-        const prompt = `Generiere ${count} innovative und trending Produktideen für einen E-Commerce Shop.
+        const prompt = `Generiere ${count} innovative und thematisch passende Produktideen für einen E-Commerce Shop.
 ${category !== 'all' ? `Kategorie-ID: ${category}` : 'Alle Kategorien erlaubt'}
 
 Für jede Idee:
@@ -620,19 +651,13 @@ Für jede Idee:
 - description: Kurze Beschreibung (50-80 Wörter)
 - category: Kategorie (z.B. "Digital Products", "Home & Garden", etc.)
 - price: Preis in Euro (9.99-299.99)
-- reason: Warum diese Idee trending ist
+- score: Qualitäts-Score 0-100
+- reason: Warum diese Idee gerade passt/trending ist
 
-Antworte mit einem JSON Array im Format:
-[
-  {
-    "title": "...",
-    "description": "...",
-    "category": "...",
-    "price": 0,
-    "score": 85,
-    "reason": "..."
-  }
-]`;
+Antwort-Format (streng):
+{ "ideas": [
+  { "title": "...", "description": "...", "category": "...", "price": 0, "score": 85, "reason": "..." }
+] }`;
 
         const completion = await openai.chat.completions.create({
           model: 'gpt-4o-mini',
@@ -641,16 +666,20 @@ Antworte mit einem JSON Array im Format:
           response_format: { type: 'json_object' }
         });
 
-        const responseContent = completion.choices[0].message.content || '[]';
+        const responseContent = completion.choices[0].message.content || '{}';
         console.log('🤖 OpenAI Ideas Response:', responseContent);
         
         let ideas: any[] = [];
         try {
           const parsed = JSON.parse(responseContent);
-          ideas = Array.isArray(parsed) ? parsed : (parsed.ideas || []);
+          ideas = Array.isArray(parsed) ? parsed : (parsed.ideas || parsed.products || []);
         } catch (parseError) {
           console.error('❌ JSON Parse Error:', parseError);
           ideas = [];
+        }
+
+        if (!ideas || ideas.length === 0) {
+          throw new Error('Keine Produktideen vom KI-Dienst erhalten');
         }
 
         // Generiere Score für jede Idee wenn nicht vorhanden
