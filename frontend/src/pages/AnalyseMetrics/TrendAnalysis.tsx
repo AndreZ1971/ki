@@ -1,17 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './page.css';
-
-interface TrendData {
-  salesGrowth?: number;
-  customerGrowth?: number;
-  popularProducts?: number;
-  seasonalTrend?: number;
-  marketTrend?: string;
-  predictionAccuracy?: number;
-  trendStrength?: number;
-  lastUpdated?: string;
-}
 
 interface Metric {
   icon: string;
@@ -107,23 +96,8 @@ const TrendAnalysis = () => {
     fetchData();
   }, [timeRange]);
 
-  // Automatische KI-Analyse bei Zeitraum-Änderung
-  useEffect(() => {
-    if (metrics.length > 0) {
-      handleAnalyzeAI();
-    }
-  }, [timeRange]);
-
-  const handleBackToDashboard = () => {
-    navigate('/');
-  };
-
-  const handleTimeRangeChange = (range: string) => {
-    setTimeRange(range);
-  };
-
   // KI/ML-Analyse: API-Call
-  const handleAnalyzeAI = async () => {
+  const handleAnalyzeAI = useCallback(async () => {
     setInsightLoading(true);
     setInsightError(null);
     setInsights([]);
@@ -180,6 +154,21 @@ const TrendAnalysis = () => {
     } finally {
       setInsightLoading(false);
     }
+  }, [timeRange]);
+
+  // Automatische KI-Analyse bei Zeitraum-Änderung
+  useEffect(() => {
+    if (metrics.length > 0) {
+      handleAnalyzeAI();
+    }
+  }, [metrics.length, handleAnalyzeAI]);
+
+  const handleBackToDashboard = () => {
+    navigate('/');
+  };
+
+  const handleTimeRangeChange = (range: string) => {
+    setTimeRange(range);
   };
 
   // getTrendIndicator entfernt

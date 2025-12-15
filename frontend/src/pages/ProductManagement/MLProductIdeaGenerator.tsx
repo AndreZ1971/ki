@@ -24,13 +24,19 @@ export const MLProductIdeaGenerator: React.FC<MLProductIdeaGeneratorProps> = ({ 
     setError(null);
     try {
       const res = await fetch(`/api/products/ml/generate-ideas?count=${count}&category=${category}`);
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || `HTTP ${res.status}`);
+      }
       const data = await res.json();
-      if (data.success && data.ideas) {
+      if (data.success && Array.isArray(data.ideas) && data.ideas.length > 0) {
         setIdeas(data.ideas);
       } else {
-        setError(data.error || 'Fehler bei der Generierung');
+        setIdeas([]);
+        setError(data.error || 'Keine Produktideen erhalten. Bitte erneut versuchen.');
       }
     } catch (err: any) {
+      setIdeas([]);
       setError(err.message || 'Fehler bei der Generierung');
     } finally {
       setLoading(false);
@@ -50,6 +56,9 @@ export const MLProductIdeaGenerator: React.FC<MLProductIdeaGeneratorProps> = ({ 
       </button>
       {loading && <div className="ml-idea-loading">Generierung läuft...</div>}
       {error && <div className="ml-idea-error">{error}</div>}
+      {!error && !loading && ideas.length === 0 && (
+        <div className="ml-idea-error" style={{color:'#6c757d'}}>Keine Ideen erhalten. Bitte erneut generieren.</div>
+      )}
       {ideas.length > 0 && (
         <div className="ml-idea-list">
           <h4>KI-Produktideen</h4>

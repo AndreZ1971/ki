@@ -160,13 +160,29 @@ export default async function productRoutes(server: FastifyInstance) {
             let imageUrl = null;
             if (generateImages) {
               try {
-                // Unsplash-ähnlichen Begriff aus Produktname extrahieren
-                const searchTerm = productIdea.name.split(' ').slice(0, 2).join(' ');
-                const unsplashUrl = `https://source.unsplash.com/800x600/?${encodeURIComponent(searchTerm)},product`;
-                imageUrl = unsplashUrl;
-                console.log(`🖼️ Generated image URL for ${productIdea.name}: ${imageUrl}`);
+                // Nutze OpenAI DALL-E für hochwertige Produktbilder
+                console.log(`🎨 Generating product image for: ${productIdea.name}`);
+                
+                const imagePrompt = `Professional product photography of ${productIdea.name}, high quality, studio lighting, white background, e-commerce style, detailed, 4k`;
+                
+                const imageResponse = await openai.images.generate({
+                  model: 'dall-e-3',
+                  prompt: imagePrompt,
+                  n: 1,
+                  size: '1024x1024',
+                  quality: 'standard'
+                });
+                
+                imageUrl = imageResponse.data?.[0]?.url || null;
+                if (imageUrl) {
+                  console.log(`✅ Generated image for ${productIdea.name}: ${imageUrl}`);
+                }
               } catch (imgError) {
-                console.error('Fehler beim Generieren der Bild-URL:', imgError);
+                console.error('Fehler beim Generieren des Bildes mit DALL-E:', imgError);
+                // Fallback zu Picsum (zuverlässiger als Unsplash)
+                const fallbackId = Math.floor(Math.random() * 1000);
+                imageUrl = `https://picsum.photos/seed/${encodeURIComponent(productIdea.name)}/800/600`;
+                console.log(`⚠️ Using fallback image: ${imageUrl}`);
               }
             }
 

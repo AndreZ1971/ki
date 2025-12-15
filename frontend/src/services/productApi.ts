@@ -82,7 +82,12 @@ export const productApi = {
   createAutoProducts: async (config: {
     count: number;
     category: string;
+    productType?: 'simple' | 'virtual' | 'downloadable';
     optimization: 'low' | 'medium' | 'high';
+    seoOptimized?: boolean;
+    keywords?: string;
+    mlMarketAnalysis?: boolean;
+    specializationPrompt?: string;
   }): Promise<ApiResponse<ProductCreationResult>> => {
     return apiRequest<ProductCreationResult>('/api/products/auto-create', {
       method: 'POST',
