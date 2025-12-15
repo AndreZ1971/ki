@@ -643,7 +643,7 @@ export default async function productRoutes(server: FastifyInstance) {
           throw new Error('OpenAI API Key nicht konfiguriert');
         }
 
-        const prompt = `Generiere ${count} innovative und thematisch passende Produktideen für einen E-Commerce Shop.
+        const prompt = `Generiere ${count} innovative und thematisch passende Produktideen für einen E-Commerce Shop. Antworte ausschließlich als JSON-Objekt.
 ${category !== 'all' ? `Kategorie-ID: ${category}` : 'Alle Kategorien erlaubt'}
 
 Für jede Idee:
