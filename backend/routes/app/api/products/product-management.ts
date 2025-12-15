@@ -580,4 +580,101 @@ Antworte mit einem JSON Objekt im Format: {"products": [...]}`;
       }
     }
   );
+
+  // ML Generate Product Ideas
+  server.get<{ Querystring: { count: string; category: string } }>(
+    '/ml/generate-ideas',
+    {
+      schema: {
+        tags: ['products', 'ml'],
+        description: 'Generiert KI-basierte Produktideen',
+        querystring: {
+          type: 'object',
+          properties: {
+            count: { type: 'string', description: 'Anzahl der Ideen (Standard: 3)' },
+            category: { type: 'string', description: 'Kategorie-ID oder "all"' }
+          }
+        }
+      }
+    },
+    async (request: FastifyRequest<{ Querystring: { count: string; category: string } }>, reply: FastifyReply) => {
+      try {
+        const count = parseInt(request.query.count || '3', 10) || 3;
+        const category = request.query.category || 'all';
+
+        console.log('🤖 Generating product ideas:', { count, category });
+
+        // OpenAI für Produktideen
+        const openai = new OpenAI({
+          apiKey: config.openAI?.apiKey || ''
+        });
+        if (!config.openAI?.apiKey) {
+          throw new Error('OpenAI API Key nicht konfiguriert');
+        }
+
+        const prompt = `Generiere ${count} innovative und trending Produktideen für einen E-Commerce Shop.
+${category !== 'all' ? `Kategorie-ID: ${category}` : 'Alle Kategorien erlaubt'}
+
+Für jede Idee:
+- title: Produktname (einzigartig, modern)
+- description: Kurze Beschreibung (50-80 Wörter)
+- category: Kategorie (z.B. "Digital Products", "Home & Garden", etc.)
+- price: Preis in Euro (9.99-299.99)
+- reason: Warum diese Idee trending ist
+
+Antworte mit einem JSON Array im Format:
+[
+  {
+    "title": "...",
+    "description": "...",
+    "category": "...",
+    "price": 0,
+    "score": 85,
+    "reason": "..."
+  }
+]`;
+
+        const completion = await openai.chat.completions.create({
+          model: 'gpt-4o-mini',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.7,
+          response_format: { type: 'json_object' }
+        });
+
+        const responseContent = completion.choices[0].message.content || '[]';
+        console.log('🤖 OpenAI Ideas Response:', responseContent);
+        
+        let ideas: any[] = [];
+        try {
+          const parsed = JSON.parse(responseContent);
+          ideas = Array.isArray(parsed) ? parsed : (parsed.ideas || []);
+        } catch (parseError) {
+          console.error('❌ JSON Parse Error:', parseError);
+          ideas = [];
+        }
+
+        // Generiere Score für jede Idee wenn nicht vorhanden
+        ideas = ideas.map((idea, idx) => ({
+          ...idea,
+          score: idea.score || Math.floor(70 + Math.random() * 25),
+          reason: idea.reason || 'Trending im Markt'
+        }));
+
+        console.log(`✅ Generated ${ideas.length} product ideas`);
+
+        return reply.send({
+          success: true,
+          ideas: ideas,
+          count: ideas.length,
+          timestamp: new Date().toISOString()
+        });
+      } catch (error) {
+        console.error('❌ Error generating product ideas:', error);
+        return reply.status(500).send({
+          success: false,
+          error: error instanceof Error ? error.message : 'Fehler bei der Generierung von Produktideen'
+        });
+      }
+    }
+  );
 }
