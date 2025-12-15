@@ -180,7 +180,6 @@ export default async function productRoutes(server: FastifyInstance) {
               } catch (imgError) {
                 console.error('Fehler beim Generieren des Bildes mit DALL-E:', imgError);
                 // Fallback zu Picsum (zuverlässiger als Unsplash)
-                const fallbackId = Math.floor(Math.random() * 1000);
                 imageUrl = `https://picsum.photos/seed/${encodeURIComponent(productIdea.name)}/800/600`;
                 console.log(`⚠️ Using fallback image: ${imageUrl}`);
               }
