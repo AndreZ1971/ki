@@ -154,12 +154,16 @@ export default async function productRoutes(server: FastifyInstance) {
               isDownloadable = true;
             }
 
+            // Parse category ID - nur wenn valide Nummer
+            const categoryId = category && category !== 'all' ? parseInt(category, 10) : null;
+            const categories = categoryId && !isNaN(categoryId) ? [{ id: categoryId }] : [];
+
             const wooPayload = {
               name: productIdea.name,
               type: wooType,
               regular_price: productIdea.price.toString(),
               description: productIdea.description,
-              categories: category && category !== 'all' ? [{ id: parseInt(category, 10) }] : [],
+              categories: categories,
               virtual: isVirtual,
               downloadable: isDownloadable,
               status: 'publish'
