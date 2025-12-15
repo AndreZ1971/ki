@@ -114,7 +114,8 @@ const RunAutoProductCreator = () => {
         keywords: trendingKeywords.join(', '),
         seoOptimized: true,
         mlMarketAnalysis: true,
-        specializationPrompt: ''
+        specializationPrompt: '',
+        generateImages: config.generateImages
       };
 
       const response = await fetch('/api/products/auto-create', {

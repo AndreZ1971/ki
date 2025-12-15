@@ -11,6 +11,7 @@ interface CreateProductBody {
   seoOptimized?: boolean;
   mlMarketAnalysis?: boolean;
   specializationPrompt?: string;
+  generateImages?: boolean;
 }
 
 interface WooProductBody {
@@ -59,9 +60,10 @@ export default async function productRoutes(server: FastifyInstance) {
           keywords = '',
           seoOptimized = true,
           mlMarketAnalysis = true,
-          specializationPrompt = ''
+          specializationPrompt = '',
+          generateImages = false
         } = request.body;
-        console.log('🤖 Auto-creating products:', { count, category, productType, optimization, keywords, seoOptimized, mlMarketAnalysis });
+        console.log('🤖 Auto-creating products:', { count, category, productType, optimization, keywords, seoOptimized, mlMarketAnalysis, generateImages });
 
 
         // WooCommerce Config aus zentraler config.json
@@ -154,11 +156,25 @@ export default async function productRoutes(server: FastifyInstance) {
               isDownloadable = true;
             }
 
+            // Bild-URL holen wenn generateImages aktiviert
+            let imageUrl = null;
+            if (generateImages) {
+              try {
+                // Unsplash-ähnlichen Begriff aus Produktname extrahieren
+                const searchTerm = productIdea.name.split(' ').slice(0, 2).join(' ');
+                const unsplashUrl = `https://source.unsplash.com/800x600/?${encodeURIComponent(searchTerm)},product`;
+                imageUrl = unsplashUrl;
+                console.log(`🖼️ Generated image URL for ${productIdea.name}: ${imageUrl}`);
+              } catch (imgError) {
+                console.error('Fehler beim Generieren der Bild-URL:', imgError);
+              }
+            }
+
             // Parse category ID - nur wenn valide Nummer
             const categoryId = category && category !== 'all' ? parseInt(category, 10) : null;
             const categories = categoryId && !isNaN(categoryId) ? [{ id: categoryId }] : [];
 
-            const wooPayload = {
+            const wooPayload: any = {
               name: productIdea.name,
               type: wooType,
               regular_price: productIdea.price.toString(),
@@ -168,6 +184,11 @@ export default async function productRoutes(server: FastifyInstance) {
               downloadable: isDownloadable,
               status: 'publish'
             };
+
+            // Bild hinzufügen wenn vorhanden
+            if (imageUrl) {
+              wooPayload.images = [{ src: imageUrl }];
+            }
 
             const response = await fetch(`${wooConfig.url}/wp-json/wc/v3/products`, {
               method: 'POST',
