@@ -452,8 +452,8 @@ const ShopHealthReport = () => {
                 <span className="stat-value good">{healthData?.recommendations || 0}</span>
               </div>
               <div className="health-stat">
-                <span className="stat-label">Scan-Dauer:</span>
-                <span className="stat-value">2.3s</span>
+                <span className="stat-label">Letzter Scan:</span>
+                <span className="stat-value">{lastUpdate.toLocaleTimeString('de-DE')}</span>
               </div>
             </div>
           </div>
@@ -560,23 +560,25 @@ const ShopHealthReport = () => {
 
         <div className="metric-card">
           <div className="metric-icon">🚨</div>
-          <div className="metric-label">Kritische Probleme</div>
-          <div className="metric-value">2</div>
-          <div className="trend-indicator negative">Sofort handeln</div>
+          <div className="metric-label">Erkannte Probleme</div>
+          <div className="metric-value">{healthData?.issuesFound ?? '—'}</div>
+          <div className="trend-indicator {(healthData?.issuesFound ?? 1) === 0 ? 'positive' : 'negative'}">
+            {(healthData?.issuesFound ?? 1) === 0 ? '✅ Keine' : '⚠️ Vorhanden'}
+          </div>
         </div>
 
         <div className="metric-card">
-          <div className="metric-icon">⚠️</div>
-          <div className="metric-label">Warnungen</div>
-          <div className="metric-value">4</div>
-          <div className="trend-indicator warning">Bald prüfen</div>
+          <div className="metric-icon">💡</div>
+          <div className="metric-label">Empfehlungen</div>
+          <div className="metric-value">{healthData?.recommendations ?? '—'}</div>
+          <div className="trend-indicator warning">{(healthData?.recommendations ?? 0) > 0 ? 'Prüfen' : 'OK'}</div>
         </div>
 
         <div className="metric-card">
           <div className="metric-icon">✅</div>
-          <div className="metric-label">Optimale Bereiche</div>
-          <div className="metric-value">6</div>
-          <div className="trend-indicator positive">Perfekt</div>
+          <div className="metric-label">Gesamt-Status</div>
+          <div className="metric-value">{healthData?.overallScore ?? '—'}%</div>
+          <div className="trend-indicator positive">Online</div>
         </div>
 
         <div className="metric-card last-updated">
@@ -636,34 +638,21 @@ const ShopHealthReport = () => {
         <div className="metric-card full-width info">
           <h3>💡 Empfehlungen & Next Steps</h3>
           <div className="recommendations-list">
-            <div className="recommendation critical">
-              <span className="rec-icon">🚨</span>
-              <div className="rec-content">
-                <strong>Checkout-Abbruch reduzieren (42%)</strong>
-                <p>Optimieren Sie den Checkout-Prozess und reduzieren Sie Abbrüche um 12%</p>
+            {mlInsights.length > 0 ? (
+              mlInsights.map((insight: any, idx: number) => (
+                <div key={idx} className={`recommendation ${insight.priority === 'critical' ? 'critical' : insight.priority === 'high' ? 'warning' : 'good'}`}>
+                  <span className="rec-icon">{insight.priority === 'critical' ? '🚨' : insight.priority === 'high' ? '⚠️' : '💡'}</span>
+                  <div className="rec-content">
+                    <strong>{insight.title}</strong>
+                    <p>{insight.value}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
+                Keine Empfehlungen verfügbar. Führe zuerst eine KI-Diagnostik durch.
               </div>
-            </div>
-            <div className="recommendation warning">
-              <span className="rec-icon">⚠️</span>
-              <div className="rec-content">
-                <strong>Sicherheits-Updates durchführen (65%)</strong>
-                <p>Installieren Sie ausstehende Sicherheits-Updates für WordPress & Plugins</p>
-              </div>
-            </div>
-            <div className="recommendation warning">
-              <span className="rec-icon">⚠️</span>
-              <div className="rec-content">
-                <strong>Bild-Optimierung verbessern (58%)</strong>
-                <p>Komprimieren Sie Produktbilder für schnellere Ladezeiten</p>
-              </div>
-            </div>
-            <div className="recommendation good">
-              <span className="rec-icon">💡</span>
-              <div className="rec-content">
-                <strong>SEO-Optimierung (78%)</strong>
-                <p>Verbessern Sie Meta-Beschreibungen und Title-Tags für bessere Rankings</p>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

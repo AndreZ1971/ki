@@ -318,7 +318,7 @@ const RunAutoProductCreator = () => {
               </label>
               <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: 'rgba(255,255,255,0.8)' }}>
                 <input type="checkbox" checked={config.generateImages} onChange={(e) => handleConfigChange('generateImages', e.target.checked)} style={{ cursor: 'pointer' }} />
-                ?? Bilder generieren (inkl. A.R.I.)
+                mit Bildern generieren
               </label>
             </div>
           </div>
