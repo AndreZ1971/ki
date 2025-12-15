@@ -144,13 +144,41 @@ const RunAutoProductCreator = () => {
       setCurrentStatus('💾 Speichere Produkte...');
       setProgress(95);
 
+      // Sicherere Berechnung der Statistiken, um irreführende 0-Werte zu vermeiden
+      const successCount = resultData.productsCreated || 0;
+      const totalAttempted = config.count;
+      const failureCount = Math.max(totalAttempted - successCount, 0);
+
+      // Durchschnittliche Qualität aus erzeugten Produkten ableiten, falls vorhanden
+      const qualityScores = Array.isArray(resultData.products)
+        ? resultData.products
+            .map((p: any) => (typeof p.qualityScore === 'number' ? p.qualityScore : null))
+            .filter((v: number | null) => typeof v === 'number') as number[]
+        : [];
+      const avgQualityScore = qualityScores.length > 0
+        ? qualityScores.reduce((a, b) => a + b, 0) / qualityScores.length
+        : NaN; // NaN bedeutet: nicht verfügbar
+
+      // Zeit pro Produkt aus geschätzter Gesamtzeit ableiten (z.B. "3 Minuten")
+      const estimatedTimeText: string | undefined = resultData.estimatedTime;
+      const estimatedMinutes = estimatedTimeText
+        ? parseInt(String(estimatedTimeText).replace(/[^0-9]/g, ''), 10)
+        : NaN;
+      const avgProcessTimeSeconds = successCount > 0 && Number.isFinite(estimatedMinutes)
+        ? Math.max(Math.round((estimatedMinutes * 60) / successCount), 1)
+        : NaN;
+
+      // Einfache ROI-Schätzung: Erfolgsquote als Prozentwert, nur Anzeigezweck
+      const successRate = totalAttempted > 0 ? (successCount / totalAttempted) * 100 : NaN;
+      const estimatedROI = Number.isFinite(successRate) ? successRate : NaN;
+
       const calculatedStats: CreationStats = {
-        totalAttempted: config.count,
-        successCount: resultData.productsCreated || 0,
-        failureCount: config.count - (resultData.productsCreated || 0),
-        avgQualityScore: resultData.avgQualityScore || 0,
-        avgProcessTime: resultData.avgProcessTime || 0,
-        estimatedROI: resultData.estimatedROI || 0,
+        totalAttempted,
+        successCount,
+        failureCount,
+        avgQualityScore: Number.isFinite(avgQualityScore) ? avgQualityScore : NaN,
+        avgProcessTime: Number.isFinite(avgProcessTimeSeconds) ? avgProcessTimeSeconds : NaN,
+        estimatedROI: Number.isFinite(estimatedROI) ? estimatedROI : NaN,
       };
 
       setStats(calculatedStats);
@@ -391,17 +419,17 @@ const RunAutoProductCreator = () => {
 
                   <div style={{ padding: '20px', background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(99, 102, 241, 0.1))', borderRadius: '10px', border: '1px solid rgba(59, 130, 246, 0.2)' }}>
                     <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', marginBottom: '8px' }}>📊 Ø Qualität</div>
-                    <div style={{ fontSize: '28px', fontWeight: '700', color: '#60a5fa' }}>{Math.round(stats.avgQualityScore)}%</div>
+                    <div style={{ fontSize: '28px', fontWeight: '700', color: '#60a5fa' }}>{Number.isFinite(stats.avgQualityScore) ? Math.round(stats.avgQualityScore) + '%' : '—'}</div>
                   </div>
 
                   <div style={{ padding: '20px', background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1))', borderRadius: '10px', border: '1px solid rgba(249, 115, 22, 0.2)' }}>
                     <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', marginBottom: '8px' }}>⏱️ Ø Zeit pro Prod.</div>
-                    <div style={{ fontSize: '28px', fontWeight: '700', color: '#f97316' }}>{Math.round(stats.avgProcessTime)}s</div>
+                    <div style={{ fontSize: '28px', fontWeight: '700', color: '#f97316' }}>{Number.isFinite(stats.avgProcessTime) ? Math.round(stats.avgProcessTime) + 's' : '—'}</div>
                   </div>
 
                   <div style={{ padding: '20px', background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(139, 92, 246, 0.1))', borderRadius: '10px', border: '1px solid rgba(168, 85, 247, 0.2)' }}>
                     <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', marginBottom: '8px' }}>💰 Geschätzter ROI</div>
-                    <div style={{ fontSize: '28px', fontWeight: '700', color: '#d946ef' }}>+{Math.round(stats.estimatedROI)}%</div>
+                    <div style={{ fontSize: '28px', fontWeight: '700', color: '#d946ef' }}>{Number.isFinite(stats.estimatedROI) ? '+' + Math.round(stats.estimatedROI) + '%' : '—'}</div>
                   </div>
                 </div>
 
