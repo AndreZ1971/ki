@@ -100,10 +100,27 @@ const RunAutoProductCreator = () => {
       setCurrentStatus('🧠 Generiere KI-Produkte...');
       setProgress(5);
 
-      const response = await fetch('/api/products/auto-create-advanced', {
+      // Mappe nicht unterstützte Werte auf das Backend-Schema
+      const mappedProductType: 'simple' | 'virtual' | 'downloadable' =
+        config.productType === 'simple' ? 'simple' : 'simple'; // variable/bundle -> simple
+      const mappedOptimization: 'low' | 'medium' | 'high' =
+        config.optimization === 'auto' ? 'high' : (config.optimization as 'low' | 'medium' | 'high');
+
+      const payload = {
+        count: config.count,
+        category: config.category,
+        productType: mappedProductType,
+        optimization: mappedOptimization,
+        keywords: trendingKeywords.join(', '),
+        seoOptimized: true,
+        mlMarketAnalysis: true,
+        specializationPrompt: ''
+      };
+
+      const response = await fetch('/api/products/auto-create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(config),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
