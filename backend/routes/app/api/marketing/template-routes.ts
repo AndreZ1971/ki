@@ -334,9 +334,17 @@ Antworte mit strukturierten Verbesserungen.`;
     ) => {
       try {
         const { productInfo, targetAudience } = request.body;
+        const apiKey = config.openAI?.apiKey;
+
+        if (!apiKey) {
+          return reply.status(400).send({
+            success: false,
+            error: 'OpenAI nicht konfiguriert',
+          });
+        }
 
         const openai = new OpenAI({
-          apiKey: process.env.OPENAI_API_KEY,
+          apiKey,
         });
 
         const prompt = `Analysiere diese Produktinformation und empfehle die beste Template-Kategorie:
