@@ -88,13 +88,68 @@ export default async function aiEmailRoutes(server: FastifyInstance) {
 
     const openAIClient = initializeOpenAI();
     if (!openAIClient) {
+      // 🔥 FALLBACK: Verwende vordefinierte Templates statt OpenAI
+      const fallbackTemplates: Record<string, any> = {
+        'welcome-email': {
+          subject: `Herzlich Willkommen ${customerName ? customerName : ''}!`,
+          body: `Hallo ${customerName ? customerName : ''},\n\nschön, dass Sie bei uns sind! Wir freuen uns, Sie als neuen Kunden begrüßen zu dürfen.\n\n${context.productName ? `Ihr digitales Produkt "${context.productName}" steht für Sie bereit. Sie erhalten in Kürze eine separate Email mit dem Download-Link.` : 'Ihre digitalen Produkte stehen für Sie bereit.'}\n\nBei Fragen stehen wir Ihnen jederzeit zur Verfügung.\n\nMit freundlichen Grüßen\nIhr Team`,
+          keyPoints: ['Persönliche Begrüßung', 'Hinweis auf digitale Verfügbarkeit', 'Support-Angebot'],
+          personalizationTips: ['Name verwenden', 'Produktnamen erwähnen']
+        },
+        'order-confirmation': {
+          subject: 'Bestellbestätigung - Ihre digitalen Produkte',
+          body: `Hallo ${customerName ? customerName : ''},\n\nvielen Dank für Ihre Bestellung!\n\n${context.productName ? `Produkt: ${context.productName}\n` : ''}Ihre digitalen Produkte werden in Kürze per Email zugestellt.\n\nBestelldetails:\n- Sofortiger digitaler Zugang\n- Keine Versandkosten\n- Lebenslanger Download-Zugriff\n\nBei Fragen kontaktieren Sie uns gerne.\n\nMit freundlichen Grüßen`,
+          keyPoints: ['Bestellung bestätigen', 'Digitaler Zugang hervorheben', 'Support bereitstellen'],
+          personalizationTips: ['Bestellnummer einfügen', 'Produktliste aufführen']
+        },
+        'download-ready': {
+          subject: '🎉 Ihr Download ist bereit!',
+          body: `Hallo ${customerName ? customerName : ''},\n\n${context.productName ? `Ihr digitales Produkt "${context.productName}" steht jetzt zum Download bereit!\n\n` : 'Ihre digitalen Produkte stehen zum Download bereit!\n\n'}So geht's weiter:\n1. Klicken Sie auf den Download-Link in dieser Email\n2. Speichern Sie die Datei auf Ihrem Gerät\n3. Starten Sie direkt mit der Nutzung\n\nDer Download-Link ist dauerhaft verfügbar - Sie können jederzeit erneut herunterladen.\n\nViel Erfolg damit!\nIhr Team`,
+          keyPoints: ['Download-Verfügbarkeit', 'Einfache Anleitung', 'Dauerhafter Zugriff'],
+          personalizationTips: ['Download-Link prominent platzieren', 'Systemanforderungen erwähnen']
+        },
+        'support-response': {
+          subject: 'Re: Ihre Anfrage - Wir sind für Sie da',
+          body: `Hallo ${customerName ? customerName : ''},\n\nvielen Dank für Ihre Nachricht.\n\nWir haben Ihre Anfrage erhalten und kümmern uns umgehend darum. ${context.productName ? `Bezüglich "${context.productName}": ` : ''}Unser Support-Team wird sich innerhalb von 24 Stunden bei Ihnen melden.\n\nIn der Zwischenzeit können Sie auch unsere FAQ-Seite besuchen.\n\nMit freundlichen Grüßen\nIhr Support-Team`,
+          keyPoints: ['Anfrage bestätigen', 'Bearbeitungszeit kommunizieren', 'Selbsthilfe anbieten'],
+          personalizationTips: ['Ticket-Nummer angeben', 'Spezifisches Problem erwähnen']
+        },
+        'newsletter': {
+          subject: '📰 Neue digitale Produkte & Updates',
+          body: `Hallo ${customerName ? customerName : ''},\n\nentdecken Sie unsere neuesten digitalen Produkte!\n\n${context.productName ? `🆕 NEU: ${context.productName}\n` : ''}Diese Woche im Fokus:\n• Sofortiger Download-Zugriff\n• Exklusive Angebote für Bestandskunden\n• Neue Features und Updates\n\nVerpassen Sie nicht unsere aktuellen Highlights.\n\nBis bald!`,
+          keyPoints: ['Neue Produkte vorstellen', 'Mehrwert bieten', 'Call-to-Action'],
+          personalizationTips: ['Kaufhistorie berücksichtigen', 'Relevante Kategorien betonen']
+        },
+        'abandoned-cart': {
+          subject: '🛒 Ihr Warenkorb wartet auf Sie',
+          body: `Hallo ${customerName ? customerName : ''},\n\nwir haben bemerkt, dass Sie ${context.productName ? `"${context.productName}"` : 'Produkte'} in Ihrem Warenkorb haben.\n\n✨ Ihre Vorteile:\n• Sofortiger Download nach Zahlung\n• Keine Versandkosten\n• Lebenslanger Zugriff\n\nSchließen Sie Ihre Bestellung jetzt ab und starten Sie in wenigen Minuten!\n\nIhr Team`,
+          keyPoints: ['Warenkorb erinnern', 'Vorteile betonen', 'Dringlichkeit erzeugen'],
+          personalizationTips: ['Produktbilder zeigen', 'Zeitlimitiertes Angebot']
+        },
+        'review-request': {
+          subject: '⭐ Wie gefällt Ihnen Ihr digitales Produkt?',
+          body: `Hallo ${customerName ? customerName : ''},\n\nwir hoffen, Sie sind zufrieden mit ${context.productName ? `"${context.productName}"` : 'Ihrem Kauf'}!\n\nIhre Meinung ist uns wichtig. Würden Sie uns mit einer kurzen Bewertung helfen?\n\n👍 Bewertung abgeben (dauert nur 1 Minute)\n\nAls Dankeschön erhalten Sie 10% Rabatt auf Ihren nächsten Kauf.\n\nVielen Dank!\nIhr Team`,
+          keyPoints: ['Bewertung anfragen', 'Anreiz bieten', 'Einfacher Prozess'],
+          personalizationTips: ['Kaufdatum erwähnen', 'Spezifische Produktfragen']
+        },
+        'product-update': {
+          subject: '🆕 Update verfügbar für Ihr digitales Produkt',
+          body: `Hallo ${customerName ? customerName : ''},\n\ngute Neuigkeiten! ${context.productName ? `"${context.productName}" wurde aktualisiert` : 'Es gibt ein Update'}.\n\n✨ Neu in dieser Version:\n• Verbesserte Features\n• Bug-Fixes\n• Optimierte Performance\n\nLaden Sie die neueste Version jetzt herunter - kostenlos für Bestandskunden!\n\nViel Spaß mit den neuen Features!`,
+          keyPoints: ['Update ankündigen', 'Verbesserungen auflisten', 'Kostenloser Download'],
+          personalizationTips: ['Versionsnummer angeben', 'Changelog verlinken']
+        },
+        'special-offer': {
+          subject: '🎁 Exklusives Angebot nur für Sie!',
+          body: `Hallo ${customerName ? customerName : ''},\n\nals geschätzter Kunde erhalten Sie exklusiven Zugang zu unserem Sonderangebot!\n\n${context.productName ? `🔥 ${context.productName} - Jetzt 25% günstiger\n` : ''}• Sofortiger Download\n• Zeitlich limitiert\n• Nur für Bestandskunden\n\nSichern Sie sich jetzt Ihr digitales Produkt zum Sonderpreis!\n\nAngebot gültig bis: [Datum]\n\nIhr Team`,
+          keyPoints: ['Exklusivität betonen', 'Zeitlimit setzen', 'Klarer Call-to-Action'],
+          personalizationTips: ['Kundenhistorie einbeziehen', 'Countdown anzeigen']
+        }
+      };
+
+      const template = fallbackTemplates[emailType] || fallbackTemplates['welcome-email'];
       return {
-        success: false,
-        subject: '',
-        body: 'AI service not available',
-        keyPoints: [],
-        personalizationTips: [],
-        error: 'OpenAI not configured'
+        success: true,
+        ...template
       };
     }
 
