@@ -565,11 +565,16 @@ export default async function imageAnalysisRoutes(fastify: FastifyInstance) {
             .send({ success: false, error: 'Bild ist leer' });
         }
 
-        const image = sharp(bufferImage);
-        const metadata = await image.metadata();
+        // Get metadata first
+        const metadata = await sharp(bufferImage).metadata();
 
-        // Resize and extract raw data
-        const buffer = await image.resize(50, 50).raw().toBuffer();
+        // Convert to RGB and get raw buffer (separate chain)
+        const buffer = await sharp(bufferImage)
+          .resize(50, 50)
+          .toColorspace('srgb')
+          .raw()
+          .toBuffer();
+
         const colorMap = new Map<string, number>();
 
         // Extract RGB values (3 bytes per pixel)
@@ -603,7 +608,7 @@ export default async function imageAnalysisRoutes(fastify: FastifyInstance) {
           _error instanceof Error
             ? _error.message
             : 'Farbanalyse fehlgeschlagen';
-        console.error('❌ Color analysis error:', errorMsg);
+        console.error('❌ Color analysis error:', errorMsg, _error);
         return reply.status(500).send({ success: false, error: errorMsg });
       }
     }
@@ -685,12 +690,10 @@ export default async function imageAnalysisRoutes(fastify: FastifyInstance) {
           },
         });
       } catch (_error) {
-        return reply
-          .status(500)
-          .send({
-            success: false,
-            error: 'Conversion prediction fehlgeschlagen',
-          });
+        return reply.status(500).send({
+          success: false,
+          error: 'Conversion prediction fehlgeschlagen',
+        });
       }
     }
   );
@@ -723,12 +726,10 @@ export default async function imageAnalysisRoutes(fastify: FastifyInstance) {
           },
         });
       } catch (_error) {
-        return reply
-          .status(500)
-          .send({
-            success: false,
-            error: 'Audience prediction fehlgeschlagen',
-          });
+        return reply.status(500).send({
+          success: false,
+          error: 'Audience prediction fehlgeschlagen',
+        });
       }
     }
   );
