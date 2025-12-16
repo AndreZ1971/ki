@@ -1,6 +1,7 @@
 // backend/routes/app/api/marketing/email-marketing.ts
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import nodemailer from 'nodemailer';
+import config from '../../../../config.js';
 
 interface SendCampaignBody {
   campaignName: string;
@@ -35,16 +36,19 @@ export default async function emailMarketingRoutes(server: FastifyInstance) {
   // GET /api/customers/segments - Lade Kundensegmente aus WooCommerce
   server.get('/api/customers/segments', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
-      const wooConfig = {
-        url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
-        consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
-        consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
-      };
+      // Lade WooCommerce-Config aus connection.json (zentrale Konfiguration)
+      if (!config.woocommerce?.url || !config.woocommerce?.consumerKey || !config.woocommerce?.consumerSecret) {
+        return reply.status(500).send({
+          success: false,
+          error: 'WooCommerce nicht konfiguriert. Bitte connection.json einrichten.',
+          data: { all: 0, new: 0, active: 0, inactive: 0 }
+        });
+      }
 
-      const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
+      const auth = Buffer.from(`${config.woocommerce.consumerKey}:${config.woocommerce.consumerSecret}`).toString('base64');
 
       // Lade alle Bestellungen (nicht Kunden, da WooCommerce oft keine separaten Customer-Records hat)
-      const response = await fetch(`${wooConfig.url}/wp-json/wc/v3/orders?per_page=100&status=completed`, {
+      const response = await fetch(`${config.woocommerce.url}/wp-json/wc/v3/orders?per_page=100&status=completed`, {
         headers: {
           'Authorization': `Basic ${auth}`,
           'Content-Type': 'application/json',
