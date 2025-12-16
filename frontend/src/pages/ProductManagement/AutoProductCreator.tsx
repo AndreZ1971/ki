@@ -1,27 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import { useProductManagement } from '../../hooks/useProductManagement';
-import { useToast } from '../../hooks/useToast';
-import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
-import { ToastContainer } from '../../components/Toast/ToastContainer';
-import { productApi, categoryApi } from '../../services/productApi';
-import type { ProductCreationResult, Category } from '../../types/product';
-import { MLProductIdeaGenerator } from './MLProductIdeaGenerator';
-import './page.css';
+import React, { useState, useEffect } from "react";
+import { formatDateTime } from "../../lib/i18n-utils";
+import { useProductManagement } from "../../hooks/useProductManagement";
+import { useToast } from "../../hooks/useToast";
+import {
+  BackButton,
+  LoadingButton,
+  ErrorMessage,
+} from "../../components/shared";
+import { ToastContainer } from "../../components/Toast/ToastContainer";
+import { productApi, categoryApi } from "../../services/productApi";
+import type { ProductCreationResult, Category } from "../../types/product";
+import { MLProductIdeaGenerator } from "./MLProductIdeaGenerator";
+import "./page.css";
 
 const AutoProductCreator = () => {
-  const { handleBackToDashboard, loading, setLoading, error, setError, clearError } = useProductManagement();
+  const {
+    handleBackToDashboard,
+    loading,
+    setLoading,
+    error,
+    setError,
+    clearError,
+  } = useProductManagement();
   const toast = useToast();
   const [result, setResult] = useState<ProductCreationResult | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [config, setConfig] = useState({
     count: 5,
-    category: 'all',
-    productType: 'simple' as 'simple' | 'virtual' | 'downloadable',
-    optimization: 'high' as 'low' | 'medium' | 'high',
+    category: "all",
+    productType: "simple" as "simple" | "virtual" | "downloadable",
+    optimization: "high" as "low" | "medium" | "high",
     seoOptimized: true,
-    keywords: '',
+    keywords: "",
     mlMarketAnalysis: true,
-    specializationPrompt: ''
+    specializationPrompt: "",
   });
 
   // Lade WooCommerce Kategorien
@@ -33,7 +45,7 @@ const AutoProductCreator = () => {
           setCategories(response.data);
         }
       } catch (err) {
-        console.error('Failed to load categories:', err);
+        console.error("Failed to load categories:", err);
       }
     };
     loadCategories();
@@ -49,12 +61,15 @@ const AutoProductCreator = () => {
 
       if (response.success && response.data) {
         setResult(response.data);
-        toast.success(`${response.data.productsCreated} Produkte erfolgreich erstellt!`);
+        toast.success(
+          `${response.data.productsCreated} Produkte erfolgreich erstellt!`
+        );
       } else {
-        throw new Error(response.error || 'Fehler bei der Produkterstellung');
+        throw new Error(response.error || "Fehler bei der Produkterstellung");
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unbekannter Fehler';
+      const errorMessage =
+        err instanceof Error ? err.message : "Unbekannter Fehler";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -72,16 +87,17 @@ const AutoProductCreator = () => {
         <p>Automatische Erstellung und Optimierung von Produkten</p>
       </div>
 
-
       <div className="metric-card full-width">
         <h3>📋 Produkt-Erstellung Konfiguration</h3>
-        <ErrorMessage message={error || ''} onClose={clearError} />
+        <ErrorMessage message={error || ""} onClose={clearError} />
         <div className="config-section">
           <div className="config-item">
             <label>Anzahl der Produkte:</label>
-            <select 
-              value={config.count} 
-              onChange={(e) => setConfig({...config, count: Number(e.target.value)})}
+            <select
+              value={config.count}
+              onChange={(e) =>
+                setConfig({ ...config, count: Number(e.target.value) })
+              }
             >
               <option value="3">3 Produkte</option>
               <option value="5">5 Produkte</option>
@@ -90,21 +106,33 @@ const AutoProductCreator = () => {
           </div>
           <div className="config-item">
             <label>Kategorie:</label>
-            <select 
+            <select
               value={config.category}
-              onChange={(e) => setConfig({...config, category: e.target.value})}
+              onChange={(e) =>
+                setConfig({ ...config, category: e.target.value })
+              }
             >
               <option value="all">Alle Kategorien</option>
-              {categories.map(cat => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
               ))}
             </select>
           </div>
           <div className="config-item">
             <label>Produkttyp:</label>
-            <select 
+            <select
               value={config.productType}
-              onChange={(e) => setConfig({...config, productType: e.target.value as 'simple' | 'virtual' | 'downloadable'})}
+              onChange={(e) =>
+                setConfig({
+                  ...config,
+                  productType: e.target.value as
+                    | "simple"
+                    | "virtual"
+                    | "downloadable",
+                })
+              }
             >
               <option value="simple">Simple (Physisch)</option>
               <option value="virtual">Virtual (Kein Versand)</option>
@@ -113,9 +141,11 @@ const AutoProductCreator = () => {
           </div>
           <div className="config-item">
             <label>AI-Optimierung:</label>
-            <select 
+            <select
               value={config.optimization}
-              onChange={(e) => setConfig({...config, optimization: e.target.value as any})}
+              onChange={(e) =>
+                setConfig({ ...config, optimization: e.target.value as any })
+              }
             >
               <option value="low">Einfache Optimierung</option>
               <option value="medium">Mittlere Optimierung</option>
@@ -127,7 +157,9 @@ const AutoProductCreator = () => {
               <input
                 type="checkbox"
                 checked={config.seoOptimized}
-                onChange={e => setConfig({ ...config, seoOptimized: e.target.checked })}
+                onChange={(e) =>
+                  setConfig({ ...config, seoOptimized: e.target.checked })
+                }
               />
               SEO-optimierte Produktbeschreibung
             </label>
@@ -137,7 +169,9 @@ const AutoProductCreator = () => {
             <input
               type="text"
               value={config.keywords}
-              onChange={e => setConfig({ ...config, keywords: e.target.value })}
+              onChange={(e) =>
+                setConfig({ ...config, keywords: e.target.value })
+              }
               placeholder="z.B. digital, modern, trendy"
             />
           </div>
@@ -146,17 +180,23 @@ const AutoProductCreator = () => {
               <input
                 type="checkbox"
                 checked={config.mlMarketAnalysis}
-                onChange={e => setConfig({ ...config, mlMarketAnalysis: e.target.checked })}
+                onChange={(e) =>
+                  setConfig({ ...config, mlMarketAnalysis: e.target.checked })
+                }
               />
               Nur relevante Produkte für meinen Shop (ML/KI-Marktanalyse)
             </label>
-            <div className="config-hint">Die Produktauswahl basiert auf Shop-Daten und aktuellen Trends.</div>
+            <div className="config-hint">
+              Die Produktauswahl basiert auf Shop-Daten und aktuellen Trends.
+            </div>
           </div>
           <div className="config-item">
             <label>Beschreibung (optional):</label>
             <textarea
               value={config.specializationPrompt}
-              onChange={e => setConfig({ ...config, specializationPrompt: e.target.value })}
+              onChange={(e) =>
+                setConfig({ ...config, specializationPrompt: e.target.value })
+              }
               placeholder="Beschreibe hier besondere Anforderungen, Zielgruppe oder Stilwünsche..."
               rows={2}
             />
@@ -164,7 +204,10 @@ const AutoProductCreator = () => {
         </div>
 
         {/* ML/AI Produktideen-Generator */}
-        <MLProductIdeaGenerator count={config.count} category={config.category} />
+        <MLProductIdeaGenerator
+          count={config.count}
+          category={config.category}
+        />
 
         <LoadingButton
           onClick={handleCreateProducts}
@@ -182,10 +225,13 @@ const AutoProductCreator = () => {
               <span>📦 {result.productsCreated} Produkte</span>
               <span>⏱️ {result.estimatedTime}</span>
               {result.timestamp && (
-                <span>🕐 {new Date(result.timestamp).toLocaleString('de-DE', {
-                  dateStyle: 'short',
-                  timeStyle: 'short'
-                })}</span>
+                <span>
+                  🕐{" "}
+                  {formatDateTime(new Date(result.timestamp), {
+                    dateStyle: "short",
+                    timeStyle: "short",
+                  })}
+                </span>
               )}
             </div>
             {result.products && result.products.length > 0 && (
@@ -194,7 +240,11 @@ const AutoProductCreator = () => {
                 <ul>
                   {result.products.map((product: any) => (
                     <li key={product.id}>
-                      <a href={product.permalink} target="_blank" rel="noopener noreferrer">
+                      <a
+                        href={product.permalink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         {product.name} - {product.price}€
                       </a>
                     </li>

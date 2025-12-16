@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './page.css';
+import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { formatTime } from "../../lib/i18n-utils";
+import "./page.css";
 
 // Types für API Responses
 export interface SecurityScanResponse {
@@ -19,7 +20,7 @@ export interface SEOAnalysisResponse {
   success: boolean;
   score: number;
   issues: Array<{
-    severity: 'critical' | 'high' | 'medium' | 'low';
+    severity: "critical" | "high" | "medium" | "low";
     message: string;
     suggestion: string;
   }>;
@@ -49,27 +50,29 @@ export interface PerformanceReportResponse {
 // API Service für Shop Health - REAL DATA
 const shopHealthService = {
   async clearCache(): Promise<CacheClearResponse> {
-    const res = await fetch('/api/health/clear-cache', { method: 'POST' });
+    const res = await fetch("/api/health/clear-cache", { method: "POST" });
     return await res.json();
   },
   async generatePerformanceReport(): Promise<PerformanceReportResponse> {
-    const res = await fetch('/api/health/performance-report', { method: 'POST' });
+    const res = await fetch("/api/health/performance-report", {
+      method: "POST",
+    });
     return await res.json();
   },
   async runSecurityScan(): Promise<SecurityScanResponse> {
-    const res = await fetch('/api/health/security-scan', { method: 'POST' });
+    const res = await fetch("/api/health/security-scan", { method: "POST" });
     return await res.json();
   },
   async analyzeSEO(): Promise<SEOAnalysisResponse> {
-    const res = await fetch('/api/health/seo-analysis', { method: 'POST' });
+    const res = await fetch("/api/health/seo-analysis", { method: "POST" });
     return await res.json();
-  }
+  },
 };
 
 interface HealthMetric {
   name: string;
   value: number;
-  status: 'excellent' | 'good' | 'warning' | 'critical';
+  status: "excellent" | "good" | "warning" | "critical";
   target: number;
   trend: number;
 }
@@ -90,7 +93,7 @@ interface ShopHealthData {
 interface QuickAction {
   id: string;
   label: string;
-  type: 'primary' | 'secondary' | 'warning' | 'success';
+  type: "primary" | "secondary" | "warning" | "success";
   icon: string;
   completed: boolean;
   loading?: boolean;
@@ -102,7 +105,7 @@ const ShopHealthReport = () => {
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [scanInProgress, setScanInProgress] = useState(false);
-  
+
   // KI/ML-Analyse States
   interface MLInsight {
     type: string;
@@ -110,19 +113,43 @@ const ShopHealthReport = () => {
     value: string;
     score?: number;
     detail?: string;
-    priority?: 'critical' | 'high' | 'medium' | 'low';
+    priority?: "critical" | "high" | "medium" | "low";
     category?: string;
   }
   const [mlLoading, setMlLoading] = useState(false);
   const [mlError, setMlError] = useState<string | null>(null);
   const [mlInsights, setMlInsights] = useState<MLInsight[]>([]);
-  
+
   // Zustand für Schnellaktionen
   const [quickActions, setQuickActions] = useState<QuickAction[]>([
-    { id: 'clear-cache', label: 'Cache leeren', type: 'primary', icon: '🔄', completed: false },
-    { id: 'performance-report', label: 'Performance Report', type: 'secondary', icon: '📊', completed: true },
-    { id: 'security-check', label: 'Sicherheits-Check', type: 'warning', icon: '🔒', completed: false },
-    { id: 'seo-analysis', label: 'SEO-Analyse', type: 'success', icon: '📈', completed: false }
+    {
+      id: "clear-cache",
+      label: "Cache leeren",
+      type: "primary",
+      icon: "🔄",
+      completed: false,
+    },
+    {
+      id: "performance-report",
+      label: "Performance Report",
+      type: "secondary",
+      icon: "📊",
+      completed: true,
+    },
+    {
+      id: "security-check",
+      label: "Sicherheits-Check",
+      type: "warning",
+      icon: "🔒",
+      completed: false,
+    },
+    {
+      id: "seo-analysis",
+      label: "SEO-Analyse",
+      type: "success",
+      icon: "📈",
+      completed: false,
+    },
   ]);
 
   // Fetch all health data from backend endpoints
@@ -133,31 +160,77 @@ const ShopHealthReport = () => {
       const [perf, sec, seo] = await Promise.all([
         shopHealthService.generatePerformanceReport(),
         shopHealthService.runSecurityScan(),
-        shopHealthService.analyzeSEO()
+        shopHealthService.analyzeSEO(),
       ]);
       // Compose healthData from real API responses
       const metrics: HealthMetric[] = [
-        { name: 'Ladezeit', value: perf.metrics.loadTime, status: perf.metrics.loadTime < 2 ? 'excellent' : 'warning', target: 2.0, trend: 0 },
-        { name: 'TTFB', value: perf.metrics.ttfb, status: perf.metrics.ttfb < 1 ? 'excellent' : 'warning', target: 1.0, trend: 0 },
-        { name: 'FCP', value: perf.metrics.fcp, status: perf.metrics.fcp < 2 ? 'good' : 'warning', target: 2.0, trend: 0 },
-        { name: 'LCP', value: perf.metrics.lcp, status: perf.metrics.lcp < 2.5 ? 'good' : 'critical', target: 2.5, trend: 0 },
-        { name: 'SEO-Optimierung', value: seo.score, status: seo.score > 85 ? 'excellent' : seo.score > 70 ? 'good' : 'warning', target: 90, trend: 0 },
-        { name: 'Sicherheits-Updates', value: sec.vulnerabilities.critical === 0 ? 100 : 60, status: sec.vulnerabilities.critical === 0 ? 'excellent' : 'critical', target: 100, trend: 0 }
+        {
+          name: "Ladezeit",
+          value: perf.metrics.loadTime,
+          status: perf.metrics.loadTime < 2 ? "excellent" : "warning",
+          target: 2.0,
+          trend: 0,
+        },
+        {
+          name: "TTFB",
+          value: perf.metrics.ttfb,
+          status: perf.metrics.ttfb < 1 ? "excellent" : "warning",
+          target: 1.0,
+          trend: 0,
+        },
+        {
+          name: "FCP",
+          value: perf.metrics.fcp,
+          status: perf.metrics.fcp < 2 ? "good" : "warning",
+          target: 2.0,
+          trend: 0,
+        },
+        {
+          name: "LCP",
+          value: perf.metrics.lcp,
+          status: perf.metrics.lcp < 2.5 ? "good" : "critical",
+          target: 2.5,
+          trend: 0,
+        },
+        {
+          name: "SEO-Optimierung",
+          value: seo.score,
+          status:
+            seo.score > 85 ? "excellent" : seo.score > 70 ? "good" : "warning",
+          target: 90,
+          trend: 0,
+        },
+        {
+          name: "Sicherheits-Updates",
+          value: sec.vulnerabilities.critical === 0 ? 100 : 60,
+          status: sec.vulnerabilities.critical === 0 ? "excellent" : "critical",
+          target: 100,
+          trend: 0,
+        },
       ];
       setHealthData({
-        overallScore: Math.round((perf.metrics.loadTime < 2 ? 30 : 10) + (seo.score / 2) + (sec.vulnerabilities.critical === 0 ? 30 : 10)),
-        performance: Math.round((perf.metrics.loadTime < 2 ? 100 : 60)),
+        overallScore: Math.round(
+          (perf.metrics.loadTime < 2 ? 30 : 10) +
+            seo.score / 2 +
+            (sec.vulnerabilities.critical === 0 ? 30 : 10)
+        ),
+        performance: Math.round(perf.metrics.loadTime < 2 ? 100 : 60),
         security: Math.round(sec.vulnerabilities.critical === 0 ? 100 : 60),
         seo: seo.score,
         inventory: 90, // TODO: Replace with real inventory data
         lastScan: new Date().toISOString(),
-        issuesFound: sec.vulnerabilities.critical + sec.vulnerabilities.high + sec.vulnerabilities.medium + sec.vulnerabilities.low + seo.issues.length,
+        issuesFound:
+          sec.vulnerabilities.critical +
+          sec.vulnerabilities.high +
+          sec.vulnerabilities.medium +
+          sec.vulnerabilities.low +
+          seo.issues.length,
         recommendations: seo.issues.length,
-        metrics
+        metrics,
       });
       setLastUpdate(new Date());
     } catch (_e) {
-      showErrorNotification('Fehler beim Laden der Shop-Daten');
+      showErrorNotification("Fehler beim Laden der Shop-Daten");
     }
     setLoading(false);
   }, []);
@@ -167,7 +240,7 @@ const ShopHealthReport = () => {
   }, [fetchHealthData]);
 
   const handleBack = () => {
-    navigate('/');
+    navigate("/");
   };
 
   // KI/ML-Analyse: Shop Health mit KI-Diagnostik
@@ -176,10 +249,12 @@ const ShopHealthReport = () => {
     setMlError(null);
     setMlInsights([]);
     try {
-      let base = (import.meta.env.VITE_API_URL || '').trim();
-      if (base.endsWith('/')) base = base.slice(0, -1);
-      const apiUrl = base ? `${base}/api/health/ml-analysis` : `/api/health/ml-analysis`;
-      
+      let base = (import.meta.env.VITE_API_URL || "").trim();
+      if (base.endsWith("/")) base = base.slice(0, -1);
+      const apiUrl = base
+        ? `${base}/api/health/ml-analysis`
+        : `/api/health/ml-analysis`;
+
       const payload = {
         healthData: healthData || {
           overallScore: 75,
@@ -190,22 +265,22 @@ const ShopHealthReport = () => {
           lastScan: new Date().toISOString(),
           issuesFound: 5,
           recommendations: 8,
-          metrics: []
+          metrics: [],
         },
-        metrics: healthData?.metrics || []
+        metrics: healthData?.metrics || [],
       };
-      
+
       const res = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
-      
-      if (!res.ok) throw new Error('Fehler beim Laden der KI-Analyse');
+
+      if (!res.ok) throw new Error("Fehler beim Laden der KI-Analyse");
       const data = await res.json();
       setMlInsights(data.mlInsights || []);
     } catch (err: any) {
-      setMlError(err.message || 'KI-Analyse konnte nicht geladen werden.');
+      setMlError(err.message || "KI-Analyse konnte nicht geladen werden.");
     }
     setMlLoading(false);
   };
@@ -223,17 +298,17 @@ const ShopHealthReport = () => {
     if (results.vulnerabilities.critical > 0) {
       // Kritische Sicherheitsprobleme - sofort handeln
       showCriticalAlert({
-        title: 'Kritische Sicherheitsprobleme!',
-        message: `${results.vulnerabilities.critical} kritische Vulnerabilities gefunden`
+        title: "Kritische Sicherheitsprobleme!",
+        message: `${results.vulnerabilities.critical} kritische Vulnerabilities gefunden`,
       });
     }
-    
+
     // Health Data aktualisieren basierend auf Scan-Ergebnissen
     if (healthData) {
       setHealthData({
         ...healthData,
         security: calculateSecurityScore(results),
-        issuesFound: healthData.issuesFound + results.vulnerabilities.critical
+        issuesFound: healthData.issuesFound + results.vulnerabilities.critical,
       });
     }
   };
@@ -243,12 +318,14 @@ const ShopHealthReport = () => {
       setHealthData({
         ...healthData,
         seo: results.score,
-        recommendations: healthData.recommendations + results.issues.length
+        recommendations: healthData.recommendations + results.issues.length,
       });
     }
   };
 
-  const calculateSecurityScore = (securityResults: SecurityScanResponse): number => {
+  const calculateSecurityScore = (
+    securityResults: SecurityScanResponse
+  ): number => {
     let score = 100;
     score -= securityResults.vulnerabilities.critical * 10;
     score -= securityResults.vulnerabilities.high * 5;
@@ -259,12 +336,12 @@ const ShopHealthReport = () => {
 
   // Notification-Funktionen
   const showSuccessNotification = (message: string) => {
-    console.log('✅ ' + message);
+    console.log("✅ " + message);
     // Optional: Hier könnten Sie ein Toast-System einbinden
   };
 
   const showErrorNotification = (message: string) => {
-    console.error('❌ ' + message);
+    console.error("❌ " + message);
   };
 
   const showCriticalAlert = (data: { title: string; message: string }) => {
@@ -273,15 +350,17 @@ const ShopHealthReport = () => {
 
   // Funktionen für Schnellaktionen - MIT FUNKTIONIERENDEN API CALLS
   const executeQuickAction = async (actionId: string) => {
-    setQuickActions(prev => prev.map(action => 
-      action.id === actionId ? { ...action, loading: true } : action
-    ));
+    setQuickActions((prev) =>
+      prev.map((action) =>
+        action.id === actionId ? { ...action, loading: true } : action
+      )
+    );
 
     try {
       let result;
-      
+
       switch (actionId) {
-        case 'clear-cache':
+        case "clear-cache":
           result = await shopHealthService.clearCache();
           showSuccessNotification(`✅ ${result.message}`);
           // Health Data nach Cache Clear aktualisieren
@@ -289,85 +368,102 @@ const ShopHealthReport = () => {
             setHealthData({
               ...healthData,
               performance: Math.min(100, healthData.performance + 5),
-              overallScore: Math.min(100, healthData.overallScore + 2)
+              overallScore: Math.min(100, healthData.overallScore + 2),
             });
           }
           break;
-          
-        case 'performance-report':
+
+        case "performance-report":
           result = await shopHealthService.generatePerformanceReport();
-          showSuccessNotification(`✅ Performance Report erstellt: ${result.reportId}`);
+          showSuccessNotification(
+            `✅ Performance Report erstellt: ${result.reportId}`
+          );
           // Report in neuem Tab öffnen (falls URL vorhanden)
           if (result.reportUrl) {
-            window.open(result.reportUrl, '_blank');
+            window.open(result.reportUrl, "_blank");
           }
           break;
-          
-        case 'security-check':
+
+        case "security-check":
           result = await shopHealthService.runSecurityScan();
           handleSecurityResults(result);
-          showSuccessNotification(`✅ Sicherheits-Scan abgeschlossen: ${result.vulnerabilities.critical} kritische Probleme`);
+          showSuccessNotification(
+            `✅ Sicherheits-Scan abgeschlossen: ${result.vulnerabilities.critical} kritische Probleme`
+          );
           break;
-          
-        case 'seo-analysis':
+
+        case "seo-analysis":
           result = await shopHealthService.analyzeSEO();
           updateSEOResults(result);
           showSuccessNotification(`✅ SEO-Analyse: Score ${result.score}/100`);
           break;
-          
+
         default:
           throw new Error(`Unbekannte Aktion: ${actionId}`);
       }
-      
+
       // Erfolg - als erledigt markieren
-      setQuickActions(prev => prev.map(action => 
-        action.id === actionId 
-          ? { ...action, completed: true, loading: false } 
-          : action
-      ));
-      
+      setQuickActions((prev) =>
+        prev.map((action) =>
+          action.id === actionId
+            ? { ...action, completed: true, loading: false }
+            : action
+        )
+      );
     } catch (error: any) {
       // Fehlerbehandlung
-      console.error('Aktion fehlgeschlagen:', error);
-      setQuickActions(prev => prev.map(action => 
-        action.id === actionId 
-          ? { ...action, loading: false } 
-          : action
-      ));
-      
+      console.error("Aktion fehlgeschlagen:", error);
+      setQuickActions((prev) =>
+        prev.map((action) =>
+          action.id === actionId ? { ...action, loading: false } : action
+        )
+      );
+
       showErrorNotification(`Aktion fehlgeschlagen: ${error.message}`);
     }
   };
 
   const resetQuickActions = () => {
-    setQuickActions(prev => prev.map(action => ({
-      ...action,
-      completed: action.id === 'performance-report' // Performance Report bleibt completed
-    })));
+    setQuickActions((prev) =>
+      prev.map((action) => ({
+        ...action,
+        completed: action.id === "performance-report", // Performance Report bleibt completed
+      }))
+    );
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'excellent': return '#27ae60';
-      case 'good': return '#3498db';
-      case 'warning': return '#f39c12';
-      case 'critical': return '#e74c3c';
-      default: return '#95a5a6';
+      case "excellent":
+        return "#27ae60";
+      case "good":
+        return "#3498db";
+      case "warning":
+        return "#f39c12";
+      case "critical":
+        return "#e74c3c";
+      default:
+        return "#95a5a6";
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'excellent': return '✅';
-      case 'good': return '👍';
-      case 'warning': return '⚠️';
-      case 'critical': return '🚨';
-      default: return '❓';
+      case "excellent":
+        return "✅";
+      case "good":
+        return "👍";
+      case "warning":
+        return "⚠️";
+      case "critical":
+        return "🚨";
+      default:
+        return "❓";
     }
   };
 
   const getTrendIndicator = (value: number) => {
-    return value >= 0 ? '↗️' : '↘️';
+    return value >= 0 ? "↗️" : "↘️";
   };
 
   if (loading) {
@@ -395,42 +491,54 @@ const ShopHealthReport = () => {
       <div className="analytics-header">
         <h1>🏪 Shop Health Report</h1>
         <p>Kompletter Gesundheits-Check deines Shops</p>
-        
-        <div className="header-controls" style={{display:'flex', gap:'16px', alignItems:'center', flexWrap:'wrap'}}>
-          <button 
-            className={`refresh-button ${scanInProgress ? 'scanning' : ''}`}
+
+        <div
+          className="header-controls"
+          style={{
+            display: "flex",
+            gap: "16px",
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          <button
+            className={`refresh-button ${scanInProgress ? "scanning" : ""}`}
             onClick={runHealthScan}
             disabled={scanInProgress}
           >
-            {scanInProgress ? '🔄 Scannt...' : '🔍 Health-Check'}
+            {scanInProgress ? "🔄 Scannt..." : "🔍 Health-Check"}
           </button>
-          <button 
-            className="ml-analytics-btn" 
-            onClick={handleMLAnalyze} 
+          <button
+            className="ml-analytics-btn"
+            onClick={handleMLAnalyze}
             disabled={mlLoading}
             title="KI-gestützte Shop-Health Diagnostik"
             style={{
-              fontSize:'1em', 
-              padding:'8px 16px', 
-              borderRadius:'8px', 
-              background:'linear-gradient(90deg, #667eea 0%, #764ba2 100%)', 
-              color:'#fff', 
-              border:'none', 
-              display:'flex', 
-              alignItems:'center', 
-              gap:'8px',
-              cursor: mlLoading ? 'not-allowed' : 'pointer',
-              opacity: mlLoading ? 0.5 : 1
+              fontSize: "1em",
+              padding: "8px 16px",
+              borderRadius: "8px",
+              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
+              color: "#fff",
+              border: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              cursor: mlLoading ? "not-allowed" : "pointer",
+              opacity: mlLoading ? 0.5 : 1,
             }}
           >
-            <span role="img" aria-label="AI" style={{fontSize: '1.2em'}}>🤖</span>
-            {mlLoading ? 'KI diagnostiziert...' : 'KI-Diagnostik'}
+            <span role="img" aria-label="AI" style={{ fontSize: "1.2em" }}>
+              🤖
+            </span>
+            {mlLoading ? "KI diagnostiziert..." : "KI-Diagnostik"}
           </button>
         </div>
-        {mlError && <div style={{color:'#e74c3c', marginTop:'8px'}}>{mlError}</div>}
-        
+        {mlError && (
+          <div style={{ color: "#e74c3c", marginTop: "8px" }}>{mlError}</div>
+        )}
+
         <div className="last-update">
-          Letzter Scan: {lastUpdate.toLocaleTimeString('de-DE')}
+          Letzter Scan: {formatTime(lastUpdate)}
         </div>
       </div>
 
@@ -445,15 +553,19 @@ const ShopHealthReport = () => {
             <div className="health-stats">
               <div className="health-stat">
                 <span className="stat-label">Gefundene Probleme:</span>
-                <span className="stat-value critical">{healthData?.issuesFound || 0}</span>
+                <span className="stat-value critical">
+                  {healthData?.issuesFound || 0}
+                </span>
               </div>
               <div className="health-stat">
                 <span className="stat-label">Empfehlungen:</span>
-                <span className="stat-value good">{healthData?.recommendations || 0}</span>
+                <span className="stat-value good">
+                  {healthData?.recommendations || 0}
+                </span>
               </div>
               <div className="health-stat">
                 <span className="stat-label">Letzter Scan:</span>
-                <span className="stat-value">{lastUpdate.toLocaleTimeString('de-DE')}</span>
+                <span className="stat-value">{formatTime(lastUpdate)}</span>
               </div>
             </div>
           </div>
@@ -463,61 +575,138 @@ const ShopHealthReport = () => {
       {/* KI-Insights Sektion */}
       {mlInsights.length > 0 && (
         <div className="analysis-section">
-          <div style={{marginBottom: 24, padding: '20px', background: 'rgba(102,126,234,0.05)', borderRadius: 12, border: '2px solid rgba(102,126,234,0.2)'}}>
-            <h4 style={{marginBottom: 16, color: '#667eea', display: 'flex', alignItems: 'center', gap: 8}}>
-              <span role="img" aria-label="AI">🤖</span>
+          <div
+            style={{
+              marginBottom: 24,
+              padding: "20px",
+              background: "rgba(102,126,234,0.05)",
+              borderRadius: 12,
+              border: "2px solid rgba(102,126,234,0.2)",
+            }}
+          >
+            <h4
+              style={{
+                marginBottom: 16,
+                color: "#667eea",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <span role="img" aria-label="AI">
+                🤖
+              </span>
               KI-Health-Diagnostik
             </h4>
-            <ul style={{listStyle:'none', padding:0, margin:0}}>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
               {mlInsights.map((insight: any, idx: number) => (
-                <li 
-                  key={idx} 
+                <li
+                  key={idx}
                   style={{
-                    background: insight.priority === 'critical' ? 'rgba(231,76,60,0.1)' : 
-                               insight.priority === 'high' ? 'rgba(230,126,34,0.1)' :
-                               insight.priority === 'medium' ? 'rgba(241,196,15,0.08)' : '#f6f8fa',
+                    background:
+                      insight.priority === "critical"
+                        ? "rgba(231,76,60,0.1)"
+                        : insight.priority === "high"
+                          ? "rgba(230,126,34,0.1)"
+                          : insight.priority === "medium"
+                            ? "rgba(241,196,15,0.08)"
+                            : "#f6f8fa",
                     borderLeft: `4px solid ${
-                      insight.priority === 'critical' ? '#e74c3c' :
-                      insight.priority === 'high' ? '#e67e22' :
-                      insight.priority === 'medium' ? '#f1c40f' : '#2563eb'
+                      insight.priority === "critical"
+                        ? "#e74c3c"
+                        : insight.priority === "high"
+                          ? "#e67e22"
+                          : insight.priority === "medium"
+                            ? "#f1c40f"
+                            : "#2563eb"
                     }`,
                     borderRadius: 8,
                     marginBottom: 12,
-                    padding: '16px 18px',
-                    boxShadow: '0 2px 8px rgba(102,126,234,0.08)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 6
+                    padding: "16px 18px",
+                    boxShadow: "0 2px 8px rgba(102,126,234,0.08)",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 6,
                   }}
                 >
-                  <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4}}>
-                    <span style={{fontWeight: 600, color: '#667eea', fontSize: '1.05em'}}>{insight.title}</span>
-                    {insight.priority && (
-                      <span style={{
-                        padding: '4px 10px',
-                        borderRadius: 6,
-                        fontSize: '0.85em',
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginBottom: 4,
+                    }}
+                  >
+                    <span
+                      style={{
                         fontWeight: 600,
-                        background: insight.priority === 'critical' ? '#e74c3c' :
-                                   insight.priority === 'high' ? '#e67e22' :
-                                   insight.priority === 'medium' ? '#f1c40f' : '#27ae60',
-                        color: '#fff'
-                      }}>
+                        color: "#667eea",
+                        fontSize: "1.05em",
+                      }}
+                    >
+                      {insight.title}
+                    </span>
+                    {insight.priority && (
+                      <span
+                        style={{
+                          padding: "4px 10px",
+                          borderRadius: 6,
+                          fontSize: "0.85em",
+                          fontWeight: 600,
+                          background:
+                            insight.priority === "critical"
+                              ? "#e74c3c"
+                              : insight.priority === "high"
+                                ? "#e67e22"
+                                : insight.priority === "medium"
+                                  ? "#f1c40f"
+                                  : "#27ae60",
+                          color: "#fff",
+                        }}
+                      >
                         {insight.priority.toUpperCase()}
                       </span>
                     )}
                   </div>
-                  <span style={{fontSize: '1.08em', color: '#222', lineHeight: 1.5}}>{insight.value}</span>
+                  <span
+                    style={{
+                      fontSize: "1.08em",
+                      color: "#222",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {insight.value}
+                  </span>
                   {insight.detail && (
-                    <span style={{color: '#6c757d', fontSize: '0.95em', marginTop: 4}}>{insight.detail}</span>
+                    <span
+                      style={{
+                        color: "#6c757d",
+                        fontSize: "0.95em",
+                        marginTop: 4,
+                      }}
+                    >
+                      {insight.detail}
+                    </span>
                   )}
                   {insight.category && (
-                    <span style={{color: '#764ba2', fontSize: '0.9em', fontWeight: 500}}>
+                    <span
+                      style={{
+                        color: "#764ba2",
+                        fontSize: "0.9em",
+                        fontWeight: 500,
+                      }}
+                    >
                       📂 {insight.category}
                     </span>
                   )}
                   {insight.score !== undefined && (
-                    <span style={{color: '#764ba2', fontWeight: 600, fontSize: '0.95em'}}>
+                    <span
+                      style={{
+                        color: "#764ba2",
+                        fontWeight: 600,
+                        fontSize: "0.95em",
+                      }}
+                    >
                       KI-Confidence: {Math.round(insight.score * 100)}%
                     </span>
                   )}
@@ -561,32 +750,34 @@ const ShopHealthReport = () => {
         <div className="metric-card">
           <div className="metric-icon">🚨</div>
           <div className="metric-label">Erkannte Probleme</div>
-          <div className="metric-value">{healthData?.issuesFound ?? '—'}</div>
+          <div className="metric-value">{healthData?.issuesFound ?? "—"}</div>
           <div className="trend-indicator {(healthData?.issuesFound ?? 1) === 0 ? 'positive' : 'negative'}">
-            {(healthData?.issuesFound ?? 1) === 0 ? '✅ Keine' : '⚠️ Vorhanden'}
+            {(healthData?.issuesFound ?? 1) === 0 ? "✅ Keine" : "⚠️ Vorhanden"}
           </div>
         </div>
 
         <div className="metric-card">
           <div className="metric-icon">💡</div>
           <div className="metric-label">Empfehlungen</div>
-          <div className="metric-value">{healthData?.recommendations ?? '—'}</div>
-          <div className="trend-indicator warning">{(healthData?.recommendations ?? 0) > 0 ? 'Prüfen' : 'OK'}</div>
+          <div className="metric-value">
+            {healthData?.recommendations ?? "—"}
+          </div>
+          <div className="trend-indicator warning">
+            {(healthData?.recommendations ?? 0) > 0 ? "Prüfen" : "OK"}
+          </div>
         </div>
 
         <div className="metric-card">
           <div className="metric-icon">✅</div>
           <div className="metric-label">Gesamt-Status</div>
-          <div className="metric-value">{healthData?.overallScore ?? '—'}%</div>
+          <div className="metric-value">{healthData?.overallScore ?? "—"}%</div>
           <div className="trend-indicator positive">Online</div>
         </div>
 
         <div className="metric-card last-updated">
           <div className="metric-icon">🕒</div>
           <div className="metric-label">Scan-Zeit</div>
-          <div className="metric-value-small">
-            {lastUpdate.toLocaleTimeString('de-DE')}
-          </div>
+          <div className="metric-value-small">{formatTime(lastUpdate)}</div>
         </div>
       </div>
 
@@ -599,7 +790,7 @@ const ShopHealthReport = () => {
               <div key={index} className="health-metric">
                 <div className="metric-header">
                   <span className="metric-name">{metric.name}</span>
-                  <span 
+                  <span
                     className="metric-status"
                     style={{ color: getStatusColor(metric.status) }}
                   >
@@ -608,22 +799,31 @@ const ShopHealthReport = () => {
                 </div>
                 <div className="metric-progress">
                   <div className="progress-bar-container">
-                    <div 
+                    <div
                       className="progress-bar"
-                      style={{ 
+                      style={{
                         width: `${metric.value}%`,
-                        background: getStatusColor(metric.status)
+                        background: getStatusColor(metric.status),
                       }}
                     ></div>
                   </div>
                   <div className="metric-values">
-                    <span className="current-value">{metric.value}{metric.name.includes('%') ? '%' : ''}</span>
-                    <span className="target-value">Ziel: {metric.target}{metric.name.includes('%') ? '%' : ''}</span>
-                    <span 
+                    <span className="current-value">
+                      {metric.value}
+                      {metric.name.includes("%") ? "%" : ""}
+                    </span>
+                    <span className="target-value">
+                      Ziel: {metric.target}
+                      {metric.name.includes("%") ? "%" : ""}
+                    </span>
+                    <span
                       className="trend-value"
-                      style={{ color: metric.trend >= 0 ? '#27ae60' : '#e74c3c' }}
+                      style={{
+                        color: metric.trend >= 0 ? "#27ae60" : "#e74c3c",
+                      }}
                     >
-                      {getTrendIndicator(metric.trend)} {Math.abs(metric.trend)}%
+                      {getTrendIndicator(metric.trend)} {Math.abs(metric.trend)}
+                      %
                     </span>
                   </div>
                 </div>
@@ -640,8 +840,17 @@ const ShopHealthReport = () => {
           <div className="recommendations-list">
             {mlInsights.length > 0 ? (
               mlInsights.map((insight: any, idx: number) => (
-                <div key={idx} className={`recommendation ${insight.priority === 'critical' ? 'critical' : insight.priority === 'high' ? 'warning' : 'good'}`}>
-                  <span className="rec-icon">{insight.priority === 'critical' ? '🚨' : insight.priority === 'high' ? '⚠️' : '💡'}</span>
+                <div
+                  key={idx}
+                  className={`recommendation ${insight.priority === "critical" ? "critical" : insight.priority === "high" ? "warning" : "good"}`}
+                >
+                  <span className="rec-icon">
+                    {insight.priority === "critical"
+                      ? "🚨"
+                      : insight.priority === "high"
+                        ? "⚠️"
+                        : "💡"}
+                  </span>
                   <div className="rec-content">
                     <strong>{insight.title}</strong>
                     <p>{insight.value}</p>
@@ -649,8 +858,11 @@ const ShopHealthReport = () => {
                 </div>
               ))
             ) : (
-              <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
-                Keine Empfehlungen verfügbar. Führe zuerst eine KI-Diagnostik durch.
+              <div
+                style={{ textAlign: "center", padding: "20px", color: "#666" }}
+              >
+                Keine Empfehlungen verfügbar. Führe zuerst eine KI-Diagnostik
+                durch.
               </div>
             )}
           </div>
@@ -662,7 +874,7 @@ const ShopHealthReport = () => {
         <div className="metric-card full-width">
           <div className="quick-actions-header">
             <h3>⚡ Schnellaktionen</h3>
-            <button 
+            <button
               className="reset-actions-button"
               onClick={resetQuickActions}
               title="Aktionen zurücksetzen"
@@ -675,24 +887,43 @@ const ShopHealthReport = () => {
               <button
                 key={action.id}
                 className={`action-button ${action.type} ${
-                  action.completed ? 'completed' : ''
-                } ${action.loading ? 'loading' : ''}`}
-                onClick={() => !action.completed && !action.loading && executeQuickAction(action.id)}
+                  action.completed ? "completed" : ""
+                } ${action.loading ? "loading" : ""}`}
+                onClick={() =>
+                  !action.completed &&
+                  !action.loading &&
+                  executeQuickAction(action.id)
+                }
                 disabled={action.completed || action.loading}
-                title={action.completed ? 'Bereits abgeschlossen' : action.loading ? 'Wird ausgeführt...' : `Starte ${action.label}`}
+                title={
+                  action.completed
+                    ? "Bereits abgeschlossen"
+                    : action.loading
+                      ? "Wird ausgeführt..."
+                      : `Starte ${action.label}`
+                }
               >
                 <span className="action-icon">
-                  {action.loading ? '⏳' : action.completed ? '✅' : action.icon}
+                  {action.loading
+                    ? "⏳"
+                    : action.completed
+                      ? "✅"
+                      : action.icon}
                 </span>
                 <span className="action-label">
                   {action.label}
-                  {action.completed && <span className="completed-badge">Erledigt</span>}
+                  {action.completed && (
+                    <span className="completed-badge">Erledigt</span>
+                  )}
                 </span>
               </button>
             ))}
           </div>
           <div className="quick-actions-info">
-            <p>💡 Klicken Sie auf eine Aktion, um sie auszuführen. Abgeschlossene Aktionen werden deaktiviert.</p>
+            <p>
+              💡 Klicken Sie auf eine Aktion, um sie auszuführen. Abgeschlossene
+              Aktionen werden deaktiviert.
+            </p>
           </div>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from "react";
+import { formatTime, formatDateTime } from "../../lib/i18n-utils";
 
 // ✅ Typen für Produktanalyse
 interface Product {
@@ -119,7 +120,7 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
 
           if (res.ok) {
             const now = new Date();
-            const timeStr = now.toLocaleTimeString("de-DE", {
+            const timeStr = formatTime(now, {
               hour: "2-digit",
               minute: "2-digit",
             });
@@ -277,7 +278,7 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
 
       // Speichern-Zeit aktualisieren
       const now = new Date();
-      const timeStr = now.toLocaleTimeString("de-DE", {
+      const timeStr = formatTime(now, {
         hour: "2-digit",
         minute: "2-digit",
       });
@@ -1528,8 +1529,7 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
               paddingTop: "16px",
             }}
           >
-            ⏱️ Analysiert am{" "}
-            {new Date(result.analyzedAt).toLocaleString("de-DE")}
+            ⏱️ Analysiert am {formatDateTime(new Date(result.analyzedAt))}
           </div>
         </div>
       )}

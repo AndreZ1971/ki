@@ -445,6 +445,11 @@ async function buildServer() {
     await server.register(standardAuditRoutes);
     console.log('✅ Standard Audit Routes erfolgreich registriert');
 
+    // 🤖 AGENTIC LOOP ROUTES (Anomaly Detection, Product Optimization, Payment Recovery, Analytics Insights)
+    const agentLoopsRoutes = require('./routes/agentLoops').default;
+    await server.register(agentLoopsRoutes, { prefix: '/api/agent/loops' });
+    console.log('✅ Agent Loops Routes erfolgreich registriert');
+
     // 🤖 AI PRODUCT ASSISTANT ROUTES
     await server.register(aiProductAssistantRoutes, {
       prefix: '/api/products',

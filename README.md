@@ -1,15 +1,46 @@
 # 🚀 ARI - Artificial Retail Intelligence System
 
-**Version:** 4.0.0  
-**Status:** Production Ready ✅
+**Version:** 4.1.0  
+**Status:** Production Ready with Agentic Loops ✅
 
-Ein **AI-gestütztes Business Automation System** für WooCommerce/WordPress mit 50+ spezialisierten Tools, KI-Agent und modernem Dashboard.
+Ein **AI-gestütztes Business Automation System** für WooCommerce/WordPress mit 50+ spezialisierten Tools, KI-Agent, Agentic Loops und modernem Dashboard.
 
 ---
 
-## ✨ Was ist neu in Version 4.0.0?
+## ✨ Was ist neu in Version 4.1.0?
 
-### 🔍 Product Analyzer & Optimizer
+### 🤖 **Agentic Loop Framework** (NEU)
+
+Autonome KI-Agenten für kontinuierliche Geschäftsprozesse:
+
+**4 spezialisierte Loop-Typen:**
+
+1. **Anomaly Detection Loop** 🚨
+   - Erkennt Payment-Anomalien automatisch
+   - Typen: failed_payment, unusual_amount, repeated_attempts, high_risk
+   - Endpoint: `POST /api/agent/loops/anomaly-detection/run`
+
+2. **Product Optimization Loop** 📈
+   - A/B testet Produktattribute automatisch
+   - Optimiert: Preis (-10%), Titel (+Bestseller), Beschreibung (+Benefits)
+   - Endpoint: `POST /api/agent/loops/product-optimization/run`
+
+3. **Payment Recovery Loop** 💳
+   - Versucht Failed Orders mit verschiedenen Strategien
+   - Strategien: Retry, Discount, Alternative Payment, Contact
+   - Success Rate: bis zu 60% bei Contact-Strategie
+   - Endpoint: `POST /api/agent/loops/payment-recovery/run`
+
+4. **Analytics Insights Loop** 📊
+   - Generiert automatisch Dashboard-Insights
+   - Erkennt Anomalien und Trends
+   - Liefert Empfehlungen für Maßnahmen
+   - Endpoint: `POST /api/agent/loops/analytics-insights/run`
+
+**Architektur:** Sense → Think → Act → Learn → Repeat Zyklus  
+**Dokumentation:** [AGENTIC_LOOP_ARCHITECTURE.md](docs/AGENTIC_LOOP_ARCHITECTURE.md)
+
+### 🔍 Product Analyzer & Optimizer (v4.0.0)
 
 - **Intelligentes Modal**: Vollständige Produktdetails mit scrollbarem Layout
 - **KI-Analyse Integration**: Produktanalyse mit Score, Metriken und personalisierten Empfehlungen
@@ -17,7 +48,7 @@ Ein **AI-gestütztes Business Automation System** für WooCommerce/WordPress mit
 - **Action Board**: Direkte Maßnahmen (Restock, Pricing, Steering) aus der Analyse heraus
 - **Light Theme**: Optimiert für Lesbarkeit mit weißem Hintergrund und dunkler Schrift
 
-### ⚡ Performance & Resilience
+### ⚡ Performance & Resilience (v4.0.0)
 
 - **30s Timeout**: Großzügigere Timeouts für langsame WooCommerce-Instanzen
 - **60s Cache**: Intelligente Caching-Schicht für Shop-Metriken und Produktdaten
@@ -29,6 +60,7 @@ Ein **AI-gestütztes Business Automation System** für WooCommerce/WordPress mit
 - **WooCommerce Service**: Zentralisierte Credentials-Verwaltung (Env + connection.json)
 - **Shop Metrics Cache**: Resiliente Metriken auch bei Shop-Ausfällen
 - **Type Safety**: Vollständige TypeScript-Typisierung für WooCommerce-Entities
+- **Agentic Loops**: 4 spezialisierte autonome Agenten für Payment, Products & Analytics
 
 ---
 
@@ -125,14 +157,14 @@ npm run dev
 
 ## 📋 Dokumentation
 
-| Dokument | Beschreibung |
-|----------|------------|
-| [Content Monetization](./docs/CONTENT_MONETIZATION.md) | Konsolidierte Anleitung & API |
-| [Bedienungsanleitung](./docs/Bedienungsanleitung-KI-Agent.md) | Komplette Tool-Übersicht & How-To's |
-| [Backend AI Setup](./docs/BACKEND_AI_SETUP.md) | AI-Transformation & Social Media Integration |
-| [Deployment Guide](./docs/deployment.md) | Production-Setup & Troubleshooting |
-| [API-Reference](./docs/api/) | Vollständige API-Dokumentation |
-| [Social Media Guide](./docs/SOCIAL_MEDIA_GUIDE.md) | Meta & TikTok Setup, .env, Test-APIs |
+| Dokument                                                      | Beschreibung                                 |
+| ------------------------------------------------------------- | -------------------------------------------- |
+| [Content Monetization](./docs/CONTENT_MONETIZATION.md)        | Konsolidierte Anleitung & API                |
+| [Bedienungsanleitung](./docs/Bedienungsanleitung-KI-Agent.md) | Komplette Tool-Übersicht & How-To's          |
+| [Backend AI Setup](./docs/BACKEND_AI_SETUP.md)                | AI-Transformation & Social Media Integration |
+| [Deployment Guide](./docs/deployment.md)                      | Production-Setup & Troubleshooting           |
+| [API-Reference](./docs/api/)                                  | Vollständige API-Dokumentation               |
+| [Social Media Guide](./docs/SOCIAL_MEDIA_GUIDE.md)            | Meta & TikTok Setup, .env, Test-APIs         |
 
 ---
 

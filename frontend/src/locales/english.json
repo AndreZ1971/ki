@@ -1,5 +1,48 @@
 {
   "welcome": "Welcome",
   "language": "Language",
-  "change_language": "Change language"
+  "change_language": "Change language",
+  "header": {
+    "title": "🚀 A.R.I. Artificial Retail Intelligence System",
+    "subtitle": "Realtime analytics & AI content generation",
+    "settings": "⚙️ Settings"
+  },
+  "loading": {
+    "title": "📊 Loading real-time data...",
+    "subtitle": "Connecting to WooCommerce API"
+  },
+  "error": {
+    "apiLabel": "⚠️ API Error",
+    "apiDetails": "Ensure the API is reachable at {{url}}"
+  },
+  "metrics": {
+    "sales": {
+      "title": "💰 Revenue",
+      "live": "● LIVE",
+      "hasData": "Real-time data",
+      "noData": "No data available"
+    },
+    "orders": {
+      "title": "📦 Orders",
+      "live": "● LIVE",
+      "hasData": "Current orders",
+      "noData": "No orders"
+    },
+    "conversion": {
+      "title": "📊 Conversion",
+      "live": "● LIVE",
+      "hasData": "Current rate",
+      "noData": "No conversion data"
+    },
+    "customers": {
+      "title": "👥 Customers",
+      "live": "● LIVE",
+      "hasData": "Current customers",
+      "noData": "No customer data"
+    }
+  },
+  "chart": {
+    "salesTitle": "📈 Revenue trend",
+    "demo": "(demo data)"
+  }
 }

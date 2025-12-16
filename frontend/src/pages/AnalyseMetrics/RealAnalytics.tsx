@@ -5,9 +5,10 @@ interface KIInsight {
   detail?: string;
   score?: number;
 }
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './page.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { formatCurrency, formatNumber, formatTime } from "../../lib/i18n-utils";
+import "./page.css";
 
 interface RealTimeData {
   totalProducts: number | null;
@@ -36,23 +37,27 @@ const RealAnalytics = () => {
     setLoading(true);
     setDataError(null);
     try {
-      let base = (import.meta.env.VITE_API_URL || '').trim();
-      if (base.endsWith('/')) base = base.slice(0, -1);
-      const apiUrl = base ? `${base}/api/analytics/real-time/dashboard` : `/api/analytics/real-time/dashboard`;
+      let base = (import.meta.env.VITE_API_URL || "").trim();
+      if (base.endsWith("/")) base = base.slice(0, -1);
+      const apiUrl = base
+        ? `${base}/api/analytics/real-time/dashboard`
+        : `/api/analytics/real-time/dashboard`;
       const response = await fetch(apiUrl, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'x-woocommerce-key': import.meta.env.VITE_WOOCOMMERCE_CONSUMER_KEY || '',
-          'x-woocommerce-secret': import.meta.env.VITE_WOOCOMMERCE_CONSUMER_SECRET || '',
-          'Content-Type': 'application/json'
-        }
+          "x-woocommerce-key":
+            import.meta.env.VITE_WOOCOMMERCE_CONSUMER_KEY || "",
+          "x-woocommerce-secret":
+            import.meta.env.VITE_WOOCOMMERCE_CONSUMER_SECRET || "",
+          "Content-Type": "application/json",
+        },
       });
       if (!response.ok) {
         throw new Error(`API Error: ${response.status}`);
       }
       const data = await response.json();
       if (!(data.success && data.data)) {
-        throw new Error(data?.error || 'API returned error');
+        throw new Error(data?.error || "API returned error");
       }
 
       setRealTimeData({
@@ -61,13 +66,16 @@ const RealAnalytics = () => {
         totalCustomers: data.data.totalCustomers ?? null,
         todaySales: data.data.todaySales ?? null,
         conversionRate: data.data.conversionRate ?? null,
-        activeSessions: data.data.activeUsers ?? data.data.activeSessions ?? null,
-        popularProduct: data.data.popularProduct || 'Keine Daten',
-        lastUpdated: data.data.lastUpdated || new Date().toISOString()
+        activeSessions:
+          data.data.activeUsers ?? data.data.activeSessions ?? null,
+        popularProduct: data.data.popularProduct || "Keine Daten",
+        lastUpdated: data.data.lastUpdated || new Date().toISOString(),
       });
     } catch (error: any) {
-      console.error('Keine Live-Daten verfügbar:', error);
-      setDataError(error?.message || 'Echtzeit-Daten konnten nicht geladen werden');
+      console.error("Keine Live-Daten verfügbar:", error);
+      setDataError(
+        error?.message || "Echtzeit-Daten konnten nicht geladen werden"
+      );
       setRealTimeData(null);
     } finally {
       setLastUpdate(new Date());
@@ -82,36 +90,39 @@ const RealAnalytics = () => {
     setKiError(null);
     setKiInsights([]);
     try {
-      let base = (import.meta.env.VITE_API_URL || '').trim();
-      if (base.endsWith('/')) base = base.slice(0, -1);
-      const apiUrl = base ? `${base}/api/analytics/ml/generate` : `/api/analytics/ml/generate`;
+      let base = (import.meta.env.VITE_API_URL || "").trim();
+      if (base.endsWith("/")) base = base.slice(0, -1);
+      const apiUrl = base
+        ? `${base}/api/analytics/ml/generate`
+        : `/api/analytics/ml/generate`;
       const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(realTimeData)
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(realTimeData),
       });
       if (response.ok) {
         const data = await response.json();
         if (data.success && Array.isArray(data.insights)) {
           const normalized = data.insights.map((insight: any) => ({
-            title: insight.title || insight.category || 'Insight',
-            value: insight.value || insight.finding || insight.reason || '',
+            title: insight.title || insight.category || "Insight",
+            value: insight.value || insight.finding || insight.reason || "",
             detail: insight.detail || insight.recommendation || insight.reason,
-            score: typeof insight.score === 'number'
-              ? insight.score
-              : typeof insight.confidence === 'number'
-                ? insight.confidence / 100
-                : undefined
+            score:
+              typeof insight.score === "number"
+                ? insight.score
+                : typeof insight.confidence === "number"
+                  ? insight.confidence / 100
+                  : undefined,
           }));
           setKiInsights(normalized);
         } else {
-          setKiError('Keine KI-Insights erhalten.');
+          setKiError("Keine KI-Insights erhalten.");
         }
       } else {
-        setKiError('Fehler beim KI-Analyse-Request.');
+        setKiError("Fehler beim KI-Analyse-Request.");
       }
     } catch (_err) {
-      setKiError('Fehler bei der KI-Analyse.');
+      setKiError("Fehler bei der KI-Analyse.");
     } finally {
       setKiLoading(false);
     }
@@ -119,7 +130,7 @@ const RealAnalytics = () => {
 
   useEffect(() => {
     fetchRealTimeData();
-    
+
     let interval: number;
     if (autoRefresh) {
       interval = window.setInterval(fetchRealTimeData, 30000); // Alle 30 Sekunden
@@ -131,24 +142,23 @@ const RealAnalytics = () => {
   }, [autoRefresh]);
 
   const handleBackToDashboard = () => {
-    navigate('/');
+    navigate("/");
   };
 
   const toggleAutoRefresh = () => {
     setAutoRefresh(!autoRefresh);
   };
 
-  const formatCurrency = (amount: number | null | undefined) => {
-    if (amount === null || amount === undefined || Number.isNaN(amount)) return '–';
-    return new Intl.NumberFormat('de-DE', {
-      style: 'currency',
-      currency: 'EUR'
-    }).format(amount);
+  const safeFormatCurrency = (amount: number | null | undefined) => {
+    if (amount === null || amount === undefined || Number.isNaN(amount))
+      return "–";
+    return formatCurrency(amount);
   };
 
-  const formatNumber = (value: number | null | undefined) => {
-    if (value === null || value === undefined || Number.isNaN(value)) return '–';
-    return value;
+  const safeFormatNumber = (value: number | null | undefined) => {
+    if (value === null || value === undefined || Number.isNaN(value))
+      return "–";
+    return formatNumber(value);
   };
 
   if (loading && !realTimeData) {
@@ -157,8 +167,8 @@ const RealAnalytics = () => {
 
   return (
     <div className="analytics-page">
-      <button 
-        className="back-button floating-back" 
+      <button
+        className="back-button floating-back"
         onClick={handleBackToDashboard}
       >
         ← Zurück
@@ -167,41 +177,51 @@ const RealAnalytics = () => {
       <div className="analytics-header">
         <h1>🔍 Real Analytics</h1>
         <p>Echtzeit-Daten aus deinem WooCommerce Shop</p>
-        
+
         <div className="header-controls">
-          <button 
-            className={`refresh-button ${autoRefresh ? 'active' : ''}`}
+          <button
+            className={`refresh-button ${autoRefresh ? "active" : ""}`}
             onClick={toggleAutoRefresh}
           >
-            {autoRefresh ? '🔄 Auto-Refresh ON' : '⏸️ Auto-Refresh OFF'}
+            {autoRefresh ? "🔄 Auto-Refresh ON" : "⏸️ Auto-Refresh OFF"}
           </button>
-          <button 
+          <button
             className="refresh-button"
             onClick={fetchRealTimeData}
             disabled={loading}
           >
-            {loading ? '⏳ Lade...' : '🔄 Aktualisieren'}
+            {loading ? "⏳ Lade..." : "🔄 Aktualisieren"}
           </button>
         </div>
-        
+
         <div className="last-update">
-          Letztes Update: {lastUpdate.toLocaleTimeString('de-DE')}
+          Letztes Update: {formatTime(lastUpdate)}
         </div>
         {dataError && (
-          <div className="error-message" style={{marginTop: 12, textAlign: 'center'}}>
+          <div
+            className="error-message"
+            style={{ marginTop: 12, textAlign: "center" }}
+          >
             ⚠️ {dataError}
           </div>
         )}
-        <div style={{marginTop: 16, marginBottom: 8, textAlign: 'center'}}>
+        <div style={{ marginTop: 16, marginBottom: 8, textAlign: "center" }}>
           <button
             className="action-button primary"
             onClick={runKIAnalysis}
             disabled={kiLoading || !realTimeData}
-            style={{fontSize: '1.1em', padding: '10px 24px'}}
+            style={{ fontSize: "1.1em", padding: "10px 24px" }}
           >
-            {kiLoading ? '⏳ KI-Analyse läuft...' : '🧠 KI-Analyse starten'}
+            {kiLoading ? "⏳ KI-Analyse läuft..." : "🧠 KI-Analyse starten"}
           </button>
-          {kiError && <div className="error-message" style={{marginTop: 8, textAlign: 'center'}}>{kiError}</div>}
+          {kiError && (
+            <div
+              className="error-message"
+              style={{ marginTop: 8, textAlign: "center" }}
+            >
+              {kiError}
+            </div>
+          )}
         </div>
       </div>
 
@@ -210,63 +230,78 @@ const RealAnalytics = () => {
         <div className="metric-card real-time">
           <div className="metric-icon">📦</div>
           <div className="metric-label">Produkte</div>
-          <div className="metric-value">{formatNumber(realTimeData?.totalProducts)}</div>
+          <div className="metric-value">
+            {safeFormatNumber(realTimeData?.totalProducts)}
+          </div>
           <div className="real-time-indicator">
-            <span className="pulse">🟢</span> {realTimeData ? 'Verfügbar' : 'Keine Daten'}
+            <span className="pulse">🟢</span>{" "}
+            {realTimeData ? "Verfügbar" : "Keine Daten"}
           </div>
         </div>
 
         <div className="metric-card real-time">
           <div className="metric-icon">🛒</div>
           <div className="metric-label">Bestellungen</div>
-          <div className="metric-value">{formatNumber(realTimeData?.totalOrders)}</div>
+          <div className="metric-value">
+            {safeFormatNumber(realTimeData?.totalOrders)}
+          </div>
           <div className="trend-indicator positive">
-            {realTimeData ? 'Aus WooCommerce' : 'Keine Daten'}
+            {realTimeData ? "Aus WooCommerce" : "Keine Daten"}
           </div>
         </div>
 
         <div className="metric-card real-time">
           <div className="metric-icon">👥</div>
           <div className="metric-label">Kunden</div>
-          <div className="metric-value">{formatNumber(realTimeData?.totalCustomers)}</div>
+          <div className="metric-value">
+            {safeFormatNumber(realTimeData?.totalCustomers)}
+          </div>
           <div className="real-time-indicator">
-            {realTimeData?.totalCustomers ? 'Registriert' : 'Keine Daten'}
+            {realTimeData?.totalCustomers ? "Registriert" : "Keine Daten"}
           </div>
         </div>
 
         <div className="metric-card real-time">
           <div className="metric-icon">💰</div>
           <div className="metric-label">Heutiger Umsatz</div>
-          <div className="metric-value">{formatCurrency(realTimeData?.todaySales)}</div>
+          <div className="metric-value">
+            {safeFormatCurrency(realTimeData?.todaySales)}
+          </div>
           <div className="trend-indicator">
-            {realTimeData?.todaySales ? '📈 Verkäufe' : 'Keine Daten'}
+            {realTimeData?.todaySales ? "📈 Verkäufe" : "Keine Daten"}
           </div>
         </div>
 
         <div className="metric-card">
           <div className="metric-icon">🎯</div>
           <div className="metric-label">Conversion Rate</div>
-          <div className="metric-value">{formatNumber(realTimeData?.conversionRate)}%</div>
-          <div className="trend-indicator">
-            Basierend auf Besuchern
+          <div className="metric-value">
+            {safeFormatNumber(realTimeData?.conversionRate)}%
           </div>
+          <div className="trend-indicator">Basierend auf Besuchern</div>
         </div>
 
         <div className="metric-card">
           <div className="metric-icon">🔥</div>
           <div className="metric-label">Aktive Sessions</div>
-          <div className="metric-value">{formatNumber(realTimeData?.activeSessions)}</div>
+          <div className="metric-value">
+            {safeFormatNumber(realTimeData?.activeSessions)}
+          </div>
           <div className="trend-indicator">
-            {realTimeData?.activeSessions ? 'Gemessen' : 'Nicht gemessen'}
+            {realTimeData?.activeSessions ? "Gemessen" : "Nicht gemessen"}
           </div>
         </div>
 
         <div className="metric-card">
           <div className="metric-icon">⭐</div>
           <div className="metric-label">Beliebtestes Produkt</div>
-          <div className="metric-value-small">{realTimeData?.popularProduct || 'N/A'}</div>
+          <div className="metric-value-small">
+            {realTimeData?.popularProduct || "N/A"}
+          </div>
           <div className="trend-indicator">
-            {realTimeData?.popularProduct !== 'Nicht getrackt' ? 'Top Seller' : 'Nicht getrackt'}
+            {realTimeData?.popularProduct !== "Nicht getrackt"
+              ? "Top Seller"
+              : "Nicht getrackt"}
           </div>
         </div>
 
@@ -274,7 +309,9 @@ const RealAnalytics = () => {
           <div className="metric-icon">🕒</div>
           <div className="metric-label">Datenstand</div>
           <div className="metric-value-small">
-            {realTimeData?.lastUpdated ? new Date(realTimeData.lastUpdated).toLocaleTimeString('de-DE') : 'N/A'}
+            {realTimeData?.lastUpdated
+              ? formatTime(new Date(realTimeData.lastUpdated))
+              : "N/A"}
           </div>
         </div>
       </div>
@@ -288,31 +325,46 @@ const RealAnalytics = () => {
               <span className="source-icon">📦</span>
               <div>
                 <strong>Produkt-Daten</strong>
-                <p>{formatNumber(realTimeData?.totalProducts)} Produkte in Datenbank</p>
+                <p>
+                  {formatNumber(realTimeData?.totalProducts)} Produkte in
+                  Datenbank
+                </p>
               </div>
             </div>
-            
+
             <div className="data-source available">
               <span className="source-icon">🛒</span>
               <div>
                 <strong>Bestellungen</strong>
-                <p>{formatNumber(realTimeData?.totalOrders)} WooCommerce Bestellungen</p>
+                <p>
+                  {formatNumber(realTimeData?.totalOrders)} WooCommerce
+                  Bestellungen
+                </p>
               </div>
             </div>
-            
-            <div className={`data-source ${realTimeData?.totalCustomers ? 'available' : 'limited'}`}>
+
+            <div
+              className={`data-source ${realTimeData?.totalCustomers ? "available" : "limited"}`}
+            >
               <span className="source-icon">👥</span>
               <div>
                 <strong>Kunden-Daten</strong>
-                <p>{formatNumber(realTimeData?.totalCustomers)} registrierte Kunden</p>
+                <p>
+                  {formatNumber(realTimeData?.totalCustomers)} registrierte
+                  Kunden
+                </p>
               </div>
             </div>
-            
-            <div className={`data-source ${realTimeData?.todaySales ? 'available' : 'limited'}`}>
+
+            <div
+              className={`data-source ${realTimeData?.todaySales ? "available" : "limited"}`}
+            >
               <span className="source-icon">💰</span>
               <div>
                 <strong>Umsatz-Daten</strong>
-                <p>{formatCurrency(realTimeData?.todaySales)} heutiger Umsatz</p>
+                <p>
+                  {formatCurrency(realTimeData?.todaySales)} heutiger Umsatz
+                </p>
               </div>
             </div>
           </div>
@@ -324,23 +376,34 @@ const RealAnalytics = () => {
         <div className="metric-card full-width info">
           <h3>ℹ️ Datenstatus</h3>
           <p>
-            <strong>Diese Analytics zeigen ausschließlich reale Daten aus deinem WooCommerce Shop.</strong><br/>
-            Aktuell verfügbar: Produkte, Bestellungen und Basis-Metriken.<br/>
+            <strong>
+              Diese Analytics zeigen ausschließlich reale Daten aus deinem
+              WooCommerce Shop.
+            </strong>
+            <br />
+            Aktuell verfügbar: Produkte, Bestellungen und Basis-Metriken.
+            <br />
             Erweiterte Tracking-Funktionen können bei Bedarf integriert werden.
           </p>
         </div>
         {/* KI/ML-Insights Sektion */}
         {kiInsights.length > 0 && (
-          <div className="metric-card full-width" style={{marginTop: 24}}>
+          <div className="metric-card full-width" style={{ marginTop: 24 }}>
             <h3>🧠 KI-Insights</h3>
             <div className="insights-list">
               {kiInsights.map((insight, idx) => (
-                <div key={idx} className="insight-item live" style={{marginBottom: 12}}>
-                  <div style={{fontWeight: 600}}>{insight.title}</div>
+                <div
+                  key={idx}
+                  className="insight-item live"
+                  style={{ marginBottom: 12 }}
+                >
+                  <div style={{ fontWeight: 600 }}>{insight.title}</div>
                   <div>{insight.value}</div>
-                  {insight.detail && <div style={{color: '#6c757d'}}>{insight.detail}</div>}
+                  {insight.detail && (
+                    <div style={{ color: "#6c757d" }}>{insight.detail}</div>
+                  )}
                   {insight.score !== undefined && (
-                    <div style={{color: '#2563eb', fontWeight: 700}}>
+                    <div style={{ color: "#2563eb", fontWeight: 700 }}>
                       KI-Score: {Math.round(insight.score * 100)}%
                     </div>
                   )}
