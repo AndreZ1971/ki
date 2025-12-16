@@ -1437,100 +1437,251 @@ Liefere JSON:
       try {
         const { issueType, description, affectedCustomers = 0, financialImpact = 0, systemsAffected = [] } = request.body;
 
-        const { getOpenAIClient } = await import('../../../utils/openai.js');
-        const openai = getOpenAIClient();
+        // === REGELBASIERTE NOTFALL-ANALYSE (OpenAI-frei, sofortige Reaktion) ===
+        
+        const ticketId = `EMG-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
 
-        const systemRole = `Du bist ein Payment-Incident-Manager mit 20 Jahren Erfahrung in kritischen E-Commerce-Umgebungen.
-Du analysierst Notfälle und triffst schnelle, fundierte Entscheidungen basierend auf:
-- Schweregrad & Business Impact
-- Betroffene Systeme & Kundenanzahl
-- SLA-Verletzungen & Eskalationspfade
-- Sofortmaßnahmen (Immediate Actions)
-- Runbooks & Standard Operating Procedures
-- Communication Templates für Stakeholder
-
-Prioritäten: P0 (Critical/Outage) > P1 (High/Degraded) > P2 (Medium) > P3 (Low)
-
-Antworte NUR mit JSON (kein Markdown)!`;
-
-        const userPrompt = `NOTFALL-ANALYSE:
-
-**Problem-Typ:** ${issueType}
-**Beschreibung:** ${description}
-**Betroffene Kunden:** ${affectedCustomers}
-**Finanzieller Impact:** €${financialImpact}
-**Betroffene Systeme:** ${systemsAffected.length > 0 ? systemsAffected.join(', ') : 'Unbekannt'}
-
-Analysiere und gib zurück (JSON):
-{
-  "severity": "P0" | "P1" | "P2" | "P3",
-  "priority": "CRITICAL" | "HIGH" | "MEDIUM" | "LOW",
-  "estimatedImpact": {
-    "customersFacing": 1000,
-    "revenueAtRisk": 50000,
-    "slaViolation": true,
-    "uptimeImpact": "95%"
-  },
-  "rootCauseHypothesis": ["...", "..."],
-  "immediateActions": [
-    {"action": "...", "owner": "DevOps", "eta": "5 min"},
-    {"action": "...", "owner": "Payment Team", "eta": "10 min"}
-  ],
-  "escalationPath": ["L1 Support", "Payment Lead", "CTO"],
-  "runbookUrl": "https://docs.company.com/runbooks/payment-outage",
-  "communicationTemplate": {
-    "internal": "...",
-    "customer": "...",
-    "stakeholder": "..."
-  },
-  "slaDeadline": "2024-12-11T15:00:00Z",
-  "mitigationSteps": ["...", "..."],
-  "preventionRecommendations": ["...", "..."],
-  "confidence": 0.9
-}`;
-
-        const response = await openai.chat.completions.create({
-          model: 'gpt-4o-mini',
-          temperature: 0.15, // Sehr niedrig für kritische Entscheidungen
-          messages: [
-            { role: 'system', content: systemRole },
-            { role: 'user', content: userPrompt }
-          ]
-        });
-
-        const responseText = response.choices[0]?.message?.content;
-        if (!responseText) {
-          throw new Error('Keine Antwort von OpenAI');
+        // 1. SEVERITY-KLASSIFIZIERUNG (basierend auf Impact)
+        let severity: 'P0' | 'P1' | 'P2' | 'P3' = 'P3';
+        let priority: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' = 'LOW';
+        
+        // P0: Critical Outage
+        if (affectedCustomers > 1000 || financialImpact > 50000 || issueType === 'gateway-down') {
+          severity = 'P0';
+          priority = 'CRITICAL';
+        }
+        // P1: High Impact
+        else if (affectedCustomers > 500 || financialImpact > 25000 || issueType === 'fraud-alert') {
+          severity = 'P1';
+          priority = 'HIGH';
+        }
+        // P2: Medium Impact
+        else if (affectedCustomers > 100 || financialImpact > 5000) {
+          severity = 'P2';
+          priority = 'MEDIUM';
         }
 
-        const cleanedText = cleanJsonResponse(responseText);
-        const analysis = JSON.parse(cleanedText);
+        // 2. ESTIMATED IMPACT
+        const customersFacing = affectedCustomers || (severity === 'P0' ? 1000 : severity === 'P1' ? 500 : severity === 'P2' ? 100 : 10);
+        const revenueAtRisk = financialImpact || customersFacing * 50; // Ø 50€ per customer
+        const slaViolation = severity === 'P0' || severity === 'P1';
+        const uptimeImpact = severity === 'P0' ? '90%' : severity === 'P1' ? '95%' : severity === 'P2' ? '98%' : '99.5%';
 
-        const ticketId = `EMG-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+        // 3. ROOT CAUSE HYPOTHESES (basierend auf Issue-Typ)
+        const rootCauseHypothesis: string[] = [];
+        switch (issueType) {
+          case 'gateway-down':
+            rootCauseHypothesis.push(
+              'Payment Gateway API-Ausfall (Provider-seitig)',
+              'Netzwerk-Konnektivitätsprobleme',
+              'Rate Limiting überschritten',
+              'SSL-Zertifikat abgelaufen'
+            );
+            break;
+          case 'fraud-alert':
+            rootCauseHypothesis.push(
+              'Ungewöhnlich hohe Anzahl verdächtiger Transaktionen',
+              'Kompromittierte Kartendaten im Umlauf',
+              'Koordinierter Betrugsversuch',
+              'Fehlerhafte Fraud-Detection-Regeln'
+            );
+            break;
+          case 'refund-issue':
+            rootCauseHypothesis.push(
+              'Refund-API-Konnektivitätsproblem',
+              'Datenbank-Inkonsistenz bei Transaktionen',
+              'Manuelle Verarbeitungsstau',
+              'Gateway-Webhook-Ausfall'
+            );
+            break;
+          default:
+            rootCauseHypothesis.push(
+              'Systemüberlastung',
+              'Konfigurationsfehler',
+              'Datenbankproblem',
+              'Third-Party-Service-Ausfall'
+            );
+        }
+
+        // 4. IMMEDIATE ACTIONS (severity-basiert)
+        const immediateActions: Array<{action: string; owner: string; eta: string}> = [];
+        
+        if (severity === 'P0') {
+          immediateActions.push(
+            { action: '🚨 War Room aktivieren - alle Stakeholder alarmieren', owner: 'Incident Manager', eta: '2 min' },
+            { action: 'Gateway-Status prüfen (Health Endpoint, Logs)', owner: 'DevOps', eta: '3 min' },
+            { action: 'Fallback-Payment-Provider aktivieren', owner: 'Payment Team', eta: '5 min' },
+            { action: 'Customer Status Page aktualisieren', owner: 'Customer Success', eta: '5 min' }
+          );
+        } else if (severity === 'P1') {
+          immediateActions.push(
+            { action: 'Incident Commander bestimmen', owner: 'Team Lead', eta: '5 min' },
+            { action: 'Monitoring-Dashboards analysieren', owner: 'DevOps', eta: '5 min' },
+            { action: 'Betroffene Kunden identifizieren', owner: 'Support', eta: '10 min' }
+          );
+        } else if (severity === 'P2') {
+          immediateActions.push(
+            { action: 'Logs und Metriken sammeln', owner: 'Engineering', eta: '15 min' },
+            { action: 'Ticket an zuständiges Team routen', owner: 'L1 Support', eta: '10 min' }
+          );
+        } else {
+          immediateActions.push(
+            { action: 'Investigation Ticket erstellen', owner: 'Support', eta: '30 min' }
+          );
+        }
+
+        // 5. ESCALATION PATH (severity-basiert)
+        const escalationPath: string[] = [];
+        if (severity === 'P0') {
+          escalationPath.push(
+            '1. Incident Manager (sofort)',
+            '2. Payment Team Lead (3 min)',
+            '3. Engineering Director (5 min)',
+            '4. CTO (10 min)',
+            '5. CEO (15 min wenn nicht gelöst)'
+          );
+        } else if (severity === 'P1') {
+          escalationPath.push(
+            '1. L2 Support (sofort)',
+            '2. Payment Team Lead (15 min)',
+            '3. Engineering Manager (30 min)'
+          );
+        } else if (severity === 'P2') {
+          escalationPath.push(
+            '1. L1 Support (sofort)',
+            '2. L2 Support (1 Stunde)',
+            '3. Engineering (2 Stunden)'
+          );
+        } else {
+          escalationPath.push(
+            '1. L1 Support (sofort)',
+            '2. Engineering (Next Business Day)'
+          );
+        }
+
+        // 6. RUNBOOK URL
+        const runbookUrls: Record<string, string> = {
+          'gateway-down': 'https://docs.internal/runbooks/payment-gateway-outage',
+          'fraud-alert': 'https://docs.internal/runbooks/fraud-incident-response',
+          'refund-issue': 'https://docs.internal/runbooks/refund-processing-issues',
+          'other': 'https://docs.internal/runbooks/general-incident-response'
+        };
+        const runbookUrl = runbookUrls[issueType] || runbookUrls.other;
+
+        // 7. COMMUNICATION TEMPLATES
+        const communicationTemplate = {
+          internal: `🚨 ${severity} Incident: ${issueType}
+          
+Beschreibung: ${description}
+Betroffene Kunden: ${customersFacing}
+Revenue at Risk: €${revenueAtRisk}
+Systeme: ${systemsAffected.join(', ') || 'TBD'}
+
+Status: Investigation in progress
+War Room: ${severity === 'P0' ? 'ACTIVE' : 'Not required'}
+Next Update: ${severity === 'P0' ? '15 min' : '30 min'}`,
+
+          customer: `Wir haben ein technisches Problem festgestellt, das ${customersFacing > 100 ? 'einige' : 'wenige'} Zahlungen betreffen könnte. 
+
+Unser Team arbeitet bereits an einer Lösung. ${severity === 'P0' ? 'Wir haben einen Fallback-Zahlungsanbieter aktiviert.' : 'Die meisten Zahlungen funktionieren weiterhin normal.'} 
+
+Wir halten Sie auf dem Laufenden. Bei Fragen kontaktieren Sie bitte unseren Support.`,
+
+          stakeholder: `Incident Alert - ${severity} ${priority}
+
+Issue: ${description}
+Impact: ${customersFacing} Kunden, €${revenueAtRisk} Revenue at Risk
+Severity: ${severity} (${priority})
+SLA Violation: ${slaViolation ? 'YES' : 'NO'}
+
+Immediate Actions: ${immediateActions.length} Maßnahmen in Arbeit
+ETA Resolution: ${severity === 'P0' ? '30 min' : severity === 'P1' ? '2 Stunden' : '24 Stunden'}
+
+Runbook: ${runbookUrl}
+Ticket: ${ticketId}`
+        };
+
+        // 8. SLA DEADLINE
+        const now = new Date();
+        const slaMinutes = severity === 'P0' ? 30 : severity === 'P1' ? 120 : severity === 'P2' ? 1440 : 4320; // P0=30min, P1=2h, P2=24h, P3=3days
+        const slaDeadline = new Date(now.getTime() + slaMinutes * 60000).toISOString();
+
+        // 9. MITIGATION STEPS
+        const mitigationSteps: string[] = [];
+        if (issueType === 'gateway-down') {
+          mitigationSteps.push(
+            'Failover zu Backup-Payment-Gateway aktivieren',
+            'DNS auf alternative Payment-Endpoint umstellen',
+            'Retry-Queue für fehlgeschlagene Transaktionen aktivieren',
+            'Customer Communication automatisiert versenden'
+          );
+        } else if (issueType === 'fraud-alert') {
+          mitigationSteps.push(
+            'Fraud-Detection-Regeln verschärfen',
+            'Verdächtige IP-Adressen blocken',
+            'Rate Limiting pro IP aktivieren',
+            'Manual Review Queue für High-Risk-Transaktionen'
+          );
+        } else if (issueType === 'refund-issue') {
+          mitigationSteps.push(
+            'Manual Refund Queue priorisieren',
+            'Batch-Refund-Prozess starten',
+            'Kunden über Verzögerung informieren',
+            'Alternative Refund-Methode aktivieren'
+          );
+        } else {
+          mitigationSteps.push(
+            'Monitoring-Alerts aktivieren',
+            'Logs sammeln für Post-Mortem',
+            'Betroffene Systeme neu starten wenn nötig',
+            'Rollback auf letzte stabile Version erwägen'
+          );
+        }
+
+        // 10. PREVENTION RECOMMENDATIONS
+        const preventionRecommendations: string[] = [];
+        if (severity === 'P0' || severity === 'P1') {
+          preventionRecommendations.push(
+            'Multi-Provider-Strategie implementieren (Redundanz)',
+            'Circuit Breaker Pattern für externe APIs',
+            'Automated Failover Testing monatlich',
+            'Enhanced Monitoring & Alerting (95th percentile latency)',
+            'Runbook-Training für alle Engineers'
+          );
+        }
+        preventionRecommendations.push(
+          'Post-Mortem-Analyse durchführen',
+          'RCA (Root Cause Analysis) dokumentieren',
+          'Incident Timeline erstellen',
+          'Action Items für Prevention tracken'
+        );
+
+        // 11. CONFIDENCE (basierend auf Datenvollständigkeit)
+        let confidence = 0.80;
+        if (affectedCustomers > 0) confidence += 0.05;
+        if (financialImpact > 0) confidence += 0.05;
+        if (systemsAffected.length > 0) confidence += 0.05;
+        if (description.length > 50) confidence += 0.05;
 
         const normalized = {
           ticketId,
-          severity: analysis.severity || 'P2',
-          priority: analysis.priority || 'MEDIUM',
-          estimatedImpact: analysis.estimatedImpact || {
-            customersFacing: affectedCustomers,
-            revenueAtRisk: financialImpact,
-            slaViolation: false,
-            uptimeImpact: '99%'
+          severity,
+          priority,
+          estimatedImpact: {
+            customersFacing,
+            revenueAtRisk,
+            slaViolation,
+            uptimeImpact
           },
-          rootCauseHypothesis: analysis.rootCauseHypothesis || ['Unbekannt'],
-          immediateActions: analysis.immediateActions || [],
-          escalationPath: analysis.escalationPath || ['Support', 'Engineering'],
-          runbookUrl: analysis.runbookUrl || null,
-          communicationTemplate: analysis.communicationTemplate || {
-            internal: 'Notfall gemeldet. Untersuchung läuft.',
-            customer: 'Wir arbeiten an einer Lösung.',
-            stakeholder: 'Incident wurde eskaliert.'
-          },
-          slaDeadline: analysis.slaDeadline || null,
-          mitigationSteps: analysis.mitigationSteps || [],
-          preventionRecommendations: analysis.preventionRecommendations || [],
-          confidence: typeof analysis.confidence === 'number' ? analysis.confidence : 0.8,
+          rootCauseHypothesis,
+          immediateActions,
+          escalationPath,
+          runbookUrl,
+          communicationTemplate,
+          slaDeadline,
+          mitigationSteps,
+          preventionRecommendations,
+          confidence: Math.round(confidence * 100) / 100,
           metadata: {
             issueType,
             affectedCustomers,
