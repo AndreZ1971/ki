@@ -493,7 +493,7 @@ Antworte als JSON-Objekt:
           ipAddress = 'unknown',
           paymentMethod = 'card',
           signature = 'not-provided',
-          payload = 'not-provided',
+          payload: _payload = 'not-provided',
           environment = 'prod'
         } = request.body;
 
