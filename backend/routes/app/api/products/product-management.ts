@@ -406,7 +406,7 @@ export default async function productRoutes(server: FastifyInstance) {
     {
       schema: {
         tags: ['products'],
-        description: 'Erstellt ein neues WooCommerce Produkt',
+        description: 'Erstellt ein neues WooCommerce Produkt mit optionalem Bild',
         body: {
           type: 'object',
           required: ['name', 'price', 'category', 'type'],
@@ -416,12 +416,13 @@ export default async function productRoutes(server: FastifyInstance) {
             price: { type: 'number' },
             category: { type: 'string' },
             type: { type: 'string', enum: ['simple', 'virtual', 'downloadable', 'variable', 'grouped', 'external'] },
-            stock: { type: 'number' }
+            stock: { type: 'number' },
+            image: { type: 'string', description: 'URL des Produktbildes (DALL-E oder andere)' }
           }
         }
       }
     },
-    async (request: FastifyRequest<{ Body: WooProductBody }>, reply: FastifyReply) => {
+    async (request: FastifyRequest<{ Body: WooProductBody & { image?: string } }>, reply: FastifyReply) => {
       try {
         const productData = request.body;
         console.log('📥 Received product data:', JSON.stringify(productData, null, 2));
@@ -469,6 +470,20 @@ export default async function productRoutes(server: FastifyInstance) {
           virtual: isVirtual,
           downloadable: isDownloadable,
         };
+
+        // 🎨 Handle Product Image - WooCommerce kann direkt eine Image-URL importieren
+        if (productData.image) {
+          try {
+            console.log('🎨 Adding product image from URL:', productData.image);
+            wooPayload.images = [
+              {
+                src: productData.image
+              }
+            ];
+          } catch (imageError) {
+            console.warn('⚠️ Image processing error, continuing without image:', imageError instanceof Error ? imageError.message : imageError);
+          }
+        }
 
         console.log('📤 Sending to WooCommerce:', JSON.stringify(wooPayload, null, 2));
 

@@ -19,6 +19,7 @@ const WooProductCreate = () => {
     type: 'simple'
   });
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [generatedImageUrl, setGeneratedImageUrl] = useState<string>('');
   
   // 🤖 AI Assistant States
   const [aiLoading, setAiLoading] = useState(false);
@@ -179,8 +180,8 @@ const WooProductCreate = () => {
 
       const data = await response.json();
       if (data.success) {
-        toast.success('🎨 Produktbild generiert!');
-        window.open(data.data.imageUrl, '_blank');
+        setGeneratedImageUrl(data.data.imageUrl);
+        toast.success('🎨 Produktbild generiert! ✓ Mit Produkt gespeichert');
       }
     } catch (_err: any) {
       toast.error('Fehler bei Bildgenerierung');
@@ -231,7 +232,12 @@ const WooProductCreate = () => {
       clearError();
       setValidationErrors([]);
 
-      const response = await productApi.createWooProduct(productData);
+      const productPayload = {
+        ...productData,
+        ...(generatedImageUrl && { image: generatedImageUrl })
+      };
+      
+      const response = await productApi.createWooProduct(productPayload);
 
       if (response.success && response.data) {
         toast.success('Produkt erfolgreich in WooCommerce erstellt!');
@@ -242,6 +248,7 @@ const WooProductCreate = () => {
           category: '',
           type: 'simple'
         });
+        setGeneratedImageUrl('');
         setQualityScore(null);
         setSeoSuggestions(null);
       } else {
@@ -324,15 +331,19 @@ const WooProductCreate = () => {
           <div className="form-row">
             <div className="form-group">
               <label>Preis (€) *</label>
-              <input 
-                type="number" 
-                value={productData.price || 0}
-                onChange={(e) => setProductData({...productData, price: parseFloat(e.target.value) || 0})}
-                placeholder="29.99"
-                step="0.01"
-                min="0"
-                required
-              />
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <input 
+                  type="number" 
+                  step="0.01"
+                  min="0"
+                  value={productData.price || ''}
+                  onChange={(e) => setProductData({...productData, price: parseFloat(e.target.value) || 0})}
+                  placeholder="29.99"
+                  style={{ flex: 1, paddingRight: '35px', fontSize: '14px' }}
+                  required
+                />
+                <span style={{ position: 'absolute', right: '12px', color: 'rgba(255,255,255,0.6)', fontWeight: '600', pointerEvents: 'none' }}>€</span>
+              </div>
             </div>
 
             <div className="form-group">
@@ -384,7 +395,21 @@ const WooProductCreate = () => {
             {showAiPanel ? '▼' : '▶'} 🤖 KI-Assistent
           </button>
           
-          <div style={{ flex: 2 }}>
+          <div style={{ flex: 2, display: 'flex', gap: '10px', alignItems: 'center' }}>
+            {generatedImageUrl && (
+              <div style={{
+                padding: '8px 12px',
+                background: 'rgba(16, 185, 129, 0.2)',
+                border: '1px solid rgba(16, 185, 129, 0.5)',
+                borderRadius: '6px',
+                color: '#6ee7b7',
+                fontSize: '12px',
+                fontWeight: '600',
+                whiteSpace: 'nowrap'
+              }}>
+                ✓ Bild gespeichert
+              </div>
+            )}
             <LoadingButton
               onClick={handleCreate}
               loading={loading}
@@ -443,17 +468,17 @@ const WooProductCreate = () => {
               disabled={aiLoading || !productData.name}
               style={{
                 padding: '12px',
-                background: 'rgba(168, 85, 247, 0.1)',
-                border: '1px solid rgba(168, 85, 247, 0.3)',
+                background: generatedImageUrl ? 'rgba(16, 185, 129, 0.2)' : 'rgba(168, 85, 247, 0.1)',
+                border: generatedImageUrl ? '1px solid rgba(16, 185, 129, 0.5)' : '1px solid rgba(168, 85, 247, 0.3)',
                 borderRadius: '8px',
-                color: 'white',
+                color: generatedImageUrl ? '#6ee7b7' : 'white',
                 fontWeight: '600',
                 cursor: aiLoading || !productData.name ? 'not-allowed' : 'pointer',
                 opacity: aiLoading || !productData.name ? 0.5 : 1,
                 fontSize: '13px'
               }}
             >
-              🎨 Bild (DALL-E)
+              {generatedImageUrl ? '✓ 🎨 Bild (gespeichert)' : '🎨 Bild (DALL-E)'}
             </button>
 
             <button
