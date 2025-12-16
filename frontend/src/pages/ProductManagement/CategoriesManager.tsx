@@ -82,7 +82,7 @@ const CategoriesManager = () => {
       setSuggestLoading(prev => ({ ...prev, [category.id]: true }));
       const response = await categoryApi.suggestCategories({
         title: category.name,
-        description: category.description || '',
+        description: category.description || category.name, // Fallback auf Name wenn keine Beschreibung
         maxSuggestions: 5
       });
 

@@ -166,6 +166,7 @@ export const categoryApi = {
   optimizeCategories: async (): Promise<ApiResponse<void>> => {
     return apiRequest<void>('/api/categories/optimize', {
       method: 'POST',
+      body: JSON.stringify({}),
     });
   },
 

@@ -436,7 +436,7 @@ const WooProductUpdate = () => {
                   setAiLoading(true);
                   let analyzed = 0;
                   
-                  for (const productId of selectedProducts.slice(0, 5)) { // Limit auf 5
+                  for (const productId of selectedProducts) {
                     const product = products.find(p => p.id === productId);
                     if (product) {
                       await analyzeTrendPricing(product);
