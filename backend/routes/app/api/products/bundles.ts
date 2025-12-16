@@ -161,15 +161,17 @@ export default async function bundleRoutes(server: FastifyInstance) {
         const bundleData = request.body;
         console.log('📦 Creating bundle:', bundleData);
 
-        // ✅ ECHTE WooCommerce Bundle-Erstellung
-        const wooConfig = {
-          url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
-          consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
-          consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
-        };
+        // ✅ ECHTE WooCommerce Bundle-Erstellung - Nutze bereits geladene Config
+        const wooConfig = config.woocommerce;
 
-        if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
-          throw new Error('WooCommerce-Konfiguration fehlt');
+        if (!wooConfig?.url || !wooConfig?.consumerKey || !wooConfig?.consumerSecret) {
+          console.error('❌ WooCommerce Config ungültig:', {
+            url: !!wooConfig?.url,
+            consumerKey: !!wooConfig?.consumerKey,
+            consumerSecret: !!wooConfig?.consumerSecret,
+            fullConfig: wooConfig
+          });
+          throw new Error(`WooCommerce-Konfiguration fehlt: ${JSON.stringify({ url: !!wooConfig?.url, key: !!wooConfig?.consumerKey, secret: !!wooConfig?.consumerSecret })}`);
         }
 
         const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
