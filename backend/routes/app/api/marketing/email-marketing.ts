@@ -138,16 +138,18 @@ export default async function emailMarketingRoutes(server: FastifyInstance) {
       try {
         const { campaignName, emailSubject, emailContent, targetSegment } = request.body;
 
-        const wooConfig = {
-          url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
-          consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
-          consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
-        };
+        // Fehlerbehandlung: WooCommerce Config prüfen
+        if (!config.woocommerce?.url || !config.woocommerce?.consumerKey || !config.woocommerce?.consumerSecret) {
+          return reply.status(400).send({
+            success: false,
+            error: 'WooCommerce ist nicht konfiguriert. Bitte connection.json prüfen.'
+          });
+        }
 
-        const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
+        const auth = Buffer.from(`${config.woocommerce.consumerKey}:${config.woocommerce.consumerSecret}`).toString('base64');
 
         // Lade Bestellungen aus WooCommerce
-        const response = await fetch(`${wooConfig.url}/wp-json/wc/v3/orders?per_page=100&status=completed`, {
+        const response = await fetch(`${config.woocommerce.url}/wp-json/wc/v3/orders?per_page=100&status=completed`, {
           headers: {
             'Authorization': `Basic ${auth}`,
             'Content-Type': 'application/json',
@@ -240,7 +242,7 @@ export default async function emailMarketingRoutes(server: FastifyInstance) {
                   <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
                   <p style="font-size: 12px; color: #999;">
                     Kampagne: ${campaignName}<br>
-                    Sie erhalten diese E-Mail, weil Sie Kunde bei ${wooConfig.url} sind.
+                    Sie erhalten diese E-Mail, weil Sie Kunde bei ${config.woocommerce.url} sind.
                   </p>
                 </div>
               `,
