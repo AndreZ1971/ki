@@ -77,6 +77,8 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
   const [actionLoading, setActionLoading] = useState(false);
   const [_products, _setProducts] = useState<Product[]>([]);
   const [_productsLoading, _setProductsLoading] = useState(true);
+  const [notes, setNotes] = useState<string>("");
+  const [notesSaving, setNotesSaving] = useState(false);
   const abortControllerRef = React.useRef<AbortController | null>(null);
 
   // 🔗 Normalisierte API-URL
@@ -184,6 +186,55 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
       setLoading(false);
     }
   }, [productId, buildUrl, loading]);
+
+  const saveNotes = useCallback(async () => {
+    if (!notes.trim()) {
+      setActionMessage("⚠️ Notizen sind leer");
+      return;
+    }
+
+    setNotesSaving(true);
+    setActionMessage(null);
+
+    try {
+      const res = await fetch(
+        buildUrl(`/api/products/adviser/notes/${productId}`),
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ notes: notes.trim() }),
+        }
+      );
+
+      if (res.status === 404) {
+        throw new Error(
+          `Endpoint nicht gefunden (404)\nBitte Routing überprüfen!`
+        );
+      }
+
+      if (res.status === 503) {
+        throw new Error(`WooCommerce API nicht erreichbar`);
+      }
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || `Fehler beim Speichern (HTTP ${res.status})`);
+      }
+
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || "Notizen speichern fehlgeschlagen");
+      }
+
+      setActionMessage("✅ Notizen erfolgreich gespeichert");
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Notizen speichern fehlgeschlagen";
+      setActionMessage(`⚠️ ${message}`);
+    } finally {
+      setNotesSaving(false);
+    }
+  }, [productId, buildUrl, notes]);
 
   const runAction = useCallback(
     async (action: "restock" | "price" | "steering") => {
@@ -1254,6 +1305,64 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
                   }}
                 >
                   {actionLoading ? "…" : "Steuerung setzen"}
+                </button>
+              </div>
+
+              {/* Notizen */}
+              <div
+                style={{
+                  border: "1px solid rgba(175,82,222,0.35)",
+                  background:
+                    "linear-gradient(135deg, rgba(175,82,222,0.08), rgba(175,82,222,0.02))",
+                  borderRadius: "10px",
+                  padding: "14px",
+                  display: "grid",
+                  gap: "8px",
+                }}
+              >
+                <div
+                  style={{
+                    fontWeight: 700,
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <span>📝 Notizen</span>
+                  <small style={{ color: "rgba(255,255,255,0.6)" }}>
+                    Lagerort, Meta-Daten
+                  </small>
+                </div>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="z.B. Lagerort: Regal 5B&#10;Lagerplatz: A2-13&#10;Oder andere Notizen für dieses Produkt..."
+                  style={{
+                    width: "100%",
+                    minHeight: "80px",
+                    padding: "10px",
+                    borderRadius: "8px",
+                    border: "1px solid rgba(175,82,222,0.3)",
+                    background: "rgba(0,0,0,0.25)",
+                    color: "#fff",
+                    fontFamily: "monospace",
+                    fontSize: "13px",
+                    resize: "vertical",
+                  }}
+                />
+                <button
+                  disabled={notesSaving}
+                  onClick={saveNotes}
+                  style={{
+                    padding: "10px",
+                    borderRadius: "8px",
+                    border: "1px solid rgba(175,82,222,0.6)",
+                    background:
+                      "linear-gradient(135deg, rgba(175,82,222,0.35), rgba(175,82,222,0.12))",
+                    color: "#f3e8ff",
+                    cursor: notesSaving ? "not-allowed" : "pointer",
+                  }}
+                >
+                  {notesSaving ? "…" : "📌 Notizen speichern"}
                 </button>
               </div>
             </div>

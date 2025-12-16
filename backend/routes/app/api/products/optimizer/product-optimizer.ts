@@ -856,6 +856,81 @@ RESPONSE IN JSON FORMAT:
       }
     }
   );
+
+  // 📝 NOTIZEN SPEICHERN
+  _server.post(
+    '/notes/:id',
+    {
+      schema: {
+        tags: ['product-optimizer'],
+        summary: 'Produkt-Notizen speichern',
+        description:
+          'Speichere Notizen (Lagerort, Meta-Daten) für ein Produkt in WooCommerce',
+        params: {
+          type: 'object',
+          properties: { id: { type: 'integer' } },
+          required: ['id'],
+        },
+        body: {
+          type: 'object',
+          required: ['notes'],
+          properties: {
+            notes: { type: 'string', minLength: 1, maxLength: 1000 },
+          },
+        },
+      },
+    },
+    async (_request: any, _reply) => {
+      const { id } = _request.params;
+      const productId = parseInt(id);
+      const { notes } = _request.body || {};
+
+      if (!wooCommerceService.isReady()) {
+        return _reply.status(503).send({
+          success: false,
+          error: 'WooCommerce Service nicht verfügbar',
+        });
+      }
+
+      try {
+        const product = await wooCommerceService.getProduct(productId, _server);
+
+        // Entferne alte Notizen und füge neue hinzu
+        const existingMetaData = (product.meta_data || []).filter(
+          (m: any) => m.key !== 'notes' && m.key !== 'product_notes'
+        );
+
+        const payload = {
+          meta_data: [
+            ...existingMetaData,
+            { key: 'notes', value: notes.trim() },
+          ],
+        };
+
+        const updated = await wooCommerceService.updateProduct(
+          productId,
+          payload,
+          _server
+        );
+
+        return {
+          success: true,
+          message: 'Notizen erfolgreich gespeichert',
+          data: {
+            notes: notes.trim(),
+            meta_data: updated.meta_data,
+          },
+        };
+      } catch (error: any) {
+        _server.log.error('Notizen speichern fehlgeschlagen:', error.message);
+        return _reply.status(500).send({
+          success: false,
+          error: error.message || 'Notizen speichern fehlgeschlagen',
+        });
+      }
+    }
+  );
+
   // 🔄 AUTO-UPDATE WOOCOMMERCE MIT SEO OPTIMIERUNGEN
   _server.post(
     '/woo/products/:id/seo-apply',
