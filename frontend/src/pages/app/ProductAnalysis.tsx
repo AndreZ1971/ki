@@ -79,6 +79,8 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
   const [_productsLoading, _setProductsLoading] = useState(true);
   const [notes, setNotes] = useState<string>("");
   const [notesSaving, setNotesSaving] = useState(false);
+  const [lastSavedTime, setLastSavedTime] = useState<string | null>(null);
+  const autoSaveTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   const abortControllerRef = React.useRef<AbortController | null>(null);
 
   // 🔗 Normalisierte API-URL
@@ -88,6 +90,55 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
     },
     [apiBase]
   );
+
+  // 🔄 AUTOSAVE: Speichere Notizen nach 2 Sekunden inaktivität
+  // (Note: saveNotes wird später definiert, deshalb hier nicht in deps)
+  useEffect(() => {
+    if (!notes.trim()) return;
+
+    // Alte Timer löschen
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+
+    // Neue Timer starten - mit delay vor dem speichern
+    autoSaveTimerRef.current = setTimeout(() => {
+      // saveNotes wird im Callback aufgerufen
+      const handleAutoSave = async () => {
+        if (!notes.trim()) return;
+
+        try {
+          const res = await fetch(
+            `${apiBase}/api/products/adviser/notes/${productId}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ notes: notes.trim() }),
+            }
+          );
+
+          if (res.ok) {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString("de-DE", {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+            setLastSavedTime(timeStr);
+          }
+        } catch (err) {
+          console.error("❌ Autosave Fehler:", err);
+        }
+      };
+
+      handleAutoSave();
+    }, 2000);
+
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [notes, productId, apiBase]);
 
   // 📦 Produktliste laden - NUR EINMAL beim Mount
   useEffect(() => {
@@ -189,12 +240,10 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
 
   const saveNotes = useCallback(async () => {
     if (!notes.trim()) {
-      setActionMessage("⚠️ Notizen sind leer");
       return;
     }
 
     setNotesSaving(true);
-    setActionMessage(null);
 
     try {
       const res = await fetch(
@@ -226,11 +275,17 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
         throw new Error(data.error || "Notizen speichern fehlgeschlagen");
       }
 
-      setActionMessage("✅ Notizen erfolgreich gespeichert");
+      // Speichern-Zeit aktualisieren
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString("de-DE", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      setLastSavedTime(timeStr);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Notizen speichern fehlgeschlagen";
-      setActionMessage(`⚠️ ${message}`);
+      console.error("❌ Notizen speichern Fehler:", message);
     } finally {
       setNotesSaving(false);
     }
@@ -1325,13 +1380,75 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
                     fontWeight: 700,
                     display: "flex",
                     justifyContent: "space-between",
+                    alignItems: "center",
                   }}
                 >
                   <span>📝 Notizen</span>
-                  <small style={{ color: "rgba(255,255,255,0.6)" }}>
-                    Lagerort, Meta-Daten
-                  </small>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "8px",
+                      alignItems: "center",
+                    }}
+                  >
+                    {notesSaving && (
+                      <small style={{ color: "rgba(175,82,222,0.8)" }}>
+                        🔄 Speichern...
+                      </small>
+                    )}
+                    {!notesSaving && lastSavedTime && (
+                      <small style={{ color: "rgba(52,199,89,0.8)" }}>
+                        ✅ {lastSavedTime}
+                      </small>
+                    )}
+                  </div>
                 </div>
+
+                {/* Quick Templates */}
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))",
+                    gap: "6px",
+                  }}
+                >
+                  {[
+                    { label: "📍 Lagerort", text: "Lagerort: " },
+                    { label: "📦 Lieferant", text: "Lieferant bestellt" },
+                    { label: "🚚 Ankunft", text: "Ankunft erwartet: " },
+                    { label: "⚠️ Mängel", text: "Mängel vorhanden: " },
+                  ].map((tpl) => (
+                    <button
+                      key={tpl.label}
+                      onClick={() =>
+                        setNotes((prev) =>
+                          prev ? prev + "\n" + tpl.text : tpl.text
+                        )
+                      }
+                      style={{
+                        padding: "6px 10px",
+                        fontSize: "11px",
+                        borderRadius: "6px",
+                        border: "1px solid rgba(175,82,222,0.4)",
+                        background: "rgba(175,82,222,0.1)",
+                        color: "#e9d5ff",
+                        cursor: "pointer",
+                        transition: "all 0.2s",
+                      }}
+                      onMouseOver={(e) => {
+                        (e.target as HTMLButtonElement).style.background =
+                          "rgba(175,82,222,0.2)";
+                      }}
+                      onMouseOut={(e) => {
+                        (e.target as HTMLButtonElement).style.background =
+                          "rgba(175,82,222,0.1)";
+                      }}
+                    >
+                      {tpl.label}
+                    </button>
+                  ))}
+                </div>
+
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
@@ -1349,20 +1466,54 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
                     resize: "vertical",
                   }}
                 />
+
+                {/* Character Counter */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    fontSize: "11px",
+                  }}
+                >
+                  <span style={{ color: "rgba(255,255,255,0.6)" }}>
+                    {notes.length} / 1000 Zeichen
+                  </span>
+                  <span
+                    style={{
+                      color:
+                        notes.length > 900
+                          ? "#ff3b30"
+                          : notes.length > 700
+                            ? "#ff9500"
+                            : "rgba(175,82,222,0.8)",
+                    }}
+                  >
+                    {notes.length > 900
+                      ? "⚠️ Fast voll"
+                      : notes.length > 700
+                        ? "⏱️ Vorsicht"
+                        : "✓"}
+                  </span>
+                </div>
+
                 <button
-                  disabled={notesSaving}
+                  disabled={notesSaving || !notes.trim()}
                   onClick={saveNotes}
                   style={{
                     padding: "10px",
                     borderRadius: "8px",
                     border: "1px solid rgba(175,82,222,0.6)",
-                    background:
-                      "linear-gradient(135deg, rgba(175,82,222,0.35), rgba(175,82,222,0.12))",
+                    background: !notes.trim()
+                      ? "rgba(175,82,222,0.1)"
+                      : "linear-gradient(135deg, rgba(175,82,222,0.35), rgba(175,82,222,0.12))",
                     color: "#f3e8ff",
-                    cursor: notesSaving ? "not-allowed" : "pointer",
+                    cursor:
+                      notesSaving || !notes.trim() ? "not-allowed" : "pointer",
+                    opacity: notesSaving || !notes.trim() ? 0.5 : 1,
                   }}
                 >
-                  {notesSaving ? "…" : "📌 Notizen speichern"}
+                  {notesSaving ? "🔄 Speichern..." : "📌 Notizen speichern"}
                 </button>
               </div>
             </div>
