@@ -565,31 +565,51 @@ export default async function imageAnalysisRoutes(fastify: FastifyInstance) {
             .send({ success: false, error: 'Bild ist leer' });
         }
 
+        console.log(
+          '📸 Color analysis input - size:',
+          bufferImage.length,
+          'bytes'
+        );
+
         // Get metadata first
         const metadata = await sharp(bufferImage).metadata();
 
-        // Convert to RGB and get raw buffer (separate chain)
+        // Convert to RGB and get raw buffer - new separate chain each time
         const buffer = await sharp(bufferImage)
           .resize(50, 50)
           .toColorspace('srgb')
           .raw()
           .toBuffer();
 
-        const colorMap = new Map<string, number>();
+        console.log('🔧 Buffer info - length:', buffer.length, 'bytes');
 
-        // Extract RGB values (3 bytes per pixel)
-        for (let i = 0; i < buffer.length; i += 3) {
-          const r = buffer[i].toString(16).padStart(2, '0');
-          const g = buffer[i + 1].toString(16).padStart(2, '0');
-          const b = buffer[i + 2].toString(16).padStart(2, '0');
-          const hex = `#${r}${g}${b}`.toUpperCase();
-          colorMap.set(hex, (colorMap.get(hex) || 0) + 1);
+        // Calculate expected pixel count
+        const pixelCount = 50 * 50; // 2500 pixels
+        const bytesPerPixel = buffer.length / pixelCount;
+        console.log('📐 Bytes per pixel:', bytesPerPixel);
+
+        const colorMap = new Map<string, number>();
+        const step = Math.round(bytesPerPixel);
+
+        // Extract RGB values (handle 3 or 4 bytes per pixel)
+        for (let i = 0; i < buffer.length; i += step) {
+          if (i + 2 < buffer.length) {
+            const r = buffer[i].toString(16).padStart(2, '0');
+            const g = buffer[i + 1].toString(16).padStart(2, '0');
+            const b = buffer[i + 2].toString(16).padStart(2, '0');
+            const hex = `#${r}${g}${b}`.toUpperCase();
+            colorMap.set(hex, (colorMap.get(hex) || 0) + 1);
+          }
         }
+
+        console.log('🎯 Unique colors found:', colorMap.size);
 
         const topColors = Array.from(colorMap.entries())
           .sort((a, b) => b[1] - a[1])
           .slice(0, 5)
           .map(([c]) => c);
+
+        console.log('✅ Top 5 colors:', topColors);
 
         return reply.send({
           success: true,
@@ -608,7 +628,8 @@ export default async function imageAnalysisRoutes(fastify: FastifyInstance) {
           _error instanceof Error
             ? _error.message
             : 'Farbanalyse fehlgeschlagen';
-        console.error('❌ Color analysis error:', errorMsg, _error);
+        const stack = (_error as any)?.stack || 'No stack trace';
+        console.error('❌ Color analysis error:', { error: errorMsg, stack });
         return reply.status(500).send({ success: false, error: errorMsg });
       }
     }
