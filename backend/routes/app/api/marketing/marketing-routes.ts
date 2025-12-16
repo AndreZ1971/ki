@@ -497,55 +497,10 @@ Deutsch, natürlich, konversionsstark, plattformoptimiert.`;
 
       try {
         const apiKey = process.env.OPENAI_API_KEY;
-        // Fallback: Wenn kein OpenAI konfiguriert ist, generiere eine einfache WAV-Audiodatei (Sinus-Ton)
         if (!apiKey) {
-          const sampleRate = 8000; // 8 kHz für kleine Datei
-          const wordCount = audioText.split(/\s+/).length;
-          const durationSec = Math.max(2, Math.round((wordCount / 150) * 60)); // mind. 2 Sekunden
-          const frequency = 440; // A4 Ton
-          const numSamples = durationSec * sampleRate;
-
-          // PCM 16-bit Mono
-          const amplitude = 0.2; // leiser Ton
-          const pcmData = Buffer.alloc(numSamples * 2);
-          for (let i = 0; i < numSamples; i++) {
-            const t = i / sampleRate;
-            const sample = Math.sin(2 * Math.PI * frequency * t) * amplitude;
-            const intSample = Math.max(-1, Math.min(1, sample)) * 0x7fff;
-            pcmData.writeInt16LE(intSample, i * 2);
-          }
-
-          // WAV Header erstellen
-          const header = Buffer.alloc(44);
-          header.write('RIFF', 0);
-          header.writeUInt32LE(36 + pcmData.length, 4);
-          header.write('WAVE', 8);
-          header.write('fmt ', 12);
-          header.writeUInt32LE(16, 16); // Subchunk1Size
-          header.writeUInt16LE(1, 20); // AudioFormat PCM
-          header.writeUInt16LE(1, 22); // NumChannels
-          header.writeUInt32LE(sampleRate, 24); // SampleRate
-          header.writeUInt32LE(sampleRate * 2, 28); // ByteRate (SampleRate * NumChannels * BitsPerSample/8)
-          header.writeUInt16LE(2, 32); // BlockAlign (NumChannels * BitsPerSample/8)
-          header.writeUInt16LE(16, 34); // BitsPerSample
-          header.write('data', 36);
-          header.writeUInt32LE(pcmData.length, 40);
-
-          const wavBuffer = Buffer.concat([header, pcmData]);
-          const base64Audio = wavBuffer.toString('base64');
-
-          return reply.send({
-            success: true,
-            audio: {
-              id: `audio_${Date.now()}`,
-              data: `data:audio/wav;base64,${base64Audio}`,
-              duration: durationSec,
-              voice,
-              platform,
-              text: audioText,
-              format: 'wav',
-              generatedAt: new Date().toISOString()
-            }
+          return reply.status(400).send({
+            success: false,
+            error: 'OpenAI TTS ist nicht konfiguriert. Bitte OPENAI_API_KEY setzen oder einen alternativen TTS-Provider hinterlegen.'
           });
         }
 
