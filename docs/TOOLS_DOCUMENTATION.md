@@ -2,21 +2,21 @@
 
 > **Fokus dieser Dokumentation**: Technische Details der ML/KI-Integration für alle Dashboard-Tools. Die User-Dokumentation mit Screenshots und Bedienanleitung befindet sich in `Bedienungsanleitung-KI-Agent.md`.
 
-**Zuletzt aktualisiert**: 12. Dezember 2025  
-**Status**: Abgeschlossen - 2 ESLint-Warnungen behoben, alle Builds erfolgreich
+**Zuletzt aktualisiert**: 16. Dezember 2025  
+**Status**: ✅ Abgeschlossen - Notes-Feature mit Autosave, Character Counter & Quick Templates, kritische Fixes für Rate-Limiting und IP-Block-Prevention
 
 ---
 
 ## 📊 Übersicht der Tool-Integration
 
-| Kategorie | Tools | ML/KI | Status |
-|-----------|-------|--------|--------|
-| **Analytics** | 9 Tools | 🟢 Ja (9/9) | Abgeschlossen |
-| **Product Management** | 8 Tools | 🟢 Ja | Abgeschlossen |
-| **Payment & Finances** | 13 Tools | 🟢 Ja | Abgeschlossen |
-| **Marketing & Content** | 10 Tools | 🟢 Ja | Abgeschlossen |
-| **Advanced AI** | 12 Tools | 🟢 Ja | Abgeschlossen |
-| **GESAMT** | **52 Tools** | 🟢 52/52 (100%) | 0 Tools offen |
+| Kategorie               | Tools        | ML/KI          | Status        |
+| ----------------------- | ------------ | -------------- | ------------- |
+| **Analytics**           | 9 Tools      | 🟢 Ja (9/9)     | Abgeschlossen |
+| **Product Management**  | 8 Tools      | 🟢 Ja           | Abgeschlossen |
+| **Payment & Finances**  | 13 Tools     | 🟢 Ja           | Abgeschlossen |
+| **Marketing & Content** | 10 Tools     | 🟢 Ja           | Abgeschlossen |
+| **Advanced AI**         | 12 Tools     | 🟢 Ja           | Abgeschlossen |
+| **GESAMT**              | **52 Tools** | 🟢 52/52 (100%) | 0 Tools offen |
 
 ---
 
@@ -33,6 +33,25 @@
 - **Status**: ✅ Vollständig refaktoriert (11.12.2025)
 - **Abhängigkeiten**: ProductAnalysis Component, useProductManagement Hook
 - **Änderungen**: Aus ProductBundles extrahiert, standalone Page mit Dashboard-Tile
+
+#### 📝 **ProductAnalysis - Notes Feature** `frontend/src/pages/app/ProductAnalysis.tsx`
+- **Neue Features (16.12.2025)**:
+  - 🎯 **Notes-Feld**: Speichern von Warehouse/Lagerort-Informationen
+  - 🔄 **Autosave**: Automatisches Speichern nach 2 Sekunden Inaktivität (kein Button-Klick nötig)
+  - 📊 **Character Counter**: Anzeige von 0/1000 Zeichen mit Warnungen (orange >70%, rot >90%)
+  - 🎯 **Quick Templates**: 4 schnelle Buttons für häufige Notizen:
+    - 📍 Lagerort (z.B. "Regal 5B")
+    - 📦 Lieferant bestellt
+    - 🚚 Ankunft erwartet
+    - ⚠️ Mängel vorhanden
+  - ⏰ **Last-Saved Timestamp**: Grüner Checkmark mit Uhrzeit (z.B. ✅ 14:32)
+  - 💾 **WooCommerce Integration**: Speichert Notizen als meta_data mit Schlüssel 'notes'
+- **Backend Endpoint**: `POST /api/products/adviser/notes/:id`
+- **Status**: ✅ Vollständig implementiert (16.12.2025)
+- **Fehler-Fixed**:
+  - ✅ Rate-limiting Fixes (useEffect Dependency Hell)
+  - ✅ OpenAI Description Sanitization (max 500 chars, HTML removal)
+  - ✅ 404 Monitoring für IP-Block Prevention
 
 #### 🤖 **Auto Product Creator** `frontend/src/pages/ProductManagement/AutoProductCreator.tsx`
 - **ML-Features**: AI-gestützte Produkterstellung mit Optimierung
@@ -287,16 +306,16 @@ Diese Tools haben Basic-APIs aber begrenzte ML/KI-Features:
 
 ### AnalyseMetrics Folder (`frontend/src/pages/AnalyseMetrics/`)
 
-| Tool | File | ML-Status | Notizen |
-|------|------|-----------|---------|
-| 📊 Shop Metrics | ShopMetrics.tsx | 🟢 Vollständig | ML-Analyse: `/api/analytics/metrics/ml-analysis` |
-| 📈 Conversion Analysis | ConversionAnalysis.tsx | 🟢 Vollständig | ML-Analyse: `/api/analytics/conversion/ml-analysis` |
+| Tool                  | File                   | ML-Status     | Notizen                                                    |
+| --------------------- | ---------------------- | ------------- | ---------------------------------------------------------- |
+| 📊 Shop Metrics        | ShopMetrics.tsx        | 🟢 Vollständig | ML-Analyse: `/api/analytics/metrics/ml-analysis`           |
+| 📈 Conversion Analysis | ConversionAnalysis.tsx | 🟢 Vollständig | ML-Analyse: `/api/analytics/conversion/ml-analysis`        |
 | 📋 Conversion Reported | ConversionReported.tsx | 🟢 Vollständig | ML-Analyse: `/api/analytics/conversion/ml/report-analysis` |
-| 🗺️ Analytic Regioning | AnalyticRegioning.tsx | 🟢 Vollständig | ML-Analyse: `/api/analytics/regioning/ml-analysis` |
-| 🏪 Shop Health Report | ShopHealthReport.tsx | 🟢 Vollständig | ML-Analyse: `/api/health/ml-analysis` |
-| ⭐ Premium Audit | PremiumAudit.tsx | 🟢 Vollständig | ML-Analyse: `/api/audit/premium/ml-analysis` |
-| 🔧 Standard Audit | StandardAudit.tsx | 🟢 Vollständig | ML-Analyse: `/api/audit/standard/ml-analysis` |
-| 🔎 Mini Audit | MiniAudit.tsx | 🟢 Vollständig | ML-Analyse: `/api/audit/mini/ml-analysis` |
+| 🗺️ Analytic Regioning  | AnalyticRegioning.tsx  | 🟢 Vollständig | ML-Analyse: `/api/analytics/regioning/ml-analysis`         |
+| 🏪 Shop Health Report  | ShopHealthReport.tsx   | 🟢 Vollständig | ML-Analyse: `/api/health/ml-analysis`                      |
+| ⭐ Premium Audit       | PremiumAudit.tsx       | 🟢 Vollständig | ML-Analyse: `/api/audit/premium/ml-analysis`               |
+| 🔧 Standard Audit      | StandardAudit.tsx      | 🟢 Vollständig | ML-Analyse: `/api/audit/standard/ml-analysis`              |
+| 🔎 Mini Audit          | MiniAudit.tsx          | 🟢 Vollständig | ML-Analyse: `/api/audit/mini/ml-analysis`                  |
 
 **ML-Integration Status**: Alle AnalyseMetrics-Tools rufen dedizierte ML/KI-Endpunkte auf und rendern KI-Insights.
 
@@ -310,27 +329,89 @@ Diese Tools haben Basic-APIs aber begrenzte ML/KI-Features:
 
 ### PaymentFinances Folder (`frontend/src/pages/PaymentFinances/`)
 
-| Tool | File | ML-Features | Status |
-|------|------|-------------|--------|
-| ⚡ Payment Fast | PaymentFast.tsx | Fraud Detection (Auto-Check), Smart Amount Suggestions, Risk Scoring | ✅ |
-| 🎯 Payment Simplified | PaymentSimplified.tsx | Simplified Payment Flow mit ML-Optimization | ✅ |
-| 🧪 Payment Tester | PaymentTester.tsx | ML-Testplan-Generator, KI-Diagnose, MLPaymentAnalyzer Integration | ✅ |
-| ✅ Payment Verifier | PaymentVerifier.tsx | ML-basierte Transaction Verification, Risk Level Detection (low/medium/high/critical) | ✅ |
-| 🎉 Payment Success | PaymentSuccess.tsx | Success Metrics Analytics, Confidence Scoring, Feature-basierte Event-Tracking | ✅ |
-| 🔐 Payment Validation | PaymentValidation.tsx | KI-gestützte Security Analysis, Risk Scoring, Pattern Detection | ✅ |
-| 📋 Payment Issued Detector | PaymentIssuedDetector.tsx | KI-Powered Issue Detection, Confidence Scoring, Auto-Categorization | ✅ |
-| ❤️ Payment User Favor | PaymentUserFavor.tsx | **GPT-4o-mini Integration**, Personalization Analytics, Datenschutz-Hinweis | ✅ |
-| 📦 Payment Delivery | PaymentDelivery.tsx | Delivery Analytics mit ML | ✅ |
-| 🚨 Payment Emergency | PaymentEmergency.tsx | **GPT-4o-mini Integration**, KI-Notfall-Analyse, Datenschutz-Hinweis | ✅ |
-| 📈 Payment Expansion | PaymentExpansion.tsx | **GPT-4o-mini Integration**, KI-Expansionsplan, Confidence & Projection, Datenschutz-Hinweis | ✅ |
-| ⚡ Payment Quick Check | PaymentQuickCheck.tsx | KI Quick-Scan, Avg Confidence Tracking | ✅ |
-| 🤖 ML Payment Analyzer | MLPaymentAnalyzer.tsx | Dedicated ML Analyzer Component | ✅ |
+| Tool                      | File                      | ML-Features                                                                                  | Status |
+| ------------------------- | ------------------------- | -------------------------------------------------------------------------------------------- | ------ |
+| ⚡ Payment Fast            | PaymentFast.tsx           | Fraud Detection (Auto-Check), Smart Amount Suggestions, Risk Scoring                         | ✅      |
+| 🎯 Payment Simplified      | PaymentSimplified.tsx     | Simplified Payment Flow mit ML-Optimization                                                  | ✅      |
+| 🧪 Payment Tester          | PaymentTester.tsx         | ML-Testplan-Generator, KI-Diagnose, MLPaymentAnalyzer Integration                            | ✅      |
+| ✅ Payment Verifier        | PaymentVerifier.tsx       | ML-basierte Transaction Verification, Risk Level Detection (low/medium/high/critical)        | ✅      |
+| 🎉 Payment Success         | PaymentSuccess.tsx        | Success Metrics Analytics, Confidence Scoring, Feature-basierte Event-Tracking               | ✅      |
+| 🔐 Payment Validation      | PaymentValidation.tsx     | KI-gestützte Security Analysis, Risk Scoring, Pattern Detection                              | ✅      |
+| 📋 Payment Issued Detector | PaymentIssuedDetector.tsx | KI-Powered Issue Detection, Confidence Scoring, Auto-Categorization                          | ✅      |
+| ❤️ Payment User Favor      | PaymentUserFavor.tsx      | **GPT-4o-mini Integration**, Personalization Analytics, Datenschutz-Hinweis                  | ✅      |
+| 📦 Payment Delivery        | PaymentDelivery.tsx       | Delivery Analytics mit ML                                                                    | ✅      |
+| 🚨 Payment Emergency       | PaymentEmergency.tsx      | **GPT-4o-mini Integration**, KI-Notfall-Analyse, Datenschutz-Hinweis                         | ✅      |
+| 📈 Payment Expansion       | PaymentExpansion.tsx      | **GPT-4o-mini Integration**, KI-Expansionsplan, Confidence & Projection, Datenschutz-Hinweis | ✅      |
+| ⚡ Payment Quick Check     | PaymentQuickCheck.tsx     | KI Quick-Scan, Avg Confidence Tracking                                                       | ✅      |
+| 🤖 ML Payment Analyzer     | MLPaymentAnalyzer.tsx     | Dedicated ML Analyzer Component                                                              | ✅      |
 
 **Datenschutz-Compliance**: PaymentUserFavor, PaymentEmergency, PaymentExpansion haben dedizierte DSGVO-Hinweise mit OpenAI-API-Transparenz (30-Tage-Retention, RAM-only Processing)
 
 **Recent Updates (11.12.2025)**: Alle Payment-Tools mit ML/KI-Features und Datenschutz-Hinweisen ausgestattet
 
 ---
+
+## 🔧 FIXES & IMPROVEMENTS - 16. Dezember 2025
+
+### KRITISCHE FIXES
+
+#### 1. ⚡ **Rate-Limiting Protection** - ProductAnalysis.tsx
+- **Problem**: useEffect Dependency Hell führte zu Infinite API Calls
+- **Lösung**: 
+  - Entfernt `buildUrl` aus useEffect Dependencies
+  - Products laden nur beim Mount
+  - AbortController für Request-Deduplication
+  - Loading-State schützt vor parallelen Requests
+- **Impact**: 🚫 Verhindert OpenAI Rate-Limiting und API-Quota-Erschöpfung
+- **Commit**: `f2d621c`
+
+#### 2. 💥 **OpenAI Description Overflow Fix**
+- **Problem**: 50.000+ Zeichen ungefilter Descriptions + HTML/Shortcodes = Token-Explosion
+- **Lösung**:
+  - Descriptions werden sanitized (HTML entfernt, Shortcodes gelöscht)
+  - Max 500 Zeichen Limit pro Beschreibung
+  - Verhindert OpenAI-Crashes und Token-Overspending
+- **Impact**: 🛡️ Shop bleibt stabil, keine Crashes mehr von großen Datenmengen
+- **Commit**: `b050bf6`
+
+#### 3. 🔐 **Bitpalast IP-Block Prevention** - 404 Monitoring
+- **Problem**: IP 213.138.57.94 wurde blockiert wegen zu vielem 404-Traffic (sieht aus wie Hacker-Scan)
+- **Lösung**:
+  - `setNotFoundHandler` in server.ts loggt ALLE 404s mit IP + Method + URL
+  - Frontend erkennt explizit 404/503 Fehler
+  - Verhindert Silent Failures die zu Retry-Spam führen
+- **Impact**: 🚨 Weniger Blockeys von Hostinganbietern, besseres Debugging
+- **Commit**: `e722fb1`
+
+#### 4. 🔧 **TypeScript Compilation Fixes**
+- **Problem**: trends-routes.ts hatte fehlende 500-Response Schema Definition
+- **Lösung**: Hinzufügen von 500-Response zu Swagger-Schema
+- **Impact**: ✅ Backend kompiliert sauber
+- **Commit**: `f68f73a`
+
+#### 5. 🚀 **Duplicate Handler Fix**
+- **Problem**: Zwei `setNotFoundHandler` Calls → "handler already set" Error
+- **Lösung**: Gemerged in ein unified 404-Handler mit 404-Monitoring + SPA-Fallback
+- **Impact**: ✅ Server startet ohne Fehler
+- **Commit**: `1c85599`
+
+---
+
+### NEUE FEATURES
+
+#### 📝 **Product Notes Feature** mit Enhancements
+- **API Endpoint**: `POST /api/products/adviser/notes/:id`
+- **Speicherung**: WooCommerce meta_data (key: 'notes')
+- **Features**:
+  - 🔄 **Autosave**: Nach 2 Sekunden Inaktivität automatisch speichern
+  - 📊 **Character Counter**: 0/1000 mit Warnungen (orange >70%, rot >90%)
+  - 🎯 **Quick Templates**: 4 Buttons für schnelle Notizen-Vorlagen
+  - ⏰ **Last-Saved Timestamp**: Visuelles Feedback (grüner Checkmark + Zeit)
+  - 💾 **Persistent Storage**: Daten bleiben über WooCommerce erhalten
+- **Commits**:
+  - `07337c8` - Initial Notes Feature
+  - `1aba1ce` - Autosave + Counter + Templates Enhancements
+
 
 ## 📋 ML Settings & Configuration
 
@@ -421,6 +502,7 @@ Diese Tools haben Basic-APIs aber begrenzte ML/KI-Features:
 - `GET /api/products/optimizer/analyze/{productId}` - Product-Analyse
 - `POST /api/products/creator/auto` - Auto-Produkt-Erstellung
 - `GET /api/woocommerce/products/create` - WooCommerce-Integration
+- `POST /api/products/adviser/notes/{productId}` - Product Notes Speichern (NEU)
 
 ### Payments
 
@@ -468,6 +550,32 @@ Diese Tools haben Basic-APIs aber begrenzte ML/KI-Features:
 
 ---
 
-**Autor**: GitHub Copilot  
-**Aktualisiert**: 11. Dezember 2025  
+**Autor**: André Zabel  
+**Aktualisiert**: 16. Dezember 2025  
 **Repository**: A.R.I. - Artificial Retail Intelligence System
+
+---
+
+## 📋 Session Summary - 16. Dezember 2025
+
+**Fokus**: Bug Fixes + Product Notes Enhancement  
+**Status**: ✅ Alle Fehler behoben, neue Features produktiv
+
+### Gelöste Issues
+- ✅ Rate-Limiting Infinite Loop (useEffect Dependencies)
+- ✅ OpenAI Token Overflow (Description Sanitization)
+- ✅ IP-Blocks von Hoster (404 Monitoring)
+- ✅ TypeScript Compilation (Schema Validation)
+- ✅ Server Startup (Duplicate Handler)
+
+### Neue Features
+- ✅ Notes-Feld für Lagerort/Warehouse-Info
+- ✅ Autosave nach 2 Sekunden
+- ✅ Character Counter + Quick Templates
+- ✅ Last-Saved Timestamps
+
+### Builds Status
+- Frontend: ✅ npm run build (Exit 0)
+- Backend: ✅ npm run build (Exit 0)
+- Server: ✅ Läuft ohne Fehler
+- All Routes: ✅ 40+ Routes registriert erfolgreich

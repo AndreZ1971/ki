@@ -240,4 +240,4 @@ Einzige Warnungen: Nicht verwendete Setter (für zukünftige API-Integration res
 
 **Status**: ✅ COMPLETE
 **Datum**: $(Get-Date -Format "yyyy-MM-dd HH:mm")
-**Entwickler**: GitHub Copilot
+**Entwickler**: André Zabel

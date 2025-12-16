@@ -266,5 +266,5 @@ Alle zukünftigen Änderungen folgen diesem Format:
 
 ---
 
-**Maintainer**: GitHub Copilot  
+**Maintainer**: André Zabel  
 **Last Updated**: 2025-12-11
