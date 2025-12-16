@@ -275,7 +275,10 @@ export default async function freebieRoutes(server: FastifyInstance) {
 
         const keywordContext = keywords ? `\nSchwerpunkt-Keywords: ${keywords}` : '';
 
-        const prompt = `Du bist ein Expert für Lead-Magnets und Freebie-Strategien. Generiere 4 kreative und hochkonvertierende Ideen für ein kostenloses ${typeNames[type]}.${keywordContext}
+        // Fallback, falls ungültiger Typ übergeben wurde
+        const resolvedTypeName = typeNames[type] || 'Lead-Magnet';
+
+        const prompt = `Du bist ein Expert für Lead-Magnets und Freebie-Strategien. Generiere 4 kreative und hochkonvertierende Ideen für ein kostenloses ${resolvedTypeName}.${keywordContext}
 
 Antworte mit JSON-Array im exakten Format:
 [
@@ -311,26 +314,49 @@ Achte auf Spezifität, emotionale Titel und realistische Scores 0.6-0.95.`;
         let parsedIdeas: FreebieIdea[] = [];
         
         try {
-          const parsed = JSON.parse(rawContent);
-          parsedIdeas = (Array.isArray(parsed) ? parsed : parsed.ideas || []).slice(0, 5);
+          // Entferne evtl. Code-Fences und JSON-Präfixe
+          const sanitized = rawContent
+            .replace(/```json/gi, '')
+            .replace(/```/g, '')
+            .trim();
+
+          const parsed = JSON.parse(sanitized);
+          const ideasArr = Array.isArray(parsed)
+            ? parsed
+            : Array.isArray((parsed as any).ideas)
+              ? (parsed as any).ideas
+              : [];
+          parsedIdeas = (ideasArr as FreebieIdea[]).slice(0, 5);
         } catch (_parseError) {
           console.warn('⚠️ JSON parse error', _parseError);
-          return reply.status(502).send({ success: false, error: 'Fehler beim Parsen der KI-Antwort' });
+          // Letzter Versuch: Finde erstes JSON-Array im String
+          try {
+            const match = rawContent.match(/\[([\s\S]*?)\]/);
+            if (match) {
+              const arr = JSON.parse(match[0]);
+              if (Array.isArray(arr)) {
+                parsedIdeas = (arr as FreebieIdea[]).slice(0, 5);
+              }
+            }
+          } catch { /* ignore */ }
+          if (parsedIdeas.length === 0) {
+            return reply.status(502).send({ success: false, error: 'Fehler beim Parsen der KI-Antwort' });
+          }
         }
 
         if (parsedIdeas.length === 0) {
           return reply.status(502).send({ success: false, error: 'Keine gültigen Ideen erhalten' });
         }
 
-        return reply.send({
-          success: true,
-          ideas: parsedIdeas.map(idea => ({
-            title: idea.title || 'Untitled',
-            description: idea.description || '',
-            conversionScore: Math.min(Math.max(idea.conversionScore ?? 0.7, 0), 1),
-            reason: idea.reason || 'AI-generiert'
-          }))
-        });
+        const normalized = parsedIdeas.map(idea => ({
+          title: idea.title || 'Untitled',
+          description: idea.description || '',
+          conversionScore: Math.min(Math.max(idea.conversionScore ?? 0.7, 0), 1),
+          reason: idea.reason || 'AI-generiert'
+        }));
+
+        // Antworte im konsistenten ApiResponse-Format mit "data"
+        return reply.send({ success: true, data: normalized });
       } catch (_error) {
         console.error('Freebie ML Generate Error:', _error);
         return reply.status(500).send({
