@@ -702,6 +702,12 @@ export const trendAggregatorRoutes: FastifyPluginAsync = async (fastify) => {
               total: { type: 'number' },
             },
           },
+          500: {
+            type: 'object',
+            properties: {
+              error: { type: 'string' },
+            },
+          },
         },
       },
     },
