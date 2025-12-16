@@ -314,25 +314,6 @@ async function buildServer() {
     });
     console.log('✅ Product Adviser Routes erfolgreich registriert');
 
-    // 🔥 404 MONITORING für Bitpalast IP-Sperre-Debugging
-    server.setNotFoundHandler((request, reply) => {
-      const clientIp = request.ip || 'unknown';
-      const method = request.method;
-      const url = request.url;
-      const statusCode = 404;
-
-      console.error(`🚨 404 NOT FOUND: ${method} ${url} from IP: ${clientIp}`);
-      server.log.warn(`404: ${method} ${url} from ${clientIp}`);
-
-      reply.code(statusCode).send({
-        success: false,
-        error: 'Route not found',
-        method,
-        path: url,
-        statusCode,
-      });
-    });
-
     await server.register(reviewsRoutes, { prefix: '/api/analytics/reviews' });
     console.log('✅ Reviews Routes erfolgreich registriert');
 
@@ -537,10 +518,16 @@ async function buildServer() {
       };
     });
 
-    // 🔥 SPA FALLBACK - Serve index.html for all non-API routes
+    // 🔥 SPA FALLBACK + 404 MONITORING - Serve index.html for all non-API routes
     // This must be registered AFTER all other routes
     server.setNotFoundHandler(async (_request, _reply) => {
       const url = _request.url;
+      const clientIp = _request.ip || 'unknown';
+      const method = _request.method;
+
+      // 🔥 404 MONITORING für Bitpalast IP-Sperre-Debugging
+      console.error(`🚨 404 NOT FOUND: ${method} ${url} from IP: ${clientIp}`);
+      server.log.warn(`404: ${method} ${url} from ${clientIp}`);
 
       // API routes → 404 JSON
       if (
@@ -552,6 +539,8 @@ async function buildServer() {
           success: false,
           error: 'Route not found',
           path: url,
+          method,
+          statusCode: 404,
         });
       }
 
