@@ -39,16 +39,15 @@ export default async function aiEmailRoutes(server: FastifyInstance) {
           emailType: { 
             type: 'string', 
             enum: [
+              'welcome-email',
               'order-confirmation',
               'download-ready',
               'support-response',
-              'welcome-email',
               'newsletter',
+              'product-update',
+              'special-offer',
               'abandoned-cart',
-              'review-request',
-              'customer-feedback',
-              'account-update',
-              'digital-delivery'
+              'review-request'
             ]
           },
           context: { type: 'object' },
