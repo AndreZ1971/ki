@@ -1,6 +1,7 @@
 // backend/routes/app/api/marketing/marketing-routes.ts
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { analyzeSegmentsAI, generateCampaignAI } from './conversion-ai.js';
+import config from '../../../../config.js';
 
 interface GermanContentRequest {
   contentType: string;
@@ -496,11 +497,11 @@ Deutsch, natürlich, konversionsstark, plattformoptimiert.`;
       const { audioText, voice, platform } = request.body;
 
       try {
-        const apiKey = process.env.OPENAI_API_KEY;
+        const apiKey = config.openAI?.apiKey;
         if (!apiKey) {
           return reply.status(400).send({
             success: false,
-            error: 'OpenAI TTS ist nicht konfiguriert. Bitte OPENAI_API_KEY setzen oder einen alternativen TTS-Provider hinterlegen.'
+            error: 'OpenAI TTS ist nicht konfiguriert. Bitte openai.apiKey in connection.json hinterlegen oder einen alternativen TTS-Provider konfigurieren.'
           });
         }
 
