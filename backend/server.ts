@@ -25,6 +25,7 @@ import productOptimizerRoutes from './routes/app/api/products/optimizer/product-
 import reviewsRoutes from './routes/app/api/analytics/reviews';
 import aiEmailRoutes from './routes/app/api/ai/email/ai-email';
 import contextGeneratorRoutes from './routes/app/api/ai/context-generator';
+import mlPersonalizationRoutes from './routes/app/api/personalization/ml-personalization';
 
 // 🔥 NEUE IMPORTS FÜR CUSTOMERS UND EMAIL
 import customersRoutes from './routes/app/api/woocommerce/customers';
@@ -333,6 +334,11 @@ async function buildServer() {
 
     await server.register(contextGeneratorRoutes, { prefix: '/api' });
     console.log('✅ Context Generator Routes erfolgreich registriert');
+
+    await server.register(mlPersonalizationRoutes, {
+      prefix: '/api/personalization',
+    });
+    console.log('✅ ML Personalization Routes erfolgreich registriert');
 
     // 🔥 NEUE ROUTES REGISTRIEREN
     await server.register(customersRoutes, { prefix: '/api/woocommerce' });
