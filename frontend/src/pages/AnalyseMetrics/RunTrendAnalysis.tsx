@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './page.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import "./page.css";
 
 interface AnalysisConfig {
   timeRange: string;
@@ -11,7 +11,7 @@ interface AnalysisConfig {
 }
 
 interface AnalysisResult {
-  status: 'idle' | 'running' | 'completed' | 'error';
+  status: "idle" | "running" | "completed" | "error";
   progress: number;
   estimatedTime: string;
   trendsFound: number;
@@ -29,97 +29,117 @@ interface InsightItem {
 
 const RunTrendAnalysis = () => {
   const [config, setConfig] = useState<AnalysisConfig>({
-    timeRange: '30d',
-    analysisType: 'comprehensive',
-    dataSources: ['sales', 'traffic', 'conversion'],
+    timeRange: "30d",
+    analysisType: "comprehensive",
+    dataSources: ["sales", "traffic", "conversion"],
     includePredictions: true,
-    alertThreshold: 10
+    alertThreshold: 10,
   });
-  
+
   const [result, setResult] = useState<AnalysisResult>({
-    status: 'idle',
+    status: "idle",
     progress: 0,
-    estimatedTime: '2min',
+    estimatedTime: "2min",
     trendsFound: 0,
     insights: [],
-    generatedReports: 0
+    generatedReports: 0,
   });
-  
+
   const [analysisHistory, setAnalysisHistory] = useState<any[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Lade Analyse-Historie
-    const history = [
-      { id: 1, date: '2025-10-30', trends: 12, duration: '1m 45s', status: 'completed' },
-      { id: 2, date: '2025-10-28', trends: 8, duration: '1m 20s', status: 'completed' },
-      { id: 3, date: '2025-10-25', trends: 15, duration: '2m 10s', status: 'completed' }
-    ];
-    setAnalysisHistory(history);
+    // Lade Analyse-Historie vom Backend
+    const loadHistory = async () => {
+      try {
+        const response = await fetch("/api/trends/history");
+        const data = await response.json();
+
+        if (data.history) {
+          // Map backend response to expected format
+          const mappedHistory = data.history.map(
+            (item: any, index: number) => ({
+              id: index + 1,
+              date: item.date,
+              trends: item.trendsFound,
+              duration: item.duration,
+              status: item.status,
+            })
+          );
+          setAnalysisHistory(mappedHistory);
+        }
+      } catch (error) {
+        console.error("Failed to load analysis history:", error);
+        // Fallback to empty array on error
+        setAnalysisHistory([]);
+      }
+    };
+
+    loadHistory();
   }, []);
 
   const handleBackToDashboard = () => {
-    navigate('/');
+    navigate("/");
   };
 
   const handleConfigChange = (key: keyof AnalysisConfig, value: any) => {
-    setConfig(prev => ({ ...prev, [key]: value }));
+    setConfig((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleDataSourceToggle = (source: string) => {
     const currentSources = [...config.dataSources];
     if (currentSources.includes(source)) {
-      setConfig(prev => ({
+      setConfig((prev) => ({
         ...prev,
-        dataSources: currentSources.filter(s => s !== source)
+        dataSources: currentSources.filter((s) => s !== source),
       }));
     } else {
-      setConfig(prev => ({
+      setConfig((prev) => ({
         ...prev,
-        dataSources: [...currentSources, source]
+        dataSources: [...currentSources, source],
       }));
     }
   };
 
-  const API_URL = import.meta.env.VITE_API_URL || '';
+  const API_URL = import.meta.env.VITE_API_URL || "";
 
   const runAnalysis = async () => {
     setResult({
-      status: 'running',
+      status: "running",
       progress: 0,
-      estimatedTime: '...',
+      estimatedTime: "...",
       trendsFound: 0,
       insights: [],
-      generatedReports: 0
+      generatedReports: 0,
     });
-    
+
     // Simuliere den Fortschritt für Demo
     const simulateProgress = () => {
       let progress = 0;
       const interval = setInterval(() => {
         progress += 5;
-        setResult(prev => ({
+        setResult((prev) => ({
           ...prev,
           progress,
-          estimatedTime: `${Math.max(0, 120 - progress * 1.2)}s`
+          estimatedTime: `${Math.max(0, 120 - progress * 1.2)}s`,
         }));
-        
+
         if (progress >= 100) {
           clearInterval(interval);
           // Simuliere abgeschlossene Analyse
           setTimeout(() => {
             setResult({
-              status: 'completed',
+              status: "completed",
               progress: 100,
-              estimatedTime: '0s',
+              estimatedTime: "0s",
               trendsFound: 14,
               insights: [
-                '📈 Sales steigen um 24% in den Abendstunden',
-                '👥 Mobile Traffic wächst um 31%',
-                '🎯 Conversion-Rate um 18% verbessert',
-                '📦 Bestandsdrehung um 42% erhöht'
+                "📈 Sales steigen um 24% in den Abendstunden",
+                "👥 Mobile Traffic wächst um 31%",
+                "🎯 Conversion-Rate um 18% verbessert",
+                "📦 Bestandsdrehung um 42% erhöht",
               ],
-              generatedReports: 3
+              generatedReports: 3,
             });
           }, 500);
         }
@@ -132,35 +152,35 @@ const RunTrendAnalysis = () => {
         // Keywords aus Datenquellen ableiten (z.B. sales, traffic, conversion)
         const keywords = config.dataSources;
         const res = await fetch(`${API_URL}/api/ml/test/trends`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ keywords })
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ keywords }),
         });
         const data = await res.json();
         if (data.success && data.result) {
           // KI-Insights aus ML-Response extrahieren
           const forecasts = data.result.prediction || [];
           setResult({
-            status: 'completed',
+            status: "completed",
             progress: 100,
-            estimatedTime: 'ca. 1min',
+            estimatedTime: "ca. 1min",
             trendsFound: forecasts.length,
             insights: forecasts.map((f: any) => ({
               title: `${f.keyword} (${f.trend})`,
               value: `Score: ${Math.round(f.score)}`,
               detail: f.reasoning,
-              score: f.confidence
+              score: f.confidence,
             })),
-            generatedReports: 1
+            generatedReports: 1,
           });
         } else {
           setResult({
-            status: 'error',
+            status: "error",
             progress: 0,
-            estimatedTime: '0s',
+            estimatedTime: "0s",
             trendsFound: 0,
-            insights: ['Fehler bei der ML/KI-Analyse.'],
-            generatedReports: 0
+            insights: ["Fehler bei der ML/KI-Analyse."],
+            generatedReports: 0,
           });
         }
       } else {
@@ -168,49 +188,57 @@ const RunTrendAnalysis = () => {
         simulateProgress();
       }
     } catch (err) {
-      console.error('Analyse-Fehler:', err);
+      console.error("Analyse-Fehler:", err);
       setResult({
-        status: 'error',
+        status: "error",
         progress: 0,
-        estimatedTime: '0s',
+        estimatedTime: "0s",
         trendsFound: 0,
-        insights: ['Fehler bei der Analyse. Bitte API überprüfen.'],
-        generatedReports: 0
+        insights: ["Fehler bei der Analyse. Bitte API überprüfen."],
+        generatedReports: 0,
       });
     }
   };
 
   const stopAnalysis = () => {
-    setResult(prev => ({ ...prev, status: 'idle', progress: 0 }));
+    setResult((prev) => ({ ...prev, status: "idle", progress: 0 }));
   };
 
   const viewResults = () => {
-    navigate('/analytics/trend-analysis');
+    navigate("/analytics/trend-analysis");
   };
 
   const getStatusColor = () => {
     switch (result.status) {
-      case 'running': return '#ffc107';
-      case 'completed': return '#28a745';
-      case 'error': return '#dc3545';
-      default: return '#6c757d';
+      case "running":
+        return "#ffc107";
+      case "completed":
+        return "#28a745";
+      case "error":
+        return "#dc3545";
+      default:
+        return "#6c757d";
     }
   };
 
   const getStatusIcon = () => {
     switch (result.status) {
-      case 'running': return '🔄';
-      case 'completed': return '✅';
-      case 'error': return '❌';
-      default: return '⏸️';
+      case "running":
+        return "🔄";
+      case "completed":
+        return "✅";
+      case "error":
+        return "❌";
+      default:
+        return "⏸️";
     }
   };
 
   return (
     <div className="analytics-page">
       {/* Absolut positionierter Back-Button */}
-      <button 
-        className="back-button floating-back" 
+      <button
+        className="back-button floating-back"
         onClick={handleBackToDashboard}
       >
         ← Zurück
@@ -219,7 +247,17 @@ const RunTrendAnalysis = () => {
       <div className="analytics-header">
         <h1>🚀 Run Trend Analysis</h1>
         <p>Führe Trend-Analyse sofort aus und entdecke neue Insights</p>
-        <div style={{background: '#e0f7fa', color: '#00796b', padding: '12px', borderRadius: '8px', margin: '16px 0', fontWeight: 500, fontSize: '1.1em'}}>
+        <div
+          style={{
+            background: "#e0f7fa",
+            color: "#00796b",
+            padding: "12px",
+            borderRadius: "8px",
+            margin: "16px 0",
+            fontWeight: 500,
+            fontSize: "1.1em",
+          }}
+        >
           Hinweis: Diese Analyse ist KI/MLgestützt.
         </div>
       </div>
@@ -229,14 +267,16 @@ const RunTrendAnalysis = () => {
         <div className="config-section">
           <div className="metric-card full-width">
             <h3>⚙️ Analyse Konfiguration</h3>
-            
+
             <div className="config-grid">
               <div className="config-group">
                 <label>Zeitraum:</label>
-                <select 
+                <select
                   value={config.timeRange}
-                  onChange={(e) => handleConfigChange('timeRange', e.target.value)}
-                  disabled={result.status === 'running'}
+                  onChange={(e) =>
+                    handleConfigChange("timeRange", e.target.value)
+                  }
+                  disabled={result.status === "running"}
                 >
                   <option value="7d">Letzte 7 Tage</option>
                   <option value="30d">Letzte 30 Tage</option>
@@ -247,10 +287,12 @@ const RunTrendAnalysis = () => {
 
               <div className="config-group">
                 <label>Analyse-Typ:</label>
-                <select 
+                <select
                   value={config.analysisType}
-                  onChange={(e) => handleConfigChange('analysisType', e.target.value)}
-                  disabled={result.status === 'running'}
+                  onChange={(e) =>
+                    handleConfigChange("analysisType", e.target.value)
+                  }
+                  disabled={result.status === "running"}
                 >
                   <option value="quick">Schnell-Analyse</option>
                   <option value="comprehensive">Umfassende Analyse</option>
@@ -260,14 +302,19 @@ const RunTrendAnalysis = () => {
 
               <div className="config-group">
                 <label>Alert-Schwelle:</label>
-                <input 
-                  type="range" 
-                  min="5" 
-                  max="50" 
+                <input
+                  type="range"
+                  min="5"
+                  max="50"
                   step="5"
                   value={config.alertThreshold}
-                  onChange={(e) => handleConfigChange('alertThreshold', parseInt(e.target.value))}
-                  disabled={result.status === 'running'}
+                  onChange={(e) =>
+                    handleConfigChange(
+                      "alertThreshold",
+                      parseInt(e.target.value)
+                    )
+                  }
+                  disabled={result.status === "running"}
                 />
                 <span>{config.alertThreshold}% Veränderung</span>
               </div>
@@ -276,37 +323,53 @@ const RunTrendAnalysis = () => {
             <div className="data-sources">
               <label>Datenquellen:</label>
               <div className="source-buttons">
-                {['sales', 'traffic', 'conversion', 'inventory', 'social', 'competitor'].map(source => (
+                {[
+                  "sales",
+                  "traffic",
+                  "conversion",
+                  "inventory",
+                  "social",
+                  "competitor",
+                ].map((source) => (
                   <button
                     key={source}
-                    className={`source-button ${config.dataSources.includes(source) ? 'active' : ''}`}
+                    className={`source-button ${config.dataSources.includes(source) ? "active" : ""}`}
                     onClick={() => handleDataSourceToggle(source)}
-                    disabled={result.status === 'running'}
+                    disabled={result.status === "running"}
                   >
-                    {source === 'sales' && '💰 Sales'}
-                    {source === 'traffic' && '👥 Traffic'}
-                    {source === 'conversion' && '🎯 Conversion'}
-                    {source === 'inventory' && '📦 Inventory'}
-                    {source === 'social' && '💬 Social'}
-                    {source === 'competitor' && '🏆 Competitor'}
+                    {source === "sales" && "💰 Sales"}
+                    {source === "traffic" && "👥 Traffic"}
+                    {source === "conversion" && "🎯 Conversion"}
+                    {source === "inventory" && "📦 Inventory"}
+                    {source === "social" && "💬 Social"}
+                    {source === "competitor" && "🏆 Competitor"}
                   </button>
                 ))}
               </div>
             </div>
 
             <div className="analysis-actions">
-              {result.status !== 'running' ? (
-                <button className="action-button primary large" onClick={runAnalysis}>
+              {result.status !== "running" ? (
+                <button
+                  className="action-button primary large"
+                  onClick={runAnalysis}
+                >
                   🚀 Analyse Starten
                 </button>
               ) : (
-                <button className="action-button warning large" onClick={stopAnalysis}>
+                <button
+                  className="action-button warning large"
+                  onClick={stopAnalysis}
+                >
                   ⏹️ Analyse Stoppen
                 </button>
               )}
-              
-              {result.status === 'completed' && (
-                <button className="action-button success large" onClick={viewResults}>
+
+              {result.status === "completed" && (
+                <button
+                  className="action-button success large"
+                  onClick={viewResults}
+                >
                   📊 Ergebnisse Anzeigen
                 </button>
               )}
@@ -315,25 +378,33 @@ const RunTrendAnalysis = () => {
         </div>
 
         {/* Fortschritts-Sektion */}
-        {result.status !== 'idle' && (
+        {result.status !== "idle" && (
           <div className="progress-section">
             <div className="metric-card full-width">
               <h3>
-                {getStatusIcon()} Analyse Fortschritt 
-                <span style={{ color: getStatusColor(), marginLeft: '10px' }}>
-                  {result.status === 'running' ? 'Läuft...' : 
-                   result.status === 'completed' ? 'Abgeschlossen' : 'Fehler'}
+                {getStatusIcon()} Analyse Fortschritt
+                <span style={{ color: getStatusColor(), marginLeft: "10px" }}>
+                  {result.status === "running"
+                    ? "Läuft..."
+                    : result.status === "completed"
+                      ? "Abgeschlossen"
+                      : "Fehler"}
                 </span>
               </h3>
-              
+
               <div className="progress-bar-container">
-                <div 
+                <div
                   className="progress-bar"
-                  style={{ width: `${result.progress}%`, backgroundColor: getStatusColor() }}
+                  style={{
+                    width: `${result.progress}%`,
+                    backgroundColor: getStatusColor(),
+                  }}
                 ></div>
-                <span className="progress-text">{Math.round(result.progress)}%</span>
+                <span className="progress-text">
+                  {Math.round(result.progress)}%
+                </span>
               </div>
-              
+
               <div className="progress-stats">
                 <div className="progress-stat">
                   <span>Geschätzte Zeit:</span>
@@ -355,7 +426,7 @@ const RunTrendAnalysis = () => {
                   <h4>🧠 KI-Insights</h4>
                   <div className="insights-list">
                     {result.insights.map((insight, index) => {
-                      if (typeof insight === 'string') {
+                      if (typeof insight === "string") {
                         return (
                           <div key={index} className="insight-item live">
                             {insight}
@@ -366,16 +437,20 @@ const RunTrendAnalysis = () => {
                         return (
                           <div key={index} className="insight-item live">
                             {insightObj.title && (
-                              <div style={{fontWeight: 600}}>{insightObj.title}</div>
+                              <div style={{ fontWeight: 600 }}>
+                                {insightObj.title}
+                              </div>
                             )}
-                            {insightObj.value && (
-                              <div>{insightObj.value}</div>
-                            )}
+                            {insightObj.value && <div>{insightObj.value}</div>}
                             {insightObj.detail && (
-                              <div style={{color: '#6c757d'}}>{insightObj.detail}</div>
+                              <div style={{ color: "#6c757d" }}>
+                                {insightObj.detail}
+                              </div>
                             )}
                             {insightObj.score !== undefined && (
-                              <div style={{color: '#2563eb', fontWeight: 700}}>
+                              <div
+                                style={{ color: "#2563eb", fontWeight: 700 }}
+                              >
                                 KI-Score: {Math.round(insightObj.score * 100)}%
                               </div>
                             )}
@@ -395,13 +470,15 @@ const RunTrendAnalysis = () => {
           <div className="metric-card full-width">
             <h3>📚 Letzte Analysen</h3>
             <div className="history-list">
-              {analysisHistory.map(analysis => (
+              {analysisHistory.map((analysis) => (
                 <div key={analysis.id} className="history-item">
                   <span className="history-date">{analysis.date}</span>
-                  <span className="history-trends">{analysis.trends} Trends</span>
+                  <span className="history-trends">
+                    {analysis.trends} Trends
+                  </span>
                   <span className="history-duration">{analysis.duration}</span>
                   <span className={`history-status ${analysis.status}`}>
-                    {analysis.status === 'completed' ? '✅' : '🔄'}
+                    {analysis.status === "completed" ? "✅" : "🔄"}
                   </span>
                 </div>
               ))}
