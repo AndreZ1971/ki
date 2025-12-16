@@ -90,8 +90,12 @@ Erstelle vollständigen HTML-Code mit:
 - Inline CSS für maximale Kompatibilität
 - Responsive Design
 - Moderne, professionelle Optik
-- Platzhalter für Texte und Bilder
+- Platzhalter für Texte und Bilder (WICHTIG: Nutze INLINE SVG statt externe URLs wie via.placeholder.com)
 - Kommentare für einfache Anpassung
+- Keine externen Abhängigkeiten (alle Ressourcen inline)
+
+Beispiel für inline SVG Platzhalter:
+<svg width="1200" height="400" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#e5e7eb"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="24" fill="#9ca3af">Bild Platzhalter</text></svg>
 
 Formatiere den Code sauber und gut lesbar.`;
 
