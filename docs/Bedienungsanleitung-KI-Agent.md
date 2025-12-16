@@ -390,6 +390,56 @@ So startest du die KI-Agent-Plattform als Endnutzer ganz ohne Quellcode-Installa
 
 ### AI Email Generator
 
+---
+
+### Social Media Poster
+
+#### Was kann ich mit dem Social Media Poster machen?
+
+- KI-generierte, plattformspezifisch optimierte Social-Posts erstellen (LinkedIn, Facebook, TikTok, u.a.)
+- Inhalte bearbeiten, Hashtags/Emojis und CTA-Typ steuern
+- Optional: AI-Optimierung beim Versand (serverseitige Transformation je Plattform)
+- Direkter Versand über konfigurierbare Webhooks (Make/Zapier/n8n)
+
+#### Wie nutze ich den Social Media Poster?
+
+1. Thema, Zielgruppe, Ton und CTA wählen
+2. Plattformen auswählen (z.B. LinkedIn, Facebook, TikTok)
+3. Posts generieren und ggf. bearbeiten
+4. Optional "AI-Optimierung beim Versand" aktivieren
+5. Veröffentlichen (Publish) – sofern Webhooks konfiguriert sind
+
+#### Webhook-Einrichtung (LinkedIn, Facebook, TikTok)
+
+Damit der Publish-Button aktiv ist und Posts über Automations-Plattformen (Make.com, Zapier, n8n) versendet werden können, trage die Webhook-URLs in die `connection.json` (Backend) ein:
+
+```json
+{
+   "webhooks": {
+      "linkedin": "https://hook.make.com/DEIN_LINKEDIN_WEBHOOK",
+      "facebook": "https://hook.make.com/DEIN_FACEBOOK_WEBHOOK",
+      "tiktok": "https://hook.make.com/DEIN_TIKTOK_WEBHOOK"
+   }
+}
+```
+
+Hinweise:
+- Nach dem Ändern der `connection.json` den Server neu starten.
+- Der Webhook-Status wird im UI angezeigt (z.B. "2/3 konfiguriert").
+- Der Publish-Button ist nur aktiv, wenn die jeweilige Plattform unterstützt und der entsprechende Webhook konfiguriert ist.
+- Teste deine Webhooks in Make/Zapier/n8n mit einem einfachen JSON-POST, um Format und Feldnamen zu verifizieren.
+
+Optional – AI-Optimierung beim Versand:
+- Wenn aktiviert, transformiert der Server den Post-Inhalt vor dem Versand plattformgerecht (z.B. Tonalität, Längen, Hashtags).
+- Schalter: "AI-Optimierung beim Versand" im Social Media Poster.
+
+Fehlerbehebung:
+- "Webhook nicht konfiguriert": Prüfe, ob die entsprechende `WEBHOOK_*` Variable gesetzt ist.
+- "Webhook für diese Plattform nicht verfügbar": Plattform wird aktuell nicht per Webhook unterstützt.
+- Bei Netzwerk-/Webhook-Fehlern: Logs des Zielsystems (Make/Zapier/n8n) prüfen und ggf. Response im UI einsehen.
+
+
+
 #### Was kann ich mit AI Email Generator machen?
 
 - Professionelle Marketing-E-Mails automatisch generieren

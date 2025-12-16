@@ -3,6 +3,7 @@
 // AI-Powered: Transformiert Content automatisch für jede Plattform!
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { transformContentForPlatform } from '../../../../utils/social-ai-transform';
+import config from '../../../../config';
 
 interface WebhookPostRequest {
   platform: string;
@@ -20,11 +21,11 @@ export default async function webhookRoutes(fastify: FastifyInstance) {
     async (request: FastifyRequest<{ Body: WebhookPostRequest }>, reply: FastifyReply) => {
       const { platform, content, mediaUrl, scheduleTime, useAI = true } = request.body;
 
-      // Get webhook URLs from environment (Make.com, Zapier, n8n etc.)
+      // Get webhook URLs from centralized connection.json config
       const webhookUrls: { [key: string]: string | undefined } = {
-        linkedin: process.env.WEBHOOK_LINKEDIN,
-        facebook: process.env.WEBHOOK_FACEBOOK,
-        tiktok: process.env.WEBHOOK_TIKTOK
+        linkedin: config.webhooks?.linkedin,
+        facebook: config.webhooks?.facebook,
+        tiktok: config.webhooks?.tiktok
       };
 
       const webhookUrl = webhookUrls[platform];
@@ -113,9 +114,9 @@ export default async function webhookRoutes(fastify: FastifyInstance) {
   // Check webhook configuration
   fastify.get('/social/webhook/status', async (_request: FastifyRequest, reply: FastifyReply) => {
     const webhooks = {
-      linkedin: !!process.env.WEBHOOK_LINKEDIN,
-      facebook: !!process.env.WEBHOOK_FACEBOOK,
-      tiktok: !!process.env.WEBHOOK_TIKTOK
+      linkedin: !!config.webhooks?.linkedin,
+      facebook: !!config.webhooks?.facebook,
+      tiktok: !!config.webhooks?.tiktok
     };
 
     const configuredCount = Object.values(webhooks).filter(Boolean).length;

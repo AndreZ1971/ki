@@ -33,6 +33,9 @@ const SocialMediaPoster: React.FC = () => {
   const [editingContent, setEditingContent] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [postStats, setPostStats] = useState({ scheduled: 0, published: 0, engagement: 0 });
+  const [webhookConfig, setWebhookConfig] = useState<Record<string, boolean>>({ linkedin: false, facebook: false, tiktok: false });
+  const [webhookConfiguredCount, setWebhookConfiguredCount] = useState(0);
+  const [aiTransformOnPublish, setAiTransformOnPublish] = useState(true);
   
   // Integration Options (for manual posting)
   const [_connectedAccounts, setConnectedAccounts] = useState({
@@ -88,6 +91,19 @@ const SocialMediaPoster: React.FC = () => {
       .catch(err => console.error('Status check failed:', err));
   }, [apiBase]);
 
+  // Webhook-Status (Make/Zapier/n8n) laden
+  React.useEffect(() => {
+    fetch(`${apiBase}/api/social/webhook/status`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setWebhookConfig(data.webhooks || {});
+          setWebhookConfiguredCount(data.configured || 0);
+        }
+      })
+      .catch(err => console.error('Webhook status check failed:', err));
+  }, [apiBase]);
+
   const handleGenerateWithAI = async () => {
     if (!topic.trim()) {
       showToast('Bitte gib ein Thema ein', 'error');
@@ -134,13 +150,24 @@ const SocialMediaPoster: React.FC = () => {
 
   const handlePublishPost = async (platform: string, content: string) => {
     try {
+      const supportedWebhookPlatforms = ['linkedin', 'facebook', 'tiktok'];
+      if (!supportedWebhookPlatforms.includes(platform)) {
+        showToast('Diese Plattform wird noch nicht unterstützt', 'error');
+        return;
+      }
+      if (!webhookConfig[platform]) {
+        showToast(`${platform.charAt(0).toUpperCase() + platform.slice(1)} ist nicht aktiviert. Siehe Bedienungsanleitung.`, 'error');
+        return;
+      }
+
       const response = await fetch(`${apiBase}/api/social/webhook/post`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           platform,
           content,
-          scheduleTime: 'now'
+          scheduleTime: 'now',
+          useAI: aiTransformOnPublish
         })
       });
 
@@ -318,6 +345,37 @@ const SocialMediaPoster: React.FC = () => {
               ℹ️ <strong>Ausgewählt:</strong> {selectedPlatforms.size} {selectedPlatforms.size === 1 ? 'Plattform' : 'Plattformen'}
             </div>
           </div>
+
+          <div className="social-poster-info-box" style={{ marginTop: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                🔌 <strong>Aktivierte Plattformen:</strong> {webhookConfiguredCount}/3
+                <span
+                  title={
+                    'Einige Plattformen sind zum Versand nicht aktiviert. ' +
+                    'Siehe Bedienungsanleitung für Details.'
+                  }
+                  style={{ marginLeft: 8, cursor: 'help', opacity: 0.9 }}
+                >
+                  ⓘ
+                </span>
+              </div>
+              <label className="social-poster-checkbox-label" title="AI-Optimierung beim Versand aktivieren (Backend transformiert den Text je Plattform)">
+                <input
+                  type="checkbox"
+                  checked={aiTransformOnPublish}
+                  onChange={(e) => setAiTransformOnPublish(e.target.checked)}
+                />
+                <span>AI-Optimierung beim Versand</span>
+              </label>
+            </div>
+            <div style={{ marginTop: 6, fontSize: 12, opacity: 0.8 }}>
+              LinkedIn: {webhookConfig.linkedin ? '✅' : '❌'} · Facebook: {webhookConfig.facebook ? '✅' : '❌'} · TikTok: {webhookConfig.tiktok ? '✅' : '❌'}
+              {!webhookConfiguredCount && (
+                <span> · Tipp: Siehe Bedienungsanleitung für Informationen</span>
+              )}
+            </div>
+          </div>
         </motion.div>
       </div>
 
@@ -421,12 +479,25 @@ const SocialMediaPoster: React.FC = () => {
                       >
                         ✎ Bearbeiten
                       </button>
-                      <button
-                        onClick={() => handlePublishPost(post.platform, post.content)}
-                        className="social-poster-btn social-poster-btn-primary"
-                      >
-                        📤 Publish
-                      </button>
+                      {(() => {
+                        const supportedWebhookPlatforms = ['linkedin', 'facebook', 'tiktok'];
+                        const isSupported = supportedWebhookPlatforms.includes(post.platform);
+                        const isConfigured = isSupported && !!webhookConfig[post.platform];
+                        const disabled = !isSupported || !isConfigured;
+                        const title = !isSupported
+                          ? 'Diese Plattform wird noch nicht unterstützt'
+                          : (!isConfigured ? 'Diese Plattform ist nicht aktiviert' : '');
+                        return (
+                          <button
+                            onClick={() => handlePublishPost(post.platform, post.content)}
+                            className="social-poster-btn social-poster-btn-primary"
+                            disabled={disabled}
+                            title={title}
+                          >
+                            📤 Publish
+                          </button>
+                        );
+                      })()}
                     </>
                   )}
                 </div>

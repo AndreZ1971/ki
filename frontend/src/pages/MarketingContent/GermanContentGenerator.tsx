@@ -110,8 +110,8 @@ const GermanContentGenerator: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1>🇩🇪 German Content Generator</h1>
-        <p>Deutsche Content-Erstellung für lokales Marketing</p>
+        <h1>Content Generator</h1>
+        <p>Content-Erstellung für lokales Marketing</p>
       </motion.div>
 
       {error && <ErrorMessage message={error} />}

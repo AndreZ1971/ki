@@ -745,7 +745,7 @@ Deutsch, natürlich, konversionsstark, plattformoptimiert.`;
 
       try {
         const posts: GeneratedPost[] = [];
-        const apiKey = process.env.OPENAI_API_KEY;
+        const apiKey = config.openAI?.apiKey;
 
         if (!apiKey) {
           // Fallback: Template-basierte Generation
@@ -791,6 +791,7 @@ Return VALID JSON:
   "suggestions": ["suggestion1", "suggestion2"]
 }`;
 
+          const modelName = config.openAI?.model || 'gpt-4-turbo';
           const response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -798,7 +799,7 @@ Return VALID JSON:
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              model: 'gpt-4-turbo',
+              model: modelName,
               messages: [
                 {
                   role: 'system',

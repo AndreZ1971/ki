@@ -25,6 +25,14 @@ if (fs.existsSync(configPath)) {
 
 
 export interface Config {
+  webhooks?: {
+    linkedin?: string;
+    facebook?: string;
+    tiktok?: string;
+    instagram?: string;
+    twitter?: string;
+    youtube?: string;
+  };
   openAI?: {
     apiKey?: string;
     model?: string;
@@ -56,6 +64,7 @@ export interface Config {
 
 
 const config: Config = {
+  webhooks: (configData.webhooks || configData.social?.webhooks || {}),
   openAI: configData.openAI || {},
   woocommerce: configData.woocommerce || {},
   wordpress: configData.wordpress || {},
