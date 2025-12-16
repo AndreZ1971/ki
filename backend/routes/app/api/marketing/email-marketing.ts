@@ -1,6 +1,6 @@
 // backend/routes/app/api/marketing/email-marketing.ts
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import nodemailer from 'nodemailer';
+import transporter from '../../../../services/emailService.js';
 import config from '../../../../config.js';
 
 interface SendCampaignBody {
@@ -212,17 +212,7 @@ export default async function emailMarketingRoutes(server: FastifyInstance) {
           });
         }
 
-        // E-Mail-Versand konfigurieren
-        const transporter = nodemailer.createTransport({
-          host: process.env.SMTP_HOST || 'smtp.gmail.com',
-          port: parseInt(process.env.SMTP_PORT || '587'),
-          secure: process.env.SMTP_SECURE === 'true',
-          auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-          },
-        });
-
+        // 🔥 KORRIGIERT: Verwende vorkonfigurierten Email-Service (services/emailService.ts)
         // Sende E-Mails
         let sentCount = 0;
         const errors: string[] = [];
@@ -230,7 +220,7 @@ export default async function emailMarketingRoutes(server: FastifyInstance) {
         for (const customer of targetCustomers) {
           try {
             await transporter.sendMail({
-              from: process.env.SMTP_FROM || process.env.SMTP_USER,
+              from: 'info@kaufe-es.eu', // Vorkonfigurierte Absenderadresse
               to: customer.email,
               subject: emailSubject,
               html: `
