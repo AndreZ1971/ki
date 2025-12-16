@@ -1206,87 +1206,190 @@ Liefere JSON:
       try {
         const { orderId, destination, items, urgency = 'standard' } = request.body;
 
-        const { getOpenAIClient } = await import('../../../utils/openai.js');
-        const openai = getOpenAIClient();
+        // === REGELBASIERTE LIEFEROPTIMIERUNG (OpenAI-frei, deterministisch) ===
 
         const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
         const totalValue = items.reduce((sum, item) => sum + item.value, 0);
-        const productTypes = items.map((i) => i.productType).join(', ');
+        const hasElectronics = items.some(i => i.productType.toLowerCase().includes('electronic'));
+        const isInternational = destination.country.toLowerCase() !== 'deutschland' && destination.country.toLowerCase() !== 'germany';
 
-        const systemRole = `Du bist ein Logistik-Experte mit 15 Jahren Erfahrung im E-Commerce-Versand. 
-Du analysierst Lieferungen und empfiehlst optimale Versandlösungen basierend auf:
-- Zielort (Customs, Infrastruktur, Wetter)
-- Produktart & Gewicht
-- Versandkosten vs. Lieferzeit
-- Carrier-Performance & Zuverlässigkeit
-- Risikofaktoren (Zoll, Verzögerungen, Verlust)
-
-Antworte NUR mit JSON (kein Markdown)!`;
-
-        const userPrompt = `Analysiere diese Lieferung:
-
-**Bestellung:** ${orderId}
-**Ziel:** ${destination.city}, ${destination.postalCode}, ${destination.country}
-**Dringlichkeit:** ${urgency}
-**Gewicht gesamt:** ${totalWeight} kg
-**Warenwert:** €${totalValue.toFixed(2)}
-**Produkte:** ${productTypes}
-
-Gib zurück (JSON):
-{
-  "recommendedCarrier": {
-    "name": "DHL Express",
-    "reason": "...",
-    "estimatedDays": 2,
-    "cost": 15.99,
-    "reliability": 95
-  },
-  "alternativeCarriers": [
-    {"name": "UPS", "estimatedDays": 3, "cost": 12.50, "reliability": 88}
-  ],
-  "deliveryRisks": [
-    {"risk": "Zollverzögerung", "probability": "medium", "mitigation": "..."}
-  ],
-  "routeOptimization": {
-    "fastestRoute": "Hamburg → Frankfurt → ${destination.city}",
-    "cheapestRoute": "...",
-    "recommended": "fastest"
-  },
-  "estimatedDelivery": {
-    "best": "2024-12-13",
-    "likely": "2024-12-14",
-    "worst": "2024-12-16"
-  },
-  "specialInstructions": ["Signature required", "Fragile handling"],
-  "confidence": 0.85
-}`;
-
-        const response = await openai.chat.completions.create({
-          model: 'gpt-4o-mini',
-          temperature: 0.32,
-          messages: [
-            { role: 'system', content: systemRole },
-            { role: 'user', content: userPrompt }
-          ]
-        });
-
-        const responseText = response.choices[0]?.message?.content;
-        if (!responseText) {
-          throw new Error('Keine Antwort von OpenAI');
+        // 1. CARRIER-AUSWAHL (regelbasiert)
+        interface CarrierOption {
+          name: string;
+          baseDays: number;
+          baseCost: number;
+          weightFactor: number;
+          reliability: number;
+          maxWeight: number;
+          internationalSurcharge: number;
         }
 
-        const cleanedText = cleanJsonResponse(responseText);
-        const analysis = JSON.parse(cleanedText);
+        const carriers: CarrierOption[] = [
+          { name: 'DHL Express', baseDays: 1, baseCost: 15.99, weightFactor: 3.5, reliability: 96, maxWeight: 31.5, internationalSurcharge: 12 },
+          { name: 'DHL Standard', baseDays: 3, baseCost: 6.99, weightFactor: 1.8, reliability: 92, maxWeight: 31.5, internationalSurcharge: 8 },
+          { name: 'UPS Express', baseDays: 2, baseCost: 18.50, weightFactor: 3.8, reliability: 94, maxWeight: 30, internationalSurcharge: 15 },
+          { name: 'UPS Standard', baseDays: 4, baseCost: 8.99, weightFactor: 2.1, reliability: 89, maxWeight: 30, internationalSurcharge: 10 },
+          { name: 'Hermes', baseDays: 5, baseCost: 4.99, weightFactor: 1.2, reliability: 82, maxWeight: 25, internationalSurcharge: 0 },
+          { name: 'DPD', baseDays: 4, baseCost: 5.99, weightFactor: 1.5, reliability: 87, maxWeight: 31.5, internationalSurcharge: 6 }
+        ];
+
+        // Filtere nach Gewichtslimit und International-Support
+        let availableCarriers = carriers.filter(c => 
+          totalWeight <= c.maxWeight && 
+          (!isInternational || c.internationalSurcharge > 0)
+        );
+
+        if (availableCarriers.length === 0) {
+          availableCarriers = carriers.filter(c => totalWeight <= c.maxWeight);
+        }
+
+        // Berechne Kosten und Lieferzeit für jeden Carrier
+        const scoredCarriers = availableCarriers.map(carrier => {
+          let days = carrier.baseDays;
+          let cost = carrier.baseCost + (totalWeight * carrier.weightFactor);
+
+          // Dringlichkeits-Anpassungen
+          if (urgency === 'express') {
+            days = Math.max(1, Math.ceil(days * 0.5));
+            cost *= 1.8;
+          } else if (urgency === 'overnight') {
+            days = 1;
+            cost *= 2.5;
+          }
+
+          // International-Zuschlag
+          if (isInternational) {
+            cost += carrier.internationalSurcharge;
+            days += 2;
+          }
+
+          // Wertzuschlag bei teuren Sendungen
+          if (totalValue > 500) {
+            cost += 5; // Versicherungszuschlag
+          }
+
+          // Score-Berechnung: Balance zwischen Kosten, Zeit und Zuverlässigkeit
+          const timeScore = (10 - days) * 10; // schneller = besser
+          const costScore = Math.max(0, (50 - cost) * 2); // günstiger = besser
+          const reliabilityScore = carrier.reliability;
+          const totalScore = (timeScore * 0.3) + (costScore * 0.3) + (reliabilityScore * 0.4);
+
+          return {
+            ...carrier,
+            estimatedDays: days,
+            cost: Math.round(cost * 100) / 100,
+            score: totalScore
+          };
+        }).sort((a, b) => b.score - a.score);
+
+        const recommended = scoredCarriers[0];
+        const alternatives = scoredCarriers.slice(1, 4);
+
+        // 2. RISIKO-ANALYSE
+        const deliveryRisks: Array<{risk: string; probability: string; mitigation: string}> = [];
+
+        if (isInternational) {
+          deliveryRisks.push({
+            risk: 'Zollverzögerungen',
+            probability: 'medium',
+            mitigation: 'Vollständige Zolldokumente vorbereiten, Wert unter €150 deklarieren wenn möglich'
+          });
+        }
+
+        if (totalValue > 500) {
+          deliveryRisks.push({
+            risk: 'Hoher Warenwert - Diebstahlrisiko',
+            probability: 'low',
+            mitigation: 'Versicherung abschließen, Unterschrift bei Zustellung verlangen'
+          });
+        }
+
+        if (totalWeight > 15) {
+          deliveryRisks.push({
+            risk: 'Schweres Paket - Handling-Verzögerungen',
+            probability: 'medium',
+            mitigation: '2-Personen-Handling einplanen, Sperrgut-Label anbringen'
+          });
+        }
+
+        if (hasElectronics) {
+          deliveryRisks.push({
+            risk: 'Elektronik - Transportschaden-Risiko',
+            probability: 'low',
+            mitigation: 'Zusätzliche Polsterung, "Fragile" Label, stoßfeste Verpackung'
+          });
+        }
+
+        // 3. ROUTEN-OPTIMIERUNG
+        const fastestCarrier = scoredCarriers.sort((a, b) => a.estimatedDays - b.estimatedDays)[0];
+        const cheapestCarrier = scoredCarriers.sort((a, b) => a.cost - b.cost)[0];
+
+        const routeOptimization = {
+          fastestRoute: `${fastestCarrier.name} - Direktversand via Luftfracht (${fastestCarrier.estimatedDays} Tage)`,
+          cheapestRoute: `${cheapestCarrier.name} - Landweg via Hub (${cheapestCarrier.estimatedDays} Tage)`,
+          recommended: urgency === 'overnight' || urgency === 'express' ? 'fastest' : (totalValue < 100 ? 'cheapest' : 'balanced')
+        };
+
+        // 4. LIEFERPROGNOSE
+        const today = new Date();
+        const bestCase = new Date(today);
+        bestCase.setDate(today.getDate() + Math.max(1, recommended.estimatedDays - 1));
+        const likelyCase = new Date(today);
+        likelyCase.setDate(today.getDate() + recommended.estimatedDays);
+        const worstCase = new Date(today);
+        worstCase.setDate(today.getDate() + recommended.estimatedDays + 2);
+
+        const estimatedDelivery = {
+          best: bestCase.toISOString().split('T')[0],
+          likely: likelyCase.toISOString().split('T')[0],
+          worst: worstCase.toISOString().split('T')[0]
+        };
+
+        // 5. SPEZIELLE ANWEISUNGEN
+        const specialInstructions: string[] = [];
+
+        if (totalValue > 300) {
+          specialInstructions.push('Unterschrift bei Zustellung erforderlich');
+        }
+        if (hasElectronics) {
+          specialInstructions.push('Fragile - Vorsichtig behandeln');
+        }
+        if (totalWeight > 20) {
+          specialInstructions.push('Sperrgut - 2-Personen-Handling erforderlich');
+        }
+        if (isInternational) {
+          specialInstructions.push('Zolldokumente beifügen (CN22/CN23)');
+        }
+        if (urgency === 'overnight' || urgency === 'express') {
+          specialInstructions.push('Eilsendung - Priorität im Hub-Sortiment');
+        }
+
+        // 6. CONFIDENCE (basierend auf Datenvollständigkeit)
+        let confidence = 0.75;
+        if (destination.postalCode && destination.city) confidence += 0.1;
+        if (items.length > 1) confidence += 0.05;
+        if (!isInternational) confidence += 0.1;
 
         const normalized = {
           orderId,
-          recommendedCarrier: analysis.recommendedCarrier || { name: 'DHL', reason: 'Standard', estimatedDays: 3, cost: 10, reliability: 90 },
-          alternativeCarriers: analysis.alternativeCarriers || [],
-          deliveryRisks: analysis.deliveryRisks || [],
-          routeOptimization: analysis.routeOptimization || { fastestRoute: 'Direct', cheapestRoute: 'Direct', recommended: 'fastest' },
-          estimatedDelivery: analysis.estimatedDelivery || { best: '', likely: '', worst: '' },
-          specialInstructions: analysis.specialInstructions || [],
-          confidence: typeof analysis.confidence === 'number' ? analysis.confidence : 0.7,
+          recommendedCarrier: {
+            name: recommended.name,
+            reason: `Beste Balance: ${recommended.estimatedDays} Tage, €${recommended.cost.toFixed(2)}, ${recommended.reliability}% Zuverlässigkeit`,
+            estimatedDays: recommended.estimatedDays,
+            cost: recommended.cost,
+            reliability: recommended.reliability
+          },
+          alternativeCarriers: alternatives.map(alt => ({
+            name: alt.name,
+            estimatedDays: alt.estimatedDays,
+            cost: alt.cost,
+            reliability: alt.reliability
+          })),
+          deliveryRisks,
+          routeOptimization,
+          estimatedDelivery,
+          specialInstructions,
+          confidence: Math.round(confidence * 100) / 100,
           metadata: {
             destination: `${destination.city}, ${destination.country}`,
             totalWeight,
