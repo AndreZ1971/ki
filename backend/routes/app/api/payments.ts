@@ -971,15 +971,14 @@ Liefere JSON:
     async (request: FastifyRequest<{ Body: UserPreferencesBody }>, reply: FastifyReply) => {
       try {
         const { customerId, customerEmail, purchaseHistory = [] } = request.body;
-        const { getOpenAIClient, executeOpenAI } = await import('../../../utils/openai.js');
-        const openai = getOpenAIClient();
 
-        // Berechne Statistiken aus Purchase History
+        // === REGELBASIERTE PRÄFERENZ-ANALYSE (OpenAI-frei, deterministisch) ===
+        
+        // 1. Statistiken aus Purchase History berechnen
         const totalPurchases = purchaseHistory.length;
         const paymentMethodCounts: Record<string, number> = {};
         const currencyCounts: Record<string, number> = {};
         let totalAmount = 0;
-        let avgAmount = 0;
 
         purchaseHistory.forEach(purchase => {
           paymentMethodCounts[purchase.paymentMethod] = (paymentMethodCounts[purchase.paymentMethod] || 0) + 1;
@@ -987,93 +986,95 @@ Liefere JSON:
           totalAmount += purchase.amount;
         });
 
-        if (totalPurchases > 0) {
-          avgAmount = totalAmount / totalPurchases;
+        const avgAmount = totalPurchases > 0 ? totalAmount / totalPurchases : 0;
+
+        // 2. Bevorzugte Zahlungsmethoden (sortiert nach Häufigkeit)
+        const sortedPaymentMethods = Object.entries(paymentMethodCounts)
+          .sort((a, b) => b[1] - a[1])
+          .map(([method]) => method);
+        
+        const preferredPaymentMethods = sortedPaymentMethods.length > 0 
+          ? sortedPaymentMethods.slice(0, 3) // Top 3
+          : ['card', 'paypal', 'sepa']; // Fallback
+
+        // 3. Bevorzugte Währung (häufigste)
+        const preferredCurrency = Object.entries(currencyCounts)
+          .sort((a, b) => b[1] - a[1])[0]?.[0] || 'EUR';
+
+        // 4. Sprache ableiten (aus Email-Domain oder Currency)
+        let preferredLanguage = 'de';
+        if (customerEmail) {
+          const domain = customerEmail.toLowerCase();
+          if (domain.includes('.com') || domain.includes('.uk')) preferredLanguage = 'en';
+          else if (domain.includes('.fr')) preferredLanguage = 'fr';
+        }
+        if (preferredCurrency === 'USD' || preferredCurrency === 'GBP') preferredLanguage = 'en';
+
+        // 5. Checkout-Flow Empfehlung (basierend auf Erfahrung)
+        const checkoutFlowRecommendation = totalPurchases >= 5 ? 'one-page' : 'multi-step';
+
+        // 6. Risk Profile (basierend auf Lifetime Value & Kauffrequenz)
+        let riskProfile: 'low' | 'medium' | 'high' = 'medium';
+        if (totalAmount >= 500 && totalPurchases >= 5) riskProfile = 'low';
+        else if (totalAmount < 50 || totalPurchases === 0) riskProfile = 'high';
+
+        // 7. Confidence (höher bei mehr Daten)
+        const confidence = Math.min(0.95, 0.5 + (totalPurchases * 0.05));
+
+        // 8. Personalisierungen (regelbasiert)
+        const personalizations = {
+          showSavedCards: totalPurchases >= 3,
+          suggestInstallments: avgAmount >= 100,
+          highlightTrustBadges: totalPurchases <= 2,
+          showSecurityFeatures: true
+        };
+
+        // 9. Conversion-Optimierungen
+        const conversionOptimizations: string[] = [];
+        if (totalPurchases >= 5) {
+          conversionOptimizations.push('Express-Checkout aktivieren - Stammkunde erkannt');
+        }
+        if (avgAmount >= 100) {
+          conversionOptimizations.push('Ratenzahlung prominent anbieten für höhere AOV');
+        }
+        if (preferredPaymentMethods[0] === 'paypal') {
+          conversionOptimizations.push('PayPal als primäre Option anzeigen (+15% Conversion)');
+        }
+        if (riskProfile === 'high') {
+          conversionOptimizations.push('Trust-Badges und Geld-zurück-Garantie hervorheben');
+        }
+        if (totalPurchases <= 2) {
+          conversionOptimizations.push('Guided Checkout mit Progress-Indicator nutzen');
+        }
+        if (avgAmount < 50) {
+          conversionOptimizations.push('Kostenlose Verschwelle kommunizieren für Upselling');
         }
 
-        const mostUsedPaymentMethod = Object.entries(paymentMethodCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'card';
-        const preferredCurrency = Object.entries(currencyCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'EUR';
-
-        const prompt = `Analysiere Kundenpräferenzen für personalisierte Payment-Erfahrung.
-
-Kunde: ${customerId}
-Email: ${customerEmail || 'unbekannt'}
-Kaufhistorie: ${totalPurchases} Transaktionen
-Durchschnittsbetrag: ${avgAmount.toFixed(2)} ${preferredCurrency}
-Am meisten genutzt: ${mostUsedPaymentMethod}
-
-Erkenne:
-1. Bevorzugte Zahlungsmethoden (Kreditkarte, PayPal, SEPA, Klarna, etc.)
-2. Bevorzugte Währung
-3. Bevorzugte Sprache (basierend auf Email/Region)
-4. Optimale Checkout-Flow (one-page vs. multi-step)
-5. Personalisierungs-Empfehlungen für höhere Conversion
-
-Liefere JSON:
-{
-  "preferredPaymentMethods": ["primary", "secondary", "tertiary"],
-  "preferredCurrency": "EUR" | "USD" | "GBP",
-  "preferredLanguage": "de" | "en" | "fr",
-  "checkoutFlowRecommendation": "one-page" | "multi-step",
-  "confidence": 0.0-1.0,
-  "personalizations": {
-    "showSavedCards": boolean,
-    "suggestInstallments": boolean,
-    "highlightTrustBadges": boolean,
-    "showSecurityFeatures": boolean
-  },
-  "conversionOptimizations": ["Konkrete Empfehlungen zur Conversion-Steigerung"],
-  "riskProfile": "low" | "medium" | "high",
-  "lifetimeValue": number,
-  "nextBestAction": "string"
-}`;
-
-        const completion = await executeOpenAI(
-          () => openai.chat.completions.create({
-            model: 'gpt-4o-mini',
-            temperature: 0.35,
-            messages: [
-              { 
-                role: 'system', 
-                content: 'Du bist Payment-UX-Experte mit Fokus auf Personalisierung und Conversion-Optimierung. Antworte kompakt in JSON.' 
-              },
-              { role: 'user', content: prompt }
-            ]
-          }),
-          'user-preferences'
-        );
-
-        const responseText = cleanJsonResponse(completion.choices[0]?.message?.content || '{}');
-        const parsed = JSON.parse(responseText);
+        // 10. Next Best Action
+        let nextBestAction = 'Checkout-Flow optimieren';
+        if (totalPurchases === 0) {
+          nextBestAction = 'Vertrauen aufbauen: Social Proof und Testimonials zeigen';
+        } else if (totalPurchases >= 10) {
+          nextBestAction = 'Loyalty-Programm oder VIP-Vorteile anbieten';
+        } else if (avgAmount >= 150) {
+          nextBestAction = 'Premium-Zahlungsoptionen (z.B. Klarna) aktivieren';
+        }
 
         const normalized = {
-          preferredPaymentMethods: Array.isArray(parsed.preferredPaymentMethods) 
-            ? parsed.preferredPaymentMethods 
-            : [mostUsedPaymentMethod],
-          preferredCurrency: parsed.preferredCurrency || preferredCurrency,
-          preferredLanguage: parsed.preferredLanguage || 'de',
-          checkoutFlowRecommendation: ['one-page', 'multi-step'].includes(parsed.checkoutFlowRecommendation)
-            ? parsed.checkoutFlowRecommendation
-            : 'one-page',
-          confidence: Math.max(0, Math.min(1, parsed.confidence ?? 0.7)),
-          personalizations: {
-            showSavedCards: parsed.personalizations?.showSavedCards ?? true,
-            suggestInstallments: parsed.personalizations?.suggestInstallments ?? false,
-            highlightTrustBadges: parsed.personalizations?.highlightTrustBadges ?? true,
-            showSecurityFeatures: parsed.personalizations?.showSecurityFeatures ?? true
-          },
-          conversionOptimizations: Array.isArray(parsed.conversionOptimizations)
-            ? parsed.conversionOptimizations
-            : [],
-          riskProfile: ['low', 'medium', 'high'].includes(parsed.riskProfile)
-            ? parsed.riskProfile
-            : 'medium',
-          lifetimeValue: parsed.lifetimeValue || totalAmount,
-          nextBestAction: parsed.nextBestAction || 'Optimize checkout flow',
+          preferredPaymentMethods,
+          preferredCurrency,
+          preferredLanguage,
+          checkoutFlowRecommendation,
+          confidence: Math.round(confidence * 100) / 100,
+          personalizations,
+          conversionOptimizations,
+          riskProfile,
+          lifetimeValue: totalAmount,
+          nextBestAction,
           metadata: {
             customerId,
             totalPurchases,
-            avgAmount,
+            avgAmount: Math.round(avgAmount * 100) / 100,
             analyzedAt: new Date().toISOString()
           }
         };
