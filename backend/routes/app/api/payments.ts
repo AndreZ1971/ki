@@ -497,84 +497,140 @@ Antworte als JSON-Objekt:
           environment = 'prod'
         } = request.body;
 
-        const { getOpenAIClient, executeOpenAI } = await import('../../../utils/openai.js');
-        const openai = getOpenAIClient();
-
+        // ✅ REGELBASIERTE PAYMENT-VERIFIKATION - Stabil ohne externe APIs
         const emailDomain = customerEmail.split('@')[1] || 'unknown';
-        const prompt = `Pruefe eine Payment-Transaktion auf Validitaet und Risiko.
+        
+        // Email-Format-Validierung
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const isValidEmailFormat = emailRegex.test(customerEmail);
+        
+        // Bekannte Wegwerf-Email-Domains
+        const disposableEmailDomains = ['tempmail.com', 'guerrillamail.com', 'mailinator.com', '10minutemail.com', 'trashmail.com'];
+        const isDisposableEmail = disposableEmailDomains.some(domain => emailDomain.toLowerCase().includes(domain));
+        
+        // Transaction ID Format Check
+        const hasValidTransactionId = transactionId && transactionId.length >= 8 && /^[A-Za-z0-9\-_]+$/.test(transactionId);
+        
+        // Signature Check
+        const hasSignature = signature && signature !== 'not-provided' && signature.length > 10;
+        
+        // Betrags-Checks
+        const isHighAmount = amount > 500;
+        const isVeryHighAmount = amount > 1000;
+        const isSuspiciousAmount = amount > 5000 || amount < 0.01;
+        
+        // Risk Scoring
+        let riskScore = 0;
+        const flags: string[] = [];
+        const checks: Array<{ name: string; status: 'pass' | 'fail' | 'warn'; detail: string }> = [];
+        
+        // Check 1: Email Validation
+        if (!isValidEmailFormat) {
+          riskScore += 30;
+          flags.push('Ungültiges Email-Format');
+          checks.push({ name: 'Email Format', status: 'fail', detail: 'Email-Format ungültig' });
+        } else if (isDisposableEmail) {
+          riskScore += 40;
+          flags.push('Wegwerf-Email-Domain erkannt');
+          checks.push({ name: 'Email Domain', status: 'warn', detail: `${emailDomain} ist bekannte Wegwerf-Email-Domain` });
+        } else {
+          checks.push({ name: 'Email', status: 'pass', detail: 'Email-Format und Domain sind valide' });
+        }
+        
+        // Check 2: Transaction ID
+        if (!hasValidTransactionId) {
+          riskScore += 20;
+          flags.push('Transaction-ID fehlt oder ungültig');
+          checks.push({ name: 'Transaction ID', status: 'fail', detail: 'ID muss mindestens 8 Zeichen lang sein' });
+        } else {
+          checks.push({ name: 'Transaction ID', status: 'pass', detail: `ID ${transactionId} ist valide` });
+        }
+        
+        // Check 3: Signature
+        if (!hasSignature) {
+          if (environment === 'prod') {
+            riskScore += 25;
+            flags.push('Fehlende Webhook-Signatur in Production');
+            checks.push({ name: 'Signature', status: 'fail', detail: 'Signatur ist in prod zwingend erforderlich' });
+          } else {
+            riskScore += 10;
+            checks.push({ name: 'Signature', status: 'warn', detail: `Keine Signatur in ${environment} Environment` });
+          }
+        } else {
+          checks.push({ name: 'Signature', status: 'pass', detail: 'Signatur vorhanden' });
+        }
+        
+        // Check 4: Amount Plausibility
+        if (isSuspiciousAmount) {
+          riskScore += 35;
+          flags.push(`Verdächtiger Betrag: ${amount} ${currency}`);
+          checks.push({ name: 'Amount', status: 'fail', detail: `${amount} ${currency} ist außerhalb plausibler Grenzen` });
+        } else if (isVeryHighAmount) {
+          riskScore += 20;
+          flags.push(`Sehr hoher Betrag: ${amount} ${currency}`);
+          checks.push({ name: 'Amount', status: 'warn', detail: `Betrag >1000 ${currency} erfordert zusätzliche Prüfung` });
+        } else if (isHighAmount) {
+          riskScore += 10;
+          checks.push({ name: 'Amount', status: 'warn', detail: `${amount} ${currency} ist höher als üblich` });
+        } else {
+          checks.push({ name: 'Amount', status: 'pass', detail: `${amount} ${currency} ist plausibel` });
+        }
+        
+        // Check 5: IP Address
+        if (ipAddress === 'unknown') {
+          riskScore += 15;
+          flags.push('IP-Adresse unbekannt');
+          checks.push({ name: 'IP Address', status: 'warn', detail: 'Keine IP-Adresse bereitgestellt' });
+        } else {
+          checks.push({ name: 'IP Address', status: 'pass', detail: `IP ${ipAddress} erfasst` });
+        }
+        
+        // Check 6: Payment Method
+        const validPaymentMethods = ['card', 'paypal', 'apple-pay', 'google-pay', 'klarna', 'sepa'];
+        if (!validPaymentMethods.includes(paymentMethod.toLowerCase())) {
+          riskScore += 10;
+          flags.push(`Unbekannte Payment-Methode: ${paymentMethod}`);
+          checks.push({ name: 'Payment Method', status: 'warn', detail: `${paymentMethod} ist nicht in bekannten Methoden` });
+        } else {
+          checks.push({ name: 'Payment Method', status: 'pass', detail: `${paymentMethod} ist valide Methode` });
+        }
+        
+        // Risk Level bestimmen
+        let riskLevel: 'low' | 'medium' | 'high' | 'critical';
+        if (riskScore <= 20) riskLevel = 'low';
+        else if (riskScore <= 50) riskLevel = 'medium';
+        else if (riskScore <= 75) riskLevel = 'high';
+        else riskLevel = 'critical';
+        
+        // Empfohlene Aktion
+        let recommendedAction: 'approve' | 'manual-review' | 'reject';
+        if (riskScore <= 20) recommendedAction = 'approve';
+        else if (riskScore <= 60) recommendedAction = 'manual-review';
+        else recommendedAction = 'reject';
+        
+        // Valid wenn riskScore niedrig und keine kritischen Fails
+        const criticalFailures = checks.filter(c => c.status === 'fail').length;
+        const valid = riskScore <= 30 && criticalFailures === 0;
+        
+        const reasoning = valid
+          ? `Transaktion validiert. Risk-Score: ${riskScore}/100. ${checks.filter(c => c.status === 'pass').length} Checks bestanden.`
+          : `Prüfung mit Findings. ${flags.length} Flags, ${criticalFailures} kritische Fehler. Manuelle Überprüfung empfohlen.`;
 
-Transaktion:
-- Transaction ID: ${transactionId}
-- Amount: ${amount} ${currency}
-- Customer Email: ${customerEmail}
-- Email Domain: ${emailDomain}
-- IP: ${ipAddress}
-- Payment Method: ${paymentMethod}
-- Environment: ${environment}
-- Signature: ${signature}
-- Payload snippet (max 500 chars): ${payload?.slice(0, 500)}
-
-Aufgaben:
-1) Validitaet der Daten plausibilisieren (IDs/Signatur/Email/IP/Method).
-2) Betrugsrisiko bewerten (Score 0-100) und Level (low|medium|high|critical).
-3) Technische und fachliche Flags ausgeben (z.B. fehlende Signatur, ungültiges Format, Domain-Risiko, Betragsspitze, Duplikatsverdacht).
-4) Empfohlene Aktion: approve | manual-review | reject.
-5) Liste der Checks mit Status und kurzer Begründung.
-
-Antwort nur als JSON:
-{
-  "valid": true|false,
-  "riskScore": 0-100,
-  "riskLevel": "low"|"medium"|"high"|"critical",
-  "flags": ["..."],
-  "recommendedAction": "approve"|"manual-review"|"reject",
-  "reasoning": "kurze Zusammenfassung",
-  "checks": [
-    { "name": "Signature", "status": "pass|fail|warn", "detail": "..." },
-    { "name": "Email", "status": "pass|fail|warn", "detail": "..." },
-    { "name": "Amount", "status": "pass|fail|warn", "detail": "..." }
-  ]
-}`;
-
-        const completion = await executeOpenAI(
-          () => openai.chat.completions.create({
-            model: 'gpt-4o-mini',
-            temperature: 0.28,
-            messages: [
-              {
-                role: 'system',
-                content: 'Du bist Payment-Risk- und SRE-Experte. Antworte strikt in JSON, kompakt, ohne Freitext.'
-              },
-              { role: 'user', content: prompt }
-            ]
-          }),
-          'payment-verify'
-        );
-
-        const responseText = completion.choices[0]?.message?.content || '{}';
-        const parsed = JSON.parse(responseText);
-
-        const normalized = {
-          valid: Boolean(parsed.valid),
-          riskScore: Math.max(0, Math.min(100, parsed.riskScore ?? 50)),
-          riskLevel: ['low', 'medium', 'high', 'critical'].includes(parsed.riskLevel) ? parsed.riskLevel : 'medium',
-          flags: Array.isArray(parsed.flags) ? parsed.flags : [],
-          recommendedAction: ['approve', 'manual-review', 'reject'].includes(parsed.recommendedAction)
-            ? parsed.recommendedAction
-            : 'manual-review',
-          reasoning: parsed.reasoning || 'Automatische Verifikation',
-          checks: Array.isArray(parsed.checks)
-            ? parsed.checks.map((c: any) => ({
-                name: c.name || 'Check',
-                status: ['pass', 'fail', 'warn'].includes(c.status) ? c.status : 'warn',
-                detail: c.detail || 'Ohne Detail'
-              }))
-            : []
+        const result = {
+          valid,
+          riskScore,
+          riskLevel,
+          flags,
+          recommendedAction,
+          reasoning,
+          checks
         };
 
-        recordMlEvent('payments.verify', normalized.valid, 1 - normalized.riskScore / 100);
+        recordMlEvent('payments.verify', valid, 1 - riskScore / 100);
 
-        return reply.send({ success: true, data: normalized });
+        console.log(`✅ Payment verification: ${transactionId}, Risk=${riskScore}, Level=${riskLevel}, Action=${recommendedAction}`);
+
+        return reply.send({ success: true, data: result });
       } catch (error) {
         console.error('❌ Payment verify error:', error);
         recordMlEvent('payments.verify', false, 0);
