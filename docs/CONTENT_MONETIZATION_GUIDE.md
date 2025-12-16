@@ -1,7 +1,15 @@
-# 💸 Content Monetization & KI-Features – Bedienungsanleitung
+# 💸 Content Monetization – Veraltet (konsolidiert)
 
-**Version:** 3.2.0  
-**Letzte Aktualisierung:** Dezember 2025
+Diese Datei ist veraltet. Die konsolidierte und aktuelle Anleitung inkl. API befindet sich in:
+
+- CONTENT_MONETIZATION.md
+
+Version: 3.2.0 (deprecated)
+Letzte Aktualisierung: Dezember 2025
+
+—
+
+Ursprünglicher Inhalt folgt unten zur Referenz.
 
 ---
 

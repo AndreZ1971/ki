@@ -1,8 +1,15 @@
-# 🎯 Content Monetization API - Technische Dokumentation
+# 🎯 Content Monetization API – Veraltet (konsolidiert)
 
-**Version:** 3.2.0
+Diese Datei ist veraltet. Die konsolidierte und aktuelle Anleitung inkl. API befindet sich in:
 
-Technische Dokumentation für die neuen Content Monetization Endpoints und Features.
+- CONTENT_MONETIZATION.md
+
+Version: 3.2.0 (deprecated)
+Letzte Aktualisierung: Dezember 2025
+
+—
+
+Ursprünglicher Inhalt folgt unten zur Referenz.
 
 ---
 

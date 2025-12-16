@@ -509,9 +509,11 @@ const start = async () => {
     console.log('🚀 Starte Server...');
     const server = await buildServer();
     
+    const listenPort = Number(process.env.PORT || 3000);
+    const listenHost = process.env.HOST || '0.0.0.0';
     await server.listen({ 
-      port: 3000, 
-      host: '0.0.0.0' 
+      port: listenPort, 
+      host: listenHost 
     });
     
 

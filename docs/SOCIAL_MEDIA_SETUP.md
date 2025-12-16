@@ -1,4 +1,12 @@
-# 🚀 Social Media API Setup Guide
+# 🚀 Social Media API Setup – Veraltet (konsolidiert)
+
+Diese Datei ist veraltet. Die konsolidierte und aktuelle Anleitung inkl. Setup & API befindet sich in:
+
+- SOCIAL_MEDIA_GUIDE.md
+
+—
+
+Ursprünglicher Inhalt folgt unten zur Referenz.
 
 ## 📋 Übersicht
 

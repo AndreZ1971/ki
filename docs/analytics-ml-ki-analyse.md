@@ -9,7 +9,7 @@
 
 Der Analytics-Bereich hat **Mock-Daten mit ML/KI-Potential**, aber **keine echte OpenAI/GPT-4-Integration**. Die APIs liefern statische Insights statt dynamischer KI-Analysen.
 
-### Status: 🟡 Teilweise funktionsfähig
+### Status: 🟢 Aktualisiert (2025-12-16)
 - ✅ API-Struktur vorhanden
 - ✅ Frontend ruft ML-APIs auf
 - ❌ **KEINE echte OpenAI-Integration in Analytics-Routes**
@@ -27,13 +27,15 @@ Der Analytics-Bereich hat **Mock-Daten mit ML/KI-Potential**, aber **keine echte
 - `analytics/conversion.ts` - Conversion-Analyse (Mock)
 - `analytics/regioning.ts` - Regionale Analytics mit `/ml-analysis` (Mock)
 - `analytics/ml-insights.ts` - ML-Insights (Mock)
-- `analytics/trends.ts` - Trend-Analyse (Mock)
+- `analytics/trends.ts` - Trend-Analyse (teilweise Mock) + neuer Endpoint: `/api/trends/trending-keywords` (real)
 - `analytics/real-time.ts` - Echtzeit-Daten (Mock)
 
-### ❌ Fehlend - Echte ML/KI-Integration
+### 🟢 Teilweise umgesetzt - Echte ML/KI-Integration
 
 **Problem:**
-Alle Analytics-Routes liefern **statische Mock-Daten** statt dynamischer KI-Analysen:
+Einige Analytics-Routes liefern noch **statische Mock-Daten**; jedoch sind KI-Funktionen im Backend produktiv:
+- Auto-Product-Creation mit OpenAI (Text + DALL·E‑3 Bilder), echten Aggregaten (Qualität/ROI/Zeit)
+- Trend-Keywords aus Multi-Source Aggregator (`/api/trends/trending-keywords`)
 
 ```typescript
 // backend/routes/app/api/analytics/ml-insights.ts

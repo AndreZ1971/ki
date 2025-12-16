@@ -127,11 +127,12 @@ npm run dev
 
 | Dokument | Beschreibung |
 |----------|------------|
-| [Content Monetization Guide](./docs/CONTENT_MONETIZATION_GUIDE.md) | KI-Preisvorschlag, Text-Generator, Forecasts |
+| [Content Monetization](./docs/CONTENT_MONETIZATION.md) | Konsolidierte Anleitung & API |
 | [Bedienungsanleitung](./docs/Bedienungsanleitung-KI-Agent.md) | Komplette Tool-Übersicht & How-To's |
 | [Backend AI Setup](./docs/BACKEND_AI_SETUP.md) | AI-Transformation & Social Media Integration |
 | [Deployment Guide](./docs/deployment.md) | Production-Setup & Troubleshooting |
 | [API-Reference](./docs/api/) | Vollständige API-Dokumentation |
+| [Social Media Guide](./docs/SOCIAL_MEDIA_GUIDE.md) | Meta & TikTok Setup, .env, Test-APIs |
 
 ---
 
