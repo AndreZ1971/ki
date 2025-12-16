@@ -314,6 +314,25 @@ async function buildServer() {
     });
     console.log('✅ Product Adviser Routes erfolgreich registriert');
 
+    // 🔥 404 MONITORING für Bitpalast IP-Sperre-Debugging
+    server.setNotFoundHandler((request, reply) => {
+      const clientIp = request.ip || 'unknown';
+      const method = request.method;
+      const url = request.url;
+      const statusCode = 404;
+
+      console.error(`🚨 404 NOT FOUND: ${method} ${url} from IP: ${clientIp}`);
+      server.log.warn(`404: ${method} ${url} from ${clientIp}`);
+
+      reply.code(statusCode).send({
+        success: false,
+        error: 'Route not found',
+        method,
+        path: url,
+        statusCode,
+      });
+    });
+
     await server.register(reviewsRoutes, { prefix: '/api/analytics/reviews' });
     console.log('✅ Reviews Routes erfolgreich registriert');
 

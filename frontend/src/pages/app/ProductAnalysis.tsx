@@ -142,6 +142,19 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
 
       console.log("📥 Response Status:", res.status, res.statusText);
 
+      // 🚨 KRITISCH: 404 oder andere Fehler sofort erkennen
+      if (res.status === 404) {
+        throw new Error(
+          `Endpoint nicht gefunden (404): ${url}\n\nBitte Routing überprüfen!`
+        );
+      }
+
+      if (res.status === 503) {
+        throw new Error(
+          `Service nicht verfügbar (503): WooCommerce API nicht erreichbar`
+        );
+      }
+
       const data = await res.json();
       console.log("📋 Response Data:", data);
 
@@ -234,9 +247,22 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
           body: JSON.stringify(payload),
         });
 
+        // 🚨 KRITISCH: 404 oder andere Fehler sofort erkennen
+        if (res.status === 404) {
+          throw new Error(
+            `Endpoint nicht gefunden (404): ${path}\n\nBitte Routing überprüfen!`
+          );
+        }
+
+        if (res.status === 503) {
+          throw new Error(
+            `Service nicht verfügbar (503): WooCommerce API nicht erreichbar`
+          );
+        }
+
         if (!res.ok) {
           const text = await res.text();
-          throw new Error(text || "Aktion fehlgeschlagen");
+          throw new Error(text || `Aktion fehlgeschlagen (HTTP ${res.status})`);
         }
 
         const data = await res.json();
@@ -253,7 +279,15 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
         setActionLoading(false);
       }
     },
-    [buildUrl, productId, restockForm, priceForm, steeringAction, actionLoading, loading]
+    [
+      buildUrl,
+      productId,
+      restockForm,
+      priceForm,
+      steeringAction,
+      actionLoading,
+      loading,
+    ]
   );
 
   // 🎨 Score-Farbe basierend auf Wert
