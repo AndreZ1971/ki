@@ -110,7 +110,8 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
       }
     };
     fetchProducts();
-  }, []); // ✅ Nur bei Mount, keine Dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // ✅ Nur bei Mount - apiBase ändert sich nie (useMemo)
 
   // 🎯 Analyse starten
   const fetchAnalysis = useCallback(async () => {
@@ -252,7 +253,7 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
         setActionLoading(false);
       }
     },
-    [buildUrl, productId, restockForm, priceForm, steeringAction]
+    [buildUrl, productId, restockForm, priceForm, steeringAction, actionLoading, loading]
   );
 
   // 🎨 Score-Farbe basierend auf Wert
