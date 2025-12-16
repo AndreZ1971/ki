@@ -6,12 +6,61 @@ import { wooCommerceService } from '../woocommerce/woocommerce.service';
 // ✅ Korrekte lazy Initialisierung
 let openai: OpenAI | null = null;
 
+// ✅ Cache für Analyse-Ergebnisse (5 Minuten)
+interface CacheEntry {
+  data: any;
+  timestamp: number;
+}
+
+const analysisCache = new Map<number, CacheEntry>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 Minuten
+
+// ✅ Rate Limiting
+const requestTimestamps = new Map<number, number>();
+const MIN_REQUEST_INTERVAL = 2000; // 2 Sekunden zwischen Requests für gleiches Produkt
+
+function canMakeRequest(productId: number): boolean {
+  const lastRequest = requestTimestamps.get(productId);
+  if (!lastRequest) return true;
+
+  const timeSinceLastRequest = Date.now() - lastRequest;
+  return timeSinceLastRequest >= MIN_REQUEST_INTERVAL;
+}
+
+function updateRequestTimestamp(productId: number): void {
+  requestTimestamps.set(productId, Date.now());
+}
+
+function getCachedAnalysis(productId: number): any | null {
+  const cached = analysisCache.get(productId);
+  if (!cached) return null;
+
+  const age = Date.now() - cached.timestamp;
+  if (age > CACHE_TTL) {
+    analysisCache.delete(productId);
+    return null;
+  }
+
+  console.log(
+    `✅ Cache HIT für Produkt ${productId} (Alter: ${Math.round(age / 1000)}s)`
+  );
+  return cached.data;
+}
+
+function setCachedAnalysis(productId: number, data: any): void {
+  analysisCache.set(productId, {
+    data,
+    timestamp: Date.now(),
+  });
+  console.log(`💾 Cache gespeichert für Produkt ${productId}`);
+}
+
 function initializeOpenAI() {
   if (openai !== null) return openai; // Bereits initialisiert
-  
+
   try {
     const apiKey = process.env.OPENAI_API_KEY; // ✅ Jetzt ist process.env geladen!
-    
+
     if (!apiKey || apiKey.trim() === '' || !apiKey.startsWith('sk-')) {
       console.warn('⚠️ OpenAI API Key nicht konfiguriert');
       openai = null;
@@ -23,15 +72,34 @@ function initializeOpenAI() {
     console.error('❌ Fehler bei OpenAI Initialisierung:', _error);
     openai = null;
   }
-  
+
   return openai;
 }
 
-// ✅ Analyse-Funktion
+// ✅ Analyse-Funktion mit Caching
 async function analyzeProduct(productId: number, _server: FastifyInstance) {
+  // ✅ Cache-Check
+  const cached = getCachedAnalysis(productId);
+  if (cached) {
+    return cached;
+  }
+
+  // ✅ Rate-Limit Check
+  if (!canMakeRequest(productId)) {
+    const waitTime =
+      MIN_REQUEST_INTERVAL -
+      (Date.now() - (requestTimestamps.get(productId) || 0));
+    throw new Error(
+      `Bitte warten Sie ${Math.ceil(waitTime / 1000)} Sekunden bevor Sie diese Analyse erneut starten`
+    );
+  }
+
+  updateRequestTimestamp(productId);
+
   // 1. Produkt von WooCommerce abrufen
+  console.log(`📡 Lade Produkt ${productId} von WooCommerce...`);
   const product = await wooCommerceService.getProduct(productId, _server);
-  
+
   // 2. OpenAI für Analyse nutzen (falls verfügbar)
   let aiAnalysis = null;
   const openAIClient = initializeOpenAI();
@@ -43,27 +111,32 @@ async function analyzeProduct(productId: number, _server: FastifyInstance) {
       // Fallback: Metriken ohne AI
     }
   }
-  
+
   // 3. Metriken berechnen
   const metrics = calculateProductMetrics(product);
-  
+
   // 4. Empfehlungen generieren
   const recommendations = generateRecommendations(aiAnalysis, metrics);
-  
-  return {
+
+  const result = {
     productId,
     basicInfo: {
       title: product.name,
       price: product.price,
       stock: product.stock_status,
-      categories: product.categories?.map((c: any) => c.name) || []
+      categories: product.categories?.map((c: any) => c.name) || [],
     },
     aiAnalysis,
     metrics,
     recommendations,
     score: calculateOverallScore(aiAnalysis, metrics),
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
+
+  // ✅ Cache speichern
+  setCachedAnalysis(productId, result);
+
+  return result;
 }
 
 // ✅ OpenAI Analyse-Funktion
@@ -101,18 +174,19 @@ Antworte im JSON-Format:
 `;
 
   const response = await openAIClient.chat.completions.create({
-    model: process.env.OPENAI_MODEL || "gpt-4o-mini",
+    model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
     messages: [
       {
-        role: "system",
-        content: "Du bist ein E-Commerce Experte für WooCommerce Shops. Analysiere Produkte und gib konstruktive Verbesserungsvorschläge."
+        role: 'system',
+        content:
+          'Du bist ein E-Commerce Experte für WooCommerce Shops. Analysiere Produkte und gib konstruktive Verbesserungsvorschläge.',
       },
       {
-        role: "user",
-        content: prompt
-      }
+        role: 'user',
+        content: prompt,
+      },
     ],
-    response_format: { type: "json_object" }
+    response_format: { type: 'json_object' },
   });
 
   return JSON.parse(response.choices[0].message.content || '{}');
@@ -122,7 +196,7 @@ Antworte im JSON-Format:
 function calculateProductMetrics(product: any) {
   const description = product.description || '';
   const cleanDescription = description.replace(/<[^>]*>/g, ''); // HTML Tags entfernen
-  
+
   return {
     titleLength: product.name?.length || 0,
     descriptionLength: cleanDescription.length,
@@ -134,42 +208,52 @@ function calculateProductMetrics(product: any) {
     onSale: !!product.sale_price,
     stockStatus: product.stock_status,
     hasDescription: cleanDescription.length > 0,
-    descriptionWordCount: cleanDescription.split(/\s+/).length
+    descriptionWordCount: cleanDescription.split(/\s+/).length,
   };
 }
 
 // ✅ Empfehlungen generieren
 function generateRecommendations(aiAnalysis: any, metrics: any) {
   const recommendations = [];
-  
+
   // Basis-Empfehlungen basierend auf Metriken
   if (metrics.titleLength < 10) {
-    recommendations.push("Produkttitel ist zu kurz - mindestens 10 Zeichen empfohlen");
+    recommendations.push(
+      'Produkttitel ist zu kurz - mindestens 10 Zeichen empfohlen'
+    );
   }
-  
+
   if (metrics.titleLength > 70) {
-    recommendations.push("Produkttitel ist zu lang - maximal 70 Zeichen für SEO");
+    recommendations.push(
+      'Produkttitel ist zu lang - maximal 70 Zeichen für SEO'
+    );
   }
-  
+
   if (!metrics.hasDescription) {
-    recommendations.push("Produktbeschreibung fehlt - wichtig für SEO und Conversion");
+    recommendations.push(
+      'Produktbeschreibung fehlt - wichtig für SEO und Conversion'
+    );
   } else if (metrics.descriptionWordCount < 50) {
-    recommendations.push("Produktbeschreibung ist zu kurz - mindestens 50 Wörter für SEO");
+    recommendations.push(
+      'Produktbeschreibung ist zu kurz - mindestens 50 Wörter für SEO'
+    );
   }
-  
+
   if (!metrics.hasImages) {
-    recommendations.push("Produktbilder fehlen - essentiel für Conversions");
+    recommendations.push('Produktbilder fehlen - essentiel für Conversions');
   }
-  
+
   if (metrics.categoryCount === 0) {
-    recommendations.push("Keine Kategorien zugewiesen - wichtig für Navigation und SEO");
+    recommendations.push(
+      'Keine Kategorien zugewiesen - wichtig für Navigation und SEO'
+    );
   }
-  
+
   // AI-basierte Empfehlungen hinzufügen
   if (aiAnalysis?.improvementSuggestions) {
     recommendations.push(...aiAnalysis.improvementSuggestions);
   }
-  
+
   return recommendations;
 }
 
@@ -177,220 +261,248 @@ function generateRecommendations(aiAnalysis: any, metrics: any) {
 function calculateOverallScore(aiAnalysis: any, metrics: any) {
   let score = 0;
   let totalWeight = 0;
-  
+
   // Basis-Score aus Metriken (50%)
   if (metrics.hasImages) score += 25;
   if (metrics.hasDescription) score += 15;
   if (metrics.titleLength >= 10 && metrics.titleLength <= 70) score += 10;
-  
+
   totalWeight += 50;
-  
+
   // AI-Score hinzufügen (50%)
   if (aiAnalysis) {
-    const aiScore = (
-      (aiAnalysis.seoScore || 0) + 
-      (aiAnalysis.contentScore || 0) + 
-      (aiAnalysis.pricingScore || 0)
-    ) / 3;
-    
+    const aiScore =
+      ((aiAnalysis.seoScore || 0) +
+        (aiAnalysis.contentScore || 0) +
+        (aiAnalysis.pricingScore || 0)) /
+      3;
+
     score += aiScore * 0.5;
     totalWeight += 50;
   }
-  
+
   return Math.round((score / totalWeight) * 100);
 }
 
 export default async function productOptimizerRoutes(_server: FastifyInstance) {
-  
   // 🔥 NEUE ANALYSE-ROUTE mit korrekter Pfad-Struktur
-  _server.post('/analyze/:id', {
-    schema: {
-      tags: ['product-adviser'],
-      summary: 'Analyze product using AI',
-      description: 'Analyze product data and provide optimization suggestions',
-      params: {
-        type: 'object',
-        properties: {
-          id: { type: 'string' }
+  _server.post(
+    '/analyze/:id',
+    {
+      schema: {
+        tags: ['product-adviser'],
+        summary: 'Analyze product using AI',
+        description:
+          'Analyze product data and provide optimization suggestions',
+        params: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+          },
+          required: ['id'],
         },
-        required: ['id']
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              success: { type: 'boolean' },
+              analysis: { type: 'object', additionalProperties: true },
+              suggestions: { type: 'array', items: { type: 'string' } },
+              error: { type: 'string' },
+            },
+          },
+          400: {
+            type: 'object',
+            properties: {
+              success: { type: 'boolean' },
+              error: { type: 'string' },
+              received: { type: 'string' },
+              parsed: { type: 'number' },
+            },
+          },
+          500: {
+            type: 'object',
+            properties: {
+              success: { type: 'boolean' },
+              error: { type: 'string' },
+            },
+          },
+          503: {
+            type: 'object',
+            properties: {
+              success: { type: 'boolean' },
+              error: { type: 'string' },
+              message: { type: 'string' },
+            },
+          },
+        },
       },
-      response: {
-        200: {
-          type: 'object',
-          properties: {
-            success: { type: 'boolean' },
-            analysis: { type: 'object', additionalProperties: true },
-            suggestions: { type: 'array', items: { type: 'string' } },
-            error: { type: 'string' }
-          }
-        },
-        400: {
-          type: 'object',
-          properties: {
-            success: { type: 'boolean' },
-            error: { type: 'string' },
-            received: { type: 'string' },
-            parsed: { type: 'number' }
-          }
-        },
-        500: {
-          type: 'object',
-          properties: {
-            success: { type: 'boolean' },
-            error: { type: 'string' }
-          }
-        },
-        503: {
-          type: 'object',
-          properties: {
-            success: { type: 'boolean' },
-            error: { type: 'string' },
-            message: { type: 'string' }
-          }
+    },
+    async (_request: any, _reply) => {
+      try {
+        const { id } = _request.params;
+        const productId = parseInt(id);
+
+        if (!id || isNaN(productId)) {
+          console.error('[Product Optimizer] Invalid productId:', {
+            id,
+            productId,
+          });
+          return _reply.status(400).send({
+            success: false,
+            error: 'Invalid product ID',
+            received: id,
+            parsed: productId,
+          });
         }
-      }
-    }
-  }, async (_request: any, _reply) => {
-    try {
-      const { id } = _request.params;
-      const productId = parseInt(id);
-      
-      if (!id || isNaN(productId)) {
-        console.error('[Product Optimizer] Invalid productId:', { id, productId });
-        return _reply.status(400).send({ 
+
+        // ✅ Erst HIER wird initialisiert
+        const openAIClient = initializeOpenAI();
+        console.log(
+          `[Product Optimizer] Starte Produkt-Analyse für ID: ${productId}`
+        );
+        console.log(`[Product Optimizer] OpenAI verfügbar: ${!!openAIClient}`);
+
+        // Prüfe ob WooCommerce verfügbar ist
+        if (!wooCommerceService.isReady()) {
+          console.warn('[Product Optimizer] WooCommerce nicht bereit');
+          return _reply.status(503).send({
+            success: false,
+            error: 'WooCommerce Service nicht verfügbar',
+            message: 'Bitte WooCommerce Konfiguration prüfen',
+          });
+        }
+
+        _server.log.info(`Starte Produkt-Analyse für ID: ${productId}`);
+        const analysis = await analyzeProduct(productId, _server);
+        _server.log.info(
+          `✅ Produkt-Analyse abgeschlossen für ID: ${productId}`
+        );
+        return {
+          success: true,
+          analysis,
+          suggestions: analysis.recommendations,
+        };
+      } catch (error: any) {
+        console.error('[Product Optimizer] Fehler:', error);
+        _server.log.error('Analyse fehlgeschlagen:', error.message);
+        return _reply.status(500).send({
           success: false,
-          error: 'Invalid product ID',
-          received: id,
-          parsed: productId
+          error: 'Analyse fehlgeschlagen',
+          message: error.message,
         });
       }
-      
-      // ✅ Erst HIER wird initialisiert
-      const openAIClient = initializeOpenAI();
-      console.log(`[Product Optimizer] Starte Produkt-Analyse für ID: ${productId}`);
-      console.log(`[Product Optimizer] OpenAI verfügbar: ${!!openAIClient}`);
-      
-      // Prüfe ob WooCommerce verfügbar ist
-      if (!wooCommerceService.isReady()) {
-        console.warn('[Product Optimizer] WooCommerce nicht bereit');
-        return _reply.status(503).send({ 
-          success: false,
-          error: 'WooCommerce Service nicht verfügbar',
-          message: 'Bitte WooCommerce Konfiguration prüfen'
-        });
-      }
-      
-      _server.log.info(`Starte Produkt-Analyse für ID: ${productId}`);
-      const analysis = await analyzeProduct(productId, _server);
-      _server.log.info(`✅ Produkt-Analyse abgeschlossen für ID: ${productId}`);
-      return { success: true, analysis, suggestions: analysis.recommendations };
-    } catch (error: any) {
-      console.error('[Product Optimizer] Fehler:', error);
-      _server.log.error('Analyse fehlgeschlagen:', error.message);
-      return _reply.status(500).send({ 
-        success: false,
-        error: 'Analyse fehlgeschlagen',
-        message: error.message 
-      });
     }
-  });
+  );
 
   // 🔥 STATUS ENDPOINT hinzugefügt
-  _server.get('/status', {
-    schema: {
-      tags: ['product-adviser'],
-      summary: 'Get optimizer status',
-      description: 'Check if product optimizer is available'
-    }
-  }, async () => {
-    const openAIClient = initializeOpenAI();
-    return {
-      available: !!openAIClient,
-      service: 'product-optimizer',
-      openaiConfigured: !!openAIClient,
-      timestamp: new Date().toISOString()
-    };
-  });
-
-  // 🔍 SEO OPTIMIZER (bestehend)
-  _server.post('/woo/products/:id/seo-optimize', {
-    schema: {
-      tags: ['product-optimizer'],
-      summary: 'AI SEO Optimization for products',
-      description: 'Automatically optimize product titles, descriptions and metadata for better SEO',
-      params: {
-        type: 'object',
-        properties: {
-          id: { type: 'integer' }
-        },
-        required: ['id']
+  _server.get(
+    '/status',
+    {
+      schema: {
+        tags: ['product-adviser'],
+        summary: 'Get optimizer status',
+        description: 'Check if product optimizer is available',
       },
-      body: {
-        type: 'object',
-        required: ['currentTitle', 'currentDescription'],
-        properties: {
-          currentTitle: { type: 'string' },
-          currentDescription: { type: 'string' },
-          targetKeywords: { 
-            type: 'array', 
-            items: { type: 'string' },
-            default: []
-          },
-          brand: { type: 'string' },
-          productCategory: { type: 'string' }
-        }
-      },
-      response: {
-        200: {
-          type: 'object',
-          properties: {
-            success: { type: 'boolean' },
-            optimizedTitle: { type: 'string' },
-            optimizedDescription: { type: 'string' },
-            metaDescription: { type: 'string' },
-            slugSuggestion: { type: 'string' },
-            keywordDensity: { type: 'object' },
-            seoScore: { type: 'number' },
-            improvements: { type: 'array', items: { type: 'string' } },
-            error: { type: 'string' }
-          }
-        }
-      }
-    }
-  }, async (_request: any) => {
-    const { id } = _request.params;
-    const { 
-      currentTitle, 
-      currentDescription, 
-      targetKeywords, 
-      brand, 
-      productCategory 
-    } = _request.body;
-
-    // ✅ Erst HIER wird initialisiert
-    const openAIClient = initializeOpenAI();
-    if (!openAIClient) {
-      _server.log.warn('OpenAI nicht verfügbar - verwende Fallback für SEO Optimierung');
+    },
+    async () => {
+      const openAIClient = initializeOpenAI();
       return {
-        success: false,
-        optimizedTitle: currentTitle,
-        optimizedDescription: currentDescription,
-        metaDescription: currentDescription.substring(0, 155),
-        slugSuggestion: currentTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-        keywordDensity: {},
-        seoScore: 50,
-        improvements: [
-          "Add more relevant keywords",
-          "Improve meta description",
-          "Optimize title length"
-        ],
-        error: 'OpenAI service not configured - using fallback SEO optimization'
+        available: !!openAIClient,
+        service: 'product-optimizer',
+        openaiConfigured: !!openAIClient,
+        timestamp: new Date().toISOString(),
       };
     }
+  );
 
-    try {
-      const prompt = `
+  // 🔍 SEO OPTIMIZER (bestehend)
+  _server.post(
+    '/woo/products/:id/seo-optimize',
+    {
+      schema: {
+        tags: ['product-optimizer'],
+        summary: 'AI SEO Optimization for products',
+        description:
+          'Automatically optimize product titles, descriptions and metadata for better SEO',
+        params: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+          },
+          required: ['id'],
+        },
+        body: {
+          type: 'object',
+          required: ['currentTitle', 'currentDescription'],
+          properties: {
+            currentTitle: { type: 'string' },
+            currentDescription: { type: 'string' },
+            targetKeywords: {
+              type: 'array',
+              items: { type: 'string' },
+              default: [],
+            },
+            brand: { type: 'string' },
+            productCategory: { type: 'string' },
+          },
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              success: { type: 'boolean' },
+              optimizedTitle: { type: 'string' },
+              optimizedDescription: { type: 'string' },
+              metaDescription: { type: 'string' },
+              slugSuggestion: { type: 'string' },
+              keywordDensity: { type: 'object' },
+              seoScore: { type: 'number' },
+              improvements: { type: 'array', items: { type: 'string' } },
+              error: { type: 'string' },
+            },
+          },
+        },
+      },
+    },
+    async (_request: any) => {
+      const { id } = _request.params;
+      const {
+        currentTitle,
+        currentDescription,
+        targetKeywords,
+        brand,
+        productCategory,
+      } = _request.body;
+
+      // ✅ Erst HIER wird initialisiert
+      const openAIClient = initializeOpenAI();
+      if (!openAIClient) {
+        _server.log.warn(
+          'OpenAI nicht verfügbar - verwende Fallback für SEO Optimierung'
+        );
+        return {
+          success: false,
+          optimizedTitle: currentTitle,
+          optimizedDescription: currentDescription,
+          metaDescription: currentDescription.substring(0, 155),
+          slugSuggestion: currentTitle
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-'),
+          keywordDensity: {},
+          seoScore: 50,
+          improvements: [
+            'Add more relevant keywords',
+            'Improve meta description',
+            'Optimize title length',
+          ],
+          error:
+            'OpenAI service not configured - using fallback SEO optimization',
+        };
+      }
+
+      try {
+        const prompt = `
 SEO OPTIMIZATION FOR: "${currentTitle}"
 
 CURRENT DESCRIPTION: ${currentDescription}
@@ -426,68 +538,76 @@ RESPONSE IN JSON FORMAT:
 }
 `;
 
-      const completion = await openAIClient.chat.completions.create({
-        model: process.env.OPENAI_MODEL || "gpt-4o-mini",
-        messages: [
-          { 
-            role: "system", 
-            content: "Du bist ein SEO-Experte für E-Commerce. Optimiere Produkttitel, Beschreibungen und Metadaten für bessere Suchmaschinenrankings und höhere Conversion Rates. Berücksichtige Keywords, Lesbarkeit und UX. Antworte immer in JSON." 
-          },
-          { role: "user", content: prompt }
-        ],
-        temperature: 0.7,
-        max_tokens: 1500,
-        response_format: { type: "json_object" }
-      });
+        const completion = await openAIClient.chat.completions.create({
+          model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'system',
+              content:
+                'Du bist ein SEO-Experte für E-Commerce. Optimiere Produkttitel, Beschreibungen und Metadaten für bessere Suchmaschinenrankings und höhere Conversion Rates. Berücksichtige Keywords, Lesbarkeit und UX. Antworte immer in JSON.',
+            },
+            { role: 'user', content: prompt },
+          ],
+          temperature: 0.7,
+          max_tokens: 1500,
+          response_format: { type: 'json_object' },
+        });
 
-      const aiResponse = completion.choices[0]?.message?.content;
-      
-      if (aiResponse) {
-        const seoOptimization = JSON.parse(aiResponse);
-        
-        // Log the optimization
-        _server.log.info(`SEO optimization for product ${id}: Score ${seoOptimization.seoScore}/100`);
-        
+        const aiResponse = completion.choices[0]?.message?.content;
+
+        if (aiResponse) {
+          const seoOptimization = JSON.parse(aiResponse);
+
+          // Log the optimization
+          _server.log.info(
+            `SEO optimization for product ${id}: Score ${seoOptimization.seoScore}/100`
+          );
+
+          return {
+            success: true,
+            productId: id,
+            ...seoOptimization,
+          };
+        } else {
+          throw new Error('No response from AI');
+        }
+      } catch (error: any) {
+        _server.log.error('SEO Optimization error:', error.message);
+
         return {
-          success: true,
-          productId: id,
-          ...seoOptimization
+          success: false,
+          optimizedTitle: currentTitle,
+          optimizedDescription: currentDescription,
+          metaDescription: currentDescription.substring(0, 155),
+          slugSuggestion: currentTitle
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-'),
+          keywordDensity: {},
+          seoScore: 50,
+          improvements: [
+            'Add more relevant keywords',
+            'Improve meta description',
+            'Optimize title length',
+          ],
+          error: error.message,
         };
-      } else {
-        throw new Error('No response from AI');
       }
-
-    } catch (error: any) {
-      _server.log.error('SEO Optimization error:', error.message);
-      
-      return {
-        success: false,
-        optimizedTitle: currentTitle,
-        optimizedDescription: currentDescription,
-        metaDescription: currentDescription.substring(0, 155),
-        slugSuggestion: currentTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-        keywordDensity: {},
-        seoScore: 50,
-        improvements: [
-          "Add more relevant keywords",
-          "Improve meta description",
-          "Optimize title length"
-        ],
-        error: error.message
-      };
     }
-  });
+  );
 
-    // 🚚 Restock / Bestellvorschlag
-    _server.post('/actions/restock/:id', {
+  // 🚚 Restock / Bestellvorschlag
+  _server.post(
+    '/actions/restock/:id',
+    {
       schema: {
         tags: ['product-optimizer'],
         summary: 'Restock / Lager auffüllen',
-        description: 'Berechnet einen Bestellvorschlag und aktualisiert WooCommerce Lagerbestand',
+        description:
+          'Berechnet einen Bestellvorschlag und aktualisiert WooCommerce Lagerbestand',
         params: {
           type: 'object',
           properties: { id: { type: 'integer' } },
-          required: ['id']
+          required: ['id'],
         },
         body: {
           type: 'object',
@@ -496,34 +616,58 @@ RESPONSE IN JSON FORMAT:
             targetStock: { type: 'integer' },
             safetyStock: { type: 'integer', default: 5 },
             leadTimeDays: { type: 'integer', default: 7 },
-            currentStock: { type: 'integer' }
-          }
-        }
-      }
-    }, async (_request: any, _reply) => {
+            currentStock: { type: 'integer' },
+          },
+        },
+      },
+    },
+    async (_request: any, _reply) => {
       const { id } = _request.params;
       const productId = parseInt(id);
-      const { targetStock, safetyStock = 5, leadTimeDays = 7, currentStock } = _request.body || {};
+      const {
+        targetStock,
+        safetyStock = 5,
+        leadTimeDays = 7,
+        currentStock,
+      } = _request.body || {};
 
       if (!wooCommerceService.isReady()) {
-        return _reply.status(503).send({ success: false, error: 'WooCommerce Service nicht verfügbar' });
+        return _reply
+          .status(503)
+          .send({
+            success: false,
+            error: 'WooCommerce Service nicht verfügbar',
+          });
       }
 
       try {
         const product = await wooCommerceService.getProduct(productId, _server);
-        const onHand = typeof currentStock === 'number' ? currentStock : (product.stock_quantity || 0);
+        const onHand =
+          typeof currentStock === 'number'
+            ? currentStock
+            : product.stock_quantity || 0;
 
-        const forecastPerDay = Math.max(1, Math.round(((product.total_sales || 0) / 30) || 1));
+        const forecastPerDay = Math.max(
+          1,
+          Math.round((product.total_sales || 0) / 30 || 1)
+        );
         const projectedNeed = forecastPerDay * leadTimeDays + safetyStock;
-        const orderQty = Math.max(0, targetStock - onHand + projectedNeed - safetyStock);
+        const orderQty = Math.max(
+          0,
+          targetStock - onHand + projectedNeed - safetyStock
+        );
 
         const updatePayload = {
           manage_stock: true,
           stock_quantity: onHand + orderQty,
-          stock_status: 'instock'
+          stock_status: 'instock',
         };
 
-        const updated = await wooCommerceService.updateProduct(productId, updatePayload, _server);
+        const updated = await wooCommerceService.updateProduct(
+          productId,
+          updatePayload,
+          _server
+        );
 
         return {
           success: true,
@@ -533,17 +677,25 @@ RESPONSE IN JSON FORMAT:
             projectedDailySales: forecastPerDay,
             leadTimeDays,
             safetyStock,
-            newStockQuantity: updated.stock_quantity
-          }
+            newStockQuantity: updated.stock_quantity,
+          },
         };
       } catch (error: any) {
         _server.log.error('Restock fehlgeschlagen:', error.message);
-        return _reply.status(500).send({ success: false, error: error.message || 'Restock fehlgeschlagen' });
+        return _reply
+          .status(500)
+          .send({
+            success: false,
+            error: error.message || 'Restock fehlgeschlagen',
+          });
       }
-    });
+    }
+  );
 
-    // 💰 Preis-/Promo-Steuerung
-    _server.post('/actions/price/:id', {
+  // 💰 Preis-/Promo-Steuerung
+  _server.post(
+    '/actions/price/:id',
+    {
       schema: {
         tags: ['product-optimizer'],
         summary: 'Preis aktualisieren',
@@ -551,7 +703,7 @@ RESPONSE IN JSON FORMAT:
         params: {
           type: 'object',
           properties: { id: { type: 'integer' } },
-          required: ['id']
+          required: ['id'],
         },
         body: {
           type: 'object',
@@ -559,17 +711,23 @@ RESPONSE IN JSON FORMAT:
           properties: {
             price: { type: 'number' },
             salePrice: { type: 'number' },
-            reason: { type: 'string' }
-          }
-        }
-      }
-    }, async (_request: any, _reply) => {
+            reason: { type: 'string' },
+          },
+        },
+      },
+    },
+    async (_request: any, _reply) => {
       const { id } = _request.params;
       const productId = parseInt(id);
       const { price, salePrice, reason } = _request.body || {};
 
       if (!wooCommerceService.isReady()) {
-        return _reply.status(503).send({ success: false, error: 'WooCommerce Service nicht verfügbar' });
+        return _reply
+          .status(503)
+          .send({
+            success: false,
+            error: 'WooCommerce Service nicht verfügbar',
+          });
       }
 
       try {
@@ -578,7 +736,11 @@ RESPONSE IN JSON FORMAT:
           payload.sale_price = salePrice.toString();
         }
 
-        const updated = await wooCommerceService.updateProduct(productId, payload, _server);
+        const updated = await wooCommerceService.updateProduct(
+          productId,
+          payload,
+          _server
+        );
 
         return {
           success: true,
@@ -586,17 +748,25 @@ RESPONSE IN JSON FORMAT:
           data: {
             price: updated.price,
             sale_price: updated.sale_price,
-            reason: reason || 'Preisupdate'
-          }
+            reason: reason || 'Preisupdate',
+          },
         };
       } catch (error: any) {
         _server.log.error('Preisupdate fehlgeschlagen:', error.message);
-        return _reply.status(500).send({ success: false, error: error.message || 'Preisupdate fehlgeschlagen' });
+        return _reply
+          .status(500)
+          .send({
+            success: false,
+            error: error.message || 'Preisupdate fehlgeschlagen',
+          });
       }
-    });
+    }
+  );
 
-    // 🎛️ Produkt-Steuerung (Promote, Depriorisieren, Bundle etc.)
-    _server.post('/actions/steering/:id', {
+  // 🎛️ Produkt-Steuerung (Promote, Depriorisieren, Bundle etc.)
+  _server.post(
+    '/actions/steering/:id',
+    {
       schema: {
         tags: ['product-optimizer'],
         summary: 'Produkt-Steuerung',
@@ -604,308 +774,369 @@ RESPONSE IN JSON FORMAT:
         params: {
           type: 'object',
           properties: { id: { type: 'integer' } },
-          required: ['id']
+          required: ['id'],
         },
         body: {
           type: 'object',
           required: ['action'],
           properties: {
-            action: { type: 'string', enum: ['promote', 'deprioritize', 'bundle', 'block', 'clearance'] },
-            note: { type: 'string' }
-          }
-        }
-      }
-    }, async (_request: any, _reply) => {
+            action: {
+              type: 'string',
+              enum: ['promote', 'deprioritize', 'bundle', 'block', 'clearance'],
+            },
+            note: { type: 'string' },
+          },
+        },
+      },
+    },
+    async (_request: any, _reply) => {
       const { id } = _request.params;
       const productId = parseInt(id);
       const { action, note } = _request.body || {};
 
       if (!wooCommerceService.isReady()) {
-        return _reply.status(503).send({ success: false, error: 'WooCommerce Service nicht verfügbar' });
+        return _reply
+          .status(503)
+          .send({
+            success: false,
+            error: 'WooCommerce Service nicht verfügbar',
+          });
       }
 
       try {
         const product = await wooCommerceService.getProduct(productId, _server);
-        const existingTags: string[] = (product.tags || []).map((t: any) => t.name);
+        const existingTags: string[] = (product.tags || []).map(
+          (t: any) => t.name
+        );
         const newTag = `opt-${action}`;
 
         const payload = {
-          tags: Array.from(new Set([...existingTags, newTag])).map(name => ({ name })),
+          tags: Array.from(new Set([...existingTags, newTag])).map((name) => ({
+            name,
+          })),
           meta_data: [
             ...(product.meta_data || []),
             { key: 'optimizer_action', value: action },
-            { key: 'optimizer_note', value: note || '' }
-          ]
+            { key: 'optimizer_note', value: note || '' },
+          ],
         };
 
-        const updated = await wooCommerceService.updateProduct(productId, payload, _server);
+        const updated = await wooCommerceService.updateProduct(
+          productId,
+          payload,
+          _server
+        );
 
         return {
           success: true,
           message: `Aktion '${action}' gesetzt`,
           data: {
             tags: updated.tags,
-            meta_data: updated.meta_data
-          }
+            meta_data: updated.meta_data,
+          },
         };
       } catch (error: any) {
         _server.log.error('Steering fehlgeschlagen:', error.message);
-        return _reply.status(500).send({ success: false, error: error.message || 'Steering fehlgeschlagen' });
-      }
-    });
-  // 🔄 AUTO-UPDATE WOOCOMMERCE MIT SEO OPTIMIERUNGEN
-  _server.post('/woo/products/:id/seo-apply', {
-    schema: {
-      tags: ['product-optimizer'],
-      summary: 'Apply SEO optimizations directly to WooCommerce',
-      description: 'Automatically update product title, description and SEO metadata in WooCommerce',
-      params: {
-        type: 'object',
-        properties: {
-          id: { type: 'integer' }
-        },
-        required: ['id']
-      },
-      body: {
-        type: 'object',
-        required: ['currentTitle', 'currentDescription'],
-        properties: {
-          currentTitle: { type: 'string' },
-          currentDescription: { type: 'string' },
-          targetKeywords: { 
-            type: 'array', 
-            items: { type: 'string' },
-            default: []
-          },
-          brand: { type: 'string' },
-          productCategory: { type: 'string' }
-        }
-      },
-      response: {
-        200: {
-          type: 'object',
-          properties: {
-            success: { type: 'boolean' },
-            message: { type: 'string' },
-            productId: { type: 'integer' },
-            changes: { type: 'object' },
-            product: { type: 'object' },
-            error: { type: 'string' }
-          }
-        }
+        return _reply
+          .status(500)
+          .send({
+            success: false,
+            error: error.message || 'Steering fehlgeschlagen',
+          });
       }
     }
-  }, async (_request: any, _reply: any) => {
-    const { id } = _request.params;
-    const { 
-      currentTitle, 
-      currentDescription, 
-      targetKeywords, 
-      brand, 
-      productCategory 
-    } = _request.body;
+  );
+  // 🔄 AUTO-UPDATE WOOCOMMERCE MIT SEO OPTIMIERUNGEN
+  _server.post(
+    '/woo/products/:id/seo-apply',
+    {
+      schema: {
+        tags: ['product-optimizer'],
+        summary: 'Apply SEO optimizations directly to WooCommerce',
+        description:
+          'Automatically update product title, description and SEO metadata in WooCommerce',
+        params: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+          },
+          required: ['id'],
+        },
+        body: {
+          type: 'object',
+          required: ['currentTitle', 'currentDescription'],
+          properties: {
+            currentTitle: { type: 'string' },
+            currentDescription: { type: 'string' },
+            targetKeywords: {
+              type: 'array',
+              items: { type: 'string' },
+              default: [],
+            },
+            brand: { type: 'string' },
+            productCategory: { type: 'string' },
+          },
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              success: { type: 'boolean' },
+              message: { type: 'string' },
+              productId: { type: 'integer' },
+              changes: { type: 'object' },
+              product: { type: 'object' },
+              error: { type: 'string' },
+            },
+          },
+        },
+      },
+    },
+    async (_request: any, _reply: any) => {
+      const { id } = _request.params;
+      const {
+        currentTitle,
+        currentDescription,
+        targetKeywords,
+        brand,
+        productCategory,
+      } = _request.body;
 
-    try {
-      _server.log.info(`Starting SEO apply for product ${id}`);
+      try {
+        _server.log.info(`Starting SEO apply for product ${id}`);
 
-      // 1. Erst SEO Optimierung durchführen
-      const seoResponse = await _server.inject({
-        method: 'POST',
-        url: `/product-optimizer/woo/products/${id}/seo-optimize`,
-        payload: {
-          currentTitle,
-          currentDescription,
-          targetKeywords,
-          brand,
-          productCategory
+        // 1. Erst SEO Optimierung durchführen
+        const seoResponse = await _server.inject({
+          method: 'POST',
+          url: `/product-optimizer/woo/products/${id}/seo-optimize`,
+          payload: {
+            currentTitle,
+            currentDescription,
+            targetKeywords,
+            brand,
+            productCategory,
+          },
+        });
+
+        const seoData = JSON.parse(seoResponse.payload);
+
+        if (!seoData.success) {
+          _server.log.error(
+            `SEO optimization failed for product ${id}:`,
+            seoData.error
+          );
+          return {
+            success: false,
+            error: 'SEO optimization failed: ' + seoData.error,
+          };
         }
-      });
 
-      const seoData = JSON.parse(seoResponse.payload);
-      
-      if (!seoData.success) {
-        _server.log.error(`SEO optimization failed for product ${id}:`, seoData.error);
+        _server.log.info(
+          `SEO optimization successful for product ${id}, score: ${seoData.seoScore}`
+        );
+
+        // 2. WooCommerce Update vorbereiten
+        const wcUpdate = {
+          name: seoData.optimizedTitle,
+          description: seoData.optimizedDescription,
+          short_description: seoData.metaDescription,
+          slug: seoData.slugSuggestion,
+          meta_data: [
+            {
+              key: '_yoast_wpseo_title',
+              value: seoData.optimizedTitle,
+            },
+            {
+              key: '_yoast_wpseo_metadesc',
+              value: seoData.metaDescription,
+            },
+            {
+              key: '_yoast_wpseo_focuskw',
+              value: targetKeywords?.slice(0, 3).join(', ') || '',
+            },
+          ],
+        };
+
+        // 3. WooCommerce aktualisieren
+        const updatedProduct = await wooCommerceService.updateProduct(
+          id,
+          wcUpdate,
+          _server
+        );
+
+        // 4. Erfolgsresponse
+        return {
+          success: true,
+          message: 'SEO optimizations applied successfully to WooCommerce',
+          productId: parseInt(id),
+          changes: {
+            title: {
+              from: currentTitle,
+              to: seoData.optimizedTitle,
+            },
+            description: 'updated',
+            metaDescription: seoData.metaDescription,
+            slug: seoData.slugSuggestion,
+            seoScore: seoData.seoScore,
+          },
+          product: {
+            id: updatedProduct.id,
+            name: updatedProduct.name,
+            slug: updatedProduct.slug,
+            permalink: updatedProduct.permalink,
+          },
+        };
+      } catch (error: any) {
+        _server.log.error(`SEO apply error for product ${id}:`, error.message);
+
         return {
           success: false,
-          error: 'SEO optimization failed: ' + seoData.error
+          error: error.message,
+          message: 'SEO optimization completed but WooCommerce update failed',
+        };
+      }
+    }
+  );
+
+  // 💰 PRICE INTELLIGENCE - NEU!
+  _server.post(
+    '/woo/products/:id/price-analysis',
+    {
+      schema: {
+        tags: ['product-optimizer'],
+        summary: 'AI-powered price analysis and recommendations',
+        description:
+          'Analyze market prices and recommend optimal pricing strategy with competitive intelligence',
+        params: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+          },
+          required: ['id'],
+        },
+        body: {
+          type: 'object',
+          required: ['currentPrice', 'productName'],
+          properties: {
+            currentPrice: { type: 'number', minimum: 0 },
+            productName: { type: 'string' },
+            productCategory: { type: 'string' },
+            costPrice: { type: 'number' },
+            competitorPrices: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  competitor: { type: 'string' },
+                  price: { type: 'number' },
+                  url: { type: 'string' },
+                },
+              },
+              default: [],
+            },
+            marketConditions: {
+              type: 'object',
+              properties: {
+                demand: {
+                  type: 'string',
+                  enum: ['low', 'medium', 'high', 'very_high'],
+                },
+                seasonality: { type: 'string' },
+                economicTrend: {
+                  type: 'string',
+                  enum: ['recession', 'stable', 'growth'],
+                },
+              },
+            },
+            targetMargin: { type: 'number', minimum: 0, maximum: 100 },
+          },
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              success: { type: 'boolean' },
+              priceRecommendation: { type: 'number' },
+              confidence: { type: 'number', minimum: 0, maximum: 100 },
+              pricingStrategy: { type: 'string' },
+              competitorAnalysis: { type: 'object' },
+              marketPosition: { type: 'string' },
+              projectedSalesImpact: { type: 'string' },
+              profitMargin: { type: 'string' },
+              riskAssessment: { type: 'string' },
+              dynamicPricingSuggestions: {
+                type: 'array',
+                items: { type: 'string' },
+              },
+              error: { type: 'string' },
+            },
+          },
+        },
+      },
+    },
+    async (_request: any) => {
+      const { id } = _request.params;
+      const {
+        currentPrice,
+        productName,
+        productCategory,
+        costPrice,
+        competitorPrices,
+        marketConditions,
+        targetMargin,
+      } = _request.body;
+
+      // ✅ Erst HIER wird initialisiert
+      const openAIClient = initializeOpenAI();
+      if (!openAIClient) {
+        _server.log.warn(
+          'OpenAI nicht verfügbar - verwende Fallback für Price Intelligence'
+        );
+
+        // Fallback price analysis
+        const averageCompetitorPrice =
+          competitorPrices.length > 0
+            ? competitorPrices.reduce(
+                (sum: number, comp: any) => sum + comp.price,
+                0
+              ) / competitorPrices.length
+            : currentPrice * 1.1;
+
+        const recommendedPrice = costPrice
+          ? costPrice * 1.4 // 40% margin fallback
+          : averageCompetitorPrice * 0.95; // 5% under competitors
+
+        return {
+          success: false,
+          priceRecommendation: Math.round(recommendedPrice * 100) / 100,
+          confidence: 60,
+          pricingStrategy: 'competitive_fallback',
+          competitorAnalysis: {
+            averagePrice: Math.round(averageCompetitorPrice * 100) / 100,
+            lowestPrice:
+              competitorPrices.length > 0
+                ? Math.min(...competitorPrices.map((c: any) => c.price))
+                : currentPrice,
+            competitorCount: competitorPrices.length,
+          },
+          marketPosition: 'mid_range',
+          projectedSalesImpact: '10-15% increase potential',
+          profitMargin: costPrice
+            ? `${Math.round(((recommendedPrice - costPrice) / recommendedPrice) * 100)}%`
+            : 'unknown',
+          riskAssessment: 'medium',
+          dynamicPricingSuggestions: [
+            'Consider seasonal discounts',
+            'Monitor competitor price changes',
+            'Test different price points',
+          ],
+          error:
+            'OpenAI service not configured - using fallback price analysis',
         };
       }
 
-      _server.log.info(`SEO optimization successful for product ${id}, score: ${seoData.seoScore}`);
-
-      // 2. WooCommerce Update vorbereiten
-      const wcUpdate = {
-        name: seoData.optimizedTitle,
-        description: seoData.optimizedDescription,
-        short_description: seoData.metaDescription,
-        slug: seoData.slugSuggestion,
-        meta_data: [
-          {
-            key: '_yoast_wpseo_title',
-            value: seoData.optimizedTitle
-          },
-          {
-            key: '_yoast_wpseo_metadesc',
-            value: seoData.metaDescription
-          },
-          {
-            key: '_yoast_wpseo_focuskw', 
-            value: targetKeywords?.slice(0, 3).join(', ') || ''
-          }
-        ]
-      };
-
-      // 3. WooCommerce aktualisieren
-      const updatedProduct = await wooCommerceService.updateProduct(id, wcUpdate, _server);
-
-      // 4. Erfolgsresponse
-      return {
-        success: true,
-        message: 'SEO optimizations applied successfully to WooCommerce',
-        productId: parseInt(id),
-        changes: {
-          title: {
-            from: currentTitle,
-            to: seoData.optimizedTitle
-          },
-          description: 'updated',
-          metaDescription: seoData.metaDescription,
-          slug: seoData.slugSuggestion,
-          seoScore: seoData.seoScore
-        },
-        product: {
-          id: updatedProduct.id,
-          name: updatedProduct.name,
-          slug: updatedProduct.slug,
-          permalink: updatedProduct.permalink
-        }
-      };
-
-    } catch (error: any) {
-      _server.log.error(`SEO apply error for product ${id}:`, error.message);
-      
-      return {
-        success: false,
-        error: error.message,
-        message: 'SEO optimization completed but WooCommerce update failed'
-      };
-    }
-  });
-
-  // 💰 PRICE INTELLIGENCE - NEU!
-  _server.post('/woo/products/:id/price-analysis', {
-    schema: {
-      tags: ['product-optimizer'],
-      summary: 'AI-powered price analysis and recommendations',
-      description: 'Analyze market prices and recommend optimal pricing strategy with competitive intelligence',
-      params: {
-        type: 'object',
-        properties: {
-          id: { type: 'integer' }
-        },
-        required: ['id']
-      },
-      body: {
-        type: 'object',
-        required: ['currentPrice', 'productName'],
-        properties: {
-          currentPrice: { type: 'number', minimum: 0 },
-          productName: { type: 'string' },
-          productCategory: { type: 'string' },
-          costPrice: { type: 'number' },
-          competitorPrices: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                competitor: { type: 'string' },
-                price: { type: 'number' },
-                url: { type: 'string' }
-              }
-            },
-            default: []
-          },
-          marketConditions: {
-            type: 'object',
-            properties: {
-              demand: { type: 'string', enum: ['low', 'medium', 'high', 'very_high'] },
-              seasonality: { type: 'string' },
-              economicTrend: { type: 'string', enum: ['recession', 'stable', 'growth'] }
-            }
-          },
-          targetMargin: { type: 'number', minimum: 0, maximum: 100 }
-        }
-      },
-      response: {
-        200: {
-          type: 'object',
-          properties: {
-            success: { type: 'boolean' },
-            priceRecommendation: { type: 'number' },
-            confidence: { type: 'number', minimum: 0, maximum: 100 },
-            pricingStrategy: { type: 'string' },
-            competitorAnalysis: { type: 'object' },
-            marketPosition: { type: 'string' },
-            projectedSalesImpact: { type: 'string' },
-            profitMargin: { type: 'string' },
-            riskAssessment: { type: 'string' },
-            dynamicPricingSuggestions: { type: 'array', items: { type: 'string' } },
-            error: { type: 'string' }
-          }
-        }
-      }
-    }
-  }, async (_request: any) => {
-    const { id } = _request.params;
-    const { 
-      currentPrice, 
-      productName, 
-      productCategory, 
-      costPrice, 
-      competitorPrices, 
-      marketConditions,
-      targetMargin 
-    } = _request.body;
-
-    // ✅ Erst HIER wird initialisiert
-    const openAIClient = initializeOpenAI();
-    if (!openAIClient) {
-      _server.log.warn('OpenAI nicht verfügbar - verwende Fallback für Price Intelligence');
-      
-      // Fallback price analysis
-      const averageCompetitorPrice = competitorPrices.length > 0 
-        ? competitorPrices.reduce((sum: number, comp: any) => sum + comp.price, 0) / competitorPrices.length
-        : currentPrice * 1.1;
-      
-      const recommendedPrice = costPrice 
-        ? costPrice * 1.4 // 40% margin fallback
-        : averageCompetitorPrice * 0.95; // 5% under competitors
-      
-      return {
-        success: false,
-        priceRecommendation: Math.round(recommendedPrice * 100) / 100,
-        confidence: 60,
-        pricingStrategy: "competitive_fallback",
-        competitorAnalysis: {
-          averagePrice: Math.round(averageCompetitorPrice * 100) / 100,
-          lowestPrice: competitorPrices.length > 0 ? Math.min(...competitorPrices.map((c: any) => c.price)) : currentPrice,
-          competitorCount: competitorPrices.length
-        },
-        marketPosition: "mid_range",
-        projectedSalesImpact: "10-15% increase potential",
-        profitMargin: costPrice ? `${Math.round(((recommendedPrice - costPrice) / recommendedPrice) * 100)}%` : "unknown",
-        riskAssessment: "medium",
-        dynamicPricingSuggestions: [
-          "Consider seasonal discounts",
-          "Monitor competitor price changes",
-          "Test different price points"
-        ],
-        error: 'OpenAI service not configured - using fallback price analysis'
-      };
-    }
-
-    try {
-      const prompt = `
+      try {
+        const prompt = `
 PRICE INTELLIGENCE ANALYSIS FOR: "${productName}"
 
 CURRENT PRICE: €${currentPrice}
@@ -947,89 +1178,106 @@ RESPONSE IN JSON FORMAT:
 }
 `;
 
-      const completion = await openAIClient.chat.completions.create({
-        model: process.env.OPENAI_MODEL || "gpt-4o-mini",
-        messages: [
-          { 
-            role: "system", 
-            content: "Du bist ein Pricing-Experte für E-Commerce. Analysiere Marktpreise, Wettbewerb und liefer datenbasierte Preisempfehlungen die Umsatz und Gewinn maximieren. Berücksichtige Kosten, Wettbewerb und Marktbedingungen. Antworte immer in JSON." 
-          },
-          { role: "user", content: prompt }
-        ],
-        temperature: 0.5, // Niedriger für konsistente Preisempfehlungen
-        max_tokens: 1200,
-        response_format: { type: "json_object" }
-      });
+        const completion = await openAIClient.chat.completions.create({
+          model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'system',
+              content:
+                'Du bist ein Pricing-Experte für E-Commerce. Analysiere Marktpreise, Wettbewerb und liefer datenbasierte Preisempfehlungen die Umsatz und Gewinn maximieren. Berücksichtige Kosten, Wettbewerb und Marktbedingungen. Antworte immer in JSON.',
+            },
+            { role: 'user', content: prompt },
+          ],
+          temperature: 0.5, // Niedriger für konsistente Preisempfehlungen
+          max_tokens: 1200,
+          response_format: { type: 'json_object' },
+        });
 
-      const aiResponse = completion.choices[0]?.message?.content;
-      
-      if (aiResponse) {
-        const priceAnalysis = JSON.parse(aiResponse);
-        
-        // Log the analysis
-        _server.log.info(`Price analysis for product ${id}: Recommended €${priceAnalysis.priceRecommendation} (Confidence: ${priceAnalysis.confidence}%)`);
-        
+        const aiResponse = completion.choices[0]?.message?.content;
+
+        if (aiResponse) {
+          const priceAnalysis = JSON.parse(aiResponse);
+
+          // Log the analysis
+          _server.log.info(
+            `Price analysis for product ${id}: Recommended €${priceAnalysis.priceRecommendation} (Confidence: ${priceAnalysis.confidence}%)`
+          );
+
+          return {
+            success: true,
+            productId: id,
+            productName,
+            currentPrice,
+            ...priceAnalysis,
+          };
+        } else {
+          throw new Error('No response from AI');
+        }
+      } catch (error: any) {
+        _server.log.error('Price Intelligence error:', error.message);
+
+        // Fallback price analysis
+        const averageCompetitorPrice =
+          competitorPrices.length > 0
+            ? competitorPrices.reduce(
+                (sum: number, comp: any) => sum + comp.price,
+                0
+              ) / competitorPrices.length
+            : currentPrice * 1.1;
+
+        const recommendedPrice = costPrice
+          ? costPrice * 1.4
+          : averageCompetitorPrice * 0.95;
+
         return {
-          success: true,
-          productId: id,
-          productName,
-          currentPrice,
-          ...priceAnalysis
+          success: false,
+          priceRecommendation: Math.round(recommendedPrice * 100) / 100,
+          confidence: 50,
+          pricingStrategy: 'competitive_fallback',
+          competitorAnalysis: {
+            averagePrice: Math.round(averageCompetitorPrice * 100) / 100,
+            lowestPrice:
+              competitorPrices.length > 0
+                ? Math.min(...competitorPrices.map((c: any) => c.price))
+                : currentPrice,
+            competitorCount: competitorPrices.length,
+          },
+          marketPosition: 'mid_range',
+          projectedSalesImpact: '5-10% increase potential',
+          profitMargin: costPrice
+            ? `${Math.round(((recommendedPrice - costPrice) / recommendedPrice) * 100)}%`
+            : 'unknown',
+          riskAssessment: 'medium',
+          dynamicPricingSuggestions: [
+            'Monitor competitor pricing weekly',
+            'Consider A/B testing different price points',
+            'Implement seasonal pricing strategy',
+          ],
+          error: error.message,
         };
-      } else {
-        throw new Error('No response from AI');
       }
-
-    } catch (error: any) {
-      _server.log.error('Price Intelligence error:', error.message);
-      
-      // Fallback price analysis
-      const averageCompetitorPrice = competitorPrices.length > 0 
-        ? competitorPrices.reduce((sum: number, comp: any) => sum + comp.price, 0) / competitorPrices.length
-        : currentPrice * 1.1;
-      
-      const recommendedPrice = costPrice 
-        ? costPrice * 1.4
-        : averageCompetitorPrice * 0.95;
-      
-      return {
-        success: false,
-        priceRecommendation: Math.round(recommendedPrice * 100) / 100,
-        confidence: 50,
-        pricingStrategy: "competitive_fallback",
-        competitorAnalysis: {
-          averagePrice: Math.round(averageCompetitorPrice * 100) / 100,
-          lowestPrice: competitorPrices.length > 0 ? Math.min(...competitorPrices.map((c: any) => c.price)) : currentPrice,
-          competitorCount: competitorPrices.length
-        },
-        marketPosition: "mid_range",
-        projectedSalesImpact: "5-10% increase potential",
-        profitMargin: costPrice ? `${Math.round(((recommendedPrice - costPrice) / recommendedPrice) * 100)}%` : "unknown",
-        riskAssessment: "medium",
-        dynamicPricingSuggestions: [
-          "Monitor competitor pricing weekly",
-          "Consider A/B testing different price points",
-          "Implement seasonal pricing strategy"
-        ],
-        error: error.message
-      };
     }
-  });
+  );
 
   // 🎁 BUNDLE SUGGESTIONS (Placeholder)
-  _server.post('/woo/products/:id/bundle-suggestions', {
-    schema: {
-      tags: ['product-optimizer'],
-      summary: 'AI-generated product bundle recommendations',
-      description: 'Suggest smart product bundles for increased average order value'
+  _server.post(
+    '/woo/products/:id/bundle-suggestions',
+    {
+      schema: {
+        tags: ['product-optimizer'],
+        summary: 'AI-generated product bundle recommendations',
+        description:
+          'Suggest smart product bundles for increased average order value',
+      },
+    },
+    async (_request: any) => {
+      return {
+        success: false,
+        message: 'Bundle suggestions module coming soon!',
+        error: 'Not implemented yet',
+      };
     }
-  }, async (_request: any) => {
-    return {
-      success: false,
-      message: 'Bundle suggestions module coming soon!',
-      error: 'Not implemented yet'
-    };
-  });
+  );
 
   // ✅ OPTIMIZE ROUTE KORRIGIERT - INNERHALB DER FUNKTION
   _server.post('/optimize/:id', async (_request, _reply) => {
