@@ -43,7 +43,6 @@ import paymentRoutes from './routes/app/api/payments';
 
 // 🔥 MARKETING ROUTES
 import marketingRoutes from './routes/app/api/marketing/marketing-routes';
-import emailMarketingRoutes from './routes/app/api/marketing/email-marketing';
 import conversionRoutesMarketing from './routes/app/api/marketing/conversion-routes';
 import contentRoutes from './routes/app/api/marketing/content-routes';
 import mlMarketingRoutes from './routes/app/api/marketing/ml-marketing';
@@ -51,7 +50,7 @@ import { emailEnhancementRoutes } from './routes/app/api/marketing/email-enhance
 
 // 🔥 SPECIALIZATIONS ROUTES
 import specializationRoutes from './routes/app/api/specializations';
-// Entfernt: blogpostRoutes (ungenutz)
+import blogpostRoutes from './routes/app/api/marketing/blogpost-routes';
 import imageAnalysisRoutes from './routes/app/api/marketing/image-analysis-routes';
 
 // 🔥 USER MANAGEMENT ROUTES
@@ -96,9 +95,9 @@ import realTimeRoutes from './routes/app/api/analytics/real-time';
 // Umgebungsvariablen laden mit erweiterter Fehlerbehandlung
 // Try multiple .env locations: backend/.env, root/.env, .env.production
 const envPaths = [
-  path.resolve(__dirname, '../.env'),        // backend/.env (local dev)
-  path.resolve(__dirname, '../../.env'),     // root/.env (docker)
-  path.resolve(__dirname, '../../.env.production')  // root/.env.production (docker prod)
+  path.resolve(__dirname, '../.env'), // backend/.env (local dev)
+  path.resolve(__dirname, '../../.env'), // root/.env (docker)
+  path.resolve(__dirname, '../../.env.production'), // root/.env.production (docker prod)
 ];
 
 let envLoaded = false;
@@ -118,7 +117,6 @@ if (!envLoaded) {
 // Error Handling Initialisierung
 setupErrorHandling();
 
-
 // Hinweis, falls OpenAI-Config fehlt
 if (!config.openAI?.apiKey) {
   console.warn('❌ OpenAI API-Key nicht in connection.json gefunden!');
@@ -126,41 +124,52 @@ if (!config.openAI?.apiKey) {
 }
 
 // Hinweis, falls WooCommerce-Config fehlt
-if (!config.woocommerce?.url || !config.woocommerce?.consumerKey || !config.woocommerce?.consumerSecret) {
-  console.warn('⚠️ WooCommerce API nicht korrekt konfiguriert – bitte URL, consumerKey und consumerSecret in connection.json setzen!');
+if (
+  !config.woocommerce?.url ||
+  !config.woocommerce?.consumerKey ||
+  !config.woocommerce?.consumerSecret
+) {
+  console.warn(
+    '⚠️ WooCommerce API nicht korrekt konfiguriert – bitte URL, consumerKey und consumerSecret in connection.json setzen!'
+  );
 }
 
 // Memory Management
 const agentMemory = {
   messages: [] as Array<{ role: string; content: string; timestamp: number }>,
-  
+
   addMessage(role: string, content: string) {
     this.messages.push({ role, content, timestamp: Date.now() });
   },
-  
-  addMessages(messages: Array<{ role: string; content: string; timestamp?: number }>) {
-    this.messages.push(...messages.map(msg => ({
-      ...msg,
-      timestamp: msg.timestamp || Date.now()
-    })));
+
+  addMessages(
+    messages: Array<{ role: string; content: string; timestamp?: number }>
+  ) {
+    this.messages.push(
+      ...messages.map((msg) => ({
+        ...msg,
+        timestamp: msg.timestamp || Date.now(),
+      }))
+    );
   },
-  
+
   getMessages() {
     return [...this.messages];
   },
-  
+
   clearMessages() {
     this.messages = [];
   },
-  
+
   getStats() {
     return {
       totalMessages: this.messages.length,
-      memorySize: this.messages.reduce((size, msg) => 
-        size + JSON.stringify(msg).length, 0
-      )
+      memorySize: this.messages.reduce(
+        (size, msg) => size + JSON.stringify(msg).length,
+        0
+      ),
     };
-  }
+  },
 };
 
 async function buildServer() {
@@ -168,8 +177,8 @@ async function buildServer() {
     logger: {
       level: 'info',
       transport: {
-        target: 'pino-pretty'
-      }
+        target: 'pino-pretty',
+      },
     },
     // Body Limit erhöhen
     bodyLimit: 1048576 * 10, // 10MB
@@ -177,37 +186,44 @@ async function buildServer() {
 
   // Multipart/Form-Data Parser für Uploads (z.B. Image Analyzer)
   await server.register(fastifyMultipart, {
-    limits: { fileSize: 10 * 1024 * 1024 }
+    limits: { fileSize: 10 * 1024 * 1024 },
   });
 
-    // Globaler Auth-Hook für alle /api-Routen (nur für Nicht-OPTIONS)
-    // server.addHook('onRequest', async (request, reply) => {
-    //   if (request.method === 'OPTIONS') return;
-    //   if (request.url.startsWith('/api/')) {
-    //     const query = request.query as Record<string, any>;
-    //     const key = request.headers['x-woocommerce-key'] || query?.consumer_key;
-    //     const secret = request.headers['x-woocommerce-secret'] || query?.consumer_secret;
-    //     if (
-    //       key !== process.env.WOOCOMMERCE_CONSUMER_KEY ||
-    //       secret !== process.env.WOOCOMMERCE_CONSUMER_SECRET
-    //     ) {
-    //       reply.status(401).send({ error: 'Unauthorized' });
-    //     }
-    //   }
-    // });
+  // Globaler Auth-Hook für alle /api-Routen (nur für Nicht-OPTIONS)
+  // server.addHook('onRequest', async (request, reply) => {
+  //   if (request.method === 'OPTIONS') return;
+  //   if (request.url.startsWith('/api/')) {
+  //     const query = request.query as Record<string, any>;
+  //     const key = request.headers['x-woocommerce-key'] || query?.consumer_key;
+  //     const secret = request.headers['x-woocommerce-secret'] || query?.consumer_secret;
+  //     if (
+  //       key !== process.env.WOOCOMMERCE_CONSUMER_KEY ||
+  //       secret !== process.env.WOOCOMMERCE_CONSUMER_SECRET
+  //     ) {
+  //       reply.status(401).send({ error: 'Unauthorized' });
+  //     }
+  //   }
+  // });
 
   try {
     // SWAGGER zuerst registrieren
     // Dynamische Host/Scheme Konfiguration, damit in Docker/Prod kein 'localhost:3000' hartkodiert ist.
-    const _swaggerHost = process.env.SWAGGER_HOST || `${process.env.HOST || 'localhost'}:${process.env.PORT || 3000}`;
-    const swaggerSchemes = (process.env.FORCE_HTTPS === 'true' || (process.env.NODE_ENV === 'production' && process.env.FORCE_HTTPS !== 'false')) ? ['https'] : ['http'];
+    const _swaggerHost =
+      process.env.SWAGGER_HOST ||
+      `${process.env.HOST || 'localhost'}:${process.env.PORT || 3000}`;
+    const swaggerSchemes =
+      process.env.FORCE_HTTPS === 'true' ||
+      (process.env.NODE_ENV === 'production' &&
+        process.env.FORCE_HTTPS !== 'false')
+        ? ['https']
+        : ['http'];
 
     await server.register(swagger, {
       swagger: {
         info: {
           title: 'WooCommerce AI Agent API',
           description: 'API für WooCommerce Integration mit AI-Funktionen',
-          version: '1.0.0'
+          version: '1.0.0',
         },
         schemes: swaggerSchemes,
         consumes: ['application/json'],
@@ -227,35 +243,36 @@ async function buildServer() {
           { name: 'categories', description: 'Category Management' },
           { name: 'bundles', description: 'Product Bundle Management' },
           { name: 'freebies', description: 'Freebie Management' },
-          { name: 'Trends', description: 'Multi-Source Trend Analysis' }
-        ]
-      }
+          { name: 'Trends', description: 'Multi-Source Trend Analysis' },
+        ],
+      },
     });
 
     await server.register(swaggerUi, {
       routePrefix: '/documentation',
       uiConfig: {
         docExpansion: 'list',
-        deepLinking: false
-      }
+        deepLinking: false,
+      },
     });
 
     // CORS
     // CORS als erstes Plugin registrieren
     await server.register(cors, {
-      origin: process.env.NODE_ENV === 'production'
-        ? ['https://my-working-space.de']
-        : ['http://localhost:5173', 'http://localhost:3000'],
+      origin:
+        process.env.NODE_ENV === 'production'
+          ? ['https://my-working-space.de']
+          : ['http://localhost:5173', 'http://localhost:3000'],
       credentials: true,
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     });
 
     // 🔥 STATIC FILES (Frontend) - Production Only
     const staticPath = path.join(__dirname, '../public');
-    
+
     if (process.env.NODE_ENV === 'production') {
       console.log(`📁 Serving static files from: ${staticPath}`);
-      
+
       // Dynamic import for @fastify/static
       const fastifyStatic = await import('@fastify/static');
       await server.register(fastifyStatic.default, {
@@ -267,12 +284,14 @@ async function buildServer() {
           if (path.endsWith('.html')) {
             res.setHeader('Cache-Control', 'no-cache');
           }
-        }
+        },
       });
 
       console.log('✅ Frontend wird als Static Files geserved');
-    }    // 🔥 KORRIGIERTE ROUTE REGISTRATION
-    await server.register(shopMetricsRoutes, { prefix: '/api/analytics/metrics' });
+    } // 🔥 KORRIGIERTE ROUTE REGISTRATION
+    await server.register(shopMetricsRoutes, {
+      prefix: '/api/analytics/metrics',
+    });
     console.log('✅ Shop Metrics Routes erfolgreich registriert');
 
     await server.register(wooCommerceRoutes, { prefix: '/api/products' });
@@ -283,25 +302,30 @@ async function buildServer() {
     console.log('✅ System Routes erfolgreich registriert');
 
     // 🔥 FIX: memoryRoutes ohne agentMemory Spread
-    await server.register(memoryRoutes, { 
-      prefix: '/api/system/memory'
+    await server.register(memoryRoutes, {
+      prefix: '/api/system/memory',
     });
     console.log('✅ Memory Routes erfolgreich registriert');
 
-    await server.register(productOptimizerRoutes, { prefix: '/api/products/adviser' });
+    await server.register(productOptimizerRoutes, {
+      prefix: '/api/products/adviser',
+    });
     console.log('✅ Product Adviser Routes erfolgreich registriert');
 
     await server.register(reviewsRoutes, { prefix: '/api/analytics/reviews' });
     console.log('✅ Reviews Routes erfolgreich registriert');
 
-      // ✅ FEEDBACK ANALYSIS ROUTES
-      const feedbackRoutes = require('./routes/app/api/analytics/feedback').default;
-      await server.register(feedbackRoutes, { prefix: '/api/analytics/feedback' });
-      console.log('✅ Feedback Analysis Routes erfolgreich registriert');
+    // ✅ FEEDBACK ANALYSIS ROUTES
+    const feedbackRoutes =
+      require('./routes/app/api/analytics/feedback').default;
+    await server.register(feedbackRoutes, {
+      prefix: '/api/analytics/feedback',
+    });
+    console.log('✅ Feedback Analysis Routes erfolgreich registriert');
 
-        // ✅ USER MANAGEMENT ROUTES
-        await server.register(userRoutes, { prefix: '/api' });
-        console.log('✅ User Management Routes erfolgreich registriert');
+    // ✅ USER MANAGEMENT ROUTES
+    await server.register(userRoutes, { prefix: '/api' });
+    console.log('✅ User Management Routes erfolgreich registriert');
 
     await server.register(aiEmailRoutes, { prefix: '/api/ai/email' });
     console.log('✅ AI Email Routes erfolgreich registriert');
@@ -355,16 +379,16 @@ async function buildServer() {
 
     await server.register(imageAnalysisRoutes, { prefix: '/api/marketing' });
     console.log('✅ Image Analysis Routes erfolgreich registriert (AKTIVIERT)');
-    
-    await server.register(emailMarketingRoutes); // Already has full paths
-    console.log('✅ Email Marketing Routes erfolgreich registriert');
-    
+
+    await server.register(blogpostRoutes, { prefix: '/api/marketing' });
+    console.log('✅ Blogpost Routes erfolgreich registriert');
+
     await server.register(conversionRoutesMarketing); // Already has full paths
     console.log('✅ Conversion Routes erfolgreich registriert');
-    
+
     await server.register(contentRoutes); // Already has full paths
     console.log('✅ Content Routes erfolgreich registriert');
-    
+
     await server.register(templateRoutes); // Already has full paths
     console.log('✅ Template Routes erfolgreich registriert');
 
@@ -373,7 +397,9 @@ async function buildServer() {
     console.log('✅ ML Marketing Routes erfolgreich registriert');
 
     // 🔥 EMAIL ENHANCEMENT ROUTES (Smart Subject Lines, Segmentation, etc.)
-    await server.register(emailEnhancementRoutes, { prefix: '/api/marketing/email-enhancement' });
+    await server.register(emailEnhancementRoutes, {
+      prefix: '/api/marketing/email-enhancement',
+    });
     console.log('✅ Email Enhancement Routes erfolgreich registriert');
 
     // 🔥 SPECIALIZATIONS ROUTES (Upload, Manage, Activate)
@@ -383,13 +409,13 @@ async function buildServer() {
     // 🔥 SOCIAL MEDIA ROUTES (OAuth + Posting)
     await server.register(oauthRoutes, { prefix: '/api' }); // OAuth endpoints like /api/auth/facebook
     console.log('✅ Social Media OAuth Routes erfolgreich registriert');
-    
+
     await server.register(postRoutes, { prefix: '/api' }); // Post endpoints like /api/social/post
     console.log('✅ Social Media Post Routes erfolgreich registriert');
-    
+
     await server.register(bufferRoutes, { prefix: '/api' }); // Buffer API (einfacher als direktes OAuth!)
     console.log('✅ Buffer Routes erfolgreich registriert');
-    
+
     await server.register(webhookRoutes, { prefix: '/api' }); // Make.com/Zapier Webhooks (Make = 1000 FREE!)
     console.log('✅ Webhook Routes erfolgreich registriert');
 
@@ -410,14 +436,20 @@ async function buildServer() {
     console.log('✅ Standard Audit Routes erfolgreich registriert');
 
     // 🤖 AI PRODUCT ASSISTANT ROUTES
-    await server.register(aiProductAssistantRoutes, { prefix: '/api/products' });
+    await server.register(aiProductAssistantRoutes, {
+      prefix: '/api/products',
+    });
     console.log('✅ AI Product Assistant Routes erfolgreich registriert');
 
     // 🔥 NEUE ANALYTICS ROUTES
-    await server.register(conversionRoutes, { prefix: '/api/analytics/conversion' });
+    await server.register(conversionRoutes, {
+      prefix: '/api/analytics/conversion',
+    });
     console.log('✅ Conversion Analytics Routes erfolgreich registriert');
 
-    await server.register(regioningRoutes, { prefix: '/api/analytics/regioning' });
+    await server.register(regioningRoutes, {
+      prefix: '/api/analytics/regioning',
+    });
     console.log('✅ Regioning Analytics Routes erfolgreich registriert');
 
     await server.register(mlInsightsRoutes, { prefix: '/api/analytics/ml' });
@@ -426,7 +458,9 @@ async function buildServer() {
     await server.register(trendsRoutes, { prefix: '/api/analytics/trends' });
     console.log('✅ Trends Analytics Routes erfolgreich registriert');
 
-    await server.register(realTimeRoutes, { prefix: '/api/analytics/real-time' });
+    await server.register(realTimeRoutes, {
+      prefix: '/api/analytics/real-time',
+    });
     console.log('✅ Real-Time Analytics Routes erfolgreich registriert');
 
     // 🔥 CHATBOT ARI - Intelligente System-Diagnose
@@ -446,17 +480,20 @@ async function buildServer() {
       console.error('🚨 Server Error:', error);
       reply.status(500).send({
         success: false,
-        error: process.env.NODE_ENV === 'development' && error instanceof Error ? error.message : 'Internal Server Error'
+        error:
+          process.env.NODE_ENV === 'development' && error instanceof Error
+            ? error.message
+            : 'Internal Server Error',
       });
     });
 
     // Health Check Endpoint
     server.get('/health', async (_request, _reply) => {
-      return { 
-        status: 'ok', 
+      return {
+        status: 'ok',
         timestamp: new Date().toISOString(),
         memory: agentMemory.getStats(),
-        services: ['api', 'memory', 'ai', 'woocommerce', 'customers', 'email']
+        services: ['api', 'memory', 'ai', 'woocommerce', 'customers', 'email'],
       };
     });
 
@@ -467,7 +504,7 @@ async function buildServer() {
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
         memory: process.memoryUsage(),
-        agentMemory: agentMemory.getStats()
+        agentMemory: agentMemory.getStats(),
       };
     });
 
@@ -475,16 +512,20 @@ async function buildServer() {
     // This must be registered AFTER all other routes
     server.setNotFoundHandler(async (_request, _reply) => {
       const url = _request.url;
-      
+
       // API routes → 404 JSON
-      if (url.startsWith('/api/') || url.startsWith('/documentation') || url.startsWith('/health')) {
+      if (
+        url.startsWith('/api/') ||
+        url.startsWith('/documentation') ||
+        url.startsWith('/health')
+      ) {
         return _reply.status(404).send({
           success: false,
           error: 'Route not found',
-          path: url 
+          path: url,
         });
       }
-      
+
       // All other routes → SPA (index.html)
       if (process.env.NODE_ENV === 'production') {
         const indexPath = path.join(staticPath, 'index.html');
@@ -496,7 +537,6 @@ async function buildServer() {
     });
 
     return server;
-
   } catch (_error) {
     console.error('❌ Fehler beim Server Setup:', _error);
     throw _error;
@@ -508,32 +548,35 @@ const start = async () => {
   try {
     console.log('🚀 Starte Server...');
     const server = await buildServer();
-    
+
     const listenPort = Number(process.env.PORT || 3000);
     const listenHost = process.env.HOST || '0.0.0.0';
-    await server.listen({ 
-      port: listenPort, 
-      host: listenHost 
+    await server.listen({
+      port: listenPort,
+      host: listenHost,
     });
-    
 
-  const host = process.env.HOST || 'localhost';
-  const port = process.env.PORT || 3000;
-  const protocol = (process.env.FORCE_HTTPS === 'true' || (process.env.NODE_ENV === 'production' && process.env.FORCE_HTTPS !== 'false')) ? 'https' : 'http';
-  const baseUrl = `${protocol}://${host}:${port}`;
-  console.log(`✅ Server läuft auf ${baseUrl}`);
-  console.log(`📚 Swagger-UI:   ${baseUrl}/documentation`);
-  console.log(`❤️  Health:      ${baseUrl}/health`);
-  console.log(`⚕️  System:      ${baseUrl}/api/system/health`);
-  console.log(`📊 Metrics:      ${baseUrl}/api/analytics/metrics`);
-  console.log(`📧 AI Email:     ${baseUrl}/api/ai/email`);
-  console.log(`🛒 Products:     ${baseUrl}/api/products`);
-  console.log(`👥 Customers:    ${baseUrl}/api/woocommerce/customers`);
-  console.log(`📨 Email Sender: ${baseUrl}/api/email/send`);
-  console.log(`🧪 Email Test:   ${baseUrl}/api/email/test-email-config`);
-  console.log(`🔍 Debug Routes: ${baseUrl}/api/debug/routes`);
-  console.log(`📈 Analytics:    ${baseUrl}/api/analytics`);
-
+    const host = process.env.HOST || 'localhost';
+    const port = process.env.PORT || 3000;
+    const protocol =
+      process.env.FORCE_HTTPS === 'true' ||
+      (process.env.NODE_ENV === 'production' &&
+        process.env.FORCE_HTTPS !== 'false')
+        ? 'https'
+        : 'http';
+    const baseUrl = `${protocol}://${host}:${port}`;
+    console.log(`✅ Server läuft auf ${baseUrl}`);
+    console.log(`📚 Swagger-UI:   ${baseUrl}/documentation`);
+    console.log(`❤️  Health:      ${baseUrl}/health`);
+    console.log(`⚕️  System:      ${baseUrl}/api/system/health`);
+    console.log(`📊 Metrics:      ${baseUrl}/api/analytics/metrics`);
+    console.log(`📧 AI Email:     ${baseUrl}/api/ai/email`);
+    console.log(`🛒 Products:     ${baseUrl}/api/products`);
+    console.log(`👥 Customers:    ${baseUrl}/api/woocommerce/customers`);
+    console.log(`📨 Email Sender: ${baseUrl}/api/email/send`);
+    console.log(`🧪 Email Test:   ${baseUrl}/api/email/test-email-config`);
+    console.log(`🔍 Debug Routes: ${baseUrl}/api/debug/routes`);
+    console.log(`📈 Analytics:    ${baseUrl}/api/analytics`);
   } catch (_err) {
     console.error('💥 Server Start fehlgeschlagen:', _err);
     process.exit(1);

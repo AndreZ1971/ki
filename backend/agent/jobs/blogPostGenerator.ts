@@ -1,5 +1,6 @@
 // KI-Blogpost-Generator
 import OpenAI from 'openai';
+import config from '../../config.js';
 
 export interface BlogPostOptions {
   topic: string;
@@ -9,17 +10,37 @@ export interface BlogPostOptions {
   language?: string;
 }
 
-export async function generateBlogPost(options: BlogPostOptions): Promise<string> {
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+export async function generateBlogPost(
+  options: BlogPostOptions
+): Promise<string> {
+  const apiKey = config.openAI?.apiKey;
+
+  if (!apiKey) {
+    throw new Error(
+      'OpenAI nicht konfiguriert. Bitte OpenAI API-Key in der Konfiguration setzen.'
+    );
+  }
+
+  const openai = new OpenAI({ apiKey });
+  const model = config.openAI?.model || 'gpt-4o-mini';
   const prompt = buildPrompt(options);
+
   const response = await openai.chat.completions.create({
-    model: 'gpt-4',
+    model,
     messages: [
-      { role: 'system', content: 'Du bist ein professioneller SEO-Blog-Autor.' },
-      { role: 'user', content: prompt }
+      {
+        role: 'system',
+        content: 'Du bist ein professioneller SEO-Blog-Autor.',
+      },
+      { role: 'user', content: prompt },
     ],
-    max_tokens: options.length === 'long' ? 1200 : options.length === 'medium' ? 800 : 400,
-    temperature: 0.7
+    max_tokens:
+      options.length === 'long'
+        ? 1200
+        : options.length === 'medium'
+          ? 800
+          : 400,
+    temperature: 0.7,
   });
   return response.choices[0].message.content || '';
 }
