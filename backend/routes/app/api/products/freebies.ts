@@ -51,11 +51,12 @@ export default async function freebieRoutes(server: FastifyInstance) {
       try {
         // ✅ ECHTE Freebies aus WooCommerce (Produkte mit Preis = 0)
         // WooCommerce-Konfiguration aus zentraler connection.json
-        const wooConfig = {
-          url: config.woocommerce?.url,
-          consumerKey: config.woocommerce?.consumerKey,
-          consumerSecret: config.woocommerce?.consumerSecret,
-        };
+        const wooConfig = config.woocommerce;
+
+        // Validiere WooCommerce-Konfiguration BEFORE fetch
+        if (!wooConfig?.url || !wooConfig?.consumerKey || !wooConfig?.consumerSecret) {
+          throw new Error('WooCommerce-Konfiguration fehlt (connection.json unvollständig)');
+        }
 
         const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
         
@@ -70,9 +71,6 @@ export default async function freebieRoutes(server: FastifyInstance) {
           }
         );
 
-        if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
-          throw new Error('WooCommerce-Konfiguration fehlt (connection.json unvollständig)');
-        }
         if (!productsResponse.ok) {
           throw new Error(`WooCommerce API Error: ${productsResponse.status}`);
         }
@@ -158,15 +156,17 @@ export default async function freebieRoutes(server: FastifyInstance) {
         const freebieData = request.body;
         console.log('🎁 Creating freebie:', freebieData);
 
-        // ✅ ECHTE WooCommerce Freebie-Erstellung
-        const wooConfig = {
-          url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
-          consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
-          consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
-        };
-
-        if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
-          throw new Error('WooCommerce-Konfiguration fehlt');
+        // ✅ ECHTE WooCommerce Freebie-Erstellung - Nutze bereits geladene Config
+        const wooConfig = config.woocommerce;
+        
+        if (!wooConfig?.url || !wooConfig?.consumerKey || !wooConfig?.consumerSecret) {
+          console.error('❌ WooCommerce Config ungültig:', {
+            url: !!wooConfig?.url,
+            consumerKey: !!wooConfig?.consumerKey,
+            consumerSecret: !!wooConfig?.consumerSecret,
+            fullConfig: wooConfig
+          });
+          throw new Error(`WooCommerce-Konfiguration fehlt: ${JSON.stringify({ url: !!wooConfig?.url, key: !!wooConfig?.consumerKey, secret: !!wooConfig?.consumerSecret })}`);
         }
 
         const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
