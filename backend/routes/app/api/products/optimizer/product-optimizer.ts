@@ -146,14 +146,36 @@ async function openAIAnalyzeProduct(product: any, _server: FastifyInstance) {
     throw new Error('OpenAI nicht verfügbar');
   }
 
+  // ✅ KRITISCH: Beschreibung limitieren und sanitizen
+  const rawDescription = product.description || 'Keine Beschreibung';
+  const cleanDescription = rawDescription
+    .replace(/<[^>]*>/g, '') // HTML Tags entfernen
+    .replace(/\[.*?\]/g, '') // WordPress Shortcodes entfernen
+    .substring(0, 500) // MAX 500 Zeichen
+    .trim();
+
+  const safeProductData = {
+    name: (product.name || '').substring(0, 200),
+    description: cleanDescription,
+    price: product.price || '0',
+    categories: (product.categories || [])
+      .slice(0, 5)
+      .map((c: any) => (c.name || '').substring(0, 50))
+      .join(', '),
+  };
+
+  console.log(
+    `⚠️ OpenAI Request - Beschreibung gekürzt von ${rawDescription.length} auf ${cleanDescription.length} Zeichen`
+  );
+
   const prompt = `
 Analysiere das folgende Produkt für einen WooCommerce Shop:
 
 PRODUKT:
-Titel: ${product.name}
-Beschreibung: ${product.description || 'Keine Beschreibung'}
-Preis: ${product.price} €
-Kategorien: ${product.categories?.map((c: any) => c.name).join(', ') || 'Keine Kategorien'}
+Titel: ${safeProductData.name}
+Beschreibung: ${safeProductData.description}
+Preis: ${safeProductData.price} €
+Kategorien: ${safeProductData.categories || 'Keine Kategorien'}
 
 ANALYSE-ASPEKTE:
 1. SEO-Potential (Titel, Beschreibung)
@@ -632,12 +654,10 @@ RESPONSE IN JSON FORMAT:
       } = _request.body || {};
 
       if (!wooCommerceService.isReady()) {
-        return _reply
-          .status(503)
-          .send({
-            success: false,
-            error: 'WooCommerce Service nicht verfügbar',
-          });
+        return _reply.status(503).send({
+          success: false,
+          error: 'WooCommerce Service nicht verfügbar',
+        });
       }
 
       try {
@@ -682,12 +702,10 @@ RESPONSE IN JSON FORMAT:
         };
       } catch (error: any) {
         _server.log.error('Restock fehlgeschlagen:', error.message);
-        return _reply
-          .status(500)
-          .send({
-            success: false,
-            error: error.message || 'Restock fehlgeschlagen',
-          });
+        return _reply.status(500).send({
+          success: false,
+          error: error.message || 'Restock fehlgeschlagen',
+        });
       }
     }
   );
@@ -722,12 +740,10 @@ RESPONSE IN JSON FORMAT:
       const { price, salePrice, reason } = _request.body || {};
 
       if (!wooCommerceService.isReady()) {
-        return _reply
-          .status(503)
-          .send({
-            success: false,
-            error: 'WooCommerce Service nicht verfügbar',
-          });
+        return _reply.status(503).send({
+          success: false,
+          error: 'WooCommerce Service nicht verfügbar',
+        });
       }
 
       try {
@@ -753,12 +769,10 @@ RESPONSE IN JSON FORMAT:
         };
       } catch (error: any) {
         _server.log.error('Preisupdate fehlgeschlagen:', error.message);
-        return _reply
-          .status(500)
-          .send({
-            success: false,
-            error: error.message || 'Preisupdate fehlgeschlagen',
-          });
+        return _reply.status(500).send({
+          success: false,
+          error: error.message || 'Preisupdate fehlgeschlagen',
+        });
       }
     }
   );
@@ -795,12 +809,10 @@ RESPONSE IN JSON FORMAT:
       const { action, note } = _request.body || {};
 
       if (!wooCommerceService.isReady()) {
-        return _reply
-          .status(503)
-          .send({
-            success: false,
-            error: 'WooCommerce Service nicht verfügbar',
-          });
+        return _reply.status(503).send({
+          success: false,
+          error: 'WooCommerce Service nicht verfügbar',
+        });
       }
 
       try {
@@ -837,12 +849,10 @@ RESPONSE IN JSON FORMAT:
         };
       } catch (error: any) {
         _server.log.error('Steering fehlgeschlagen:', error.message);
-        return _reply
-          .status(500)
-          .send({
-            success: false,
-            error: error.message || 'Steering fehlgeschlagen',
-          });
+        return _reply.status(500).send({
+          success: false,
+          error: error.message || 'Steering fehlgeschlagen',
+        });
       }
     }
   );
