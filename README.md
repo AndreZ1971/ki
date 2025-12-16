@@ -1,13 +1,13 @@
 # 🚀 ARI - Artificial Retail Intelligence System
 
-**Version:** 3.7.0  
+**Version:** 4.0.0  
 **Status:** Production Ready ✅
 
 Ein **AI-gestütztes Business Automation System** für WooCommerce/WordPress mit 50+ spezialisierten Tools, KI-Agent und modernem Dashboard.
 
 ---
 
-## ✨ Was ist neu in Version 3.7.0?
+## ✨ Was ist neu in Version 4.0.0?
 
 ### 🔍 Product Analyzer & Optimizer
 
