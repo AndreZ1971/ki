@@ -326,7 +326,7 @@ const RealAnalytics = () => {
               <div>
                 <strong>Produkt-Daten</strong>
                 <p>
-                  {formatNumber(realTimeData?.totalProducts)} Produkte in
+                  {formatNumber(realTimeData?.totalProducts ?? 0)} Produkte in
                   Datenbank
                 </p>
               </div>
@@ -337,7 +337,7 @@ const RealAnalytics = () => {
               <div>
                 <strong>Bestellungen</strong>
                 <p>
-                  {formatNumber(realTimeData?.totalOrders)} WooCommerce
+                  {formatNumber(realTimeData?.totalOrders ?? 0)} WooCommerce
                   Bestellungen
                 </p>
               </div>
@@ -350,7 +350,7 @@ const RealAnalytics = () => {
               <div>
                 <strong>Kunden-Daten</strong>
                 <p>
-                  {formatNumber(realTimeData?.totalCustomers)} registrierte
+                  {formatNumber(realTimeData?.totalCustomers ?? 0)} registrierte
                   Kunden
                 </p>
               </div>
@@ -363,7 +363,8 @@ const RealAnalytics = () => {
               <div>
                 <strong>Umsatz-Daten</strong>
                 <p>
-                  {formatCurrency(realTimeData?.todaySales)} heutiger Umsatz
+                  {formatCurrency(realTimeData?.todaySales ?? 0)} heutiger
+                  Umsatz
                 </p>
               </div>
             </div>
