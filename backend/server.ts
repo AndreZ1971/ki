@@ -78,6 +78,7 @@ import connectionRoutes from './routes/app/api/settings/connection';
 
 // 🔥 MONITORING ROUTES
 import monitoringRoutes from './routes/app/api/monitoring/system';
+import agentMonitoringRoutes from './routes/agentMonitoring';
 
 // AUDIT ROUTES
 import premiumAuditRoutes from './routes/app/api/audit/premium';
@@ -449,6 +450,12 @@ async function buildServer() {
     const agentLoopsRoutes = require('./routes/agentLoops').default;
     await server.register(agentLoopsRoutes, { prefix: '/api/agent/loops' });
     console.log('✅ Agent Loops Routes erfolgreich registriert');
+
+    // 🔥 AGENT MONITORING ROUTES
+    await server.register(agentMonitoringRoutes, {
+      prefix: '/api/agent/monitoring',
+    });
+    console.log('✅ Agent Monitoring Routes erfolgreich registriert');
 
     // 🤖 AI PRODUCT ASSISTANT ROUTES
     await server.register(aiProductAssistantRoutes, {

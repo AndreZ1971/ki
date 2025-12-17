@@ -61,44 +61,51 @@ const LoopMonitoring: React.FC = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const apiUrl = import.meta.env.VITE_API_URL;
+        // Use localhost:5000 for backend API (default port)
+        const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
         // Get scheduler status
         const statusRes = await fetch(`${apiUrl}/api/agent/monitoring/status`);
         const statusData = await statusRes.json();
-        setStatus(statusData.scheduler);
+        setStatus(statusData?.scheduler || null);
 
         // Get stats for selected loop
         const statsRes = await fetch(
           `${apiUrl}/api/agent/monitoring/stats/${selectedLoop}?days=7`
         );
         const statsData = await statsRes.json();
-        setStats(statsData.stats);
+        setStats(statsData?.stats || null);
 
         // Get trends
         const trendsRes = await fetch(
           `${apiUrl}/api/agent/monitoring/trends/${selectedLoop}?days=30`
         );
         const trendsData = await trendsRes.json();
-        _setTrends(trendsData.trends);
+        _setTrends(trendsData?.trends || []);
 
         // Get history
         const historyRes = await fetch(
           `${apiUrl}/api/agent/monitoring/history/${selectedLoop}?limit=20`
         );
         const historyData = await historyRes.json();
-        setHistory(historyData.history);
+        setHistory(historyData?.history || []);
 
         // Get insights
         const insightsRes = await fetch(
           `${apiUrl}/api/agent/monitoring/insights/${selectedLoop}`
         );
         const insightsData = await insightsRes.json();
-        setInsights(insightsData.insights);
+        setInsights(insightsData?.insights || []);
 
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
+        // Set safe defaults on error
+        setStatus(null);
+        setStats(null);
+        _setTrends([]);
+        setHistory([]);
+        setInsights([]);
       } finally {
         setLoading(false);
       }
@@ -353,7 +360,7 @@ const LoopMonitoring: React.FC = () => {
       )}
 
       {/* Insights */}
-      {insights.length > 0 && (
+      {(insights ?? []).length > 0 && (
         <div className="settings-section" style={{ marginBottom: "30px" }}>
           <h2>💡 Top Insights</h2>
           <div

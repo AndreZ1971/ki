@@ -1,265 +1,277 @@
 // backend/routes/agentMonitoring.ts
 /**
- * Monitoring API für Agentic Loops
+ * Monitoring API für Agentic Loops (Fastify)
  * Endpoints für Status, History, Stats, Trends
  */
 
-import { Router, Request, Response } from 'express';
+import { FastifyInstance } from 'fastify';
 import { logger } from '../logger';
 import { globalScheduler } from '../agent/scheduler';
 import { executionLogger } from '../agent/logger/executionLogger';
 import { persistentMemory } from '../agent/memory/persistentMemory';
 
-const router = Router();
+export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
+  /**
+   * GET /status
+   * Hole aktuellen Status aller Loops
+   */
+  fastify.get('/status', async (_request, _reply) => {
+    try {
+      const status = globalScheduler.getStatus();
 
-/**
- * GET /api/agent/monitoring/status
- * Hole aktuellen Status aller Loops
- */
-router.get('/status', async (req: Request, res: Response) => {
-  try {
-    const status = globalScheduler.getStatus();
-
-    return res.json({
-      success: true,
-      scheduler: {
-        isRunning: status.isRunning,
-        loops: {
-          'anomaly-detection': {
-            scheduled: status.anomalyDetection.scheduled,
-            lastRun: status.anomalyDetection.lastRun,
-            nextRun: status.anomalyDetection.nextRun,
-          },
-          'product-optimization': {
-            scheduled: status.productOptimization.scheduled,
-            lastRun: status.productOptimization.lastRun,
-            nextRun: status.productOptimization.nextRun,
-          },
-          'payment-recovery': {
-            scheduled: status.paymentRecovery.scheduled,
-            lastRun: status.paymentRecovery.lastRun,
-            nextRun: status.paymentRecovery.nextRun,
-          },
-          'analytics-insights': {
-            scheduled: status.analyticsInsights.scheduled,
-            lastRun: status.analyticsInsights.lastRun,
-            nextRun: status.analyticsInsights.nextRun,
+      return {
+        success: true,
+        scheduler: {
+          isRunning: status.isRunning,
+          loops: {
+            'anomaly-detection': {
+              scheduled: status.anomalyDetection.scheduled,
+              lastRun: status.anomalyDetection.lastRun,
+              nextRun: status.anomalyDetection.nextRun,
+            },
+            'product-optimization': {
+              scheduled: status.productOptimization.scheduled,
+              lastRun: status.productOptimization.lastRun,
+              nextRun: status.productOptimization.nextRun,
+            },
+            'payment-recovery': {
+              scheduled: status.paymentRecovery.scheduled,
+              lastRun: status.paymentRecovery.lastRun,
+              nextRun: status.paymentRecovery.nextRun,
+            },
+            'analytics-insights': {
+              scheduled: status.analyticsInsights.scheduled,
+              lastRun: status.analyticsInsights.lastRun,
+              nextRun: status.analyticsInsights.nextRun,
+            },
           },
         },
-      },
-    });
-  } catch (error) {
-    logger.error(`Failed to get status: ${error}`);
-    return res.status(500).json({
-      success: false,
-      error: 'Failed to get status',
-    });
-  }
-});
-
-/**
- * GET /api/agent/monitoring/history/:loopType
- * Hole Execution History für einen Loop
- */
-router.get('/history/:loopType', async (req: Request, res: Response) => {
-  try {
-    const { loopType } = req.params;
-    const { limit = 50 } = req.query;
-
-    if (!executionLogger) {
-      return res.status(503).json({
+      };
+    } catch (error) {
+      logger.error(`Failed to get status: ${error}`);
+      _reply.status(500);
+      return {
         success: false,
-        error: 'Execution Logger not initialized',
-      });
+        error: 'Failed to get status',
+      };
     }
-
-    const history = await executionLogger.getHistory(
-      loopType,
-      parseInt(String(limit)) || 50
-    );
-
-    return res.json({
-      success: true,
-      loopType,
-      count: history.length,
-      history,
-    });
-  } catch (error) {
-    logger.error(`Failed to get history: ${error}`);
-    return res.status(500).json({
-      success: false,
-      error: 'Failed to get history',
-    });
-  }
-});
-
-/**
- * GET /api/agent/monitoring/stats/:loopType
- * Hole Statistics für einen Loop
- */
-router.get('/stats/:loopType', async (req: Request, res: Response) => {
-  try {
-    const { loopType } = req.params;
-    const { days = 7 } = req.query;
-
-    if (!executionLogger) {
-      return res.status(503).json({
-        success: false,
-        error: 'Execution Logger not initialized',
-      });
-    }
-
-    const stats = await executionLogger.getStats(
-      loopType,
-      parseInt(String(days)) || 7
-    );
-
-    return res.json({
-      success: true,
-      loopType,
-      period: `${days} days`,
-      stats,
-    });
-  } catch (error) {
-    logger.error(`Failed to get stats: ${error}`);
-    return res.status(500).json({
-      success: false,
-      error: 'Failed to get stats',
-    });
-  }
-});
-
-/**
- * GET /api/agent/monitoring/trends/:loopType
- * Hole Trend-Daten für Visualisierung
- */
-router.get('/trends/:loopType', async (req: Request, res: Response) => {
-  try {
-    const { loopType } = req.params;
-    const { days = 30 } = req.query;
-
-    if (!executionLogger) {
-      return res.status(503).json({
-        success: false,
-        error: 'Execution Logger not initialized',
-      });
-    }
-
-    const trends = await executionLogger.getTrends(
-      loopType,
-      parseInt(String(days)) || 30
-    );
-
-    return res.json({
-      success: true,
-      loopType,
-      period: `${days} days`,
-      trends,
-    });
-  } catch (error) {
-    logger.error(`Failed to get trends: ${error}`);
-    return res.status(500).json({
-      success: false,
-      error: 'Failed to get trends',
-    });
-  }
-});
-
-/**
- * GET /api/agent/monitoring/insights/:loopType
- * Hole Learnings/Insights
- */
-router.get('/insights/:loopType', async (req: Request, res: Response) => {
-  try {
-    const { loopType } = req.params;
-
-    if (!persistentMemory) {
-      return res.status(503).json({
-        success: false,
-        error: 'Persistent Memory not initialized',
-      });
-    }
-
-    const insights = await persistentMemory.getInsights(loopType);
-
-    return res.json({
-      success: true,
-      loopType,
-      insightCount: insights.length,
-      insights,
-    });
-  } catch (error) {
-    logger.error(`Failed to get insights: ${error}`);
-    return res.status(500).json({
-      success: false,
-      error: 'Failed to get insights',
-    });
-  }
-});
-
-/**
- * POST /api/agent/monitoring/scheduler/start
- * Starte Scheduler
- */
-router.post('/scheduler/start', (req: Request, res: Response) => {
-  try {
-    globalScheduler.startAll();
-
-    return res.json({
-      success: true,
-      message: 'Scheduler started',
-      status: globalScheduler.getStatus(),
-    });
-  } catch (error) {
-    logger.error(`Failed to start scheduler: ${error}`);
-    return res.status(500).json({
-      success: false,
-      error: 'Failed to start scheduler',
-    });
-  }
-});
-
-/**
- * POST /api/agent/monitoring/scheduler/stop
- * Stoppe Scheduler
- */
-router.post('/scheduler/stop', (req: Request, res: Response) => {
-  try {
-    globalScheduler.stopAll();
-
-    return res.json({
-      success: true,
-      message: 'Scheduler stopped',
-      status: globalScheduler.getStatus(),
-    });
-  } catch (error) {
-    logger.error(`Failed to stop scheduler: ${error}`);
-    return res.status(500).json({
-      success: false,
-      error: 'Failed to stop scheduler',
-    });
-  }
-});
-
-/**
- * POST /api/agent/monitoring/health
- * Allgemeiner Health Check
- */
-router.get('/health', (req: Request, res: Response) => {
-  return res.json({
-    success: true,
-    scheduler: {
-      running: globalScheduler.isActive(),
-      status: globalScheduler.getStatus(),
-    },
-    memory: {
-      initialized: persistentMemory !== null,
-    },
-    logger: {
-      initialized: executionLogger !== null,
-    },
-    timestamp: new Date().toISOString(),
   });
-});
 
-export default router;
+  /**
+   * GET /history/:loopType
+   * Hole Execution History für einen Loop
+   */
+  fastify.get<{
+    Params: { loopType: string };
+    Querystring: { limit?: string };
+  }>('/history/:loopType', async (request, _reply) => {
+    try {
+      const { loopType } = request.params;
+      const limit = parseInt(request.query.limit ?? '50') || 50;
+
+      if (!executionLogger) {
+        _reply.status(503);
+        return {
+          success: false,
+          error: 'Execution Logger not initialized',
+        };
+      }
+
+      const history = await executionLogger.getHistory(loopType, limit);
+
+      return {
+        success: true,
+        loopType,
+        count: history.length,
+        history,
+      };
+    } catch (error) {
+      logger.error(`Failed to get history: ${error}`);
+      _reply.status(500);
+      return {
+        success: false,
+        error: 'Failed to get history',
+      };
+    }
+  });
+
+  /**
+   * GET /stats/:loopType
+   * Hole Statistics für einen Loop
+   */
+  fastify.get<{ Params: { loopType: string }; Querystring: { days?: string } }>(
+    '/stats/:loopType',
+    async (request, _reply) => {
+      try {
+        const { loopType } = request.params;
+        const days = parseInt(request.query.days ?? '7') || 7;
+
+        if (!executionLogger) {
+          _reply.status(503);
+          return {
+            success: false,
+            error: 'Execution Logger not initialized',
+          };
+        }
+
+        const stats = await executionLogger.getStats(loopType, days);
+
+        return {
+          success: true,
+          loopType,
+          period: `${days} days`,
+          stats,
+        };
+      } catch (error) {
+        logger.error(`Failed to get stats: ${error}`);
+        _reply.status(500);
+        return {
+          success: false,
+          error: 'Failed to get stats',
+        };
+      }
+    }
+  );
+
+  /**
+   * GET /trends/:loopType
+   * Hole Trend-Daten für Visualisierung
+   */
+  fastify.get<{ Params: { loopType: string }; Querystring: { days?: string } }>(
+    '/trends/:loopType',
+    async (request, _reply) => {
+      try {
+        const { loopType } = request.params;
+        const days = parseInt(request.query.days ?? '30') || 30;
+
+        if (!executionLogger) {
+          _reply.status(503);
+          return {
+            success: false,
+            error: 'Execution Logger not initialized',
+          };
+        }
+
+        const trends = await executionLogger.getTrends(loopType, days);
+
+        return {
+          success: true,
+          loopType,
+          period: `${days} days`,
+          trends,
+        };
+      } catch (error) {
+        logger.error(`Failed to get trends: ${error}`);
+        _reply.status(500);
+        return {
+          success: false,
+          error: 'Failed to get trends',
+        };
+      }
+    }
+  );
+
+  /**
+   * GET /insights/:loopType
+   * Hole Learnings/Insights
+   */
+  fastify.get<{ Params: { loopType: string } }>(
+    '/insights/:loopType',
+    async (request, _reply) => {
+      try {
+        const { loopType } = request.params;
+
+        if (!persistentMemory) {
+          _reply.status(503);
+          return {
+            success: false,
+            error: 'Persistent Memory not initialized',
+          };
+        }
+
+        const insights = await persistentMemory.getInsights(loopType);
+
+        return {
+          success: true,
+          loopType,
+          insightCount: insights.length,
+          insights,
+        };
+      } catch (error) {
+        logger.error(`Failed to get insights: ${error}`);
+        _reply.status(500);
+        return {
+          success: false,
+          error: 'Failed to get insights',
+        };
+      }
+    }
+  );
+
+  /**
+   * POST /scheduler/start
+   * Starte Scheduler
+   */
+  fastify.post('/scheduler/start', async (_request, _reply) => {
+    try {
+      globalScheduler.startAll();
+
+      return {
+        success: true,
+        message: 'Scheduler started',
+        status: globalScheduler.getStatus(),
+      };
+    } catch (error) {
+      logger.error(`Failed to start scheduler: ${error}`);
+      _reply.status(500);
+      return {
+        success: false,
+        error: 'Failed to start scheduler',
+      };
+    }
+  });
+
+  /**
+   * POST /scheduler/stop
+   * Stoppe Scheduler
+   */
+  fastify.post('/scheduler/stop', async (_request, _reply) => {
+    try {
+      globalScheduler.stopAll();
+
+      return {
+        success: true,
+        message: 'Scheduler stopped',
+        status: globalScheduler.getStatus(),
+      };
+    } catch (error) {
+      logger.error(`Failed to stop scheduler: ${error}`);
+      _reply.status(500);
+      return {
+        success: false,
+        error: 'Failed to stop scheduler',
+      };
+    }
+  });
+
+  /**
+   * GET /health
+   * Allgemeiner Health Check
+   */
+  fastify.get('/health', async (_request, _reply) => {
+    return {
+      success: true,
+      scheduler: {
+        running: globalScheduler.isActive(),
+        status: globalScheduler.getStatus(),
+      },
+      memory: {
+        initialized: persistentMemory !== null,
+      },
+      logger: {
+        initialized: executionLogger !== null,
+      },
+      timestamp: new Date().toISOString(),
+    };
+  });
+}
