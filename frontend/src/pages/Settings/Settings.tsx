@@ -153,6 +153,12 @@ const defaultCredentials: ShopCredentials = {
   mlCacheResults: true,
   mlCacheTtl: 3600,
 
+  // Support defaults
+  supportTicketsEndpoint: "/wp-json/awesome-support/v1/tickets",
+  supportPerPage: 20,
+  supportProvider: "auto",
+  supportCptSlug: "wpas_ticket",
+
   // Social Media Defaults
   linkedinEnabled: false,
   linkedinAccessToken: "",

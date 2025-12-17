@@ -9,14 +9,14 @@ interface ShopCredentials {
   wpUrl: string;
   wpUsername: string;
   wpAppPassword: string;
-  
+
   // WooCommerce
   wcApiUrl: string;
   wcConsumerKey: string;
   wcConsumerSecret: string;
   wooAuthMode: 'basic' | 'oauth';
   wooTimeoutMs: number;
-  
+
   // AI & Services
   openaiApiKey: string;
   openaiModel: string;
@@ -60,78 +60,89 @@ interface ShopCredentials {
 }
 
 const connectionRoutes: FastifyPluginAsync = async (fastify) => {
-  
   // GET /api/settings/connection - Get current credentials from .env
-    fastify.get('/connection', async (request, reply) => {
+  fastify.get('/connection', async (request, reply) => {
+    try {
+      logger.info(
+        '📊 Settings: Getting current connection credentials (connection.json)'
+      );
+      const jsonPath = path.resolve(process.cwd(), 'connection.json');
+      let credentials: ShopCredentials;
       try {
-        logger.info('📊 Settings: Getting current connection credentials (connection.json)');
-        const jsonPath = path.resolve(process.cwd(), 'connection.json');
-        let credentials: ShopCredentials;
-        try {
-          const json = await fs.readFile(jsonPath, 'utf-8');
-          credentials = JSON.parse(json);
-        } catch {
-          // Datei existiert nicht oder ist leer
-          credentials = {
-            wpUrl: '',
-            wpUsername: '',
-            wpAppPassword: '',
-            wcApiUrl: '',
-            wcConsumerKey: '',
-            wcConsumerSecret: '',
-            wooAuthMode: 'basic',
-            wooTimeoutMs: 30000,
-            openaiApiKey: '',
-            openaiModel: 'gpt-4o-mini',
-            jobMode: 'once',
-            jobIntervalMs: 900000,
-            enableAnalytics: true,
-            enableAutoProducts: true,
-            enableEmailMarketing: true,
-            // Social Media Defaults
-            linkedinEnabled: false,
-            linkedinAccessToken: '',
-            linkedinRefreshToken: '',
-            facebookEnabled: false,
-            facebookAccessToken: '',
-            facebookPageId: '',
-            instagramEnabled: false,
-            instagramAccessToken: '',
-            instagramBusinessAccountId: '',
-            twitterEnabled: false,
-            twitterApiKey: '',
-            twitterApiSecret: '',
-            twitterAccessToken: '',
-            twitterAccessTokenSecret: '',
-            tiktokEnabled: false,
-            tiktokAccessToken: '',
-            tiktokRefreshToken: '',
-            youtubeEnabled: false,
-            youtubeAccessToken: '',
-            youtubeRefreshToken: '',
-            youtubeChannelId: ''
-          };
-        }
-        return {
-          success: true,
-          credentials,
-          hasFull: {
-            wordpress: !!(credentials.wpUrl && credentials.wpUsername && credentials.wpAppPassword),
-            woocommerce: !!(credentials.wcApiUrl && credentials.wcConsumerKey && credentials.wcConsumerSecret),
-            openai: !!credentials.openaiApiKey,
-          }
+        const json = await fs.readFile(jsonPath, 'utf-8');
+        credentials = JSON.parse(json);
+      } catch {
+        // Datei existiert nicht oder ist leer
+        credentials = {
+          wpUrl: '',
+          wpUsername: '',
+          wpAppPassword: '',
+          wcApiUrl: '',
+          wcConsumerKey: '',
+          wcConsumerSecret: '',
+          wooAuthMode: 'basic',
+          wooTimeoutMs: 30000,
+          openaiApiKey: '',
+          openaiModel: 'gpt-4o-mini',
+          jobMode: 'once',
+          jobIntervalMs: 900000,
+          enableAnalytics: true,
+          enableAutoProducts: true,
+          enableEmailMarketing: true,
+          // Social Media Defaults
+          linkedinEnabled: false,
+          linkedinAccessToken: '',
+          linkedinRefreshToken: '',
+          facebookEnabled: false,
+          facebookAccessToken: '',
+          facebookPageId: '',
+          instagramEnabled: false,
+          instagramAccessToken: '',
+          instagramBusinessAccountId: '',
+          twitterEnabled: false,
+          twitterApiKey: '',
+          twitterApiSecret: '',
+          twitterAccessToken: '',
+          twitterAccessTokenSecret: '',
+          tiktokEnabled: false,
+          tiktokAccessToken: '',
+          tiktokRefreshToken: '',
+          youtubeEnabled: false,
+          youtubeAccessToken: '',
+          youtubeRefreshToken: '',
+          youtubeChannelId: '',
         };
-      } catch (error) {
-        logger.error(`Settings GET error: ${error}`);
-        reply.status(500).send({ error: 'Failed to get connection settings' });
       }
-    });
+      return {
+        success: true,
+        credentials,
+        hasFull: {
+          wordpress: !!(
+            credentials.wpUrl &&
+            credentials.wpUsername &&
+            credentials.wpAppPassword
+          ),
+          woocommerce: !!(
+            credentials.wcApiUrl &&
+            credentials.wcConsumerKey &&
+            credentials.wcConsumerSecret
+          ),
+          openai: !!credentials.openaiApiKey,
+        },
+      };
+    } catch (error) {
+      logger.error(`Settings GET error: ${error}`);
+      reply.status(500).send({ error: 'Failed to get connection settings' });
+    }
+  });
 
   // POST /api/settings/connection - Update credentials and save to .env
   fastify.post('/connection', async (request, reply) => {
     try {
       const newCredentials = request.body as ShopCredentials;
-      logger.info('💾 Settings: Updating connection credentials (connection.json)');
+      logger.info(
+        '💾 Settings: Updating connection credentials (connection.json)'
+      );
       const jsonPath = path.resolve(process.cwd(), 'connection.json');
       // Masked Werte behandeln: Wenn Wert mit **** beginnt, alten Wert aus JSON übernehmen
       let oldCredentials: Partial<ShopCredentials> = {};
@@ -141,7 +152,10 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
       } catch {
         // intentionally left blank: falls Datei nicht existiert, bleibt oldCredentials leer
       }
-      const unmaskValue = (newValue: string, oldValue: string | undefined): string => {
+      const unmaskValue = (
+        newValue: string,
+        oldValue: string | undefined
+      ): string => {
         if (typeof newValue === 'string' && newValue.startsWith('****')) {
           return oldValue || '';
         }
@@ -149,11 +163,24 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
       };
       const cleanedCredentials: ShopCredentials = {
         ...newCredentials,
-        wpAppPassword: unmaskValue(newCredentials.wpAppPassword, oldCredentials.wpAppPassword),
-        wcConsumerSecret: unmaskValue(newCredentials.wcConsumerSecret, oldCredentials.wcConsumerSecret),
-        openaiApiKey: unmaskValue(newCredentials.openaiApiKey, oldCredentials.openaiApiKey),
+        wpAppPassword: unmaskValue(
+          newCredentials.wpAppPassword,
+          oldCredentials.wpAppPassword
+        ),
+        wcConsumerSecret: unmaskValue(
+          newCredentials.wcConsumerSecret,
+          oldCredentials.wcConsumerSecret
+        ),
+        openaiApiKey: unmaskValue(
+          newCredentials.openaiApiKey,
+          oldCredentials.openaiApiKey
+        ),
       };
-      await fs.writeFile(jsonPath, JSON.stringify(cleanedCredentials, null, 2), 'utf-8');
+      await fs.writeFile(
+        jsonPath,
+        JSON.stringify(cleanedCredentials, null, 2),
+        'utf-8'
+      );
       logger.info('✅ Settings: connection.json updated successfully');
       return {
         success: true,
@@ -169,32 +196,45 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.post('/connection/test', async (request, reply) => {
     try {
       const credentials = request.body as ShopCredentials;
-      
+
       logger.info('🔍 Settings: Testing connection...');
-      
+
       const results = {
         wordpress: { success: false, message: '', time: 0 },
         woocommerce: { success: false, message: '', time: 0 },
       };
 
       // Test WordPress
-      if (credentials.wpUrl && credentials.wpUsername && credentials.wpAppPassword) {
+      if (
+        credentials.wpUrl &&
+        credentials.wpUsername &&
+        credentials.wpAppPassword
+      ) {
         const wpStart = Date.now();
         try {
-          const wpResponse = await fetch(`${credentials.wpUrl}/wp-json/wp/v2/users/me`, {
-            method: 'GET',
-            headers: {
-              'Authorization': 'Basic ' + Buffer.from(`${credentials.wpUsername}:${credentials.wpAppPassword}`).toString('base64'),
-            },
-          });
-          
+          const wpResponse = await fetch(
+            `${credentials.wpUrl}/wp-json/wp/v2/users/me`,
+            {
+              method: 'GET',
+              headers: {
+                Authorization:
+                  'Basic ' +
+                  Buffer.from(
+                    `${credentials.wpUsername}:${credentials.wpAppPassword}`
+                  ).toString('base64'),
+              },
+            }
+          );
+
           results.wordpress.time = Date.now() - wpStart;
-          
+
           if (wpResponse.ok) {
-            const userData = await wpResponse.json() as { name?: string };
+            const userData = (await wpResponse.json()) as { name?: string };
             results.wordpress.success = true;
             results.wordpress.message = `✅ Verbunden als ${userData.name || 'User'}`;
-            logger.info(`✅ WordPress connection successful (${results.wordpress.time}ms)`);
+            logger.info(
+              `✅ WordPress connection successful (${results.wordpress.time}ms)`
+            );
           } else {
             results.wordpress.message = `❌ WordPress-Fehler: ${wpResponse.status} ${wpResponse.statusText}`;
             logger.warn(`❌ WordPress connection failed: ${wpResponse.status}`);
@@ -209,31 +249,47 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       // Test WooCommerce
-      if (credentials.wcApiUrl && credentials.wcConsumerKey && credentials.wcConsumerSecret) {
+      if (
+        credentials.wcApiUrl &&
+        credentials.wcConsumerKey &&
+        credentials.wcConsumerSecret
+      ) {
         const wcStart = Date.now();
         try {
-          const wcUrl = new URL('/wp-json/wc/v3/system_status', credentials.wcApiUrl);
+          const wcUrl = new URL(
+            '/wp-json/wc/v3/system_status',
+            credentials.wcApiUrl
+          );
           wcUrl.searchParams.append('consumer_key', credentials.wcConsumerKey);
-          wcUrl.searchParams.append('consumer_secret', credentials.wcConsumerSecret);
-          
+          wcUrl.searchParams.append(
+            'consumer_secret',
+            credentials.wcConsumerSecret
+          );
+
           const wcResponse = await fetch(wcUrl.toString(), {
             method: 'GET',
             headers: {
-              'Accept': 'application/json',
+              Accept: 'application/json',
             },
           });
-          
+
           results.woocommerce.time = Date.now() - wcStart;
-          
+
           if (wcResponse.ok) {
-            const systemStatus = await wcResponse.json() as { environment?: { version?: string } };
+            const systemStatus = (await wcResponse.json()) as {
+              environment?: { version?: string };
+            };
             const version = systemStatus?.environment?.version || 'Unknown';
             results.woocommerce.success = true;
             results.woocommerce.message = `✅ WooCommerce ${version} verbunden`;
-            logger.info(`✅ WooCommerce connection successful (${results.woocommerce.time}ms)`);
+            logger.info(
+              `✅ WooCommerce connection successful (${results.woocommerce.time}ms)`
+            );
           } else {
             results.woocommerce.message = `❌ WooCommerce-Fehler: ${wcResponse.status} ${wcResponse.statusText}`;
-            logger.warn(`❌ WooCommerce connection failed: ${wcResponse.status}`);
+            logger.warn(
+              `❌ WooCommerce connection failed: ${wcResponse.status}`
+            );
           }
         } catch (wcError) {
           results.woocommerce.time = Date.now() - wcStart;
@@ -244,13 +300,14 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         results.woocommerce.message = '⚠️ WooCommerce-API-Keys unvollständig';
       }
 
-      const overallSuccess = results.wordpress.success || results.woocommerce.success;
-      
+      const overallSuccess =
+        results.wordpress.success || results.woocommerce.success;
+
       return {
         success: overallSuccess,
         results,
-        message: overallSuccess 
-          ? '✅ Verbindungstest erfolgreich!' 
+        message: overallSuccess
+          ? '✅ Verbindungstest erfolgreich!'
           : '❌ Verbindungstest fehlgeschlagen - bitte Zugangsdaten prüfen',
       };
     } catch (error) {
