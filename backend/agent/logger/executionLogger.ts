@@ -35,6 +35,7 @@ export interface ExecutionRecord {
 export class ExecutionLogger {
   private db: any;
   private collectionName = 'loop_executions';
+  private memoryStore: ExecutionRecord[] = [];
 
   constructor(mongoDb: any) {
     this.db = mongoDb;
@@ -46,6 +47,10 @@ export class ExecutionLogger {
    */
   private async initializeIndexes(): Promise<void> {
     try {
+      if (!this.db) {
+        logger.info('ℹ️ Execution Logger running in memory mode (no DB)');
+        return;
+      }
       const collection = this.db.collection(this.collectionName);
 
       // Query Indexes
@@ -75,6 +80,37 @@ export class ExecutionLogger {
     error?: Error
   ): Promise<void> {
     try {
+      if (!this.db) {
+        const duration = result.executionTime;
+        const record: ExecutionRecord = {
+          loopType,
+          runId: result.context.id,
+          startTime: result.context.startTime,
+          endTime: new Date(),
+          duration,
+          status: error ? 'failed' : result.success ? 'success' : 'failed',
+          iterations: result.context.iteration,
+          result: {
+            findings: result.context.findings,
+            recommendations: result.recommendations,
+            insights: result.insights,
+          },
+          metrics: {
+            successRate: result.success ? 1.0 : 0.0,
+            avgProcessingTime: duration / Math.max(1, result.context.iteration),
+          },
+          error: error?.message,
+          tags: [loopType, result.success ? 'success' : 'failure'],
+          createdAt: new Date(),
+        };
+        this.memoryStore.unshift(record);
+        // cap memory to last 500 records
+        if (this.memoryStore.length > 500) this.memoryStore.length = 500;
+        logger.info(
+          `📝 (mem) Execution logged: ${loopType} (${result.success ? '✅' : '❌'}, ${duration}ms)`
+        );
+        return;
+      }
       const collection = this.db.collection(this.collectionName);
       const duration = result.executionTime;
 
@@ -118,16 +154,21 @@ export class ExecutionLogger {
     limit: number = 50
   ): Promise<ExecutionRecord[]> {
     try {
+      if (!this.db) {
+        const filtered = loopType
+          ? this.memoryStore.filter((r) => r.loopType === loopType)
+          : this.memoryStore.slice();
+        return filtered
+          .sort((a, b) => b.startTime.getTime() - a.startTime.getTime())
+          .slice(0, limit);
+      }
       const collection = this.db.collection(this.collectionName);
-
       const query = loopType ? { loopType } : {};
-
       const executions = await collection
         .find(query)
         .sort({ startTime: -1 })
         .limit(limit)
         .toArray();
-
       return executions;
     } catch (error) {
       logger.error(`Failed to get history: ${error}`);
@@ -150,9 +191,41 @@ export class ExecutionLogger {
     lastRun: Date | null;
   }> {
     try {
+      if (!this.db) {
+        const cutoffDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+        const relevant = this.memoryStore.filter(
+          (r) => r.loopType === loopType && r.startTime >= cutoffDate
+        );
+        const totalRuns = relevant.length;
+        const successCount = relevant.filter(
+          (r) => r.status === 'success'
+        ).length;
+        const failureCount = relevant.filter(
+          (r) => r.status === 'failed'
+        ).length;
+        const avgDuration =
+          totalRuns > 0
+            ? relevant.reduce((sum, r) => sum + (r.duration || 0), 0) /
+              totalRuns
+            : 0;
+        const lastRun =
+          totalRuns > 0
+            ? relevant.reduce(
+                (max, r) => (r.startTime > max ? r.startTime : max),
+                new Date(0)
+              )
+            : null;
+        return {
+          totalRuns,
+          successCount,
+          failureCount,
+          avgDuration,
+          successRate: totalRuns > 0 ? successCount / totalRuns : 0,
+          lastRun,
+        };
+      }
       const collection = this.db.collection(this.collectionName);
       const cutoffDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
-
       const stats = await collection
         .aggregate([
           {
@@ -227,9 +300,33 @@ export class ExecutionLogger {
     }>
   > {
     try {
+      if (!this.db) {
+        const cutoffDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+        const relevant = this.memoryStore
+          .filter((r) => r.loopType === loopType && r.startTime >= cutoffDate)
+          .sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
+        const byDay: Record<
+          string,
+          { runs: number; success: number; failures: number }
+        > = {};
+        for (const r of relevant) {
+          const key = r.startTime.toISOString().slice(0, 10);
+          if (!byDay[key]) byDay[key] = { runs: 0, success: 0, failures: 0 };
+          byDay[key].runs += 1;
+          if (r.status === 'success') byDay[key].success += 1;
+          if (r.status === 'failed') byDay[key].failures += 1;
+        }
+        return Object.keys(byDay)
+          .sort()
+          .map((date) => ({
+            date,
+            runs: byDay[date].runs,
+            success: byDay[date].success,
+            failures: byDay[date].failures,
+          }));
+      }
       const collection = this.db.collection(this.collectionName);
       const cutoffDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
-
       const trends = await collection
         .aggregate([
           {

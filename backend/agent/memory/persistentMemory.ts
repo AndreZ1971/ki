@@ -31,6 +31,7 @@ export class PersistentMemory {
   private db: any; // MongoDB connection
   private collectionName = 'loop_learnings';
   private ttlDays = 30; // Default TTL
+  private memoryStore: LearningRecord[] = []; // In-memory fallback
 
   constructor(mongoDb: any) {
     this.db = mongoDb;
@@ -42,6 +43,10 @@ export class PersistentMemory {
    */
   private async initializeIndexes(): Promise<void> {
     try {
+      if (!this.db) {
+        logger.info('ℹ️ Persistent Memory running in memory mode (no DB)');
+        return;
+      }
       const collection = this.db.collection(this.collectionName);
 
       // TTL Index: Automatic deletion nach expiresAt
@@ -69,7 +74,6 @@ export class PersistentMemory {
     tags: string[] = []
   ): Promise<void> {
     try {
-      const collection = this.db.collection(this.collectionName);
       const expiresAt = new Date(
         Date.now() + this.ttlDays * 24 * 60 * 60 * 1000
       );
@@ -84,6 +88,17 @@ export class PersistentMemory {
         tags: [...tags, loopType, pattern],
       };
 
+      if (!this.db) {
+        this.memoryStore.unshift(record);
+        // Cap memory to last 1000 records
+        if (this.memoryStore.length > 1000) this.memoryStore.length = 1000;
+        logger.info(
+          `📚 (mem) Learning remembered: ${loopType}/${pattern} (confidence: ${confidence})`
+        );
+        return;
+      }
+
+      const collection = this.db.collection(this.collectionName);
       await collection.insertOne(record);
 
       logger.info(
@@ -103,11 +118,29 @@ export class PersistentMemory {
     limit: number = 10
   ): Promise<LearningRecord[]> {
     try {
+      const now = new Date();
+
+      if (!this.db) {
+        const filtered = this.memoryStore.filter((r) => {
+          const matchesType = r.loopType === loopType;
+          const matchesPattern = !pattern || r.pattern === pattern;
+          const notExpired = r.expiresAt > now;
+          return matchesType && matchesPattern && notExpired;
+        });
+        const result = filtered
+          .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+          .slice(0, limit);
+        logger.info(
+          `🧠 (mem) Recalled ${result.length} learnings for ${loopType}`
+        );
+        return result;
+      }
+
       const collection = this.db.collection(this.collectionName);
 
       const query: any = {
         loopType,
-        expiresAt: { $gt: new Date() }, // Nicht abgelaufen
+        expiresAt: { $gt: now }, // Nicht abgelaufen
       };
 
       if (pattern) {
@@ -133,6 +166,48 @@ export class PersistentMemory {
    */
   async getInsights(loopType: string): Promise<MemoryInsight[]> {
     try {
+      const now = new Date();
+
+      if (!this.db) {
+        const relevant = this.memoryStore.filter(
+          (r) => r.loopType === loopType && r.expiresAt > now
+        );
+
+        // Group by pattern
+        const byPattern: Record<string, LearningRecord[]> = {};
+        for (const rec of relevant) {
+          if (!byPattern[rec.pattern]) byPattern[rec.pattern] = [];
+          byPattern[rec.pattern].push(rec);
+        }
+
+        const insights: MemoryInsight[] = Object.keys(byPattern).map(
+          (pattern) => {
+            const records = byPattern[pattern];
+            const occurrences = records.length;
+            const avgConfidence =
+              records.reduce((sum, r) => sum + r.confidence, 0) / occurrences;
+            const lastSeen = records.reduce(
+              (max, r) => (r.timestamp > max ? r.timestamp : max),
+              new Date(0)
+            );
+            const successRate =
+              records.reduce((sum, r) => sum + (r.successRate || 0), 0) /
+              occurrences;
+            return {
+              pattern,
+              occurrences,
+              avgConfidence,
+              lastSeen,
+              successRate,
+            };
+          }
+        );
+
+        return insights
+          .sort((a, b) => b.occurrences - a.occurrences)
+          .slice(0, 20);
+      }
+
       const collection = this.db.collection(this.collectionName);
 
       const insights = await collection
@@ -140,7 +215,7 @@ export class PersistentMemory {
           {
             $match: {
               loopType,
-              expiresAt: { $gt: new Date() },
+              expiresAt: { $gt: now },
             },
           },
           {
@@ -201,10 +276,21 @@ export class PersistentMemory {
    */
   async cleanup(olderThanDays: number = 60): Promise<number> {
     try {
-      const collection = this.db.collection(this.collectionName);
       const cutoffDate = new Date(
         Date.now() - olderThanDays * 24 * 60 * 60 * 1000
       );
+
+      if (!this.db) {
+        const before = this.memoryStore.length;
+        this.memoryStore = this.memoryStore.filter(
+          (r) => r.timestamp >= cutoffDate
+        );
+        const deleted = before - this.memoryStore.length;
+        logger.info(`🧹 (mem) Cleaned up ${deleted} old learnings`);
+        return deleted;
+      }
+
+      const collection = this.db.collection(this.collectionName);
 
       const result = await collection.deleteMany({
         timestamp: { $lt: cutoffDate },
@@ -223,6 +309,42 @@ export class PersistentMemory {
    */
   async getStats(loopType?: string): Promise<any> {
     try {
+      if (!this.db) {
+        const filtered = loopType
+          ? this.memoryStore.filter((r) => r.loopType === loopType)
+          : this.memoryStore.slice();
+
+        if (filtered.length === 0) return [];
+
+        const byType: Record<string, LearningRecord[]> = {};
+        for (const rec of filtered) {
+          if (!byType[rec.loopType]) byType[rec.loopType] = [];
+          byType[rec.loopType].push(rec);
+        }
+
+        return Object.keys(byType).map((type) => {
+          const records = byType[type];
+          const totalRecords = records.length;
+          const avgConfidence =
+            records.reduce((sum, r) => sum + r.confidence, 0) / totalRecords;
+          const oldestRecord = records.reduce(
+            (min, r) => (r.timestamp < min ? r.timestamp : min),
+            new Date()
+          );
+          const newestRecord = records.reduce(
+            (max, r) => (r.timestamp > max ? r.timestamp : max),
+            new Date(0)
+          );
+          return {
+            _id: type,
+            totalRecords,
+            avgConfidence,
+            oldestRecord,
+            newestRecord,
+          };
+        });
+      }
+
       const collection = this.db.collection(this.collectionName);
 
       const query = loopType ? { loopType } : {};

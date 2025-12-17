@@ -119,7 +119,7 @@ const LoopMonitoring: React.FC = () => {
 
   const handleStartScheduler = async () => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL;
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
       const res = await fetch(
         `${apiUrl}/api/agent/monitoring/scheduler/start`,
         {
@@ -139,7 +139,7 @@ const LoopMonitoring: React.FC = () => {
 
   const handleStopScheduler = async () => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL;
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
       const res = await fetch(`${apiUrl}/api/agent/monitoring/scheduler/stop`, {
         method: "POST",
       });

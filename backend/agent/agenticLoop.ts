@@ -5,6 +5,8 @@
  */
 
 import { logger } from '../logger';
+import { executionLogger } from './logger/executionLogger';
+import { persistentMemory } from './memory/persistentMemory';
 
 export interface LoopStep {
   name: string;
@@ -130,14 +132,25 @@ export class AgenticLoop {
       const learning = await learnStep.action();
       this.context.learnings.push(learning);
 
-      // Speichere in Memory für zukünftige Loops
-      // TODO: Implementiere Memory-System wenn vorhanden
-      // await memory.remember(this.context.type, {
-      //   iteration: this.context.iteration,
-      //   result,
-      //   learning,
-      //   timestamp: new Date(),
-      // });
+      // Speichere in PersistentMemory für zukünftige Loops
+      if (persistentMemory) {
+        try {
+          await persistentMemory.remember(
+            this.context.type,
+            `iteration-${this.context.iteration}`,
+            {
+              iteration: this.context.iteration,
+              learning,
+              timestamp: new Date(),
+            },
+            0.8,
+            ['loop-learning', this.context.type]
+          );
+          logger.info(`✅ Learning saved to persistent memory`);
+        } catch (error) {
+          logger.warn(`Failed to save learning to memory: ${error}`);
+        }
+      }
     }
   }
 
@@ -164,6 +177,8 @@ export class AgenticLoop {
    * Hauptschleife: Sense → Think → Act → Learn → Repeat
    */
   async execute(): Promise<LoopResult> {
+    let error: Error | undefined;
+
     try {
       while (this.context.status === 'running') {
         this.context.iteration++;
@@ -190,13 +205,42 @@ export class AgenticLoop {
         }
       }
 
-      return this.buildResult(true);
-    } catch (error) {
+      const finalResult = this.buildResult(true);
+
+      // Log execution to ExecutionLogger
+      if (executionLogger) {
+        try {
+          await executionLogger.logExecution(this.context.type, finalResult);
+          logger.info(`✅ Execution logged to history`);
+        } catch (err) {
+          logger.warn(`Failed to log execution: ${err}`);
+        }
+      }
+
+      return finalResult;
+    } catch (err) {
+      error = err instanceof Error ? err : new Error(String(err));
       logger.error(
-        `[${this.context.type}] Loop execution failed: ${error instanceof Error ? error.message : String(error)}`
+        `[${this.context.type}] Loop execution failed: ${error.message}`
       );
       this.context.status = 'failed';
-      return this.buildResult(false);
+
+      const failedResult = this.buildResult(false);
+
+      // Log failure to ExecutionLogger
+      if (executionLogger) {
+        try {
+          await executionLogger.logExecution(
+            this.context.type,
+            failedResult,
+            error
+          );
+        } catch (logErr) {
+          logger.warn(`Failed to log error: ${logErr}`);
+        }
+      }
+
+      return failedResult;
     }
   }
 

@@ -177,25 +177,24 @@ export class LoopScheduler {
       anomalyDetection: {
         scheduled: this.jobs.has('anomaly-detection'),
         lastRun: this.lastRuns.get('anomaly-detection'),
-        nextRun: this.jobs.get('anomaly-detection')?.nextDate().toISOString(),
+        nextRun: this.jobs.has('anomaly-detection') ? 'scheduled' : undefined,
       },
       productOptimization: {
         scheduled: this.jobs.has('product-optimization'),
         lastRun: this.lastRuns.get('product-optimization'),
-        nextRun: this.jobs
-          .get('product-optimization')
-          ?.nextDate()
-          .toISOString(),
+        nextRun: this.jobs.has('product-optimization')
+          ? 'scheduled'
+          : undefined,
       },
       paymentRecovery: {
         scheduled: this.jobs.has('payment-recovery'),
         lastRun: this.lastRuns.get('payment-recovery'),
-        nextRun: this.jobs.get('payment-recovery')?.nextDate().toISOString(),
+        nextRun: this.jobs.has('payment-recovery') ? 'scheduled' : undefined,
       },
       analyticsInsights: {
         scheduled: this.jobs.has('analytics-insights'),
         lastRun: this.lastRuns.get('analytics-insights'),
-        nextRun: this.jobs.get('analytics-insights')?.nextDate().toISOString(),
+        nextRun: this.jobs.has('analytics-insights') ? 'scheduled' : undefined,
       },
       isRunning: this.isRunning,
     };

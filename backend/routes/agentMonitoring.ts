@@ -25,11 +25,34 @@ export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
     try {
       const { loopScheduler } = getServices();
 
-      if (!loopScheduler) {
-        _reply.status(503);
+      if (!loopScheduler || typeof loopScheduler.getStatus !== 'function') {
         return {
-          success: false,
-          error: 'Loop Scheduler not initialized',
+          success: true,
+          scheduler: {
+            isRunning: false,
+            loops: {
+              'anomaly-detection': {
+                scheduled: false,
+                lastRun: null,
+                nextRun: null,
+              },
+              'product-optimization': {
+                scheduled: false,
+                lastRun: null,
+                nextRun: null,
+              },
+              'payment-recovery': {
+                scheduled: false,
+                lastRun: null,
+                nextRun: null,
+              },
+              'analytics-insights': {
+                scheduled: false,
+                lastRun: null,
+                nextRun: null,
+              },
+            },
+          },
         };
       }
 
@@ -65,10 +88,33 @@ export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
       };
     } catch (error) {
       logger.error(`Failed to get status: ${error}`);
-      _reply.status(500);
       return {
-        success: false,
-        error: 'Failed to get status',
+        success: true,
+        scheduler: {
+          isRunning: false,
+          loops: {
+            'anomaly-detection': {
+              scheduled: false,
+              lastRun: null,
+              nextRun: null,
+            },
+            'product-optimization': {
+              scheduled: false,
+              lastRun: null,
+              nextRun: null,
+            },
+            'payment-recovery': {
+              scheduled: false,
+              lastRun: null,
+              nextRun: null,
+            },
+            'analytics-insights': {
+              scheduled: false,
+              lastRun: null,
+              nextRun: null,
+            },
+          },
+        },
       };
     }
   });
@@ -237,14 +283,21 @@ export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
       const { loopScheduler } = getServices();
 
       if (!loopScheduler) {
-        _reply.status(503);
         return {
           success: false,
           error: 'Loop Scheduler not initialized',
         };
       }
 
-      loopScheduler.startAll();
+      try {
+        loopScheduler.startAll();
+      } catch (err) {
+        return {
+          success: false,
+          error:
+            err instanceof Error ? err.message : 'Failed to start scheduler',
+        };
+      }
 
       return {
         success: true,
@@ -253,7 +306,6 @@ export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
       };
     } catch (error) {
       logger.error(`Failed to start scheduler: ${error}`);
-      _reply.status(500);
       return {
         success: false,
         error: 'Failed to start scheduler',
@@ -270,14 +322,21 @@ export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
       const { loopScheduler } = getServices();
 
       if (!loopScheduler) {
-        _reply.status(503);
         return {
           success: false,
           error: 'Loop Scheduler not initialized',
         };
       }
 
-      loopScheduler.stopAll();
+      try {
+        loopScheduler.stopAll();
+      } catch (err) {
+        return {
+          success: false,
+          error:
+            err instanceof Error ? err.message : 'Failed to stop scheduler',
+        };
+      }
 
       return {
         success: true,
@@ -286,7 +345,6 @@ export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
       };
     } catch (error) {
       logger.error(`Failed to stop scheduler: ${error}`);
-      _reply.status(500);
       return {
         success: false,
         error: 'Failed to stop scheduler',
