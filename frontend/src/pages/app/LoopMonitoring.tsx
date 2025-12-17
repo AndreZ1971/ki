@@ -61,8 +61,8 @@ const LoopMonitoring: React.FC = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Use localhost:5000 for backend API (default port)
-        const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+        // Use localhost:3000 for backend API (default Fastify port)
+        const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
         // Get scheduler status
         const statusRes = await fetch(`${apiUrl}/api/agent/monitoring/status`);
