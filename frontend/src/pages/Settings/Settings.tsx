@@ -169,7 +169,12 @@ const defaultCredentials: ShopCredentials = {
 const Settings = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<
-    "connection" | "specialization" | "license" | "social" | "agentic"
+    | "connection"
+    | "onboarding"
+    | "specialization"
+    | "license"
+    | "social"
+    | "agentic"
   >("connection");
   const [testingConnection, setTestingConnection] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<
@@ -741,6 +746,7 @@ const Settings = () => {
         >
           {[
             { id: "connection", label: "🔌 Shop-Verbindung", color: "#3b82f6" },
+            { id: "onboarding", label: "🚀 Onboarding", color: "#f97316" },
             {
               id: "specialization",
               label: "🎯 Spezialisierung",
@@ -796,6 +802,324 @@ const Settings = () => {
         </div>
 
         {/* TAB 1: Shop-Verbindung */}
+        {/* TAB 1b: Onboarding */}
+        {activeTab === "onboarding" && (
+          <div>
+            <h3>🚀 Shop-Onboarding konfigurieren</h3>
+            <p
+              style={{
+                color: "rgba(255,255,255,0.9)",
+                marginBottom: "30px",
+              }}
+            >
+              Konfiguriere die Onboarding-Informationen für deine Kunden
+            </p>
+
+            <div
+              style={{
+                display: "grid",
+                gap: "24px",
+              }}
+            >
+              {/* Shop Info */}
+              <div
+                style={{
+                  background: "rgba(249, 115, 22, 0.12)",
+                  padding: "24px",
+                  borderRadius: "12px",
+                  border: "2px solid rgba(249, 115, 22, 0.35)",
+                }}
+              >
+                <h4 style={{ marginBottom: "15px" }}>📝 Shop-Informationen</h4>
+
+                <div style={{ marginBottom: "15px" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "8px",
+                      color: "#ffffff",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Shop-Name:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="z.B. Mein Online-Shop"
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      background: "rgba(255,255,255,0.08)",
+                      border: "1px solid rgba(255,255,255,0.35)",
+                      borderRadius: "8px",
+                      color: "#f8fafc",
+                      fontSize: "14px",
+                    }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: "15px" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "8px",
+                      color: "#ffffff",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Shop-URL:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="https://meinshop.de"
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      background: "rgba(255,255,255,0.08)",
+                      border: "1px solid rgba(255,255,255,0.35)",
+                      borderRadius: "8px",
+                      color: "#f8fafc",
+                      fontSize: "14px",
+                    }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: "15px" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "8px",
+                      color: "#ffffff",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Kontakt-E-Mail:
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="support@meinshop.de"
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      background: "rgba(255,255,255,0.08)",
+                      border: "1px solid rgba(255,255,255,0.35)",
+                      borderRadius: "8px",
+                      color: "#f8fafc",
+                      fontSize: "14px",
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "8px",
+                      color: "#ffffff",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Support-Telefon (optional):
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="+49 123 456789"
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      background: "rgba(255,255,255,0.08)",
+                      border: "1px solid rgba(255,255,255,0.35)",
+                      borderRadius: "8px",
+                      color: "#f8fafc",
+                      fontSize: "14px",
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Onboarding-Präferenzen */}
+              <div
+                style={{
+                  background: "rgba(99, 102, 241, 0.12)",
+                  padding: "24px",
+                  borderRadius: "12px",
+                  border: "2px solid rgba(99, 102, 241, 0.35)",
+                }}
+              >
+                <h4 style={{ marginBottom: "15px" }}>
+                  ⚙️ Onboarding-Einstellungen
+                </h4>
+
+                <div style={{ marginBottom: "15px" }}>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      cursor: "pointer",
+                      color: "rgba(255,255,255,0.9)",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      defaultChecked={true}
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                        cursor: "pointer",
+                      }}
+                    />
+                    <span>📧 Automatische Willkommens-E-Mail versenden</span>
+                  </label>
+                  <small
+                    style={{
+                      color: "rgba(255,255,255,0.6)",
+                      display: "block",
+                      marginLeft: "28px",
+                      marginTop: "4px",
+                    }}
+                  >
+                    Kunden erhalten eine E-Mail mit Links zu Monitoring &
+                    Dokumentation
+                  </small>
+                </div>
+
+                <div style={{ marginBottom: "15px" }}>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      cursor: "pointer",
+                      color: "rgba(255,255,255,0.9)",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      defaultChecked={true}
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                        cursor: "pointer",
+                      }}
+                    />
+                    <span>🎯 Start-Checkliste zeigen</span>
+                  </label>
+                  <small
+                    style={{
+                      color: "rgba(255,255,255,0.6)",
+                      display: "block",
+                      marginLeft: "28px",
+                      marginTop: "4px",
+                    }}
+                  >
+                    Neue Kunden sehen eine interaktive To-Do-Liste im Dashboard
+                  </small>
+                </div>
+
+                <div style={{ marginBottom: "15px" }}>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      cursor: "pointer",
+                      color: "rgba(255,255,255,0.9)",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      defaultChecked={false}
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                        cursor: "pointer",
+                      }}
+                    />
+                    <span>📱 Quick-Start Video anzeigen</span>
+                  </label>
+                  <small
+                    style={{
+                      color: "rgba(255,255,255,0.6)",
+                      display: "block",
+                      marginLeft: "28px",
+                      marginTop: "4px",
+                    }}
+                  >
+                    Embedded Video mit ersten Schritten
+                  </small>
+                </div>
+
+                <div>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      cursor: "pointer",
+                      color: "rgba(255,255,255,0.9)",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      defaultChecked={true}
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                        cursor: "pointer",
+                      }}
+                    />
+                    <span>📚 Dokumentation & Bedienungsanleitung</span>
+                  </label>
+                  <small
+                    style={{
+                      color: "rgba(255,255,255,0.6)",
+                      display: "block",
+                      marginLeft: "28px",
+                      marginTop: "4px",
+                    }}
+                  >
+                    Links zu Handbüchern und FAQs
+                  </small>
+                </div>
+              </div>
+
+              {/* Speichern Button */}
+              <div style={{ display: "flex", gap: "12px" }}>
+                <button
+                  style={{
+                    padding: "12px 24px",
+                    background: "linear-gradient(135deg, #f97316, #ea580c)",
+                    border: "none",
+                    borderRadius: "8px",
+                    color: "white",
+                    cursor: "pointer",
+                    fontSize: "16px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  💾 Onboarding speichern
+                </button>
+                <button
+                  style={{
+                    padding: "12px 24px",
+                    background: "rgba(255,255,255,0.1)",
+                    border: "2px solid rgba(255,255,255,0.2)",
+                    borderRadius: "8px",
+                    color: "rgba(255,255,255,0.9)",
+                    cursor: "pointer",
+                    fontSize: "16px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  👁️ Vorschau
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 2: Shop-Verbindung */}
         {activeTab === "connection" && (
           <div>
             {loading && (
@@ -3047,64 +3371,7 @@ const Settings = () => {
               </div>
             </div>
 
-            {/* Documentation */}
-            <div
-              style={{
-                marginTop: "30px",
-                background: "rgba(255,255,255,0.02)",
-                border: "1px solid rgba(255,255,255,0.1)",
-                borderRadius: "8px",
-                padding: "20px",
-              }}
-            >
-              <h4
-                style={{
-                  marginTop: "0",
-                  marginBottom: "16px",
-                  color: "#e5e7eb",
-                }}
-              >
-                📖 Documentation
-              </h4>
-              <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-                <a
-                  href="https://github.com/andreZ1971/ki/blob/master/docs/AGENTIC_LOOP_ARCHITECTURE.md"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    padding: "10px 16px",
-                    background: "rgba(6, 182, 212, 0.1)",
-                    border: "1px solid rgba(6, 182, 212, 0.3)",
-                    borderRadius: "6px",
-                    color: "#06b6d4",
-                    textDecoration: "none",
-                    fontSize: "14px",
-                    cursor: "pointer",
-                    transition: "all 0.3s",
-                  }}
-                >
-                  📄 Architecture Docs
-                </a>
-                <a
-                  href="https://github.com/andreZ1971/ki/blob/master/README.md#-agentic-loop-framework"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    padding: "10px 16px",
-                    background: "rgba(6, 182, 212, 0.1)",
-                    border: "1px solid rgba(6, 182, 212, 0.3)",
-                    borderRadius: "6px",
-                    color: "#06b6d4",
-                    textDecoration: "none",
-                    fontSize: "14px",
-                    cursor: "pointer",
-                    transition: "all 0.3s",
-                  }}
-                >
-                  📚 README
-                </a>
-              </div>
-            </div>
+            {/* Documentation tiles removed (private repo, central docs planned) */}
           </div>
         )}
       </div>

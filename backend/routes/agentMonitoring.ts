@@ -5,6 +5,8 @@
  */
 
 import { FastifyInstance } from 'fastify';
+import fs from 'fs';
+import path from 'path';
 import { logger } from '../logger';
 
 // Get services from global context (initialized in server.ts)
@@ -373,5 +375,91 @@ export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
       },
       timestamp: new Date().toISOString(),
     };
+  });
+
+  /**
+   * GET /export
+   * Liefert aggregierte, datenschutzkonforme Monitoring-Daten (keine PII)
+   * Optional: write=1 schreibt JSON nach METRICS_EXPORT_DIR oder Default /app/data/exports
+   */
+  fastify.get<{
+    Querystring: { days?: string; write?: string };
+  }>('/export', async (request, _reply) => {
+    try {
+      const { executionLogger, persistentMemory, loopScheduler } =
+        getServices();
+
+      const days = parseInt(request.query.days ?? '30') || 30;
+      const loopTypes = [
+        'anomaly-detection',
+        'product-optimization',
+        'payment-recovery',
+        'analytics-insights',
+      ];
+
+      // Sammle aggregierte Daten pro LoopType
+      const loops: Record<string, any> = {};
+      for (const lt of loopTypes) {
+        const stats = executionLogger
+          ? await executionLogger.getStats(lt, days)
+          : {
+              totalRuns: 0,
+              successCount: 0,
+              failureCount: 0,
+              avgDuration: 0,
+              successRate: 0,
+              lastRun: null,
+            };
+        const trends = executionLogger
+          ? await executionLogger.getTrends(lt, days)
+          : [];
+        const insights = persistentMemory
+          ? await persistentMemory.getInsights(lt)
+          : [];
+
+        loops[lt] = {
+          stats,
+          trends,
+          insightCount: Array.isArray(insights) ? insights.length : 0,
+          topInsights: (insights || []).slice(0, 5),
+        };
+      }
+
+      const payload = {
+        success: true,
+        generatedAt: new Date().toISOString(),
+        periodDays: days,
+        scheduler: loopScheduler ? loopScheduler.getStatus() : null,
+        loops,
+        privacy: {
+          piiStored: false,
+          storage: 'in-memory',
+          note: 'Aggregierte, anonyme Metriken – keine personenbezogenen Daten',
+        },
+      };
+
+      // Optional: In Datei schreiben, wenn write=1
+      const shouldWrite = request.query.write === '1';
+      if (shouldWrite) {
+        const exportDir = process.env.METRICS_EXPORT_DIR || '/app/data/exports';
+        try {
+          const dir = path.resolve(exportDir);
+          if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+          const ts = new Date().toISOString().replace(/[:.]/g, '-');
+          const filePath = path.join(dir, `agent-monitoring-${ts}.json`);
+          fs.writeFileSync(filePath, JSON.stringify(payload, null, 2), 'utf-8');
+          return { ...payload, writtenTo: filePath };
+        } catch (err) {
+          logger.warn(`Export write failed: ${err}`);
+          // Fallback: nur payload zurückgeben
+        }
+      }
+
+      return payload;
+    } catch (error) {
+      logger.error(`Failed to export monitoring: ${error}`);
+      _reply.status(500);
+      return { success: false, error: 'Failed to export monitoring' };
+    }
   });
 }

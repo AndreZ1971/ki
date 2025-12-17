@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../AnalyseMetrics/page.css";
 
 interface ExecutionStats {
@@ -24,6 +25,7 @@ interface TrendData {
 }
 
 const LoopMonitoring: React.FC = () => {
+  const navigate = useNavigate();
   const [status, setStatus] = useState<any>(null);
   const [selectedLoop, setSelectedLoop] = useState<string>("anomaly-detection");
   const [stats, setStats] = useState<ExecutionStats | null>(null);
@@ -162,9 +164,30 @@ const LoopMonitoring: React.FC = () => {
 
   return (
     <div className="settings-container">
-      <div className="settings-header">
-        <h1>🤖 Agentic Loop Monitoring</h1>
-        <p>Überwache Status, Performance und Learnings aller Loops</p>
+      <div
+        className="settings-header"
+        style={{ display: "flex", alignItems: "center", gap: "12px" }}
+      >
+        <div style={{ flex: 1 }}>
+          <h1>🤖 Agentic Loop Monitoring</h1>
+          <p>Überwache Status, Performance und Learnings aller Loops</p>
+        </div>
+        <button
+          onClick={() => navigate("/settings")}
+          style={{
+            marginLeft: "auto",
+            padding: "10px 16px",
+            background: "linear-gradient(135deg, #06b6d4, #0891b2)",
+            border: "none",
+            borderRadius: "8px",
+            color: "white",
+            cursor: "pointer",
+            fontWeight: 600,
+            whiteSpace: "nowrap",
+          }}
+        >
+          ⚙️ Settings
+        </button>
       </div>
 
       {error && (
