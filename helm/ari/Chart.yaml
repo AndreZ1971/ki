@@ -1,0 +1,6 @@
+apiVersion: v2
+name: ari
+description: Minimal Helm chart to deploy the A.R.I. app (backend + bundled frontend) as a single service
+version: 0.1.0
+appVersion: "latest"
+type: application
