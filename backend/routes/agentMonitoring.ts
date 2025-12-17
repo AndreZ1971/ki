@@ -6,9 +6,15 @@
 
 import { FastifyInstance } from 'fastify';
 import { logger } from '../logger';
-import { globalScheduler } from '../agent/scheduler';
-import { executionLogger } from '../agent/logger/executionLogger';
-import { persistentMemory } from '../agent/memory/persistentMemory';
+
+// Get services from global context (initialized in server.ts)
+function getServices() {
+  const executionLogger = (global as any).executionLogger;
+  const persistentMemory = (global as any).persistentMemory;
+  const loopScheduler = (global as any).loopScheduler;
+
+  return { executionLogger, persistentMemory, loopScheduler };
+}
 
 export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
   /**
@@ -17,7 +23,17 @@ export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
    */
   fastify.get('/status', async (_request, _reply) => {
     try {
-      const status = globalScheduler.getStatus();
+      const { loopScheduler } = getServices();
+
+      if (!loopScheduler) {
+        _reply.status(503);
+        return {
+          success: false,
+          error: 'Loop Scheduler not initialized',
+        };
+      }
+
+      const status = loopScheduler.getStatus();
 
       return {
         success: true,
@@ -68,6 +84,7 @@ export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
     try {
       const { loopType } = request.params;
       const limit = parseInt(request.query.limit ?? '50') || 50;
+      const { executionLogger } = getServices();
 
       if (!executionLogger) {
         _reply.status(503);
@@ -105,6 +122,7 @@ export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
       try {
         const { loopType } = request.params;
         const days = parseInt(request.query.days ?? '7') || 7;
+        const { executionLogger } = getServices();
 
         if (!executionLogger) {
           _reply.status(503);
@@ -143,6 +161,7 @@ export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
       try {
         const { loopType } = request.params;
         const days = parseInt(request.query.days ?? '30') || 30;
+        const { executionLogger } = getServices();
 
         if (!executionLogger) {
           _reply.status(503);
@@ -180,6 +199,7 @@ export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
     async (request, _reply) => {
       try {
         const { loopType } = request.params;
+        const { persistentMemory } = getServices();
 
         if (!persistentMemory) {
           _reply.status(503);
@@ -214,12 +234,22 @@ export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
    */
   fastify.post('/scheduler/start', async (_request, _reply) => {
     try {
-      globalScheduler.startAll();
+      const { loopScheduler } = getServices();
+
+      if (!loopScheduler) {
+        _reply.status(503);
+        return {
+          success: false,
+          error: 'Loop Scheduler not initialized',
+        };
+      }
+
+      loopScheduler.startAll();
 
       return {
         success: true,
         message: 'Scheduler started',
-        status: globalScheduler.getStatus(),
+        status: loopScheduler.getStatus(),
       };
     } catch (error) {
       logger.error(`Failed to start scheduler: ${error}`);
@@ -237,12 +267,22 @@ export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
    */
   fastify.post('/scheduler/stop', async (_request, _reply) => {
     try {
-      globalScheduler.stopAll();
+      const { loopScheduler } = getServices();
+
+      if (!loopScheduler) {
+        _reply.status(503);
+        return {
+          success: false,
+          error: 'Loop Scheduler not initialized',
+        };
+      }
+
+      loopScheduler.stopAll();
 
       return {
         success: true,
         message: 'Scheduler stopped',
-        status: globalScheduler.getStatus(),
+        status: loopScheduler.getStatus(),
       };
     } catch (error) {
       logger.error(`Failed to stop scheduler: ${error}`);
@@ -259,11 +299,13 @@ export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
    * Allgemeiner Health Check
    */
   fastify.get('/health', async (_request, _reply) => {
+    const { loopScheduler, persistentMemory, executionLogger } = getServices();
+
     return {
       success: true,
       scheduler: {
-        running: globalScheduler.isActive(),
-        status: globalScheduler.getStatus(),
+        running: loopScheduler ? loopScheduler.isActive() : false,
+        status: loopScheduler ? loopScheduler.getStatus() : null,
       },
       memory: {
         initialized: persistentMemory !== null,

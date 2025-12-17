@@ -80,6 +80,11 @@ import connectionRoutes from './routes/app/api/settings/connection';
 import monitoringRoutes from './routes/app/api/monitoring/system';
 import agentMonitoringRoutes from './routes/agentMonitoring';
 
+// 🤖 AGENT SERVICES (für Monitoring)
+import { ExecutionLogger } from './agent/logger/executionLogger';
+import { PersistentMemory } from './agent/memory/persistentMemory';
+import { LoopScheduler } from './agent/scheduler';
+
 // AUDIT ROUTES
 import premiumAuditRoutes from './routes/app/api/audit/premium';
 import standardAuditRoutes from './routes/app/api/audit/standard';
@@ -291,7 +296,32 @@ async function buildServer() {
       });
 
       console.log('✅ Frontend wird als Static Files geserved');
-    } // 🔥 KORRIGIERTE ROUTE REGISTRATION
+    }
+
+    // 🤖 INITIALIZE AGENT SERVICES
+    console.log('🤖 Initializing Agent Services...');
+
+    // Dev Mode: Use null for MongoDB (will use in-memory storage)
+    const mongoDb = null;
+
+    // Initialize ExecutionLogger (pass MongoDB or null for dev mode)
+    const executionLogger = new ExecutionLogger(mongoDb);
+    console.log('✅ ExecutionLogger initialisiert (Dev Mode)');
+
+    // Initialize PersistentMemory (pass MongoDB or null for dev mode)
+    const persistentMemory = new PersistentMemory(mongoDb);
+    console.log('✅ PersistentMemory initialisiert (Dev Mode)');
+
+    // Initialize LoopScheduler
+    const loopScheduler = new LoopScheduler();
+    console.log('✅ LoopScheduler initialisiert');
+
+    // Make services globally available for routes
+    (global as any).executionLogger = executionLogger;
+    (global as any).persistentMemory = persistentMemory;
+    (global as any).loopScheduler = loopScheduler;
+
+    // 🔥 KORRIGIERTE ROUTE REGISTRATION
     await server.register(shopMetricsRoutes, {
       prefix: '/api/analytics/metrics',
     });
