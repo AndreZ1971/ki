@@ -54,6 +54,17 @@ interface ShopCredentials {
   jobMode: "once" | "interval";
   jobIntervalMs: number;
 
+  // Support Configuration
+  supportTicketsEndpoint: string;
+  supportPerPage: number;
+  supportProvider:
+    | "auto"
+    | "awesome-support"
+    | "wp-cpt"
+    | "woo-order-notes"
+    | "none";
+  supportCptSlug: string;
+
   // Optional Services
   enableAnalytics: boolean;
   enableAutoProducts: boolean;
@@ -223,6 +234,13 @@ const Settings = () => {
           // Reddit
           redditClientId: data.reddit?.clientId || "",
           redditClientSecret: data.reddit?.clientSecret || "",
+          // Support
+          supportTicketsEndpoint:
+            data.support?.ticketsEndpoint ||
+            "/wp-json/awesome-support/v1/tickets",
+          supportPerPage: data.support?.perPage || 20,
+          supportProvider: data.support?.provider || "auto",
+          supportCptSlug: data.support?.cptSlug || "wpas_ticket",
           // E-Mail
           smtpHost: data.smtp?.host || "",
           smtpPort: data.smtp?.port || 465,
@@ -596,6 +614,12 @@ const Settings = () => {
         reddit: {
           clientId: credentials.redditClientId,
           clientSecret: credentials.redditClientSecret,
+        },
+        support: {
+          ticketsEndpoint: credentials.supportTicketsEndpoint,
+          perPage: credentials.supportPerPage,
+          provider: credentials.supportProvider,
+          cptSlug: credentials.supportCptSlug,
         },
         ml: {
           enabled: credentials.mlEnabled,
@@ -1697,6 +1721,180 @@ const Settings = () => {
                           📧 Email-Marketing aktivieren
                         </span>
                       </label>
+                    </div>
+                  </div>
+
+                  {/* Support Configuration */}
+                  <div
+                    style={{
+                      background: "rgba(236, 72, 153, 0.12)",
+                      padding: "20px",
+                      borderRadius: "12px",
+                      border: "2px solid rgba(236, 72, 153, 0.35)",
+                    }}
+                  >
+                    <h4 style={{ marginBottom: "15px" }}>
+                      🎟️ Support-Konfiguration
+                    </h4>
+
+                    <div style={{ marginBottom: "15px" }}>
+                      <label
+                        style={{
+                          display: "block",
+                          marginBottom: "8px",
+                          color: "rgba(255,255,255,0.94)",
+                        }}
+                      >
+                        Tickets Endpoint:
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="/wp-json/awesome-support/v1/tickets"
+                        value={credentials.supportTicketsEndpoint || ""}
+                        onChange={(e) =>
+                          handleCredentialChange(
+                            "supportTicketsEndpoint",
+                            e.target.value
+                          )
+                        }
+                        style={{
+                          width: "100%",
+                          padding: "12px",
+                          background: "rgba(255,255,255,0.08)",
+                          border: "1px solid rgba(255,255,255,0.35)",
+                          borderRadius: "8px",
+                          color: "#f8fafc",
+                          fontSize: "14px",
+                        }}
+                      />
+                      <small
+                        style={{
+                          color: "rgba(255,255,255,0.85)",
+                          fontSize: "12px",
+                        }}
+                      >
+                        💡 REST API Endpoint für Support-Tickets
+                      </small>
+                    </div>
+
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr",
+                        gap: "15px",
+                        marginBottom: "15px",
+                      }}
+                    >
+                      <div>
+                        <label
+                          style={{
+                            display: "block",
+                            marginBottom: "8px",
+                            color: "rgba(255,255,255,0.94)",
+                          }}
+                        >
+                          Per Page:
+                        </label>
+                        <input
+                          type="number"
+                          value={credentials.supportPerPage ?? 0}
+                          onChange={(e) =>
+                            handleCredentialChange(
+                              "supportPerPage",
+                              parseInt(e.target.value) || 0
+                            )
+                          }
+                          style={{
+                            width: "100%",
+                            padding: "12px",
+                            background: "rgba(255,255,255,0.08)",
+                            border: "1px solid rgba(255,255,255,0.35)",
+                            borderRadius: "8px",
+                            color: "#f8fafc",
+                            fontSize: "14px",
+                          }}
+                        />
+                      </div>
+
+                      <div>
+                        <label
+                          style={{
+                            display: "block",
+                            marginBottom: "8px",
+                            color: "rgba(255,255,255,0.94)",
+                          }}
+                        >
+                          Provider:
+                        </label>
+                        <select
+                          value={credentials.supportProvider || "auto"}
+                          onChange={(e) =>
+                            handleCredentialChange(
+                              "supportProvider",
+                              e.target.value
+                            )
+                          }
+                          style={{
+                            width: "100%",
+                            padding: "12px",
+                            background: "rgba(255,255,255,0.08)",
+                            border: "1px solid rgba(255,255,255,0.35)",
+                            borderRadius: "8px",
+                            color: "#f8fafc",
+                            fontSize: "14px",
+                          }}
+                        >
+                          <option value="auto">Auto</option>
+                          <option value="awesome-support">
+                            Awesome Support
+                          </option>
+                          <option value="wp-cpt">WordPress CPT</option>
+                          <option value="woo-order-notes">
+                            WooCommerce Order Notes
+                          </option>
+                          <option value="none">Keine</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label
+                        style={{
+                          display: "block",
+                          marginBottom: "8px",
+                          color: "rgba(255,255,255,0.94)",
+                        }}
+                      >
+                        CPT Slug:
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="wpas_ticket"
+                        value={credentials.supportCptSlug || ""}
+                        onChange={(e) =>
+                          handleCredentialChange(
+                            "supportCptSlug",
+                            e.target.value
+                          )
+                        }
+                        style={{
+                          width: "100%",
+                          padding: "12px",
+                          background: "rgba(255,255,255,0.08)",
+                          border: "1px solid rgba(255,255,255,0.35)",
+                          borderRadius: "8px",
+                          color: "#f8fafc",
+                          fontSize: "14px",
+                        }}
+                      />
+                      <small
+                        style={{
+                          color: "rgba(255,255,255,0.85)",
+                          fontSize: "12px",
+                        }}
+                      >
+                        💡 Custom Post Type Slug für Tickets
+                      </small>
                     </div>
                   </div>
                 </div>

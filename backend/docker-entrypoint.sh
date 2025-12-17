@@ -16,13 +16,68 @@ chown -R nodeuser:nodejs /app/data /app/logs 2>/dev/null || echo "[Entrypoint] H
 echo "[Entrypoint] Erstelle frische connection.json mit Platzhaltern..."
 cat <<EOF > /app/connection.json
 {
-  "openai": {
-    "apiKey": "PLEASE_SET_YOUR_OPENAI_KEY"
+  "wordpress": {
+    "url": "PLEASE_SET_WORDPRESS_URL",
+    "username": "PLEASE_SET_WORDPRESS_USERNAME",
+    "appPassword": "PLEASE_SET_WORDPRESS_APP_PASSWORD"
   },
   "woocommerce": {
     "url": "PLEASE_SET_WOOCOMMERCE_URL",
     "consumerKey": "PLEASE_SET_WOOCOMMERCE_KEY",
-    "consumerSecret": "PLEASE_SET_WOOCOMMERCE_SECRET"
+    "consumerSecret": "PLEASE_SET_WOOCOMMERCE_SECRET",
+    "authMode": "basic",
+    "timeoutMs": 30000
+  },
+  "openAI": {
+    "apiKey": "PLEASE_SET_YOUR_OPENAI_KEY",
+    "model": "gpt-4o-mini"
+  },
+  "smtp": {
+    "host": "PLEASE_SET_SMTP_HOST",
+    "port": 465,
+    "secure": true,
+    "user": "PLEASE_SET_SMTP_USER",
+    "password": "PLEASE_SET_SMTP_PASSWORD",
+    "from": "PLEASE_SET_SMTP_FROM"
+  },
+  "job": {
+    "mode": "interval",
+    "intervalMs": 900000
+  },
+  "features": {
+    "enableAnalytics": false,
+    "enableAutoProducts": false,
+    "enableEmailMarketing": false
+  },
+  "reddit": {
+    "clientId": "PLEASE_SET_REDDIT_CLIENT_ID",
+    "clientSecret": "PLEASE_SET_REDDIT_CLIENT_SECRET"
+  },
+  "ml": {
+    "enabled": false,
+    "productRecommendations": false,
+    "trendForecasting": false,
+    "dynamicPricing": false,
+    "emailOptimization": false,
+    "churnPrediction": false,
+    "sentimentAnalysis": false,
+    "fraudDetection": false,
+    "productRecMinConfidence": 0.7,
+    "productRecFallback": true,
+    "trendMinConfidence": 0.6,
+    "trendFallback": true,
+    "emailMinConfidence": 0.65,
+    "emailFallback": true,
+    "emailDefaultTime": "09:00",
+    "maxInferenceTime": 5000,
+    "cacheResults": true,
+    "cacheTtl": 3600
+  },
+  "support": {
+    "ticketsEndpoint": "/wp-json/awesome-support/v1/tickets",
+    "perPage": 20,
+    "provider": "auto",
+    "cptSlug": "wpas_ticket"
   }
 }
 EOF
