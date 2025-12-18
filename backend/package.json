@@ -71,6 +71,8 @@
     "test:ui": "vitest --ui",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "encrypt:test-specializations": "tsx scripts/encrypt-test-specializations.ts",
+    "verify:test-specializations": "tsx scripts/verify-test-specializations.ts",
     "db:migrate": "knex migrate:latest",
     "db:migrate:make": "knex migrate:make",
     "db:rollback": "knex migrate:rollback",
