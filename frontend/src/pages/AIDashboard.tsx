@@ -204,7 +204,7 @@ const AIDashboard: React.FC = () => {
   const toolCategories = [
     {
       id: "analytics",
-      name: "📊 Analytics & Metrics",
+      name: t("dashboard.categories.analytics"),
       color: "#3b82f6",
       tools: [
         {
@@ -318,7 +318,7 @@ const AIDashboard: React.FC = () => {
     },
     {
       id: "products",
-      name: "🛍️ Product Management",
+      name: t("dashboard.categories.products"),
       color: "#10b981",
       tools: [
         {
@@ -398,7 +398,7 @@ const AIDashboard: React.FC = () => {
     },
     {
       id: "payments",
-      name: "💰 Payment & Finances",
+      name: t("dashboard.categories.payments"),
       color: "#f59e0b",
       tools: [
         {
@@ -501,7 +501,7 @@ const AIDashboard: React.FC = () => {
     },
     {
       id: "marketing",
-      name: "📢 Marketing & Content",
+      name: t("dashboard.categories.marketing"),
       color: "#ec4899",
       tools: [
         {
@@ -590,7 +590,7 @@ const AIDashboard: React.FC = () => {
     },
     {
       id: "advanced",
-      name: "⚡ Advanced AI",
+      name: t("dashboard.categories.advanced"),
       color: "#8b5cf6",
       tools: [
         {
@@ -1044,7 +1044,7 @@ const AIDashboard: React.FC = () => {
                 cursor: "pointer",
               }}
             >
-              🔥 Alle Tools ({allTools.length})
+              🔥 {t("dashboard.categories.all")} ({allTools.length})
             </motion.button>
             {toolCategories.map((category) => (
               <motion.button

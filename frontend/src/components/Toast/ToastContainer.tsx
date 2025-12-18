@@ -1,30 +1,40 @@
-import React from 'react';
-import type { Toast } from '../../hooks/useToast';
-import './ToastContainer.css';
+import React from "react";
+import { useTranslation } from "react-i18next";
+import type { Toast } from "../../hooks/useToast";
+import "./ToastContainer.css";
 
 interface ToastContainerProps {
   toasts: Toast[];
   onRemove: (id: string) => void;
 }
 
-export const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, onRemove }) => {
+export const ToastContainer: React.FC<ToastContainerProps> = ({
+  toasts,
+  onRemove,
+}) => {
+  const { t } = useTranslation();
   if (toasts.length === 0) return null;
 
-  const getIcon = (type: Toast['type']) => {
+  const getIcon = (type: Toast["type"]) => {
     switch (type) {
-      case 'success': return '✅';
-      case 'error': return '❌';
-      case 'warning': return '⚠️';
-      case 'info': return 'ℹ️';
-      default: return 'ℹ️';
+      case "success":
+        return "✅";
+      case "error":
+        return "❌";
+      case "warning":
+        return "⚠️";
+      case "info":
+        return "ℹ️";
+      default:
+        return "ℹ️";
     }
   };
 
   return (
     <div className="toast-container">
-      {toasts.map(toast => (
-        <div 
-          key={toast.id} 
+      {toasts.map((toast) => (
+        <div
+          key={toast.id}
           className={`toast toast-${toast.type}`}
           onClick={() => onRemove(toast.id)}
         >

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import "../AnalyseMetrics/page.css";
 
 interface ShopCredentials {
@@ -185,6 +186,7 @@ const defaultCredentials: ShopCredentials = {
 
 const Settings = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<
     "connection" | "specialization" | "license" | "social" | "agentic"
   >("connection");
@@ -770,15 +772,31 @@ const Settings = () => {
           }}
         >
           {[
-            { id: "connection", label: "🔌 Shop-Verbindung", color: "#3b82f6" },
+            {
+              id: "connection",
+              label: t("settings.tabs.connection"),
+              color: "#3b82f6",
+            },
             {
               id: "specialization",
-              label: "🎯 Spezialisierung",
+              label: t("settings.tabs.specialization"),
               color: "#8b5cf6",
             },
-            { id: "license", label: "🔑 Lizenz", color: "#10b981" },
-            { id: "social", label: "📱 Social Media", color: "#f59e0b" },
-            { id: "agentic", label: "🤖 Agentic Loops", color: "#06b6d4" },
+            {
+              id: "license",
+              label: t("settings.tabs.license"),
+              color: "#10b981",
+            },
+            {
+              id: "social",
+              label: t("settings.tabs.social"),
+              color: "#f59e0b",
+            },
+            {
+              id: "agentic",
+              label: t("settings.tabs.agentic"),
+              color: "#06b6d4",
+            },
           ].map((tab) => (
             <button
               key={tab.id}

@@ -77,12 +77,12 @@
     "subtitle": "50+ tools for shop automation",
     "searchPlaceholder": "Search tools...",
     "categories": {
-      "analytics": "📊 Analytics & Reports",
-      "shop": "🛍️ Shop Management",
-      "customers": "👥 Customers & Support",
-      "payments": "💳 Payment & Finance",
+      "analytics": "📊 Analytics & Metrics",
+      "products": "🛍️ Product Management",
+      "payments": "💰 Payment & Finances",
       "marketing": "📢 Marketing & Content",
-      "advanced": "⚡ Advanced Tools"
+      "advanced": "⚡ Advanced AI",
+      "all": "All Tools"
     }
   },
   "tools": {
