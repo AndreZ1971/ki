@@ -14,11 +14,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const PAGES_DIR = path.join(__dirname, "../frontend/src/pages");
-const GERMAN_LOCALE = path.join(
+const _GERMAN_LOCALE = path.join(
   __dirname,
   "../frontend/src/locales/german.json"
 );
-const ENGLISH_LOCALE = path.join(
+const _ENGLISH_LOCALE = path.join(
   __dirname,
   "../frontend/src/locales/english.json"
 );
@@ -105,7 +105,7 @@ function extractGermanStrings(filePath) {
   return Array.from(germanStrings);
 }
 
-function generateTranslationKey(str, pageName) {
+function _generateTranslationKey(str, pageName) {
   // Erstelle snake_case key aus String
   const key = str
     .toLowerCase()

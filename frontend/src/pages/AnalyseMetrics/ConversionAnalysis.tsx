@@ -60,7 +60,7 @@ const ConversionAnalysis = () => {
       }
     };
     fetchConversionData();
-  }, []);
+  }, [t]);
 
   const handleBackToDashboard = () => {
     navigate("/");
