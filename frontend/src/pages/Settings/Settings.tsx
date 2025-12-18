@@ -631,7 +631,7 @@ const Settings = () => {
         );
       }
 
-      const result = (await response.json()) as {
+      (await response.json()) as {
         success?: boolean;
         message?: string;
       };
