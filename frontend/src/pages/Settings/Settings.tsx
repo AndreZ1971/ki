@@ -718,7 +718,7 @@ const Settings = () => {
     >
       {/* Floating Back Button (global style for consistency) */}
       <button className="back-button floating-back" onClick={handleBack}>
-        ← Zurück
+        {t("common.back")}
       </button>
 
       {/* Hero Header */}
@@ -744,7 +744,7 @@ const Settings = () => {
               backgroundClip: "text",
             }}
           >
-            ⚙️ Einstellungen & Konfiguration
+            {t("settings.title")}
           </h1>
           <p
             style={{
@@ -753,7 +753,7 @@ const Settings = () => {
               margin: "0",
             }}
           >
-            Verwalte deine Shop-Verbindung, Spezialisierungen und Integrationen
+            {t("settings.subtitle")}
           </p>
         </div>
       </div>
@@ -850,20 +850,20 @@ const Settings = () => {
           <div>
             {loading && (
               <div style={{ textAlign: "center", padding: "40px" }}>
-                <h3>Lade Einstellungen...</h3>
+                <h3>{t("settings.connection.loading")}</h3>
               </div>
             )}
 
             {!loading && (
               <>
-                <h3>🔌 Shop-Verbindung einrichten</h3>
+                <h3>{t("settings.connection.setupHeader")}</h3>
                 <p
                   style={{
                     color: "rgba(255,255,255,0.9)",
                     marginBottom: "30px",
                   }}
                 >
-                  Verbinde dein WooCommerce/WordPress Shop mit dem AI-Agent
+                  {t("settings.connection.setupDescription")}
                 </p>
 
                 {/* Import-Konfiguration: Button wird unten platziert */}
@@ -908,7 +908,7 @@ const Settings = () => {
                     }}
                   >
                     <h4 style={{ marginBottom: "15px" }}>
-                      📝 WordPress Zugangsdaten
+                      {t("settings.connection.wpCredentials")}
                     </h4>
 
                     <div style={{ marginBottom: "15px" }}>
@@ -919,7 +919,7 @@ const Settings = () => {
                           color: "#ffffff",
                         }}
                       >
-                        WordPress URL:
+                        {t("settings.connection.wpUrl")}:
                       </label>
                       <input
                         type="text"
@@ -948,7 +948,7 @@ const Settings = () => {
                           color: "#ffffff",
                         }}
                       >
-                        Username/Email:
+                        {t("settings.connection.wpUsername")}:
                       </label>
                       <input
                         type="text"
@@ -977,7 +977,7 @@ const Settings = () => {
                           color: "#ffffff",
                         }}
                       >
-                        Application Password:
+                        {t("settings.connection.wpAppPassword")}:
                       </label>
                       <input
                         type="password"
@@ -1005,8 +1005,7 @@ const Settings = () => {
                           fontSize: "12px",
                         }}
                       >
-                        💡 Erstelle ein Application Password in WordPress unter
-                        Benutzer → Profil
+                        {t("settings.connection.wpPasswordHint")}
                       </small>
                     </div>
                   </div>
@@ -1021,7 +1020,7 @@ const Settings = () => {
                     }}
                   >
                     <h4 style={{ marginBottom: "15px" }}>
-                      🛒 WooCommerce API Keys
+                      {t("settings.connection.wcApiKeys")}
                     </h4>
 
                     <div style={{ marginBottom: "15px" }}>
@@ -1032,7 +1031,7 @@ const Settings = () => {
                           color: "#ffffff",
                         }}
                       >
-                        WooCommerce API URL:
+                        {t("settings.connection.wcApiUrl")}:
                       </label>
                       <input
                         type="text"
@@ -1061,7 +1060,7 @@ const Settings = () => {
                           color: "#ffffff",
                         }}
                       >
-                        Consumer Key:
+                        {t("settings.connection.wcConsumerKey")}
                       </label>
                       <input
                         type="text"
@@ -1093,7 +1092,7 @@ const Settings = () => {
                           color: "#ffffff",
                         }}
                       >
-                        Consumer Secret:
+                        {t("settings.connection.wcConsumerSecret")}
                       </label>
                       <input
                         type="password"
@@ -1121,8 +1120,7 @@ const Settings = () => {
                           fontSize: "12px",
                         }}
                       >
-                        💡 Erstelle API-Keys in WooCommerce → Einstellungen →
-                        Erweitert → REST API
+                        {t("settings.connection.wcApiHint")}
                       </small>
                     </div>
 
@@ -1141,7 +1139,7 @@ const Settings = () => {
                             color: "rgba(255,255,255,0.94)",
                           }}
                         >
-                          Auth Mode:
+                          {t("settings.connection.wcAuthMode")}
                         </label>
                         <select
                           value={credentials.wooAuthMode || "basic"}
@@ -1161,8 +1159,12 @@ const Settings = () => {
                             fontSize: "14px",
                           }}
                         >
-                          <option value="basic">Basic Auth</option>
-                          <option value="oauth">OAuth</option>
+                          <option value="basic">
+                            {t("settings.connection.wcAuthModeBasic")}
+                          </option>
+                          <option value="oauth">
+                            {t("settings.connection.wcAuthModeOAuth")}
+                          </option>
                         </select>
                       </div>
 
@@ -1174,7 +1176,7 @@ const Settings = () => {
                             color: "rgba(255,255,255,0.94)",
                           }}
                         >
-                          Timeout (ms):
+                          {t("settings.connection.wcTimeout")}
                         </label>
                         <input
                           type="number"
@@ -1208,7 +1210,9 @@ const Settings = () => {
                       border: "2px solid rgba(234, 88, 12, 0.35)",
                     }}
                   >
-                    <h4 style={{ marginBottom: "15px" }}>👽 Reddit API</h4>
+                    <h4 style={{ marginBottom: "15px" }}>
+                      {t("settings.connection.redditApi")}
+                    </h4>
                     <div style={{ marginBottom: "15px" }}>
                       <label
                         style={{
@@ -1217,7 +1221,7 @@ const Settings = () => {
                           color: "rgba(255,255,255,0.94)",
                         }}
                       >
-                        Reddit Client ID:
+                        {t("settings.connection.redditClientId")}
                       </label>
                       <input
                         type="text"
@@ -1248,7 +1252,7 @@ const Settings = () => {
                           color: "rgba(255,255,255,0.94)",
                         }}
                       >
-                        Reddit Client Secret:
+                        {t("settings.connection.redditClientSecret")}
                       </label>
                       <input
                         type="password"
@@ -1293,7 +1297,7 @@ const Settings = () => {
                           color: "rgba(255,255,255,0.94)",
                         }}
                       >
-                        SMTP Host:
+                        {t("settings.connection.smtpHost")}
                       </label>
                       <input
                         type="text"
@@ -1321,7 +1325,7 @@ const Settings = () => {
                           color: "rgba(255,255,255,0.94)",
                         }}
                       >
-                        SMTP Port:
+                        {t("settings.connection.smtpPort")}
                       </label>
                       <input
                         type="number"
@@ -1352,7 +1356,7 @@ const Settings = () => {
                           color: "rgba(255,255,255,0.94)",
                         }}
                       >
-                        SMTP Secure:
+                        {t("settings.connection.smtpSecure")}
                       </label>
                       <select
                         value={credentials.smtpSecure ? "true" : "false"}
@@ -1384,7 +1388,7 @@ const Settings = () => {
                           color: "rgba(255,255,255,0.94)",
                         }}
                       >
-                        SMTP User:
+                        {t("settings.connection.smtpUser")}
                       </label>
                       <input
                         type="text"
@@ -1412,7 +1416,7 @@ const Settings = () => {
                           color: "rgba(255,255,255,0.94)",
                         }}
                       >
-                        SMTP Password:
+                        {t("settings.connection.smtpPassword")}
                       </label>
                       <input
                         type="password"
@@ -1440,7 +1444,7 @@ const Settings = () => {
                           color: "rgba(255,255,255,0.94)",
                         }}
                       >
-                        SMTP From:
+                        {t("settings.connection.smtpFrom")}
                       </label>
                       <input
                         type="text"
@@ -1481,7 +1485,7 @@ const Settings = () => {
                           color: "rgba(255,255,255,0.94)",
                         }}
                       >
-                        OpenAI API Key:
+                        {t("settings.connection.openaiApiKey")}
                       </label>
                       <input
                         type="password"
@@ -1506,8 +1510,7 @@ const Settings = () => {
                           fontSize: "12px",
                         }}
                       >
-                        💡 Benötigt für AI-Features (Content-Generierung,
-                        Optimierung, etc.)
+                        {t("settings.connection.openaiHint")}
                       </small>
                     </div>
 
@@ -1519,7 +1522,7 @@ const Settings = () => {
                           color: "rgba(255,255,255,0.94)",
                         }}
                       >
-                        OpenAI Model:
+                        {t("settings.connection.openaiModel")}
                       </label>
                       <select
                         value={credentials.openaiModel || "gpt-4o-mini"}
@@ -1536,13 +1539,17 @@ const Settings = () => {
                           fontSize: "14px",
                         }}
                       >
-                        <option value="gpt-4o">GPT-4o (Empfohlen)</option>
-                        <option value="gpt-4o-mini">
-                          GPT-4o Mini (Schneller)
+                        <option value="gpt-4o">
+                          {t("settings.connection.modelGpt4o")}
                         </option>
-                        <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                        <option value="gpt-4o-mini">
+                          {t("settings.connection.modelGpt4oMini")}
+                        </option>
+                        <option value="gpt-4-turbo">
+                          {t("settings.connection.modelGpt4Turbo")}
+                        </option>
                         <option value="gpt-3.5-turbo">
-                          GPT-3.5 Turbo (Günstig)
+                          {t("settings.connection.modelGpt35Turbo")}
                         </option>
                       </select>
                     </div>
@@ -1569,7 +1576,7 @@ const Settings = () => {
                           color: "rgba(255,255,255,0.94)",
                         }}
                       >
-                        Job Mode:
+                        {t("settings.connection.jobMode")}
                       </label>
                       <select
                         value={credentials.jobMode || "once"}
@@ -1586,9 +1593,11 @@ const Settings = () => {
                           fontSize: "14px",
                         }}
                       >
-                        <option value="once">Einmalig (Once)</option>
+                        <option value="once">
+                          {t("settings.connection.jobModeOnce")}
+                        </option>
                         <option value="interval">
-                          Intervall (Wiederkehrend)
+                          {t("settings.connection.jobModeInterval")}
                         </option>
                       </select>
                       <small
@@ -1597,8 +1606,7 @@ const Settings = () => {
                           fontSize: "12px",
                         }}
                       >
-                        💡 Legt fest, ob Jobs einmalig oder wiederkehrend
-                        ausgeführt werden
+                        {t("settings.connection.jobModeHint")}
                       </small>
                     </div>
 
@@ -1610,7 +1618,7 @@ const Settings = () => {
                           color: "rgba(255,255,255,0.94)",
                         }}
                       >
-                        Job Intervall (ms):
+                        {t("settings.connection.jobInterval")}
                       </label>
                       <input
                         type="number"
@@ -1637,8 +1645,7 @@ const Settings = () => {
                           fontSize: "12px",
                         }}
                       >
-                        💡 Standard: 900000ms (15 Minuten) - Nur relevant bei
-                        "Intervall"-Modus
+                        {t("settings.connection.jobIntervalHint")}
                       </small>
                     </div>
                   </div>
@@ -1686,7 +1693,7 @@ const Settings = () => {
                           }}
                         />
                         <span style={{ color: "rgba(255,255,255,0.9)" }}>
-                          📊 Analytics & Reporting aktivieren
+                          {t("settings.connection.enableAnalytics")}
                         </span>
                       </label>
 
@@ -1714,7 +1721,7 @@ const Settings = () => {
                           }}
                         />
                         <span style={{ color: "rgba(255,255,255,0.9)" }}>
-                          🤖 Auto-Product-Creation aktivieren
+                          {t("settings.connection.enableAutoProducts")}
                         </span>
                       </label>
 
@@ -1742,7 +1749,7 @@ const Settings = () => {
                           }}
                         />
                         <span style={{ color: "rgba(255,255,255,0.9)" }}>
-                          📧 Email-Marketing aktivieren
+                          {t("settings.connection.enableEmailMarketing")}
                         </span>
                       </label>
                     </div>
@@ -1769,7 +1776,7 @@ const Settings = () => {
                           color: "rgba(255,255,255,0.94)",
                         }}
                       >
-                        Tickets Endpoint:
+                        {t("settings.connection.supportTicketsEndpoint")}
                       </label>
                       <input
                         type="text"
@@ -1797,7 +1804,7 @@ const Settings = () => {
                           fontSize: "12px",
                         }}
                       >
-                        💡 REST API Endpoint für Support-Tickets
+                        {t("settings.connection.supportEndpointHint")}
                       </small>
                     </div>
 
@@ -1817,7 +1824,7 @@ const Settings = () => {
                             color: "rgba(255,255,255,0.94)",
                           }}
                         >
-                          Per Page:
+                          {t("settings.connection.supportPerPage")}
                         </label>
                         <input
                           type="number"
@@ -1848,7 +1855,7 @@ const Settings = () => {
                             color: "rgba(255,255,255,0.94)",
                           }}
                         >
-                          Provider:
+                          {t("settings.connection.supportProvider")}
                         </label>
                         <select
                           value={credentials.supportProvider || "auto"}
@@ -1868,15 +1875,21 @@ const Settings = () => {
                             fontSize: "14px",
                           }}
                         >
-                          <option value="auto">Auto</option>
+                          <option value="auto">
+                            {t("settings.connection.supportProviderAuto")}
+                          </option>
                           <option value="awesome-support">
-                            Awesome Support
+                            {t("settings.connection.supportProviderAwesome")}
                           </option>
-                          <option value="wp-cpt">WordPress CPT</option>
+                          <option value="wp-cpt">
+                            {t("settings.connection.supportProviderWpCpt")}
+                          </option>
                           <option value="woo-order-notes">
-                            WooCommerce Order Notes
+                            {t("settings.connection.supportProviderWooNotes")}
                           </option>
-                          <option value="none">Keine</option>
+                          <option value="none">
+                            {t("settings.connection.supportProviderNone")}
+                          </option>
                         </select>
                       </div>
                     </div>
@@ -1889,7 +1902,7 @@ const Settings = () => {
                           color: "rgba(255,255,255,0.94)",
                         }}
                       >
-                        CPT Slug:
+                        {t("settings.connection.supportCptSlug")}
                       </label>
                       <input
                         type="text"
@@ -1917,7 +1930,7 @@ const Settings = () => {
                           fontSize: "12px",
                         }}
                       >
-                        💡 Custom Post Type Slug für Tickets
+                        {t("settings.connection.supportCptHint")}
                       </small>
                     </div>
                   </div>
@@ -1939,11 +1952,11 @@ const Settings = () => {
                   >
                     {connectionStatus === "success" ? (
                       <span style={{ color: "#22c55e" }}>
-                        ✅ Verbindung erfolgreich getestet!
+                        {t("settings.connection.connectionSuccess")}
                       </span>
                     ) : (
                       <span style={{ color: "#ef4444" }}>
-                        ❌ Verbindung fehlgeschlagen. Prüfe deine Zugangsdaten.
+                        {t("settings.connection.connectionFailed")}
                       </span>
                     )}
                   </div>
@@ -1975,8 +1988,8 @@ const Settings = () => {
                     }}
                   >
                     {testingConnection
-                      ? "🔄 Teste Verbindung..."
-                      : "🧪 Verbindung testen"}
+                      ? t("settings.connection.testingConnection")
+                      : t("settings.connection.testConnection")}
                   </button>
 
                   <button
@@ -1995,7 +2008,9 @@ const Settings = () => {
                       fontWeight: "bold",
                     }}
                   >
-                    {saving ? "💾 Speichert..." : "💾 Konfiguration speichern"}
+                    {saving
+                      ? t("settings.connection.saving")
+                      : t("settings.connection.saveConfiguration")}
                   </button>
 
                   {/* Import-Konfiguration Button */}
@@ -2014,7 +2029,7 @@ const Settings = () => {
                       marginLeft: "10px",
                     }}
                   >
-                    📂 Konfiguration laden
+                    {t("settings.connection.importConfig")}
                     <input
                       id="import-config"
                       type="file"
@@ -2032,10 +2047,9 @@ const Settings = () => {
         {/* TAB 2: Spezialisierung */}
         {activeTab === "specialization" && (
           <div>
-            <h3>🎯 Agent-Spezialisierung wählen</h3>
+            <h3>{t("settings.specialization.title")}</h3>
             <p style={{ color: "rgba(255,255,255,0.9)", marginBottom: "30px" }}>
-              Wähle eine Branche, um den AI-Agent optimal auf deine Produkte zu
-              trainieren
+              {t("settings.specialization.subtitle")}
             </p>
 
             <div
@@ -2085,7 +2099,7 @@ const Settings = () => {
                           zIndex: 3,
                         }}
                       >
-                        ✓ AKTIV
+                        {t("settings.specialization.active")}
                       </div>
                     )}
 
@@ -2204,7 +2218,7 @@ const Settings = () => {
                               fontWeight: 700,
                             }}
                           >
-                            🛒 Aktivieren
+                            {t("settings.specialization.activate")}
                           </button>
                         )}
                       </div>
@@ -2225,13 +2239,12 @@ const Settings = () => {
               }}
             >
               <h4 style={{ margin: "0 0 10px 0" }}>
-                📂 Upload für Trainingsdaten
+                {t("settings.specialization.uploadSection")}
               </h4>
               <p
                 style={{ margin: "0 0 12px 0", color: "rgba(255,255,255,0.8)" }}
               >
-                Lade Produkt- oder Content-Daten hoch, damit die gewählte
-                Spezialisierung schneller trainiert wird.
+                {t("settings.specialization.uploadDescription")}
               </p>
               <label
                 style={{
@@ -2245,7 +2258,7 @@ const Settings = () => {
                   border: "none",
                 }}
               >
-                Datei wählen (CSV/JSON)
+                {t("settings.specialization.uploadButton")}
                 <input
                   type="file"
                   accept=".json,.csv"
@@ -2260,9 +2273,9 @@ const Settings = () => {
         {/* TAB 3: Lizenz */}
         {activeTab === "license" && (
           <div>
-            <h3>🔑 Lizenz-Verwaltung</h3>
+            <h3>{t("settings.license.title")}</h3>
             <p style={{ color: "rgba(255,255,255,0.9)", marginBottom: "30px" }}>
-              Aktiviere deine gekaufte Spezialisierung mit einem Lizenzschlüssel
+              {t("settings.license.subtitle")}
             </p>
 
             <div
@@ -2282,7 +2295,7 @@ const Settings = () => {
                     fontSize: "16px",
                   }}
                 >
-                  Lizenzschlüssel eingeben:
+                  {t("settings.license.enterKey")}
                 </label>
                 <input
                   type="text"
@@ -2310,8 +2323,7 @@ const Settings = () => {
                     display: "block",
                   }}
                 >
-                  💡 Du findest deinen Lizenzschlüssel in der Kaufbestätigung
-                  per Email
+                  {t("settings.license.keyHint")}
                 </small>
               </div>
 
@@ -2337,14 +2349,16 @@ const Settings = () => {
                 }}
               >
                 {activatingLicense
-                  ? "⏳ Aktiviere Lizenz..."
-                  : "🔓 Lizenz aktivieren"}
+                  ? t("settings.license.activating")
+                  : t("settings.license.activateLicense")}
               </button>
             </div>
 
             {/* Aktive Lizenzen */}
             <div style={{ marginTop: "40px" }}>
-              <h4 style={{ marginBottom: "20px" }}>📋 Aktive Lizenzen</h4>
+              <h4 style={{ marginBottom: "20px" }}>
+                {t("settings.license.activeLicenses")}
+              </h4>
               <div
                 style={{
                   background: "rgba(34, 197, 94, 0.1)",
@@ -2409,10 +2423,9 @@ const Settings = () => {
         {/* TAB 4: Social Media */}
         {activeTab === "social" && (
           <div>
-            <h3>📱 Social Media Konten verbinden</h3>
+            <h3>{t("settings.social.title")}</h3>
             <p style={{ color: "rgba(255,255,255,0.9)", marginBottom: "30px" }}>
-              Verbinde deine Social-Media-Konten, um KI-generierte Posts direkt
-              zu veröffentlichen
+              {t("settings.social.subtitle")}
             </p>
 
             {/* Social Media Grid */}
@@ -2449,8 +2462,8 @@ const Settings = () => {
                     </h4>
                     <small style={{ color: "rgba(255,255,255,0.6)" }}>
                       {credentials.linkedinEnabled
-                        ? "✅ Verbunden"
-                        : "⏸️ Nicht verbunden"}
+                        ? t("settings.social.connected")
+                        : t("settings.social.notConnected")}
                     </small>
                   </div>
                 </div>
@@ -2463,7 +2476,7 @@ const Settings = () => {
                       fontSize: "12px",
                     }}
                   >
-                    Access Token:
+                    {t("settings.social.accessToken")}
                   </label>
                   <input
                     type="password"
@@ -2506,7 +2519,7 @@ const Settings = () => {
                     style={{ cursor: "pointer" }}
                   />
                   <span style={{ color: "rgba(255,255,255,0.8)" }}>
-                    Aktiviert
+                    {t("settings.social.enabled")}
                   </span>
                 </label>
               </div>
@@ -2536,8 +2549,8 @@ const Settings = () => {
                     </h4>
                     <small style={{ color: "rgba(255,255,255,0.6)" }}>
                       {credentials.facebookEnabled
-                        ? "✅ Verbunden"
-                        : "⏸️ Nicht verbunden"}
+                        ? t("settings.social.connected")
+                        : t("settings.social.notConnected")}
                     </small>
                   </div>
                 </div>
@@ -2550,7 +2563,7 @@ const Settings = () => {
                       fontSize: "12px",
                     }}
                   >
-                    Access Token:
+                    {t("settings.social.accessToken")}
                   </label>
                   <input
                     type="password"
@@ -2581,7 +2594,7 @@ const Settings = () => {
                       fontSize: "12px",
                     }}
                   >
-                    Page ID:
+                    {t("settings.social.facebookPageId")}
                   </label>
                   <input
                     type="text"
@@ -2621,7 +2634,7 @@ const Settings = () => {
                     style={{ cursor: "pointer" }}
                   />
                   <span style={{ color: "rgba(255,255,255,0.8)" }}>
-                    Aktiviert
+                    {t("settings.social.enabled")}
                   </span>
                 </label>
               </div>
@@ -2651,8 +2664,8 @@ const Settings = () => {
                     </h4>
                     <small style={{ color: "rgba(255,255,255,0.6)" }}>
                       {credentials.instagramEnabled
-                        ? "✅ Verbunden"
-                        : "⏸️ Nicht verbunden"}
+                        ? t("settings.social.connected")
+                        : t("settings.social.notConnected")}
                     </small>
                   </div>
                 </div>
@@ -2665,7 +2678,7 @@ const Settings = () => {
                       fontSize: "12px",
                     }}
                   >
-                    Access Token:
+                    {t("settings.social.accessToken")}
                   </label>
                   <input
                     type="password"
@@ -2696,7 +2709,7 @@ const Settings = () => {
                       fontSize: "12px",
                     }}
                   >
-                    Business Account ID:
+                    {t("settings.social.instagramBusinessId")}
                   </label>
                   <input
                     type="text"
@@ -2739,7 +2752,7 @@ const Settings = () => {
                     style={{ cursor: "pointer" }}
                   />
                   <span style={{ color: "rgba(255,255,255,0.8)" }}>
-                    Aktiviert
+                    {t("settings.social.enabled")}
                   </span>
                 </label>
               </div>
@@ -2769,8 +2782,8 @@ const Settings = () => {
                     </h4>
                     <small style={{ color: "rgba(255,255,255,0.6)" }}>
                       {credentials.twitterEnabled
-                        ? "✅ Verbunden"
-                        : "⏸️ Nicht verbunden"}
+                        ? t("settings.social.connected")
+                        : t("settings.social.notConnected")}
                     </small>
                   </div>
                 </div>
@@ -2783,7 +2796,7 @@ const Settings = () => {
                       fontSize: "12px",
                     }}
                   >
-                    API Key:
+                    {t("settings.social.twitterApiKey")}
                   </label>
                   <input
                     type="password"
@@ -2811,7 +2824,7 @@ const Settings = () => {
                       fontSize: "12px",
                     }}
                   >
-                    API Secret:
+                    {t("settings.social.twitterApiSecret")}
                   </label>
                   <input
                     type="password"
@@ -2848,7 +2861,7 @@ const Settings = () => {
                     style={{ cursor: "pointer" }}
                   />
                   <span style={{ color: "rgba(255,255,255,0.8)" }}>
-                    Aktiviert
+                    {t("settings.social.enabled")}
                   </span>
                 </label>
               </div>
@@ -2878,8 +2891,8 @@ const Settings = () => {
                     </h4>
                     <small style={{ color: "rgba(255,255,255,0.6)" }}>
                       {credentials.tiktokEnabled
-                        ? "✅ Verbunden"
-                        : "⏸️ Nicht verbunden"}
+                        ? t("settings.social.connected")
+                        : t("settings.social.notConnected")}
                     </small>
                   </div>
                 </div>
@@ -2892,7 +2905,7 @@ const Settings = () => {
                       fontSize: "12px",
                     }}
                   >
-                    Access Token:
+                    {t("settings.social.accessToken")}
                   </label>
                   <input
                     type="password"
@@ -2932,7 +2945,7 @@ const Settings = () => {
                     style={{ cursor: "pointer" }}
                   />
                   <span style={{ color: "rgba(255,255,255,0.8)" }}>
-                    Aktiviert
+                    {t("settings.social.enabled")}
                   </span>
                 </label>
               </div>
@@ -2962,8 +2975,8 @@ const Settings = () => {
                     </h4>
                     <small style={{ color: "rgba(255,255,255,0.6)" }}>
                       {credentials.youtubeEnabled
-                        ? "✅ Verbunden"
-                        : "⏸️ Nicht verbunden"}
+                        ? t("settings.social.connected")
+                        : t("settings.social.notConnected")}
                     </small>
                   </div>
                 </div>
@@ -2976,7 +2989,7 @@ const Settings = () => {
                       fontSize: "12px",
                     }}
                   >
-                    Access Token:
+                    {t("settings.social.accessToken")}
                   </label>
                   <input
                     type="password"
@@ -3007,7 +3020,7 @@ const Settings = () => {
                       fontSize: "12px",
                     }}
                   >
-                    Channel ID:
+                    {t("settings.social.youtubeChannelId")}
                   </label>
                   <input
                     type="text"
@@ -3044,7 +3057,7 @@ const Settings = () => {
                     style={{ cursor: "pointer" }}
                   />
                   <span style={{ color: "rgba(255,255,255,0.8)" }}>
-                    Aktiviert
+                    {t("settings.social.enabled")}
                   </span>
                 </label>
               </div>
@@ -3061,7 +3074,7 @@ const Settings = () => {
               }}
             >
               <h4 style={{ margin: "0 0 10px 0", color: "#60a5fa" }}>
-                ℹ️ Anleitung zum Verbinden
+                {t("settings.social.guideTitle")}
               </h4>
               <ul
                 style={{
@@ -3072,16 +3085,11 @@ const Settings = () => {
                   lineHeight: "1.6",
                 }}
               >
-                <li>
-                  Rufe die Entwicklerportal deiner Plattform auf (z.B.
-                  developer.linkedin.com)
-                </li>
-                <li>Erstelle eine neue App/Integration für A.r.I.</li>
-                <li>
-                  Kopiere die Access Tokens und IDs in die entsprechenden Felder
-                </li>
-                <li>Aktiviere die Plattform mit dem Checkbox</li>
-                <li>Speichere die Konfiguration</li>
+                <li>{t("settings.social.guideStep1")}</li>
+                <li>{t("settings.social.guideStep2")}ß</li>
+                <li>{t("settings.social.guideStep3")}</li>
+                <li>{t("settings.social.guideStep4")}</li>
+                <li>{t("settings.social.guideStep5")}</li>
               </ul>
             </div>
 
@@ -3103,7 +3111,7 @@ const Settings = () => {
                 transition: "all 0.3s ease",
               }}
             >
-              {saving ? "⏳ Speichern..." : "💾 Speichern"}
+              {saving ? t("settings.social.saving") : t("settings.social.save")}
             </button>
 
             {connectionMessage && (
@@ -3129,9 +3137,9 @@ const Settings = () => {
         {/* TAB 5: Agentic Loops */}
         {activeTab === "agentic" && (
           <div>
-            <h3>🤖 Agentic Loop Monitoring</h3>
+            <h3>{t("settings.agentic.title")}</h3>
             <p style={{ color: "rgba(255,255,255,0.9)", marginBottom: "30px" }}>
-              Überwache und steuere deine autonomen AI-Agenten
+              {t("settings.agentic.subtitle")}
             </p>
 
             <div
@@ -3162,7 +3170,7 @@ const Settings = () => {
                 </div>
                 <div>
                   <h4 style={{ margin: "0 0 8px 0", color: "#06b6d4" }}>
-                    Agentic Loop Dashboard
+                    {t("settings.agentic.dashboardTitle")}
                   </h4>
                   <p
                     style={{
@@ -3171,8 +3179,7 @@ const Settings = () => {
                       fontSize: "14px",
                     }}
                   >
-                    Detailliertes Monitoring aller 4 Loop-Typen mit Stats,
-                    Trends und Learnings
+                    {t("settings.agentic.dashboardDescription")}
                   </p>
                 </div>
                 <button
@@ -3189,7 +3196,7 @@ const Settings = () => {
                     whiteSpace: "nowrap",
                   }}
                 >
-                  → Zum Dashboard
+                  {t("settings.agentic.toDashboard")}
                 </button>
               </div>
             </div>
@@ -3197,7 +3204,7 @@ const Settings = () => {
             {/* Loop Types */}
             <div style={{ marginTop: "30px" }}>
               <h4 style={{ marginBottom: "20px", color: "#e5e7eb" }}>
-                📌 Available Loops
+                {t("settings.agentic.availableLoops")}
               </h4>
               <div
                 style={{
@@ -3209,27 +3216,27 @@ const Settings = () => {
                 {[
                   {
                     icon: "🚨",
-                    name: "Anomaly Detection",
-                    desc: "Payment-Anomalien automatisch erkennen",
-                    schedule: "Täglich 09:00",
+                    name: t("settings.agentic.loopAnomalyName"),
+                    desc: t("settings.agentic.loopAnomalyDesc"),
+                    schedule: t("settings.agentic.loopAnomalySchedule"),
                   },
                   {
                     icon: "📈",
-                    name: "Product Optimization",
-                    desc: "A/B Testing für Produkte",
-                    schedule: "Mo/Do 10:00",
+                    name: t("settings.agentic.loopProductName"),
+                    desc: t("settings.agentic.loopProductDesc"),
+                    schedule: t("settings.agentic.loopProductSchedule"),
                   },
                   {
                     icon: "💳",
-                    name: "Payment Recovery",
-                    desc: "Failed Orders mit Strategien retten",
-                    schedule: "Alle 30 Min",
+                    name: t("settings.agentic.loopPaymentName"),
+                    desc: t("settings.agentic.loopPaymentDesc"),
+                    schedule: t("settings.agentic.loopPaymentSchedule"),
                   },
                   {
                     icon: "📊",
-                    name: "Analytics Insights",
-                    desc: "Automatische Business-Reports",
-                    schedule: "Täglich 20:00",
+                    name: t("settings.agentic.loopAnalyticsName"),
+                    desc: t("settings.agentic.loopAnalyticsDesc"),
+                    schedule: t("settings.agentic.loopAnalyticsSchedule"),
                   },
                 ].map((loop, idx) => (
                   <div
