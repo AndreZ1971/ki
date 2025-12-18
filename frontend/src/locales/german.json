@@ -13,7 +13,97 @@
   },
   "error": {
     "apiLabel": "⚠️ API Fehler",
-    "apiDetails": "Stelle sicher, dass die API unter {{url}} erreichbar ist"
+    "apiDetails": "Stelle sicher, dass die API unter {{url}} erreichbar ist",
+    "generic": "Ein Fehler ist aufgetreten"
+  },
+  "common": {
+    "back": "Zurück",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "loading": "Lädt...",
+    "success": "Erfolg",
+    "failed": "Fehlgeschlagen",
+    "copy": "Kopieren",
+    "copied": "In Zwischenablage kopiert!",
+    "generate": "Generieren",
+    "analyze": "Analysieren",
+    "preview": "Vorschau",
+    "close": "Schließen"
+  },
+  "settings": {
+    "title": "⚙️ Einstellungen",
+    "subtitle": "Konfiguriere deine Shop-Verbindung und Spezialisierung",
+    "tabs": {
+      "connection": "🔌 Shop-Verbindung",
+      "specialization": "🎯 Spezialisierung",
+      "license": "🔑 Lizenz",
+      "social": "📱 Social Media",
+      "agentic": "🤖 Agentic Loops"
+    },
+    "connection": {
+      "woocommerce": "WooCommerce Shop",
+      "wooUrl": "Shop-URL",
+      "wooUrlPlaceholder": "https://dein-shop.de",
+      "consumerKey": "Consumer Key",
+      "consumerSecret": "Consumer Secret",
+      "authMode": "Auth-Modus",
+      "authModeBasic": "Basic (Header)",
+      "authModeQuery": "OAuth (Query)",
+      "timeout": "Timeout (ms)",
+      "wordpress": "WordPress",
+      "wpUrl": "WordPress-URL",
+      "wpUsername": "Benutzername",
+      "wpAppPassword": "App-Passwort",
+      "openai": "OpenAI",
+      "apiKey": "API-Schlüssel",
+      "model": "Modell",
+      "testConnection": "Verbindung testen",
+      "testSuccess": "✅ Verbindung erfolgreich",
+      "testFailed": "❌ Verbindung fehlgeschlagen"
+    },
+    "specialization": {
+      "title": "Wähle deine Spezialisierung",
+      "subtitle": "Passe A.R.I. an deine Branche an",
+      "activate": "Aktivieren",
+      "deactivate": "Deaktivieren",
+      "price": "Preis",
+      "features": "Features"
+    }
+  },
+  "dashboard": {
+    "title": "🚀 KI-Agent Dashboard",
+    "subtitle": "50+ Tools für Shop-Automatisierung",
+    "searchPlaceholder": "Tools durchsuchen...",
+    "categories": {
+      "analytics": "📊 Analytics & Reports",
+      "shop": "🛍️ Shop Management",
+      "customers": "👥 Kunden & Support",
+      "payments": "💳 Payment & Finanzen",
+      "marketing": "📢 Marketing & Content",
+      "advanced": "⚡ Advanced Tools"
+    }
+  },
+  "tools": {
+    "startTool": "Tool starten",
+    "openPage": "Seite öffnen",
+    "running": "Wird ausgeführt..."
+  },
+  "buttons": {
+    "backToDashboard": "← Zurück zum Dashboard",
+    "generate": "🚀 Generieren",
+    "analyze": "🧠 Analysieren",
+    "create": "✨ Erstellen",
+    "save": "💾 Speichern",
+    "test": "🧪 Testen",
+    "optimize": "⚡ Optimieren"
+  },
+  "toast": {
+    "success": "Erfolgreich!",
+    "error": "Fehler aufgetreten",
+    "warning": "Warnung",
+    "info": "Information"
   },
   "metrics": {
     "sales": {
@@ -44,5 +134,59 @@
   "chart": {
     "salesTitle": "📈 Umsatzentwicklung",
     "demo": "(Demo-Daten)"
+  },
+  "marketing": {
+    "germanContent": {
+      "title": "🇩🇪 Content Generator",
+      "subtitle": "Deutsche Content-Erstellung für lokales Marketing",
+      "contentType": "Content-Typ",
+      "topic": "Thema / Produkt",
+      "topicPlaceholder": "z.B. DSGVO-konforme Software",
+      "targetAudience": "Zielgruppe (optional)",
+      "tone": "Tonalität",
+      "generate": "🚀 Content Generieren",
+      "generating": "Generiere Content...",
+      "preview": "👁️ Vorschau",
+      "copy": "📋 Kopieren",
+      "newContent": "🔄 Neuer Content"
+    },
+    "emailAutomation": {
+      "title": "✉️ Email Marketing Automation",
+      "subtitle": "Komplette Email-Marketing Automatisierung",
+      "selectCustomers": "Kunden auswählen",
+      "emailType": "Email-Typ",
+      "generate": "📧 Email Generieren",
+      "send": "📮 Emails Versenden",
+      "preview": "📧 Email Vorschau",
+      "subject": "Betreff",
+      "recipientCount": "{{count}} Empfänger"
+    }
+  },
+  "payment": {
+    "simplified": {
+      "title": "🎯 Payment Simplified",
+      "subtitle": "Vereinfachte Payment-Prozesse für höhere Conversion",
+      "amount": "Betrag",
+      "currency": "Währung",
+      "productName": "Produktname",
+      "optimize": "🎯 Prozess Vereinfachen",
+      "optimizing": "Optimiere...",
+      "uxCheck": "🧠 UX Quick Wins",
+      "analyzing": "🔎 Analysiere UX..."
+    }
+  },
+  "analytics": {
+    "shopMetrics": {
+      "title": "📊 Shop-Metriken",
+      "totalSales": "Gesamtumsatz",
+      "todaySales": "Heutiger Umsatz",
+      "totalOrders": "Gesamtbestellungen",
+      "todayOrders": "Heutige Bestellungen",
+      "totalCustomers": "Gesamtkunden",
+      "todayCustomers": "Heutige Kunden",
+      "totalProducts": "Gesamtprodukte",
+      "conversionRate": "Conversion Rate",
+      "lastUpdated": "Zuletzt aktualisiert"
+    }
   }
 }

@@ -1,4 +1,5 @@
-import React from 'react';
+import React from "react";
+import { useTranslation } from "react-i18next";
 
 interface LoadingButtonProps {
   onClick: () => void;
@@ -7,25 +8,28 @@ interface LoadingButtonProps {
   loadingText?: string;
   children: React.ReactNode;
   className?: string;
-  variant?: 'primary' | 'secondary';
+  variant?: "primary" | "secondary";
 }
 
 export const LoadingButton: React.FC<LoadingButtonProps> = ({
   onClick,
   loading,
   disabled = false,
-  loadingText = 'Lädt...',
+  loadingText,
   children,
-  className = '',
-  variant = 'primary'
+  className = "",
+  variant = "primary",
 }) => {
+  const { t } = useTranslation();
+  const loadingLabel = loadingText || t("common.loading");
+
   return (
-    <button 
-      className={`action-button ${variant} ${loading ? 'loading' : ''} ${className}`}
+    <button
+      className={`action-button ${variant} ${loading ? "loading" : ""} ${className}`}
       onClick={onClick}
       disabled={loading || disabled}
     >
-      {loading ? loadingText : children}
+      {loading ? loadingLabel : children}
     </button>
   );
 };

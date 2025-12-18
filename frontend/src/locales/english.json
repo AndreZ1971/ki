@@ -13,7 +13,97 @@
   },
   "error": {
     "apiLabel": "⚠️ API Error",
-    "apiDetails": "Ensure the API is reachable at {{url}}"
+    "apiDetails": "Ensure the API is reachable at {{url}}",
+    "generic": "An error occurred"
+  },
+  "common": {
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "success": "Success",
+    "failed": "Failed",
+    "copy": "Copy",
+    "copied": "Copied to clipboard!",
+    "generate": "Generate",
+    "analyze": "Analyze",
+    "preview": "Preview",
+    "close": "Close"
+  },
+  "settings": {
+    "title": "⚙️ Settings",
+    "subtitle": "Configure your shop connection and specialization",
+    "tabs": {
+      "connection": "🔌 Shop Connection",
+      "specialization": "🎯 Specialization",
+      "license": "🔑 License",
+      "social": "📱 Social Media",
+      "agentic": "🤖 Agentic Loops"
+    },
+    "connection": {
+      "woocommerce": "WooCommerce Shop",
+      "wooUrl": "Shop URL",
+      "wooUrlPlaceholder": "https://your-shop.com",
+      "consumerKey": "Consumer Key",
+      "consumerSecret": "Consumer Secret",
+      "authMode": "Auth Mode",
+      "authModeBasic": "Basic (Header)",
+      "authModeQuery": "OAuth (Query)",
+      "timeout": "Timeout (ms)",
+      "wordpress": "WordPress",
+      "wpUrl": "WordPress URL",
+      "wpUsername": "Username",
+      "wpAppPassword": "App Password",
+      "openai": "OpenAI",
+      "apiKey": "API Key",
+      "model": "Model",
+      "testConnection": "Test Connection",
+      "testSuccess": "✅ Connection successful",
+      "testFailed": "❌ Connection failed"
+    },
+    "specialization": {
+      "title": "Choose your specialization",
+      "subtitle": "Customize A.R.I. for your industry",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "price": "Price",
+      "features": "Features"
+    }
+  },
+  "dashboard": {
+    "title": "🚀 AI Agent Dashboard",
+    "subtitle": "50+ tools for shop automation",
+    "searchPlaceholder": "Search tools...",
+    "categories": {
+      "analytics": "📊 Analytics & Reports",
+      "shop": "🛍️ Shop Management",
+      "customers": "👥 Customers & Support",
+      "payments": "💳 Payment & Finance",
+      "marketing": "📢 Marketing & Content",
+      "advanced": "⚡ Advanced Tools"
+    }
+  },
+  "tools": {
+    "startTool": "Start tool",
+    "openPage": "Open page",
+    "running": "Running..."
+  },
+  "buttons": {
+    "backToDashboard": "← Back to Dashboard",
+    "generate": "🚀 Generate",
+    "analyze": "🧠 Analyze",
+    "create": "✨ Create",
+    "save": "💾 Save",
+    "test": "🧪 Test",
+    "optimize": "⚡ Optimize"
+  },
+  "toast": {
+    "success": "Success!",
+    "error": "Error occurred",
+    "warning": "Warning",
+    "info": "Information"
   },
   "metrics": {
     "sales": {
@@ -44,5 +134,59 @@
   "chart": {
     "salesTitle": "📈 Revenue trend",
     "demo": "(demo data)"
+  },
+  "marketing": {
+    "germanContent": {
+      "title": "🇩🇪 Content Generator",
+      "subtitle": "German content creation for local marketing",
+      "contentType": "Content Type",
+      "topic": "Topic / Product",
+      "topicPlaceholder": "e.g. GDPR-compliant software",
+      "targetAudience": "Target Audience (optional)",
+      "tone": "Tone",
+      "generate": "🚀 Generate Content",
+      "generating": "Generating content...",
+      "preview": "👁️ Preview",
+      "copy": "📋 Copy",
+      "newContent": "🔄 New Content"
+    },
+    "emailAutomation": {
+      "title": "✉️ Email Marketing Automation",
+      "subtitle": "Complete email marketing automation",
+      "selectCustomers": "Select Customers",
+      "emailType": "Email Type",
+      "generate": "📧 Generate Email",
+      "send": "📮 Send Emails",
+      "preview": "📧 Email Preview",
+      "subject": "Subject",
+      "recipientCount": "{{count}} recipients"
+    }
+  },
+  "payment": {
+    "simplified": {
+      "title": "🎯 Payment Simplified",
+      "subtitle": "Simplified payment processes for higher conversion",
+      "amount": "Amount",
+      "currency": "Currency",
+      "productName": "Product Name",
+      "optimize": "🎯 Simplify Process",
+      "optimizing": "Optimizing...",
+      "uxCheck": "🧠 UX Quick Wins",
+      "analyzing": "🔎 Analyzing UX..."
+    }
+  },
+  "analytics": {
+    "shopMetrics": {
+      "title": "📊 Shop Metrics",
+      "totalSales": "Total Sales",
+      "todaySales": "Today's Sales",
+      "totalOrders": "Total Orders",
+      "todayOrders": "Today's Orders",
+      "totalCustomers": "Total Customers",
+      "todayCustomers": "Today's Customers",
+      "totalProducts": "Total Products",
+      "conversionRate": "Conversion Rate",
+      "lastUpdated": "Last Updated"
+    }
   }
 }
