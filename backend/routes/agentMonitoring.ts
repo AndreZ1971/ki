@@ -282,7 +282,7 @@ export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
    */
   fastify.post('/scheduler/start', async (_request, _reply) => {
     try {
-      const { loopScheduler } = getServices();
+      const { loopScheduler, executionLogger } = getServices();
 
       if (!loopScheduler) {
         return {
@@ -292,7 +292,7 @@ export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
       }
 
       try {
-        loopScheduler.startAll();
+        loopScheduler.startAll(undefined, executionLogger);
       } catch (err) {
         return {
           success: false,
@@ -350,6 +350,49 @@ export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
       return {
         success: false,
         error: 'Failed to stop scheduler',
+      };
+    }
+  });
+
+  /**
+   * POST /scheduler/trigger/:loopType
+   * Trigger einen Loop manuell
+   */
+  fastify.post<{
+    Params: { loopType: string };
+  }>('/scheduler/trigger/:loopType', async (request, _reply) => {
+    try {
+      const { loopType } = request.params;
+      const { loopScheduler } = getServices();
+
+      if (!loopScheduler) {
+        _reply.status(503);
+        return {
+          success: false,
+          error: 'Loop Scheduler not initialized',
+        };
+      }
+
+      logger.info(`🔥 Manual trigger requested for: ${loopType}`);
+      const result = await loopScheduler.triggerManual(loopType);
+
+      return {
+        success: true,
+        loopType,
+        result: {
+          success: result.success,
+          insights: result.insights.length,
+          recommendations: result.recommendations.length,
+          executionTime: result.executionTime,
+        },
+      };
+    } catch (error) {
+      logger.error(`Failed to trigger loop: ${error}`);
+      _reply.status(500);
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'Failed to trigger loop',
       };
     }
   });
