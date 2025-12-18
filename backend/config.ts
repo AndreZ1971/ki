@@ -46,6 +46,7 @@ export interface Config {
     url?: string;
     consumerKey?: string;
     consumerSecret?: string;
+    authMode?: 'basic' | 'query';
   };
   wordpress?: {
     url?: string;
@@ -142,6 +143,37 @@ const config: Config = {
   ml: configData.ml || {},
   // ...weitere Bereiche nach Bedarf
 };
+
+/**
+ * Lädt connection.json dynamisch neu (für Endpunkte, die aktuelle Konfiguration benötigen).
+ * @returns Aktuelles Config-Objekt
+ */
+export function getConfig(): Config {
+  try {
+    const freshConfigPath = path.resolve(__dirname, '../connection.json');
+    if (fs.existsSync(freshConfigPath)) {
+      const freshData = JSON.parse(fs.readFileSync(freshConfigPath, 'utf-8'));
+      return {
+        webhooks: freshData.webhooks || freshData.social?.webhooks || {},
+        openAI: freshData.openAI || {},
+        woocommerce: freshData.woocommerce || {},
+        wordpress: freshData.wordpress || {},
+        support: freshData.support || {},
+        job: freshData.job || {},
+        features: freshData.features || {},
+        reddit: freshData.reddit || {},
+        ml: freshData.ml || {},
+      };
+    }
+    console.warn(
+      '[getConfig] connection.json nicht gefunden, nutze statische Config'
+    );
+    return config;
+  } catch (error) {
+    console.error('[getConfig] Fehler beim Laden:', error);
+    return config;
+  }
+}
 
 export default config;
 
