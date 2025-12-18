@@ -1,5 +1,6 @@
 // src/pages/PaymentFinances/PaymentSuccess.tsx
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { formatDateTime } from "../../lib/i18n-utils";
 import { motion } from "framer-motion";
 import { useProductManagement } from "../../hooks/useProductManagement";
@@ -15,6 +16,7 @@ import type { PaymentSuccessMetrics } from "../../types/product";
 import "./page.css";
 
 const PaymentSuccess: React.FC = () => {
+  const { t } = useTranslation();
   const { handleBackToDashboard, loading, setLoading, error, setError } =
     useProductManagement();
   const { toasts, showToast } = useToast();
@@ -54,8 +56,8 @@ const PaymentSuccess: React.FC = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1>🎉 Payment Success</h1>
-        <p>Analyse erfolgreicher Transaktionen und Umsätze</p>
+        <h1>{t("payment.success.title")}</h1>
+        <p>{t("payment.success.subtitle")}</p>
       </motion.div>
 
       {error && <ErrorMessage message={error} />}
@@ -74,20 +76,20 @@ const PaymentSuccess: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <h3 style={{ color: "white", marginBottom: "20px" }}>
-            ⚙️ Analyse-Zeitraum
+            {t("payment.success.timeRangeLabel")}
           </h3>
 
           <div className="form-group">
-            <label>Zeitraum</label>
+            <label>{t("common.timeRange")}</label>
             <select
               value={timeRange}
               onChange={(e) => setTimeRange(e.target.value as typeof timeRange)}
               className="form-input"
             >
-              <option value="today">Heute</option>
-              <option value="week">Diese Woche</option>
-              <option value="month">Dieser Monat</option>
-              <option value="year">Dieses Jahr</option>
+              <option value="today">{t("common.today")}</option>
+              <option value="week">{t("common.thisWeek")}</option>
+              <option value="month">{t("common.thisMonth")}</option>
+              <option value="year">{t("common.thisYear")}</option>
             </select>
           </div>
 
@@ -95,9 +97,9 @@ const PaymentSuccess: React.FC = () => {
             <LoadingButton
               onClick={handleAnalyze}
               loading={loading}
-              loadingText="Analysiere..."
+              loadingText={t("common.analyzing")}
             >
-              🎉 Erfolge Analysieren
+              {t("payment.success.analyzeButton")}
             </LoadingButton>
           </div>
         </motion.div>
@@ -108,7 +110,7 @@ const PaymentSuccess: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <h3 style={{ color: "white", marginBottom: "20px" }}>
-            📊 Erfolgs-Metriken
+            {t("payment.success.metricsHeader")}
           </h3>
           {successMetrics ? (
             <div
@@ -136,7 +138,7 @@ const PaymentSuccess: React.FC = () => {
                 <div
                   style={{ fontSize: "14px", color: "rgba(255,255,255,0.8)" }}
                 >
-                  Verifizierte Transaktionen
+                  {t("payment.success.verifiedTransactions")}
                 </div>
               </div>
               <div
@@ -161,7 +163,7 @@ const PaymentSuccess: React.FC = () => {
                 <div
                   style={{ fontSize: "14px", color: "rgba(255,255,255,0.8)" }}
                 >
-                  Erfolgsrate
+                  {t("payment.success.successRate")}
                 </div>
               </div>
               <div
@@ -186,7 +188,7 @@ const PaymentSuccess: React.FC = () => {
                 <div
                   style={{ fontSize: "14px", color: "rgba(255,255,255,0.8)" }}
                 >
-                  Ø Konfidenz
+                  {t("payment.success.avgConfidence")}
                 </div>
               </div>
               <div
@@ -205,13 +207,13 @@ const PaymentSuccess: React.FC = () => {
                     marginBottom: "10px",
                   }}
                 >
-                  Events nach Feature
+                  {t("payment.success.eventsByFeature")}
                 </div>
                 {Object.keys(successMetrics.byFeature).length === 0 && (
                   <div
                     style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)" }}
                   >
-                    Keine Events im Zeitraum
+                    {t("common.noEventsInRange")}
                   </div>
                 )}
                 <div
@@ -246,7 +248,7 @@ const PaymentSuccess: React.FC = () => {
                   textAlign: "center",
                 }}
               >
-                Letztes Event:{" "}
+                {t("payment.success.lastEvent")}{" "}
                 {successMetrics.lastEvent
                   ? formatDateTime(new Date(successMetrics.lastEvent))
                   : "—"}
@@ -264,7 +266,7 @@ const PaymentSuccess: React.FC = () => {
               }}
             >
               <div style={{ fontSize: "48px", marginBottom: "16px" }}>🎉</div>
-              <p>Keine Metriken verfügbar</p>
+              <p>{t("payment.success.noMetricsAvailable")}</p>
             </div>
           )}
         </motion.div>

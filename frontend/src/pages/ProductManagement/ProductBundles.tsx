@@ -1,29 +1,42 @@
-import React, { useState } from 'react';
-import { useProductManagement } from '../../hooks/useProductManagement';
-import { useToast } from '../../hooks/useToast';
-import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
-import { ToastContainer } from '../../components/Toast/ToastContainer';
-import { bundleApi } from '../../services/productApi';
-import type { Bundle, BundleIdea } from '../../types/product';
-import './page.css';
-import './CreateFreebies.css';
-import './ProductBundles.css';
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useProductManagement } from "../../hooks/useProductManagement";
+import { useToast } from "../../hooks/useToast";
+import {
+  BackButton,
+  LoadingButton,
+  ErrorMessage,
+} from "../../components/shared";
+import { ToastContainer } from "../../components/Toast/ToastContainer";
+import { bundleApi } from "../../services/productApi";
+import type { Bundle, BundleIdea } from "../../types/product";
+import "./page.css";
+import "./CreateFreebies.css";
+import "./ProductBundles.css";
 
 const ProductBundles = () => {
-  const { handleBackToDashboard, loading, setLoading, error, setError, clearError } = useProductManagement();
+  const { t } = useTranslation();
+  const {
+    handleBackToDashboard,
+    loading,
+    setLoading,
+    error,
+    setError,
+    clearError,
+  } = useProductManagement();
   const toast = useToast();
   const [bundles, setBundles] = useState<Bundle[]>([]);
   const [_initialLoading, setInitialLoading] = useState(true);
-  
+
   // ML State
   const [bundleIdeas, setBundleIdeas] = useState<BundleIdea[]>([]);
   const [ideasLoading, setIdeasLoading] = useState(false);
   const [_selectedIdea, setSelectedIdea] = useState<BundleIdea | null>(null);
   const [expandedIdeas, setExpandedIdeas] = useState<Set<number>>(new Set());
   const [filters, setFilters] = useState({
-    category: 'all',
-    priceRange: '50-200',
-    targetAudience: 'B2B & Selbstständige'
+    category: "all",
+    priceRange: "50-200",
+    targetAudience: "B2B & Selbstständige",
   });
 
   // Load bundles on mount
@@ -32,15 +45,18 @@ const ProductBundles = () => {
       try {
         setInitialLoading(true);
         const response = await bundleApi.getBundles();
-        
+
         if (response.success && response.data) {
           setBundles(response.data);
           toast.success(`${response.data.length} Bundles geladen`);
         } else {
-          throw new Error(response.error || 'Bundles konnten nicht geladen werden');
+          throw new Error(
+            response.error || "Bundles konnten nicht geladen werden"
+          );
         }
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Fehler beim Laden der Bundles';
+        const errorMessage =
+          err instanceof Error ? err.message : "Fehler beim Laden der Bundles";
         setError(errorMessage);
         toast.error(errorMessage);
         setBundles([]);
@@ -48,7 +64,7 @@ const ProductBundles = () => {
         setInitialLoading(false);
       }
     };
-    
+
     loadBundles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -62,10 +78,13 @@ const ProductBundles = () => {
         setBundleIdeas(response.data);
         toast.success(`✅ ${response.data.length} Bundle-Ideen generiert`);
       } else {
-        throw new Error(response.error || 'Bundle-Ideen konnten nicht generiert werden');
+        throw new Error(
+          response.error || "Bundle-Ideen konnten nicht generiert werden"
+        );
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unbekannter Fehler';
+      const errorMessage =
+        err instanceof Error ? err.message : "Unbekannter Fehler";
       toast.error(errorMessage);
     } finally {
       setIdeasLoading(false);
@@ -83,7 +102,7 @@ const ProductBundles = () => {
         price: idea.suggestedPrice,
         discount: idea.suggestedDiscount,
         active: true,
-        description: `${idea.reason} | Zielgruppe: ${idea.targetAudience}`
+        description: `${idea.reason} | Zielgruppe: ${idea.targetAudience}`,
       };
 
       const response = await bundleApi.createBundle(newBundleData);
@@ -93,10 +112,11 @@ const ProductBundles = () => {
         toast.success(`Bundle "${idea.name}" erfolgreich erstellt!`);
         setSelectedIdea(null);
       } else {
-        throw new Error(response.error || 'Fehler beim Erstellen');
+        throw new Error(response.error || "Fehler beim Erstellen");
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unbekannter Fehler';
+      const errorMessage =
+        err instanceof Error ? err.message : "Unbekannter Fehler";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -105,7 +125,7 @@ const ProductBundles = () => {
   };
 
   const calculateSavings = (bundle: any) => {
-    return (bundle.price * bundle.discount / 100).toFixed(2);
+    return ((bundle.price * bundle.discount) / 100).toFixed(2);
   };
 
   return (
@@ -114,29 +134,47 @@ const ProductBundles = () => {
       <BackButton onClick={handleBackToDashboard} />
 
       <div className="analytics-header">
-        <h1>📦 Product Bundles</h1>
-        <p>Erstelle und verwalte Produkt-Bundles automatisch</p>
+        <h1>{t("product.bundles.title")}</h1>
+        <p>{t("product.bundles.subtitle")}</p>
       </div>
 
       <div className="metric-card full-width">
-        <h3>🤖 KI-gestützte Bundle-Erstellung</h3>
-        
-        <ErrorMessage message={error || ''} onClose={clearError} />
-        
+        <h3>{t("product.bundles.aiCreation")}</h3>
+
+        <ErrorMessage message={error || ""} onClose={clearError} />
+
         <div className="bundle-config">
           <div className="config-group">
-            <label>Kategorie:</label>
-            <select value={filters.category} onChange={(e) => setFilters({ ...filters, category: e.target.value })}>
-              <option value="all">Alle Kategorien</option>
-              <option value="digital">Digitale Produkte</option>
-              <option value="marketing">Marketing</option>
-              <option value="design">Design & Templates</option>
-              <option value="education">Kurse & Schulungen</option>
+            <label>{t("product.bundles.categoryLabel")}</label>
+            <select
+              value={filters.category}
+              onChange={(e) =>
+                setFilters({ ...filters, category: e.target.value })
+              }
+            >
+              <option value="all">{t("product.bundles.allCategories")}</option>
+              <option value="digital">
+                {t("product.bundles.digitalProducts")}
+              </option>
+              <option value="marketing">
+                {t("product.bundles.marketing")}
+              </option>
+              <option value="design">
+                {t("product.bundles.designTemplates")}
+              </option>
+              <option value="education">
+                {t("product.bundles.coursesTraining")}
+              </option>
             </select>
           </div>
           <div className="config-group">
-            <label>Preisspanne (€):</label>
-            <select value={filters.priceRange} onChange={(e) => setFilters({ ...filters, priceRange: e.target.value })}>
+            <label>{t("product.bundles.priceRangeLabel")}</label>
+            <select
+              value={filters.priceRange}
+              onChange={(e) =>
+                setFilters({ ...filters, priceRange: e.target.value })
+              }
+            >
               <option value="25-75">25-75€</option>
               <option value="50-200">50-200€</option>
               <option value="100-300">100-300€</option>
@@ -144,12 +182,14 @@ const ProductBundles = () => {
             </select>
           </div>
           <div className="config-group">
-            <label>Zielgruppe:</label>
-            <input 
-              type="text" 
+            <label>{t("product.bundles.targetAudienceLabel")}</label>
+            <input
+              type="text"
               value={filters.targetAudience}
-              onChange={(e) => setFilters({ ...filters, targetAudience: e.target.value })}
-              placeholder="z.B. B2B, Freelancer, Startups"
+              onChange={(e) =>
+                setFilters({ ...filters, targetAudience: e.target.value })
+              }
+              placeholder={t("product.bundles.targetAudiencePlaceholder")}
             />
           </div>
         </div>
@@ -157,22 +197,22 @@ const ProductBundles = () => {
         <LoadingButton
           onClick={handleGenerateBundleIdeas}
           loading={ideasLoading}
-          loadingText="🔄 KI generiert Bundle-Ideen..."
+          loadingText={t("product.bundles.generatingIdeas")}
         >
-          ✨ Bundle-Ideen mit KI generieren
+          {t("product.bundles.generateButton")}
         </LoadingButton>
       </div>
 
       {bundleIdeas.length > 0 && (
         <div className="metric-card ideas-section">
-          <h3>📋 KI-generierte Bundle-Vorschläge</h3>
+          <h3>{t("product.bundles.ideasHeader")}</h3>
           <div className="ideas-grid">
             {bundleIdeas
               .sort((a, b) => b.conversionScore - a.conversionScore)
               .map((idea, idx) => (
                 <div
                   key={`${idea.name}-${idx}`}
-                  className={`idea-card ${expandedIdeas.has(idx) ? 'expanded' : ''}`}
+                  className={`idea-card ${expandedIdeas.has(idx) ? "expanded" : ""}`}
                 >
                   <div className="idea-header">
                     <h4>{idea.name}</h4>
@@ -193,21 +233,36 @@ const ProductBundles = () => {
 
                     <div className="pricing-info">
                       <div className="price-row">
-                        <span className="original-price">Regulär: €{idea.originalPrice.toFixed(2)}</span>
-                        <span className="discount-badge">-{idea.suggestedDiscount}%</span>
+                        <span className="original-price">
+                          Regulär: €{idea.originalPrice.toFixed(2)}
+                        </span>
+                        <span className="discount-badge">
+                          -{idea.suggestedDiscount}%
+                        </span>
                       </div>
-                      <div className="bundle-price">Bundle-Preis: €{idea.suggestedPrice.toFixed(2)}</div>
-                      <div className="savings">💰 Ersparnis: €{(idea.originalPrice - idea.suggestedPrice).toFixed(2)}</div>
+                      <div className="bundle-price">
+                        Bundle-Preis: €{idea.suggestedPrice.toFixed(2)}
+                      </div>
+                      <div className="savings">
+                        💰 Ersparnis: €
+                        {(idea.originalPrice - idea.suggestedPrice).toFixed(2)}
+                      </div>
                     </div>
 
                     <div className="performance-metrics">
                       <div className="metric">
                         <span className="metric-label">🎯 Zielgruppe:</span>
-                        <span className="metric-value">{idea.targetAudience}</span>
+                        <span className="metric-value">
+                          {idea.targetAudience}
+                        </span>
                       </div>
                       <div className="metric">
-                        <span className="metric-label">💵 Erwarteter Umsatz/Monat:</span>
-                        <span className="metric-value">€{idea.expectedRevenue.toFixed(0)}</span>
+                        <span className="metric-label">
+                          💵 Erwarteter Umsatz/Monat:
+                        </span>
+                        <span className="metric-value">
+                          €{idea.expectedRevenue.toFixed(0)}
+                        </span>
                       </div>
                     </div>
 
@@ -230,14 +285,14 @@ const ProductBundles = () => {
                         setSelectedIdea(idea);
                       }}
                     >
-                      {expandedIdeas.has(idx) ? '−' : '+'} Details
+                      {expandedIdeas.has(idx) ? "−" : "+"} Details
                     </button>
                     <button
                       className="create-idea-btn"
                       onClick={() => handleCreateFromIdea(idea)}
                       disabled={loading}
                     >
-                      {loading ? '⏳' : '→'} Bundle erstellen
+                      {loading ? "⏳" : "→"} Bundle erstellen
                     </button>
                   </div>
                 </div>
@@ -247,32 +302,41 @@ const ProductBundles = () => {
       )}
 
       <div className="metric-card">
-        <h3>📊 Meine Bundles</h3>
+        <h3>{t("product.bundles.myBundles")}</h3>
         <div className="bundles-list">
-          {bundles.map(bundle => (
-            <div key={bundle.id} className={`bundle-item ${bundle.active ? 'active' : 'inactive'}`}>
+          {bundles.map((bundle) => (
+            <div
+              key={bundle.id}
+              className={`bundle-item ${bundle.active ? "active" : "inactive"}`}
+            >
               <div className="bundle-header">
                 <span className="bundle-name">{bundle.name}</span>
-                <span className={`status ${bundle.active ? 'active' : 'inactive'}`}>
-                  {bundle.active ? '✅ Aktiv' : '⏸️ Inaktiv'}
+                <span
+                  className={`status ${bundle.active ? "active" : "inactive"}`}
+                >
+                  {bundle.active ? "✅ Aktiv" : "⏸️ Inaktiv"}
                 </span>
               </div>
-              
+
               <div className="bundle-products">
                 <strong>Enthalten:</strong>
-                {bundle.products.join(', ')}
+                {bundle.products.join(", ")}
               </div>
-              
+
               <div className="bundle-pricing">
                 <span className="price">€{bundle.price}</span>
                 <span className="discount">-{bundle.discount}%</span>
-                <span className="savings">💵 Spare €{calculateSavings(bundle)}</span>
+                <span className="savings">
+                  💵 Spare €{calculateSavings(bundle)}
+                </span>
               </div>
-              
+
               <div className="bundle-actions">
-                <button className="edit-button">✏️ Bearbeiten</button>
+                <button className="edit-button">{t("common.edit")}</button>
                 <button className="toggle-button">
-                  {bundle.active ? '⏸️ Deaktivieren' : '▶️ Aktivieren'}
+                  {bundle.active
+                    ? t("common.deactivate")
+                    : t("common.activate")}
                 </button>
               </div>
             </div>
@@ -281,18 +345,25 @@ const ProductBundles = () => {
       </div>
 
       <div className="metric-card">
-        <h3>📈 Bundle-Performance</h3>
+        <h3>{t("product.bundles.performanceHeader")}</h3>
         <div className="performance-stats">
           <div className="stat">
             <span className="value">{bundles.length}</span>
             <span className="label">Aktive Bundles</span>
           </div>
           <div className="stat">
-            <span className="value">{bundles.filter(b => b.active).length}</span>
+            <span className="value">
+              {bundles.filter((b) => b.active).length}
+            </span>
             <span className="label">Aktiv</span>
           </div>
           <div className="stat">
-            <span className="value">{(bundles.reduce((sum, b) => sum + b.discount, 0) / bundles.length).toFixed(0)}%</span>
+            <span className="value">
+              {(
+                bundles.reduce((sum, b) => sum + b.discount, 0) / bundles.length
+              ).toFixed(0)}
+              %
+            </span>
             <span className="label">Ø Rabatt</span>
           </div>
         </div>

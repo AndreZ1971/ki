@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { formatCurrency, formatTime } from "../../lib/i18n-utils";
 import "./page.css";
@@ -32,6 +33,7 @@ interface KIReport {
 }
 
 const RealWebAnalytics = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [trendResults, setTrendResults] = useState<TrendResult[]>([]);
@@ -132,13 +134,15 @@ const RealWebAnalytics = () => {
     return (
       <div className="analytics-page">
         <button className="back-button floating-back" onClick={handleBack}>
-          ← Zurück
+          {t("common.back")}
         </button>
         <div className="analytics-header">
-          <h1>🌐 Real Web Analytics</h1>
-          <p>Analyse digitaler Produkte mit Google Trends, Reddit & KI</p>
+          <h1>{t("analytics.realWebAnalytics.title")}</h1>
+          <p>{t("analytics.realWebAnalytics.subtitle")}</p>
         </div>
-        <div className="loading-spinner">📊 Analyse läuft...</div>
+        <div className="loading-spinner">
+          {t("analytics.realWebAnalytics.analyzing")}
+        </div>
       </div>
     );
   }
@@ -146,11 +150,11 @@ const RealWebAnalytics = () => {
   return (
     <div className="analytics-page">
       <button className="back-button floating-back" onClick={handleBack}>
-        ← Zurück
+        {t("common.back")}
       </button>
       <div className="analytics-header">
-        <h1>🌐 Real Web Analytics</h1>
-        <p>Analyse digitaler Produkte mit Google Trends, Reddit & KI</p>
+        <h1>{t("analytics.realWebAnalytics.title")}</h1>
+        <p>{t("analytics.realWebAnalytics.subtitle")}</p>
         <div className="time-range-selector">
           <button
             className={timeRange === "today" ? "active" : ""}
@@ -160,7 +164,7 @@ const RealWebAnalytics = () => {
             }}
             disabled={products.length === 0}
           >
-            Heute
+            {t("common.today")}
           </button>
           <button
             className={timeRange === "week" ? "active" : ""}
@@ -170,7 +174,7 @@ const RealWebAnalytics = () => {
             }}
             disabled={products.length === 0}
           >
-            Diese Woche
+            {t("common.thisWeek")}
           </button>
           <button
             className={timeRange === "month" ? "active" : ""}
@@ -180,16 +184,16 @@ const RealWebAnalytics = () => {
             }}
             disabled={products.length === 0}
           >
-            Dieser Monat
+            {t("common.thisMonth")}
           </button>
         </div>
       </div>
       {error && <div className="info-banner">❌ {error}</div>}
       <div className="analysis-section">
         <div className="metric-card full-width">
-          <h3>🛒 Produkte im Shop</h3>
+          <h3>{t("analytics.realWebAnalytics.productsInShop")}</h3>
           {products.length === 0 ? (
-            <div>Keine Produkte gefunden.</div>
+            <div>{t("analytics.realWebAnalytics.noProductsFound")}</div>
           ) : (
             <div className="products-list">
               {products.map((p) => (
@@ -206,9 +210,9 @@ const RealWebAnalytics = () => {
       </div>
       <div className="analysis-section">
         <div className="metric-card full-width">
-          <h3>📈 Trend-Analyse</h3>
+          <h3>{t("analytics.realWebAnalytics.trendAnalysis")}</h3>
           {trendResults.length === 0 ? (
-            <div>Keine Trenddaten geladen.</div>
+            <div>{t("analytics.realWebAnalytics.noTrendData")}</div>
           ) : (
             <div className="trend-list">
               {trendResults.map((tr) => (
@@ -236,7 +240,7 @@ const RealWebAnalytics = () => {
       {kiReport && (
         <div className="analysis-section">
           <div className="metric-card full-width">
-            <h3>🧠 KI-Report</h3>
+            <h3>{t("analytics.realWebAnalytics.kiReport")}</h3>
             <div className="ki-report-text" style={{ whiteSpace: "pre-line" }}>
               {kiReport.report}
             </div>
@@ -257,20 +261,19 @@ const RealWebAnalytics = () => {
       )}
       <div className="analysis-section">
         <div className="metric-card full-width info">
-          <h3>ℹ️ Über diese Analytics</h3>
+          <h3>ℹ️ {t("analytics.realWebAnalytics.aboutTitle")}</h3>
           <p>
-            <strong>
-              Real Web Analytics analysiert alle digitalen Produkte im Shop.
-            </strong>
+            <strong>{t("analytics.realWebAnalytics.aboutDescription")}</strong>
             <br />
-            Die Analyse erfolgt mit Google Trends, Reddit, News, GitHub,
-            StackOverflow und KI.
+            {t("analytics.realWebAnalytics.analysisDetails")}
             <br />
-            Die Zeitintervalle stehen für kurzfristige, mittelfristige und
-            langfristige Analysen.
+            {t("analytics.realWebAnalytics.timeIntervalsExplanation")}
             <br />
           </p>
-          <div>Letztes Update: {formatTime(lastUpdate)}</div>
+          <div>
+            {t("analytics.realWebAnalytics.lastUpdate")}:{" "}
+            {formatTime(lastUpdate)}
+          </div>
         </div>
       </div>
     </div>

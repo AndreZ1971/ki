@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { formatDateTime } from "../../lib/i18n-utils";
 import { useProductManagement } from "../../hooks/useProductManagement";
 import { useToast } from "../../hooks/useToast";
@@ -14,6 +15,7 @@ import { MLProductIdeaGenerator } from "./MLProductIdeaGenerator";
 import "./page.css";
 
 const AutoProductCreator = () => {
+  const { t } = useTranslation();
   const {
     handleBackToDashboard,
     loading,
@@ -83,8 +85,8 @@ const AutoProductCreator = () => {
       <BackButton onClick={handleBackToDashboard} />
 
       <div className="analytics-header">
-        <h1>🤖 Auto Product Creator</h1>
-        <p>Automatische Erstellung und Optimierung von Produkten</p>
+        <h1>{t("product.autoCreator.title")}</h1>
+        <p>{t("product.autoCreator.title")}</p>
       </div>
 
       <div className="metric-card full-width">
@@ -212,9 +214,9 @@ const AutoProductCreator = () => {
         <LoadingButton
           onClick={handleCreateProducts}
           loading={loading}
-          loadingText="🔄 Produkte werden erstellt..."
+          loadingText={t("product.autoCreator.creating")}
         >
-          🚀 Produkte automatisch erstellen
+          🚀 {t("product.autoCreator.create")}
         </LoadingButton>
 
         {result && (

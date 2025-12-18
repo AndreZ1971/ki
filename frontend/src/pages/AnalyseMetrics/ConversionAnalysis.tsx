@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../lib/i18n-utils";
 import "./page.css";
@@ -26,6 +27,7 @@ interface ConversionData {
 }
 
 const ConversionAnalysis = () => {
+  const { t } = useTranslation();
   const [conversionData, setConversionData] = useState<ConversionData | null>(
     null
   );
@@ -45,7 +47,8 @@ const ConversionAnalysis = () => {
           ? `${base}/api/analytics/conversion/analysis`
           : `/api/analytics/conversion/analysis`;
         const res = await fetch(apiUrl);
-        if (!res.ok) throw new Error("Fehler beim Laden der Conversion-Daten");
+        if (!res.ok)
+          throw new Error(t("analytics.conversionAnalysis.errorLoadingData"));
         const data = await res.json();
         if (data.success && data.data) {
           setConversionData(data.data);
@@ -77,7 +80,8 @@ const ConversionAnalysis = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ data: conversionData }),
       });
-      if (!res.ok) throw new Error("ML-Analyse fehlgeschlagen");
+      if (!res.ok)
+        throw new Error(t("analytics.conversionAnalysis.mlAnalysisFailed"));
       const result = await res.json();
       setMlInsights(result.mlInsights || []);
     } catch (_err) {
@@ -139,9 +143,16 @@ const ConversionAnalysis = () => {
 
   if (loading)
     return (
-      <div className="loading-spinner">📈 Loading Conversion Analysis...</div>
+      <div className="loading-spinner">
+        {t("analytics.conversionAnalysis.loading")}
+      </div>
     );
-  if (error) return <div className="error-message">Error: {error}</div>;
+  if (error)
+    return (
+      <div className="error-message">
+        {t("common.error")}: {error}
+      </div>
+    );
 
   return (
     <div className="analytics-page">
@@ -150,7 +161,7 @@ const ConversionAnalysis = () => {
         className="back-button floating-back"
         onClick={handleBackToDashboard}
       >
-        ← Zurück
+        {t("common.back")}
       </button>
 
       <div className="analytics-header">
@@ -163,8 +174,8 @@ const ConversionAnalysis = () => {
           }}
         >
           <div>
-            <h1>📈 Conversion Analysis</h1>
-            <p>Detaillierte Analyse der Conversion-Raten und Optimierung</p>
+            <h1>{t("analytics.conversionAnalysis.title")}</h1>
+            <p>{t("analytics.conversionAnalysis.subtitle")}</p>
           </div>
           <button
             onClick={handleMLAnalyze}
@@ -183,7 +194,9 @@ const ConversionAnalysis = () => {
               whiteSpace: "nowrap",
             }}
           >
-            {mlLoading ? "⏳ Analysiere..." : "🤖 KI-Analyse"}
+            {mlLoading
+              ? `${t("common.analyzing")}`
+              : `${t("analytics.conversionAnalysis.aiAnalysisButton")}`}
           </button>
         </div>
       </div>

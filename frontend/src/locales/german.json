@@ -28,6 +28,21 @@
     "copy": "Kopieren",
     "copied": "In Zwischenablage kopiert!",
     "generate": "Generieren",
+    "analyzing": "Analysiere...",
+    "validating": "Validiere...",
+    "deactivate": "Deaktivieren",
+    "activate": "Aktivieren",
+    "timeRange": "Zeitraum",
+    "today": "Heute",
+    "thisWeek": "Diese Woche",
+    "thisMonth": "Dieser Monat",
+    "thisYear": "Dieses Jahr",
+    "fillRequiredFields": "Bitte alle erforderlichen Felder ausfüllen",
+    "error": "Fehler",
+    "aiAnalyzing": "KI analysiert...",
+    "noEventsInRange": "Keine Events im Zeitraum",
+    "privacyNotice": "Datenschutz-Hinweis",
+    "allCategories": "Alle Kategorien",
     "analyze": "Analysieren",
     "preview": "Vorschau",
     "close": "Schließen"
@@ -280,6 +295,158 @@
       "generate": "Analyse generieren",
       "generating": "Generiere Analyse...",
       "error": "Fehler bei der Analytics-Generierung"
+    },
+    "payment": {
+      "verifier": {
+        "title": "✅ Payment-Verifizierer",
+        "verify": "Payment verifizieren",
+        "verifying": "Verifiziere...",
+        "error": "Fehler bei der Verifikation"
+      },
+      "validation": {
+        "title": "🔐 Payment-Validierung",
+        "validate": "Validieren",
+        "validating": "Validiere...",
+        "error": "Fehler bei der Validierung"
+      },
+      "issuedDetector": {
+        "title": "📋 Payment-Problem-Detektor",
+        "analyze": "Probleme prüfen",
+        "analyzing": "Analysiere...",
+        "error": "Fehler bei der Analyse"
+      }
+    },
+    "product": {
+      "createFreebies": {
+        "title": "🎁 Freebies Erstellen",
+        "create": "Freebies erstellen",
+        "creating": "Erstelle...",
+        "error": "Fehler beim Erstellen"
+      },
+      "autoCreator": {
+        "title": "🤖 Auto Produkt Creator",
+        "create": "Automatisch erstellen",
+        "creating": "Erstelle Produkte...",
+        "error": "Fehler beim Erstellen"
+      },
+      "bundles": {
+        "title": "📦 Produkt-Bundles",
+        "create": "Bundle erstellen",
+        "creating": "Erstelle Bundle...",
+        "error": "Fehler beim Erstellen"
+      }
+    },
+    "analytics_pages": {
+      "paymentSuccess": {
+        "title": "🎉 Zahlungs-Erfolg",
+        "subtitle": "Analyse erfolgreicher Transaktionen und Umsätze",
+        "timeRangeLabel": "⚙️ Analyse-Zeitraum",
+        "analyzeButton": "🎉 Erfolge Analysieren",
+        "metricsHeader": "📊 Erfolgs-Metriken",
+        "verifiedTransactions": "Verifizierte Transaktionen",
+        "successRate": "Erfolgsrate",
+        "avgConfidence": "Ø Konfidenz",
+        "eventsByFeature": "Events nach Feature",
+        "lastEvent": "Letztes Event:",
+        "noMetricsAvailable": "Keine Metriken verfügbar"
+      },
+      "paymentDelivery": {
+        "title": "🤖 Zahlungs-Versand (KI-Powered)",
+        "subtitle": "GPT-4o-mini gestützte Lieferoptimierung & Carrier-Empfehlung",
+        "privacyText": "KI-Analyse erfolgt in Echtzeit via GPT-4o-mini. Keine dauerhafte Speicherung von Lieferdaten. Analysedaten werden nur temporär im RAM verarbeitet. OpenAI-API verarbeitet Daten gemäß deren Datenschutzrichtlinien.",
+        "optimizationConfig": "⚙️ Lieferoptimierung",
+        "orderId": "Bestell-ID *",
+        "city": "Stadt *",
+        "postalCode": "PLZ *",
+        "country": "Land *",
+        "urgency": "Dringlichkeit",
+        "standard": "📦 Standard",
+        "express": "⚡ Express",
+        "overnight": "🚀 Overnight",
+        "startOptimization": "🤖 KI-Optimierung starten"
+      },
+      "paymentValidation": {
+        "title": "🔐 Zahlungs-Validierung & Betrugserkennung",
+        "subtitle": "KI-gestützte Sicherheitsanalyse mit echtem Risk-Scoring",
+        "transactionDataHeader": "📋 Transaktions-Daten",
+        "cardNumber": "Kartennummer (Test) *",
+        "testCardHint": "Test: 4111111111111111",
+        "amount": "Betrag (EUR) *",
+        "ipAddress": "IP-Adresse (optional)",
+        "validateButton": "🔐 Mit KI Validieren",
+        "resultHeader": "📊 Validierungs-Ergebnis",
+        "securityChecks": "🔍 Security Checks"
+      },
+      "paymentIssuedDetector": {
+        "title": "🤖 Zahlungs-Fehlermelder (KI-Powered)",
+        "subtitle": "GPT-4o-mini gestützte Echtzeit-Analyse des Payment-Systems",
+        "systemHealth": "System-Status",
+        "healthy": "HEALTHY",
+        "degraded": "DEGRADED",
+        "critical": "CRITICAL",
+        "kiConfidence": "KI Konfidenz",
+        "analyzedEvents": "Analysierte Events",
+        "failureRate": "Fehlerquote",
+        "scanSettingsHeader": "⚙️ Scan-Einstellungen",
+        "scanDepth": "Scan-Tiefe",
+        "quick": "🚀 Schnell (Oberflächlich)",
+        "standard": "⚡ Standard (Empfohlen)",
+        "deep": "🔬 Tiefgehend (Gründlich)",
+        "detectedIssuesHeader": "🔍 Erkannte Issues"
+      },
+      "productBundles": {
+        "title": "📦 Produkt-Bundles",
+        "subtitle": "Erstelle und verwalte Produkt-Bundles automatisch",
+        "aiCreation": "🤖 KI-gestützte Bundle-Erstellung",
+        "categoryLabel": "Kategorie:",
+        "allCategories": "Alle Kategorien",
+        "digitalProducts": "Digitale Produkte",
+        "marketing": "Marketing",
+        "designTemplates": "Design & Templates",
+        "coursesTraining": "Kurse & Schulungen",
+        "priceRangeLabel": "Preisspanne (€):",
+        "targetAudienceLabel": "Zielgruppe:",
+        "targetAudiencePlaceholder": "z.B. B2B, Freelancer, Startups",
+        "generatingIdeas": "🔄 KI generiert Bundle-Ideen...",
+        "generateButton": "✨ Bundle-Ideen mit KI generieren",
+        "ideasHeader": "📋 KI-generierte Bundle-Vorschläge",
+        "myBundles": "📊 Meine Bundles",
+        "performanceHeader": "📈 Bundle-Performance"
+      },
+      "realWebAnalytics": {
+        "title": "🌐 Real Web Analytics",
+        "subtitle": "Analyse digitaler Produkte mit Google Trends, Reddit & KI",
+        "productsInShop": "🛒 Produkte im Shop",
+        "noProductsFound": "Keine Produkte gefunden.",
+        "trendAnalysis": "📈 Trend-Analyse",
+        "noTrendData": "Keine Trenddaten geladen.",
+        "kiReport": "🧠 KI-Report",
+        "aboutTitle": "Über diese Analytics",
+        "aboutDescription": "Real Web Analytics analysiert alle digitalen Produkte im Shop.",
+        "analysisDetails": "Die Analyse erfolgt mit Google Trends, Reddit, News, GitHub, StackOverflow und KI.",
+        "timeIntervalsExplanation": "Die Zeitintervalle stehen für kurzfristige, mittelfristige und langfristige Analysen.",
+        "lastUpdate": "Letztes Update",
+        "analyzing": "📊 Analyse läuft..."
+      },
+      "standardAudit": {
+        "title": "🔧 Standard Audit",
+        "subtitle": "Führe Basis-Audit durch...",
+        "checking": "🔍 Prüfe Shop-Grundfunktionen...",
+        "errorLoadingData": "Fehler beim Laden der Audit-Daten",
+        "performanceCategory": "⚡ Performance",
+        "seoCategory": "🔍 SEO",
+        "securityCategory": "🛡️ Sicherheit",
+        "uxCategory": "🎨 UX/Conversion",
+        "contentCategory": "📝 Content"
+      },
+      "conversionAnalysis": {
+        "title": "📈 Conversion Analysis",
+        "subtitle": "Detaillierte Analyse der Conversion-Raten und Optimierung",
+        "loading": "📈 Loading Conversion Analysis...",
+        "errorLoadingData": "Fehler beim Laden der Conversion-Daten",
+        "mlAnalysisFailed": "ML-Analyse fehlgeschlagen",
+        "aiAnalysisButton": "🤖 KI-Analyse"
+      }
     }
   },
   "components": {

@@ -30,7 +30,22 @@
     "generate": "Generate",
     "analyze": "Analyze",
     "preview": "Preview",
-    "close": "Close"
+    "close": "Close",
+    "analyzing": "Analyzing...",
+    "validating": "Validating...",
+    "deactivate": "Deactivate",
+    "activate": "Activate",
+    "timeRange": "Time Range",
+    "today": "Today",
+    "thisWeek": "This Week",
+    "thisMonth": "This Month",
+    "thisYear": "This Year",
+    "fillRequiredFields": "Please fill in all required fields",
+    "error": "Error",
+    "aiAnalyzing": "AI analyzing...",
+    "noEventsInRange": "No events in range",
+    "privacyNotice": "Privacy Notice",
+    "allCategories": "All Categories"
   },
   "settings": {
     "title": "⚙️ Settings",
@@ -280,6 +295,158 @@
       "generate": "Generate analysis",
       "generating": "Generating analysis...",
       "error": "Error generating analytics"
+    },
+    "payment": {
+      "verifier": {
+        "title": "✅ Payment Verifier",
+        "verify": "Verify payment",
+        "verifying": "Verifying...",
+        "error": "Error verifying payment"
+      },
+      "validation": {
+        "title": "🔐 Payment Validation",
+        "validate": "Validate",
+        "validating": "Validating...",
+        "error": "Validation error"
+      },
+      "issuedDetector": {
+        "title": "📋 Payment Issue Detector",
+        "analyze": "Check issues",
+        "analyzing": "Analyzing...",
+        "error": "Error analyzing"
+      }
+    },
+    "product": {
+      "createFreebies": {
+        "title": "🎁 Create Freebies",
+        "create": "Create freebies",
+        "creating": "Creating...",
+        "error": "Error creating"
+      },
+      "autoCreator": {
+        "title": "🤖 Auto Product Creator",
+        "create": "Create automatically",
+        "creating": "Creating products...",
+        "error": "Error creating"
+      },
+      "bundles": {
+        "title": "📦 Product Bundles",
+        "create": "Create bundle",
+        "creating": "Creating bundle...",
+        "error": "Error creating"
+      }
+    },
+    "analytics_pages": {
+      "paymentSuccess": {
+        "title": "🎉 Payment Success",
+        "subtitle": "Analysis of successful transactions and revenue",
+        "timeRangeLabel": "⚙️ Analysis Time Range",
+        "analyzeButton": "🎉 Analyze Successes",
+        "metricsHeader": "📊 Success Metrics",
+        "verifiedTransactions": "Verified Transactions",
+        "successRate": "Success Rate",
+        "avgConfidence": "Avg Confidence",
+        "eventsByFeature": "Events by Feature",
+        "lastEvent": "Last Event:",
+        "noMetricsAvailable": "No metrics available"
+      },
+      "paymentDelivery": {
+        "title": "🤖 Payment Delivery (AI-Powered)",
+        "subtitle": "GPT-4o-mini powered delivery optimization & carrier recommendation",
+        "privacyText": "AI analysis occurs in real-time via GPT-4o-mini. No permanent storage of delivery data. Analysis data is processed only temporarily in RAM. OpenAI API processes data according to their privacy policies.",
+        "optimizationConfig": "⚙️ Delivery Optimization",
+        "orderId": "Order ID *",
+        "city": "City *",
+        "postalCode": "Postal Code *",
+        "country": "Country *",
+        "urgency": "Urgency",
+        "standard": "📦 Standard",
+        "express": "⚡ Express",
+        "overnight": "🚀 Overnight",
+        "startOptimization": "🤖 Start AI Optimization"
+      },
+      "paymentValidation": {
+        "title": "🔐 Payment Validation & Fraud Detection",
+        "subtitle": "AI-powered security analysis with real risk scoring",
+        "transactionDataHeader": "📋 Transaction Data",
+        "cardNumber": "Card Number (Test) *",
+        "testCardHint": "Test: 4111111111111111",
+        "amount": "Amount (EUR) *",
+        "ipAddress": "IP Address (optional)",
+        "validateButton": "🔐 Validate with AI",
+        "resultHeader": "📊 Validation Result",
+        "securityChecks": "🔍 Security Checks"
+      },
+      "paymentIssuedDetector": {
+        "title": "🤖 Payment Issue Detector (AI-Powered)",
+        "subtitle": "GPT-4o-mini powered real-time analysis of payment system",
+        "systemHealth": "System Status",
+        "healthy": "HEALTHY",
+        "degraded": "DEGRADED",
+        "critical": "CRITICAL",
+        "kiConfidence": "AI Confidence",
+        "analyzedEvents": "Analyzed Events",
+        "failureRate": "Failure Rate",
+        "scanSettingsHeader": "⚙️ Scan Settings",
+        "scanDepth": "Scan Depth",
+        "quick": "🚀 Quick (Surface)",
+        "standard": "⚡ Standard (Recommended)",
+        "deep": "🔬 Deep (Thorough)",
+        "detectedIssuesHeader": "🔍 Detected Issues"
+      },
+      "productBundles": {
+        "title": "📦 Product Bundles",
+        "subtitle": "Create and manage product bundles automatically",
+        "aiCreation": "🤖 AI-Powered Bundle Creation",
+        "categoryLabel": "Category:",
+        "allCategories": "All Categories",
+        "digitalProducts": "Digital Products",
+        "marketing": "Marketing",
+        "designTemplates": "Design & Templates",
+        "coursesTraining": "Courses & Training",
+        "priceRangeLabel": "Price Range (€):",
+        "targetAudienceLabel": "Target Audience:",
+        "targetAudiencePlaceholder": "e.g. B2B, Freelancer, Startups",
+        "generatingIdeas": "🔄 AI generating bundle ideas...",
+        "generateButton": "✨ Generate Bundle Ideas with AI",
+        "ideasHeader": "📋 AI-Generated Bundle Suggestions",
+        "myBundles": "📊 My Bundles",
+        "performanceHeader": "📈 Bundle Performance"
+      },
+      "realWebAnalytics": {
+        "title": "🌐 Real Web Analytics",
+        "subtitle": "Analysis of digital products with Google Trends, Reddit & AI",
+        "productsInShop": "🛒 Products in Shop",
+        "noProductsFound": "No products found.",
+        "trendAnalysis": "📈 Trend Analysis",
+        "noTrendData": "No trend data loaded.",
+        "kiReport": "🧠 AI Report",
+        "aboutTitle": "About this Analytics",
+        "aboutDescription": "Real Web Analytics analyzes all digital products in your shop.",
+        "analysisDetails": "Analysis is performed using Google Trends, Reddit, News, GitHub, StackOverflow and AI.",
+        "timeIntervalsExplanation": "Time intervals represent short-term, medium-term and long-term analysis.",
+        "lastUpdate": "Last Update",
+        "analyzing": "📊 Analysis running..."
+      },
+      "standardAudit": {
+        "title": "🔧 Standard Audit",
+        "subtitle": "Run basic audit...",
+        "checking": "🔍 Checking shop basics...",
+        "errorLoadingData": "Error loading audit data",
+        "performanceCategory": "⚡ Performance",
+        "seoCategory": "🔍 SEO",
+        "securityCategory": "🛡️ Security",
+        "uxCategory": "🎨 UX/Conversion",
+        "contentCategory": "📝 Content"
+      },
+      "conversionAnalysis": {
+        "title": "📈 Conversion Analysis",
+        "subtitle": "Detailed analysis of conversion rates and optimization",
+        "loading": "📈 Loading Conversion Analysis...",
+        "errorLoadingData": "Error loading conversion data",
+        "mlAnalysisFailed": "ML analysis failed",
+        "aiAnalysisButton": "🤖 AI Analysis"
+      }
     }
   },
   "components": {
