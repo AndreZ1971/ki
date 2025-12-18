@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface MLPersonalizationOffer {
   title: string;
@@ -11,7 +12,10 @@ interface MLPersonalizationProps {
   userId: number;
 }
 
-export const MLPersonalization: React.FC<MLPersonalizationProps> = ({ userId }) => {
+export const MLPersonalization: React.FC<MLPersonalizationProps> = ({
+  userId,
+}) => {
+  const { t } = useTranslation();
   const [offers, setOffers] = useState<MLPersonalizationOffer[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,15 +24,17 @@ export const MLPersonalization: React.FC<MLPersonalizationProps> = ({ userId }) 
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/personalization/ml/offers?userId=${userId}`);
+      const res = await fetch(
+        `/api/personalization/ml/offers?userId=${userId}`
+      );
       const data = await res.json();
       if (data.success && data.offers) {
         setOffers(data.offers);
       } else {
-        setError(data.error || 'Fehler bei der Personalisierung');
+        setError(data.error || t("ml.personalization.error"));
       }
     } catch (err: any) {
-      setError(err.message || 'Fehler bei der Personalisierung');
+      setError(err.message || t("ml.personalization.error"));
     } finally {
       setLoading(false);
     }
@@ -37,19 +43,23 @@ export const MLPersonalization: React.FC<MLPersonalizationProps> = ({ userId }) 
   return (
     <div className="ml-personalization">
       <button onClick={fetchOffers} disabled={loading}>
-        KI-Angebote für mich generieren
+        {t("ml.personalization.analyze")}
       </button>
-      {loading && <div>Generierung läuft...</div>}
+      {loading && <div>{t("ml.personalization.analyzing")}</div>}
       {error && <div className="error">{error}</div>}
       {offers.length > 0 && (
         <div className="offers-list">
-          <h4>Individuelle KI-Angebote</h4>
+          <h4>{t("ml.personalization.title")}</h4>
           <ul>
             {offers.map((offer, i) => (
               <li key={i}>
-                <strong>{offer.title}</strong><br />
-                <span>{offer.description}</span><br />
-                <em>Score: {Math.round(offer.score * 100)}% – {offer.reason}</em>
+                <strong>{offer.title}</strong>
+                <br />
+                <span>{offer.description}</span>
+                <br />
+                <em>
+                  Score: {Math.round(offer.score * 100)}% – {offer.reason}
+                </em>
               </li>
             ))}
           </ul>

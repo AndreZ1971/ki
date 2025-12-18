@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface MLMarketingIdea {
-  type: 'text' | 'image' | 'audience' | 'forecast';
+  type: "text" | "image" | "audience" | "forecast";
   content: string;
   score?: number;
   reason?: string;
@@ -12,7 +13,11 @@ interface MLMarketingGeneratorProps {
   audience: string;
 }
 
-export const MLMarketingGenerator: React.FC<MLMarketingGeneratorProps> = ({ campaignGoal, audience }) => {
+export const MLMarketingGenerator: React.FC<MLMarketingGeneratorProps> = ({
+  campaignGoal,
+  audience,
+}) => {
+  const { t } = useTranslation();
   const [ideas, setIdeas] = useState<MLMarketingIdea[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,18 +27,18 @@ export const MLMarketingGenerator: React.FC<MLMarketingGeneratorProps> = ({ camp
     setError(null);
     try {
       const res = await fetch(`/api/marketing/ml/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ goal: campaignGoal, audience })
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ goal: campaignGoal, audience }),
       });
       const data = await res.json();
       if (data.success && data.ideas) {
         setIdeas(data.ideas);
       } else {
-        setError(data.error || 'Fehler bei der Marketing-Generierung');
+        setError(data.error || t("ml.marketingGenerator.error"));
       }
     } catch (err: any) {
-      setError(err.message || 'Fehler bei der Marketing-Generierung');
+      setError(err.message || t("ml.marketingGenerator.error"));
     } finally {
       setLoading(false);
     }
@@ -42,19 +47,32 @@ export const MLMarketingGenerator: React.FC<MLMarketingGeneratorProps> = ({ camp
   return (
     <div className="ml-marketing-generator">
       <button onClick={fetchIdeas} disabled={loading}>
-        KI-Marketing-Ideen generieren
+        {t("ml.marketingGenerator.generate")}
       </button>
-      {loading && <div>Generierung läuft...</div>}
+      {loading && <div>{t("ml.marketingGenerator.generating")}</div>}
       {error && <div className="error">{error}</div>}
       {ideas.length > 0 && (
         <div className="ideas-list">
-          <h4>KI-Marketing-Ideen</h4>
+          <h4>{t("ml.marketingGenerator.title")}</h4>
           <ul>
             {ideas.map((idea, i) => (
               <li key={i}>
-                <strong>{idea.type === 'text' ? 'Text' : idea.type === 'image' ? 'Bild' : idea.type === 'audience' ? 'Zielgruppe' : 'Prognose'}</strong><br />
-                <span>{idea.content}</span><br />
-                {idea.score !== undefined && <span>Score: {Math.round(idea.score * 100)}%</span>}<br />
+                <strong>
+                  {idea.type === "text"
+                    ? "Text"
+                    : idea.type === "image"
+                      ? "Bild"
+                      : idea.type === "audience"
+                        ? "Zielgruppe"
+                        : "Prognose"}
+                </strong>
+                <br />
+                <span>{idea.content}</span>
+                <br />
+                {idea.score !== undefined && (
+                  <span>Score: {Math.round(idea.score * 100)}%</span>
+                )}
+                <br />
                 {idea.reason && <em>{idea.reason}</em>}
               </li>
             ))}

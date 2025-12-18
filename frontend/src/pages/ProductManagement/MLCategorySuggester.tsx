@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
-import { categoryApi } from '../../services/productApi';
-import type { CategorySuggestion } from '../../types/product';
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { categoryApi } from "../../services/productApi";
+import type { CategorySuggestion } from "../../types/product";
 
 interface MLCategorySuggesterProps {
   productTitle: string;
   productDescription: string;
 }
 
-export const MLCategorySuggester: React.FC<MLCategorySuggesterProps> = ({ productTitle, productDescription }) => {
+export const MLCategorySuggester: React.FC<MLCategorySuggesterProps> = ({
+  productTitle,
+  productDescription,
+}) => {
+  const { t } = useTranslation();
   const [suggestions, setSuggestions] = useState<CategorySuggestion[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,16 +24,16 @@ export const MLCategorySuggester: React.FC<MLCategorySuggesterProps> = ({ produc
       const response = await categoryApi.suggestCategories({
         title: productTitle,
         description: productDescription,
-        maxSuggestions: 5
+        maxSuggestions: 5,
       });
 
       if (response.success && response.data) {
         setSuggestions(response.data);
       } else {
-        setError(response.error || 'Fehler bei der Kategorie-Vorschlag-Generierung');
+        setError(response.error || t("ml.categorySuggester.error"));
       }
     } catch (err: any) {
-      setError(err.message || 'Fehler bei der Kategorie-Vorschlag-Generierung');
+      setError(err.message || t("ml.categorySuggester.error"));
     } finally {
       setLoading(false);
     }
@@ -37,17 +42,20 @@ export const MLCategorySuggester: React.FC<MLCategorySuggesterProps> = ({ produc
   return (
     <div className="ml-category-suggester">
       <button onClick={fetchSuggestions} disabled={loading}>
-        KI-Kategorie-Vorschläge generieren
+        {t("ml.categorySuggester.generate")}
       </button>
-      {loading && <div>Generierung läuft...</div>}
+      {loading && <div>{t("ml.categorySuggester.generating")}</div>}
       {error && <div className="error">{error}</div>}
       {suggestions.length > 0 && (
         <div className="suggestions-list">
-          <h4>KI-Kategorie-Vorschläge</h4>
+          <h4>{t("ml.categorySuggester.suggestions")}</h4>
           <ul>
             {suggestions.map((s, i) => (
               <li key={i}>
-                <strong>{s.name}</strong> (Confidence: {Math.round(s.confidence * 100)}%)<br />
+                <strong>{s.name}</strong> (
+                {t("ml.categorySuggester.confidence")}:{" "}
+                {Math.round(s.confidence * 100)}%)
+                <br />
                 <em>{s.reason}</em>
               </li>
             ))}

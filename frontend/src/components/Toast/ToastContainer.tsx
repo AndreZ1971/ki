@@ -1,5 +1,4 @@
 import React from "react";
-import { useTranslation } from "react-i18next";
 import type { Toast } from "../../hooks/useToast";
 import "./ToastContainer.css";
 
@@ -12,7 +11,6 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({
   toasts,
   onRemove,
 }) => {
-  const { t } = useTranslation();
   if (toasts.length === 0) return null;
 
   const getIcon = (type: Toast["type"]) => {

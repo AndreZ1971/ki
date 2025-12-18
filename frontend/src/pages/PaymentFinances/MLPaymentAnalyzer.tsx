@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface MLPaymentInsight {
-  type: 'anomaly' | 'churn' | 'fraud';
+  type: "anomaly" | "churn" | "fraud";
   score: number;
   message: string;
   details?: string;
@@ -11,7 +12,10 @@ interface MLPaymentAnalyzerProps {
   paymentId: string;
 }
 
-export const MLPaymentAnalyzer: React.FC<MLPaymentAnalyzerProps> = ({ paymentId }) => {
+export const MLPaymentAnalyzer: React.FC<MLPaymentAnalyzerProps> = ({
+  paymentId,
+}) => {
+  const { t } = useTranslation();
   const [insights, setInsights] = useState<MLPaymentInsight[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,10 +29,10 @@ export const MLPaymentAnalyzer: React.FC<MLPaymentAnalyzerProps> = ({ paymentId 
       if (data.success && data.insights) {
         setInsights(data.insights);
       } else {
-        setError(data.error || 'Fehler bei der Payment-Analyse');
+        setError(data.error || t("ml.paymentAnalyzer.error"));
       }
     } catch (err: any) {
-      setError(err.message || 'Fehler bei der Payment-Analyse');
+      setError(err.message || t("ml.paymentAnalyzer.error"));
     } finally {
       setLoading(false);
     }
@@ -36,21 +40,31 @@ export const MLPaymentAnalyzer: React.FC<MLPaymentAnalyzerProps> = ({ paymentId 
 
   return (
     <div className="ml-payment-analyzer">
-      <button onClick={fetchInsights} disabled={loading}>
-        
-      </button>
-      {loading && <div>Analyse läuft...</div>}
+      <button onClick={fetchInsights} disabled={loading}></button>
+      {loading && <div>{t("ml.paymentAnalyzer.analyzing")}</div>}
       {error && <div className="error">{error}</div>}
       {insights.length > 0 && (
         <div className="insights-list">
-          <h4>KI-Payment-Insights</h4>
+          <h4>{t("ml.paymentAnalyzer.title")}</h4>
           <ul>
             {insights.map((insight, i) => (
               <li key={i}>
-                <strong>{insight.type === 'anomaly' ? 'Anomalie' : insight.type === 'churn' ? 'Churn-Risiko' : 'Fraud-Alarm'}</strong><br />
-                <span>Score: {Math.round(insight.score * 100)}%</span><br />
+                <strong>
+                  {insight.type === "anomaly"
+                    ? "Anomalie"
+                    : insight.type === "churn"
+                      ? "Churn-Risiko"
+                      : "Fraud-Alarm"}
+                </strong>
+                <br />
+                <span>Score: {Math.round(insight.score * 100)}%</span>
+                <br />
                 <span>{insight.message}</span>
-                {insight.details && <div><em>{insight.details}</em></div>}
+                {insight.details && (
+                  <div>
+                    <em>{insight.details}</em>
+                  </div>
+                )}
               </li>
             ))}
           </ul>

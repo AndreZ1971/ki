@@ -188,5 +188,105 @@
       "conversionRate": "Conversion Rate",
       "lastUpdated": "Last Updated"
     }
+  },
+  "ml": {
+    "categorySuggester": {
+      "title": "🤖 AI Category Suggestions",
+      "generate": "Generate AI category suggestions",
+      "generating": "Generating...",
+      "suggestions": "AI Category Suggestions",
+      "error": "Error generating category suggestions",
+      "confidence": "Confidence"
+    },
+    "freebieGenerator": {
+      "title": "🎁 AI Freebie Generator",
+      "generate": "Generate freebie suggestions",
+      "generating": "Generating freebie...",
+      "suggestions": "AI Freebie Suggestions",
+      "error": "Error generating freebie"
+    },
+    "personalization": {
+      "title": "👤 AI Personalization",
+      "analyze": "Analyze personalization",
+      "analyzing": "Analyzing personalization...",
+      "error": "Error analyzing personalization"
+    },
+    "paymentAnalyzer": {
+      "title": "💳 Payment Analysis",
+      "analyze": "Analyze payment process",
+      "analyzing": "Analyzing payment...",
+      "error": "Error analyzing payment"
+    },
+    "supportGenerator": {
+      "title": "🆘 Support Generator",
+      "generate": "Generate support text",
+      "generating": "Generating support text...",
+      "error": "Error generating support text"
+    },
+    "marketingGenerator": {
+      "title": "📢 Marketing Text Generator",
+      "generate": "Generate marketing text",
+      "generating": "Generating marketing text...",
+      "error": "Error generating marketing text"
+    },
+    "productIdeaGenerator": {
+      "title": "💡 Product Ideas Generator",
+      "generate": "Generate product ideas",
+      "generating": "Generating product ideas...",
+      "error": "Error generating product ideas",
+      "ideas": "Product Ideas"
+    },
+    "blogPostGenerator": {
+      "title": "📝 Blogpost Generator",
+      "topic": "Topic",
+      "topicPlaceholder": "e.g., SEO tips for e-commerce",
+      "generate": "Generate blogpost",
+      "generating": "Generating blogpost...",
+      "error": "Error generating blogpost"
+    },
+    "analyticsGenerator": {
+      "title": "📊 Analytics Generator",
+      "generate": "Generate analysis",
+      "generating": "Generating analysis...",
+      "error": "Error generating analytics"
+    },
+    "stringGenerator": {
+      "title": "🔤 String Generator",
+      "type": "Type",
+      "length": "Length",
+      "generate": "Generate strings",
+      "generating": "Generating strings...",
+      "error": "Error generating strings"
+    }
+  },
+  "pages": {
+    "blogpost": {
+      "title": "📝 AI Blogpost Generator",
+      "topic": "Topic",
+      "keywords": "Keywords (comma-separated)",
+      "seo": "SEO Optimization",
+      "length": "Length",
+      "lengthShort": "Short",
+      "lengthMedium": "Medium",
+      "lengthLong": "Long",
+      "language": "Language",
+      "generate": "Generate blogpost",
+      "generating": "Generating...",
+      "result": "Result",
+      "error": "Error generating"
+    },
+    "analytics": {
+      "title": "📊 Analytics Generator",
+      "generate": "Generate analysis",
+      "generating": "Generating analysis...",
+      "error": "Error generating analytics"
+    }
+  },
+  "components": {
+    "mlComponent": {
+      "error": "Error",
+      "loading": "Loading...",
+      "success": "Success"
+    }
   }
 }

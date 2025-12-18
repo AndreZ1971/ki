@@ -188,5 +188,105 @@
       "conversionRate": "Conversion Rate",
       "lastUpdated": "Zuletzt aktualisiert"
     }
+  },
+  "ml": {
+    "categorySuggester": {
+      "title": "🤖 KI-Kategorie-Vorschläge",
+      "generate": "KI-Kategorie-Vorschläge generieren",
+      "generating": "Generierung läuft...",
+      "suggestions": "KI-Kategorie-Vorschläge",
+      "error": "Fehler bei der Kategorie-Vorschlag-Generierung",
+      "confidence": "Confidence"
+    },
+    "freebieGenerator": {
+      "title": "🎁 KI-Freebie-Generator",
+      "generate": "Freebie-Vorschlag generieren",
+      "generating": "Generiere Freebie...",
+      "suggestions": "KI-Freebie-Vorschläge",
+      "error": "Fehler bei der Freebie-Generierung"
+    },
+    "personalization": {
+      "title": "👤 KI-Personalisierung",
+      "analyze": "Personalisierung analysieren",
+      "analyzing": "Analysiere Personalisierung...",
+      "error": "Fehler bei der Personalisierungs-Analyse"
+    },
+    "paymentAnalyzer": {
+      "title": "💳 Payment-Analyse",
+      "analyze": "Payment-Prozess analysieren",
+      "analyzing": "Analysiere Payment...",
+      "error": "Fehler bei der Payment-Analyse"
+    },
+    "supportGenerator": {
+      "title": "🆘 Support-Generator",
+      "generate": "Support-Text generieren",
+      "generating": "Generiere Support-Text...",
+      "error": "Fehler bei der Support-Text-Generierung"
+    },
+    "marketingGenerator": {
+      "title": "📢 Marketing-Text Generator",
+      "generate": "Marketing-Text generieren",
+      "generating": "Generiere Marketing-Text...",
+      "error": "Fehler bei der Marketing-Text-Generierung"
+    },
+    "productIdeaGenerator": {
+      "title": "💡 Produkt-Ideen Generator",
+      "generate": "Produktideen generieren",
+      "generating": "Generiere Produktideen...",
+      "error": "Fehler bei der Produktideen-Generierung",
+      "ideas": "Produktideen"
+    },
+    "blogPostGenerator": {
+      "title": "📝 Blogpost-Generator",
+      "topic": "Thema",
+      "topicPlaceholder": "z.B. SEO-Tipps für E-Commerce",
+      "generate": "Blogpost generieren",
+      "generating": "Generiere Blogpost...",
+      "error": "Fehler bei der Blogpost-Generierung"
+    },
+    "analyticsGenerator": {
+      "title": "📊 Analytics-Generator",
+      "generate": "Analyse generieren",
+      "generating": "Generiere Analyse...",
+      "error": "Fehler bei der Analytics-Generierung"
+    },
+    "stringGenerator": {
+      "title": "🔤 String-Generator",
+      "type": "Typ",
+      "length": "Länge",
+      "generate": "Strings generieren",
+      "generating": "Generiere Strings...",
+      "error": "Fehler bei der String-Generierung"
+    }
+  },
+  "pages": {
+    "blogpost": {
+      "title": "📝 KI-Blogpost Generator",
+      "topic": "Thema",
+      "keywords": "Keywords (kommagetrennt)",
+      "seo": "SEO-Optimierung",
+      "length": "Länge",
+      "lengthShort": "Kurz",
+      "lengthMedium": "Mittel",
+      "lengthLong": "Lang",
+      "language": "Sprache",
+      "generate": "Blogpost generieren",
+      "generating": "Generiere...",
+      "result": "Ergebnis",
+      "error": "Fehler beim Generieren"
+    },
+    "analytics": {
+      "title": "📊 Analytics-Generator",
+      "generate": "Analyse generieren",
+      "generating": "Generiere Analyse...",
+      "error": "Fehler bei der Analytics-Generierung"
+    }
+  },
+  "components": {
+    "mlComponent": {
+      "error": "Fehler",
+      "loading": "Lädt...",
+      "success": "Erfolgreich"
+    }
   }
 }
