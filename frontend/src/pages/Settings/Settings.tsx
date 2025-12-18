@@ -532,14 +532,128 @@ const Settings = () => {
     setCredentials((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSpecializationUpload = (
+  const handleSpecializationUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    // TODO: Implement real upload/parse logic
-    console.log("📤 Spezialisierungs-Upload gestartet:", file.name);
-    setConnectionMessage(`📂 Upload gestartet: ${file.name}`);
+
+    // Validate file type
+    const fileExtension = file.name.split(".").pop()?.toLowerCase();
+    if (!["json", "csv"].includes(fileExtension || "")) {
+      setConnectionMessage("❌ Nur .json oder .csv Dateien sind erlaubt");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setConnectionMessage("❌ Datei zu groß (Maximum: 5MB)");
+      return;
+    }
+
+    setConnectionMessage(`⏳ ${file.name} wird hochgeladen und verarbeitet...`);
+    setTestingConnection(true);
+
+    try {
+      // Read file content
+      const fileContent = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target?.result as string);
+        reader.onerror = reject;
+        reader.readAsText(file);
+      });
+
+      // Parse and validate content
+      let specialization: Record<string, unknown>;
+
+      if (fileExtension === "json") {
+        try {
+          specialization = JSON.parse(fileContent);
+        } catch (_error) {
+          setConnectionMessage(
+            "❌ Ungültiges JSON-Format. Bitte überprüfe die Datei."
+          );
+          setTestingConnection(false);
+          return;
+        }
+      } else if (fileExtension === "csv") {
+        // Simple CSV parsing - convert to JSON
+        const lines = fileContent.trim().split("\n");
+        const headers = lines[0]?.split(",").map((h) => h.trim()) || [];
+        const values = lines[1]?.split(",").map((v) => v.trim()) || [];
+
+        specialization = {};
+        headers.forEach((header, index) => {
+          specialization[header] = values[index] || "";
+        });
+      } else {
+        setConnectionMessage("❌ Dateiformat nicht unterstützt");
+        setTestingConnection(false);
+        return;
+      }
+
+      // Validate required fields
+      const requiredFields = ["id", "name", "systemPrompt", "description"];
+      const missingFields = requiredFields.filter(
+        (field) => !specialization[field]
+      );
+
+      if (missingFields.length > 0) {
+        setConnectionMessage(
+          `❌ Erforderliche Felder fehlen: ${missingFields.join(", ")}`
+        );
+        setTestingConnection(false);
+        return;
+      }
+
+      // Upload to backend
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+      const uploadUrl = `${apiUrl}/api/settings/specialization/upload`;
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("specialization", JSON.stringify(specialization));
+
+      const response = await fetch(uploadUrl, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = (await response.json()) as { message?: string };
+        throw new Error(
+          errorData.message ||
+            `Upload fehlgeschlagen (Status: ${response.status})`
+        );
+      }
+
+      const result = (await response.json()) as {
+        success?: boolean;
+        message?: string;
+      };
+
+      setConnectionMessage(
+        `✅ ${file.name} erfolgreich hochgeladen! Agent wird neu gestartet...`
+      );
+      setConnectionStatus("success");
+
+      // Auto-reload agent after 2 seconds
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unbekannter Fehler";
+      console.error("❌ Spezialisierungs-Upload Fehler:", errorMessage);
+      setConnectionMessage(`❌ Fehler: ${errorMessage}`);
+      setConnectionStatus("error");
+    } finally {
+      setTestingConnection(false);
+    }
   };
 
   const testConnection = async () => {
