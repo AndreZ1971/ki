@@ -307,7 +307,7 @@ describe('Integration: Test Specialization Encryption Full Flow', () => {
 
       // Measure encryption time
       const encryptStart = performance.now();
-      const result = await manager.saveEncrypted('perf-spec', testSpec);
+      await manager.saveEncrypted('perf-spec', testSpec);
       const encryptTime = performance.now() - encryptStart;
 
       // Measure decryption time
