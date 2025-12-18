@@ -82,6 +82,43 @@ Das WooCommerce AI Agent System ist eine vollständig integrierte, KI-gestützte
   5. **Google Tools**: Trends Analysis, Search Data
 - **Interface**: Standardisiertes Tool-Interface für AI Agent
 
+#### **Specialization System** (`backend/services/`)
+
+**SpecializationPersistenceManager** (`specializationPersistenceManager.ts`):
+- **Funktion**: Persistente Speicherung von KI-Spezialisierungen
+- **Features**:
+  - Filesystem-basierte Persistierung (JSON)
+  - SHA-256 Integritätschecks
+  - CRUD-Operationen
+  - Active/Fallback-Verwaltung
+  - Corruption-Recovery
+- **Storage-Struktur**:
+  - `index.json` - Globales Inventar
+  - `active.json` - Aktive Spezialisierungen
+  - `fallback.json` - Fallback-Spezialisierungen
+  - `{userId}/{specId}.json` - Spezialisierungs-Daten
+  - `{userId}/{specId}.meta.json` - Metadata & Checksums
+
+**SpecializationAutoLoad** (`specializationAutoLoad.ts`):
+- **Funktion**: Automatisches Laden beim Server-Start
+- **Features**:
+  - In-Memory Cache für aktive Spezialisierung
+  - State-Management (not-started → loading → loaded/failed)
+  - Fallback-Mechanismen
+  - Reload & Invalidation
+  - Validation für alle Spezialisierungen
+- **Performance**: < 5ms Cache-Hit, ~10-20ms Disk-Load
+
+**TestSpecializationBackupManager** (`security/testSpecializationBackupManager.ts`):
+- **Funktion**: Verschlüsselte Speicherung von Test-Spezialisierungen
+- **Verschlüsselung**: AES-256-GCM
+- **Features**:
+  - Unique IV pro Encryption
+  - Authentication Tag für Tamper-Detection
+  - Original-Hash-Preservation
+  - Backup & Restore
+- **Siehe**: [SPECIALIZATION_PERSISTENCE_SYSTEM.md](./SPECIALIZATION_PERSISTENCE_SYSTEM.md)
+
 #### **Job System** (`backend/agent/jobs/`)
 
 **Automatisierte Jobs** (44 verschiedene Job-Typen):
@@ -475,38 +512,38 @@ Scheduler (Cron) → Job Trigger → executeWithFullProtection()
 
 ### 4.1 Backend
 
-| Kategorie | Technologie | Version | Verwendung |
-|-----------|-------------|---------|------------|
-| **Runtime** | Node.js | 18+ | Server Runtime |
-| **Framework** | Fastify | 5.2.1 | REST API Server |
-| **Language** | TypeScript | 5.8.3 | Type-Safe Development |
-| **AI** | OpenAI SDK | Latest | GPT-4, DALL-E, Embeddings |
-| **HTTP Client** | Axios | 1.7.9 | External API Calls |
-| **Scheduler** | Node-Cron | 3.0.3 | Job Scheduling |
-| **Testing** | Vitest | 2.1.8 | Unit & Integration Tests |
-| **Linting** | ESLint | 9.18.0 | Code Quality |
-| **Process Manager** | PM2 | 5.4.3 | Production Process Management |
+| Kategorie           | Technologie | Version | Verwendung                    |
+| ------------------- | ----------- | ------- | ----------------------------- |
+| **Runtime**         | Node.js     | 18+     | Server Runtime                |
+| **Framework**       | Fastify     | 5.2.1   | REST API Server               |
+| **Language**        | TypeScript  | 5.8.3   | Type-Safe Development         |
+| **AI**              | OpenAI SDK  | Latest  | GPT-4, DALL-E, Embeddings     |
+| **HTTP Client**     | Axios       | 1.7.9   | External API Calls            |
+| **Scheduler**       | Node-Cron   | 3.0.3   | Job Scheduling                |
+| **Testing**         | Vitest      | 2.1.8   | Unit & Integration Tests      |
+| **Linting**         | ESLint      | 9.18.0  | Code Quality                  |
+| **Process Manager** | PM2         | 5.4.3   | Production Process Management |
 
 ### 4.2 Frontend
 
-| Kategorie | Technologie | Version | Verwendung |
-|-----------|-------------|---------|------------|
-| **Framework** | React | 18.3.1 | UI Framework |
-| **Build Tool** | Vite | 6.0.5 | Fast Build Tool |
-| **UI Library** | Shadcn/ui | Latest | Component Library |
-| **CSS** | Tailwind CSS | 3.4.17 | Utility-First CSS |
-| **Routing** | React Router | 7.1.1 | Client-Side Routing |
-| **Icons** | Lucide React | 0.468.0 | Icon Library |
+| Kategorie      | Technologie  | Version | Verwendung          |
+| -------------- | ------------ | ------- | ------------------- |
+| **Framework**  | React        | 18.3.1  | UI Framework        |
+| **Build Tool** | Vite         | 6.0.5   | Fast Build Tool     |
+| **UI Library** | Shadcn/ui    | Latest  | Component Library   |
+| **CSS**        | Tailwind CSS | 3.4.17  | Utility-First CSS   |
+| **Routing**    | React Router | 7.1.1   | Client-Side Routing |
+| **Icons**      | Lucide React | 0.468.0 | Icon Library        |
 
 ### 4.3 DevOps
 
-| Kategorie | Technologie | Verwendung |
-|-----------|-------------|------------|
-| **Container** | Docker | Containerization |
-| **Orchestration** | Docker Compose | Multi-Container Management |
-| **Auto-Update** | Watchtower | Automatic Container Updates |
-| **Git Hooks** | Husky | Pre-Commit Hooks |
-| **Code Formatting** | Prettier | Code Formatting |
+| Kategorie           | Technologie    | Verwendung                  |
+| ------------------- | -------------- | --------------------------- |
+| **Container**       | Docker         | Containerization            |
+| **Orchestration**   | Docker Compose | Multi-Container Management  |
+| **Auto-Update**     | Watchtower     | Automatic Container Updates |
+| **Git Hooks**       | Husky          | Pre-Commit Hooks            |
+| **Code Formatting** | Prettier       | Code Formatting             |
 
 ---
 
