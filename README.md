@@ -1,9 +1,31 @@
 # 🚀 ARI - Artificial Retail Intelligence System
 
-**Version:** 5.0.0-alpha  
-**Status:** Alpha-Container MVP - Live Testing Phase 🧪
+**Version:** 5.1.0  
+**Status:** Full i18n Multi-Language Support ✅ | Alpha-Container MVP - Live Testing Phase 🧪
 
-Ein **AI-gestütztes Business Automation System** für WooCommerce/WordPress mit 50+ spezialisierten Tools, KI-Agent, Agentic Loops und modernem Dashboard.
+Ein **AI-gestütztes Business Automation System** für WooCommerce/WordPress mit 50+ spezialisierten Tools, KI-Agent, Agentic Loops, modernem Dashboard und **vollständiger Mehrsprachunterstützung (Deutsch/Englisch)**.
+
+---
+
+## 🌍 **Neu in Version 5.1.0: Vollständige Mehrsprachunterstützung!**
+
+### 🇩🇪 🇬🇧 **Multi-Language i18n Implementation**
+
+✅ **100% Frontend Coverage** - Alle 64 Seiten konvertiert zur react-i18next  
+✅ **Deutsch + Englisch** - Komplette Übersetzungen für beide Sprachen  
+✅ **Language Switcher** - Einfache Sprachumschaltung via 🇩🇪🇬🇧 Buttons  
+✅ **LocalStorage Persistence** - Sprachpräferenz wird gespeichert  
+✅ **Zero Breaking Changes** - Vollständig abwärtskompatibel
+
+**Unterstützte Seiten (alle konvertiert):**
+- Dashboard, Settings (alle 5 Tabs), Analytics, Payment-Module
+- Product Management, Marketing Tools, AI Agent Interface
+- Agentic Loops, License Management, Specializations
+- 58+ weitere funktionale Seiten
+
+**Translation Keys:** 150+ Struktur-Keys für konsistente Übersetzungen
+
+**Details:** Siehe [I18N_COVERAGE_REPORT.md](docs/I18N_COVERAGE_REPORT.md)
 
 ---
 
@@ -171,18 +193,27 @@ cd frontend
 npm run dev
 ```
 
+### 🌍 Language Switching (i18n)
+
+Nach dem Start kann die Sprache über die **Flaggen-Buttons** oben rechts im Dashboard gewechselt werden:
+- 🇩🇪 Deutsch
+- 🇬🇧 English
+
+Die Sprachpräferenz wird **automatisch in localStorage gespeichert** und beim nächsten Besuch wiederhergestellt.
+
 ---
 
 ## 📋 Dokumentation
 
-| Dokument                                                      | Beschreibung                                 |
-| ------------------------------------------------------------- | -------------------------------------------- |
-| [Content Monetization](./docs/CONTENT_MONETIZATION.md)        | Konsolidierte Anleitung & API                |
-| [Bedienungsanleitung](./docs/Bedienungsanleitung-KI-Agent.md) | Komplette Tool-Übersicht & How-To's          |
-| [Backend AI Setup](./docs/BACKEND_AI_SETUP.md)                | AI-Transformation & Social Media Integration |
-| [Deployment Guide](./docs/deployment.md)                      | Production-Setup & Troubleshooting           |
-| [API-Reference](./docs/api/)                                  | Vollständige API-Dokumentation               |
-| [Social Media Guide](./docs/SOCIAL_MEDIA_GUIDE.md)            | Meta & TikTok Setup, .env, Test-APIs         |
+| Dokument                                                      | Beschreibung                                    |
+| ------------------------------------------------------------- | ----------------------------------------------- |
+| [i18n Coverage Report](./docs/I18N_COVERAGE_REPORT.md)        | 🌍 Multi-Language Implementation (100% Coverage) |
+| [Content Monetization](./docs/CONTENT_MONETIZATION.md)        | Konsolidierte Anleitung & API                   |
+| [Bedienungsanleitung](./docs/Bedienungsanleitung-KI-Agent.md) | Komplette Tool-Übersicht & How-To's             |
+| [Backend AI Setup](./docs/BACKEND_AI_SETUP.md)                | AI-Transformation & Social Media Integration    |
+| [Deployment Guide](./docs/deployment.md)                      | Production-Setup & Troubleshooting              |
+| [API-Reference](./docs/api/)                                  | Vollständige API-Dokumentation                  |
+| [Social Media Guide](./docs/SOCIAL_MEDIA_GUIDE.md)            | Meta & TikTok Setup, .env, Test-APIs            |
 
 ---
 
