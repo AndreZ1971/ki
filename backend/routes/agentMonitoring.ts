@@ -462,4 +462,180 @@ export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
       return { success: false, error: 'Failed to export monitoring' };
     }
   });
+
+  /**
+   * GET /export/:loopType/:format
+   * Exportiere Loop-Daten in verschiedenen Formaten
+   * Formate: json, csv, pdf
+   */
+  fastify.get<{
+    Params: { loopType: string; format: string };
+    Querystring: { days?: string; limit?: string };
+  }>('/export/:loopType/:format', async (request, reply) => {
+    try {
+      const { loopType, format } = request.params;
+      const days = parseInt(request.query.days ?? '30') || 30;
+      const limit = parseInt(request.query.limit ?? '100') || 100;
+      const { executionLogger } = getServices();
+
+      if (!executionLogger) {
+        reply.status(503);
+        return { success: false, error: 'Execution Logger not initialized' };
+      }
+
+      // Hole Daten
+      const history = await executionLogger.getHistory(loopType, limit);
+      const stats = await executionLogger.getStats(loopType, days);
+
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const filename = `${loopType}-export-${timestamp}`;
+
+      // JSON Export
+      if (format === 'json') {
+        const data = {
+          exportDate: new Date().toISOString(),
+          loopType,
+          period: { days, limit },
+          stats,
+          history,
+        };
+        reply.header('Content-Type', 'application/json');
+        reply.header(
+          'Content-Disposition',
+          `attachment; filename="${filename}.json"`
+        );
+        return data;
+      }
+
+      // CSV Export
+      if (format === 'csv') {
+        const csvRows = [
+          // Header
+          [
+            'Run ID',
+            'Start Time',
+            'Duration (ms)',
+            'Status',
+            'Iterations',
+            'Success Rate',
+            'Findings',
+            'Insights',
+          ].join(','),
+          // Data rows
+          ...history.map((record: any) =>
+            [
+              record.runId,
+              record.startTime.toISOString(),
+              record.duration,
+              record.status,
+              record.iterations,
+              ((record.metrics?.successRate ?? 0) * 100).toFixed(1) + '%',
+              record.result?.findings?.length ?? 0,
+              record.insights?.length ?? 0,
+            ].join(',')
+          ),
+        ];
+        const csvContent = csvRows.join('\n');
+        reply.header('Content-Type', 'text/csv');
+        reply.header(
+          'Content-Disposition',
+          `attachment; filename="${filename}.csv"`
+        );
+        return csvContent;
+      }
+
+      // PDF Export (Simple HTML-to-PDF approach)
+      if (format === 'pdf') {
+        // For now, return HTML that can be printed to PDF
+        const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>${loopType} Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 40px; }
+    h1 { color: #06b6d4; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+    th { background-color: #06b6d4; color: white; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 30px 0; }
+    .stat-card { background: #f0f9ff; padding: 20px; border-radius: 8px; }
+    .stat-value { font-size: 32px; font-weight: bold; color: #06b6d4; }
+    .stat-label { color: #64748b; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h1>🤖 ${loopType} Report</h1>
+  <p>Generated: ${new Date().toLocaleString()}</p>
+  <p>Period: Last ${days} days</p>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-value">${stats.totalRuns}</div>
+      <div class="stat-label">Total Runs</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${(stats.successRate * 100).toFixed(1)}%</div>
+      <div class="stat-label">Success Rate</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${stats.avgDuration.toFixed(0)}ms</div>
+      <div class="stat-label">Avg Duration</div>
+    </div>
+  </div>
+
+  <h2>Execution History</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Run ID</th>
+        <th>Start Time</th>
+        <th>Duration</th>
+        <th>Status</th>
+        <th>Iterations</th>
+        <th>Findings</th>
+        <th>Insights</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${history
+        .map(
+          (record: any) => `
+        <tr>
+          <td>${record.runId}</td>
+          <td>${new Date(record.startTime).toLocaleString()}</td>
+          <td>${record.duration}ms</td>
+          <td>${record.status}</td>
+          <td>${record.iterations}</td>
+          <td>${record.result?.findings?.length ?? 0}</td>
+          <td>${record.insights?.length ?? 0}</td>
+        </tr>
+      `
+        )
+        .join('')}
+    </tbody>
+  </table>
+
+  <footer style="margin-top: 40px; color: #64748b; font-size: 12px;">
+    <p>Export created by AI Agent System | Print to PDF: Ctrl+P or Cmd+P</p>
+  </footer>
+</body>
+</html>`;
+        reply.header('Content-Type', 'text/html');
+        return htmlContent;
+      }
+
+      // Unknown format
+      reply.status(400);
+      return {
+        success: false,
+        error: `Unknown format: ${format}. Supported: json, csv, pdf`,
+      };
+    } catch (error) {
+      logger.error(`Failed to export: ${error}`);
+      reply.status(500);
+      return { success: false, error: 'Export failed' };
+    }
+  });
 }

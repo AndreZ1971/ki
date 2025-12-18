@@ -34,6 +34,7 @@ const LoopMonitoring: React.FC = () => {
   const [insights, setInsights] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showExportModal, setShowExportModal] = useState(false);
 
   const loops = [
     {
@@ -162,6 +163,21 @@ const LoopMonitoring: React.FC = () => {
     );
   }
 
+  const handleExport = (format: string) => {
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    const url = `${apiUrl}/api/agent/monitoring/export/${selectedLoop}/${format}?days=30&limit=100`;
+
+    if (format === "pdf") {
+      // PDF öffnet in neuem Tab zum Drucken
+      window.open(url, "_blank");
+    } else {
+      // JSON/CSV direct download
+      window.location.href = url;
+    }
+
+    setShowExportModal(false);
+  };
+
   return (
     <div className="settings-container">
       <div
@@ -173,9 +189,25 @@ const LoopMonitoring: React.FC = () => {
           <p>Überwache Status, Performance und Learnings aller Loops</p>
         </div>
         <button
+          onClick={() => setShowExportModal(true)}
+          style={{
+            padding: "10px 20px",
+            background: "linear-gradient(135deg, #10b981, #059669)",
+            border: "none",
+            borderRadius: "8px",
+            color: "white",
+            cursor: "pointer",
+            fontWeight: 600,
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
+          💾 Sichern
+        </button>
+        <button
           onClick={() => navigate("/settings")}
           style={{
-            marginLeft: "auto",
             padding: "10px 16px",
             background: "linear-gradient(135deg, #06b6d4, #0891b2)",
             border: "none",
@@ -462,6 +494,187 @@ const LoopMonitoring: React.FC = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* Export Modal */}
+      {showExportModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.7)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+          }}
+          onClick={() => setShowExportModal(false)}
+        >
+          <div
+            style={{
+              background: "linear-gradient(135deg, #1e293b, #0f172a)",
+              borderRadius: "16px",
+              padding: "32px",
+              maxWidth: "500px",
+              width: "90%",
+              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
+              border: "1px solid rgba(6, 182, 212, 0.3)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ marginBottom: "24px" }}>
+              <h2 style={{ color: "#06b6d4", margin: "0 0 8px 0" }}>
+                💾 Export wählen
+              </h2>
+              <p style={{ color: "rgba(255, 255, 255, 0.7)", margin: 0 }}>
+                Wähle das gewünschte Export-Format für{" "}
+                <strong>
+                  {loops.find((l) => l.id === selectedLoop)?.name}
+                </strong>
+              </p>
+            </div>
+
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "12px" }}
+            >
+              {/* JSON Export */}
+              <button
+                onClick={() => handleExport("json")}
+                style={{
+                  padding: "16px 20px",
+                  background: "linear-gradient(135deg, #3b82f6, #2563eb)",
+                  border: "none",
+                  borderRadius: "10px",
+                  color: "white",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  fontSize: "16px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  transition: "transform 0.2s",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.transform = "scale(1.02)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.transform = "scale(1)")
+                }
+              >
+                <span style={{ fontSize: "24px" }}>📄</span>
+                <div style={{ textAlign: "left", flex: 1 }}>
+                  <div>JSON Export</div>
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      opacity: 0.8,
+                      fontWeight: "normal",
+                    }}
+                  >
+                    Strukturierte Daten für externe Tools
+                  </div>
+                </div>
+              </button>
+
+              {/* CSV Export */}
+              <button
+                onClick={() => handleExport("csv")}
+                style={{
+                  padding: "16px 20px",
+                  background: "linear-gradient(135deg, #10b981, #059669)",
+                  border: "none",
+                  borderRadius: "10px",
+                  color: "white",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  fontSize: "16px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  transition: "transform 0.2s",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.transform = "scale(1.02)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.transform = "scale(1)")
+                }
+              >
+                <span style={{ fontSize: "24px" }}>📊</span>
+                <div style={{ textAlign: "left", flex: 1 }}>
+                  <div>CSV Export</div>
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      opacity: 0.8,
+                      fontWeight: "normal",
+                    }}
+                  >
+                    Für Excel & Datenanalyse
+                  </div>
+                </div>
+              </button>
+
+              {/* PDF Export */}
+              <button
+                onClick={() => handleExport("pdf")}
+                style={{
+                  padding: "16px 20px",
+                  background: "linear-gradient(135deg, #f59e0b, #d97706)",
+                  border: "none",
+                  borderRadius: "10px",
+                  color: "white",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  fontSize: "16px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  transition: "transform 0.2s",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.transform = "scale(1.02)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.transform = "scale(1)")
+                }
+              >
+                <span style={{ fontSize: "24px" }}>📑</span>
+                <div style={{ textAlign: "left", flex: 1 }}>
+                  <div>PDF Report</div>
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      opacity: 0.8,
+                      fontWeight: "normal",
+                    }}
+                  >
+                    Für Präsentationen & Berichte
+                  </div>
+                </div>
+              </button>
+
+              {/* Cancel Button */}
+              <button
+                onClick={() => setShowExportModal(false)}
+                style={{
+                  padding: "12px",
+                  background: "rgba(255, 255, 255, 0.1)",
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  borderRadius: "8px",
+                  color: "white",
+                  cursor: "pointer",
+                  marginTop: "8px",
+                }}
+              >
+                Abbrechen
+              </button>
+            </div>
           </div>
         </div>
       )}
