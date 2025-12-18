@@ -22,13 +22,23 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
     return true;
   };
 
-  // WooCommerce Client initialisieren
-  const WooCommerce = new WooCommerceRestApi({
-    url: config.woocommerce?.url || '',
-    consumerKey: config.woocommerce?.consumerKey || '',
-    consumerSecret: config.woocommerce?.consumerSecret || '',
-    version: 'wc/v3',
-  });
+  // Helper: Client-Factory mit wählbarem Auth-Modus
+  const createWooClient = (useQueryStringAuth: boolean) =>
+    new WooCommerceRestApi({
+      url: config.woocommerce?.url || '',
+      consumerKey: config.woocommerce?.consumerKey || '',
+      consumerSecret: config.woocommerce?.consumerSecret || '',
+      version: 'wc/v3',
+      // Manche Hosts blocken Authorization-Header → query string auth nutzen
+      queryStringAuth: useQueryStringAuth,
+      axiosConfig: {
+        timeout: (config as any)?.woocommerce?.timeoutMs || 30000,
+      },
+    });
+
+  const preferQuery = (config as any)?.woocommerce?.authMode === 'query';
+  const WooPrimary = createWooClient(preferQuery);
+  const WooFallback = createWooClient(!preferQuery);
 
   // GET: Alle Kunden aus WooCommerce
   fastify.get('/customers', async (request, reply) => {
@@ -48,7 +58,7 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
       // Echte WooCommerce API Integration - robust mit Fallback-Parametern
       let response: any;
       try {
-        response = await WooCommerce.get('customers', {
+        response = await WooPrimary.get('customers', {
           per_page: 100, // Hole bis zu 100 Kunden
           orderby: 'registered_date',
           order: 'desc',
@@ -59,11 +69,21 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
           '⚠️ Woo customers primary query failed, retrying with fallback params...',
           primaryErr?.response?.status || primaryErr?.message
         );
-        response = await WooCommerce.get('customers', {
-          per_page: 100,
-          orderby: 'id',
-          order: 'desc',
-        });
+        // Beim Fallback auch den Auth-Mode wechseln
+        try {
+          response = await WooFallback.get('customers', {
+            per_page: 100,
+            orderby: 'registered_date',
+            order: 'desc',
+          });
+        } catch (fallbackAuthErr: any) {
+          // Letzter Versuch: minimalistische Parameter
+          response = await WooFallback.get('customers', {
+            per_page: 100,
+            orderby: 'id',
+            order: 'desc',
+          });
+        }
       }
 
       const customers = response.data.map((customer: any) => ({
@@ -128,26 +148,35 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
 
       console.log('📥 Fetching subscribers from WooCommerce...');
 
-      // ✅ ECHTE Subscriber aus WooCommerce (User mit Rolle "subscriber") – robust mit Fallback
+      // ✅ ECHTE Subscriber aus WooCommerce (User mit Rolle "subscriber") – robust inkl. Auth-Fallback
       let response: any;
       try {
-        response = await WooCommerce.get('customers', {
+        response = await WooPrimary.get('customers', {
           per_page: 100,
           orderby: 'registered_date',
           order: 'desc',
-          role: 'subscriber', // Nur Subscriber-Rolle
+          role: 'subscriber',
         });
       } catch (primaryErr: any) {
         console.warn(
-          '⚠️ Woo subscribers primary query failed, retrying with fallback params...',
+          '⚠️ Woo subscribers primary query failed, retrying with fallback auth/params...',
           primaryErr?.response?.status || primaryErr?.message
         );
-        response = await WooCommerce.get('customers', {
-          per_page: 100,
-          orderby: 'id',
-          order: 'desc',
-          role: 'subscriber',
-        });
+        try {
+          response = await WooFallback.get('customers', {
+            per_page: 100,
+            orderby: 'registered_date',
+            order: 'desc',
+            role: 'subscriber',
+          });
+        } catch (fallbackAuthErr: any) {
+          response = await WooFallback.get('customers', {
+            per_page: 100,
+            orderby: 'id',
+            order: 'desc',
+            role: 'subscriber',
+          });
+        }
       }
 
       const subscribers = response.data.map((subscriber: any) => ({
@@ -203,12 +232,18 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
     let error: any = null;
     if (configured) {
       try {
-        const res = await WooCommerce.get('customers', { per_page: 1 });
+        const res = await WooPrimary.get('customers', { per_page: 1 });
         status = typeof res?.status === 'number' ? res.status : 200;
         connectivity = status >= 200 && status < 300;
-      } catch (e: any) {
-        status = e?.response?.status || 500;
-        error = e?.response?.data || e?.message || String(e);
+      } catch (e1: any) {
+        try {
+          const res2 = await WooFallback.get('customers', { per_page: 1 });
+          status = typeof res2?.status === 'number' ? res2.status : 200;
+          connectivity = status >= 200 && status < 300;
+        } catch (e2: any) {
+          status = e2?.response?.status || 500;
+          error = e2?.response?.data || e2?.message || String(e2);
+        }
       }
     }
     return reply.send({
