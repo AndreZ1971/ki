@@ -1,15 +1,33 @@
 # 🚀 ARI - Artificial Retail Intelligence System
 
-**Version:** 4.1.0  
-**Status:** Production Ready with Agentic Loops ✅
+**Version:** 5.0.0-alpha  
+**Status:** Alpha-Container MVP - Live Testing Phase 🧪
 
 Ein **AI-gestütztes Business Automation System** für WooCommerce/WordPress mit 50+ spezialisierten Tools, KI-Agent, Agentic Loops und modernem Dashboard.
 
 ---
 
-## ✨ Was ist neu in Version 4.1.0?
+## ✨ Was ist neu in Version 5.0.0-alpha?
 
-### 🤖 **Agentic Loop Framework** (NEU)
+### 🔄 **Dynamic Config Reload** (NEU)
+
+- **Live-Update ohne Restart**: Änderungen in Settings UI werden sofort aktiv
+- **getConfig()**: Dynamisches Nachladen von connection.json bei jeder API-Anfrage
+- **Auth-Modus Switching**: Unterstützung für 'basic' (Header) und 'query' (URL-Parameter)
+- **Shop-Metrics Dashboard**: Zeigt echte Shop-Daten unmittelbar nach Settings-Speicherung
+
+### 🐋 **Alpha-Container Philosophie** (MVP)
+
+- **Ephemeral Design**: Jeder Container-Start mit frischen Platzhaltern
+- **UI-Driven Onboarding**: Kunden konfigurieren via Settings-Interface
+- **K8s-Ready**: Repair/Update Container für Production (Roadmap)
+- **Stateless Architecture**: Keine Persistierung über Container-Restarts
+
+---
+
+## 🎯 Version 4.1.0 Features
+
+### 🤖 **Agentic Loop Framework**
 
 Autonome KI-Agenten für kontinuierliche Geschäftsprozesse:
 

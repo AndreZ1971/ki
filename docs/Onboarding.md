@@ -1,6 +1,6 @@
 # Onboarding – Einstellungen für deinen KI-Agenten
 
-**Version:** 3.2.0
+**Version:** 5.0.0-alpha (Alpha-Container MVP)
 
 Willkommen! Hier erfährst du, wie du deinen KI-Agenten als Shop-Besitzer beim ersten Mal einrichtest. Du brauchst keine technischen Vorkenntnisse – alles läuft direkt im Browser.
 
@@ -8,10 +8,13 @@ Willkommen! Hier erfährst du, wie du deinen KI-Agenten als Shop-Besitzer beim e
 
 ## 🎯 Schnellstart
 
-1. **Frontend öffnen**: `http://localhost:5173` (lokal) oder `http://your-server:5173` (Server)
+1. **Frontend öffnen**: `https://my-working-space.de` (Production) oder `http://localhost:5173` (Entwicklung)
 2. **Einstellungen ausfüllen**: Shop-URL, WooCommerce Schlüssel, OpenAI API-Key
-3. **Dashboard öffnen**: 50+ Tools sind jetzt nutzbar
-4. **Erste Tool testen**: Probiere z.B. "Content Monetized" aus
+3. **Verbindung testen**: Button "Verbindung testen" speichert und validiert Einstellungen
+4. **Dashboard sofort nutzen**: Änderungen werden **ohne Neustart** aktiv! 🚀
+5. **Erste Tools testen**: Probiere z.B. "Shop-Metriken" oder "Produktanalyse" aus
+
+> 🆕 **Neu in v5.0.0-alpha**: Settings werden dynamisch geladen - keine Container-Restarts mehr nötig!
 
 ---
 
@@ -40,9 +43,18 @@ Hinweis: Die meisten Zugangsdaten erhältst du direkt von Woo oder deinem Suppor
 
 ## 3. Einstellungen speichern
 
-Klicke auf „Speichern“. Das System prüft automatisch, ob alle Verbindungen funktionieren.
+Klicke auf „Verbindung testen“. Das System:
+1. **Speichert** alle Einstellungen in `connection.json`
+2. **Validiert** WordPress & WooCommerce Verbindung
+3. **Aktiviert** die Konfiguration **sofort** (kein Neustart!)
 
-Bei Erfolg erscheint eine Bestätigung. Bei Fehlern erhältst du eine Rückmeldung, was noch fehlt oder falsch ist.
+Bei Erfolg erscheint:
+- ✅ WordPress-Test erfolgreich
+- ✅ WooCommerce-Test erfolgreich
+
+Bei Fehlern erhältst du eine Rückmeldung, was noch fehlt oder falsch ist.
+
+> ⚡ **Alpha-Container Design**: Bei Container-Neustart werden Platzhalter wiederhergestellt. Einfach Settings erneut speichern oder JSON importieren!
 
 ---
 

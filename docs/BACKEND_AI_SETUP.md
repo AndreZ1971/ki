@@ -1,6 +1,9 @@
 # 🤖 Backend AI-Transformation - Die BESTE Lösung!
 
+**Version:** 5.0.0-alpha  
 **Problem gelöst:** Make.com limitiert, IFTTT AI funktioniert nicht? **Dein Backend macht's jetzt selbst!** 🚀
+
+> ℹ️ **Alpha-Container MVP**: Konfiguration wird bei Container-Restart zurückgesetzt. Settings UI nutzen oder JSON importieren.
 
 ---
 
@@ -24,14 +27,14 @@ Backend AI transformiert automatisch:
 
 ## 🎯 Vorteile dieser Lösung
 
-| Feature | IFTTT/Make.com | **Dein Backend** |
-|---------|----------------|------------------|
-| **AI-Transformation** | ❌ Limitiert/kaputt | ✅ **Funktioniert perfekt!** |
-| **Plattform-Support** | ❌ Viele fehlen | ✅ **ALLE Plattformen!** |
-| **Kontrolle** | ❌ Abhängig von Dienst | ✅ **100% in deiner Hand!** |
-| **Kosten** | 💸 4€/Monat | 💰 **Nur OpenAI-Kosten (ca. 0.01€/Post!)** |
-| **Flexibilität** | ❌ Fixe Prompts | ✅ **Jederzeit anpassbar!** |
-| **Debugging** | ❌ Black Box | ✅ **Volle Logs!** |
+| Feature               | IFTTT/Make.com        | **Dein Backend**                          |
+| --------------------- | --------------------- | ----------------------------------------- |
+| **AI-Transformation** | ❌ Limitiert/kaputt    | ✅ **Funktioniert perfekt!**               |
+| **Plattform-Support** | ❌ Viele fehlen        | ✅ **ALLE Plattformen!**                   |
+| **Kontrolle**         | ❌ Abhängig von Dienst | ✅ **100% in deiner Hand!**                |
+| **Kosten**            | 💸 4€/Monat            | 💰 **Nur OpenAI-Kosten (ca. 0.01€/Post!)** |
+| **Flexibilität**      | ❌ Fixe Prompts        | ✅ **Jederzeit anpassbar!**                |
+| **Debugging**         | ❌ Black Box           | ✅ **Volle Logs!**                         |
 
 ---
 
@@ -410,11 +413,11 @@ Falls OpenAI down ist oder Error:
 
 ### OpenAI API (gpt-4o-mini):
 
-| Nutzung | Kosten |
-|---------|--------|
-| **1 Post** | ~$0.0001 (0.01 Cent!) |
-| **100 Posts** | ~$0.01 (1 Cent!) |
-| **1000 Posts** | ~$0.10 (10 Cent!) |
+| Nutzung        | Kosten                |
+| -------------- | --------------------- |
+| **1 Post**     | ~$0.0001 (0.01 Cent!) |
+| **100 Posts**  | ~$0.01 (1 Cent!)      |
+| **1000 Posts** | ~$0.10 (10 Cent!)     |
 
 **Im Vergleich:**
 - IFTTT Pro: 4€/Monat = **400x teurer!**

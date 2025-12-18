@@ -7,6 +7,54 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [5.0.0-alpha] - 2025-12-18
+
+### 🎯 Alpha-Container MVP - Live Testing Phase
+
+Dies ist die erste Alpha-Release des neuen Container-Designs. Hauptfokus liegt auf Live-Testing aller Features auf Production-Server.
+
+### ✨ Hinzugefügt
+
+#### Dynamic Config Reload
+- **getConfig()** Funktion in `backend/config.ts` für dynamisches Nachladen von `connection.json`
+- Settings UI Änderungen werden **sofort aktiv** ohne Backend-Restart
+- Shop-Metrics Dashboard zeigt Live-Daten unmittelbar nach Settings-Speicherung
+- Auth-Modus Switching: Unterstützung für 'basic' (Header) und 'query' (URL-Parameter)
+- Endpoint-basierte Cache-Keys für bessere Wiederverwendbarkeit
+
+#### Alpha-Container Philosophie
+- Ephemeral Design: Container startet mit frischen Platzhaltern
+- UI-Driven Onboarding: Konfiguration via Settings-Interface
+- docker-entrypoint.sh erstellt vollständiges connection.json Schema
+- Stateless Architecture für K8s-Readiness
+
+### 🔧 Geändert
+
+- `backend/routes/app/api/analytics/metrics/shop-metrics.ts`: Nutzt `getConfig()` statt statischen Import
+- `backend/config.ts`: Interface `woocommerce` um `authMode` erweitert
+- Dokumentation aktualisiert: README.md, Onboarding.md, BACKEND_AI_SETUP.md
+
+### 🐛 Behoben
+
+- **Dashboard Platzhalter Bug**: Shop-Metrics zeigten `PLEASE_SET_WOOCOMMERCE_URL` auch nach erfolgreichem Speichern
+- Settings UI speichert korrekt zu `/app/connection.json`, Dashboard liest diese Daten nun dynamisch
+- Nginx IP-Cache Problem nach Backend-Restart dokumentiert (Lösung: Nginx ebenfalls neu starten)
+
+### 📝 Dokumentation
+
+- README.md: v5.0.0-alpha Features, Alpha-Container Konzept
+- Onboarding.md: Live-Update Workflow, keine Restarts nötig
+- CHANGELOG.md: v5.0.0-alpha Release Notes
+
+### 🧪 Testing
+
+- Live-Testing Phase gestartet auf Production-Server (debian-4gb-fsn1-1)
+- Shop-Metriken Dashboard: ✅ Funktioniert
+- Settings UI mit Connection Test: ✅ Funktioniert
+- Dynamic Config Reload: ✅ Funktioniert
+
+---
+
 ## [3.7.0] - 2025-01-XX
 
 ### ✨ Added (Neue Features)
