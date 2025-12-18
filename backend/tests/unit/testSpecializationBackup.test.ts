@@ -4,7 +4,7 @@
  * Tests für die Verschlüsselung und Verwaltung der Test-Spezialisierungen
  */
 
-import { describe, it, expect, beforeAll, afterEach } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
@@ -71,30 +71,20 @@ describe('Test Specialization Backup Manager', () => {
   describe('Encryption & Decryption', () => {
     it('should encrypt and decrypt specialization', async () => {
       const loaded = await manager.load('fashion-mode');
-      const originalContent = JSON.stringify(loaded.data);
 
       // Save encrypted
-      const result = await manager.saveEncrypted(
+      const encResult = await manager.saveEncrypted(
         'fashion-mode-test',
         loaded.data
       );
 
-      expect(result.filePath).toContain('.json.enc');
-      expect(result.size).toBeGreaterThan(0);
-      expect(result.hash).toBeLengthOf(64); // SHA-256
-
-      // Load encrypted and verify
-      const filePath = result.filePath.replace('.json.enc', '');
-      const specId = path.basename(filePath).replace('-test', '');
-
-      // Note: This would require the encrypted file to be in place
-      // In a real test, we'd verify the encrypted file can be read back
+      expect(encResult.filePath).toContain('.json.enc');
+      expect(encResult.size).toBeGreaterThan(0);
+      expect(encResult.hash).toBeLengthOf(64); // SHA-256
     });
 
     it('should preserve data integrity through encryption', async () => {
       const loaded = await manager.load('technik-elektronik');
-      const originalSystemPrompt = loaded.data.data.systemPrompt;
-      const originalFeatures = loaded.data.data.features;
 
       // Simulate encrypt/decrypt cycle
       const encrypted = await manager.saveEncrypted('tech-test', loaded.data);

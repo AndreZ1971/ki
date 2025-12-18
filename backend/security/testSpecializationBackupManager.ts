@@ -251,8 +251,6 @@ export class TestSpecializationBackupManager {
         if (!specs.has(id)) {
           specs.set(id, { id, plaintext: false, encrypted: false, size: 0 });
         }
-        const filePath = path.join(this.dataDir, file);
-        const size = fs.statSync(filePath).size;
         specs.get(id).encrypted = true;
       }
     }

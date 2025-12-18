@@ -12,10 +12,8 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import fs from 'fs';
 import path from 'path';
-import crypto from 'crypto';
 import { getTestSpecializationBackupManager } from '../security/testSpecializationBackupManager';
 
-const TEST_DATA_DIR = path.join(__dirname, '../../data/test-specializations');
 const TEMP_DIR = path.join(__dirname, '../../temp');
 
 describe('Integration: Test Specialization Encryption Full Flow', () => {
@@ -77,14 +75,14 @@ describe('Integration: Test Specialization Encryption Full Flow', () => {
       fs.writeFileSync(plainPath, JSON.stringify(testSpec, null, 2));
 
       // 2. Encrypt to backup
-      const result = await manager.saveEncrypted('test-spec', testSpec);
+      const encResult = await manager.saveEncrypted('test-spec', testSpec);
 
-      expect(result.filePath).toContain('.json.enc');
-      expect(fs.existsSync(result.filePath)).toBe(true);
+      expect(encResult.filePath).toContain('.json.enc');
+      expect(fs.existsSync(encResult.filePath)).toBe(true);
 
       // 3. Verify encrypted file structure
       const encryptedContent = JSON.parse(
-        fs.readFileSync(result.filePath, 'utf-8')
+        fs.readFileSync(encResult.filePath, 'utf-8')
       );
 
       expect(encryptedContent.version).toBe('1.0');
@@ -93,7 +91,7 @@ describe('Integration: Test Specialization Encryption Full Flow', () => {
       expect(encryptedContent.authTag).toBeDefined();
       expect(encryptedContent.ciphertext).toBeDefined();
       expect(encryptedContent.integrity).toBeDefined();
-      expect(encryptedContent.integrity.originalHash).toBe(result.hash);
+      expect(encryptedContent.integrity.originalHash).toBe(encResult.hash);
 
       // 4. Verify file was actually encrypted (not plaintext)
       expect(encryptedContent.ciphertext).not.toBe(JSON.stringify(testSpec));
@@ -105,7 +103,7 @@ describe('Integration: Test Specialization Encryption Full Flow', () => {
       expect(loaded.data.data.systemPrompt).toBe(testSpec.data.systemPrompt);
 
       // 6. Verify integrity hash matches
-      expect(loaded.hash).toBe(result.hash);
+      expect(loaded.hash).toBe(encResult.hash);
     });
 
     it('should handle multiple specializations in same directory', async () => {
@@ -152,8 +150,8 @@ describe('Integration: Test Specialization Encryption Full Flow', () => {
           },
         };
 
-        const filePath = path.join(TEMP_DIR, `${spec.id}.json`);
-        fs.writeFileSync(filePath, JSON.stringify(fullSpec, null, 2));
+        const specFilePath = path.join(TEMP_DIR, `${spec.id}.json`);
+        fs.writeFileSync(specFilePath, JSON.stringify(fullSpec, null, 2));
 
         await manager.saveEncrypted(spec.id, fullSpec);
       }
@@ -199,7 +197,7 @@ describe('Integration: Test Specialization Encryption Full Flow', () => {
         },
       };
 
-      const result = await manager.saveEncrypted('large-spec', testSpec);
+      await manager.saveEncrypted('large-spec', testSpec);
 
       // Verify can decrypt
       const loaded = await manager.load('large-spec');
@@ -239,7 +237,7 @@ describe('Integration: Test Specialization Encryption Full Flow', () => {
         },
       };
 
-      const result = await manager.saveEncrypted('unicode-spec', testSpec);
+      await manager.saveEncrypted('unicode-spec', testSpec);
 
       // Verify special chars preserved
       const loaded = await manager.load('unicode-spec');
@@ -273,7 +271,7 @@ describe('Integration: Test Specialization Encryption Full Flow', () => {
         },
       };
 
-      const result = await manager.saveEncrypted('empty-spec', testSpec);
+      await manager.saveEncrypted('empty-spec', testSpec);
       const loaded = await manager.load('empty-spec');
 
       expect(loaded.data.data.systemPrompt).toBe('');

@@ -142,7 +142,7 @@ class SpecializationEncryption {
 
         // 1. Read original JSON
         const content = fs.readFileSync(filePath, 'utf-8');
-        const parsedJson = JSON.parse(content); // Validate JSON
+        JSON.parse(content); // Validate JSON
 
         // 2. Encrypt
         const encrypted = this.encrypt(content, masterKey);
