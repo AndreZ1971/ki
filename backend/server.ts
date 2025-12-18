@@ -316,9 +316,12 @@ async function buildServer() {
     const persistentMemory = new PersistentMemory(mongoDb);
     console.log('✅ PersistentMemory initialisiert (Dev Mode)');
 
-    // Initialize LoopScheduler
+    // Initialize LoopScheduler with ExecutionLogger
     const loopScheduler = new LoopScheduler();
-    console.log('✅ LoopScheduler initialisiert');
+    loopScheduler.startAll(undefined, executionLogger);
+    console.log(
+      '✅ LoopScheduler initialisiert und gestartet mit ExecutionLogger'
+    );
 
     // Make services globally available for routes
     (global as any).executionLogger = executionLogger;

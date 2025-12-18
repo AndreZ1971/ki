@@ -7,6 +7,7 @@
 
 import cron from 'node-cron';
 import { logger } from '../logger';
+import { ExecutionLogger } from './logger/executionLogger';
 import { AnomalyDetectionLoop } from './loops/anomalyDetectionLoop';
 import { ProductOptimizationLoop } from './loops/productOptimizationLoop';
 import { PaymentRecoveryLoop } from './loops/paymentRecoveryLoop';
@@ -32,6 +33,7 @@ export class LoopScheduler {
   private jobs: Map<string, any> = new Map();
   private lastRuns: Map<string, Date> = new Map();
   private isRunning = false;
+  private executionLogger: ExecutionLogger | null = null;
 
   private defaultSchedule: ScheduleConfig = {
     // Daily at 09:00
@@ -47,12 +49,13 @@ export class LoopScheduler {
   /**
    * Starte alle Scheduled Jobs
    */
-  startAll(config?: ScheduleConfig): void {
+  startAll(config?: ScheduleConfig, executionLogger?: ExecutionLogger): void {
     if (this.isRunning) {
       logger.warn('Scheduler is already running');
       return;
     }
 
+    this.executionLogger = executionLogger || null;
     const schedule = config || this.defaultSchedule;
     this.isRunning = true;
 
@@ -103,10 +106,37 @@ export class LoopScheduler {
           logger.info(
             `✅ ${loopType} completed: ${result.insights.length} insights`
           );
+
+          // 🔥 LOG EXECUTION RESULT
+          if (this.executionLogger) {
+            await this.executionLogger.logExecution(loopType, result);
+          }
         } catch (error) {
           logger.error(
             `❌ ${loopType} failed: ${error instanceof Error ? error.message : String(error)}`
           );
+
+          // 🔥 LOG EXECUTION ERROR
+          if (this.executionLogger && error instanceof Error) {
+            const result: LoopResult = {
+              success: false,
+              context: {
+                id: `${loopType}-${Date.now()}`,
+                type: loopType,
+                startTime: new Date(),
+                iteration: 0,
+                maxIterations: 1,
+                status: 'failed',
+                findings: [],
+                learnings: [],
+                decisions: [],
+              },
+              insights: [],
+              recommendations: [],
+              executionTime: 0,
+            };
+            await this.executionLogger.logExecution(loopType, result, error);
+          }
         }
       });
 
@@ -166,7 +196,41 @@ export class LoopScheduler {
     }
 
     this.lastRuns.set(loopType, new Date());
-    return await loop.execute();
+    try {
+      const result = await loop.execute();
+
+      // 🔥 LOG EXECUTION RESULT
+      if (this.executionLogger) {
+        await this.executionLogger.logExecution(loopType, result);
+      }
+
+      return result;
+    } catch (error) {
+      logger.error(`Manual trigger failed for ${loopType}: ${error}`);
+
+      // 🔥 LOG EXECUTION ERROR
+      if (this.executionLogger && error instanceof Error) {
+        const result: LoopResult = {
+          success: false,
+          context: {
+            id: `${loopType}-manual-${Date.now()}`,
+            type: loopType,
+            startTime: new Date(),
+            iteration: 0,
+            maxIterations: 1,
+            status: 'failed',
+            findings: [],
+            learnings: [],
+            decisions: [],
+          },
+          insights: [],
+          recommendations: [],
+          executionTime: 0,
+        };
+        await this.executionLogger.logExecution(loopType, result, error);
+      }
+      throw error;
+    }
   }
 
   /**
