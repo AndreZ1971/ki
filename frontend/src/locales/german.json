@@ -558,5 +558,10 @@
       "loading": "Lädt...",
       "success": "Erfolgreich"
     }
+  },
+  "pages": {
+    "productAnalysis": {
+      "title": "🔍 KI-Produktanalyse"
+    }
   }
 }

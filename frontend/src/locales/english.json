@@ -558,5 +558,10 @@
       "loading": "Loading...",
       "success": "Success"
     }
+  },
+  "pages": {
+    "productAnalysis": {
+      "title": "🔍 AI Product Analysis"
+    }
   }
 }
