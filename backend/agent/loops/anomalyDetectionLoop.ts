@@ -89,6 +89,18 @@ export class AnomalyDetectionLoop extends AgenticLoop {
             });
           }
 
+          // 🆕 Cancelled Order Detection
+          if (order.status === 'cancelled') {
+            detectedAnomalies.push({
+              orderId: order.id,
+              type: 'failed_payment',
+              severity: 'medium',
+              description: `Order cancelled - potential payment issue #${order.id}`,
+              suggestedAction:
+                'Investigate cancellation reason and contact customer',
+            });
+          }
+
           // 2️⃣ Unusual Amount Detection
           const amount = parseFloat(order.total);
           if (amount > 5000) {
@@ -151,7 +163,7 @@ export class AnomalyDetectionLoop extends AgenticLoop {
         logger.info(`✅ ACT: Created ${actions.length} recovery actions`);
         return actions;
       },
-      validation: (result: any) => Array.isArray(result) && result.length > 0,
+      // 🔧 FIXED: Entferne Validation - auch 0 actions sind valid (keine Anomalien gefunden ist OK)
     });
 
     // LEARN: Speichere Patterns

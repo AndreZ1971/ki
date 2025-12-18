@@ -421,6 +421,38 @@ export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
   });
 
   /**
+   * GET /debug/memory-store
+   * Debug: Zeige memoryStore vom ExecutionLogger
+   */
+  fastify.get('/debug/memory-store', async (_request, _reply) => {
+    try {
+      const { executionLogger } = getServices();
+
+      if (!executionLogger) {
+        return {
+          success: false,
+          error: 'ExecutionLogger not initialized',
+        };
+      }
+
+      // Access private memoryStore via any cast
+      const memoryStore = (executionLogger as any).memoryStore || [];
+
+      return {
+        success: true,
+        count: memoryStore.length,
+        store: memoryStore.slice(0, 10), // First 10 records
+      };
+    } catch (error) {
+      logger.error(`Failed to get memory store: ${error}`);
+      return {
+        success: false,
+        error: 'Failed to get memory store',
+      };
+    }
+  });
+
+  /**
    * GET /export
    * Liefert aggregierte, datenschutzkonforme Monitoring-Daten (keine PII)
    * Optional: write=1 schreibt JSON nach METRICS_EXPORT_DIR oder Default /app/data/exports

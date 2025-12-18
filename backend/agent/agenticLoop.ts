@@ -250,12 +250,44 @@ export class AgenticLoop {
   private buildResult(success: boolean): LoopResult {
     const executionTime = Date.now() - this.context.startTime.getTime();
 
+    // 🔧 IMPROVED: Generiere insights aus findings, decisions UND learnings
+    const insights: string[] = [];
+
+    // Insights aus Learnings
+    this.context.learnings.forEach((l) => {
+      if (typeof l === 'string') {
+        insights.push(l);
+      } else if (Array.isArray(l)) {
+        l.forEach((item: any) => {
+          if (item.type && item.count) {
+            insights.push(
+              `Detected ${item.count}x ${item.type} (confidence: ${Math.round((item.confidence || 0) * 100)}%)`
+            );
+          }
+        });
+      }
+    });
+
+    // Insights aus Findings (falls vorhanden)
+    if (this.context.findings.length > 0) {
+      const lastFinding =
+        this.context.findings[this.context.findings.length - 1];
+      if (Array.isArray(lastFinding)) {
+        insights.push(`Analyzed ${lastFinding.length} data points`);
+      }
+    }
+
+    // Fallback falls keine Insights
+    if (insights.length === 0 && success) {
+      insights.push(
+        `Completed ${this.context.iteration} iteration(s) successfully`
+      );
+    }
+
     return {
       context: this.context,
       success,
-      insights: this.context.learnings.map((l) =>
-        typeof l === 'string' ? l : JSON.stringify(l)
-      ),
+      insights,
       recommendations: this.context.decisions,
       executionTime,
     };
