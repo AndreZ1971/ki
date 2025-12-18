@@ -57,7 +57,7 @@ import imageAnalysisRoutes from './routes/app/api/marketing/image-analysis-route
 
 // 🔐 SPECIALIZATION PERSISTENCE & AUTO-LOAD
 import { SpecializationPersistenceManager } from './services/specializationPersistenceManager';
-import { initializeSpecializationAutoLoad } from './services/specializationAutoLoad';
+import { initializeSpecializationAutoLoad as _initializeSpecializationAutoLoad } from './services/specializationAutoLoad';
 
 // 🔥 USER MANAGEMENT ROUTES
 import userRoutes from './routes/app/api/users';

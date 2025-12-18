@@ -620,7 +620,7 @@ function sanitizeSpecializationData(
   for (const field of allowedFields) {
     if (!(field in data)) continue;
 
-    let value: unknown = data[field];
+    const value: unknown = data[field];
 
     // Sanitize strings
     if (typeof value === 'string') {
