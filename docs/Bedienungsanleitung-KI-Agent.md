@@ -721,22 +721,22 @@ Fehlerbehebung:
 
 #### Dashboard-Metriken
 
-| Metrik | Erklärung |
-|--------|-----------|
-| **Kundenbewertungen** | Anzahl eingegangener WooCommerce Reviews |
-| **Support-Tickets** | Anzahl offener/bearbeiteter Awesome-Support-Tickets |
-| **Stimmung** | 😊 Positiv / 😐 Neutral / 😟 Negativ (KI-Analyse) |
-| **Bearbeitungszeit** | Durchschnitt: Zeit von Erstellung bis Lösung |
+| Metrik                | Erklärung                                           |
+| --------------------- | --------------------------------------------------- |
+| **Kundenbewertungen** | Anzahl eingegangener WooCommerce Reviews            |
+| **Support-Tickets**   | Anzahl offener/bearbeiteter Awesome-Support-Tickets |
+| **Stimmung**          | 😊 Positiv / 😐 Neutral / 😟 Negativ (KI-Analyse)      |
+| **Bearbeitungszeit**  | Durchschnitt: Zeit von Erstellung bis Lösung        |
 
 #### Insight-Kategorien (KI-Analyse)
 
-| Kategorie | Beispiel |
-|-----------|----------|
-| **Customer** | "Kunden berichten von langen Lieferzeiten" |
-| **Performance** | "Produktseite lädt zu langsam laut Feedback" |
-| **Products** | "Bestseller-Produkt hat hohe Zufriedenheit" |
-| **Traffic** | "Viele Fragen zum Checkout-Prozess" |
-| **Conversion** | "Rückgabequote steigt, weil Beschreibungen unklar" |
+| Kategorie       | Beispiel                                           |
+| --------------- | -------------------------------------------------- |
+| **Customer**    | "Kunden berichten von langen Lieferzeiten"         |
+| **Performance** | "Produktseite lädt zu langsam laut Feedback"       |
+| **Products**    | "Bestseller-Produkt hat hohe Zufriedenheit"        |
+| **Traffic**     | "Viele Fragen zum Checkout-Prozess"                |
+| **Conversion**  | "Rückgabequote steigt, weil Beschreibungen unklar" |
 
 #### Impact & Criticality
 
@@ -756,11 +756,11 @@ Fehlerbehebung:
 
 #### Fehlerbehandlung
 
-| Fehler | Lösung |
-|--------|--------|
-| "Bewertungen laden schlägt fehl" | Prüfe, ob WooCommerce API Keys aktiv sind |
+| Fehler                               | Lösung                                                                    |
+| ------------------------------------ | ------------------------------------------------------------------------- |
+| "Bewertungen laden schlägt fehl"     | Prüfe, ob WooCommerce API Keys aktiv sind                                 |
 | "Support-Tickets laden schlägt fehl" | Plugin fehlend oder falsche App-Password. Siehe "Setup für Tickets" oben. |
-| "KI-Analyse schlägt fehl" | Prüfe OpenAI API Key in Backend-Config |
+| "KI-Analyse schlägt fehl"            | Prüfe OpenAI API Key in Backend-Config                                    |
 
 #### Best Practices
 
@@ -1221,6 +1221,148 @@ Fehlerbehebung:
 - **Product Recommendations**: Collaborative Filtering basierend auf Kaufhistorie
 - **Trend Forecasting**: Time Series Analysis mit Google Trends Daten
 - **Email Send Time**: Lernt optimale Sendezeit pro Kunde aus historischen Daten
+
+---
+
+### 🔐 Specialization Upload (Umschulung)
+
+#### Was ist eine Specialization?
+
+Eine **Specialization** ist eine maßgefertigte KI-Umschulung, die den Produktbeschreibungs-KI-Agent auf Ihre spezifischen Geschäftsanforderungen trainiert. Sie können branchenspezifische Regeln, Schreibstile und Compliance-Anforderungen definieren.
+
+**Beispiele für Specializations:**
+- 💄 **Beauty & Kosmetik**: Spezielle INCI-Inhaltsstoff-Beschreibungen & Compliance für Health Claims
+- 👗 **Fashion & Mode**: Trend-Sprache, Body-Type Beratung & Visual Descriptions
+- 🏠 **Home & Living**: Interior-Design-Terminologie & Nachhaltigkeits-Fokus
+- 📚 **E-Learning**: Didaktische Sprache & Lernergebnis-Fokus
+
+#### Wie lade ich eine Specialization hoch?
+
+1. **Settings öffnen** - Klicken Sie auf das ⚙️ Icon oben rechts
+2. **Zum Tab "Specialization" navigieren** - Neben "Connection", "License", "Social"
+3. **Datei wählen** - Unterstützte Formate:
+   - `.json` - Strukturierte Specialization-Definition (empfohlen)
+   - `.csv` - Vereinfachtes Format mit Key-Value Paaren
+4. **Datei hochladen** - Klicken Sie auf "📤 Specialization hochladen"
+5. **Verifikation** - Das System verifiziert die Datei
+6. **Aktivieren** - Klicken Sie auf "Specialization aktivieren"
+7. **Speichern** - Die Umschulung ist jetzt aktiv
+
+#### Specialization Datei-Format (JSON)
+
+```json
+{
+  "id": "beauty-kosmetik",
+  "name": "Beauty & Kosmetik - Der Haut-Experte",
+  "description": "Spezialisiert auf Hauttypen, Inhaltsstoffe (INCI), Anwendung",
+  "category": "Beauty & Wellness",
+  "icon": "💄",
+  "version": "1.0.0",
+  "systemPrompt": "Du bist ein hochspezialisierter Beauty & Kosmetik Experte...",
+  "contextInstructions": [
+    "WICHTIG: Keine Health Claims! 'reduziert' statt 'bekämpft'",
+    "Nenne konkrete INCI-Stoffe und deren Funktion"
+  ],
+  "examplePrompts": [
+    "Schreib eine Produktbeschreibung für eine Vitamin-C-Serum"
+  ],
+  "features": [
+    "Hauttyp-Bestimmung & Routing",
+    "INCI-Ingredient Erklärungen",
+    "Compliance & rechtlich sichere Aussagen"
+  ],
+  "targetAudience": "Kosmetik-Shops, Online-Beauty-Retailer",
+  "keywords": ["beauty", "kosmetik", "hautpflege", "skincare"]
+}
+```
+
+#### Specialization Datei-Format (CSV)
+
+```csv
+id,beauty-kosmetik
+name,Beauty & Kosmetik - Der Haut-Experte
+description,Spezialisiert auf Hauttypen und Inhaltsstoffe
+category,Beauty & Wellness
+icon,💄
+systemPrompt,"Du bist ein Beauty Experte..."
+contextInstructions,"Keine Health Claims | Nenne INCI-Stoffe"
+keywords,"beauty,kosmetik,hautpflege"
+```
+
+#### 🔒 Sicherheit & Verschlüsselung
+
+⚠️ **Wichtig:** Ihre Specialization wird verschlüsselt gespeichert:
+
+- **Verschlüsselung:** AES-256-GCM (Militär-Standard)
+- **Transport:** HTTPS + End-to-End Encryption
+- **Speicherung:** Encrypted at Rest (TDE)
+- **Zugriffsschutz:** Nur Sie und Ihr KI-Agent haben Zugriff
+- **Audit Logging:** Alle Zugriffe werden anonym protokolliert
+
+**Ihre Specialization ist sicher vor:**
+- ❌ Unbefugtem Zugriff
+- ❌ Datenverlust
+- ❌ Tampering/Manipulation
+- ❌ Unbefugter Weitergabe
+
+#### Features der Specialization
+
+| Feature                  | Beschreibung                                           |
+| ------------------------ | ------------------------------------------------------ |
+| **System Prompt**        | Die Kern-Persönlichkeit und Expertise des KI-Agenten   |
+| **Context Instructions** | Regeln und Best Practices für Ihre Branche             |
+| **Example Prompts**      | Vorlagen für häufige Anwendungsfälle                   |
+| **Features**             | Was kann dieser Agent alles?                           |
+| **Target Audience**      | Für welche Geschäfte ist diese Specialization gedacht? |
+| **Keywords**             | SEO-relevante Keywords für bessere Suchergebnisse      |
+
+#### Specialization Aktivieren & Deaktivieren
+
+```
+📋 Specialization Status: 
+   ✅ beauty-kosmetik aktiviert
+   Status: Lädt neu...
+   
+🔄 Letzte Aktualisierung: 2025-12-18 10:30
+```
+
+- **Aktivieren:** Toggle auf ✅ setzen → Agent nutzt diese Specialization
+- **Deaktivieren:** Toggle auf ❌ setzen → Agent fällt auf Standard-Konfiguration zurück
+
+#### Test-Specializations
+
+Das System kommt mit **10 vordefinierten Test-Specializations**:
+
+| Name                 | ID                 | Branche      | Usecase                              |
+| -------------------- | ------------------ | ------------ | ------------------------------------ |
+| Beauty & Kosmetik    | beauty-kosmetik    | Kosmetik     | INCI-Inhaltsstoffe, Hauttyp-Beratung |
+| Fashion & Mode       | fashion-mode       | Mode         | Trend-Sprache, Styling-Tipps         |
+| Home & Living        | home-living        | Interior     | Design-Terminologie, Nachhaltigkeit  |
+| Fitness & Ernährung  | fitness-ernaehrung | Wellness     | Workout-Pläne, Ernährungsberatung    |
+| Immobilien           | immobilien         | Real Estate  | Marktanalyse, Investitionsberatung   |
+| Reisebüro            | reisebuero         | Reisen       | Zielempfehlungen, Reiseplaner        |
+| Digitale Kurse       | digitale-kurse     | E-Learning   | Didaktische Sprache, Lernziele       |
+| Technik & Elektronik | technik-elektronik | Tech         | Spezifikationen, Kompatibilität      |
+| Tierbedarf           | tierbedarf         | Pet Supplies | Tiergesundheit, Fütterung            |
+| Wein & Feinkost      | wein-feinkost      | Gourmet      | Sommelière-Beratung, Pairing         |
+
+Diese können Sie als Vorlage für Ihre eigene Specialization verwenden!
+
+#### Troubleshooting Specialization
+
+| Problem                                 | Lösung                                                      |
+| --------------------------------------- | ----------------------------------------------------------- |
+| **Datei wird nicht akzeptiert**         | Stelle sicher, dass es `.json` oder `.csv` ist              |
+| **"Invalid format" Fehler**             | Prüfe JSON Syntax oder CSV-Struktur                         |
+| **Specialization wird nicht aktiviert** | Speichern nicht vergessen! Klick "Specialization speichern" |
+| **Agent verwendet alte Specialization** | Seite neu laden (F5), dann Cache leeren                     |
+| **Upload fehlgeschlagen**               | Datei ist zu groß (Max 5MB) oder Internet unterbrochen      |
+
+#### Weiterführende Ressourcen
+
+- [Test Specializations Analyse](../docs/TEST_SPECIALIZATIONS_ANALYSIS.md) - Alle 10 vordefinierten Specs
+- [Specialization Upload Feature Guide](../docs/SPECIALIZATION_UPLOAD_ANALYSIS.md) - Technische Details
+- [Quick Start Guide](../QUICK_START_TEST_SPECIALIZATION_ENCRYPTION.md) - Schnelle Anleitung
 
 ---
 
