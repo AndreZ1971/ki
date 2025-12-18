@@ -1,7 +1,10 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import crypto from 'crypto';
 import { SpecializationService } from '../../../../services/specializationService';
-import { SignedSpecialization } from '../../../../types/specialization';
+import {
+  SignedSpecialization,
+  SpecializationData,
+} from '../../../../types/specialization';
 import { logger } from '../../../../logger';
 
 /**
@@ -365,9 +368,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
 
         // Store specialization (encrypted)
         const stored = await SpecializationService.encryptAndStore(
-          specialization as Parameters<
-            typeof SpecializationService.encryptAndStore
-          >[0],
+          specialization as unknown as SpecializationData,
           userId
         );
 
@@ -607,8 +608,10 @@ function sanitizeSpecializationData(
     'description',
     'systemPrompt',
     'category',
+    'icon',
     'version',
     'features',
+    'contextInstructions',
     'author',
     'createdAt',
     'updatedAt',
@@ -617,20 +620,20 @@ function sanitizeSpecializationData(
   for (const field of allowedFields) {
     if (!(field in data)) continue;
 
-    let value = data[field];
+    let value: unknown = data[field];
 
     // Sanitize strings
     if (typeof value === 'string') {
       // Remove null bytes
-      value = value.replace(/\0/g, '');
+      let s = (value as string).replace(/\0/g, '');
       // Trim whitespace
-      value = value.trim();
+      s = s.trim();
       // Validate length (max 5000 chars for most fields, 50000 for systemPrompt)
       const maxLength = field === 'systemPrompt' ? 50000 : 5000;
-      if (value.length > maxLength) {
-        value = value.substring(0, maxLength);
+      if (s.length > maxLength) {
+        s = s.substring(0, maxLength);
       }
-      sanitized[field] = value;
+      sanitized[field] = s;
     }
     // Allow arrays for features
     else if (field === 'features' && Array.isArray(value)) {
@@ -638,6 +641,13 @@ function sanitizeSpecializationData(
         .filter((item) => typeof item === 'string')
         .map((item) => (item as string).substring(0, 100))
         .slice(0, 20); // Max 20 features
+    }
+    // Allow arrays for contextInstructions
+    else if (field === 'contextInstructions' && Array.isArray(value)) {
+      sanitized[field] = value
+        .filter((item) => typeof item === 'string')
+        .map((item) => (item as string).substring(0, 2000))
+        .slice(0, 50);
     }
     // Allow numbers for version timestamps
     else if (field === 'createdAt' || field === 'updatedAt') {

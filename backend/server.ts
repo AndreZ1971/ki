@@ -55,6 +55,10 @@ import specializationRoutes from './routes/app/api/specializations';
 import blogpostRoutes from './routes/app/api/marketing/blogpost-routes';
 import imageAnalysisRoutes from './routes/app/api/marketing/image-analysis-routes';
 
+// 🔐 SPECIALIZATION PERSISTENCE & AUTO-LOAD
+import { SpecializationPersistenceManager } from './services/specializationPersistenceManager';
+import { initializeSpecializationAutoLoad } from './services/specializationAutoLoad';
+
 // 🔥 USER MANAGEMENT ROUTES
 import userRoutes from './routes/app/api/users';
 import templateRoutes from './routes/app/api/marketing/template-routes';
@@ -607,6 +611,16 @@ async function buildServer() {
 const start = async () => {
   try {
     console.log('🚀 Starte Server...');
+
+    // 🔐 Persistence Manager initialisieren
+    console.log('🔐 Initialisiere Specialization Persistence...');
+    await SpecializationPersistenceManager.initialize();
+    console.log('✅ Persistence Manager bereit');
+
+    // 🔄 Auto-Load für Default-User initialisieren (optional)
+    // Falls du einen Standard-User hast, kannst du hier dessen Spezialisierung laden:
+    // await initializeSpecializationAutoLoad('default-user');
+
     const server = await buildServer();
 
     const listenPort = Number(process.env.PORT || 3000);

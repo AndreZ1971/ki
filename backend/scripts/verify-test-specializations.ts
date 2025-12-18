@@ -59,22 +59,25 @@ async function verifyBackups(): Promise<void> {
 
     if (verification.failed === 0) {
       console.log('\n✨ All encrypted backups verified successfully!\n');
-      logger.info('Test specialization verification complete', {
-        total: verification.total,
-        verified: verification.verified,
-      });
+      logger.info(
+        { total: verification.total, verified: verification.verified },
+        'Test specialization verification complete'
+      );
     } else {
       console.log('\n⚠️  Some backups failed verification!\n');
-      logger.error('Test specialization verification failed', {
-        total: verification.total,
-        verified: verification.verified,
-        failed: verification.failed,
-      });
+      logger.error(
+        {
+          total: verification.total,
+          verified: verification.verified,
+          failed: verification.failed,
+        },
+        'Test specialization verification failed'
+      );
       process.exit(1);
     }
   } catch (error) {
     console.error('❌ Verification error:', error);
-    logger.error('Test specialization verification error:', error);
+    logger.error({ err: error }, 'Test specialization verification error');
     process.exit(1);
   }
 }

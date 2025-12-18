@@ -97,10 +97,10 @@ export class SpecializationPersistenceManager {
       logger.info('✅ Persistence Manager initialisiert');
     } catch (_error) {
       logger.error(
-        { err: error },
+        { err: _error },
         '❌ Fehler beim Initialisieren des Persistence Managers'
       );
-      throw error;
+      throw _error;
     }
   }
 
@@ -187,9 +187,10 @@ export class SpecializationPersistenceManager {
         fallbackReady: true,
       };
     } catch (_error) {
-      const errorMsg = error instanceof Error ? error.message : String(error);
+      const errorMsg =
+        _error instanceof Error ? _error.message : String(_error);
       logger.error(
-        { err: error },
+        { err: _error },
         `❌ Fehler beim Persistieren der Spezialisierung: ${errorMsg}`
       );
       return {
@@ -230,12 +231,12 @@ export class SpecializationPersistenceManager {
         return specialization;
       } catch (_error) {
         logger.warn(
-          `⚠️ Fehler beim Laden von ${specializationId}: ${error instanceof Error ? error.message : String(error)}`
+          `⚠️ Fehler beim Laden von ${specializationId}: ${_error instanceof Error ? _error.message : String(_error)}`
         );
         return null;
       }
     } catch (_error) {
-      logger.error({ err: error }, `❌ Fehler beim Laden der Spezialisierung`);
+      logger.error({ err: _error }, `❌ Fehler beim Laden der Spezialisierung`);
       return null;
     }
   }
@@ -264,7 +265,7 @@ export class SpecializationPersistenceManager {
       return true;
     } catch (_error) {
       logger.error(
-        { err: error },
+        { err: _error },
         '❌ Fehler beim Setzen der aktiven Spezialisierung'
       );
       return false;
@@ -315,7 +316,7 @@ export class SpecializationPersistenceManager {
       return { specialization: null, source: 'none' };
     } catch (_error) {
       logger.error(
-        { err: error },
+        { err: _error },
         '❌ Fehler beim Laden der aktiven Spezialisierung'
       );
       return { specialization: null, source: 'none' };
@@ -352,7 +353,7 @@ export class SpecializationPersistenceManager {
       }));
     } catch (_error) {
       logger.error(
-        { err: error },
+        { err: _error },
         '❌ Fehler beim Auflisten von Spezialisierungen'
       );
       return [];
@@ -424,7 +425,7 @@ export class SpecializationPersistenceManager {
 
       return result;
     } catch (_error) {
-      logger.error({ err: error }, '❌ Fehler bei der Integrität-Validierung');
+      logger.error({ err: _error }, '❌ Fehler bei der Integrität-Validierung');
       return result;
     }
   }
@@ -461,7 +462,7 @@ export class SpecializationPersistenceManager {
       return true;
     } catch (_error) {
       logger.error(
-        { err: error },
+        { err: _error },
         `❌ Fehler beim Löschen der Spezialisierung: ${specializationId}`
       );
       return false;
@@ -484,8 +485,8 @@ export class SpecializationPersistenceManager {
     try {
       await fs.writeFile(this.INDEX_FILE, JSON.stringify(index, null, 2));
     } catch (_error) {
-      logger.error({ err: error }, '❌ Fehler beim Speichern des Index');
-      throw error;
+      logger.error({ err: _error }, '❌ Fehler beim Speichern des Index');
+      throw _error;
     }
   }
 
@@ -506,8 +507,11 @@ export class SpecializationPersistenceManager {
     try {
       await fs.writeFile(this.ACTIVE_FILE, JSON.stringify(data, null, 2));
     } catch (_error) {
-      logger.error({ err: error }, '❌ Fehler beim Speichern des Active-Files');
-      throw error;
+      logger.error(
+        { err: _error },
+        '❌ Fehler beim Speichern des Active-Files'
+      );
+      throw _error;
     }
   }
 

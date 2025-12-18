@@ -1,0 +1,20 @@
+{
+  "specializationId": "error-recovery-001",
+  "userId": "test-user-persistence",
+  "data": {
+    "id": "error-recovery-001",
+    "name": "Error Recovery",
+    "description": "Testing specialization persistence",
+    "systemPrompt": "You are a test agent for specialization persistence testing.",
+    "category": "testing",
+    "version": "1.0.0",
+    "features": [
+      "persistence",
+      "fallback",
+      "recovery"
+    ],
+    "createdAt": 1766036196404
+  },
+  "timestamp": 1766036196422,
+  "checksum": "3dd8d1d4b523ad9032d4d6e998ce5b25bef5dbd99fd7a7a9d3ff2bce201d6d27"
+}

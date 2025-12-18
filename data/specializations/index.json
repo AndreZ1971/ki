@@ -1,0 +1,180 @@
+{
+  "test-user-persistence": {
+    "specializations": [
+      {
+        "id": "test-spec-001",
+        "name": "Test Specialization",
+        "version": "1.0.0",
+        "checksum": "a63345bf4afc98d154f3d59414528726dfd58fccd00306e102905dcc5e7688b3",
+        "createdAt": 1766036195946,
+        "updatedAt": 1766036195952,
+        "size": 294,
+        "encrypted": false
+      },
+      {
+        "id": "load-test-001",
+        "name": "Load Test",
+        "version": "1.0.0",
+        "checksum": "dc44c48b4db2a23b7014c5bcdd895b2a567aca1f8fde91ceeb181178af3c22e0",
+        "createdAt": 1766036195957,
+        "updatedAt": 1766036195958,
+        "size": 284,
+        "encrypted": false
+      },
+      {
+        "id": "list-1",
+        "name": "Spec 1",
+        "version": "1.0.0",
+        "checksum": "b1c52be0ec0affda62fe81133be5faf576778c4ef4a14bbd2c7431924e8f0b0c",
+        "createdAt": 1766036195975,
+        "updatedAt": 1766036195977,
+        "size": 274,
+        "encrypted": false
+      },
+      {
+        "id": "list-2",
+        "name": "Spec 2",
+        "version": "1.0.0",
+        "checksum": "666608a631d68b3d5cbefeaa4470575a5cce9d99426e6343e636aff44cfc6000",
+        "createdAt": 1766036195975,
+        "updatedAt": 1766036195983,
+        "size": 274,
+        "encrypted": false
+      },
+      {
+        "id": "active-test-001",
+        "name": "Active Test",
+        "version": "1.0.0",
+        "checksum": "fe9c04456f913823d9e7d4fc2312dc9a651d48ebf5cd39bd61dbe7aae29d8322",
+        "createdAt": 1766036195995,
+        "updatedAt": 1766036195996,
+        "size": 288,
+        "encrypted": false
+      },
+      {
+        "id": "integrity-test-001",
+        "name": "Integrity Test",
+        "version": "1.0.0",
+        "checksum": "960a16c63adad67f925981f88a5c0b6faa7c3238ab6b59af910d11f2d4b8df43",
+        "createdAt": 1766036196058,
+        "updatedAt": 1766036196060,
+        "size": 294,
+        "encrypted": false
+      },
+      {
+        "id": "corrupted-test-001",
+        "name": "Corrupted Test",
+        "version": "1.0.0",
+        "checksum": "2728885470d3c6caf363c050834dffda2e1516f41e278c7cb3acbef555d9e2cf",
+        "createdAt": 1766036196099,
+        "updatedAt": 1766036196103,
+        "size": 294,
+        "encrypted": false
+      },
+      {
+        "id": "autoload-init-001",
+        "name": "Auto-Load Init",
+        "version": "1.0.0",
+        "checksum": "72ac97b48c487b1e5fba11bc67e7caf5e74fd54c8b661c902198c64445b1f201",
+        "createdAt": 1766036196117,
+        "updatedAt": 1766036196119,
+        "size": 293,
+        "encrypted": false
+      },
+      {
+        "id": "cache-test-001",
+        "name": "Cache Test",
+        "version": "1.0.0",
+        "checksum": "3180eb9b4e424a75ccc709344bc989e52cc313886e574468ac3ef88bd1d2487e",
+        "createdAt": 1766036196137,
+        "updatedAt": 1766036196141,
+        "size": 286,
+        "encrypted": false
+      },
+      {
+        "id": "activate-1",
+        "name": "Spec 1",
+        "version": "1.0.0",
+        "checksum": "7b5513346f4cbeb2e8375397b028c35bcba575271920cb1cdc4e1aee36628d0b",
+        "createdAt": 1766036196169,
+        "updatedAt": 1766036196178,
+        "size": 278,
+        "encrypted": false
+      },
+      {
+        "id": "activate-2",
+        "name": "Spec 2",
+        "version": "1.0.0",
+        "checksum": "6ef0702d5a3a69a7203cf437b40c3b1f7ccc9975ccfdd8946cd32c686324594c",
+        "createdAt": 1766036196169,
+        "updatedAt": 1766036196200,
+        "size": 278,
+        "encrypted": false
+      },
+      {
+        "id": "reload-test-001",
+        "name": "Reload Test",
+        "version": "1.0.0",
+        "checksum": "85fe66bf46f5608429541c88dfbe8cc53bd55578720887c3e9a4428a476692de",
+        "createdAt": 1766036196249,
+        "updatedAt": 1766036196252,
+        "size": 288,
+        "encrypted": false
+      },
+      {
+        "id": "list-avail-001",
+        "name": "Available",
+        "version": "1.0.0",
+        "checksum": "d851cc453aadb79dcfd2264a9c8287cbc46fb1091966db793988ca8442925a3a",
+        "createdAt": 1766036196282,
+        "updatedAt": 1766036196285,
+        "size": 285,
+        "encrypted": false
+      },
+      {
+        "id": "validate-all-001",
+        "name": "Validate All",
+        "version": "1.0.0",
+        "checksum": "35c911640b2cbe09e3a84298ba0e9fbe6950b69aa081b4261cfb966b41a6f0cc",
+        "createdAt": 1766036196321,
+        "updatedAt": 1766036196325,
+        "size": 290,
+        "encrypted": false
+      },
+      {
+        "id": "error-recovery-001",
+        "name": "Error Recovery",
+        "version": "1.0.0",
+        "checksum": "3dd8d1d4b523ad9032d4d6e998ce5b25bef5dbd99fd7a7a9d3ff2bce201d6d27",
+        "createdAt": 1766036196404,
+        "updatedAt": 1766036196411,
+        "size": 294,
+        "encrypted": false
+      },
+      {
+        "id": "state-test-001",
+        "name": "State Test",
+        "version": "1.0.0",
+        "checksum": "d5c871c36444b0e4572b00aa369a4daa2cb24077ad5508f65b286d19d592996f",
+        "createdAt": 1766036196396,
+        "updatedAt": 1766036196397,
+        "size": 286,
+        "encrypted": false
+      }
+    ]
+  },
+  "fallback-test-user": {
+    "specializations": [
+      {
+        "id": "fallback-spec-001",
+        "name": "Fallback Test",
+        "version": "1.0.0",
+        "checksum": "6536572bb5a340700f23cd63cd51c5ab99a056a271a0d051e9feed11c321b510",
+        "createdAt": 1766036196008,
+        "updatedAt": 1766036196014,
+        "size": 292,
+        "encrypted": false
+      }
+    ]
+  }
+}

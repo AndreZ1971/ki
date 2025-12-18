@@ -1,0 +1,14 @@
+{
+  "id": "fallback-spec-001",
+  "name": "Fallback Test",
+  "description": "Testing specialization persistence",
+  "systemPrompt": "You are a test agent for specialization persistence testing.",
+  "category": "testing",
+  "version": "1.0.0",
+  "features": [
+    "persistence",
+    "fallback",
+    "recovery"
+  ],
+  "createdAt": 1766036196008
+}
