@@ -11,6 +11,8 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
     const missing = !woo.url || !woo.consumerKey || !woo.consumerSecret;
     const looksPlaceholder = (v: string) =>
       typeof v === 'string' && (v.startsWith('PLEASE_SET') || v.trim() === '');
+    const validUrl = (u: string) =>
+      typeof u === 'string' && /^(https?:)\/\//i.test(u);
 
     if (missing) return false;
     if (
@@ -19,6 +21,7 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
       looksPlaceholder(woo.consumerSecret)
     )
       return false;
+    if (!validUrl(woo.url)) return false;
     return true;
   };
 

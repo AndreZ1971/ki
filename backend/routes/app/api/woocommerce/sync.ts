@@ -40,6 +40,9 @@ const syncRoutes: FastifyPluginAsync = async (fastify) => {
       looksPlaceholder(wooCfg.consumerSecret)
     )
       return false;
+    const validUrl = (u: string) =>
+      typeof u === 'string' && /^(https?:\/\/)/i.test(u);
+    if (!validUrl(wooCfg.url)) return false;
     return true;
   };
 
