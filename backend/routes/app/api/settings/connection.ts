@@ -82,7 +82,7 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
 
           // WooCommerce
           wcApiUrl: fileData.woocommerce?.url || '',
-          wcConsumerKey: fileData.woocommerce?.consumerKey || '',
+          wcConsumerKey: fileData.woocommerce?.consumerKey ? '****' : '', // Mask sensitive API key
           wcConsumerSecret: fileData.woocommerce?.consumerSecret ? '****' : '', // Mask sensitive data
           wooAuthMode: fileData.woocommerce?.authMode || 'basic',
           wooTimeoutMs: fileData.woocommerce?.timeoutMs || 30000,
@@ -242,19 +242,83 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         }
         return newValue;
       };
+
+      // Helper: Get old value from nested social media structure
+      const getOldSocialMediaValue = (
+        channel: string,
+        field: string
+      ): string | undefined => {
+        return oldFileData?.socialMedia?.[channel]?.[field];
+      };
+
+      // Get masked values from old structured format
+      const oldWpPassword = oldFileData?.wordpress?.appPassword;
+      const oldWcConsumerSecret = oldFileData?.woocommerce?.consumerSecret;
+      const oldOpenaiApiKey = oldFileData?.openAI?.apiKey;
+      const oldWcConsumerKey = oldFileData?.woocommerce?.consumerKey;
+
+      // Build cleaned credentials (unmasking if needed)
       const cleanedCredentials: ShopCredentials = {
         ...newCredentials,
-        wpAppPassword: unmaskValue(
-          newCredentials.wpAppPassword,
-          oldFileData?.wpAppPassword
-        ),
+        // WordPress & WooCommerce
+        wpAppPassword: unmaskValue(newCredentials.wpAppPassword, oldWpPassword),
         wcConsumerSecret: unmaskValue(
           newCredentials.wcConsumerSecret,
-          oldFileData?.wcConsumerSecret
+          oldWcConsumerSecret
         ),
-        openaiApiKey: unmaskValue(
-          newCredentials.openaiApiKey,
-          oldFileData?.openaiApiKey
+        wcConsumerKey: unmaskValue(
+          newCredentials.wcConsumerKey,
+          oldWcConsumerKey
+        ),
+        openaiApiKey: unmaskValue(newCredentials.openaiApiKey, oldOpenaiApiKey),
+        // Social Media - unmask tokens
+        linkedinAccessToken: unmaskValue(
+          newCredentials.linkedinAccessToken,
+          getOldSocialMediaValue('linkedin', 'accessToken')
+        ),
+        linkedinRefreshToken: unmaskValue(
+          newCredentials.linkedinRefreshToken,
+          getOldSocialMediaValue('linkedin', 'refreshToken')
+        ),
+        facebookAccessToken: unmaskValue(
+          newCredentials.facebookAccessToken,
+          getOldSocialMediaValue('facebook', 'accessToken')
+        ),
+        instagramAccessToken: unmaskValue(
+          newCredentials.instagramAccessToken,
+          getOldSocialMediaValue('instagram', 'accessToken')
+        ),
+        twitterApiKey: unmaskValue(
+          newCredentials.twitterApiKey,
+          getOldSocialMediaValue('twitter', 'apiKey')
+        ),
+        twitterApiSecret: unmaskValue(
+          newCredentials.twitterApiSecret,
+          getOldSocialMediaValue('twitter', 'apiSecret')
+        ),
+        twitterAccessToken: unmaskValue(
+          newCredentials.twitterAccessToken,
+          getOldSocialMediaValue('twitter', 'accessToken')
+        ),
+        twitterAccessTokenSecret: unmaskValue(
+          newCredentials.twitterAccessTokenSecret,
+          getOldSocialMediaValue('twitter', 'accessTokenSecret')
+        ),
+        tiktokAccessToken: unmaskValue(
+          newCredentials.tiktokAccessToken,
+          getOldSocialMediaValue('tiktok', 'accessToken')
+        ),
+        tiktokRefreshToken: unmaskValue(
+          newCredentials.tiktokRefreshToken,
+          getOldSocialMediaValue('tiktok', 'refreshToken')
+        ),
+        youtubeAccessToken: unmaskValue(
+          newCredentials.youtubeAccessToken,
+          getOldSocialMediaValue('youtube', 'accessToken')
+        ),
+        youtubeRefreshToken: unmaskValue(
+          newCredentials.youtubeRefreshToken,
+          getOldSocialMediaValue('youtube', 'refreshToken')
         ),
       };
 
