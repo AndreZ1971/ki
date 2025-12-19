@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { formatDate, formatDateTime } from "../../lib/i18n-utils";
 import { useNavigate } from "react-router-dom";
 import "./page.css";
@@ -48,29 +48,26 @@ const UserManagement: React.FC = () => {
   const [sortBy, setSortBy] = useState<"name" | "revenue" | "date">("name");
   const [selectedUser, setSelectedUser] = useState<Customer | null>(null);
 
-  // 🔗 Normalisierte API-URL
-  const buildUrl = useCallback(
-    (path: string) => {
-      const base =
-        apiBase.endsWith("/api") && path.startsWith("/api")
-          ? apiBase.replace(/\/api$/, "")
-          : apiBase;
-      if (!path.startsWith("/")) {
-        return `${base}/${path}`;
-      }
-      return `${base}${path}`;
-    },
-    [apiBase]
-  );
-
   // ✅ Kundendaten laden
   useEffect(() => {
     const fetchCustomers = async () => {
       setLoading(true);
       setError(null);
       try {
-        const url = buildUrl("/api/woocommerce/customers");
+        // 🔗 Vereinfachte URL-Konstruktion (robuster)
+        let url: string;
+        if (apiBase) {
+          // Wenn apiBase gesetzt ist, nutze es als Basis
+          const base = apiBase.endsWith("/") ? apiBase.slice(0, -1) : apiBase;
+          url = `${base}/api/woocommerce/customers`;
+        } else {
+          // Fallback: nutze relative URL (funktioniert wenn Frontend und Backend auf gleichem Host)
+          url = "/api/woocommerce/customers";
+        }
+
         console.log("🔗 API URL:", url);
+        console.log("🔗 VITE_API_URL env:", import.meta.env.VITE_API_URL);
+        console.log("🔗 apiBase resolved:", apiBase);
 
         const res = await fetch(url);
         console.log("📊 Response Status:", res.status, res.statusText);
@@ -126,7 +123,7 @@ const UserManagement: React.FC = () => {
     };
 
     fetchCustomers();
-  }, [buildUrl]);
+  }, [apiBase]);
 
   // 📊 Berechnete Statistiken
   const stats = useMemo((): CustomerStats => {
