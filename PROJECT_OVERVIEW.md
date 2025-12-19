@@ -12,12 +12,12 @@
 
 **4 neue Dokumente** für langfristige Produktentwicklung:
 
-| Dokument | Fokus | Status |
-|----------|-------|--------|
-| **DEVELOPMENT_ROADMAP.md** | Feature-Roadmap v5.1→v6.0 (6 Monate) | ✅ DONE |
-| **UPDATE_STRATEGY.md** | Update-Prozess, Versionierung, Rollback | ✅ DONE |
+| Dokument                              | Fokus                                      | Status |
+| ------------------------------------- | ------------------------------------------ | ------ |
+| **DEVELOPMENT_ROADMAP.md**            | Feature-Roadmap v5.1→v6.0 (6 Monate)       | ✅ DONE |
+| **UPDATE_STRATEGY.md**                | Update-Prozess, Versionierung, Rollback    | ✅ DONE |
 | **V5.1.0_CONFIGURATION_HARDENING.md** | Diese Sprint Details + Acceptance Criteria | ✅ DONE |
-| **DOCUMENTATION_OVERVIEW.md** | Dokumentations-Struktur & Navigation | ✅ DONE |
+| **DOCUMENTATION_OVERVIEW.md**         | Dokumentations-Struktur & Navigation       | ✅ DONE |
 
 **+** Perfektioniertes docker-entrypoint.sh mit **ALLEN connection.json Feldern**  
 **+** Backend ConfigValidator Service (validiert alle Inputs)
