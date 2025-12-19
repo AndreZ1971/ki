@@ -3,6 +3,7 @@ import { FastifyPluginAsync } from 'fastify';
 import { logger } from '../../../../logger.js';
 import fs from 'fs/promises';
 import path from 'path';
+import { configValidator } from '../../../../services/configValidator.js';
 
 interface ShopCredentials {
   // WordPress
@@ -257,6 +258,37 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         ),
       };
 
+      // 🔍 VALIDATE all credentials before saving
+      const validationResult = configValidator.validate(cleanedCredentials);
+
+      if (!validationResult.isValid) {
+        logger.warn(
+          `❌ Validation failed: ${validationResult.errors.length} errors`
+        );
+        return reply.status(400).send({
+          success: false,
+          message: 'Konfiguration hat Validierungsfehler',
+          errors: validationResult.errors.map((err: any) => ({
+            field: err.field,
+            message: err.message,
+            severity: err.severity,
+          })),
+          warnings: validationResult.warnings.map((w: any) => ({
+            field: w.field,
+            message: w.message,
+          })),
+        });
+      }
+
+      // Log warnings if any
+      if (validationResult.warnings.length > 0) {
+        logger.info(
+          `⚠️ Validation warnings: ${validationResult.warnings.length}`
+        );
+        validationResult.warnings.forEach((w: any) => {
+          logger.info(`  - ${w.field}: ${w.message}`);
+        });
+      }
       // Transform flat social media fields to structured format for storage
       const socialMediaStructured: any = {
         linkedin: {
