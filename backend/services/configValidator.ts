@@ -98,6 +98,14 @@ class ConfigValidator {
   }
 
   /**
+   * Interval Validation: Accept reasonable scheduler intervals
+   * Default range: 10s (10_000 ms) up to 24h (86_400_000 ms)
+   */
+  private isValidInterval(ms: number): boolean {
+    return Number.isInteger(ms) && ms >= 10_000 && ms <= 86_400_000;
+  }
+
+  /**
    * MAIN VALIDATION FUNCTION
    */
   validate(credentials: Record<string, any>): ValidationResult {
@@ -299,17 +307,20 @@ class ConfigValidator {
     }
 
     // JOB CONFIG
-    if (
-      credentials.jobIntervalMs &&
-      !this.isValidTimeout(credentials.jobIntervalMs)
-    ) {
-      errors.push({
-        field: 'jobIntervalMs',
-        value: credentials.jobIntervalMs,
-        rule: 'timeout',
-        message: 'Job Interval muss zwischen 1 und 120000 Millisekunden liegen',
-        severity: 'error',
-      });
+    if (credentials.jobMode === 'interval') {
+      if (
+        typeof credentials.jobIntervalMs !== 'number' ||
+        !this.isValidInterval(credentials.jobIntervalMs)
+      ) {
+        errors.push({
+          field: 'jobIntervalMs',
+          value: credentials.jobIntervalMs,
+          rule: 'interval',
+          message:
+            'Job Interval muss zwischen 10.000 ms (10s) und 86.400.000 ms (24h) liegen',
+          severity: 'error',
+        });
+      }
     }
 
     // WOOCOMMERCE TIMEOUT
