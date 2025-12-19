@@ -853,13 +853,19 @@ productOptimizationConfig = {
 }
 ```
 
-**Oder: Reduziere Frequenz**:
+**Oder: Reduziere Frequenz / verschiebe Zeiten** (Settings → Agentic Loops → ⚙️ Schedule oder direkt in `backend/data/loop-schedules.json`):
 ```json
 {
-  "loopSchedules": {
-    "product_optimization": {
-      "frequencyMultiplier": 4  // Nur jedes 4. mal
-    }
+  "product-optimization": {
+    "enabled": true,
+    "type": "weekly",
+    "time": "22:00",
+    "weekdays": ["Monday", "Thursday"]
+  },
+  "payment-recovery": {
+    "enabled": true,
+    "type": "interval",
+    "minutes": 60
   }
 }
 ```

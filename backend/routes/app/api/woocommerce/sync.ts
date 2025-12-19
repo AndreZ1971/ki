@@ -81,7 +81,7 @@ const syncRoutes: FastifyPluginAsync = async (fastify) => {
       ): Promise<number> => {
         try {
           return await fetchCount(wooPrimary, resource);
-        } catch (e1) {
+        } catch (_e1) {
           // Retry with alternate auth mode
           return await fetchCount(wooFallback, resource);
         }

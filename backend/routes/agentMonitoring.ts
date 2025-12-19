@@ -713,4 +713,214 @@ export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
       return { success: false, error: 'Export failed' };
     }
   });
+
+  // ===== SCHEDULE MANAGEMENT ENDPOINTS =====
+
+  /**
+   * GET /schedules - Alle Loop Schedules abrufen
+   */
+  fastify.get('/schedules', async () => {
+    const { loopScheduleManager } =
+      await import('../services/loopScheduleManager.js');
+    return {
+      success: true,
+      schedules: loopScheduleManager.getAllSchedules(),
+    };
+  });
+
+  /**
+   * GET /schedules/:loopType - Schedule für einen spezifischen Loop
+   */
+  fastify.get<{
+    Params: { loopType: string };
+  }>('/schedules/:loopType', async (request, reply) => {
+    const { loopScheduleManager } =
+      await import('../services/loopScheduleManager.js');
+    const { loopType } = request.params;
+
+    const validLoopTypes = [
+      'anomaly-detection',
+      'payment-recovery',
+      'product-optimization',
+      'analytics-insights',
+    ];
+
+    if (!validLoopTypes.includes(loopType)) {
+      return reply.code(400).send({
+        success: false,
+        error: `Invalid loopType. Must be one of: ${validLoopTypes.join(', ')}`,
+      });
+    }
+
+    return {
+      success: true,
+      schedule: loopScheduleManager.getSchedule(loopType as any),
+    };
+  });
+
+  /**
+   * PUT /schedules/:loopType - Schedule für einen spezifischen Loop aktualisieren
+   */
+  fastify.put<{
+    Params: { loopType: string };
+    Body: {
+      enabled: boolean;
+      type: 'daily' | 'weekly' | 'interval';
+      time?: string;
+      weekdays?: string[];
+      minutes?: number;
+    };
+  }>('/schedules/:loopType', async (request, reply) => {
+    const { loopScheduleManager } =
+      await import('../services/loopScheduleManager.js');
+    const { loopType } = request.params;
+    const config = request.body;
+
+    const validLoopTypes = [
+      'anomaly-detection',
+      'payment-recovery',
+      'product-optimization',
+      'analytics-insights',
+    ];
+
+    if (!validLoopTypes.includes(loopType)) {
+      return reply.code(400).send({
+        success: false,
+        error: `Invalid loopType. Must be one of: ${validLoopTypes.join(', ')}`,
+      });
+    }
+
+    // Validation
+    if (typeof config.enabled !== 'boolean') {
+      return reply.code(400).send({
+        success: false,
+        error: 'enabled must be a boolean',
+      });
+    }
+
+    if (!['daily', 'weekly', 'interval'].includes(config.type)) {
+      return reply.code(400).send({
+        success: false,
+        error: 'type must be daily, weekly, or interval',
+      });
+    }
+
+    // Type-spezifische Validation
+    if (config.type === 'daily' && !config.time?.match(/^\d{2}:\d{2}$/)) {
+      return reply.code(400).send({
+        success: false,
+        error: 'daily type requires time in HH:MM format',
+      });
+    }
+
+    if (config.type === 'weekly') {
+      if (!config.time?.match(/^\d{2}:\d{2}$/)) {
+        return reply.code(400).send({
+          success: false,
+          error: 'weekly type requires time in HH:MM format',
+        });
+      }
+      if (!Array.isArray(config.weekdays) || config.weekdays.length === 0) {
+        return reply.code(400).send({
+          success: false,
+          error:
+            'weekly type requires weekdays array (e.g., ["Monday", "Friday"])',
+        });
+      }
+    }
+
+    if (
+      config.type === 'interval' &&
+      config.minutes !== undefined &&
+      ![15, 30, 45, 60].includes(config.minutes)
+    ) {
+      return reply.code(400).send({
+        success: false,
+        error: 'interval type requires minutes to be 15, 30, 45, or 60',
+      });
+    }
+
+    try {
+      loopScheduleManager.updateSchedule(loopType as any, config as any);
+
+      // Scheduler aktualisieren (wenn er läuft)
+      const { loopScheduler } = getServices();
+      if (loopScheduler && loopScheduler.getIsRunning()) {
+        await loopScheduler.rescheduleLoop(loopType as any, config as any);
+      }
+
+      return {
+        success: true,
+        message: `Schedule für ${loopType} aktualisiert`,
+        schedule: config,
+      };
+    } catch (error: any) {
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to update schedule',
+        details: error.message,
+      });
+    }
+  });
+
+  /**
+   * POST /schedules/:loopType/toggle - Loop aktivieren/deaktivieren
+   */
+  fastify.post<{
+    Params: { loopType: string };
+    Body: { enabled: boolean };
+  }>('/schedules/:loopType/toggle', async (request, reply) => {
+    const { loopScheduleManager } =
+      await import('../services/loopScheduleManager.js');
+    const { loopType } = request.params;
+    const { enabled } = request.body;
+
+    const validLoopTypes = [
+      'anomaly-detection',
+      'payment-recovery',
+      'product-optimization',
+      'analytics-insights',
+    ];
+
+    if (!validLoopTypes.includes(loopType)) {
+      return reply.code(400).send({
+        success: false,
+        error: `Invalid loopType. Must be one of: ${validLoopTypes.join(', ')}`,
+      });
+    }
+
+    if (typeof enabled !== 'boolean') {
+      return reply.code(400).send({
+        success: false,
+        error: 'enabled must be a boolean',
+      });
+    }
+
+    try {
+      loopScheduleManager.setEnabled(loopType as any, enabled);
+
+      // Scheduler aktualisieren
+      const { loopScheduler } = getServices();
+      if (loopScheduler && loopScheduler.getIsRunning()) {
+        if (enabled) {
+          const config = loopScheduleManager.getSchedule(loopType as any);
+          await loopScheduler.rescheduleLoop(loopType as any, config);
+        } else {
+          await loopScheduler.stopLoop(loopType as any);
+        }
+      }
+
+      return {
+        success: true,
+        message: `Loop ${loopType} ${enabled ? 'aktiviert' : 'deaktiviert'}`,
+        enabled,
+      };
+    } catch (error: any) {
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to toggle loop',
+        details: error.message,
+      });
+    }
+  });
 }

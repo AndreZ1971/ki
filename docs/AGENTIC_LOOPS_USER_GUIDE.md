@@ -191,12 +191,12 @@ Loop Monitoring → Stats Tab
 
 ### F: Wie oft laufen die Loops?
 **A:** 
-- Anomaly Detection: Alle 15 Minuten (24/7)
-- Product Optimization: 1x täglich (nachts um 02:00 UTC)
-- Payment Recovery: In Echtzeit + 1x täglich Batch
-- Analytics Insights: 1x täglich (morgens um 08:00 UTC)
-
-*(Konfigurierbar in connection.json)*
+- **Konfigurierbar pro Loop** in Settings → Agentic Loops → ⚙️ Schedule
+- Defaults (persistiert in `backend/data/loop-schedules.json`):
+  - Anomaly Detection: Täglich 08:00
+  - Payment Recovery: Alle 30 Minuten
+  - Product Optimization: Mo/Mi/Fr um 10:00
+  - Analytics Insights: Täglich 22:00
 
 ### F: Ich möchte einen Loop ausschalten
 **A:** 

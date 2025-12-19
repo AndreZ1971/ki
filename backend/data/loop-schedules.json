@@ -1,0 +1,27 @@
+{
+  "anomaly-detection": {
+    "enabled": true,
+    "type": "daily",
+    "time": "10:00"
+  },
+  "payment-recovery": {
+    "enabled": true,
+    "type": "interval",
+    "minutes": 15
+  },
+  "product-optimization": {
+    "enabled": true,
+    "type": "weekly",
+    "time": "10:00",
+    "weekdays": [
+      "Monday",
+      "Wednesday",
+      "Friday"
+    ]
+  },
+  "analytics-insights": {
+    "enabled": true,
+    "type": "daily",
+    "time": "18:00"
+  }
+}

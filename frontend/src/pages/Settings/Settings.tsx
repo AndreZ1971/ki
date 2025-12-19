@@ -2,6 +2,39 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import "../AnalyseMetrics/page.css";
+import { LoopScheduleEditor } from "../../components/LoopScheduleEditor";
+
+// Loop Schedule Types
+interface DailyScheduleConfig {
+  enabled: boolean;
+  type: "daily";
+  time: string;
+}
+
+interface WeeklyScheduleConfig {
+  enabled: boolean;
+  type: "weekly";
+  time: string;
+  weekdays: string[];
+}
+
+interface IntervalScheduleConfig {
+  enabled: boolean;
+  type: "interval";
+  minutes: 15 | 30 | 45 | 60;
+}
+
+type ScheduleConfig =
+  | DailyScheduleConfig
+  | WeeklyScheduleConfig
+  | IntervalScheduleConfig;
+
+interface LoopSchedules {
+  "anomaly-detection": DailyScheduleConfig;
+  "payment-recovery": IntervalScheduleConfig;
+  "product-optimization": WeeklyScheduleConfig;
+  "analytics-insights": DailyScheduleConfig;
+}
 
 interface ShopCredentials {
   // Reddit
@@ -184,6 +217,19 @@ const defaultCredentials: ShopCredentials = {
   youtubeChannelId: "",
 };
 
+// Default Loop Schedules (Fallback falls API noch nicht geladen)
+const defaultLoopSchedules: LoopSchedules = {
+  "anomaly-detection": { enabled: true, type: "daily", time: "08:00" },
+  "payment-recovery": { enabled: true, type: "interval", minutes: 30 },
+  "product-optimization": {
+    enabled: true,
+    type: "weekly",
+    time: "10:00",
+    weekdays: ["Monday", "Wednesday", "Friday"],
+  },
+  "analytics-insights": { enabled: true, type: "daily", time: "22:00" },
+};
+
 const Settings = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -198,6 +244,47 @@ const Settings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  // Loop Schedule State
+  const [loopSchedules, setLoopSchedules] = useState<LoopSchedules | null>(
+    null
+  );
+  const [editingLoop, setEditingLoop] = useState<keyof LoopSchedules | null>(
+    null
+  );
+  const [savingSchedule, setSavingSchedule] = useState(false);
+
+  const effectiveSchedules = loopSchedules || defaultLoopSchedules;
+
+  const formatScheduleLabel = (loopType: keyof LoopSchedules): string => {
+    const config = effectiveSchedules[loopType];
+    if (!config) return "—";
+
+    if (config.type === "interval") {
+      return `Alle ${config.minutes} Minuten`;
+    }
+
+    if (config.type === "daily") {
+      return `Täglich um ${config.time} Uhr`;
+    }
+
+    if (config.type === "weekly") {
+      return `${config.weekdays.join(", ")} um ${config.time} Uhr`;
+    }
+
+    return "—";
+  };
+
+  const handleOpenSchedule = async (loopType: keyof LoopSchedules) => {
+    // Wenn noch keine Schedules geladen wurden, lade sie jetzt
+    if (!loopSchedules) {
+      await loadLoopSchedules();
+    }
+
+    // Fallback auf Default, falls API fehlschlägt
+    setLoopSchedules((prev) => prev || defaultLoopSchedules);
+    setEditingLoop(loopType);
+  };
+
   // Shop-Verbindungsdaten
   const [credentials, setCredentials] = useState<ShopCredentials>({
     ...defaultCredentials,
@@ -206,7 +293,62 @@ const Settings = () => {
   // Load credentials on mount
   React.useEffect(() => {
     loadCredentials();
+    loadLoopSchedules();
   }, []);
+
+  const loadLoopSchedules = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/agent/monitoring/schedules`
+      );
+      if (!response.ok) throw new Error("Failed to load schedules");
+      const data = await response.json();
+      if (data.success) {
+        setLoopSchedules(data.schedules);
+      }
+    } catch (error) {
+      console.error("Failed to load loop schedules:", error);
+    }
+  };
+
+  const handleScheduleChange = (config: ScheduleConfig) => {
+    if (!editingLoop || !loopSchedules) return;
+    setLoopSchedules({
+      ...loopSchedules,
+      [editingLoop]: config,
+    });
+  };
+
+  const handleSaveSchedule = async () => {
+    if (!editingLoop || !loopSchedules) return;
+
+    setSavingSchedule(true);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/agent/monitoring/schedules/${editingLoop}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(loopSchedules[editingLoop]),
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to save schedule");
+
+      const data = await response.json();
+      if (data.success) {
+        setConnectionMessage(`✅ ${data.message}`);
+        setConnectionStatus("success");
+        setEditingLoop(null);
+      }
+    } catch (error) {
+      console.error("Failed to save schedule:", error);
+      setConnectionMessage("❌ Fehler beim Speichern des Schedules");
+      setConnectionStatus("error");
+    } finally {
+      setSavingSchedule(false);
+    }
+  };
 
   // Import-Konfiguration (connection.json) laden
   const handleImportConfig = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -3332,25 +3474,25 @@ const Settings = () => {
                     icon: "🚨",
                     name: t("settings.agentic.loopAnomalyName"),
                     desc: t("settings.agentic.loopAnomalyDesc"),
-                    schedule: t("settings.agentic.loopAnomalySchedule"),
+                    loopType: "anomaly-detection" as const,
                   },
                   {
                     icon: "📈",
                     name: t("settings.agentic.loopProductName"),
                     desc: t("settings.agentic.loopProductDesc"),
-                    schedule: t("settings.agentic.loopProductSchedule"),
+                    loopType: "product-optimization" as const,
                   },
                   {
                     icon: "💳",
                     name: t("settings.agentic.loopPaymentName"),
                     desc: t("settings.agentic.loopPaymentDesc"),
-                    schedule: t("settings.agentic.loopPaymentSchedule"),
+                    loopType: "payment-recovery" as const,
                   },
                   {
                     icon: "📊",
                     name: t("settings.agentic.loopAnalyticsName"),
                     desc: t("settings.agentic.loopAnalyticsDesc"),
-                    schedule: t("settings.agentic.loopAnalyticsSchedule"),
+                    loopType: "analytics-insights" as const,
                   },
                 ].map((loop, idx) => (
                   <div
@@ -3383,13 +3525,42 @@ const Settings = () => {
                         fontSize: "12px",
                         color: "#06b6d4",
                         fontWeight: "500",
+                        marginBottom: "12px",
                       }}
                     >
-                      ⏱️ {loop.schedule}
+                      ⏱️ {formatScheduleLabel(loop.loopType)}
+                      <button
+                        onClick={() => handleOpenSchedule(loop.loopType)}
+                        style={{
+                          width: "100%",
+                          padding: "8px 12px",
+                          background:
+                            "linear-gradient(135deg, #06b6d4, #0891b2)",
+                          border: "none",
+                          borderRadius: "6px",
+                          color: "white",
+                          fontWeight: "600",
+                          cursor: "pointer",
+                          fontSize: "13px",
+                        }}
+                      >
+                        ⚙️ Schedule anpassen
+                      </button>
                     </div>
                   </div>
                 ))}
               </div>
+              {/* Schedule Editor Modal */}
+              {editingLoop && loopSchedules && (
+                <LoopScheduleEditor
+                  loopType={editingLoop}
+                  config={loopSchedules[editingLoop]}
+                  onChange={handleScheduleChange}
+                  onClose={() => setEditingLoop(null)}
+                  onSave={handleSaveSchedule}
+                  saving={savingSchedule}
+                />
+              )}
             </div>
 
             {/* Documentation tiles removed (private repo, central docs planned) */}

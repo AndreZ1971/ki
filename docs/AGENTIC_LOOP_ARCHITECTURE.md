@@ -447,11 +447,23 @@ const history = executionLogger.getHistory('payment-recovery', 100)
 
 ### Loop Scheduler
 ```typescript
-// Loops können zeit-basiert oder ereignis-basiert triggert werden
-scheduler.schedule('payment-recovery', {
-  cron: '0 */4 * * *', // Every 4 hours
-  maxDuration: 300000 // 5 min timeout
-})
+// Persistente Konfiguration (backend/data/loop-schedules.json)
+//   - anomaly-detection: daily HH:MM
+//   - payment-recovery: interval (15/30/45/60 min)
+//   - product-optimization: weekly (Wochentage + HH:MM)
+//   - analytics-insights: daily HH:MM
+
+// Laden & planen
+const schedules = loopScheduleManager.getAllSchedules();
+Object.entries(schedules).forEach(([loopType, cfg]) => {
+  if (!cfg.enabled) return;
+  const cron = scheduleToCron(cfg); // z.B. */30 * * * *
+  scheduler.scheduleLoop(loopType, cron, () => runLoop(loopType));
+});
+
+// API Update → neu planen (PUT /api/agent/monitoring/schedules/:loopType)
+loopScheduleManager.updateSchedule(loopType, body);
+await scheduler.rescheduleLoop(loopType, body);
 ```
 
 ---

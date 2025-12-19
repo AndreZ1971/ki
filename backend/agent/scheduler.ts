@@ -13,6 +13,7 @@ import { ProductOptimizationLoop } from './loops/productOptimizationLoop';
 import { PaymentRecoveryLoop } from './loops/paymentRecoveryLoop';
 import { AnalyticsInsightsLoop } from './loops/analyticsInsightsLoop';
 import { AgenticLoop, LoopResult } from './agenticLoop';
+import type { ScheduleConfig as LoopScheduleConfig } from '../types/loopSchedule';
 
 export interface ScheduleConfig {
   anomalyDetection: string; // Cron pattern
@@ -272,41 +273,103 @@ export class LoopScheduler {
   }
 
   /**
-   * Update Cron Pattern für einen Loop
+   * Prüfe ob Scheduler läuft (für API)
    */
-  updateSchedule(loopType: string, cronPattern: string): void {
-    if (!this.jobs.has(loopType)) {
-      throw new Error(`Loop ${loopType} not scheduled`);
+  getIsRunning(): boolean {
+    return this.isRunning;
+  }
+
+  /**
+   * Konvertiere LoopScheduleConfig zu Cron Pattern
+   */
+  private scheduleToCron(config: LoopScheduleConfig): string {
+    if (config.type === 'daily') {
+      const [hour, minute] = config.time.split(':');
+      return `${minute} ${hour} * * *`; // täglich um HH:MM
     }
 
-    logger.info(`Updating ${loopType} schedule to: ${cronPattern}`);
+    if (config.type === 'weekly') {
+      const [hour, minute] = config.time.split(':');
+      // Weekday mapping: Monday=1, Sunday=0
+      const weekdayMap: Record<string, number> = {
+        Monday: 1,
+        Tuesday: 2,
+        Wednesday: 3,
+        Thursday: 4,
+        Friday: 5,
+        Saturday: 6,
+        Sunday: 0,
+      };
+      const days = config.weekdays.map((d) => weekdayMap[d]).join(',');
+      return `${minute} ${hour} * * ${days}`; // z.B. "0 10 * * 1,3,5"
+    }
+
+    if (config.type === 'interval') {
+      return `*/${config.minutes} * * * *`; // z.B. "*/30 * * * *"
+    }
+
+    throw new Error(`Unknown schedule type: ${(config as any).type}`);
+  }
+
+  /**
+   * Re-schedule einen Loop mit neuer Konfiguration
+   */
+  async rescheduleLoop(
+    loopType: string,
+    config: LoopScheduleConfig
+  ): Promise<void> {
+    if (!config.enabled) {
+      // Loop deaktiviert → stoppe ihn
+      await this.stopLoop(loopType);
+      return;
+    }
+
+    const cronPattern = this.scheduleToCron(config);
+
+    // Stoppe existierenden Job
+    if (this.jobs.has(loopType)) {
+      const job = this.jobs.get(loopType)!;
+      job.stop();
+      this.jobs.delete(loopType);
+    }
+
+    // Re-schedule mit neuem Pattern
+    let executeFunc: () => Promise<LoopResult>;
+
+    switch (loopType) {
+      case 'anomaly-detection':
+        executeFunc = () => new AnomalyDetectionLoop().execute();
+        break;
+      case 'product-optimization':
+        executeFunc = () => new ProductOptimizationLoop().execute();
+        break;
+      case 'payment-recovery':
+        executeFunc = () => new PaymentRecoveryLoop().execute();
+        break;
+      case 'analytics-insights':
+        executeFunc = () => new AnalyticsInsightsLoop().execute();
+        break;
+      default:
+        throw new Error(`Unknown loop type: ${loopType}`);
+    }
+
+    this.scheduleLoop(loopType, cronPattern, executeFunc);
+    logger.info(`🔄 Re-scheduled ${loopType} with pattern: ${cronPattern}`);
+  }
+
+  /**
+   * Stoppe einen spezifischen Loop
+   */
+  async stopLoop(loopType: string): Promise<void> {
+    if (!this.jobs.has(loopType)) {
+      logger.warn(`Loop ${loopType} not scheduled, skipping stop`);
+      return;
+    }
+
     const job = this.jobs.get(loopType)!;
     job.stop();
     this.jobs.delete(loopType);
-
-    // Re-schedule mit neuem Pattern
-    switch (loopType) {
-      case 'anomaly-detection':
-        this.scheduleLoop(loopType, cronPattern, () =>
-          new AnomalyDetectionLoop().execute()
-        );
-        break;
-      case 'product-optimization':
-        this.scheduleLoop(loopType, cronPattern, () =>
-          new ProductOptimizationLoop().execute()
-        );
-        break;
-      case 'payment-recovery':
-        this.scheduleLoop(loopType, cronPattern, () =>
-          new PaymentRecoveryLoop().execute()
-        );
-        break;
-      case 'analytics-insights':
-        this.scheduleLoop(loopType, cronPattern, () =>
-          new AnalyticsInsightsLoop().execute()
-        );
-        break;
-    }
+    logger.info(`⏹️ Stopped ${loopType}`);
   }
 }
 

@@ -79,8 +79,8 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
             orderby: 'registered_date',
             order: 'desc',
           });
-        } catch (fallbackAuthErr: any) {
-          // Letzter Versuch: minimalistische Parameter
+        } catch (_fallbackAuthErr: any) {
+            // Letzter Versuch: minimalistische Parameter
           response = await WooFallback.get('customers', {
             per_page: 100,
             orderby: 'id',
@@ -172,8 +172,8 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
             order: 'desc',
             role: 'subscriber',
           });
-        } catch (fallbackAuthErr: any) {
-          response = await WooFallback.get('customers', {
+        } catch (_fallbackAuthErr: any) {
+            response = await WooFallback.get('customers', {
             per_page: 100,
             orderby: 'id',
             order: 'desc',
@@ -238,13 +238,13 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
         const res = await WooPrimary.get('customers', { per_page: 1 });
         status = typeof res?.status === 'number' ? res.status : 200;
         connectivity = status >= 200 && status < 300;
-      } catch (e1: any) {
+      } catch (_e1: any) {
         try {
           const res2 = await WooFallback.get('customers', { per_page: 1 });
           status = typeof res2?.status === 'number' ? res2.status : 200;
           connectivity = status >= 200 && status < 300;
         } catch (e2: any) {
-          status = e2?.response?.status || 500;
+            status = e2?.response?.status || 500;
           error = e2?.response?.data || e2?.message || String(e2);
         }
       }

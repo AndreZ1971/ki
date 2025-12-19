@@ -180,45 +180,48 @@ Für Social Media Listening (nicht für Loops nötig, nur für Extended Features
 
 ---
 
-### 1.5 Job Scheduler Konfiguration
+### 1.5 Loop Schedules (per Loop konfigurierbar)
+
+**Datei**: `backend/data/loop-schedules.json`
 
 ```json
 {
-  "job": {
-    "mode": "once",
-    "intervalMs": 900000
-  }
+  "anomaly-detection": { "enabled": true, "type": "daily", "time": "08:00" },
+  "payment-recovery":  { "enabled": true, "type": "interval", "minutes": 30 },
+  "product-optimization": {
+    "enabled": true,
+    "type": "weekly",
+    "time": "10:00",
+    "weekdays": ["Monday", "Wednesday", "Friday"]
+  },
+  "analytics-insights": { "enabled": true, "type": "daily", "time": "22:00" }
 }
 ```
 
-**Parameter erklären**:
+**Typen & Felder**
 
-| Feld         | Typ    | Bedeutung                           | Optionen                                       |
-| ------------ | ------ | ----------------------------------- | ---------------------------------------------- |
-| `mode`       | String | Wie oft sollen Loops laufen?        | `once` (manuell), `continuous` (wiederkehrend) |
-| `intervalMs` | Number | Wartezeit zwischen Loop-Durchläufen | `900000` = 15 Minuten                          |
+| Feld       | Typ      | Bedeutung                                 |
+| ---------- | -------- | ----------------------------------------- |
+| `enabled`  | boolean  | Loop aktiv (true) / pausiert (false)      |
+| `type`     | string   | `daily` \| `weekly` \| `interval`         |
+| `time`     | string   | HH:MM (für `daily` und `weekly`)          |
+| `weekdays` | string[] | z.B. `["Monday","Friday"]` (nur `weekly`) |
+| `minutes`  | number   | 15 \| 30 \| 45 \| 60 (nur `interval`)     |
 
-**Häufige Intervalle**:
+**API**
 
-| Interval   | Frequency     | Use-Case                        |
-| ---------- | ------------- | ------------------------------- |
-| `60000`    | 1x / Minute   | ⚠️ Zu aggressiv, nur für Testing |
-| `300000`   | 1x / 5 Min    | Production High-Frequency       |
-| `900000`   | 1x / 15 Min   | **Standard (empfohlen)**        |
-| `3600000`  | 1x / 1 Stunde | Low-Frequency / Testing         |
-| `86400000` | 1x / 24h      | Nightly Batch                   |
+- GET  `/api/agent/monitoring/schedules` – alle Schedules
+- GET  `/api/agent/monitoring/schedules/:loopType`
+- PUT  `/api/agent/monitoring/schedules/:loopType` – ändern & sofort neu planen
+- POST `/api/agent/monitoring/schedules/:loopType/toggle` – aktivieren/deaktivieren
 
-**Mode erklären**:
+**UI**
 
-```typescript
-// mode: 'once'
-// → Loop läuft nur auf manuellen Trigger
-// POST /api/agent/loops/anomaly-detection/run → Jetzt ausführen
-
-// mode: 'continuous'
-// → Loop läuft automatisch alle intervalMs Millisekunden
-// Stellt sich selbst in die Warteschlange (via node-cron)
-```
+Settings → Agentic Loops → ⚙️ Schedule (Modal)
+- Anomaly Detection: Daily HH:MM
+- Payment Recovery: Interval 15/30/45/60 Min
+- Product Optimization: Weekly (Wochentage + HH:MM)
+- Analytics Insights: Daily HH:MM
 
 ---
 
