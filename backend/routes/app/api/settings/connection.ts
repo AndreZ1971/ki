@@ -453,6 +453,10 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         logger.warn(
           `❌ Validation failed: ${validationResult.errors.length} errors`
         );
+        // Log each validation error with details
+        validationResult.errors.forEach((err: any) => {
+          logger.error(`  ❌ ${err.field}: ${err.message} (rule: ${err.rule})`);
+        });
         return reply.status(400).send({
           success: false,
           message: 'Konfiguration hat Validierungsfehler',
