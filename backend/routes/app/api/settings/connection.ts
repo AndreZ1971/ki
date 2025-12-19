@@ -354,16 +354,20 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
     }
   });
 
-  // POST /api/settings/connection/test - Test connection to WordPress and WooCommerce
+  // POST /api/settings/connection/test - Test connection to all services
   fastify.post('/connection/test', async (request, reply) => {
     try {
       const credentials = request.body as ShopCredentials;
 
-      logger.info('🔍 Settings: Testing connection...');
+      logger.info('🔍 Settings: Testing connection to all services...');
 
-      const results = {
+      const results: any = {
         wordpress: { success: false, message: '', time: 0 },
         woocommerce: { success: false, message: '', time: 0 },
+        openai: { success: false, message: '', time: 0 },
+        smtp: { success: false, message: '', time: 0 },
+        reddit: { success: false, message: '', time: 0 },
+        support: { success: false, message: '', time: 0 },
       };
 
       // Test WordPress
@@ -462,15 +466,73 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         results.woocommerce.message = '⚠️ WooCommerce-API-Keys unvollständig';
       }
 
+      // Test OpenAI
+      if (credentials.openaiApiKey) {
+        const openaiStart = Date.now();
+        try {
+          const openaiResponse = await fetch(
+            'https://api.openai.com/v1/models',
+            {
+              method: 'GET',
+              headers: {
+                Authorization: `Bearer ${credentials.openaiApiKey}`,
+              },
+            }
+          );
+
+          results.openai.time = Date.now() - openaiStart;
+
+          if (openaiResponse.ok) {
+            const data = (await openaiResponse.json()) as {
+              data?: { id?: string }[];
+            };
+            const modelCount = data?.data?.length || 0;
+            results.openai.success = true;
+            results.openai.message = `✅ OpenAI API aktiv (${modelCount} Modelle verfügbar)`;
+            logger.info(
+              `✅ OpenAI connection successful (${results.openai.time}ms)`
+            );
+          } else if (openaiResponse.status === 401) {
+            results.openai.message = '❌ OpenAI API-Key ungültig';
+            logger.warn('❌ OpenAI authentication failed');
+          } else {
+            results.openai.message = `❌ OpenAI-Fehler: ${openaiResponse.status}`;
+            logger.warn(
+              `❌ OpenAI connection failed: ${openaiResponse.status}`
+            );
+          }
+        } catch (openaiError) {
+          results.openai.time = Date.now() - openaiStart;
+          results.openai.message = `❌ OpenAI nicht erreichbar: ${openaiError}`;
+          logger.error(`❌ OpenAI connection error: ${openaiError}`);
+        }
+      } else {
+        results.openai.message = '⚠️ OpenAI API-Key nicht konfiguriert';
+      }
+
+      // Test SMTP (optional - nur wenn in config vorhanden)
+      // Note: SMTP Test wird in Zukunft implementiert wenn connection.json SMTP-Felder hat
+      results.smtp.message = '⏳ SMTP Test kommt in v5.1.1';
+
+      // Test Reddit (optional - nur wenn konfiguriert)
+      // Note: Reddit Test wird in Zukunft implementiert wenn OAuth-Details vorhanden
+      results.reddit.message = '⏳ Reddit Test kommt in v5.1.1';
+
+      // Test Support-System (optional)
+      // Note: Support Test wird in Zukunft implementiert
+      results.support.message = '⏳ Support-System Test kommt in v5.2.0';
+
       const overallSuccess =
-        results.wordpress.success || results.woocommerce.success;
+        results.wordpress.success ||
+        results.woocommerce.success ||
+        results.openai.success;
 
       return {
         success: overallSuccess,
         results,
         message: overallSuccess
-          ? '✅ Verbindungstest erfolgreich!'
-          : '❌ Verbindungstest fehlgeschlagen - bitte Zugangsdaten prüfen',
+          ? '✅ Verbindungstest erfolgreich! (einige Services noch ausstehend)'
+          : '❌ Kein Service erreichbar - bitte Zugangsdaten prüfen',
       };
     } catch (error) {
       logger.error(`Connection test error: ${error}`);
