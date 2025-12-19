@@ -291,8 +291,22 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
       try {
         const json = await fs.readFile(jsonPath, 'utf-8');
         oldFileData = JSON.parse(json);
-      } catch {
-        // intentionally left blank: falls Datei nicht existiert, bleibt oldFileData leer
+
+        // 💾 CREATE BACKUP before modifying
+        const backupDir = path.resolve(process.cwd(), 'data', 'backups');
+        await fs.mkdir(backupDir, { recursive: true });
+        const timestamp = new Date()
+          .toISOString()
+          .replace(/:/g, '-')
+          .split('.')[0];
+        const backupPath = path.join(backupDir, `connection.${timestamp}.json`);
+        await fs.writeFile(backupPath, json, 'utf-8');
+        logger.info(`📦 Backup created: ${backupPath}`);
+      } catch (error) {
+        // If file doesn't exist or backup fails, log but continue
+        if ((error as any).code !== 'ENOENT') {
+          logger.warn(`⚠️ Backup creation failed: ${error}`);
+        }
       }
       const unmaskValue = (
         newValue: string,
