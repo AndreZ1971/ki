@@ -68,25 +68,55 @@ const UserManagement: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(buildUrl("/api/woocommerce/customers"));
+        const url = buildUrl("/api/woocommerce/customers");
+        console.log("🔗 API URL:", url);
 
+        const res = await fetch(url);
+        console.log("📊 Response Status:", res.status, res.statusText);
+
+        const data: any = await res.json();
+        console.log("📥 API Response:", data);
+
+        // ✅ Verbesserte Fehlerbehandlung für verschiedene API-Antworten
         if (!res.ok) {
-          throw new Error(`Fehler ${res.status}: ${res.statusText}`);
+          // Wenn 503 oder andere Error-Status, zeige die API-Meldung
+          const errorMsg =
+            data?.message ||
+            data?.error ||
+            `Fehler ${res.status}: ${res.statusText}`;
+          throw new Error(errorMsg);
         }
 
-        const data: ApiResponse<Customer[]> = await res.json();
+        // ✅ Prüfe auf verschiedene Response-Formate
+        let customers: Customer[] = [];
 
         if (data.success && Array.isArray(data.data)) {
-          setCustomers(data.data);
+          // Standard-Format: { success: true, data: [...] }
+          customers = data.data;
         } else if (Array.isArray(data)) {
-          // Fallback für ältere API-Struktur
-          setCustomers(data);
+          // Direktes Array-Format: [...]
+          customers = data;
+        } else if (data.success === false) {
+          // API gibt einen Error-Status zurück
+          throw new Error(
+            data.message ||
+              data.error ||
+              "WooCommerce API gibt einen Fehler zurück"
+          );
         } else {
-          throw new Error("Ungültige Datenstruktur");
+          // Unbekanntes Format
+          console.warn("⚠️ Unerwartetes Response-Format:", data);
+          throw new Error(
+            "Ungültige API-Antwort: " + JSON.stringify(data).substring(0, 100)
+          );
         }
+
+        console.log(`✅ ${customers.length} Kunden geladen`);
+        setCustomers(customers);
       } catch (err) {
         const message =
           err instanceof Error ? err.message : "Unbekannter Fehler";
+        console.error("❌ Fehler beim Laden der Kunden:", message, err);
         setError(`Kundendaten konnten nicht geladen werden: ${message}`);
         setCustomers([]);
       } finally {
