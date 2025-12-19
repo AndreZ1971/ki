@@ -56,6 +56,14 @@ Bei Fehlern erhältst du eine Rückmeldung, was noch fehlt oder falsch ist.
 
 > ⚡ **Alpha-Container Design**: Bei Container-Neustart werden Platzhalter wiederhergestellt. Einfach Settings erneut speichern oder JSON importieren!
 
+### Gültigkeitsregeln (wichtig bei der Ersteinrichtung)
+
+- WordPress, WooCommerce, OpenAI sind jeweils optional. Wenn du ein Feld einer Gruppe befüllst, müssen die restlichen Pflichtfelder dieser Gruppe ebenfalls korrekt sein (sonst bekommst du eine klare Fehlermeldung).
+- Job-Einstellungen: `Job-Modus` kann „einmalig“ oder „Intervall“ sein.
+	- Bei „einmalig“ wird `Job-Intervall` ignoriert.
+	- Bei „Intervall“ muss `Job-Intervall (ms)` im Bereich 10 Sekunden bis 24 Stunden liegen.
+- Die Settings-API zeigt dir im Fehlerfall an, welches Feld und welche Regel betroffen sind.
+
 ---
 
 ## 4. System nutzen

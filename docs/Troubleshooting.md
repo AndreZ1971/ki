@@ -64,6 +64,22 @@ Hier findest du schnelle Hilfe bei typischen Problemen und Störungen rund um di
 - **Import-Funktion in der Settings-UI korrekt genutzt?**
 - **Browser-Konsole auf Fehler prüfen**
 
+### 400 Bad Request beim Speichern der Einstellungen
+
+- Prüfe, ob innerhalb einer Gruppe (WordPress, WooCommerce, OpenAI) nur teilweise Felder befüllt wurden. Entweder komplett korrekt ausfüllen – oder Gruppe leer lassen.
+- Wenn `Job-Modus = Intervall`: `Job-Intervall (ms)` muss zwischen 10 000 und 86 400 000 liegen (10 s–24 h). Bei `einmalig` wird das Intervall ignoriert.
+- Backend-Logs zeigen genaue Hinweise zu Feld und Regel:
+  
+  ```bash
+  docker compose logs backend | grep "Validation failed"
+  ```
+  
+  oder gesamtes Log prüfen:
+  
+  ```bash
+  docker compose logs -f backend
+  ```
+
 ---
 
 ## System reagiert langsam oder hängt

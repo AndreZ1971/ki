@@ -66,6 +66,33 @@ Ruft alle WooCommerce-Produkte ab mit optionalen Filtern.
 ```json
 {
   "success": true,
+
+**Error Responses**:
+
+```json
+// 503 Service Unavailable – WooCommerce nicht konfiguriert
+{
+  "success": false,
+  "error": "WooCommerce ist nicht konfiguriert"
+}
+```
+
+```json
+// 502 Bad Gateway – Upstream-Fehler (Shop antwortet nicht / Auth fehlgeschlagen)
+{
+  "success": false,
+  "error": "WooCommerce API Error",
+  "details": {
+    "status": 401,
+    "message": "Unauthorized"
+  }
+}
+```
+
+**Hinweise**:
+- Die Implementierung nutzt die WordPress/WooCommerce REST API direkt (Basic Auth). Fallbacks: Query-String-Auth und Abruf ohne `role`-Filter.
+- Leere Ergebnisse können auf fehlende Berechtigungen oder Shop-Restriktionen des `role`-Parameters hindeuten.
+
   "data": [
     {
       "id": 123,
@@ -498,6 +525,58 @@ Detaillierte Conversion-Funnel-Analyse.
 ```
 
 ---
+
+## Settings
+
+### Get Settings (masked)
+**GET** `/app/api/settings/connection`
+
+Gibt die aktuelle Konfiguration zurück. Geheimfelder sind maskiert (`****`). Struktur entspricht dem UI (verschachtelte Gruppen):
+
+**Response** (200 OK):
+```json
+{
+  "wordpress": { "url": "https://shop.de", "user": "admin", "appPassword": "****" },
+  "woocommerce": { "url": "https://shop.de", "consumerKey": "****", "consumerSecret": "****" },
+  "openAI": { "apiKey": "****" },
+  "smtp": { "host": "smtp.example.com", "user": "alerts@example.com", "pass": "****" },
+  "job": { "mode": "once", "intervalMs": 900000 },
+  "features": { "ml": false, "emailMarketing": false }
+}
+```
+
+### Save Settings
+**POST** `/app/api/settings/connection`
+
+Nimmt ein verschachteltes Payload entgegen (wie im UI) und mappt es serverseitig auf die flache `connection.json`. Maskierte Felder (`****`) behalten ihren vorhandenen Secret-Wert.
+
+**Request Body** (Beispiel):
+```json
+{
+  "wordpress": { "url": "https://shop.de", "user": "admin", "appPassword": "xxxx xxxx xxxx xxxx" },
+  "woocommerce": { "url": "https://shop.de", "consumerKey": "ck_xxx", "consumerSecret": "cs_xxx" },
+  "openAI": { "apiKey": "sk-xxx" },
+  "job": { "mode": "interval", "intervalMs": 900000 },
+  "features": { "ml": true }
+}
+```
+
+**Validation**:
+- Gruppen (WordPress, WooCommerce, OpenAI) sind optional. Wenn Felder innerhalb einer Gruppe befüllt werden, müssen die Pflichtfelder dieser Gruppe gültig sein.
+- `job.mode`: `"once" | "interval"`
+  - `once`: `job.intervalMs` wird ignoriert
+  - `interval`: `job.intervalMs` ∈ [10 000, 86 400 000] (10 s–24 h)
+
+**Error Response** (400 Bad Request):
+```json
+{
+  "success": false,
+  "error": "Validation failed",
+  "details": [
+    { "field": "job.intervalMs", "rule": "interval_range", "message": "Must be between 10s and 24h" }
+  ]
+}
+```
 
 ---
 
@@ -1282,28 +1361,28 @@ Alle API-Fehler folgen diesem Format:
 
 ### HTTP Status Codes
 
-| Code | Bedeutung | Verwendung |
-|------|-----------|------------|
-| 200 | OK | Successful GET/PUT/DELETE |
-| 201 | Created | Successful POST (resource created) |
-| 400 | Bad Request | Invalid input/parameters |
-| 401 | Unauthorized | Missing/invalid authentication |
-| 403 | Forbidden | Insufficient permissions |
-| 404 | Not Found | Resource not found |
-| 429 | Too Many Requests | Rate limit exceeded |
-| 500 | Internal Server Error | Server error |
-| 503 | Service Unavailable | Circuit Breaker OPEN |
+| Code | Bedeutung             | Verwendung                         |
+| ---- | --------------------- | ---------------------------------- |
+| 200  | OK                    | Successful GET/PUT/DELETE          |
+| 201  | Created               | Successful POST (resource created) |
+| 400  | Bad Request           | Invalid input/parameters           |
+| 401  | Unauthorized          | Missing/invalid authentication     |
+| 403  | Forbidden             | Insufficient permissions           |
+| 404  | Not Found             | Resource not found                 |
+| 429  | Too Many Requests     | Rate limit exceeded                |
+| 500  | Internal Server Error | Server error                       |
+| 503  | Service Unavailable   | Circuit Breaker OPEN               |
 
 ### Error Codes
 
-| Code | Bedeutung | Action |
-|------|-----------|--------|
-| `CIRCUIT_BREAKER_OPEN` | Service Circuit Breaker ist OPEN | Warten (Auto-Recovery nach 60s) |
-| `RATE_LIMIT_EXCEEDED` | Rate Limit überschritten | Warten und erneut versuchen |
-| `INVALID_INPUT` | Ungültige Eingabedaten | Request-Body korrigieren |
-| `RESOURCE_NOT_FOUND` | Ressource nicht gefunden | ID prüfen |
-| `EXTERNAL_API_ERROR` | Fehler bei externer API (WooCommerce/WordPress) | Credentials prüfen |
-| `AUTHENTICATION_FAILED` | Authentifizierung fehlgeschlagen | API Keys prüfen |
+| Code                    | Bedeutung                                       | Action                          |
+| ----------------------- | ----------------------------------------------- | ------------------------------- |
+| `CIRCUIT_BREAKER_OPEN`  | Service Circuit Breaker ist OPEN                | Warten (Auto-Recovery nach 60s) |
+| `RATE_LIMIT_EXCEEDED`   | Rate Limit überschritten                        | Warten und erneut versuchen     |
+| `INVALID_INPUT`         | Ungültige Eingabedaten                          | Request-Body korrigieren        |
+| `RESOURCE_NOT_FOUND`    | Ressource nicht gefunden                        | ID prüfen                       |
+| `EXTERNAL_API_ERROR`    | Fehler bei externer API (WooCommerce/WordPress) | Credentials prüfen              |
+| `AUTHENTICATION_FAILED` | Authentifizierung fehlgeschlagen                | API Keys prüfen                 |
 
 ---
 

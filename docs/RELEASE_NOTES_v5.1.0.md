@@ -298,6 +298,14 @@ A huge thank you to our development team for making ARI truly global! The multi-
 
 ## 📋 Version History
 
+### v5.1.1 – Configuration & Woo Fixes (Dec 19, 2025)
+- Settings API: Verschachteltes UI-Payload wird serverseitig auf flache `connection.json` gemappt
+- Secrets: GET maskiert (`****`), POST übernimmt maskierte Felder unverändert (Unmasking)
+- Validator: Gruppen (WordPress, WooCommerce, OpenAI) optional, aber konsistent – Teilbefüllung führt zu gezielter Fehlermeldung
+- Jobs: `jobMode="once"` ignoriert `jobIntervalMs`; bei `interval` muss `jobIntervalMs` in [10s..24h] liegen
+- Customers Endpoint: Umgestellt auf direkten WooCommerce REST-Aufruf (Basic Auth, Fallbacks) für verlässliche Kundendaten
+- Doku aktualisiert: Onboarding, Troubleshooting (400 beim Speichern), Deploy Support, API (Settings/Customers)
+
 ### v5.1.0 - Multi-Language Support
 - ✅ Added German & English translations (150+ keys)
 - ✅ Added language switcher UI

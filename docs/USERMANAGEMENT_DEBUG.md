@@ -39,6 +39,18 @@ Die ursprüngliche Logik konnte nicht alle Fälle korrekt handhaben.
 
 ---
 
+## 🔄 Relevante Backend-Änderung (Dez 2025)
+
+Der Endpoint `/api/woocommerce/customers` ruft WooCommerce-Kunden jetzt direkt über die WordPress REST API ab und verwendet Basic Auth mit Fallback (Query-String-Auth; ohne `role`-Filter bei Bedarf). Typische Antworten:
+
+- `200 OK` mit `success: true` und `data: Customer[]`
+- `503 Service Unavailable` wenn WooCommerce nicht konfiguriert ist
+- `502 Bad Gateway` bei Upstream-Fehlern (Shop antwortet nicht / Auth schlägt fehl)
+
+Wenn „0 Kunden“ zurückkommen, prüfe Berechtigungen und ggf. den Rollenfilter im Shop (manche Installationen respektieren `role=all` nicht).
+
+---
+
 ## ✅ Implementierte Lösungen
 
 ### 1. **Erweiterte Fehlerbehandlung mit besseren Messages**

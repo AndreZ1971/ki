@@ -585,7 +585,7 @@ const Settings = () => {
       id: "pet-supplies",
       name: "Haustierbedarf",
       description: "Futter, Pflege und Zubehör für Haustiere",
-      price: 89,
+      price: 99,
       icon: "🐾",
       isActive: false,
       image:

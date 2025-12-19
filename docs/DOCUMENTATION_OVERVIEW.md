@@ -27,16 +27,16 @@ Die folgende Struktur ermöglicht es Nutzern, **schnell die richtige Information
 
 ### 🟢 **Aktuell (v5.1.0 - Dezember 2025)**
 
-| Dokument                                                           | Fokus                                   | Zielgruppe          | Status                  |
-| ------------------------------------------------------------------ | --------------------------------------- | ------------------- | ----------------------- |
-| **[UPDATE_STRATEGY.md](./UPDATE_STRATEGY.md)**                     | Update-Prozess, Versionierung, Rollback | Admins, DevOps      | 🆕 NEU                   |
-| **[DEVELOPMENT_ROADMAP.md](./DEVELOPMENT_ROADMAP.md)**             | Feature-Roadmap bis v6.0.0              | Product, Leadership | 🆕 NEU                   |
-| **[AGENTIC_CONFIGURATION.md](./AGENTIC_CONFIGURATION.md)**         | API Endpoints, Config Schema            | Developers          | ✅ Aktuell               |
-| **[AGENTIC_LOOP_ARCHITECTURE.md](./AGENTIC_LOOP_ARCHITECTURE.md)** | Loop-Internals, Scheduling              | Developers          | ✅ Aktuell               |
-| **[AGENTIC_LOOPS_USER_GUIDE.md](./AGENTIC_LOOPS_USER_GUIDE.md)**   | UI für Loop-Nutzung                     | End-Users           | ✅ Aktuell               |
-| **[Onboarding.md](./Onboarding.md)**                               | Setup & erste Schritte                  | End-Users           | ✅ Aktuell               |
-| **[deployment.md](./deployment.md)**                               | Server-Setup, Docker                    | DevOps              | ⚠️ Partial Update needed |
-| **[Troubleshooting.md](./Troubleshooting.md)**                     | Error-Lösungen                          | End-Users, Support  | ✅ Aktuell               |
+| Dokument                                                           | Fokus                                   | Zielgruppe          | Status    |
+| ------------------------------------------------------------------ | --------------------------------------- | ------------------- | --------- |
+| **[UPDATE_STRATEGY.md](./UPDATE_STRATEGY.md)**                     | Update-Prozess, Versionierung, Rollback | Admins, DevOps      | 🆕 NEU     |
+| **[DEVELOPMENT_ROADMAP.md](./DEVELOPMENT_ROADMAP.md)**             | Feature-Roadmap bis v6.0.0              | Product, Leadership | 🆕 NEU     |
+| **[AGENTIC_CONFIGURATION.md](./AGENTIC_CONFIGURATION.md)**         | API Endpoints, Config Schema            | Developers          | ✅ Aktuell |
+| **[AGENTIC_LOOP_ARCHITECTURE.md](./AGENTIC_LOOP_ARCHITECTURE.md)** | Loop-Internals, Scheduling              | Developers          | ✅ Aktuell |
+| **[AGENTIC_LOOPS_USER_GUIDE.md](./AGENTIC_LOOPS_USER_GUIDE.md)**   | UI für Loop-Nutzung                     | End-Users           | ✅ Aktuell |
+| **[Onboarding.md](./Onboarding.md)**                               | Setup & erste Schritte                  | End-Users           | ✅ Aktuell |
+| **[deployment.md](./deployment.md)**                               | Server-Setup, Docker                    | DevOps              | ✅ Aktuell |
+| **[Troubleshooting.md](./Troubleshooting.md)**                     | Error-Lösungen                          | End-Users, Support  | ✅ Aktuell |
 
 ---
 
@@ -75,7 +75,7 @@ Diese Dokumente beschreiben ältere Versionen, sind aber noch für Legacy-Nutzer
 docs/
 ├── README.md (Hauptdokumentation)
 ├── Onboarding.md (User: Erste Schritte) ✅
-├── deployment.md (Admin: Server Setup) ⚠️
+├── deployment.md (Admin: Server Setup) ✅
 ├── Troubleshooting.md (Support: Fehler-Lösungen) ✅
 │
 ├── 🆕 UPDATE_STRATEGY.md (Admin: Updates & Rollback)
@@ -101,13 +101,13 @@ docs/
 - [x] UPDATE_STRATEGY.md erstellen
 - [x] docker-entrypoint.sh perfektionieren
 - [x] configValidator.ts implementieren
-- [ ] deployment.md: "Update-Prozess" Sektion hinzufügen
-- [ ] Troubleshooting.md: Neue Error-Kategorien hinzufügen
+- [x] deployment.md: "Update-Prozess" Sektion verlinken (Support/Entrypoint-Hinweis)
+- [x] Troubleshooting.md: Neue Error-Kategorien (400 Settings Save, Intervallbereich)
 
 **Nächste Woche (Dezember 23-27):**
 - [ ] API-Test Dokumentation (OpenAI, SMTP, etc.)
-- [ ] Feldvalidierung Dokumentieren
-- [ ] API Key Masking Dokumentieren
+- [x] Feldvalidierung Dokumentieren
+- [x] API Key Masking Dokumentieren
 - [ ] Health Check API Dokumentieren
 
 **Januar:**
