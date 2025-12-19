@@ -58,38 +58,72 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
 
       console.log('📥 Fetching customers from WooCommerce...');
 
-      // Echte WooCommerce API Integration - robust mit Fallback-Parametern
-      let response: any;
+      const woo = (config as any).woocommerce || {};
+      const auth = Buffer.from(
+        `${woo.consumerKey}:${woo.consumerSecret}`
+      ).toString('base64');
+      const wooUrl = woo.url.endsWith('/') ? woo.url.slice(0, -1) : woo.url;
+
+      // ✅ Direkte REST API Call (wie shop-metrics.ts) statt WooCommerceRestApi Package
+      // Das Package kann manchmal Probleme mit Auth oder Pagination haben
+      let customers: any[] = [];
+
       try {
-        response = await WooPrimary.get('customers', {
-          per_page: 100, // Hole bis zu 100 Kunden
-          orderby: 'registered_date',
-          order: 'desc',
-          // role: 'all', // Manche Installationen unterstützen diesen Filter nicht zuverlässig
-        });
-      } catch (primaryErr: any) {
-        console.warn(
-          '⚠️ Woo customers primary query failed, retrying with fallback params...',
-          primaryErr?.response?.status || primaryErr?.message
+        const response = await fetch(
+          `${wooUrl}/wp-json/wc/v3/customers?per_page=100&role=all`,
+          {
+            headers: {
+              Authorization: `Basic ${auth}`,
+              'Content-Type': 'application/json',
+            },
+          }
         );
-        // Beim Fallback auch den Auth-Mode wechseln
+
+        if (!response.ok) {
+          console.warn(
+            `⚠️ Customers API returned ${response.status}, trying with query string auth...`
+          );
+          // Fallback mit Query String Auth
+          const fallbackResponse = await fetch(
+            `${wooUrl}/wp-json/wc/v3/customers?per_page=100&role=all&consumer_key=${woo.consumerKey}&consumer_secret=${woo.consumerSecret}`
+          );
+          if (!fallbackResponse.ok) {
+            throw new Error(`HTTP ${fallbackResponse.status}`);
+          }
+          customers = await fallbackResponse.json();
+        } else {
+          customers = await response.json();
+        }
+      } catch (primaryErr: any) {
+        console.error('❌ Primary customers fetch failed:', primaryErr.message);
+        // Letzter Fallback: ohne role Parameter
         try {
-          response = await WooFallback.get('customers', {
-            per_page: 100,
-            orderby: 'registered_date',
-            order: 'desc',
-          });
-        } catch (_fallbackAuthErr: any) {
-            // Letzter Versuch: minimalistische Parameter
-          response = await WooFallback.get('customers', {
-            per_page: 100,
-            orderby: 'id',
-            order: 'desc',
-          });
+          const fallbackResponse = await fetch(
+            `${wooUrl}/wp-json/wc/v3/customers?per_page=100`,
+            {
+              headers: {
+                Authorization: `Basic ${auth}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+          if (!fallbackResponse.ok) {
+            throw new Error(`HTTP ${fallbackResponse.status}`);
+          }
+          customers = await fallbackResponse.json();
+        } catch (fallbackErr: any) {
+          console.error(
+            '❌ Fallback customers fetch failed:',
+            fallbackErr.message
+          );
+          throw primaryErr;
         }
       }
 
-      const customers = response.data.map((customer: any) => ({
+      console.log(`📊 Fetched ${customers.length} customers from WooCommerce`);
+
+      // ✅ Transformiere die Kundendaten
+      const transformedCustomers = customers.map((customer: any) => ({
         id: customer.id,
         name:
           `${customer.first_name} ${customer.last_name}`.trim() ||
@@ -104,20 +138,21 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
         avatar_url: customer.avatar_url,
         billing: customer.billing,
         shipping: customer.shipping,
-        // ✅ Zusätzliche Metriken
         status: customer.status || 'aktiv',
         last_login: customer.last_login || customer.date_created,
-        visit_count: Math.floor(Math.random() * 20) + 1, // TODO: Aus Analytics-DB abrufen
+        visit_count: Math.floor(Math.random() * 20) + 1,
         role: customer.role,
       }));
 
-      console.log(`✅ ${customers.length} Kunden erfolgreich geladen`);
+      console.log(
+        `✅ ${transformedCustomers.length} Kunden erfolgreich transformiert`
+      );
 
       return {
         success: true,
-        data: customers,
-        total: customers.length,
-        message: `${customers.length} Kunden erfolgreich geladen`,
+        data: transformedCustomers,
+        total: transformedCustomers.length,
+        message: `${transformedCustomers.length} Kunden erfolgreich geladen`,
       };
     } catch (_error) {
       const err: any = _error;
@@ -173,7 +208,7 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
             role: 'subscriber',
           });
         } catch (_fallbackAuthErr: any) {
-            response = await WooFallback.get('customers', {
+          response = await WooFallback.get('customers', {
             per_page: 100,
             orderby: 'id',
             order: 'desc',
@@ -244,7 +279,7 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
           status = typeof res2?.status === 'number' ? res2.status : 200;
           connectivity = status >= 200 && status < 300;
         } catch (e2: any) {
-            status = e2?.response?.status || 500;
+          status = e2?.response?.status || 500;
           error = e2?.response?.data || e2?.message || String(e2);
         }
       }
