@@ -70,7 +70,87 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
       let credentials: ShopCredentials;
       try {
         const json = await fs.readFile(jsonPath, 'utf-8');
-        credentials = JSON.parse(json);
+        const fileData = JSON.parse(json);
+
+        // Transform structured format to flat for frontend compatibility
+        credentials = {
+          // WordPress
+          wpUrl: fileData.wordpress?.url || '',
+          wpUsername: fileData.wordpress?.username || '',
+          wpAppPassword: fileData.wordpress?.appPassword ? '****' : '', // Mask sensitive data
+
+          // WooCommerce
+          wcApiUrl: fileData.woocommerce?.url || '',
+          wcConsumerKey: fileData.woocommerce?.consumerKey || '',
+          wcConsumerSecret: fileData.woocommerce?.consumerSecret ? '****' : '', // Mask sensitive data
+          wooAuthMode: fileData.woocommerce?.authMode || 'basic',
+          wooTimeoutMs: fileData.woocommerce?.timeoutMs || 30000,
+
+          // OpenAI
+          openaiApiKey: fileData.openAI?.apiKey ? '****' : '', // Mask sensitive data
+          openaiModel: fileData.openAI?.model || 'gpt-4o-mini',
+
+          // Job Configuration
+          jobMode: fileData.job?.mode || 'once',
+          jobIntervalMs: fileData.job?.intervalMs || 900000,
+
+          // Features
+          enableAnalytics: fileData.features?.enableAnalytics ?? true,
+          enableAutoProducts: fileData.features?.enableAutoProducts ?? true,
+          enableEmailMarketing: fileData.features?.enableEmailMarketing ?? true,
+
+          // Social Media - Convert from structured to flat
+          linkedinEnabled: fileData.socialMedia?.linkedin?.enabled ?? false,
+          linkedinAccessToken: fileData.socialMedia?.linkedin?.accessToken
+            ? '****'
+            : '',
+          linkedinRefreshToken: fileData.socialMedia?.linkedin?.refreshToken
+            ? '****'
+            : '',
+
+          facebookEnabled: fileData.socialMedia?.facebook?.enabled ?? false,
+          facebookAccessToken: fileData.socialMedia?.facebook?.accessToken
+            ? '****'
+            : '',
+          facebookPageId: fileData.socialMedia?.facebook?.pageId || '',
+
+          instagramEnabled: fileData.socialMedia?.instagram?.enabled ?? false,
+          instagramAccessToken: fileData.socialMedia?.instagram?.accessToken
+            ? '****'
+            : '',
+          instagramBusinessAccountId:
+            fileData.socialMedia?.instagram?.businessAccountId || '',
+
+          twitterEnabled: fileData.socialMedia?.twitter?.enabled ?? false,
+          twitterApiKey: fileData.socialMedia?.twitter?.apiKey ? '****' : '',
+          twitterApiSecret: fileData.socialMedia?.twitter?.apiSecret
+            ? '****'
+            : '',
+          twitterAccessToken: fileData.socialMedia?.twitter?.accessToken
+            ? '****'
+            : '',
+          twitterAccessTokenSecret: fileData.socialMedia?.twitter
+            ?.accessTokenSecret
+            ? '****'
+            : '',
+
+          tiktokEnabled: fileData.socialMedia?.tiktok?.enabled ?? false,
+          tiktokAccessToken: fileData.socialMedia?.tiktok?.accessToken
+            ? '****'
+            : '',
+          tiktokRefreshToken: fileData.socialMedia?.tiktok?.refreshToken
+            ? '****'
+            : '',
+
+          youtubeEnabled: fileData.socialMedia?.youtube?.enabled ?? false,
+          youtubeAccessToken: fileData.socialMedia?.youtube?.accessToken
+            ? '****'
+            : '',
+          youtubeRefreshToken: fileData.socialMedia?.youtube?.refreshToken
+            ? '****'
+            : '',
+          youtubeChannelId: fileData.socialMedia?.youtube?.channelId || '',
+        };
       } catch {
         // Datei existiert nicht oder ist leer
         credentials = {
@@ -145,12 +225,12 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
       );
       const jsonPath = path.resolve(process.cwd(), 'connection.json');
       // Masked Werte behandeln: Wenn Wert mit **** beginnt, alten Wert aus JSON übernehmen
-      let oldCredentials: Partial<ShopCredentials> = {};
+      let oldFileData: any = {};
       try {
         const json = await fs.readFile(jsonPath, 'utf-8');
-        oldCredentials = JSON.parse(json);
+        oldFileData = JSON.parse(json);
       } catch {
-        // intentionally left blank: falls Datei nicht existiert, bleibt oldCredentials leer
+        // intentionally left blank: falls Datei nicht existiert, bleibt oldFileData leer
       }
       const unmaskValue = (
         newValue: string,
@@ -165,23 +245,105 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         ...newCredentials,
         wpAppPassword: unmaskValue(
           newCredentials.wpAppPassword,
-          oldCredentials.wpAppPassword
+          oldFileData?.wpAppPassword
         ),
         wcConsumerSecret: unmaskValue(
           newCredentials.wcConsumerSecret,
-          oldCredentials.wcConsumerSecret
+          oldFileData?.wcConsumerSecret
         ),
         openaiApiKey: unmaskValue(
           newCredentials.openaiApiKey,
-          oldCredentials.openaiApiKey
+          oldFileData?.openaiApiKey
         ),
       };
+
+      // Transform flat social media fields to structured format for storage
+      const socialMediaStructured: any = {
+        linkedin: {
+          enabled: cleanedCredentials.linkedinEnabled,
+          accessToken: cleanedCredentials.linkedinAccessToken,
+          refreshToken: cleanedCredentials.linkedinRefreshToken,
+        },
+        facebook: {
+          enabled: cleanedCredentials.facebookEnabled,
+          accessToken: cleanedCredentials.facebookAccessToken,
+          pageId: cleanedCredentials.facebookPageId,
+        },
+        instagram: {
+          enabled: cleanedCredentials.instagramEnabled,
+          accessToken: cleanedCredentials.instagramAccessToken,
+          businessAccountId: cleanedCredentials.instagramBusinessAccountId,
+        },
+        twitter: {
+          enabled: cleanedCredentials.twitterEnabled,
+          apiKey: cleanedCredentials.twitterApiKey,
+          apiSecret: cleanedCredentials.twitterApiSecret,
+          accessToken: cleanedCredentials.twitterAccessToken,
+          accessTokenSecret: cleanedCredentials.twitterAccessTokenSecret,
+        },
+        tiktok: {
+          enabled: cleanedCredentials.tiktokEnabled,
+          accessToken: cleanedCredentials.tiktokAccessToken,
+          refreshToken: cleanedCredentials.tiktokRefreshToken,
+        },
+        youtube: {
+          enabled: cleanedCredentials.youtubeEnabled,
+          accessToken: cleanedCredentials.youtubeAccessToken,
+          refreshToken: cleanedCredentials.youtubeRefreshToken,
+          channelId: cleanedCredentials.youtubeChannelId,
+        },
+      };
+
+      // Store in connection.json with structured format
+      const dataToStore = {
+        // Core Services
+        wordpress: {
+          url: cleanedCredentials.wpUrl,
+          username: cleanedCredentials.wpUsername,
+          appPassword: cleanedCredentials.wpAppPassword,
+        },
+        woocommerce: {
+          url: cleanedCredentials.wcApiUrl,
+          consumerKey: cleanedCredentials.wcConsumerKey,
+          consumerSecret: cleanedCredentials.wcConsumerSecret,
+          authMode: cleanedCredentials.wooAuthMode,
+          timeoutMs: cleanedCredentials.wooTimeoutMs,
+        },
+        openAI: {
+          apiKey: cleanedCredentials.openaiApiKey,
+          model: cleanedCredentials.openaiModel,
+        },
+        // Job Configuration
+        job: {
+          mode: cleanedCredentials.jobMode,
+          intervalMs: cleanedCredentials.jobIntervalMs,
+        },
+        // Feature Flags
+        features: {
+          enableAnalytics: cleanedCredentials.enableAnalytics,
+          enableAutoProducts: cleanedCredentials.enableAutoProducts,
+          enableEmailMarketing: cleanedCredentials.enableEmailMarketing,
+        },
+        // Social Media - NEW STRUCTURED FORMAT
+        socialMedia: socialMediaStructured,
+        // Preserve other existing data from old file
+        ...(oldFileData.reddit && { reddit: oldFileData.reddit }),
+        ...(oldFileData.smtp && { smtp: oldFileData.smtp }),
+        ...(oldFileData.support && { support: oldFileData.support }),
+        ...(oldFileData.ml && { ml: oldFileData.ml }),
+        ...(oldFileData.onboarding && { onboarding: oldFileData.onboarding }),
+        ...(oldFileData.metadata && { metadata: oldFileData.metadata }),
+      };
+
       await fs.writeFile(
         jsonPath,
-        JSON.stringify(cleanedCredentials, null, 2),
+        JSON.stringify(dataToStore, null, 2),
         'utf-8'
       );
       logger.info('✅ Settings: connection.json updated successfully');
+      logger.info(
+        `✅ Social Media section saved: ${Object.keys(socialMediaStructured).filter((k) => socialMediaStructured[k].enabled).length} channels enabled`
+      );
       return {
         success: true,
         message: 'Konfiguration erfolgreich gespeichert!',
