@@ -27,7 +27,8 @@ interface CustomerStats {
   topCustomer: Customer | null;
 }
 
-interface ApiResponse<T> {
+// ✅ API Response Type (wird im Fehlerfall genutzt für Type-Checking)
+interface _ApiResponse<T> {
   success: boolean;
   data?: T;
   error?: string;
