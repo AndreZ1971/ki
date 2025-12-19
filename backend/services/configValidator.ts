@@ -104,9 +104,23 @@ class ConfigValidator {
     const errors: ValidationError[] = [];
     const warnings: ValidationError[] = [];
 
-    // WORDPRESS
-    if (credentials.wpUrl) {
-      if (!this.isValidUrl(credentials.wpUrl)) {
+    // WORDPRESS - All WordPress fields must be filled together or all empty (optional group)
+    const hasWpUrl = credentials.wpUrl && credentials.wpUrl.trim() !== '';
+    const hasWpUser =
+      credentials.wpUsername && credentials.wpUsername.trim() !== '';
+    const hasWpPass =
+      credentials.wpAppPassword && credentials.wpAppPassword.trim() !== '';
+
+    if (hasWpUrl || hasWpUser || hasWpPass) {
+      if (!hasWpUrl) {
+        errors.push({
+          field: 'wpUrl',
+          value: credentials.wpUrl,
+          rule: 'required',
+          message: 'Wenn Sie WordPress konfigurieren, ist die URL erforderlich',
+          severity: 'error',
+        });
+      } else if (!this.isValidUrl(credentials.wpUrl)) {
         errors.push({
           field: 'wpUrl',
           value: credentials.wpUrl,
@@ -115,39 +129,61 @@ class ConfigValidator {
           severity: 'error',
         });
       }
+
+      if (!hasWpUser) {
+        errors.push({
+          field: 'wpUsername',
+          value: credentials.wpUsername,
+          rule: 'required',
+          message:
+            'Wenn Sie WordPress konfigurieren, ist der Username erforderlich',
+          severity: 'error',
+        });
+      }
+
+      if (!hasWpPass) {
+        errors.push({
+          field: 'wpAppPassword',
+          value: credentials.wpAppPassword,
+          rule: 'required',
+          message:
+            'Wenn Sie WordPress konfigurieren, ist das App Password erforderlich',
+          severity: 'error',
+        });
+      }
     } else {
-      errors.push({
-        field: 'wpUrl',
-        value: credentials.wpUrl,
-        rule: 'required',
-        message: 'WordPress URL ist erforderlich',
-        severity: 'error',
-      });
-    }
-
-    if (!credentials.wpUsername || credentials.wpUsername.trim() === '') {
-      errors.push({
-        field: 'wpUsername',
-        value: credentials.wpUsername,
-        rule: 'required',
-        message: 'WordPress Username ist erforderlich',
-        severity: 'error',
-      });
-    }
-
-    if (!credentials.wpAppPassword || credentials.wpAppPassword.trim() === '') {
-      errors.push({
-        field: 'wpAppPassword',
-        value: credentials.wpAppPassword,
-        rule: 'required',
-        message: 'WordPress App Password ist erforderlich',
-        severity: 'error',
+      warnings.push({
+        field: 'wordpress',
+        value: '',
+        rule: 'empty',
+        message:
+          'WordPress ist nicht konfiguriert. Einige KI-Features werden nicht verfügbar sein.',
+        severity: 'warning',
       });
     }
 
     // WOOCOMMERCE
-    if (credentials.wcApiUrl) {
-      if (!this.isValidUrl(credentials.wcApiUrl)) {
+    // WOOCOMMERCE - All WooCommerce fields must be filled together or all empty (optional group)
+    const hasWooUrl =
+      credentials.wcApiUrl && credentials.wcApiUrl.trim() !== '';
+    const hasWooKey =
+      credentials.wcConsumerKey && credentials.wcConsumerKey.trim() !== '';
+    const hasWooSecret =
+      credentials.wcConsumerSecret &&
+      credentials.wcConsumerSecret.trim() !== '';
+
+    // If any WooCommerce field is filled, all must be filled
+    if (hasWooUrl || hasWooKey || hasWooSecret) {
+      if (!hasWooUrl) {
+        errors.push({
+          field: 'wcApiUrl',
+          value: credentials.wcApiUrl,
+          rule: 'required',
+          message:
+            'Wenn Sie WooCommerce konfigurieren, ist die URL erforderlich',
+          severity: 'error',
+        });
+      } else if (!this.isValidUrl(credentials.wcApiUrl)) {
         errors.push({
           field: 'wcApiUrl',
           value: credentials.wcApiUrl,
@@ -156,47 +192,49 @@ class ConfigValidator {
           severity: 'error',
         });
       }
+
+      if (!hasWooKey) {
+        errors.push({
+          field: 'wcConsumerKey',
+          value: credentials.wcConsumerKey,
+          rule: 'required',
+          message:
+            'Wenn Sie WooCommerce konfigurieren, ist der Consumer Key erforderlich',
+          severity: 'error',
+        });
+      }
+
+      if (!hasWooSecret) {
+        errors.push({
+          field: 'wcConsumerSecret',
+          value: credentials.wcConsumerSecret,
+          rule: 'required',
+          message:
+            'Wenn Sie WooCommerce konfigurieren, ist der Consumer Secret erforderlich',
+          severity: 'error',
+        });
+      }
     } else {
-      errors.push({
-        field: 'wcApiUrl',
-        value: credentials.wcApiUrl,
-        rule: 'required',
-        message: 'WooCommerce URL ist erforderlich',
-        severity: 'error',
+      // All WooCommerce fields empty - add warning if not configured
+      warnings.push({
+        field: 'woocommerce',
+        value: '',
+        rule: 'empty',
+        message:
+          'WooCommerce ist nicht konfiguriert. Sie können Orders und Produkte nicht verwalten.',
+        severity: 'warning',
       });
     }
 
-    if (!credentials.wcConsumerKey || credentials.wcConsumerKey.trim() === '') {
-      errors.push({
-        field: 'wcConsumerKey',
-        value: credentials.wcConsumerKey,
-        rule: 'required',
-        message: 'WooCommerce Consumer Key ist erforderlich',
-        severity: 'error',
-      });
-    }
-
-    if (
-      !credentials.wcConsumerSecret ||
-      credentials.wcConsumerSecret.trim() === ''
-    ) {
-      errors.push({
-        field: 'wcConsumerSecret',
-        value: credentials.wcConsumerSecret,
-        rule: 'required',
-        message: 'WooCommerce Consumer Secret ist erforderlich',
-        severity: 'error',
-      });
-    }
-
-    // OPENAI
+    // OPENAI - Optional but with warning if empty
     if (!credentials.openaiApiKey || credentials.openaiApiKey.trim() === '') {
-      errors.push({
+      warnings.push({
         field: 'openaiApiKey',
         value: credentials.openaiApiKey,
-        rule: 'required',
-        message: 'OpenAI API Key ist erforderlich',
-        severity: 'error',
+        rule: 'empty',
+        message:
+          'OpenAI API Key nicht konfiguriert. KI-Features werden nicht funktionieren.',
+        severity: 'warning',
       });
     } else if (!this.isValidApiKey(credentials.openaiApiKey)) {
       errors.push({

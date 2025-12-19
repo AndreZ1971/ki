@@ -281,10 +281,59 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
   // POST /api/settings/connection - Update credentials and save to .env
   fastify.post('/connection', async (request, reply) => {
     try {
-      const newCredentials = request.body as ShopCredentials;
+      const payload = request.body as any;
       logger.info(
         '💾 Settings: Updating connection credentials (connection.json)'
       );
+
+      // Transform nested structure from frontend to flat structure for validator
+      const newCredentials: ShopCredentials = {
+        // WordPress
+        wpUrl: payload.wordpress?.url || '',
+        wpUsername: payload.wordpress?.username || '',
+        wpAppPassword: payload.wordpress?.appPassword || '',
+        // WooCommerce
+        wcApiUrl: payload.woocommerce?.url || '',
+        wcConsumerKey: payload.woocommerce?.consumerKey || '',
+        wcConsumerSecret: payload.woocommerce?.consumerSecret || '',
+        wooAuthMode: payload.woocommerce?.authMode || 'basic',
+        wooTimeoutMs: payload.woocommerce?.timeoutMs || 30000,
+        // OpenAI
+        openaiApiKey: payload.openAI?.apiKey || '',
+        openaiModel: payload.openAI?.model || 'gpt-4o-mini',
+        // Job
+        jobMode: payload.job?.mode || 'once',
+        jobIntervalMs: payload.job?.intervalMs || 900000,
+        // Features
+        enableAnalytics: payload.features?.enableAnalytics ?? true,
+        enableAutoProducts: payload.features?.enableAutoProducts ?? true,
+        enableEmailMarketing: payload.features?.enableEmailMarketing ?? true,
+        // Social Media (extract from payload.socialMedia or legacy format)
+        linkedinEnabled: payload.socialMedia?.linkedin?.enabled ?? false,
+        linkedinAccessToken: payload.socialMedia?.linkedin?.accessToken || '',
+        linkedinRefreshToken: payload.socialMedia?.linkedin?.refreshToken || '',
+        facebookEnabled: payload.socialMedia?.facebook?.enabled ?? false,
+        facebookAccessToken: payload.socialMedia?.facebook?.accessToken || '',
+        facebookPageId: payload.socialMedia?.facebook?.pageId || '',
+        instagramEnabled: payload.socialMedia?.instagram?.enabled ?? false,
+        instagramAccessToken: payload.socialMedia?.instagram?.accessToken || '',
+        instagramBusinessAccountId:
+          payload.socialMedia?.instagram?.businessAccountId || '',
+        twitterEnabled: payload.socialMedia?.twitter?.enabled ?? false,
+        twitterApiKey: payload.socialMedia?.twitter?.apiKey || '',
+        twitterApiSecret: payload.socialMedia?.twitter?.apiSecret || '',
+        twitterAccessToken: payload.socialMedia?.twitter?.accessToken || '',
+        twitterAccessTokenSecret:
+          payload.socialMedia?.twitter?.accessTokenSecret || '',
+        tiktokEnabled: payload.socialMedia?.tiktok?.enabled ?? false,
+        tiktokAccessToken: payload.socialMedia?.tiktok?.accessToken || '',
+        tiktokRefreshToken: payload.socialMedia?.tiktok?.refreshToken || '',
+        youtubeEnabled: payload.socialMedia?.youtube?.enabled ?? false,
+        youtubeAccessToken: payload.socialMedia?.youtube?.accessToken || '',
+        youtubeRefreshToken: payload.socialMedia?.youtube?.refreshToken || '',
+        youtubeChannelId: payload.socialMedia?.youtube?.channelId || '',
+      };
+
       const jsonPath = path.resolve(process.cwd(), 'connection.json');
       // Masked Werte behandeln: Wenn Wert mit **** beginnt, alten Wert aus JSON übernehmen
       let oldFileData: any = {};
