@@ -74,6 +74,15 @@ const UserManagement: React.FC = () => {
 
         const data: any = await res.json();
         console.log("📥 API Response:", data);
+        console.log("📥 API Response data.data:", data.data);
+        console.log("📥 API Response is Array?:", Array.isArray(data));
+        console.log(
+          "📥 API Response data.data is Array?:",
+          Array.isArray(data.data)
+        );
+        console.log("📥 API Response data.success:", data.success);
+        console.log("📥 API Response data.total:", data.total);
+        console.log("📥 API Response data.message:", data.message);
 
         // ✅ Verbesserte Fehlerbehandlung für verschiedene API-Antworten
         if (!res.ok) {
@@ -110,6 +119,7 @@ const UserManagement: React.FC = () => {
         }
 
         console.log(`✅ ${customers.length} Kunden geladen`);
+        console.log("📋 Customers array:", customers);
         setCustomers(customers);
       } catch (err) {
         const message =
@@ -172,6 +182,11 @@ const UserManagement: React.FC = () => {
         );
       return 0;
     });
+
+    console.log(
+      `📊 filteredCustomers: ${result.length} (von ${customers.length} Kunden)`
+    );
+    console.log(`📊 searchTerm: "${searchTerm}", sortBy: "${sortBy}"`);
 
     return result;
   }, [customers, searchTerm, sortBy]);
