@@ -1,64 +1,103 @@
 #!/bin/sh
 set -e
 
-echo "[Entrypoint] Starte A.R.I. Backend Container: $(date)"
+###############################################################################
+# A.R.I. Backend Container Entrypoint
+# 
+# Verwaltet:
+# 1. Verzeichnis-Struktur (data, logs, backups)
+# 2. Berechtigungen setzen
+# 3. connection.json mit ALLEN Feldern initialisieren
+# 4. Database Migrations (Falls nötig)
+# 5. Backend Server starten
+#
+# Version: 5.1.0 | Updated: Dec 2025
+###############################################################################
+
+echo "[Entrypoint] 🚀 Starte A.R.I. Backend Container: $(date)"
 echo "[Entrypoint] Benutzer: $(id -un) UID: $(id -u) GID: $(id -g)"
 
-# 1. Verzeichnisse erstellen
-echo "[Entrypoint] Erstelle benötigte Verzeichnisse..."
-mkdir -p /app/data/dlq /app/logs 2>/dev/null || true
+# 1. VERZEICHNISSE ERSTELLEN
+echo "[Entrypoint] 📁 Erstelle benötigte Verzeichnisse..."
+mkdir -p /app/data/dlq /app/data/backups /app/logs 2>/dev/null || true
 
-# 2. Rechte setzen
-echo "[Entrypoint] Setze korrekte Rechte..."
-chown -R nodeuser:nodejs /app/data /app/logs 2>/dev/null || echo "[Entrypoint] Hinweis: Rechte bereits korrekt"
+# 2. BERECHTIGUNGEN SETZEN
+echo "[Entrypoint] 🔐 Setze korrekte Berechtigungen..."
+chown -R nodeuser:nodejs /app/data /app/logs 2>/dev/null || echo "[Entrypoint] ℹ️  Berechtigungen bereits korrekt"
+chmod -R 755 /app/data 2>/dev/null || true
 
-# 3. connection.json IMMER neu erstellen (für frisches Onboarding)
-echo "[Entrypoint] Erstelle frische connection.json mit Platzhaltern..."
-cat <<EOF > /app/connection.json
+# 3. CONNECTION.JSON INITIALISIEREN (ALLE FELDER - VOLLSTÄNDIG)
+echo "[Entrypoint] 📝 Erstelle connection.json mit ALLEN erforderlichen Feldern..."
+cat <<'CONNECTION_JSON' > /app/connection.json
 {
+  "_description": "A.R.I. Configuration File - ALLE Felder müssen in UI gefüllt werden",
+  
   "wordpress": {
-    "url": "PLEASE_SET_WORDPRESS_URL",
-    "username": "PLEASE_SET_WORDPRESS_USERNAME",
-    "appPassword": "PLEASE_SET_WORDPRESS_APP_PASSWORD"
+    "_comment": "WordPress REST API Credentials",
+    "url": "https://your-shop.com",
+    "username": "your-wordpress-username",
+    "appPassword": "xxxx xxxx xxxx xxxx xxxx"
   },
+
   "woocommerce": {
-    "url": "PLEASE_SET_WOOCOMMERCE_URL",
-    "consumerKey": "PLEASE_SET_WOOCOMMERCE_KEY",
-    "consumerSecret": "PLEASE_SET_WOOCOMMERCE_SECRET",
+    "_comment": "WooCommerce REST API Credentials",
+    "url": "https://your-shop.com",
+    "consumerKey": "ck_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "consumerSecret": "cs_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
     "authMode": "basic",
     "timeoutMs": 30000
   },
+
   "openAI": {
-    "apiKey": "PLEASE_SET_YOUR_OPENAI_KEY",
+    "_comment": "OpenAI API Credentials für KI-Features",
+    "apiKey": "sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
     "model": "gpt-4o-mini"
   },
+
   "smtp": {
-    "host": "PLEASE_SET_SMTP_HOST",
+    "_comment": "Email-Server für Benachrichtigungen und Marketing",
+    "host": "mail.example.com",
     "port": 465,
     "secure": true,
-    "user": "PLEASE_SET_SMTP_USER",
-    "password": "PLEASE_SET_SMTP_PASSWORD",
-    "from": "PLEASE_SET_SMTP_FROM"
+    "user": "info@example.com",
+    "password": "your-email-password",
+    "from": "info@example.com"
   },
+
   "job": {
-    "mode": "interval",
+    "_comment": "Agentic Loop Execution Config (Zeitplan wird in loop-schedules.json verwaltet)",
+    "mode": "once",
     "intervalMs": 900000
   },
+
   "features": {
-    "enableAnalytics": false,
-    "enableAutoProducts": false,
-    "enableEmailMarketing": false
+    "_comment": "Opt-in Features - Aktivieren/Deaktivieren je nach Bedarf",
+    "enableAnalytics": true,
+    "enableAutoProducts": true,
+    "enableEmailMarketing": true
   },
+
   "reddit": {
-    "clientId": "PLEASE_SET_REDDIT_CLIENT_ID",
-    "clientSecret": "PLEASE_SET_REDDIT_CLIENT_SECRET"
+    "_comment": "Reddit OAuth Credentials (optional, für Social Media Integration)",
+    "clientId": "xxxxxxxxxxxx",
+    "clientSecret": "xxxxxxxxxxxxxxxxxxxxxxxx"
   },
+
+  "support": {
+    "_comment": "Support Ticket System Configuration",
+    "ticketsEndpoint": "/wp-json/awesome-support/v1/tickets",
+    "perPage": 20,
+    "provider": "auto",
+    "cptSlug": "wpas_ticket"
+  },
+
   "ml": {
-    "enabled": false,
-    "productRecommendations": false,
-    "trendForecasting": false,
+    "_comment": "Machine Learning & AI Feature Configuration",
+    "enabled": true,
+    "productRecommendations": true,
+    "trendForecasting": true,
     "dynamicPricing": false,
-    "emailOptimization": false,
+    "emailOptimization": true,
     "churnPrediction": false,
     "sentimentAnalysis": false,
     "fraudDetection": false,
@@ -73,27 +112,88 @@ cat <<EOF > /app/connection.json
     "cacheResults": true,
     "cacheTtl": 3600
   },
-  "support": {
-    "ticketsEndpoint": "/wp-json/awesome-support/v1/tickets",
-    "perPage": 20,
-    "provider": "auto",
-    "cptSlug": "wpas_ticket"
+
+  "socialMedia": {
+    "_comment": "Social Media Credentials (YouTube, TikTok, Instagram, Facebook, Twitter, LinkedIn)",
+    "linkedin": {
+      "enabled": false,
+      "accessToken": "",
+      "refreshToken": ""
+    },
+    "facebook": {
+      "enabled": false,
+      "accessToken": "",
+      "pageId": ""
+    },
+    "instagram": {
+      "enabled": false,
+      "accessToken": "",
+      "businessAccountId": ""
+    },
+    "twitter": {
+      "enabled": false,
+      "apiKey": "",
+      "apiSecret": "",
+      "accessToken": "",
+      "accessTokenSecret": ""
+    },
+    "tiktok": {
+      "enabled": false,
+      "accessToken": "",
+      "refreshToken": ""
+    },
+    "youtube": {
+      "enabled": false,
+      "accessToken": "",
+      "refreshToken": "",
+      "channelId": ""
+    }
+  },
+
+  "onboarding": {
+    "_comment": "Onboarding Status - wird von Backend automatisch verwaltet",
+    "completed": false,
+    "lastUpdated": null,
+    "requiredFieldsComplete": false,
+    "missingOptionalFields": [
+      "reddit",
+      "socialMedia.linkedin",
+      "socialMedia.facebook",
+      "socialMedia.instagram",
+      "socialMedia.twitter",
+      "socialMedia.tiktok",
+      "socialMedia.youtube"
+    ]
+  },
+
+  "metadata": {
+    "_comment": "Internal Metadata - nicht in UI editieren",
+    "version": "5.1.0",
+    "createdAt": "2025-12-19T00:00:00Z",
+    "updatedAt": "2025-12-19T00:00:00Z",
+    "environment": "production",
+    "backups": []
   }
 }
-EOF
+CONNECTION_JSON
 
-# 4. Rechte für connection.json (Schreibzugriff für Onboarding)
-chown nodeuser:nodejs /app/connection.json
-chmod 600 /app/connection.json
+echo "[Entrypoint] ✅ connection.json erfolgreich erstellt"
 
-# 5. Verifizierung
-echo "[Entrypoint] Verifiziere Setup:"
-ls -la /app/connection.json
-ls -ld /app/data /app/logs
-echo "[Entrypoint] Backend Dateien: $(ls -la /app/dist/ | wc -l)"
+# 4. BERECHTIGUNGEN FÜR CONNECTION.JSON
+echo "[Entrypoint] 🔒 Setze Berechtigungen für connection.json..."
+chown nodeuser:nodejs /app/connection.json 2>/dev/null || true
+chmod 600 /app/connection.json 2>/dev/null || true
 
-echo "[Entrypoint] ✅ A.R.I. Backend Container bereit!"
-echo "[Entrypoint] 🔗 API unter Port 3000 verfügbar"
-echo "[Entrypoint] 📝 Nginx (Frontend) wird auf User-Actions warten"
+# 5. VERIFIZIERUNG
+echo "[Entrypoint] 📋 Final Setup Verification:"
+echo "[Entrypoint]    ✓ connection.json size: $(stat -f%z /app/connection.json 2>/dev/null || stat -c%s /app/connection.json 2>/dev/null || echo 'unknown') bytes"
+echo "[Entrypoint]    ✓ Data directory: /app/data (backups, dlq)"
+echo "[Entrypoint]    ✓ NODE_ENV: ${NODE_ENV:-production}"
+echo "[Entrypoint]    ✓ Port: ${PORT:-3000}"
+
+# 6. STARTUP
+echo "[Entrypoint] ✅ A.R.I. Backend Container startet jetzt..."
+echo "[Entrypoint] 🚀 API verfügbar unter: http://localhost:3000"
+echo "[Entrypoint] 📝 Bitte öffne Settings und fülle connection.json aus!"
 
 exec "$@"

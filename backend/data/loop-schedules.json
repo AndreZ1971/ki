@@ -12,7 +12,7 @@
   "product-optimization": {
     "enabled": true,
     "type": "weekly",
-    "time": "10:00",
+    "time": "11:00",
     "weekdays": [
       "Monday",
       "Wednesday",
