@@ -60,7 +60,68 @@ interface ShopCredentials {
   youtubeChannelId: string;
 }
 
+// Error categorization for connection tests
+type ErrorCategory = 'network' | 'auth' | 'validation' | 'timeout' | 'unknown';
+
 const connectionRoutes: FastifyPluginAsync = async (fastify) => {
+  // Helper: Categorize errors and provide helpful hints
+  const categorizeError = (
+    error: Error | string | unknown
+  ): { category: ErrorCategory; hint: string } => {
+    const errorStr = (
+      error instanceof Error ? error.message : String(error)
+    ).toLowerCase();
+
+    // Network errors
+    if (
+      errorStr.includes('enotfound') ||
+      errorStr.includes('econnrefused') ||
+      errorStr.includes('etimedout') ||
+      errorStr.includes('nicht erreichbar')
+    ) {
+      if (errorStr.includes('etimedout')) {
+        return {
+          category: 'timeout',
+          hint: '⏱️ Timeout - Server antwortete nicht rechtzeitig. Prüfen Sie die URL und Netzwerkverbindung.',
+        };
+      }
+      return {
+        category: 'network',
+        hint: '🌐 Netzwerkfehler - Kann den Server nicht erreichen. Prüfen Sie die URL und Firewall-Einstellungen.',
+      };
+    }
+
+    // Auth errors
+    if (
+      errorStr.includes('401') ||
+      errorStr.includes('unauthorized') ||
+      errorStr.includes('forbidden') ||
+      errorStr.includes('invalid') ||
+      errorStr.includes('authentifizierung')
+    ) {
+      return {
+        category: 'auth',
+        hint: '🔐 Authentifizierungsfehler - Zugangsdaten ungültig oder abgelaufen. Überprüfen Sie API-Keys und Passwörter.',
+      };
+    }
+
+    // Validation errors
+    if (
+      errorStr.includes('400') ||
+      errorStr.includes('syntax') ||
+      errorStr.includes('parse')
+    ) {
+      return {
+        category: 'validation',
+        hint: '✓ Validierungsfehler - Request-Format ungültig. Prüfen Sie die eingegebenen Daten.',
+      };
+    }
+
+    return {
+      category: 'unknown',
+      hint: '❓ Unbekannter Fehler - Prüfen Sie die Logs für mehr Details.',
+    };
+  };
   // GET /api/settings/connection - Get current credentials from .env
   fastify.get('/connection', async (request, reply) => {
     try {
@@ -498,12 +559,24 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
               `✅ WordPress connection successful (${results.wordpress.time}ms)`
             );
           } else {
-            results.wordpress.message = `❌ WordPress-Fehler: ${wpResponse.status} ${wpResponse.statusText}`;
+            const errorCategory =
+              wpResponse.status === 401 ? 'auth' : 'unknown';
+            const hint =
+              wpResponse.status === 401
+                ? '🔐 Authentifizierungsfehler - Username oder App Password ungültig'
+                : `❌ WordPress-Fehler ${wpResponse.status}: ${wpResponse.statusText}`;
+            results.wordpress.message = hint;
+            results.wordpress.error = {
+              category: errorCategory,
+              hint,
+            };
             logger.warn(`❌ WordPress connection failed: ${wpResponse.status}`);
           }
         } catch (wpError) {
           results.wordpress.time = Date.now() - wpStart;
-          results.wordpress.message = `❌ WordPress nicht erreichbar: ${wpError}`;
+          const { category, hint } = categorizeError(wpError);
+          results.wordpress.message = hint;
+          results.wordpress.error = { category, hint };
           logger.error(`❌ WordPress connection error: ${wpError}`);
         }
       } else {
@@ -548,14 +621,26 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
               `✅ WooCommerce connection successful (${results.woocommerce.time}ms)`
             );
           } else {
-            results.woocommerce.message = `❌ WooCommerce-Fehler: ${wcResponse.status} ${wcResponse.statusText}`;
+            const errorCategory =
+              wcResponse.status === 401 ? 'auth' : 'unknown';
+            const hint =
+              wcResponse.status === 401
+                ? '🔐 Authentifizierungsfehler - Consumer Key/Secret ungültig'
+                : `❌ WooCommerce-Fehler ${wcResponse.status}: ${wcResponse.statusText}`;
+            results.woocommerce.message = hint;
+            results.woocommerce.error = {
+              category: errorCategory,
+              hint,
+            };
             logger.warn(
               `❌ WooCommerce connection failed: ${wcResponse.status}`
             );
           }
         } catch (wcError) {
           results.woocommerce.time = Date.now() - wcStart;
-          results.woocommerce.message = `❌ WooCommerce nicht erreichbar: ${wcError}`;
+          const { category, hint } = categorizeError(wcError);
+          results.woocommerce.message = hint;
+          results.woocommerce.error = { category, hint };
           logger.error(`❌ WooCommerce connection error: ${wcError}`);
         }
       } else {
@@ -589,17 +674,28 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
               `✅ OpenAI connection successful (${results.openai.time}ms)`
             );
           } else if (openaiResponse.status === 401) {
-            results.openai.message = '❌ OpenAI API-Key ungültig';
+            results.openai.message =
+              '🔐 OpenAI API-Key ungültig oder abgelaufen';
+            results.openai.error = {
+              category: 'auth',
+              hint: '🔐 Authentifizierungsfehler - API-Key ist ungültig. Überprüfen Sie den Key auf https://platform.openai.com',
+            };
             logger.warn('❌ OpenAI authentication failed');
           } else {
             results.openai.message = `❌ OpenAI-Fehler: ${openaiResponse.status}`;
+            results.openai.error = {
+              category: 'unknown',
+              hint: `❌ OpenAI API Fehler ${openaiResponse.status}. Probieren Sie später erneut.`,
+            };
             logger.warn(
               `❌ OpenAI connection failed: ${openaiResponse.status}`
             );
           }
         } catch (openaiError) {
           results.openai.time = Date.now() - openaiStart;
-          results.openai.message = `❌ OpenAI nicht erreichbar: ${openaiError}`;
+          const { category, hint } = categorizeError(openaiError);
+          results.openai.message = hint;
+          results.openai.error = { category, hint };
           logger.error(`❌ OpenAI connection error: ${openaiError}`);
         }
       } else {
