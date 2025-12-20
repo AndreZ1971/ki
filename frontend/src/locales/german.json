@@ -28,6 +28,9 @@
     "copy": "Kopieren",
     "copied": "In Zwischenablage kopiert!",
     "generate": "Generieren",
+    "analyze": "Analysieren",
+    "preview": "Vorschau",
+    "close": "Schließen",
     "analyzing": "Analysiere...",
     "validating": "Validiere...",
     "deactivate": "Deaktivieren",
@@ -42,10 +45,7 @@
     "aiAnalyzing": "KI analysiert...",
     "noEventsInRange": "Keine Events im Zeitraum",
     "privacyNotice": "Datenschutz-Hinweis",
-    "allCategories": "Alle Kategorien",
-    "analyze": "Analysieren",
-    "preview": "Vorschau",
-    "close": "Schließen"
+    "allCategories": "Alle Kategorien"
   },
   "settings": {
     "title": "⚙️ Einstellungen",
@@ -562,6 +562,27 @@
   "pages": {
     "productAnalysis": {
       "title": "🔍 KI-Produktanalyse"
+    },
+    "blogpost": {
+      "title": "📝 KI-Blogpost Generator",
+      "topic": "Thema",
+      "keywords": "Keywords (kommagetrennt)",
+      "seo": "SEO-Optimierung",
+      "length": "Länge",
+      "lengthShort": "Kurz",
+      "lengthMedium": "Mittel",
+      "lengthLong": "Lang",
+      "language": "Sprache",
+      "generate": "Blogpost generieren",
+      "generating": "Generiere...",
+      "result": "Ergebnis",
+      "error": "Fehler beim Generieren"
+    },
+    "analytics": {
+      "title": "📈 Analytics Generator",
+      "generate": "Analyse generieren",
+      "generating": "Generiere Analyse...",
+      "error": "Fehler bei der Analytics-Generierung"
     }
   }
 }

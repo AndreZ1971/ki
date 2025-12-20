@@ -194,12 +194,12 @@ async function buildServer() {
       },
     },
     // Body Limit erhöhen
-    bodyLimit: 1048576 * 10, // 10MB
+    bodyLimit: 1048576 * 100, // 100MB
   });
 
   // Multipart/Form-Data Parser für Uploads (z.B. Image Analyzer)
   await server.register(fastifyMultipart, {
-    limits: { fileSize: 10 * 1024 * 1024 },
+    limits: { fileSize: 100 * 2000 * 2000 }, // 100MB
   });
 
   // Globaler Auth-Hook für alle /api-Routen (nur für Nicht-OPTIONS)
@@ -638,6 +638,9 @@ const start = async () => {
       host: listenHost,
     });
 
+    // Ausgabe aller registrierten Routen
+    console.log(server.printRoutes({ commonPrefix: false }));
+
     const host = process.env.HOST || 'localhost';
     const port = process.env.PORT || 3000;
     const protocol =
@@ -676,4 +679,7 @@ process.on('SIGTERM', () => {
   process.exit(0);
 });
 
-start();
+if (require.main === module) {
+  start();
+}
+export { buildServer };
