@@ -197,6 +197,12 @@ async function buildServer() {
     bodyLimit: 1048576 * 100, // 100MB
   });
 
+  // Debug-Route: Gibt alle registrierten Routen als Text zurück
+  server.get('/api/debug/routes', async (_request, reply) => {
+    const routes = server.printRoutes({ commonPrefix: false });
+    reply.type('text/plain').send(routes);
+  });
+
   // Multipart/Form-Data Parser für Uploads (z.B. Image Analyzer)
   await server.register(fastifyMultipart, {
     limits: { fileSize: 100 * 2000 * 2000 }, // 100MB
