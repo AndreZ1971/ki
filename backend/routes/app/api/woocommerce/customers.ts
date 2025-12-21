@@ -2,17 +2,17 @@
 import { FastifyPluginAsync } from 'fastify';
 
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
-import config from '../../../../config';
+import { getConfig } from '../../../../config';
 
 const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
   // Helper: Prüfe, ob WooCommerce konfiguriert ist (Onboarding kann Placeholder setzen)
   const isWooConfigured = (): boolean => {
-    const woo = config.woocommerce || ({} as any);
+    const woo = getConfig().woocommerce || {};
     const missing = !woo.url || !woo.consumerKey || !woo.consumerSecret;
-    const looksPlaceholder = (v: string) =>
+    const looksPlaceholder = (v?: string) =>
       typeof v === 'string' && (v.startsWith('PLEASE_SET') || v.trim() === '');
-    const validUrl = (u: string) =>
-      typeof u === 'string' && /^(https?:)\/\//i.test(u);
+    const validUrl = (u?: string) =>
+      typeof u === 'string' && /^(https?:)\/+/.test(u);
 
     if (missing) return false;
     if (
@@ -26,20 +26,22 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
   };
 
   // Helper: Client-Factory mit wählbarem Auth-Modus
-  const createWooClient = (useQueryStringAuth: boolean) =>
-    new WooCommerceRestApi({
-      url: config.woocommerce?.url || '',
-      consumerKey: config.woocommerce?.consumerKey || '',
-      consumerSecret: config.woocommerce?.consumerSecret || '',
+  const createWooClient = (useQueryStringAuth: boolean) => {
+    const wooConfig: any = getConfig().woocommerce || {};
+    return new WooCommerceRestApi({
+      url: wooConfig.url || '',
+      consumerKey: wooConfig.consumerKey || '',
+      consumerSecret: wooConfig.consumerSecret || '',
       version: 'wc/v3',
-      // Manche Hosts blocken Authorization-Header → query string auth nutzen
       queryStringAuth: useQueryStringAuth,
       axiosConfig: {
-        timeout: (config as any)?.woocommerce?.timeoutMs || 30000,
+        timeout: wooConfig.timeoutMs ? Number(wooConfig.timeoutMs) : 30000,
       },
     });
+  };
 
-  const preferQuery = (config as any)?.woocommerce?.authMode === 'query';
+  const wooConfig = getConfig().woocommerce || {};
+  const preferQuery = wooConfig.authMode === 'query';
   const WooPrimary = createWooClient(preferQuery);
   const WooFallback = createWooClient(!preferQuery);
 
@@ -58,11 +60,13 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
 
       console.log('📥 Fetching customers from WooCommerce...');
 
-      const woo = (config as any).woocommerce || {};
+      const woo = getConfig().woocommerce || {};
       const auth = Buffer.from(
-        `${woo.consumerKey}:${woo.consumerSecret}`
+        `${woo.consumerKey || ''}:${woo.consumerSecret || ''}`
       ).toString('base64');
-      const wooUrl = woo.url.endsWith('/') ? woo.url.slice(0, -1) : woo.url;
+      const wooUrl = (woo.url || '').endsWith('/')
+        ? (woo.url || '').slice(0, -1)
+        : woo.url || '';
 
       // ✅ Direkte REST API Call (wie shop-metrics.ts) statt WooCommerceRestApi Package
       // Das Package kann manchmal Probleme mit Auth oder Pagination haben
@@ -85,7 +89,7 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
           );
           // Fallback mit Query String Auth
           const fallbackResponse = await fetch(
-            `${wooUrl}/wp-json/wc/v3/customers?per_page=100&role=all&consumer_key=${woo.consumerKey}&consumer_secret=${woo.consumerSecret}`
+            `${wooUrl}/wp-json/wc/v3/customers?per_page=100&role=all&consumer_key=${woo.consumerKey || ''}&consumer_secret=${woo.consumerSecret || ''}`
           );
           if (!fallbackResponse.ok) {
             throw new Error(`HTTP ${fallbackResponse.status}`);
@@ -259,7 +263,7 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
 
   // GET: WooCommerce Health (Connectivity & Config Überblick)
   fastify.get('/health', async (_request, reply) => {
-    const woo = (config as any).woocommerce || {};
+    const woo = getConfig().woocommerce || {};
     const mask = (v?: string) =>
       typeof v === 'string'
         ? v.replace(/(.{3}).*(.{3})/, '$1***$2')

@@ -1,7 +1,7 @@
 // backend/routes/app/api/woocommerce/sync.ts
 import { FastifyPluginAsync } from 'fastify';
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
-import config from '../../../../config';
+import { getConfig } from '../../../../config';
 
 interface SyncResult {
   products: number;
@@ -26,12 +26,12 @@ const fetchCount = async (client: WooCommerceRestApi, resource: string) => {
 };
 
 const syncRoutes: FastifyPluginAsync = async (fastify) => {
-  const wooCfg = (config as any).woocommerce || {};
+  const wooCfg: any = getConfig().woocommerce || {};
 
   const isWooConfigured = (): boolean => {
     const missing =
       !wooCfg.url || !wooCfg.consumerKey || !wooCfg.consumerSecret;
-    const looksPlaceholder = (v: string) =>
+    const looksPlaceholder = (v?: string) =>
       typeof v === 'string' && (v.startsWith('PLEASE_SET') || v.trim() === '');
     if (missing) return false;
     if (
@@ -40,7 +40,7 @@ const syncRoutes: FastifyPluginAsync = async (fastify) => {
       looksPlaceholder(wooCfg.consumerSecret)
     )
       return false;
-    const validUrl = (u: string) =>
+    const validUrl = (u?: string) =>
       typeof u === 'string' && /^(https?:\/\/)/i.test(u);
     if (!validUrl(wooCfg.url)) return false;
     return true;
@@ -54,7 +54,7 @@ const syncRoutes: FastifyPluginAsync = async (fastify) => {
       version: 'wc/v3',
       queryStringAuth: useQueryStringAuth,
       axiosConfig: {
-        timeout: wooCfg.timeoutMs || 30000,
+        timeout: wooCfg.timeoutMs ? Number(wooCfg.timeoutMs) : 30000,
       },
     });
 

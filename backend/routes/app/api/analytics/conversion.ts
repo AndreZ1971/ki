@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
 import { registerConversionMLAnalysis } from './conversion/ml-analysis';
 import { registerConversionReportMLAnalysis } from './conversion/ml-report-analysis';
-import config from '../../../../config';
+import { getConfig } from '../../../../config';
 
 export default async function conversionRoutes(fastify: FastifyInstance) {
   // Registriere ML-Analysis Sub-Routes
@@ -14,6 +14,7 @@ export default async function conversionRoutes(fastify: FastifyInstance) {
     '/analysis',
     async (_request: FastifyRequest, reply: FastifyReply) => {
       try {
+        const config = getConfig();
         const wooConfig = {
           url: config.woocommerce?.url,
           consumerKey: config.woocommerce?.consumerKey,
