@@ -29,8 +29,11 @@ ENV HUSKY=0
 COPY backend/package*.json ./
 RUN npm ci  --ignore-scripts
 
+
 # Copy built backend
 COPY --from=backend-builder /app/backend/dist ./dist
+# Copy module-alias.js explizit ins dist-Verzeichnis
+COPY backend/module-alias.js ./dist/module-alias.js
 
 # Copy built frontend (wird vom Backend als static files geserved)
 COPY --from=frontend-builder /app/frontend/dist ./public
