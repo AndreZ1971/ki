@@ -1,7 +1,7 @@
 // backend/routes/app/api/woocommerce/sync.ts
 import { FastifyPluginAsync } from 'fastify';
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
-import { getConfig } from '../../../../config';
+import { getConfig } from '@config';
 
 interface SyncResult {
   products: number;

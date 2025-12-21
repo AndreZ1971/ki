@@ -1,7 +1,7 @@
 // backend/routes/app/api/marketing/marketing-routes.ts
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { analyzeSegmentsAI, generateCampaignAI } from './conversion-ai.js';
-import config from '../../../../config.js';
+import { getConfig } from '@config';
 
 interface GermanContentRequest {
   contentType: string;
@@ -497,7 +497,8 @@ Deutsch, natürlich, konversionsstark, plattformoptimiert.`;
       const { audioText, voice, platform } = request.body;
 
       try {
-        const apiKey = config.openAI?.apiKey;
+        const { openAI } = getConfig();
+        const apiKey = openAI?.apiKey;
         if (!apiKey) {
           return reply.status(400).send({
             success: false,
@@ -745,7 +746,8 @@ Deutsch, natürlich, konversionsstark, plattformoptimiert.`;
 
       try {
         const posts: GeneratedPost[] = [];
-        const apiKey = config.openAI?.apiKey;
+        const { openAI } = getConfig();
+        const apiKey = openAI?.apiKey;
 
         if (!apiKey) {
           // Fallback: Template-basierte Generation
@@ -791,7 +793,8 @@ Return VALID JSON:
   "suggestions": ["suggestion1", "suggestion2"]
 }`;
 
-          const modelName = config.openAI?.model || 'gpt-4-turbo';
+          const { openAI } = getConfig();
+          const modelName = openAI?.model || 'gpt-4-turbo';
           const response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
             headers: {

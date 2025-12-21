@@ -1,5 +1,6 @@
 // backend/routes/app/api/social/oauth-routes.ts
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { getConfig } from '@config';
 
 interface OAuthCallbackQuery {
   code: string;
@@ -11,8 +12,9 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
   
   // Facebook OAuth Start
   fastify.get('/auth/facebook', async (_request: FastifyRequest, reply: FastifyReply) => {
-    const appId = process.env.META_APP_ID;
-    const redirectUri = `${process.env.OAUTH_CALLBACK_BASE_URL}/api/auth/facebook/callback`;
+    const config = getConfig();
+    const appId = config.webhooks?.facebook || process.env.META_APP_ID;
+    const redirectUri = `${config.webhooks?.facebookRedirect || process.env.OAUTH_CALLBACK_BASE_URL}/api/auth/facebook/callback`;
     
     const scopes = [
       'pages_manage_posts',
@@ -37,9 +39,10 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
       }
 
       try {
-        const appId = process.env.META_APP_ID;
-        const appSecret = process.env.META_APP_SECRET;
-        const redirectUri = `${process.env.OAUTH_CALLBACK_BASE_URL}/api/auth/facebook/callback`;
+        const config = getConfig();
+        const appId = config.webhooks?.facebook || process.env.META_APP_ID;
+        const appSecret = config.webhooks?.facebookSecret || process.env.META_APP_SECRET;
+        const redirectUri = `${config.webhooks?.facebookRedirect || process.env.OAUTH_CALLBACK_BASE_URL}/api/auth/facebook/callback`;
 
         // Exchange code for access token
         const tokenUrl = `https://graph.facebook.com/v18.0/oauth/access_token?client_id=${appId}&client_secret=${appSecret}&redirect_uri=${encodeURIComponent(redirectUri)}&code=${code}`;
@@ -102,8 +105,9 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
 
   // TikTok OAuth Start
   fastify.get('/auth/tiktok', async (_request: FastifyRequest, reply: FastifyReply) => {
-    const clientKey = process.env.TIKTOK_CLIENT_KEY;
-    const redirectUri = process.env.TIKTOK_REDIRECT_URI;
+    const config = getConfig();
+    const clientKey = config.webhooks?.tiktok || process.env.TIKTOK_CLIENT_KEY;
+    const redirectUri = config.webhooks?.tiktokRedirect || process.env.TIKTOK_REDIRECT_URI;
     const state = Math.random().toString(36).substring(7); // CSRF protection
 
     const scopes = ['user.info.basic', 'video.publish', 'video.list'].join(',');
@@ -124,9 +128,10 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
       }
 
       try {
-        const clientKey = process.env.TIKTOK_CLIENT_KEY;
-        const clientSecret = process.env.TIKTOK_CLIENT_SECRET;
-        const redirectUri = process.env.TIKTOK_REDIRECT_URI;
+        const config = getConfig();
+        const clientKey = config.webhooks?.tiktok || process.env.TIKTOK_CLIENT_KEY;
+        const clientSecret = config.webhooks?.tiktokSecret || process.env.TIKTOK_CLIENT_SECRET;
+        const redirectUri = config.webhooks?.tiktokRedirect || process.env.TIKTOK_REDIRECT_URI;
 
         // Exchange code for access token
         const tokenUrl = 'https://open.tiktokapis.com/v2/oauth/token/';
@@ -194,12 +199,12 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
       success: true,
       accounts: {
         facebook: {
-          connected: !!process.env.FACEBOOK_PAGE_ACCESS_TOKEN,
-          pageId: process.env.FACEBOOK_PAGE_ID || null
+          connected: !!(getConfig().webhooks?.facebookPageAccessToken || process.env.FACEBOOK_PAGE_ACCESS_TOKEN),
+          pageId: getConfig().webhooks?.facebookPageId || process.env.FACEBOOK_PAGE_ID || null
         },
         instagram: {
-          connected: !!process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID,
-          accountId: process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID || null
+          connected: !!(getConfig().webhooks?.instagramBusinessAccountId || process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID),
+          accountId: getConfig().webhooks?.instagramBusinessAccountId || process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID || null
         },
         tiktok: {
           connected: false, // Check in DB

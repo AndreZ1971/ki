@@ -1,3 +1,5 @@
+import { getConfig } from '../../../../config.js';
+
 export async function GET() {
   // 🔥 LERNKONZEPT: System Monitoring & Health Checks
   // - Service-Verfügbarkeit prüfen
@@ -20,7 +22,7 @@ export async function GET() {
       },
       woo_commerce: {
         status: 'connected',
-        url: process.env.WOOCOMMERCE_URL ? '✅' : '❌',
+        url: getConfig().woocommerce?.url ? '✅' : (process.env.WOOCOMMERCE_URL ? '✅' : '❌'),
         products: 19, // Aus deiner echten API!
         orders: 3
       },

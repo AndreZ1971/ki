@@ -5,14 +5,15 @@ import { MultipartFile } from '@fastify/multipart';
 import sharp from 'sharp';
 import OpenAI from 'openai';
 
-import config from '../../../../config';
+import { getConfig } from '@config';
 
 // Lazy initialization - OpenAI wird erst beim ersten API-Call initialisiert
 let openai: OpenAI | null = null;
 const getOpenAI = () => {
   if (!openai) {
+    const { openAI } = getConfig();
     openai = new OpenAI({
-      apiKey: config.openAI?.apiKey || process.env.OPENAI_API_KEY,
+      apiKey: openAI?.apiKey || process.env.OPENAI_API_KEY,
     });
   }
   return openai;

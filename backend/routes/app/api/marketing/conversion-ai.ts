@@ -3,7 +3,7 @@
 
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { logger } from '../../../../logger.js';
-import config from '../../../../config.js';
+import { getConfig } from '@config';
 
 interface _ConversionSegmentAnalysis {
   segmentId: string;
@@ -113,7 +113,8 @@ export async function generateCampaignAI(
 ) {
   try {
     const { segmentId, segmentName, conversionGoal, incentiveType } = req.body;
-    const apiKey = config.openAI?.apiKey;
+    const { openAI } = getConfig();
+    const apiKey = openAI?.apiKey;
 
     if (!apiKey) {
       return reply.status(400).send({
@@ -161,7 +162,7 @@ Generiere bitte:
   WICHTIG: Antworte NUR mit einem gültigen JSON-Objekt. Kein Markdown, keine zusätzlichen Erklärungen. Nur das JSON-Objekt:
 {"title":"...","text":"...","offer":"...","cta":"...","sendTime":"HH:MM","estimatedLift":15}`;
 
-    const openaiModel = config.openAI?.model || 'gpt-4o-mini';
+    const openaiModel = openAI?.model || 'gpt-4o-mini';
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {

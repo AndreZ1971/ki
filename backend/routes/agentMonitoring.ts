@@ -1,29 +1,64 @@
-// backend/routes/agentMonitoring.ts
-/**
- * Monitoring API für Agentic Loops (Fastify)
- * Endpoints für Status, History, Stats, Trends
- */
-
-import { FastifyInstance } from 'fastify';
+// (Klammer entfernt)
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import fs from 'fs';
 import path from 'path';
 import { logger } from '../logger';
+import { executeOpenAI, getOpenAIClient } from '../utils/openai';
 
-// Get services from global context (initialized in server.ts)
 function getServices() {
   const executionLogger = (global as any).executionLogger;
   const persistentMemory = (global as any).persistentMemory;
   const loopScheduler = (global as any).loopScheduler;
-
   return { executionLogger, persistentMemory, loopScheduler };
+
+
 }
 
 export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
   /**
-   * GET /status
-   * Hole aktuellen Status aller Loops
+   * GET /openai-insight
+   * Liefert eine KI-generierte Shop-Übersicht basierend auf den letzten Loop-Statistiken
    */
-  fastify.get('/status', async (_request, _reply) => {
+  fastify.get('/openai-insight', async (_request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      const { executionLogger } = getServices();
+      if (!executionLogger) {
+        return reply.status(503).send({ success: false, error: 'Execution Logger not initialized' });
+      }
+      // Hole die letzten 10 Runs aller Loops
+      const loopTypes = ['anomaly-detection', 'product-optimization', 'payment-recovery', 'analytics-insights'];
+      let allHistory: any[] = [];
+      for (const loopType of loopTypes) {
+        const history = await executionLogger.getHistory(loopType, 10);
+        allHistory.push({ loopType, history });
+      }
+      // Baue Prompt für OpenAI
+      const prompt = `Du bist ein KI-Analyst für einen E-Commerce-Shop. Fasse die wichtigsten Erkenntnisse, Auffälligkeiten und Optimierungspotenziale aus den folgenden Agentic-Loop-Logs zusammen. Gib eine motivierende, verständliche Shop-Übersicht für das Management. Nutze maximal 10 Sätze.\n\nLogs:\n${JSON.stringify(allHistory, null, 2)}`;
+      const openai = getOpenAIClient();
+      const completion = await executeOpenAI(
+        () => openai.chat.completions.create({
+          model: 'gpt-4o',
+          messages: [
+            { role: 'system', content: 'Du bist ein erfahrener E-Commerce-Analyst.' },
+            { role: 'user', content: prompt }
+          ],
+          max_tokens: 600,
+          temperature: 0.7
+        }),
+        'Shop-Übersicht generieren'
+      );
+      const summary = completion.choices?.[0]?.message?.content || 'Keine Zusammenfassung generiert.';
+      return reply.send({ success: true, summary });
+    } catch (error: any) {
+      return reply.status(500).send({ success: false, error: error.message });
+    }
+  });
+
+/**
+ * GET /status
+ * Hole aktuellen Status aller Loops
+ */
+fastify.get('/status', async (_request, _reply) => {
     try {
       const { loopScheduler } = getServices();
 

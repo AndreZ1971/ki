@@ -1,11 +1,12 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import config from '../../../../config';
+import { getConfig } from '../../../../config';
 import { getTickets } from '../../../../services/supportTickets';
 
 export default async function feedbackRoutes(fastify: FastifyInstance) {
   // GET /api/analytics/feedback/reviews - WooCommerce Produktbewertungen
   fastify.get('/reviews', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
+      const config = getConfig();
       const wooConfig = {
         url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL || config.woocommerce?.url,
         consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY || config.woocommerce?.consumerKey,
@@ -64,6 +65,7 @@ export default async function feedbackRoutes(fastify: FastifyInstance) {
   // GET /api/analytics/feedback/tickets/health - Ermittelt verfügbare WP REST-Namespaces und mögliche Ticket-Routen
   fastify.get('/tickets/health', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
+      const config = getConfig();
       const wpUrl = process.env.WORDPRESS_URL || config.wordpress?.url;
       if (!wpUrl) {
         return reply.status(400).send({ success: false, error: 'WORDPRESS_URL fehlt in Konfiguration.' });

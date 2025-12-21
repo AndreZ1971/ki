@@ -1,7 +1,7 @@
 // backend/routes/app/api/marketing/email-marketing.ts
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import transporter from '../../../../services/emailService.js';
-import config from '../../../../config.js';
+import { getConfig } from '@config';
 
 interface SendCampaignBody {
   campaignName: string;
@@ -37,7 +37,8 @@ export default async function emailMarketingRoutes(server: FastifyInstance) {
   server.get('/api/customers/segments', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
       // Lade WooCommerce-Config aus connection.json (zentrale Konfiguration)
-      if (!config.woocommerce?.url || !config.woocommerce?.consumerKey || !config.woocommerce?.consumerSecret) {
+      const { woocommerce } = getConfig();
+      if (!woocommerce?.url || !woocommerce?.consumerKey || !woocommerce?.consumerSecret) {
         return reply.status(500).send({
           success: false,
           error: 'WooCommerce nicht konfiguriert. Bitte connection.json einrichten.',
@@ -45,10 +46,10 @@ export default async function emailMarketingRoutes(server: FastifyInstance) {
         });
       }
 
-      const auth = Buffer.from(`${config.woocommerce.consumerKey}:${config.woocommerce.consumerSecret}`).toString('base64');
+      const auth = Buffer.from(`${woocommerce.consumerKey}:${woocommerce.consumerSecret}`).toString('base64');
 
       // Lade alle Bestellungen (nicht Kunden, da WooCommerce oft keine separaten Customer-Records hat)
-      const response = await fetch(`${config.woocommerce.url}/wp-json/wc/v3/orders?per_page=100&status=completed`, {
+      const response = await fetch(`${woocommerce.url}/wp-json/wc/v3/orders?per_page=100&status=completed`, {
         headers: {
           'Authorization': `Basic ${auth}`,
           'Content-Type': 'application/json',
@@ -139,17 +140,18 @@ export default async function emailMarketingRoutes(server: FastifyInstance) {
         const { campaignName, emailSubject, emailContent, targetSegment } = request.body;
 
         // Fehlerbehandlung: WooCommerce Config prüfen
-        if (!config.woocommerce?.url || !config.woocommerce?.consumerKey || !config.woocommerce?.consumerSecret) {
+        const { woocommerce } = getConfig();
+        if (!woocommerce?.url || !woocommerce?.consumerKey || !woocommerce?.consumerSecret) {
           return reply.status(400).send({
             success: false,
             error: 'WooCommerce ist nicht konfiguriert. Bitte connection.json prüfen.'
           });
         }
 
-        const auth = Buffer.from(`${config.woocommerce.consumerKey}:${config.woocommerce.consumerSecret}`).toString('base64');
+        const auth = Buffer.from(`${woocommerce.consumerKey}:${woocommerce.consumerSecret}`).toString('base64');
 
         // Lade Bestellungen aus WooCommerce
-        const response = await fetch(`${config.woocommerce.url}/wp-json/wc/v3/orders?per_page=100&status=completed`, {
+        const response = await fetch(`${woocommerce.url}/wp-json/wc/v3/orders?per_page=100&status=completed`, {
           headers: {
             'Authorization': `Basic ${auth}`,
             'Content-Type': 'application/json',
@@ -232,7 +234,7 @@ export default async function emailMarketingRoutes(server: FastifyInstance) {
                   <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
                   <p style="font-size: 12px; color: #999;">
                     Kampagne: ${campaignName}<br>
-                    Sie erhalten diese E-Mail, weil Sie Kunde bei ${config.woocommerce.url} sind.
+                    Sie erhalten diese E-Mail, weil Sie Kunde bei ${woocommerce.url} sind.
                   </p>
                 </div>
               `,

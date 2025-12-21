@@ -1,3 +1,4 @@
+import { getConfig } from '@config';
 // backend/routes/app/api/monitoring/system.ts
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import os from 'os';
@@ -264,10 +265,10 @@ async function checkServicesStatus() {
 
 async function checkWordPress() {
   try {
-    const wpUrl = process.env.WORDPRESS_URL || process.env.WP_URL;
-    const wpUsername = process.env.WORDPRESS_USERNAME || process.env.WP_USERNAME;
-    const wpPassword = process.env.WORDPRESS_APPLICATION_PASSWORD || process.env.WP_APP_PASSWORD || process.env.WORDPRESS_APP_PASSWORD;
-    
+    const { wordpress } = getConfig();
+    const wpUrl = process.env.WORDPRESS_URL || process.env.WP_URL || wordpress?.url;
+    const wpUsername = process.env.WORDPRESS_USERNAME || process.env.WP_USERNAME || wordpress?.username;
+    const wpPassword = process.env.WORDPRESS_APPLICATION_PASSWORD || process.env.WP_APP_PASSWORD || process.env.WORDPRESS_APP_PASSWORD || wordpress?.appPassword;
     if (!wpUrl || !wpUsername || !wpPassword) {
       return {
         name: 'WordPress',
@@ -313,10 +314,10 @@ async function checkWordPress() {
 
 async function checkWooCommerce() {
   try {
-    const wooUrl = process.env.WOOCOMMERCE_URL || process.env.WOO_URL;
-    const consumerKey = process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY;
-    const consumerSecret = process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET;
-    
+    const { woocommerce } = getConfig();
+    const wooUrl = process.env.WOOCOMMERCE_URL || process.env.WOO_URL || woocommerce?.url;
+    const consumerKey = process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY || woocommerce?.consumerKey;
+    const consumerSecret = process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET || woocommerce?.consumerSecret;
     if (!wooUrl || !consumerKey || !consumerSecret) {
       return {
         name: 'WooCommerce',
@@ -366,7 +367,8 @@ async function checkWooCommerce() {
 }
 
 async function checkOpenAI() {
-  const openaiKey = process.env.OPENAI_API_KEY;
+  const { openAI } = getConfig();
+  const openaiKey = process.env.OPENAI_API_KEY || openAI?.apiKey;
   return {
     name: 'OpenAI',
     status: (openaiKey && openaiKey.startsWith('sk-')) ? 'healthy' as const : 'warning' as const,

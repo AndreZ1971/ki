@@ -55,153 +55,18 @@ const AnalyticRegioning = () => {
         const res = await fetch(apiUrl);
         if (!res.ok) throw new Error("Fehler beim Laden der Regions-Daten");
         const data = await res.json();
-        if (data.success) {
-          const mockRegionData: RegionData = {
-            totalRegions: data.all_regions?.length || 8,
-            activeCountries: 24,
-            topRegion: data.region || "Deutschland",
-            europeTraffic: data.data?.sales || 45230,
-            northAmericaTraffic: 20,
-            asiaTraffic: 10,
-            otherRegions: 5,
-            regionalConversion: 3.2,
-            lastUpdated: new Date().toISOString(),
-          };
-          const mockCountryData: CountryData[] = [
-            {
-              country: "Deutschland",
-              visitors: 15420,
-              conversion: 4.1,
-              revenue: 45280,
-              trend: 12,
-            },
-            {
-              country: "Österreich",
-              visitors: 8420,
-              conversion: 3.8,
-              revenue: 21850,
-              trend: 8,
-            },
-            {
-              country: "Schweiz",
-              visitors: 7210,
-              conversion: 3.5,
-              revenue: 19540,
-              trend: 5,
-            },
-            {
-              country: "Frankreich",
-              visitors: 6320,
-              conversion: 2.9,
-              revenue: 15420,
-              trend: 15,
-            },
-            {
-              country: "Italien",
-              visitors: 5210,
-              conversion: 2.4,
-              revenue: 11250,
-              trend: -2,
-            },
-            {
-              country: "USA",
-              visitors: 4850,
-              conversion: 2.1,
-              revenue: 14210,
-              trend: 22,
-            },
-            {
-              country: "UK",
-              visitors: 3980,
-              conversion: 2.8,
-              revenue: 9850,
-              trend: 7,
-            },
-            {
-              country: "Spanien",
-              visitors: 3540,
-              conversion: 2.2,
-              revenue: 7650,
-              trend: -5,
-            },
-          ];
-          setRegionData(mockRegionData);
-          setCountryData(mockCountryData);
-          setLastUpdate(new Date());
+        if (data.success && data.data) {
+          // Die API liefert ein Objekt mit regionData und countryData
+          setRegionData(data.data.regionData || null);
+          setCountryData(data.data.countryData || []);
+          setLastUpdate(new Date(data.data.regionData?.lastUpdated || Date.now()));
+        } else {
+          setRegionData(null);
+          setCountryData([]);
         }
       } catch (_err) {
-        // Fallback zu Mock-Daten
-        const mockRegionData: RegionData = {
-          totalRegions: 8,
-          activeCountries: 24,
-          topRegion: "Deutschland",
-          europeTraffic: 65,
-          northAmericaTraffic: 20,
-          asiaTraffic: 10,
-          otherRegions: 5,
-          regionalConversion: 3.2,
-          lastUpdated: new Date().toISOString(),
-        };
-        const mockCountryData: CountryData[] = [
-          {
-            country: "Deutschland",
-            visitors: 15420,
-            conversion: 4.1,
-            revenue: 45280,
-            trend: 12,
-          },
-          {
-            country: "Österreich",
-            visitors: 8420,
-            conversion: 3.8,
-            revenue: 21850,
-            trend: 8,
-          },
-          {
-            country: "Schweiz",
-            visitors: 7210,
-            conversion: 3.5,
-            revenue: 19540,
-            trend: 5,
-          },
-          {
-            country: "Frankreich",
-            visitors: 6320,
-            conversion: 2.9,
-            revenue: 15420,
-            trend: 15,
-          },
-          {
-            country: "Italien",
-            visitors: 5210,
-            conversion: 2.4,
-            revenue: 11250,
-            trend: -2,
-          },
-          {
-            country: "USA",
-            visitors: 4850,
-            conversion: 2.1,
-            revenue: 14210,
-            trend: 22,
-          },
-          {
-            country: "UK",
-            visitors: 3980,
-            conversion: 2.8,
-            revenue: 9850,
-            trend: 7,
-          },
-          {
-            country: "Spanien",
-            visitors: 3540,
-            conversion: 2.2,
-            revenue: 7650,
-            trend: -5,
-          },
-        ];
-        setRegionData(mockRegionData);
-        setCountryData(mockCountryData);
+        setRegionData(null);
+        setCountryData([]);
         setLastUpdate(new Date());
       } finally {
         setLoading(false);

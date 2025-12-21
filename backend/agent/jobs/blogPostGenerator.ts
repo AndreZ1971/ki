@@ -1,6 +1,6 @@
 // KI-Blogpost-Generator
 import OpenAI from 'openai';
-import config from '../../config.js';
+import { getConfig } from '@config';
 
 export interface BlogPostOptions {
   topic: string;
@@ -13,7 +13,8 @@ export interface BlogPostOptions {
 export async function generateBlogPost(
   options: BlogPostOptions
 ): Promise<string> {
-  const apiKey = config.openAI?.apiKey;
+  const { openAI } = getConfig();
+  const apiKey = openAI?.apiKey;
 
   if (!apiKey) {
     throw new Error(
@@ -22,7 +23,7 @@ export async function generateBlogPost(
   }
 
   const openai = new OpenAI({ apiKey });
-  const model = config.openAI?.model || 'gpt-4o-mini';
+  const model = openAI?.model || 'gpt-4o-mini';
   const prompt = buildPrompt(options);
 
   const response = await openai.chat.completions.create({

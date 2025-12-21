@@ -2,7 +2,7 @@
 import { FastifyPluginAsync } from 'fastify';
 
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
-import { getConfig } from '../../../../config';
+import { getConfig } from '@config';
 
 const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
   // Helper: Prüfe, ob WooCommerce konfiguriert ist (Onboarding kann Placeholder setzen)

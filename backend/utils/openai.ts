@@ -2,13 +2,14 @@
 
 import OpenAI from "openai";
 import { openAIBreaker, openAIRetry, alertError } from '../error-handling';
-import config from '../config';
+import { getConfig } from '@config';
 
 
 let openAIClient: OpenAI | null = null;
 
 export function getOpenAIClient() {
   if (!openAIClient) {
+    const config = getConfig();
     const apiKey = config.openAI?.apiKey?.trim();
     if (!apiKey) {
       console.error('❌ [OpenAI] API Key fehlt in connection.json!');

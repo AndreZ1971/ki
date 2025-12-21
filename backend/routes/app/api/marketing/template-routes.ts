@@ -1,7 +1,7 @@
 // backend/routes/app/api/marketing/template-routes.ts
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import OpenAI from 'openai';
-import config from '../../../../config.js';
+import { getConfig } from '@config';
 import { logger } from '../../../../logger.js';
 
 interface GenerateTemplateBody {
@@ -43,7 +43,8 @@ export default async function templateRoutes(server: FastifyInstance) {
     ) => {
       try {
         const { templateCategory, industry, customization } = request.body;
-        const apiKey = config.openAI?.apiKey;
+        const { openAI } = getConfig();
+        const apiKey = openAI?.apiKey;
 
         if (!apiKey) {
           return reply.status(400).send({
@@ -166,7 +167,8 @@ Formatiere den Code sauber und gut lesbar.`;
     ) => {
       try {
         const { templateContent, industry, targetAudience } = request.body;
-        const apiKey = config.openAI?.apiKey;
+        const { openAI } = getConfig();
+        const apiKey = openAI?.apiKey;
 
         if (!apiKey) {
           return reply.status(400).send({
@@ -338,7 +340,8 @@ Antworte mit strukturierten Verbesserungen.`;
     ) => {
       try {
         const { productInfo, targetAudience } = request.body;
-        const apiKey = config.openAI?.apiKey;
+        const { openAI } = getConfig();
+        const apiKey = openAI?.apiKey;
 
         if (!apiKey) {
           return reply.status(400).send({
@@ -411,7 +414,8 @@ Antworte nur mit JSON:
     ) => {
       try {
         const { templateCategory, industry, templateContent } = request.body;
-        const apiKey = config.openAI?.apiKey;
+        const { openAI } = getConfig();
+        const apiKey = openAI?.apiKey;
 
         if (!apiKey) {
           return reply.status(400).send({

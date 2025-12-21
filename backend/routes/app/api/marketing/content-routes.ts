@@ -1,6 +1,6 @@
 // backend/routes/app/api/marketing/content-routes.ts
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import config from '../../../../config.js';
+import { getConfig } from '@config';
 
 interface CreateDigitalProductBody {
   contentTitle: string;
@@ -59,8 +59,9 @@ export default async function contentRoutes(server: FastifyInstance) {
       const body: any = request.body || {};
       const { contentTitle = 'Dein Produkt', contentType = 'digital', monetizationStrategy = 'one-time', pricing = 49 } = body;
 
-      const apiKey = process.env.OPENAI_API_KEY || config.openAI?.apiKey;
-      const model = process.env.OPENAI_MODEL || config.openAI?.model || 'gpt-4o-mini';
+      const { openAI } = getConfig();
+      const apiKey = process.env.OPENAI_API_KEY || openAI?.apiKey;
+      const model = process.env.OPENAI_MODEL || openAI?.model || 'gpt-4o-mini';
 
       const prompt = `Schreibe eine kurze Angebotsbeschreibung (max 80 Wörter) für ein Produkt.
 Titel: ${contentTitle}
@@ -103,10 +104,11 @@ Liefer ein JSON { "headline": "...", "body": "...", "cta": "..." }.`;
   server.get('/api/marketing/content/revenue-forecast', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
       // reuse revenue calculation by calling internal handler would be ideal; recompute minimal
+      const { woocommerce } = getConfig();
       const wooConfig = {
-        url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL || config.woocommerce?.url,
-        consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY || config.woocommerce?.consumerKey,
-        consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET || config.woocommerce?.consumerSecret,
+        url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL || woocommerce?.url,
+        consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY || woocommerce?.consumerKey,
+        consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET || woocommerce?.consumerSecret,
       };
       if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
         throw new Error('WooCommerce Konfiguration fehlt (url/consumerKey/consumerSecret).');
@@ -151,10 +153,11 @@ Liefer ein JSON { "headline": "...", "body": "...", "cta": "..." }.`;
   // GET /api/marketing/content/revenue - Lade Revenue-Daten
   server.get('/api/marketing/content/revenue', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
+      const { woocommerce } = getConfig();
       const wooConfig = {
-        url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL || config.woocommerce?.url,
-        consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY || config.woocommerce?.consumerKey,
-        consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET || config.woocommerce?.consumerSecret,
+        url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL || woocommerce?.url,
+        consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY || woocommerce?.consumerKey,
+        consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET || woocommerce?.consumerSecret,
       };
 
       if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
@@ -249,10 +252,11 @@ Liefer ein JSON { "headline": "...", "body": "...", "cta": "..." }.`;
       try {
         const { contentTitle, contentType, monetizationStrategy, pricing } = request.body;
 
+        const { woocommerce } = getConfig();
         const wooConfig = {
-          url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL || config.woocommerce?.url,
-          consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY || config.woocommerce?.consumerKey,
-          consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET || config.woocommerce?.consumerSecret,
+          url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL || woocommerce?.url,
+          consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY || woocommerce?.consumerKey,
+          consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET || woocommerce?.consumerSecret,
         };
 
         if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {

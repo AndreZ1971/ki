@@ -1,6 +1,7 @@
 // routes/emailTest.ts - VOLLSTÄNDIG KORRIGIERT
 import { FastifyRequest, FastifyReply } from 'fastify';
 import transporter from '../services/emailService';
+import { getConfig } from '@config';
 
 async function emailTestRoutes(fastify: any, _options: any) {
   
@@ -24,25 +25,31 @@ async function emailTestRoutes(fastify: any, _options: any) {
 
       console.log('✅ Test-Email gesendet:', testResult.messageId);
 
+      const smtp = getConfig().smtp || {};
       return {
         success: true,
         message: 'Email-Konfiguration funktioniert!',
         messageId: testResult.messageId,
         config: {
-          host: 'inn.bitpalast.net',
-          port: 465,
-          secure: true
+          host: smtp.host,
+          port: smtp.port,
+          secure: smtp.secure,
+          user: smtp.user,
+          from: smtp.from
         }
       };
     } catch (error: any) {
       console.error('❌ Email Test fehlgeschlagen:', error.message);
+      const smtp = getConfig().smtp || {};
       return _reply.status(500).send({
         success: false,
         error: error.message,
         config: {
-          host: 'inn.bitpalast.net',
-          port: 465,
-          secure: true
+          host: smtp.host,
+          port: smtp.port,
+          secure: smtp.secure,
+          user: smtp.user,
+          from: smtp.from
         }
       });
     }

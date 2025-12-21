@@ -1,5 +1,6 @@
 // backend/server.ts - KOMPLETT KORRIGIERT
-require('module-alias/register');
+require('./module-alias');
+import 'module-alias/register';
 import cors from '@fastify/cors';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';

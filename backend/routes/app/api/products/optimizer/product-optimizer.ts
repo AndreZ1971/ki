@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import OpenAI from 'openai';
+import { getConfig } from '@config';
 
 import { wooCommerceService } from '../woocommerce/woocommerce.service';
 
@@ -59,7 +60,8 @@ function initializeOpenAI() {
   if (openai !== null) return openai; // Bereits initialisiert
 
   try {
-    const apiKey = process.env.OPENAI_API_KEY; // ✅ Jetzt ist process.env geladen!
+    const config = getConfig();
+    const apiKey = config.openAI?.apiKey || process.env.OPENAI_API_KEY;
 
     if (!apiKey || apiKey.trim() === '' || !apiKey.startsWith('sk-')) {
       console.warn('⚠️ OpenAI API Key nicht konfiguriert');
@@ -196,7 +198,7 @@ Antworte im JSON-Format:
 `;
 
   const response = await openAIClient.chat.completions.create({
-    model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+    model: getConfig().openAI?.model || process.env.OPENAI_MODEL || 'gpt-4o-mini',
     messages: [
       {
         role: 'system',
@@ -561,7 +563,7 @@ RESPONSE IN JSON FORMAT:
 `;
 
         const completion = await openAIClient.chat.completions.create({
-          model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+          model: getConfig().openAI?.model || process.env.OPENAI_MODEL || 'gpt-4o-mini',
           messages: [
             {
               role: 'system',
@@ -1264,7 +1266,7 @@ RESPONSE IN JSON FORMAT:
 `;
 
         const completion = await openAIClient.chat.completions.create({
-          model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+          model: getConfig().openAI?.model || process.env.OPENAI_MODEL || 'gpt-4o-mini',
           messages: [
             {
               role: 'system',

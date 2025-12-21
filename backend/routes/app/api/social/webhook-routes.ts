@@ -3,7 +3,7 @@
 // AI-Powered: Transformiert Content automatisch für jede Plattform!
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { transformContentForPlatform } from '../../../../utils/social-ai-transform';
-import config from '../../../../config';
+import { getConfig } from '@config';
 
 interface WebhookPostRequest {
   platform: string;
@@ -21,13 +21,13 @@ export default async function webhookRoutes(fastify: FastifyInstance) {
     async (request: FastifyRequest<{ Body: WebhookPostRequest }>, reply: FastifyReply) => {
       const { platform, content, mediaUrl, scheduleTime, useAI = true } = request.body;
 
-      // Get webhook URLs from centralized connection.json config
+      // Get webhook URLs from dynamic config
+      const config = getConfig();
       const webhookUrls: { [key: string]: string | undefined } = {
-        linkedin: config.webhooks?.linkedin,
-        facebook: config.webhooks?.facebook,
-        tiktok: config.webhooks?.tiktok
+        linkedin: config.webhooks?.linkedin || process.env.WEBHOOK_LINKEDIN,
+        facebook: config.webhooks?.facebook || process.env.WEBHOOK_FACEBOOK,
+        tiktok: config.webhooks?.tiktok || process.env.WEBHOOK_TIKTOK
       };
-
       const webhookUrl = webhookUrls[platform];
       
       if (!webhookUrl) {
@@ -113,15 +113,14 @@ export default async function webhookRoutes(fastify: FastifyInstance) {
 
   // Check webhook configuration
   fastify.get('/social/webhook/status', async (_request: FastifyRequest, reply: FastifyReply) => {
+    const config = getConfig();
     const webhooks = {
-      linkedin: !!config.webhooks?.linkedin,
-      facebook: !!config.webhooks?.facebook,
-      tiktok: !!config.webhooks?.tiktok
+      linkedin: !!(config.webhooks?.linkedin || process.env.WEBHOOK_LINKEDIN),
+      facebook: !!(config.webhooks?.facebook || process.env.WEBHOOK_FACEBOOK),
+      tiktok: !!(config.webhooks?.tiktok || process.env.WEBHOOK_TIKTOK)
     };
-
     const configuredCount = Object.values(webhooks).filter(Boolean).length;
     const totalCount = Object.keys(webhooks).length;
-
     return reply.send({
       success: true,
       webhooks,
@@ -139,12 +138,12 @@ export default async function webhookRoutes(fastify: FastifyInstance) {
     async (request: FastifyRequest<{ Body: { platform: string } }>, reply: FastifyReply) => {
       const { platform } = request.body;
 
+      const config = getConfig();
       const webhookUrls: { [key: string]: string | undefined } = {
-        linkedin: process.env.WEBHOOK_LINKEDIN,
-        facebook: process.env.WEBHOOK_FACEBOOK,
-        tiktok: process.env.WEBHOOK_TIKTOK
+        linkedin: config.webhooks?.linkedin || process.env.WEBHOOK_LINKEDIN,
+        facebook: config.webhooks?.facebook || process.env.WEBHOOK_FACEBOOK,
+        tiktok: config.webhooks?.tiktok || process.env.WEBHOOK_TIKTOK
       };
-
       const webhookUrl = webhookUrls[platform];
 
       if (!webhookUrl) {

@@ -1,5 +1,6 @@
 // backend/routes/app/api/social/buffer-routes.ts
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { getConfig } from '@config';
 
 interface BufferPostRequest {
   platform: string;
@@ -16,7 +17,7 @@ export default async function bufferRoutes(fastify: FastifyInstance) {
     async (request: FastifyRequest<{ Body: BufferPostRequest }>, reply: FastifyReply) => {
       const { platform, content, mediaUrl, scheduleTime } = request.body;
 
-      const bufferAccessToken = process.env.BUFFER_ACCESS_TOKEN;
+      const bufferAccessToken = getConfig().webhooks?.buffer || process.env.BUFFER_ACCESS_TOKEN;
       
       if (!bufferAccessToken) {
         return reply.status(400).send({
@@ -106,7 +107,7 @@ export default async function bufferRoutes(fastify: FastifyInstance) {
 
   // Get Buffer profiles (connected accounts)
   fastify.get('/social/buffer/profiles', async (_request: FastifyRequest, reply: FastifyReply) => {
-    const bufferAccessToken = process.env.BUFFER_ACCESS_TOKEN;
+    const bufferAccessToken = getConfig().webhooks?.buffer || process.env.BUFFER_ACCESS_TOKEN;
     
     if (!bufferAccessToken) {
       return reply.send({
@@ -150,7 +151,7 @@ export default async function bufferRoutes(fastify: FastifyInstance) {
 
   // Get Buffer stats
   fastify.get('/social/buffer/stats', async (_request: FastifyRequest, reply: FastifyReply) => {
-    const bufferAccessToken = process.env.BUFFER_ACCESS_TOKEN;
+    const bufferAccessToken = getConfig().webhooks?.buffer || process.env.BUFFER_ACCESS_TOKEN;
     
     if (!bufferAccessToken) {
       return reply.send({

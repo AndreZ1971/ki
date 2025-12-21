@@ -1,3 +1,4 @@
+import { getConfig } from '@config';
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { recordMlEvent, getMlEvents } from '../../../services/mlStats.js';
 
@@ -1832,7 +1833,7 @@ async function sendEmergencyAlerts(analysis: any): Promise<void> {
 
   try {
     // 1. Slack Webhook (wenn konfiguriert)
-    const slackWebhook = process.env.SLACK_EMERGENCY_WEBHOOK;
+    const slackWebhook = getConfig().slackEmergencyWebhook;
     if (slackWebhook) {
       try {
         const slackPayload = {
@@ -1883,7 +1884,7 @@ async function sendEmergencyAlerts(analysis: any): Promise<void> {
     }
 
     // 2. Email Alert (über existierendes Email-System)
-    const alertEmail = process.env.EMERGENCY_ALERT_EMAIL;
+    const alertEmail = getConfig().emergencyAlertEmail;
     if (alertEmail) {
       try {
         // Hier würde dein bestehendes Email-System integriert werden
@@ -1896,7 +1897,7 @@ async function sendEmergencyAlerts(analysis: any): Promise<void> {
     }
 
     // 3. PagerDuty Integration (wenn konfiguriert)
-    const pagerDutyKey = process.env.PAGERDUTY_INTEGRATION_KEY;
+    const pagerDutyKey = getConfig().pagerDutyIntegrationKey;
     if (pagerDutyKey && (analysis.severity === 'P0' || analysis.severity === 'P1')) {
       try {
         const pagerDutyPayload = {

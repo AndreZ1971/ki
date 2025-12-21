@@ -1,12 +1,13 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import config from '../../../../config.js';
+import { getConfig } from '@config';
 
 const PER_PAGE = 100;
 const MAX_PAGES = 5;
 
 async function fetchAllDirect(path: string, params: Record<string, unknown> = {}) {
+  const config = getConfig();
   const wooConfig = config.woocommerce;
-  const base = wooConfig?.url?.replace(/\/+$/, '') || '';
+  const base = wooConfig?.url?.replace(/\/+$|$/, '') || '';
   const key = wooConfig?.consumerKey || '';
   const secret = wooConfig?.consumerSecret || '';
 

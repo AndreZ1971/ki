@@ -1,27 +1,32 @@
 import { FastifyInstance } from 'fastify';
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
 import * as dotenv from 'dotenv';
-import config from '../../../config';
+import { getConfig } from '@config';
 
 dotenv.config();
 
 // Dynamischer Import für node-fetch (ESM in CommonJS)
 const fetch = async (url: string, options?: any) => (await import('node-fetch')).default(url, options);
 
-// WooCommerce-Client aus zentraler Config (falls env fehlt)
-const wooConfig = {
-  url: config.woocommerce?.url || process.env.WOOCOMMERCE_URL || '',
-  consumerKey: config.woocommerce?.consumerKey || process.env.CONSUMER_KEY || '',
-  consumerSecret: config.woocommerce?.consumerSecret || process.env.CONSUMER_SECRET || '',
-  version: 'wc/v3' as const
+
+// WooCommerce-Client aus dynamischer Config
+const getWooConfig = () => {
+  const config = getConfig();
+  const woo = config.woocommerce || {};
+  return {
+    url: woo.url || '',
+    consumerKey: woo.consumerKey || '',
+    consumerSecret: woo.consumerSecret || '',
+    version: 'wc/v3' as const
+  };
 };
 
-if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
+const wooCommerce = new WooCommerceRestApi(getWooConfig());
+const apiBase = getConfig().apiBaseUrl || 'http://localhost:3000';
+
+if (!getWooConfig().url || !getWooConfig().consumerKey || !getWooConfig().consumerSecret) {
   console.error('❌ WooCommerce Config fehlt: Bitte URL / ConsumerKey / ConsumerSecret setzen.');
 }
-
-const wooCommerce = new WooCommerceRestApi(wooConfig);
-const apiBase = process.env.API_BASE_URL || 'http://localhost:3000';
 
 export default async function chatbotMessageRoute(server: FastifyInstance) {
   server.post('/message', async (request, _reply) => {

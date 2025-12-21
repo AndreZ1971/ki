@@ -1,3 +1,4 @@
+import { getConfig } from '@config';
 import { FastifyInstance } from 'fastify';
 import os from 'os';
 
@@ -60,17 +61,24 @@ export default async function systemRoutes(server: FastifyInstance, _options: an
   // Configuration Status
   server.get('/system/config-status', async (_request, _reply) => {
     return {
-      openai: {
-        configured: !!process.env.OPENAI_API_KEY,
-        status: process.env.OPENAI_API_KEY ? '✅ Konfiguriert' : '❌ Nicht konfiguriert'
-      },
-      woocommerce: {
-        configured: !!(process.env.WOOCOMMERCE_URL && process.env.WOOCOMMERCE_CONSUMER_KEY),
-        status: (process.env.WOOCOMMERCE_URL && process.env.WOOCOMMERCE_CONSUMER_KEY) 
-          ? '✅ Konfiguriert' 
-          : '❌ Nicht konfiguriert',
-        url: process.env.WOOCOMMERCE_URL || 'Nicht gesetzt'
-      },
+      openai: (() => {
+        const { openAI } = getConfig();
+        const apiKey = process.env.OPENAI_API_KEY || openAI?.apiKey;
+        return {
+          configured: !!apiKey,
+          status: apiKey ? '✅ Konfiguriert' : '❌ Nicht konfiguriert'
+        };
+      })(),
+      woocommerce: (() => {
+        const { woocommerce } = getConfig();
+        const url = process.env.WOOCOMMERCE_URL || woocommerce?.url;
+        const key = process.env.WOOCOMMERCE_CONSUMER_KEY || woocommerce?.consumerKey;
+        return {
+          configured: !!(url && key),
+          status: (url && key) ? '✅ Konfiguriert' : '❌ Nicht konfiguriert',
+          url: url || 'Nicht gesetzt'
+        };
+      })(),
       server: {
         port: process.env.PORT || 3000,
         environment: process.env.NODE_ENV || 'development'

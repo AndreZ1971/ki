@@ -59,9 +59,9 @@
     "payment-emergency": "tsx agent/jobs/paymentEmergency.ts",
     "validate-payment-success": "tsx agent/jobs/paymentSuccessValidator.ts",
     "ultimate-payment-fix": "npm run payment-emergency && npm run validate-payment-success",
-    "_moduleAliases": {
-      "@config": "./dist/config.js"
-    },
+      "_moduleAliases": {
+        "@config": "./dist/config.js"
+      },
     "simple-payment-fix": "tsx agent/jobs/paymentSimpleFix.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

@@ -1,26 +1,30 @@
 import { FastifyInstance } from 'fastify';
 import OpenAI from 'openai';
+import { getConfig } from '@config';
 
 // ✅ NEU (richtig - lazy Initialisierung)
 let openai: OpenAI | null = null;
+let lastApiKey: string | undefined = undefined;
+let lastModel: string | undefined = undefined;
 
 function initializeOpenAI() {
-  if (openai !== null) return openai;
-  
-  try {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey || apiKey.trim() === '' || !apiKey.startsWith('sk-')) {
-      console.warn('⚠️ OpenAI API Key nicht konfiguriert');
-      openai = null;
-    } else {
-      openai = new OpenAI({ apiKey });
-      console.log('✅ Reviews OpenAI Client erfolgreich initialisiert');
-    }
-  } catch (_error) {
-    console.error('❌ Fehler bei Reviews OpenAI Initialisierung:', _error);
+  const config = getConfig();
+  const apiKey = config.openAI?.apiKey;
+  const model = config.openAI?.model;
+  if (!apiKey || apiKey.trim() === '' || !apiKey.startsWith('sk-')) {
+    console.warn('⚠️ OpenAI API Key nicht konfiguriert (getConfig)');
     openai = null;
+    lastApiKey = undefined;
+    lastModel = undefined;
+    return null;
   }
-  
+  // Only re-initialize if apiKey or model changed
+  if (!openai || apiKey !== lastApiKey || model !== lastModel) {
+    openai = new OpenAI({ apiKey });
+    lastApiKey = apiKey;
+    lastModel = model;
+    console.log('✅ Reviews OpenAI Client (getConfig) erfolgreich initialisiert');
+  }
   return openai;
 }
 
@@ -102,8 +106,9 @@ Antworte im JSON Format:
 }
 `;
 
+      const config = getConfig();
       const completion = await openAIClient.chat.completions.create({
-        model: process.env.OPENAI_MODEL || "gpt-4o-mini",
+        model: config.openAI?.model || "gpt-4o-mini",
         messages: [
           {
             role: "system",
@@ -240,8 +245,9 @@ Antworte im JSON Format:
 }
 `;
 
+      const config = getConfig();
       const completion = await openAIClient.chat.completions.create({
-        model: process.env.OPENAI_MODEL || "gpt-4o-mini",
+        model: config.openAI?.model || "gpt-4o-mini",
         messages: [
           {
             role: "system",

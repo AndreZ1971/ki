@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import config from '../../../../../config';
+import { getConfig } from '@config';
 
 export class WooCommerceService {
   private baseUrl: string;
@@ -7,19 +7,18 @@ export class WooCommerceService {
   private isConfigured: boolean = false;
 
   constructor() {
+    const config = getConfig();
     const envBaseUrl = process.env.WOOCOMMERCE_URL;
     const envConsumerKey = process.env.WOOCOMMERCE_CONSUMER_KEY || process.env.CONSUMER_KEY;
     const envConsumerSecret = process.env.WOOCOMMERCE_CONSUMER_SECRET || process.env.CONSUMER_SECRET;
 
     const cfg = config.woocommerce || {};
-    const baseUrl = envBaseUrl || cfg.url;
-    const consumerKey = envConsumerKey || cfg.consumerKey;
-    const consumerSecret = envConsumerSecret || cfg.consumerSecret;
-    
+    const baseUrl = cfg.url || envBaseUrl;
+    const consumerKey = cfg.consumerKey || envConsumerKey;
+    const consumerSecret = cfg.consumerSecret || envConsumerSecret;
+
     if (!baseUrl || !consumerKey || !consumerSecret) {
-      // console.warn('⚠️ WooCommerce API nicht konfiguriert - bitte WOOCOMMERCE_URL, CONSUMER_KEY und CONSUMER_SECRET in .env setzen');
       this.isConfigured = false;
-      // Dummy-Werte zuweisen, um TypeScript-Fehler zu vermeiden
       this.baseUrl = '';
       this.auth = '';
       return;

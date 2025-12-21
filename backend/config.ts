@@ -37,6 +37,16 @@ export interface Config {
     instagram?: string;
     twitter?: string;
     youtube?: string;
+    // Erweiterte Social Properties für dynamische Konfiguration
+    buffer?: string;
+    facebookRedirect?: string;
+    facebookSecret?: string;
+    facebookPageAccessToken?: string;
+    facebookPageId?: string;
+    instagramBusinessAccountId?: string;
+    tiktokAccessToken?: string;
+    tiktokSecret?: string;
+    tiktokRedirect?: string;
   };
   openAI?: {
     apiKey?: string;
@@ -128,7 +138,37 @@ export interface Config {
     // Cache TTL in Sekunden
     cacheTtl?: number;
   };
+  regioning?: {
+    regions?: Record<string, any>;
+  };
   // ...weitere Bereiche nach Bedarf
+  /**
+   * SMTP-Konfiguration für E-Mail-Versand
+   */
+  smtp?: {
+    host?: string;
+    port?: number;
+    secure?: boolean;
+    user?: string;
+    password?: string;
+    from?: string;
+  };
+  /**
+   * Webhook-URL für Slack-Notfallbenachrichtigungen
+   */
+  slackEmergencyWebhook?: string;
+  /**
+   * E-Mail-Adresse für Notfall-Alerts
+   */
+  emergencyAlertEmail?: string;
+  /**
+   * PagerDuty Integration Key
+   */
+  pagerDutyIntegrationKey?: string;
+  /**
+   * Basis-URL für interne API-Aufrufe (z.B. http://localhost:3000)
+   */
+  apiBaseUrl?: string;
 }
 
 const config: Config = {
@@ -141,7 +181,13 @@ const config: Config = {
   features: configData.features || {},
   reddit: configData.reddit || {},
   ml: configData.ml || {},
+  regioning: configData.regioning || {},
+  smtp: configData.smtp || {},
   // ...weitere Bereiche nach Bedarf
+  slackEmergencyWebhook: configData.slackEmergencyWebhook,
+  emergencyAlertEmail: configData.emergencyAlertEmail,
+  pagerDutyIntegrationKey: configData.pagerDutyIntegrationKey,
+  apiBaseUrl: configData.apiBaseUrl,
 };
 
 /**
@@ -163,6 +209,12 @@ export function getConfig(): Config {
         features: freshData.features || {},
         reddit: freshData.reddit || {},
         ml: freshData.ml || {},
+        regioning: freshData.regioning || {},
+        smtp: freshData.smtp || {},
+        apiBaseUrl: freshData.apiBaseUrl,
+        slackEmergencyWebhook: freshData.slackEmergencyWebhook,
+        emergencyAlertEmail: freshData.emergencyAlertEmail,
+        pagerDutyIntegrationKey: freshData.pagerDutyIntegrationKey,
       };
     }
     console.warn(
