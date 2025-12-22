@@ -1761,34 +1761,6 @@ Diese können Sie als Vorlage für Ihre eigene Specialization verwenden!
 
 ---
 
-### Database Monitor
-
-#### Was kann ich mit Database Monitor machen?
-
-- Datenbank-Performance überwachen
-- Query Performance monitoring
-- Database Health Checks
-- Capacity & Growth tracking
-
-#### Wie nutze ich Database Monitor?
-
-1. **Datenbanken verbinden** - SQL, NoSQL, Data Warehouses
-2. **Performance-Metriken wählen** - Query Times, Connections, Locks
-3. **DB-Monitoring starten** - Klicken Sie auf "Database Watch"
-4. **Slow Query Detection** - Langsame Queries identifizieren
-5. **Capacity Planning** - Wachstumstrends analysieren
-6. **Backup Monitoring** - Backup-Erfolg überwachen
-
-#### Database-Metrics
-
-- Query Performance
-- Connection Pool Usage
-- Lock Contention
-- Storage Growth
-- Replication Lag
-
----
-
 ### Network Monitor
 
 #### Was kann ich mit Network Monitor machen?
@@ -1827,4 +1799,4 @@ Diese können Sie als Vorlage für Ihre eigene Specialization verwenden!
 ---
 
 **Version:** 1.0.0  
-**Zuletzt aktualisiert:** November 2025
+**Zuletzt aktualisiert:** Dezember 2025
