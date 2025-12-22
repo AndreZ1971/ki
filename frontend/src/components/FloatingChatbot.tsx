@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useChatbotGreeting } from './useChatbotGreeting';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -12,16 +13,15 @@ interface FloatingChatbotProps {
   greetings?: string[];
 }
 
-const DEFAULT_GREETINGS = [
-  'Hi, ich bin Ari. 🤖 Ich bin dein neuer digitaler Mitarbeiter. Ich schlafe nie, mache keine Kaffeepausen und kenne deine Lagerbestände auswendig.'
-];
+
 
 export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
   userRole = 'admin',
   context = {},
   botName = 'KiBot',
-  greetings = DEFAULT_GREETINGS
+  greetings
 }) => {
+  const i18nGreetings = useChatbotGreeting();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -32,12 +32,12 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
   useEffect(() => {
     if (open && messages.length === 0) {
       // Begrüßung beim ersten Öffnen
-      setMessages([{ role: 'assistant', content: greetings[0] }]);
+      setMessages([{ role: 'assistant', content: (greetings && greetings[0]) || i18nGreetings[0] }]);
     }
     if (open) {
       setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
     }
-  }, [open, greetings, messages.length]);
+  }, [open, greetings, i18nGreetings, messages.length]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });

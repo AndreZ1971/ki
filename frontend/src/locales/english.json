@@ -377,6 +377,9 @@
       "error": "Error generating strings"
     }
   },
+  "chatbot": {
+    "greeting": "Hi, I'm Ari. 🤖 I'm your new digital assistant. I never sleep, never take coffee breaks, and I know your inventory by heart."
+  },
   "pages": {
     "blogpost": {
       "title": "📝 AI Blogpost Generator",

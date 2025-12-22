@@ -27,7 +27,7 @@ export default async function agentMonitoringRoutes(fastify: FastifyInstance) {
       }
       // Hole die letzten 10 Runs aller Loops
       const loopTypes = ['anomaly-detection', 'product-optimization', 'payment-recovery', 'analytics-insights'];
-      let allHistory: any[] = [];
+      const allHistory: any[] = [];
       for (const loopType of loopTypes) {
         const history = await executionLogger.getHistory(loopType, 10);
         allHistory.push({ loopType, history });

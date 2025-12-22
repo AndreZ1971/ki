@@ -377,6 +377,9 @@
       "error": "Fehler bei der String-Generierung"
     }
   },
+  "chatbot": {
+    "greeting": "Hi, ich bin Ari. 🤖 Ich bin dein neuer digitaler Mitarbeiter. Ich schlafe nie, mache keine Kaffeepausen und kenne deine Lagerbestände auswendig."
+  },
   "pages": {
     "blogpost": {
       "title": "📝 KI-Blogpost Generator",

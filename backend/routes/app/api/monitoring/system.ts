@@ -390,10 +390,11 @@ async function getQuickMetrics() {
   const totalMem = os.totalmem();
   const freeMem = os.freemem();
   const usedMem = totalMem - freeMem;
-  
+  const disk = await getDiskUsagePercent();
   return {
     cpu: calculateCPUUsage(),
     memory: Math.round((usedMem / totalMem) * 100),
+    disk,
     uptime: formatUptime(process.uptime())
   };
 }

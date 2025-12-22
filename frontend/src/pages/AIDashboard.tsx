@@ -514,10 +514,10 @@ const AIDashboard: React.FC = () => {
         },
         {
           id: "german-content-generator",
-          title: "Content Generator",
+          title: "📝 Content Generator",
           description: "Content-Erstellung für lokales Marketing",
           endpoint: "marketing/content/german",
-          icon: "🇩🇪",
+          icon: "📝",
           pageUrl: "/marketing/german-content",
         },
         {

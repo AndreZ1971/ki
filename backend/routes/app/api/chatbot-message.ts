@@ -1,7 +1,10 @@
 import { FastifyInstance } from 'fastify';
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
 import * as dotenv from 'dotenv';
+
 import { getConfig } from '@config';
+import { getShopStats, getSystemHealth } from '../../../services/shopData';
+import { getOpenAIClient, executeOpenAI } from '../../../utils/openai';
 
 dotenv.config();
 
@@ -31,8 +34,19 @@ if (!getWooConfig().url || !getWooConfig().consumerKey || !getWooConfig().consum
 export default async function chatbotMessageRoute(server: FastifyInstance) {
   server.post('/message', async (request, _reply) => {
     try {
-      const { message, context } = request.body as any;
-      // Detect if user asks for news/status
+      type ChatbotRequestBody = { message: string; context?: any; history?: { role: string; content: string }[]; userRole?: string };
+      const body = request.body as ChatbotRequestBody;
+      const { message, context, history, userRole } = body;
+      // INTENT-KEYWORDS & Routing für interne Tools und Standard-Intents
+      const emailKeywords = ['email', 'mail', 'nachricht', 'schreiben', 'senden', 'kontakt', 'kontaktieren', 'support'];
+      const campaignKeywords = ['kampagne', 'newsletter', 'email kampagne', 'email marketing', 'automation', 'mailing', 'newsletter erstellen'];
+      const dbKeywords = ['datenbank', 'database', 'sql', 'db', 'shopdatenbank'];
+      const exportKeywords = ['export', 'daten exportieren', 'csv', 'excel', 'daten herunterladen'];
+      const monitoringKeywords = ['monitoring', 'systemstatus', 'system health', 'überwachung', 'status', 'uptime'];
+      const productKeywords = ['produkt', 'produkte', 'artikel', 'bestseller', 'sortiment', 'product', 'verkaufen sich nicht'];
+      const orderKeywords = ['bestellung', 'order', 'verkauf', 'kauf', 'transaktion'];
+      const customerKeywords = ['kunde', 'kunden', 'user', 'benutzer', 'account'];
+      const automationKeywords = ['automation', 'automatisierung', 'workflow', 'prozess', 'regel'];
       const newsKeywords = [
         'was gibt es neues',
         'news',
@@ -51,6 +65,34 @@ export default async function chatbotMessageRoute(server: FastifyInstance) {
         'produkte'
       ];
       const lowerMsg = (message || '').toLowerCase();
+      if (emailKeywords.some(k => lowerMsg.includes(k))) {
+        return { success: true, reply: 'Nutze das interne E-Mail-Modul im Menü "Kommunikation", um E-Mails direkt aus dem System zu schreiben oder Vorlagen zu nutzen. Für E-Mail-Kampagnen steht dir das Modul "E-Mail Marketing Automation" zur Verfügung.' };
+      }
+      if (campaignKeywords.some(k => lowerMsg.includes(k))) {
+        return { success: true, reply: 'Für E-Mail-Kampagnen und Newsletter nutze bitte das Modul "E-Mail Marketing Automation" im Shop. Dort kannst du Kampagnen planen, Vorlagen nutzen und automatisierte Abläufe einrichten.' };
+      }
+      if (dbKeywords.some(k => lowerMsg.includes(k))) {
+        return { success: true, reply: 'Alle Shop- und Kundendaten werden sicher in der internen Shop-Datenbank verwaltet. Ein direkter SQL-Zugriff ist nicht nötig – nutze die Shop-Module für Auswertungen und Exporte.' };
+      }
+      if (exportKeywords.some(k => lowerMsg.includes(k))) {
+        return { success: true, reply: 'Du kannst Daten (z.B. Bestellungen, Produkte, Kunden) jederzeit über die Export-Funktion im jeweiligen Modul als CSV oder Excel-Datei herunterladen.' };
+      }
+      if (monitoringKeywords.some(k => lowerMsg.includes(k))) {
+        const analysis = await summarizeMonitoring();
+        return { success: true, reply: analysis };
+      }
+      if (productKeywords.some(k => lowerMsg.includes(k))) {
+        return { success: true, reply: 'Produktverwaltung, Bestseller-Analysen und Sortimentsoptimierung findest du im Modul "Produkte". Dort kannst du neue Artikel anlegen, bearbeiten und auswerten.' };
+      }
+      if (orderKeywords.some(k => lowerMsg.includes(k))) {
+        return { success: true, reply: 'Alle Bestellungen und Transaktionen findest du im Modul "Bestellungen". Dort kannst du Aufträge verwalten, exportieren und analysieren.' };
+      }
+      if (customerKeywords.some(k => lowerMsg.includes(k))) {
+        return { success: true, reply: 'Kundenverwaltung, Segmentierung und CRM-Funktionen findest du im Modul "Kunden". Dort kannst du Kundendaten einsehen, bearbeiten und exportieren.' };
+      }
+      if (automationKeywords.some(k => lowerMsg.includes(k))) {
+        return { success: true, reply: 'Automatisierungen und Workflows kannst du im Modul "Automation" einrichten. Damit lassen sich wiederkehrende Aufgaben und Prozesse effizient steuern.' };
+      }
       const isNewsRequest = newsKeywords.some(k => lowerMsg.includes(k));
 
       // 🔍 A.R.I. SYSTEM-ANALYSE - Ari kann das gesamte System diagnostizieren
@@ -76,7 +118,6 @@ export default async function chatbotMessageRoute(server: FastifyInstance) {
       const isContentIssue = contentKeywords.some(k => lowerMsg.includes(k));
       
       // Produkt-Analyse
-      const productKeywords = ['produkt', 'product', 'artikel', 'verkaufen sich nicht', 'bestseller'];
       const isProductIssue = productKeywords.some(k => lowerMsg.includes(k));
 
       // INTELLIGENTE ROUTING
@@ -133,11 +174,46 @@ export default async function chatbotMessageRoute(server: FastifyInstance) {
         }
       }
 
-      // Default fallback: motivierende Standardantwort
-      return {
-        success: true,
-        reply: 'Ich bin Ari, dein motivierender KI-Chatbot! Stelle mir Fragen zu deinem Shop, und ich liefere dir aktuelle News, Kennzahlen und Tipps.'
-      };
+      // OpenAI-Integration: Generative Antwort mit Shop- und Systemdaten
+      try {
+        const stats = await getShopStats();
+        const health = await getSystemHealth();
+        const systemPrompt = `Du bist ein KI-Shopassistent für das System A.R.I. Antworte immer bevorzugt mit Hinweisen auf interne Shop- und Systemfunktionen. Verweise NIEMALS auf externe Tools wie Gmail, Outlook, Thunderbird, Google Sheets, SQL-Clients oder Webmail. Nutze stattdessen folgende interne Tools:
+
+      - E-Mails: Über das interne E-Mail-Modul im Menü "Kommunikation" (inkl. Vorlagen, Versand, Kampagnen)
+      - E-Mail-Kampagnen: Im Modul "E-Mail Marketing Automation" (Planung, Versand, Automatisierung)
+      - Datenbank: Alle Shopdaten sind intern, kein externer Zugriff nötig
+      - Monitoring: Systemstatus und Fehler im Bereich "System-Health"
+      - Produktverwaltung: Im Modul "Produkte"
+      - Bestellungen: Im Modul "Bestellungen"
+      - Kundenverwaltung: Im Modul "Kunden"
+      - Automatisierungen: Im Modul "Automation"
+
+      Shopname: ${stats.shopName}. Umsatz heute: ${stats.salesToday} EUR. Bestellungen: ${stats.ordersToday}. Produkte: ${stats.products}. Systemstatus: ${health.status}. CPU: ${health.cpu}%. RAM: ${health.memory}%. Antworte freundlich, präzise und auf Basis dieser Shopdaten.`;
+        const userPrompt = `Frage: ${message}`;
+        const openai = getOpenAIClient();
+        const completion = await executeOpenAI(
+          () => openai.chat.completions.create({
+            model: 'gpt-4o',
+            messages: [
+              { role: 'system', content: systemPrompt },
+              ...(history || []).map((m: any) => ({ role: m.role, content: m.content })),
+              { role: 'user', content: userPrompt }
+            ],
+            max_tokens: 400,
+            temperature: 0.2
+          }),
+          'chatbot-gpt4o',
+          { userRole, context }
+        );
+        const reply = completion.choices?.[0]?.message?.content || 'Entschuldigung, ich konnte dazu nichts finden.';
+        return { success: true, reply };
+      } catch (_err: any) {
+        return {
+          success: true,
+          reply: 'Ich bin Ari, dein motivierender KI-Chatbot! Stelle mir Fragen zu deinem Shop, und ich liefere dir aktuelle News, Kennzahlen und Tipps.'
+        };
+      }
     } catch (error) {
       return { success: false, error: error instanceof Error ? error.message : 'Unbekannter Fehler' };
     }
@@ -581,11 +657,12 @@ async function summarizeMonitoring(): Promise<string> {
     const metrics = data.metrics;
     const services = data.services || [];
 
-    const cpu = metrics?.cpu?.usage ?? '–';
-    const mem = metrics?.memory?.usagePercent ?? '–';
-    const disk = metrics?.disk?.usagePercent ?? '–';
+    // Kompatibel zu /health/summary und /system/metrics
+    const cpu = metrics?.cpu?.usage ?? metrics?.cpu ?? '–';
+    const mem = metrics?.memory?.usagePercent ?? metrics?.memory ?? '–';
+    const disk = metrics?.disk?.usagePercent ?? metrics?.disk ?? '–';
     const net = metrics?.network?.status ?? 'unknown';
-    const uptime = metrics?.uptime?.formatted ?? '–';
+    const uptime = metrics?.uptime?.formatted ?? metrics?.uptime ?? '–';
     const overall = data.overall || metrics?.status || 'unknown';
 
     const healthyServices = services.filter((s: any) => s.status === 'healthy').length;

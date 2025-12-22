@@ -1,0 +1,92 @@
+# 🌀 Social Media API Onboarding Guide
+
+Dieses Dokument dient als technischer Leitfaden für die Einrichtung von API-Schnittstellen, um automatisierte Beiträge auf den wichtigsten Social-Media-Plattformen zu veröffentlichen.
+
+---
+
+## 🔗 1. LinkedIn (Professional Networking)
+**Ziel:** Beiträge im Namen eines Nutzers oder einer Organisation teilen.
+
+### Vorgehensweise:
+1.  **Portal:** Gehe zu [LinkedIn Developers](https://www.linkedin.com/developers/).
+2.  **App Setup:** Erstelle eine App und verknüpfe sie mit einer verifizierten Unternehmensseite.
+3.  **Produkte:** Füge das Produkt **"Share on LinkedIn"** hinzu.
+4.  **Auth-Konfiguration:** Hinterlege eine `Redirect URL` (z.B. `http://localhost:3000`).
+5.  **Token-Erhalt:**
+    * Nutze den [OAuth Token Generator](https://www.linkedin.com/developers/tools/oauth).
+    * Wähle den Scope `w_member_social`.
+    * Klicke auf "Request Access Token".
+
+---
+
+## 🎵 2. TikTok (Short-form Video)
+**Ziel:** Direktes Veröffentlichen von Videos im Nutzer-Feed.
+
+### Vorgehensweise:
+1.  **Portal:** Registriere dich im [TikTok for Developers Portal](https://developers.tiktok.com/).
+2.  **App-Erstellung:** Erstelle eine neue App und füge die **"Content Posting API"** hinzu.
+3.  **Review-Prozess:** Fülle die erforderlichen Informationen aus und reiche die App zur Prüfung ein.
+4.  **Scopes:** Stelle sicher, dass `video.publish` aktiviert ist.
+5.  **Token-Erhalt:** * Führe den OAuth-Flow durch: Leite den User zur TikTok-Auth-Seite.
+    * Tausche den `Authorization Code` gegen einen `Access Token` und `Refresh Token`.
+
+---
+
+## 📸 3. Instagram (Visual Media)
+**Ziel:** Automatisches Posten von Bildern, Reels und Karussells.
+
+### Vorgehensweise:
+1.  **Voraussetzung:** Instagram Business/Creator Account + Verknüpfung mit Facebook-Seite.
+2.  **Portal:** Nutze das [Meta Developer Portal](https://developers.facebook.com/).
+3.  **App-Typ:** Wähle "Business" und füge **"Instagram Graph API"** hinzu.
+4.  **Scopes:** Du benötigst `instagram_basic` und `instagram_content_publish`.
+5.  **Token-Erhalt:**
+    * Generiere einen User-Token im **Graph API Explorer**.
+    * Wähle deine Instagram-ID aus.
+    * Verlängere den Token über das Access Token Tool auf einen **Long-lived Token** (60 Tage).
+
+---
+
+## 🐦 4. X (Twitter)
+**Ziel:** Textbasierte Posts und Medienteilung.
+
+### Vorgehensweise:
+1.  **Portal:** Melde dich im [X Developer Portal](https://developer.x.com/) an.
+2.  **Berechtigungen:** Gehe zu den App-Einstellungen -> "User authentication settings". Ändere die App-Berechtigung von "Read" auf **"Read and Write"**.
+3.  **App-Info:** Hinterlege zwingend eine Website-URL und eine Callback-URL.
+4.  **Keys & Tokens:**
+    * Generiere unter "Keys and Tokens" den `API Key`, `API Key Secret`.
+    * Generiere den `Access Token` und das `Access Token Secret`.
+5.  **API Version:** Stelle sicher, dass dein Code die **v2 API** (`/2/tweets`) anspricht.
+
+---
+
+## 💙 5. Facebook (Pages)
+**Ziel:** Status-Updates und Medien auf Unternehmensseiten posten.
+
+### Vorgehensweise:
+1.  **Portal:** [Meta Developer Portal](https://developers.facebook.com/).
+2.  **Scopes:** Füge `pages_manage_posts` und `pages_read_engagement` hinzu.
+3.  **Token-Erhalt:**
+    * Öffne den **Graph API Explorer**.
+    * Wähle unter "User or Page" die spezifische Facebook-Seite aus.
+    * Generiere den **Page Access Token**.
+4.  **Permanenz:** Tausche den User-Token in einen langlebigen Token um, damit der Page-Token seine Gültigkeit nicht verliert.
+
+---
+
+## 🎥 6. YouTube (Video Content)
+**Ziel:** Video-Uploads und Kanal-Management.
+
+### Vorgehensweise:
+1.  **Portal:** [Google Cloud Console](https://console.cloud.google.com/).
+2.  **API:** Aktiviere die **"YouTube Data API v3"**.
+3.  **OAuth Screen:** Richte den OAuth-Zustimmungsbildschirm ein und füge deine E-Mail als Test-Nutzer hinzu.
+4.  **Credentials:** Erstelle eine "OAuth 2.0 Client ID" für eine Desktop-Anwendung.
+5.  **Token-Erhalt:**
+    * Nutze den [OAuth 2.0 Playground](https://developers.google.com/oauthplayground/).
+    * Scope: `https://www.googleapis.com/auth/youtube.force-ssl`.
+    * Klicke auf "Authorize" und tausche den Code gegen den `Access Token` und den **`Refresh Token`** aus.
+
+---
+## Erstellt am: 22. Dezember 2025
