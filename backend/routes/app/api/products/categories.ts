@@ -1,6 +1,6 @@
 
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import config from '../../../../config';
+import { getConfig } from '../../../../config';
 import { getOpenAIClient, executeOpenAI } from '../../../../utils/openaiHelper';
 
 interface Category {
@@ -35,10 +35,11 @@ interface CategorySuggestion {
 }
 
 async function fetchWooCategories() {
+  const cfg = getConfig();
   const wooConfig = {
-    url: config.woocommerce?.url || '',
-    consumerKey: config.woocommerce?.consumerKey || '',
-    consumerSecret: config.woocommerce?.consumerSecret || '',
+    url: cfg.woocommerce?.url || '',
+    consumerKey: cfg.woocommerce?.consumerKey || '',
+    consumerSecret: cfg.woocommerce?.consumerSecret || '',
   };
 
   if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
@@ -129,11 +130,12 @@ export default async function categoryRoutes(server: FastifyInstance) {
       try {
         const categoryData = request.body;
 
-        // WooCommerce-Konfiguration aus zentraler config
+        // WooCommerce-Konfiguration dynamisch laden
+        const cfg = getConfig();
         const wooConfig = {
-          url: config.woocommerce?.url || '',
-          consumerKey: config.woocommerce?.consumerKey || '',
-          consumerSecret: config.woocommerce?.consumerSecret || '',
+          url: cfg.woocommerce?.url || '',
+          consumerKey: cfg.woocommerce?.consumerKey || '',
+          consumerSecret: cfg.woocommerce?.consumerSecret || '',
         };
 
         if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {

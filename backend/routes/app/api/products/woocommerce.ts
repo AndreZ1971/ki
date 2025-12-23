@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import OpenAI from 'openai';
+import { getConfig } from '../../../../config';
 import { wooCache } from '../../../../utils/woo-cache';
 
 // ✅ Korrekte lazy Initialisierung
@@ -7,11 +8,14 @@ let openai: OpenAI | null = null;
 
 function initializeOpenAI() {
   if (openai !== null) return openai; // Bereits initialisiert
-  
+
   try {
-    const apiKey = process.env.OPENAI_API_KEY; // ✅ Jetzt ist process.env geladen!
+    // Bevorzuge getConfig().openAI?.apiKey, fallback auf process.env
+    const configKey = getConfig().openAI?.apiKey;
+    const envKey = process.env.OPENAI_API_KEY;
+    const apiKey = configKey || envKey;
     if (!apiKey || apiKey.trim() === '' || !apiKey.startsWith('sk-')) {
-      console.warn('⚠️ OpenAI API Key nicht konfiguriert');
+      console.warn('⚠️ OpenAI API Key nicht konfiguriert (getConfig/process.env)');
       openai = null;
     } else {
       openai = new OpenAI({ apiKey });
@@ -21,26 +25,27 @@ function initializeOpenAI() {
     console.error('❌ Fehler bei OpenAI Initialisierung:', _error);
     openai = null;
   }
-  
+
   return openai;
 }
 
 // Einfache WooCommerce Client Implementierung
-import config from '../../../../config';
 import { Agent } from 'undici';
 
-class WooCommerceClient {
-  private baseUrl: string;
-  private consumerKey: string;
-  private consumerSecret: string;
 
-  constructor() {
-    const woo = config.woocommerce || {};
-    console.log('[WooCommerceClient] Initialisierte Daten:', woo);
-    this.baseUrl = woo.url || '';
-    this.consumerKey = woo.consumerKey || '';
-    this.consumerSecret = woo.consumerSecret || '';
-    this.validateConfig();
+class WooCommerceClient {
+  private get woo() {
+    return getConfig().woocommerce || {};
+  }
+
+  private get baseUrl() {
+    return this.woo.url || '';
+  }
+  private get consumerKey() {
+    return this.woo.consumerKey || '';
+  }
+  private get consumerSecret() {
+    return this.woo.consumerSecret || '';
   }
 
   private validateConfig() {
@@ -55,6 +60,12 @@ class WooCommerceClient {
     } else {
       console.log('✅ WooCommerce Client erfolgreich konfiguriert');
     }
+  }
+
+  constructor() {
+    const woo = this.woo;
+    console.log('[WooCommerceClient] Initialisierte Daten:', woo);
+    this.validateConfig();
   }
 
   private async makeRequest(endpoint: string, options: any = {}) {
