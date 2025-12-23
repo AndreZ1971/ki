@@ -2,7 +2,7 @@
 import { trendAnalysisJob } from './trendAnalysis';
 import { TrendData } from './trendAnalysis';
 import { wooPost } from '../../tools/woo';
-import { getOpenAIClient, executeOpenAI } from '../../utils/openai';
+import { getOpenAIClient, executeOpenAI } from '../../utils/openaiHelper';
 import { analyzeImage } from './image-analysis';
 import axios from 'axios';
 

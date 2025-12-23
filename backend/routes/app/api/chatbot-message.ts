@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 
 import { getConfig } from '@config';
 import { getShopStats, getSystemHealth } from '../../../services/shopData';
-import { getOpenAIClient, executeOpenAI } from '../../../utils/openai';
+import { getOpenAIClient, executeOpenAI } from '../../../utils/openaiHelper';
 
 dotenv.config();
 

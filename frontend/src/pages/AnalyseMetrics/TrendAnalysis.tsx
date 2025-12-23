@@ -179,7 +179,7 @@ const TrendAnalysis = () => {
           data.analysis.insights.slice(0, 8).map((i: any) => ({
             type: i.category?.toLowerCase() || "other",
             title: i.category,
-            value: i.finding?.substring(0, 30) + "..." || i.finding,
+            value: i.finding || "",
             detail: i.finding,
             score: i.confidence || 0.8,
           }))

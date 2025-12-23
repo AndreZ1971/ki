@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { getOpenAIClient, executeOpenAI } from '../../../../utils/openai';
+import { getOpenAIClient, executeOpenAI } from '../../../../utils/openaiHelper';
 
 interface DescriptionRequest {
   productName: string;

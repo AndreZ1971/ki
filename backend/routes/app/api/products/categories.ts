@@ -1,7 +1,7 @@
 
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import config from '../../../../config';
-import { getOpenAIClient, executeOpenAI } from '../../../../utils/openai';
+import { getOpenAIClient, executeOpenAI } from '../../../../utils/openaiHelper';
 
 interface Category {
   id: number;

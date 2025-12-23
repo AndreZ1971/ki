@@ -3,7 +3,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import fs from 'fs';
 import path from 'path';
 import { logger } from '../logger';
-import { executeOpenAI, getOpenAIClient } from '../utils/openai';
+import { executeOpenAI, getOpenAIClient } from '../utils/openaiHelper';
 
 function getServices() {
   const executionLogger = (global as any).executionLogger;

@@ -1,5 +1,5 @@
 // services/analyticsMLService.ts
-import { getOpenAIClient, executeOpenAI } from '../utils/openai';
+import { getOpenAIClient, executeOpenAI } from '../utils/openaiHelper';
 import config from '../config';
 
 const OPENAI_MODEL = config.openAI?.model?.trim() || 'gpt-4-turbo';
