@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import config from '../../../../config';
+import { getConfig } from '../../../../config';
 
 interface Freebie {
   id: number;
@@ -51,7 +51,7 @@ export default async function freebieRoutes(server: FastifyInstance) {
       try {
         // ✅ ECHTE Freebies aus WooCommerce (Produkte mit Preis = 0)
         // WooCommerce-Konfiguration aus zentraler connection.json
-        const wooConfig = config.woocommerce;
+        const wooConfig = getConfig().woocommerce || {};
 
         // Validiere WooCommerce-Konfiguration BEFORE fetch
         if (!wooConfig?.url || !wooConfig?.consumerKey || !wooConfig?.consumerSecret) {
@@ -157,7 +157,7 @@ export default async function freebieRoutes(server: FastifyInstance) {
         console.log('🎁 Creating freebie:', freebieData);
 
         // ✅ ECHTE WooCommerce Freebie-Erstellung - Nutze bereits geladene Config
-        const wooConfig = config.woocommerce;
+        const wooConfig = getConfig().woocommerce || {};
         
         if (!wooConfig?.url || !wooConfig?.consumerKey || !wooConfig?.consumerSecret) {
           console.error('❌ WooCommerce Config ungültig:', {
@@ -340,7 +340,7 @@ export default async function freebieRoutes(server: FastifyInstance) {
         // ✅ AI-basierte Freebie-Generierung mit OpenAI
         const OpenAI = (await import('openai')).default;
         const openai = new OpenAI({
-          apiKey: process.env.OPENAI_API_KEY
+          apiKey: getConfig().openAI?.apiKey
         });
 
         // Generiere Freebie-Idee mit OpenAI
@@ -384,11 +384,7 @@ Antworte mit einem JSON Objekt im Format:
         }
 
         // Erstelle Freebie in WooCommerce
-        const wooConfig = {
-          url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL,
-          consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY,
-          consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET,
-        };
+        const wooConfig = getConfig().woocommerce || {};
 
         if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
           throw new Error('WooCommerce-Konfiguration fehlt');
