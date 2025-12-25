@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import OpenAI from 'openai';
-import config from '../../../../config';
+import { getConfig } from '../../../../config';
 
 interface CreateProductBody {
   count: number;
@@ -67,20 +67,16 @@ export default async function productRoutes(server: FastifyInstance) {
 
 
         // WooCommerce Config aus zentraler config.json
-        const wooConfig = {
-          url: config.woocommerce?.url || '',
-          consumerKey: config.woocommerce?.consumerKey || '',
-          consumerSecret: config.woocommerce?.consumerSecret || '',
-        };
+        const wooConfig = getConfig().woocommerce || {};
         if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
           throw new Error('WooCommerce API nicht konfiguriert');
         }
 
         // OpenAI für Produktideen
         const openai = new OpenAI({
-          apiKey: config.openAI?.apiKey || ''
+          apiKey: getConfig().openAI?.apiKey || ''
         });
-        if (!config.openAI?.apiKey) {
+        if (!getConfig().openAI?.apiKey) {
           throw new Error('OpenAI API Key nicht konfiguriert');
         }
 
@@ -95,7 +91,7 @@ export default async function productRoutes(server: FastifyInstance) {
         const mlFilterText = mlMarketAnalysis ? 'Nutze Markt-/Trendwissen und ähnliche Shops, um nur passende Produkte vorzuschlagen.' : 'Kein ML-Filter, aber bleibe thematisch konsistent.';
 
         const prompt = `Generiere ${count} hochrelevante Produktideen für einen WooCommerce Shop.
-      Shop-URL: ${config.wordpress?.url || 'unbekannt'}
+      Shop-URL: ${getConfig().wordpress?.url || 'unbekannt'}
       Kategorie-ID: ${category}
       Produkttyp: ${productType}
       Optimierungsgrad: ${optimization}
@@ -428,11 +424,7 @@ export default async function productRoutes(server: FastifyInstance) {
         console.log('📥 Received product data:', JSON.stringify(productData, null, 2));
 
         // ✅ WooCommerce API Integration (aus zentraler config)
-        const wooConfig = {
-          url: config.woocommerce?.url || '',
-          consumerKey: config.woocommerce?.consumerKey || '',
-          consumerSecret: config.woocommerce?.consumerSecret || '',
-        };
+        const wooConfig = getConfig().woocommerce || {};
 
         if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
           throw new Error('WooCommerce API nicht konfiguriert');
@@ -531,16 +523,10 @@ export default async function productRoutes(server: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const wooConfig = {
-          url: config.woocommerce?.url || '',
-          consumerKey: config.woocommerce?.consumerKey || '',
-          consumerSecret: config.woocommerce?.consumerSecret || '',
-        };
-
+        const wooConfig = getConfig().woocommerce || {};
         if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
           throw new Error('WooCommerce-Konfiguration fehlt');
         }
-
         const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
 
         // Lade alle Produkte (max 100 pro Request)
@@ -607,16 +593,10 @@ export default async function productRoutes(server: FastifyInstance) {
 
         console.log(`🔄 Updating single product ${productId} with AI values:`, updatePayload);
 
-        const wooConfig = {
-          url: config.woocommerce?.url || '',
-          consumerKey: config.woocommerce?.consumerKey || '',
-          consumerSecret: config.woocommerce?.consumerSecret || '',
-        };
-
+        const wooConfig = getConfig().woocommerce || {};
         if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
           throw new Error('WooCommerce-Konfiguration fehlt');
         }
-
         const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
 
         const response = await fetch(`${wooConfig.url}/wp-json/wc/v3/products/${productId}`, {
@@ -678,16 +658,10 @@ export default async function productRoutes(server: FastifyInstance) {
           throw new Error('Keine Produkt-IDs angegeben');
         }
 
-        const wooConfig = {
-          url: config.woocommerce?.url || '',
-          consumerKey: config.woocommerce?.consumerKey || '',
-          consumerSecret: config.woocommerce?.consumerSecret || '',
-        };
-
+        const wooConfig = getConfig().woocommerce || {};
         if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
           throw new Error('WooCommerce-Konfiguration fehlt');
         }
-
         const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
 
         // Batch Update mit WooCommerce API
@@ -815,9 +789,9 @@ export default async function productRoutes(server: FastifyInstance) {
 
         // OpenAI für Produktideen
         const openai = new OpenAI({
-          apiKey: config.openAI?.apiKey || ''
+          apiKey: getConfig().openAI?.apiKey || ''
         });
-        if (!config.openAI?.apiKey) {
+        if (!getConfig().openAI?.apiKey) {
           throw new Error('OpenAI API Key nicht konfiguriert');
         }
 

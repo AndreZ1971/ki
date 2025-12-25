@@ -6,7 +6,7 @@ import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import fastifyMultipart from '@fastify/multipart';
 import dotenv from 'dotenv';
-import config from './config';
+import { getConfig } from './config';
 import Fastify from 'fastify';
 import fs from 'fs';
 import path from 'path';
@@ -132,6 +132,8 @@ if (!envLoaded) {
 setupErrorHandling();
 
 // Hinweis, falls OpenAI-Config fehlt
+
+const config = getConfig();
 if (!config.openAI?.apiKey) {
   console.warn('❌ OpenAI API-Key nicht in connection.json gefunden!');
   console.warn('💡 Bitte trage deinen OpenAI-Key in die connection.json ein.');

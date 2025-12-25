@@ -10,7 +10,7 @@
 import { AgenticLoop } from '../agenticLoop';
 import { logger } from '../../logger';
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
-import config from '../../config';
+import { getConfig } from '../../config';
 
 interface FailedOrder {
   id: number;
@@ -43,6 +43,8 @@ export class PaymentRecoveryLoop extends AgenticLoop {
   constructor() {
     super('payment-recovery', 4);
 
+
+    const config = getConfig();
     this.wooCommerce = new WooCommerceRestApi({
       url: config.woocommerce?.url || '',
       consumerKey: config.woocommerce?.consumerKey || '',

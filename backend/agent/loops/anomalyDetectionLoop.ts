@@ -10,7 +10,7 @@
 import { AgenticLoop } from '../agenticLoop';
 import { logger } from '../../logger';
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
-import config from '../../config';
+import { getConfig } from '../../config';
 
 interface PaymentAnomaly {
   orderId: number;
@@ -28,6 +28,8 @@ export class AnomalyDetectionLoop extends AgenticLoop {
   constructor() {
     super('anomaly-detection', 3);
 
+
+    const config = getConfig();
     this.wooCommerce = new WooCommerceRestApi({
       url: config.woocommerce?.url || '',
       consumerKey: config.woocommerce?.consumerKey || '',

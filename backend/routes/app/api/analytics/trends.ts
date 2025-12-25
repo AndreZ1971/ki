@@ -88,7 +88,7 @@ export default async function trendsRoutes(fastify: FastifyInstance) {
       if (res.ok) {
         orders = await res.json();
       }
-    } catch (err) {
+    } catch (_err) {
       // Ignoriere Fehler, KI kann auch ohne Kontext antworten
     }
     // Aggregiere Top-Produkte

@@ -1,8 +1,8 @@
 // backend/services/emailEnhancementService.ts
 import { getOpenAIClient, executeOpenAI } from '../utils/openaiHelper';
-import config from '../config';
+import { getConfig } from '../config';
 
-const OPENAI_MODEL = config.openAI?.model?.trim() || 'gpt-4-turbo';
+const OPENAI_MODEL = getConfig().openAI?.model?.trim() || 'gpt-4-turbo';
 
 export interface CustomerSegment {
   id: string;

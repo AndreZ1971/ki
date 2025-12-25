@@ -10,7 +10,7 @@
 
 // FÜGE DIESE ZEILE HINZU: Environment Variablen laden
 
-import config from '../config';
+import { getConfig } from '../config';
 
 import axios, { isAxiosError, type AxiosInstance } from 'axios';
 
@@ -23,6 +23,7 @@ const TIMEOUT_MS = Number(process.env.WOO_TIMEOUT_MS ?? 30000);
 
 function getWooConfig() {
   // Hole WooCommerce-Konfiguration aus connection.json (config.woocommerce)
+  const config = getConfig();
   const base = config.woocommerce?.url?.replace(/\/+$/, '') || '';
   const key = config.woocommerce?.consumerKey || '';
   const secret = config.woocommerce?.consumerSecret || '';

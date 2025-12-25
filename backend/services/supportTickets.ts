@@ -1,4 +1,4 @@
-import config from '../config';
+import { getConfig } from '../config';
 
 export type Ticket = {
   id: number | string;
@@ -42,6 +42,7 @@ function withPerPage(urlStr: string, perPage: number) {
 }
 
 export async function getTickets(): Promise<Ticket[]> {
+  const config = getConfig();
   const wpUrl = process.env.WORDPRESS_URL || config.wordpress?.url;
   const wpUser = process.env.WORDPRESS_USER || config.wordpress?.username;
   const wpAppPassword = process.env.WORDPRESS_APP_PASSWORD || config.wordpress?.appPassword;

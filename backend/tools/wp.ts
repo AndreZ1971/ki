@@ -32,9 +32,10 @@ const hasMessage = (v: unknown): v is { message: string } =>
   isRecord(v) && typeof (v as Record<string, unknown>).message === 'string';
 
 
-import config from '../config';
+import { getConfig } from '../config';
 
 function wpBase(): string {
+  const config = getConfig();
   const url = config.wordpress?.url?.replace(/\/+$/, '') || '';
   if (!url) throw new Error('WordPress URL fehlt in connection.json');
   return url;
@@ -42,6 +43,7 @@ function wpBase(): string {
 
 
 function wpAuthHeader(): string {
+  const config = getConfig();
   const user = config.wordpress?.username;
   const pass = config.wordpress?.appPassword;
   if (!user || !pass)

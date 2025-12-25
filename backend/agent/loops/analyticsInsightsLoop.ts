@@ -10,7 +10,7 @@
 import { AgenticLoop } from '../agenticLoop';
 import { logger } from '../../logger';
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
-import config from '../../config';
+import { getConfig } from '../../config';
 
 interface DashboardMetrics {
   revenue: { total: number; change: number };
@@ -45,6 +45,8 @@ export class AnalyticsInsightsLoop extends AgenticLoop {
   constructor() {
     super('analytics-insights', 4);
 
+
+    const config = getConfig();
     this.wooCommerce = new WooCommerceRestApi({
       url: config.woocommerce?.url || '',
       consumerKey: config.woocommerce?.consumerKey || '',

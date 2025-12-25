@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import config from '../../../../config';
+import { getConfig } from '../../../../config';
 
 interface Bundle {
   id: number;
@@ -24,7 +24,6 @@ interface CreateBundleBody {
 type UpdateBundleBody = Partial<CreateBundleBody>;
 
 export default async function bundleRoutes(server: FastifyInstance) {
-  
   // Get All Bundles
   server.get(
     '/',
@@ -38,12 +37,10 @@ export default async function bundleRoutes(server: FastifyInstance) {
       try {
         // ✅ ECHTE Bundle-Vorschläge aus WooCommerce Order-Daten
         // WooCommerce-Konfiguration aus zentraler connection.json
-        const wooConfig = {
-          url: config.woocommerce?.url,
-          consumerKey: config.woocommerce?.consumerKey,
-          consumerSecret: config.woocommerce?.consumerSecret,
-        };
-
+        const wooConfig = getConfig().woocommerce;
+        if (!wooConfig || !wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
+          throw new Error('WooCommerce-Konfiguration fehlt oder unvollständig.');
+        }
         const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
         
         // Lade abgeschlossene Orders der letzten 90 Tage
@@ -162,7 +159,7 @@ export default async function bundleRoutes(server: FastifyInstance) {
         console.log('📦 Creating bundle:', bundleData);
 
         // ✅ ECHTE WooCommerce Bundle-Erstellung - Nutze bereits geladene Config
-        const wooConfig = config.woocommerce;
+        const wooConfig = getConfig().woocommerce;
 
         if (!wooConfig?.url || !wooConfig?.consumerKey || !wooConfig?.consumerSecret) {
           console.error('❌ WooCommerce Config ungültig:', {

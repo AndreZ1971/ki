@@ -10,7 +10,7 @@
 import { AgenticLoop } from '../agenticLoop';
 import { logger } from '../../logger';
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
-import config from '../../config';
+import { getConfig } from '../../config';
 
 interface ProductVariant {
   productId: number;
@@ -37,6 +37,8 @@ export class ProductOptimizationLoop extends AgenticLoop {
   constructor() {
     super('product-optimization', 5);
 
+
+    const config = getConfig();
     this.wooCommerce = new WooCommerceRestApi({
       url: config.woocommerce?.url || '',
       consumerKey: config.woocommerce?.consumerKey || '',
