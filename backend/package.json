@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "build": "tsc && npm run copy-module-alias",
-      "copy-module-alias": "copy module-alias.js dist\\",
+    "copy-module-alias": "cp module-alias.js dist/",
     "dev": "tsc && node --watch dist/server.js",
     "dev:agent": "tsx watch agent/planner.ts",
     "start": "node dist/server.js",
