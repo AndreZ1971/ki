@@ -282,10 +282,24 @@ async function buildServer() {
     // CORS
     // CORS als erstes Plugin registrieren
     await server.register(cors, {
-      origin:
-        process.env.NODE_ENV === 'production'
-          ? ['https://my-working-space.de']
-          : ['http://localhost:5173', 'http://localhost:3000'],
+      origin: (origin, cb) => {
+        // Erlaube alle Subdomains und die Hauptdomain von my-working-space.de
+        if (
+          process.env.NODE_ENV === 'production' &&
+          origin &&
+          (/\.my-working-space\.de$/.test(origin) || origin === 'https://my-working-space.de')
+        ) {
+          cb(null, true);
+        } else if (
+          !origin || // z.B. für Server-zu-Server oder lokale Tests
+          origin === 'http://localhost:5173' ||
+          origin === 'http://localhost:3000'
+        ) {
+          cb(null, true);
+        } else {
+          cb(new Error('Nicht erlaubter Origin: ' + origin), false);
+        }
+      },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     });
