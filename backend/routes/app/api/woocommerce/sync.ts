@@ -1,6 +1,7 @@
 // backend/routes/app/api/woocommerce/sync.ts
 import { FastifyPluginAsync } from 'fastify';
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
+import https from 'https';
 import { getConfig } from '@config';
 
 interface SyncResult {
@@ -46,8 +47,14 @@ const syncRoutes: FastifyPluginAsync = async (fastify) => {
     return true;
   };
 
-  const createWooClient = (useQueryStringAuth: boolean) =>
-    new WooCommerceRestApi({
+  const createWooClient = (useQueryStringAuth: boolean) => {
+    // Debug-Ausgabe für SSL und Verbindung
+    console.log('[WooSync] Erstelle WooCommerceRestApi-Client mit URL:', wooCfg.url);
+    // https.Agent mit systemweiten CAs (wie curl)
+    const agent = new https.Agent({
+      rejectUnauthorized: true, // SSL-Validierung aktiv
+    });
+    return new WooCommerceRestApi({
       url: wooCfg.url || '',
       consumerKey: wooCfg.consumerKey || '',
       consumerSecret: wooCfg.consumerSecret || '',
@@ -55,8 +62,10 @@ const syncRoutes: FastifyPluginAsync = async (fastify) => {
       queryStringAuth: useQueryStringAuth,
       axiosConfig: {
         timeout: wooCfg.timeoutMs ? Number(wooCfg.timeoutMs) : 30000,
+        httpsAgent: agent,
       },
     });
+  };
 
   const preferQuery = wooCfg?.authMode === 'query';
   const wooPrimary = createWooClient(preferQuery);

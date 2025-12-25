@@ -2,6 +2,8 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import transporter from '../../../../services/emailService.js';
 import { getConfig } from '@config';
+import https from 'https';
+import axios from 'axios';
 
 interface SendCampaignBody {
   campaignName: string;
@@ -49,18 +51,18 @@ export default async function emailMarketingRoutes(server: FastifyInstance) {
       const auth = Buffer.from(`${woocommerce.consumerKey}:${woocommerce.consumerSecret}`).toString('base64');
 
       // Lade alle Bestellungen (nicht Kunden, da WooCommerce oft keine separaten Customer-Records hat)
-      const response = await fetch(`${woocommerce.url}/wp-json/wc/v3/orders?per_page=100&status=completed`, {
+      const agent = new https.Agent({ rejectUnauthorized: true });
+      const axiosResponse = await axios.get(`${woocommerce.url}/wp-json/wc/v3/orders?per_page=100&status=completed`, {
         headers: {
           'Authorization': `Basic ${auth}`,
           'Content-Type': 'application/json',
         },
+        httpsAgent: agent,
       });
-
-      if (!response.ok) {
-        throw new Error(`WooCommerce API Error: ${response.status}`);
+      if (axiosResponse.status < 200 || axiosResponse.status >= 300) {
+        throw new Error(`WooCommerce API Error: ${axiosResponse.status}`);
       }
-
-      const orders = await response.json();
+      const orders = axiosResponse.data;
 
       // Extrahiere unique E-Mail-Adressen aus Bestellungen
       const customerEmails = new Map<string, { email: string; dateCreated: Date; lastOrder: Date }>();
@@ -151,18 +153,18 @@ export default async function emailMarketingRoutes(server: FastifyInstance) {
         const auth = Buffer.from(`${woocommerce.consumerKey}:${woocommerce.consumerSecret}`).toString('base64');
 
         // Lade Bestellungen aus WooCommerce
-        const response = await fetch(`${woocommerce.url}/wp-json/wc/v3/orders?per_page=100&status=completed`, {
+        const agent = new https.Agent({ rejectUnauthorized: true });
+        const axiosResponse = await axios.get(`${woocommerce.url}/wp-json/wc/v3/orders?per_page=100&status=completed`, {
           headers: {
             'Authorization': `Basic ${auth}`,
             'Content-Type': 'application/json',
           },
+          httpsAgent: agent,
         });
-
-        if (!response.ok) {
-          throw new Error(`WooCommerce API Error: ${response.status}`);
+        if (axiosResponse.status < 200 || axiosResponse.status >= 300) {
+          throw new Error(`WooCommerce API Error: ${axiosResponse.status}`);
         }
-
-        const orders = await response.json();
+        const orders = axiosResponse.data;
 
         // Extrahiere unique Kunden aus Bestellungen
         const customerMap = new Map<string, { email: string; name: string; dateCreated: Date; lastOrder: Date }>();

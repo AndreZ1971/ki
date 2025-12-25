@@ -261,6 +261,97 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
     }
   });
 
+  // GET: Kundensegmente (analog zu /api/marketing/conversion/segments)
+  fastify.get('/segments', async (_request, reply) => {
+    try {
+      const { woocommerce } = getConfig();
+      const wooConfig = {
+        url: process.env.WOOCOMMERCE_URL || process.env.WOO_URL || woocommerce?.url,
+        consumerKey: process.env.CONSUMER_KEY || process.env.WOOCOMMERCE_CONSUMER_KEY || woocommerce?.consumerKey,
+        consumerSecret: process.env.CONSUMER_SECRET || process.env.WOOCOMMERCE_CONSUMER_SECRET || woocommerce?.consumerSecret,
+      };
+
+      if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
+        throw new Error('WooCommerce Konfiguration fehlt (url/consumerKey/consumerSecret). Bitte .env oder connection.json prüfen.');
+      }
+
+      const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
+      const ordersResponse = await fetch(`${wooConfig.url}/wp-json/wc/v3/orders?per_page=100&status=completed`, {
+        headers: { 'Authorization': `Basic ${auth}`, 'Content-Type': 'application/json' },
+      });
+
+      if (!ordersResponse.ok) {
+        throw new Error('WooCommerce API Error');
+      }
+
+      const orders = await ordersResponse.json();
+      const customerMap = new Map();
+      orders.forEach((order: any) => {
+        const email = order.billing?.email;
+        if (!email) return;
+        if (customerMap.has(email)) {
+          customerMap.get(email).orders.push(order);
+        } else {
+          customerMap.set(email, { email, orders: [order] });
+        }
+      });
+      const customers = Array.from(customerMap.values());
+      const now = new Date();
+      const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+      const segments = {
+        inactive: { count: 0, conversionRate: 8 },
+        oneTime: { count: 0, conversionRate: 15 },
+        abandonedCart: { count: 0, conversionRate: 22 },
+        lowValue: { count: 0, conversionRate: 12 }
+      };
+      let totalOrderValue = 0;
+      const totalOrders = orders.length;
+      customers.forEach((customer: any) => {
+        const customerOrders = customer.orders;
+        const lastOrderDate = customerOrders.length > 0
+          ? new Date(Math.max(...customerOrders.map((o: any) => new Date(o.date_created).getTime())))
+          : null;
+        if (!lastOrderDate || lastOrderDate < ninetyDaysAgo) {
+          segments.inactive.count++;
+        }
+        if (customerOrders.length === 1) {
+          segments.oneTime.count++;
+        }
+        const customerValue = customerOrders.reduce((sum: number, order: any) => sum + parseFloat(order.total), 0);
+        if (customerOrders.length > 0) {
+          totalOrderValue += customerValue;
+        }
+      });
+      const avgOrderValue = totalOrders > 0 ? totalOrderValue / totalOrders : 0;
+      customers.forEach((customer: any) => {
+        const customerValue = customer.orders.reduce((sum: number, order: any) => sum + parseFloat(order.total), 0);
+        if (customer.orders.length > 0 && customerValue < avgOrderValue) {
+          segments.lowValue.count++;
+        }
+      });
+      segments.abandonedCart.count = Math.round(customers.length * 0.15);
+      return reply.send({
+        success: true,
+        data: {
+          inactive: segments.inactive,
+          oneTime: segments.oneTime,
+          abandonedCart: segments.abandonedCart,
+          lowValue: segments.lowValue,
+          currentConversions: Math.round(totalOrders * 0.12),
+          targetConversions: Math.round(totalOrders * 0.20),
+          totalUsers: customers.length,
+          avgOrderValue: Math.round(avgOrderValue * 100) / 100
+        }
+      });
+    } catch (_error) {
+      console.error('❌ Fehler beim Laden der Kundensegmente:', _error);
+      return reply.status(500).send({
+        success: false,
+        error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
+      });
+    }
+  });
+
   // GET: WooCommerce Health (Connectivity & Config Überblick)
   fastify.get('/health', async (_request, reply) => {
     const woo = getConfig().woocommerce || {};
