@@ -198,6 +198,7 @@ async function buildServer() {
     },
     // Body Limit erhöhen
     bodyLimit: 1048576 * 100, // 100MB
+    requestTimeout: 300000, // 5 Minuten Timeout für lange Requests
   });
 
   // Debug-Route: Gibt alle registrierten Routen als Text zurück
