@@ -65,6 +65,11 @@ export default async function productRoutes(server: FastifyInstance) {
         } = request.body;
         console.log('🤖 Auto-creating products:', { count, category, productType, optimization, keywords, seoOptimized, mlMarketAnalysis, generateImages });
 
+        // Debug: Logge OpenAI-Key und Model
+        const openAIKey = getConfig().openAI?.apiKey;
+        const openAIModel = getConfig().openAI?.model;
+        console.log('[auto-create] OpenAI-Key:', openAIKey ? openAIKey.substring(0, 8) + '...' : 'NICHT VORHANDEN');
+        console.log('[auto-create] OpenAI-Model:', openAIModel);
 
         // WooCommerce Config aus zentraler config.json
         const wooConfig = getConfig().woocommerce || {};
@@ -74,9 +79,9 @@ export default async function productRoutes(server: FastifyInstance) {
 
         // OpenAI für Produktideen
         const openai = new OpenAI({
-          apiKey: getConfig().openAI?.apiKey || ''
+          apiKey: openAIKey || ''
         });
-        if (!getConfig().openAI?.apiKey) {
+        if (!openAIKey) {
           throw new Error('OpenAI API Key nicht konfiguriert');
         }
 
