@@ -8,6 +8,72 @@ import {
 import { logger } from '../../../../logger';
 
 /**
+ * ARI Spezialisierungs-Dateiformat (.ari-spec)
+ * 
+ * Format-Spezifikation:
+ * - Extension: .ari-spec oder .json (muss Format validieren)
+ * - Inhalt: Signierte Spezialisierungs-Datei von kaufe-es.eu
+ * - Struktur: { format: "ari-specialization", version: "1.0", data: {...} }
+ */
+export interface ARISpecializationFile {
+  format: "ari-specialization";
+  version: "1.0";
+  issuer: "kaufe-es.eu";
+  timestamp: number;
+  signature: string;
+  data: {
+    id: string;
+    name: string;
+    description: string;
+    systemPrompt: string;
+    category?: string;
+    icon?: string;
+    version?: string;
+    contextInstructions?: string[];
+    examplePrompts?: string[];
+    features?: string[];
+  };
+}
+
+/**
+ * Validiert, dass eine Datei das .ari-spec Format erfüllt
+ */
+function validateARISpecFormat(data: Record<string, unknown>): {
+  valid: boolean;
+  error?: string;
+} {
+  // Prüfe ob Pflichtfelder für ARI-Spec vorhanden sind
+  if (data.format !== "ari-specialization") {
+    return {
+      valid: false,
+      error: 'Format muss "ari-specialization" sein',
+    };
+  }
+
+  if (!data.data || typeof data.data !== "object") {
+    return {
+      valid: false,
+      error: 'Feld "data" ist erforderlich',
+    };
+  }
+
+  const specData = data.data as Record<string, unknown>;
+
+  // Prüfe erforderliche Felder
+  const requiredFields = ["id", "name", "description", "systemPrompt"];
+  for (const field of requiredFields) {
+    if (!specData[field]) {
+      return {
+        valid: false,
+        error: `Erforderliches Feld fehlt: ${field}`,
+      };
+    }
+  }
+
+  return { valid: true };
+}
+
+/**
  * Spezialisierungs-Routen
  * Endpoints für Upload, Verwaltung und Aktivierung von Spezialisierungen
  */
@@ -161,268 +227,6 @@ export default async function specializationRoutes(server: FastifyInstance) {
         return reply.status(500).send({
           success: false,
           error: 'Fehler beim Installieren der Spezialisierung',
-        });
-      }
-    }
-  );
-
-  /**
-   * POST /api/settings/specialization/upload
-   * Lädt eine Spezialisierungs-Datei vom Settings-Frontend hoch
-   * Akzeptiert JSON/CSV mit FormData
-   *
-   * Security Features:
-   * - Input Sanitization
-   * - File Integrity Verification
-   * - Audit Logging
-   * - Rate Limiting Support
-   * - Encrypted Storage
-   */
-  server.post<{ Body: unknown }>(
-    '/api/settings/specialization/upload',
-    {
-      schema: {
-        tags: ['specializations'],
-        summary: 'Upload specialization from settings',
-        description:
-          'Upload specialization file (JSON/CSV) directly from frontend settings with enhanced security',
-        response: {
-          200: {
-            type: 'object',
-            properties: {
-              success: { type: 'boolean' },
-              message: { type: 'string' },
-              data: {
-                type: 'object',
-                properties: {
-                  id: { type: 'string' },
-                  name: { type: 'string' },
-                  checksum: { type: 'string' },
-                },
-              },
-            },
-          },
-          400: {
-            type: 'object',
-            properties: {
-              success: { type: 'boolean' },
-              error: { type: 'string' },
-              code: { type: 'string' },
-            },
-          },
-          413: {
-            type: 'object',
-            properties: {
-              success: { type: 'boolean' },
-              error: { type: 'string' },
-              code: { type: 'string' },
-            },
-          },
-          429: {
-            type: 'object',
-            properties: {
-              success: { type: 'boolean' },
-              error: { type: 'string' },
-              code: { type: 'string' },
-            },
-          },
-        },
-      },
-    },
-    async (request: FastifyRequest, reply: FastifyReply) => {
-      const uploadStartTime = Date.now();
-      let fileName = '';
-      let fileSize = 0;
-      let fileChecksum = '';
-
-      try {
-        // Extract user ID from headers or use default
-        const userId = (request.headers['x-user-id'] as string) || 'default';
-        const uploadId = crypto.randomUUID();
-
-        logger.debug(
-          `📋 Upload-Session gestartet: ${uploadId} | User: ${userId}`
-        );
-
-        // Get file from request
-        const data = await request.file();
-
-        if (!data) {
-          logger.warn(
-            `⚠️ Upload ${uploadId} fehlergeschlagen: Keine Datei übertragen`
-          );
-          return reply.status(400).send({
-            success: false,
-            error: 'Keine Datei hochgeladen',
-            code: 'NO_FILE_PROVIDED',
-          });
-        }
-
-        fileName = data.filename;
-        fileSize = data.file.readableLength || 0;
-
-        // Validate file extension
-        const fileExtension = fileName.split('.').pop()?.toLowerCase();
-        if (!['json', 'csv'].includes(fileExtension || '')) {
-          logger.warn(
-            `⚠️ Upload ${uploadId} fehlergeschlagen: Ungültiger Dateityp ${fileExtension}`
-          );
-          return reply.status(400).send({
-            success: false,
-            error: 'Nur .json oder .csv Dateien sind erlaubt',
-            code: 'INVALID_FILE_TYPE',
-          });
-        }
-
-        // Validate file size (max 5MB)
-        const MAX_FILE_SIZE = 5 * 1024 * 1024;
-        if (fileSize > MAX_FILE_SIZE) {
-          logger.warn(
-            `⚠️ Upload ${uploadId} fehlergeschlagen: Datei zu groß (${fileSize} bytes > ${MAX_FILE_SIZE} bytes)`
-          );
-          return reply.status(413).send({
-            success: false,
-            error: `Datei zu groß (${(fileSize / 1024 / 1024).toFixed(2)}MB > 5MB)`,
-            code: 'FILE_TOO_LARGE',
-          });
-        }
-
-        // Read file content
-        const buffer = await data.toBuffer();
-        const content = buffer.toString('utf-8');
-
-        // Calculate file checksum for integrity verification
-        fileChecksum = crypto.createHash('sha256').update(buffer).digest('hex');
-
-        logger.debug(
-          `✓ Datei geladen: ${fileName} (${(fileSize / 1024).toFixed(2)}KB) | Checksum: ${fileChecksum.substring(0, 8)}...`
-        );
-
-        // Parse content
-        let specialization: Record<string, unknown>;
-
-        try {
-          if (fileExtension === 'csv') {
-            // Parse CSV to JSON
-            const lines = content
-              .trim()
-              .split('\n')
-              .map((line) => line.trim())
-              .filter((line) => line.length > 0);
-
-            if (lines.length < 2) {
-              throw new Error(
-                'CSV muss mindestens 2 Zeilen haben (Header + Daten)'
-              );
-            }
-
-            const headers = lines[0].split(',').map((h) => h.trim());
-            const values = lines[1].split(',').map((v) => v.trim());
-
-            specialization = {};
-            headers.forEach((header, index) => {
-              specialization[header] = values[index] || '';
-            });
-          } else {
-            // Parse JSON
-            specialization = JSON.parse(content);
-          }
-        } catch (parseError) {
-          const errorMsg =
-            parseError instanceof Error
-              ? parseError.message
-              : 'Unbekannter Parse-Fehler';
-          logger.warn(
-            `⚠️ Upload ${uploadId} fehlergeschlagen: Parse-Fehler - ${errorMsg}`
-          );
-          return reply.status(400).send({
-            success: false,
-            error: `Ungültiges ${fileExtension?.toUpperCase() || 'Datei'}-Format: ${errorMsg}`,
-            code: 'INVALID_FILE_FORMAT',
-          });
-        }
-
-        // Validate required fields
-        const requiredFields = ['id', 'name', 'systemPrompt', 'description'];
-        const missingFields = requiredFields.filter(
-          (field) => !specialization[field]
-        );
-
-        if (missingFields.length > 0) {
-          logger.warn(
-            `⚠️ Upload ${uploadId} fehlergeschlagen: Fehlende Felder - ${missingFields.join(', ')}`
-          );
-          return reply.status(400).send({
-            success: false,
-            error: `Erforderliche Felder fehlen: ${missingFields.join(', ')}`,
-            code: 'MISSING_REQUIRED_FIELDS',
-          });
-        }
-
-        // Sanitize specialization data
-        specialization = sanitizeSpecializationData(specialization);
-
-        logger.debug(
-          `✓ Validation erfolgreich | ID: ${specialization.id} | Name: ${specialization.name}`
-        );
-
-        // Store specialization (encrypted)
-        const stored = await SpecializationService.encryptAndStore(
-          specialization as unknown as SpecializationData,
-          userId
-        );
-
-        const uploadDuration = Date.now() - uploadStartTime;
-
-        // Audit logging
-        logger.info(
-          {
-            uploadId,
-            userId,
-            specializationId: stored.id,
-            specializationName: stored.name,
-            fileName,
-            fileSize,
-            fileChecksum: fileChecksum.substring(0, 16),
-            duration: uploadDuration,
-            status: 'SUCCESS',
-          },
-          `✅ Spezialisierung erfolgreich hochgeladen: ${stored.name}`
-        );
-
-        return reply.send({
-          success: true,
-          message: `Spezialisierung "${stored.name}" erfolgreich installiert!`,
-          data: {
-            id: stored.id,
-            name: stored.name,
-            checksum: fileChecksum,
-          },
-        });
-      } catch (error) {
-        const uploadDuration = Date.now() - uploadStartTime;
-        const errorMessage =
-          error instanceof Error ? error.message : 'Unbekannter Fehler';
-
-        // Error audit logging
-        logger.error(
-          {
-            uploadId: crypto.randomUUID(),
-            fileName,
-            fileSize,
-            fileChecksum: fileChecksum.substring(0, 16),
-            duration: uploadDuration,
-            error: errorMessage,
-            stack: error instanceof Error ? error.stack : undefined,
-            status: 'ERROR',
-          },
-          `❌ Fehler beim Settings-Upload: ${errorMessage}`
-        );
-
-        return reply.status(400).send({
-          success: false,
-          error: `Upload fehlgeschlagen: ${errorMessage}`,
-          code: 'UPLOAD_FAILED',
         });
       }
     }

@@ -649,9 +649,9 @@ const start = async () => {
     await SpecializationPersistenceManager.initialize();
     console.log('✅ Persistence Manager bereit');
 
-    // 🔄 Auto-Load für Default-User initialisieren (optional)
-    // Falls du einen Standard-User hast, kannst du hier dessen Spezialisierung laden:
-    // await initializeSpecializationAutoLoad('default-user');
+    // 🔄 Auto-Load für Default-User initialisieren
+    console.log('🔄 Lade aktive Spezialisierung...');
+    await _initializeSpecializationAutoLoad('default');
 
     const server = await buildServer();
 

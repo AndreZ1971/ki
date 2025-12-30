@@ -234,7 +234,7 @@ const Settings = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<
-    "connection" | "specialization" | "license" | "social" | "agentic"
+    "connection" | "specialization" | "subscription" | "social" | "agentic"
   >("connection");
   const [testingConnection, setTestingConnection] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<
@@ -455,9 +455,9 @@ const Settings = () => {
     reader.readAsText(file);
   };
 
-  // Lizenz-Daten
-  const [licenseKey, setLicenseKey] = useState("");
-  const [activatingLicense, setActivatingLicense] = useState(false);
+  // Subscription-Daten (Platzhalter, wird von Automattic aktualisiert)
+  const [subscriptionEndDate, _setSubscriptionEndDate] = useState<Date | null>(null);
+  const [renewalUrl, _setRenewalUrl] = useState<string | null>(null);
 
   // Verfügbare Spezialisierungen
   const [specializations] = useState<Specialization[]>([
@@ -680,10 +680,12 @@ const Settings = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
+    // Validate file type - only .ari-spec or .json (which must be .ari-spec format)
     const fileExtension = file.name.split(".").pop()?.toLowerCase();
-    if (!["json", "csv"].includes(fileExtension || "")) {
-      setConnectionMessage("❌ Nur .json oder .csv Dateien sind erlaubt");
+    if (!["ari-spec", "json"].includes(fileExtension || "")) {
+      setConnectionMessage(
+        "❌ Nur .ari-spec oder .json Dateien (im ARI-Spezialisierungs-Format) sind erlaubt"
+      );
       return;
     }
 
@@ -709,41 +711,25 @@ const Settings = () => {
       // Parse and validate content
       let specialization: Record<string, unknown>;
 
-      if (fileExtension === "json") {
-        try {
-          specialization = JSON.parse(fileContent);
-        } catch (_error) {
-          setConnectionMessage(
-            "❌ Ungültiges JSON-Format. Bitte überprüfe die Datei."
-          );
-          setTestingConnection(false);
-          return;
-        }
-      } else if (fileExtension === "csv") {
-        // Simple CSV parsing - convert to JSON
-        const lines = fileContent.trim().split("\n");
-        const headers = lines[0]?.split(",").map((h) => h.trim()) || [];
-        const values = lines[1]?.split(",").map((v) => v.trim()) || [];
-
-        specialization = {};
-        headers.forEach((header, index) => {
-          specialization[header] = values[index] || "";
-        });
-      } else {
-        setConnectionMessage("❌ Dateiformat nicht unterstützt");
+      try {
+        specialization = JSON.parse(fileContent);
+      } catch (_error) {
+        setConnectionMessage(
+          "❌ Ungültiges JSON-Format. Bitte überprüfe die Datei."
+        );
         setTestingConnection(false);
         return;
       }
 
-      // Validate required fields
-      const requiredFields = ["id", "name", "systemPrompt", "description"];
-      const missingFields = requiredFields.filter(
-        (field) => !specialization[field]
-      );
-
-      if (missingFields.length > 0) {
+      // Validate ARI format (must have: format, version, issuer, data)
+      if (
+        !specialization.format ||
+        !specialization.version ||
+        !specialization.issuer ||
+        !specialization.data
+      ) {
         setConnectionMessage(
-          `❌ Erforderliche Felder fehlen: ${missingFields.join(", ")}`
+          "❌ Datei ist nicht im ARI-Spezialisierungs-Format. Erforderlich: format, version, issuer, data"
         );
         setTestingConnection(false);
         return;
@@ -751,11 +737,10 @@ const Settings = () => {
 
       // Upload to backend
       const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
-      const uploadUrl = `${apiUrl}/api/settings/specialization/upload`;
+      const uploadUrl = `${apiUrl}/api/specializations/upload`;
 
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("specialization", JSON.stringify(specialization));
 
       const response = await fetch(uploadUrl, {
         method: "POST",
@@ -765,18 +750,23 @@ const Settings = () => {
         },
       });
 
+      const responseData = (await response.json()) as { 
+        success?: boolean;
+        message?: string;
+        error?: string;
+      };
+
       if (!response.ok) {
-        const errorData = (await response.json()) as { message?: string };
         throw new Error(
-          errorData.message ||
+          responseData.error || 
+          responseData.message ||
             `Upload fehlgeschlagen (Status: ${response.status})`
         );
       }
 
-      (await response.json()) as {
-        success?: boolean;
-        message?: string;
-      };
+      if (!responseData.success) {
+        throw new Error(responseData.message || "Upload fehlgeschlagen");
+      }
 
       setConnectionMessage(
         `✅ ${file.name} erfolgreich hochgeladen! Agent wird neu gestartet...`
@@ -936,24 +926,13 @@ const Settings = () => {
     }
   };
 
-  const activateLicense = async () => {
-    if (!licenseKey) {
-      alert("❌ Bitte gib einen Lizenzschlüssel ein");
-      return;
-    }
-
-    setActivatingLicense(true);
-
-    try {
-      // Simuliere Lizenz-Aktivierung
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log("🔑 Lizenz aktiviert:", licenseKey);
-      alert("✅ Lizenz erfolgreich aktiviert!");
-    } catch (error) {
-      console.error("❌ Lizenz-Aktivierung fehlgeschlagen:", error);
-      alert("❌ Ungültiger Lizenzschlüssel");
-    } finally {
-      setActivatingLicense(false);
+  const handleRenewSubscription = () => {
+    if (renewalUrl) {
+      window.open(renewalUrl, "_blank");
+    } else {
+      setConnectionMessage(
+        "❌ Erneuerungslink nicht verfügbar. Kontaktieren Sie den Support."
+      );
     }
   };
 
@@ -1039,8 +1018,8 @@ const Settings = () => {
               color: "#8b5cf6",
             },
             {
-              id: "license",
-              label: t("settings.tabs.license"),
+              id: "subscription",
+              label: t("settings.tabs.subscription") || "Subscription",
               color: "#10b981",
             },
             {
@@ -2517,7 +2496,7 @@ const Settings = () => {
                 {t("settings.specialization.uploadButton")}
                 <input
                   type="file"
-                  accept=".json,.csv"
+                  accept=".ari-spec,.json"
                   onChange={handleSpecializationUpload}
                   style={{ display: "none" }}
                 />
@@ -2526,12 +2505,13 @@ const Settings = () => {
           </div>
         )}
 
-        {/* TAB 3: Lizenz */}
-        {activeTab === "license" && (
+        {/* TAB 3: Subscription (Laufzeit) */}
+        {activeTab === "subscription" && (
           <div>
-            <h3>{t("settings.license.title")}</h3>
+            <h3>⏱️ {t("settings.subscription.title") || "Subscription & Laufzeit"}</h3>
             <p style={{ color: "rgba(255,255,255,0.9)", marginBottom: "30px" }}>
-              {t("settings.license.subtitle")}
+              {t("settings.subscription.subtitle") ||
+                "Verwalte deine Container-Laufzeit und Spezialisierungen"}
             </p>
 
             <div
@@ -2542,72 +2522,94 @@ const Settings = () => {
                 maxWidth: "600px",
               }}
             >
-              <div style={{ marginBottom: "20px" }}>
-                <label
-                  style={{
-                    display: "block",
-                    marginBottom: "10px",
-                    color: "rgba(255,255,255,0.9)",
-                    fontSize: "16px",
-                  }}
-                >
-                  {t("settings.license.enterKey")}
-                </label>
-                <input
-                  type="text"
-                  placeholder="XXXX-XXXX-XXXX-XXXX"
-                  value={licenseKey}
-                  onChange={(e) => setLicenseKey(e.target.value.toUpperCase())}
-                  style={{
-                    width: "100%",
-                    padding: "15px",
-                    background: "rgba(0,0,0,0.3)",
-                    border: "2px solid rgba(255,255,255,0.2)",
-                    borderRadius: "8px",
-                    color: "white",
-                    fontSize: "18px",
-                    fontFamily: "monospace",
-                    textAlign: "center",
-                    letterSpacing: "2px",
-                  }}
-                />
+              {/* Subscription Runtime Display */}
+              <div
+                style={{
+                  background: "rgba(59, 130, 246, 0.1)",
+                  border: "2px solid #3b82f6",
+                  padding: "20px",
+                  borderRadius: "10px",
+                  marginBottom: "20px",
+                }}
+              >
+                <div style={{ marginBottom: "15px" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "8px",
+                      color: "rgba(255,255,255,0.8)",
+                      fontSize: "14px",
+                      fontWeight: "600",
+                    }}
+                  >
+                    📅 Gültig bis:
+                  </label>
+                  <div
+                    style={{
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                      color: "#3b82f6",
+                      fontFamily: "monospace",
+                    }}
+                  >
+                    {subscriptionEndDate
+                      ? subscriptionEndDate.toLocaleDateString("de-DE", {
+                          weekday: "long",
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })
+                      : "Platzhalter: Wird von Automattic aktualisiert"}
+                  </div>
+                </div>
+
                 <small
                   style={{
-                    color: "rgba(255,255,255,0.5)",
+                    color: "rgba(255,255,255,0.6)",
                     fontSize: "12px",
-                    marginTop: "8px",
                     display: "block",
                   }}
                 >
-                  {t("settings.license.keyHint")}
+                  Nach Ablauf wird dein Container automatisch von Kubernetes
+                  beendet.
                 </small>
               </div>
 
+              {/* Renew Button */}
               <button
-                onClick={activateLicense}
-                disabled={activatingLicense || !licenseKey}
+                onClick={handleRenewSubscription}
+                disabled={!renewalUrl}
                 style={{
                   width: "100%",
                   padding: "15px",
-                  background:
-                    activatingLicense || !licenseKey
-                      ? "rgba(100,100,100,0.3)"
-                      : "linear-gradient(135deg, #22c55e, #16a34a)",
+                  background: renewalUrl
+                    ? "linear-gradient(135deg, #22c55e, #16a34a)"
+                    : "rgba(100,100,100,0.3)",
                   border: "none",
                   borderRadius: "8px",
                   color: "white",
-                  cursor:
-                    activatingLicense || !licenseKey
-                      ? "not-allowed"
-                      : "pointer",
+                  cursor: renewalUrl ? "pointer" : "not-allowed",
                   fontSize: "16px",
                   fontWeight: "bold",
+                  marginBottom: "10px",
                 }}
               >
-                {activatingLicense
-                  ? t("settings.license.activating")
-                  : t("settings.license.activateLicense")}
+                {renewalUrl
+                  ? "🔄 Subscription erneuern"
+                  : "⏳ Erneuerungslink wird von Automattic bereitgestellt"}
               </button>
+
+              <small
+                style={{
+                  color: "rgba(255,255,255,0.6)",
+                  fontSize: "12px",
+                  display: "block",
+                  textAlign: "center",
+                }}
+              >
+                Automattic wird die Erneuerungs-URL und Laufzeit-Daten
+                automatisch aktualisieren
+              </small>
             </div>
 
             {/* Aktive Lizenzen */}

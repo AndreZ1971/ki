@@ -44,6 +44,7 @@
 4. **Produkt ist sofort mit Bild & SEO online** – Kein manuelles Hochladen oder Bearbeiten nötig
 
 **Hinweis:**
+
 - Die KI-Bildgenerierung nutzt OpenAI DALL·E. Ein OpenAI API-Key muss in der `connection.json` hinterlegt sein.
 - Die SEO-Analyse erfolgt automatisch im Hintergrund. Bei Fehlern wird ein Standard-Alt-Text verwendet.
 
@@ -68,11 +69,13 @@ So startest du die KI-Agent-Plattform als Endnutzer ganz ohne Quellcode-Installa
    docker compose up -d
    ```
 
+   # Bedienungsanleitung KI-Agent
+
 3. **Frontend öffnen**
    - Öffne deinen Browser und rufe `http://localhost:5173` auf.
    - Speichere die Einstellungen.
 
-5. **System nutzen**
+4. **System nutzen**
    - Alle Funktionen sind jetzt einsatzbereit.
    - Bei Problemen wende dich an den Support.
 
@@ -88,6 +91,7 @@ So startest du die KI-Agent-Plattform als Endnutzer ganz ohne Quellcode-Installa
 
 1. **Datenquelle auswählen** - Wählen Sie die zu analysierenden Daten (Umsätze, Kunden, Conversions)
 2. **Regionen definieren** - Legen Sie geografische Bereiche fest (Länder, Bundesländer, Postleitzahlen)
+
 #### Erweiterte Funktionen
 
 - Automatische Hotspot-Erkennung
@@ -101,11 +105,13 @@ So startest du die KI-Agent-Plattform als Endnutzer ganz ohne Quellcode-Installa
 #### Was kann ich mit ConversionAnalysis machen?
 
 #### Wie nutze ich ConversionAnalysis?
+
 1. **Conversion-Ziel definieren** - Was ist eine erfolgreiche Conversion? (Kauf, Anmeldung, Download)
 2. **Datenquellen verbinden** - Google Analytics, Shop-System, CRM
 3. **Funnel erstellen** - Definieren Sie die einzelnen Schritte zum Ziel
 4. **Analysezeitraum festlegen** - Wählen Sie den zu analysierenden Zeitraum
 5. **Auswertung starten** - Klicken Sie auf "Conversion-Analyse starten"
+
 - Funnel-Abbruchquoten
 - Zeit bis zur Conversion
 - Wert pro Conversion
@@ -118,11 +124,12 @@ So startest du die KI-Agent-Plattform als Endnutzer ganz ohne Quellcode-Installa
 
 - Automatische Conversion-Reporting
 - Echtzeit-Benachrichtigungen bei Conversions
+
 1. **Reporting-Ziele festlegen** - Welche Conversions sollen getrackt werden?
-3. **Berichtsvorlagen wählen** - Täglich, wöchentlich, monatlich
-4. **KPIs definieren** - Welche Kennzahlen sind wichtig?
-5. **Automation aktivieren** - "Automatisches Reporting aktivieren"
-6. **Dashboards einrichten** - Personalisierte Übersichts-Dashboards
+2. **Berichtsvorlagen wählen** - Täglich, wöchentlich, monatlich
+3. **KPIs definieren** - Welche Kennzahlen sind wichtig?
+4. **Automation aktivieren** - "Automatisches Reporting aktivieren"
+5. **Dashboards einrichten** - Personalisierte Übersichts-Dashboards
 
 #### Features
 
@@ -699,6 +706,7 @@ Fehlerbehebung:
 **Das Feedback-System nutzt echte Support-Tickets. Dafür wird folgendes Plugin vorausgesetzt:**
 
 **Plugin**: Welcome to Awesome Support 6.3.6 (oder kompatible Version)
+
 - **REST-Endpunkt**: `/wp-json/wpas-api/v1/tickets`
 - **Authentifizierung**: WordPress App Password (Basic Auth)
 - **Daten**: Echte Support-Tickets mit Titel, Beschreibung, Status, Priorität
