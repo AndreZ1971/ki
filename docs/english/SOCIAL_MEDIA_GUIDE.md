@@ -1,18 +1,18 @@
-# 📣 Social Media – Konsolidierte Anleitung & API
+# 📣 Social Media – Consolidated Guide & API
 
 Version: 1.0.0
-Letzte Aktualisierung: Dezember 2025
+Last Updated: December 2025
 
 ---
 
-## Überblick
+## Overview
 
-Dieses Dokument vereint Setup, Berechtigungen, Umgebungsvariablen und Test-APIs für Facebook/Instagram (Meta) und TikTok.
+This document combines setup, permissions, environment variables, and test APIs for Facebook/Instagram (Meta) and TikTok.
 
 - Meta: Facebook Page Posting, Instagram Business Publishing
-- TikTok: Video Publishing über Business API
+- TikTok: Video Publishing via Business API
 
-Gesamtfluss: Entwickler-Konten → App anlegen → Berechtigungen → OAuth/Token → Credentials in `.env` → Test-APIs
+Complete flow: Developer Accounts → Create App → Permissions → OAuth/Token → Credentials in `.env` → Test APIs
 
 ---
 
@@ -20,31 +20,31 @@ Gesamtfluss: Entwickler-Konten → App anlegen → Berechtigungen → OAuth/Toke
 
 1. Meta Developer Account: developers.facebook.com → My Apps → Create App (Business)
 2. Settings → Basic: App ID, App Secret, App Domains (`kaufe-es.eu`), Website
-3. Produkte hinzufügen:
+3. Add Products:
    - Facebook Login → Valid OAuth Redirect URIs:
      - https://kaufe-es.eu/api/auth/facebook/callback
      - http://localhost:3000/api/auth/facebook/callback
-   - Instagram → Business Account verknüpfen, Facebook Page auswählen
-4. Permissions beantragen:
+   - Instagram → Link Business Account, Select Facebook Page
+4. Request Permissions:
    - instagram_basic, instagram_content_publish
    - pages_read_engagement, pages_manage_posts
-5. App Review: Gründe erläutern, Formulare ausfüllen, Approval abwarten
-6. Page Access Token generieren (Graph API Explorer), Instagram Business Account ID notieren
+5. App Review: Explain purposes, Fill out forms, Await Approval
+6. Generate Page Access Token (Graph API Explorer), Note Instagram Business Account ID
 
 ---
 
 ## Setup – TikTok for Business
 
 1. developers.tiktok.com → My Apps → Create App
-2. App Infos: Name, Kategorie (Marketing), Website
+2. App Info: Name, Category (Marketing), Website
 3. Credentials: Client Key, Client Secret
 4. OAuth Redirect URI: https://kaufe-es.eu/api/auth/tiktok/callback
 5. Scopes: user.info.basic, video.publish, video.list
-6. Review mit Beschreibung, Use Case, Screenshots
+6. Review with Description, Use Case, Screenshots
 
 ---
 
-## Konfiguration – `.env` (Backend)
+## Configuration – `.env` (Backend)
 
 Meta (Facebook + Instagram):
 - META_APP_ID
@@ -59,42 +59,42 @@ TikTok:
 - TIKTOK_REDIRECT_URI (https://kaufe-es.eu/api/auth/tiktok/callback)
 
 Callbacks:
-- OAUTH_CALLBACK_BASE_URL (z. B. https://kaufe-es.eu)
+- OAUTH_CALLBACK_BASE_URL (e.g. https://kaufe-es.eu)
 
 ---
 
-## Test-APIs
+## Test APIs
 
 Facebook Post:
 curl -X POST http://localhost:3000/api/marketing/social/post -H "Content-Type: application/json" -d '{"platform":"facebook","message":"Test Post 🚀","link":"https://kaufe-es.eu"}'
 
 Instagram Post:
-curl -X POST http://localhost:3000/api/marketing/social/post -H "Content-Type: application/json" -d '{"platform":"instagram","caption":"Neues Produkt! 🛍️ #kaufees","image_url":"https://kaufe-es.eu/images/product.jpg"}'
+curl -X POST http://localhost:3000/api/marketing/social/post -H "Content-Type: application/json" -d '{"platform":"instagram","caption":"New Product! 🛍️ #kaufees","image_url":"https://kaufe-es.eu/images/product.jpg"}'
 
 TikTok Video:
 curl -X POST http://localhost:3000/api/marketing/social/post -H "Content-Type: application/json" -d '{"platform":"tiktok","video_url":"https://kaufe-es.eu/videos/promo.mp4","caption":"Check out Kaufe.es! #shopping"}'
 
-Hinweise:
-- Für Instagram ist ein öffentlich erreichbares Bild (`image_url`) erforderlich.
-- Für TikTok muss das Video den Plattform-Richtlinien entsprechen.
+Notes:
+- For Instagram, a publicly accessible image (`image_url`) is required.
+- For TikTok, the video must comply with platform guidelines.
 
 ---
 
 ## Troubleshooting
 
-- 401/403 bei Meta: Prüfe App Review, Permissions und Token Gültigkeit.
-- Instagram Publish schlägt fehl: Business Account verknüpft? Richtige Permissions? Bild-URL erreichbar?
-- TikTok OAuth Fehler: Redirect URI exakt wie registriert, Scopes gesetzt.
-- Rate Limits: API Antworten prüfen, Backoff/Retry implementieren.
+- 401/403 with Meta: Check App Review, Permissions, and Token validity.
+- Instagram Publish fails: Business Account linked? Correct Permissions? Image URL accessible?
+- TikTok OAuth Error: Redirect URI exact as registered, Scopes set.
+- Rate Limits: Check API responses, Implement Backoff/Retry.
 
 ---
 
-## Nächste Schritte
+## Next Steps
 
-- Credentials eintragen, Backend neu starten, Test-Posts durchführen.
-- Automatisches Social Posting aus Produkt-Workflows integrieren.
-- Logging/Alerts für fehlgeschlagene Publishes in `backend/error-handling` nutzen.
+- Enter credentials, Restart backend, Run test posts.
+- Integrate automatic Social Posting from product workflows.
+- Use Logging/Alerts for failed publishes in `backend/error-handling`.
 
-Siehe auch:
-- docs/README.md → API-Übersicht
-- docs/TIKTOK_PROMPTS.md → Content-Ideen
+See also:
+- docs/README.md → API Overview
+- docs/TIKTOK_PROMPTS.md → Content Ideas
