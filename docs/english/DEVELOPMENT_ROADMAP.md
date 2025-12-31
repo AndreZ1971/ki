@@ -1,112 +1,112 @@
-# 🚀 KI-Agent Entwicklungs-Roadmap & Update-Strategie
+# 🚀 KI-Agent Development Roadmap & Update Strategy
 
-**Version:** 1.0.0 | **Datum:** Dezember 2025 | **Status:** Aktive Entwicklung
+**Version:** 1.0.0 | **Date:** December 2025 | **Status:** Active Development
 
 ---
 
-## 📋 Inhaltsverzeichnis
+## 📋 Table of Contents
 
 1. [Vision](#vision)
-2. [Update-Strategie](#update-strategie)
-3. [Release-Roadmap](#release-roadmap)
-4. [Implementierungs-Phasen](#implementierungs-phasen)
-5. [Qualitätssicherung](#qualitätssicherung)
+2. [Update Strategy](#update-strategy)
+3. [Release Roadmap](#release-roadmap)
+4. [Implementation Phases](#implementation-phases)
+5. [Quality Assurance](#quality-assurance)
 6. [Breaking Changes Management](#breaking-changes-management)
 
 ---
 
 ## 🎯 Vision
 
-**Mission:** Produktionsreifer KI-Agent für E-Commerce mit **robuster Konfiguration**, **perfektem Onboarding** und **hoher Skalierbarkeit**.
+**Mission:** Production-ready AI Agent for E-Commerce with **robust configuration**, **perfect onboarding** and **high scalability**.
 
-**Kernziele:**
-- ✅ Fehlertoleranz beim Setup erhöhen
-- ✅ Datensicherheit durch Validierung und Verschlüsselung
-- ✅ Nutzerfreundlichkeit durch Wizards und Dokumentation
-- ✅ Produktion skalierbar (Multi-Tenant, Cloud-Ready)
-- ✅ Transparente Update-Mechanismen
+**Core Goals:**
+- ✅ Increase fault tolerance during setup
+- ✅ Data security through validation and encryption
+- ✅ User-friendliness through wizards and documentation
+- ✅ Production scalability (Multi-Tenant, Cloud-Ready)
+- ✅ Transparent update mechanisms
 
 ---
 
-## 🔄 Update-Strategie
+## 🔄 Update Strategy
 
-### Versionierungsschema: Semantic Versioning (SemVer)
+### Versioning Schema: Semantic Versioning (SemVer)
 
 ```
 MAJOR.MINOR.PATCH
   |      |      |
-  |      |      └─ Bugfixes (z.B. 5.0.1 → 5.0.2)
-  |      └─────────  Features, backwards-compatible (z.B. 5.0.0 → 5.1.0)
-  └────────────────  Breaking Changes (z.B. 5.0.0 → 6.0.0)
+  |      |      └─ Bugfixes (e.g. 5.0.1 → 5.0.2)
+  |      └─────────  Features, backwards-compatible (e.g. 5.0.0 → 5.1.0)
+  └────────────────  Breaking Changes (e.g. 5.0.0 → 6.0.0)
 ```
 
-### Release-Cadence
+### Release Cadence
 
-| Phase      | Kadenz         | Scope                              | Deployment         |
+| Phase      | Cadence        | Scope                              | Deployment         |
 | ---------- | -------------- | ---------------------------------- | ------------------ |
-| **Alpha**  | Wöchentlich    | Neue Features, Breaking Changes ok | Dev/Staging        |
-| **Beta**   | Bi-wöchentlich | Feature-Complete, Stabilisierung   | Staging/Early Prod |
-| **RC**     | Nach Bedarf    | Final Bugfixes, Performance        | Staging only       |
-| **Stable** | Monatlich      | Production-Ready                   | Production         |
+| **Alpha**  | Weekly         | New Features, Breaking Changes OK  | Dev/Staging        |
+| **Beta**   | Bi-weekly      | Feature-Complete, Stabilization    | Staging/Early Prod  |
+| **RC**     | As Needed      | Final Bugfixes, Performance        | Staging only       |
+| **Stable** | Monthly        | Production-Ready                   | Production         |
 
 ### Backward Compatibility Policy
 
 ```
-✅ IMMER unterstützen:
-   - connection.json Format (mit Migration)
-   - API Endpoints (alte Versionen: /api/v1, /api/v2)
-   - Database Schemas (mit Migrations)
+✅ ALWAYS support:
+   - connection.json format (with migration)
+   - API endpoints (old versions: /api/v1, /api/v2)
+   - Database schemas (with migrations)
 
-⚠️  WARNUNG (1-2 Versionen vorher ankündigen):
-   - Deprecated Endpoints
-   - Schema Changes
-   - Behavior Changes
+⚠️  WARNING (announce 1-2 versions before):
+   - Deprecated endpoints
+   - Schema changes
+   - Behavior changes
 
 ❌ BREAKING CHANGES:
-   - Nur in MAJOR Versions
-   - Mit ausführlicher Migration Guide
-   - Mindestens 6 Monate Vorankündigung
+   - Only in MAJOR versions
+   - With detailed migration guide
+   - At least 6 months advance notice
 ```
 
-### Update-Prozess für Nutzer
+### User Update Process
 
 ```
 ┌─────────────────────────────────────────────────┐
-│ Nutzer erhält Update-Benachrichtigung           │
+│ User receives update notification               │
 │ (Docker Image Tag, Release Notes, Changelog)    │
 └────────────┬────────────────────────────────────┘
              │
              ▼
 ┌─────────────────────────────────────────────────┐
 │ 1. PRE-UPDATE CHECK                             │
-│    - Config Backup erstellen                    │
-│    - Health Check durchführen                   │
-│    - Speicherplatz prüfen                       │
+│    - Create config backup                       │
+│    - Perform health check                       │
+│    - Check disk space                           │
 └────────────┬────────────────────────────────────┘
              │
              ▼
 ┌─────────────────────────────────────────────────┐
 │ 2. UPDATE EXECUTE                               │
-│    - Neues Container Image pullen               │
-│    - Alte Volumes mitnehmen                     │
-│    - Graceful Shutdown (30s timeout)            │
+│    - Pull new container image                   │
+│    - Keep old volumes                           │
+│    - Graceful shutdown (30s timeout)            │
 └────────────┬────────────────────────────────────┘
              │
              ▼
 ┌─────────────────────────────────────────────────┐
 │ 3. POST-UPDATE VALIDATION                       │
-│    - Config Migration bei Bedarf                │
-│    - Database Migrations applyen                │
-│    - Health Check starten                       │
-│    - Smoke Tests durchführen                    │
+│    - Config migration if needed                 │
+│    - Apply database migrations                  │
+│    - Start health check                         │
+│    - Run smoke tests                            │
 └────────────┬────────────────────────────────────┘
              │
              ▼
 ┌─────────────────────────────────────────────────┐
-│ 4. ROLLBACK (bei Fehler)                        │
-│    - Config Backup wiederherstellen             │
-│    - Altes Container Image starten              │
-│    - Logs für Debug sammeln                     │
+│ 4. ROLLBACK (on error)                          │
+│    - Restore config backup                      │
+│    - Start old container image                  │
+│    - Collect logs for debugging                 │
 └────────────┬────────────────────────────────────┘
              │
              ▼
@@ -115,108 +115,108 @@ MAJOR.MINOR.PATCH
 
 ---
 
-## 📊 Release-Roadmap
+## 📊 Release Roadmap
 
-### 🔴 **v5.1.0 - Configuration Hardening** (Diese Woche)
-**Fokus:** Robuste Konfiguration, sichere Data Persistence
+### 🔴 **v5.1.0 - Configuration Hardening** (This Week)
+**Focus:** Robust configuration, secure data persistence
 
-| Item                 | Beschreibung                                         | Status | Priority |
+| Item                 | Description                                         | Status | Priority |
 | -------------------- | ---------------------------------------------------- | ------ | -------- |
-| Social Media Storage | Speichern in connection.json                         | 🔴      | P0       |
+| Social Media Storage | Store in connection.json                             | 🔴      | P0       |
 | API Tests            | OpenAI, SMTP, Reddit, Support                        | 🔴      | P0       |
-| Field Validation     | URL, Email, Required Fields Backend-seitig           | 🔴      | P0       |
-| API Key Masking      | Besseres Masking-System (kein Plaintext Log)         | 🔴      | P0       |
-| Error Categorization | Network vs. Auth vs. Validation Errors               | 🔴      | P0       |
-| Init Script          | Perfektes connection.json Template mit allen Feldern | 🔴      | P0       |
+| Field Validation     | URL, Email, Required Fields backend-side             | 🔴      | P0       |
+| API Key Masking      | Better masking system (no plaintext logs)            | 🔴      | P0       |
+| Error Categorization | Network vs. Auth vs. Validation errors               | 🔴      | P0       |
+| Init Script          | Perfect connection.json template with all fields     | 🔴      | P0       |
 
-**Breaking Changes:** Keine  
-**Migration:** Automatisch (alte connection.json wird gemappt)  
-**Expected Release:** 19-20 Dez 2025
+**Breaking Changes:** None  
+**Migration:** Automatic (old connection.json gets mapped)  
+**Expected Release:** Dec 19-20, 2025
 
 ---
 
-### 🟡 **v5.2.0 - Configuration Safety** (Nächste Woche)
-**Fokus:** Backup, Validierung, Monitoring
+### 🟡 **v5.2.0 - Configuration Safety** (Next Week)
+**Focus:** Backup, validation, monitoring
 
-| Item                     | Beschreibung                              | Status | Priority |
+| Item                     | Description                              | Status | Priority |
 | ------------------------ | ----------------------------------------- | ------ | -------- |
-| Config Backup            | Auto-Backup vor jedem Save                | 🟡      | P1       |
-| Dependency Validation    | Feature braucht Service Warning           | 🟡      | P1       |
+| Config Backup            | Auto-backup before each save              | 🟡      | P1       |
+| Dependency Validation    | Feature needs service warning             | 🟡      | P1       |
 | Onboarding Complete Flag | Flag in connection.json                   | 🟡      | P1       |
-| Health Check API         | GET /api/health mit Status aller Services | 🟡      | P1       |
-| Field Documentation      | Inline Help für jeden Field               | 🟡      | P2       |
-| Config Diff Viewer       | Siehe was sich geändert hat vor Save      | 🟡      | P2       |
+| Health Check API         | GET /api/health with all services status  | 🟡      | P1       |
+| Field Documentation      | Inline help for each field                | 🟡      | P2       |
+| Config Diff Viewer       | See what changed before save              | 🟡      | P2       |
 
-**Breaking Changes:** Keine  
-**Migration:** Automatisch (onboardingComplete Flag wird gesetzt)  
-**Expected Release:** 23-27 Dez 2025
+**Breaking Changes:** None  
+**Migration:** Automatic (onboardingComplete flag gets set)  
+**Expected Release:** Dec 23-27, 2025
 
 ---
 
-### 🟢 **v5.3.0 - Onboarding UX** (Anfang Januar)
-**Fokus:** Setup Wizard, bessere Dokumentation, OAuth Flow
+### 🟢 **v5.3.0 - Onboarding UX** (Early January)
+**Focus:** Setup wizard, better documentation, OAuth flow
 
-| Item                    | Beschreibung                    | Status | Priority |
+| Item                    | Description                    | Status | Priority |
 | ----------------------- | ------------------------------- | ------ | -------- |
-| Setup Wizard            | Step-by-Step Guided Setup       | 🟢      | P2       |
-| OAuth Integration       | OAuth Flow für Social Media     | 🟢      | P2       |
-| API Documentation       | Detaillierte Docs pro API-Key   | 🟢      | P2       |
-| Video Walkthroughs      | Setup Videos für Non-Tech Users | 🟢      | P3       |
-| Setup Progress Tracking | Zeige Fortschritt im Setup      | 🟢      | P3       |
+| Setup Wizard            | Step-by-step guided setup       | 🟢      | P2       |
+| OAuth Integration       | OAuth flow for social media     | 🟢      | P2       |
+| API Documentation       | Detailed docs per API key       | 🟢      | P2       |
+| Video Walkthroughs      | Setup videos for non-tech users | 🟢      | P3       |
+| Setup Progress Tracking | Show progress in setup          | 🟢      | P3       |
 
-**Breaking Changes:** Keine  
-**Migration:** Keine  
-**Expected Release:** 06-10 Jan 2026
+**Breaking Changes:** None  
+**Migration:** None  
+**Expected Release:** Jan 6-10, 2026
 
 ---
 
-### 🟣 **v5.4.0 - Security & Encryption** (Mid Januar)
-**Fokus:** Secrets Management, Verschlüsselung, Audit Logging
+### 🟣 **v5.4.0 - Security & Encryption** (Mid January)
+**Focus:** Secrets management, encryption, audit logging
 
-| Item                 | Beschreibung                                | Status | Priority |
+| Item                 | Description                                | Status | Priority |
 | -------------------- | ------------------------------------------- | ------ | -------- |
-| API Key Encryption   | Verschlüssele sensible Keys at-rest         | 🟣      | P1       |
-| Audit Logging        | Logge alle Config Changes                   | 🟣      | P1       |
-| Config Versionierung | Rollback zu alten Configs möglich           | 🟣      | P2       |
-| Secrets Rotation     | Automatische Key-Rotation für External APIs | 🟣      | P2       |
-| RBAC für Settings    | Role-Based Access Control auf Config-Level  | 🟣      | P3       |
+| API Key Encryption   | Encrypt sensitive keys at-rest              | 🟣      | P1       |
+| Audit Logging        | Log all config changes                      | 🟣      | P1       |
+| Config Versioning    | Rollback to old configs possible            | 🟣      | P2       |
+| Secrets Rotation     | Automatic key rotation for external APIs    | 🟣      | P2       |
+| RBAC for Settings    | Role-based access control on config level   | 🟣      | P3       |
 
-**Breaking Changes:** Ja (Keys werden verschlüsselt)  
-**Migration:** Auto-Encryption beim Update  
-**Expected Release:** 15-20 Jan 2026
+**Breaking Changes:** Yes (keys will be encrypted)  
+**Migration:** Auto-encryption on update  
+**Expected Release:** Jan 15-20, 2026
 
 ---
 
-### 🔵 **v6.0.0 - Multi-Tenant Ready** (Februar)
-**Fokus:** Skalierbarkeit, Multi-Tenant, Cloud-Native
+### 🔵 **v6.0.0 - Multi-Tenant Ready** (February)
+**Focus:** Scalability, multi-tenant, cloud-native
 
-| Item                        | Beschreibung                                    | Status | Priority |
+| Item                        | Description                                    | Status | Priority |
 | --------------------------- | ----------------------------------------------- | ------ | -------- |
 | Database Migration          | connection.json → PostgreSQL                    | 🔵      | P0       |
-| Multi-Tenant Support        | Mehrere Orgs pro Agent                          | 🔵      | P0       |
-| Config API v2               | RESTful Config Management                       | 🔵      | P0       |
-| Kubernetes Operators        | K8s CRDs für Config Management                  | 🔵      | P1       |
+| Multi-Tenant Support        | Multiple organizations per agent                | 🔵      | P0       |
+| Config API v2               | RESTful config management                       | 🔵      | P0       |
+| Kubernetes Operators        | K8s CRDs for config management                  | 🔵      | P1       |
 | Secrets Manager Integration | AWS Secrets, Azure KeyVault, GCP Secret Manager | 🔵      | P1       |
 
-**Breaking Changes:** Ja (große Architektur-Changes)  
-**Migration:** Guided Migration Tool  
-**Expected Release:** 20-28 Feb 2026
+**Breaking Changes:** Yes (major architecture changes)  
+**Migration:** Guided migration tool  
+**Expected Release:** Feb 20-28, 2026
 
 ---
 
-## 🎯 Implementierungs-Phasen
+## 🎯 Implementation Phases
 
-### Phase 1: **Configuration Hardening (v5.1.0)** ⏱️ Diese Woche
+### Phase 1: **Configuration Hardening (v5.1.0)** ⏱️ This Week
 
-#### Schritt 1a: Init-Script perfektionieren
+#### Step 1a: Perfectionize init script
 ```bash
 # backend/docker-entrypoint.sh (UPDATED)
 ```
-- Alle Felder mit korrekten Platzhaltern
-- Struktur matcht 100% connection.json Schema
-- Comments für jedes Feld
+- All fields with correct placeholders
+- Structure matches 100% connection.json schema
+- Comments for each field
 
-#### Schritt 1b: Social Media zu connection.json hinzufügen
+#### Step 1b: Add social media to connection.json
 ```typescript
 // backend/connection.json
 {
@@ -228,7 +228,7 @@ MAJOR.MINOR.PATCH
 }
 ```
 
-#### Schritt 1c: API Tests erweitern
+#### Step 1c: Expand API tests
 ```typescript
 // backend/routes/app/api/settings/connection.ts - POST /connection/test
 testOpenAI()
@@ -237,7 +237,7 @@ testReddit()
 testSupport()
 ```
 
-#### Schritt 1d: Feldvalidierung implementieren
+#### Step 1d: Implement field validation
 ```typescript
 // backend/services/configValidator.ts (NEW)
 validateUrl(url)
@@ -247,42 +247,42 @@ validateApiKey(key)
 validatePortNumber(port)
 ```
 
-#### Schritt 1e: Besseres Masking-System
+#### Step 1e: Better masking system
 ```typescript
-// Nicht: Speichern mit **** Markierung
-// Sondern: Nie im Response senden, nur im Frontend maskieren
+// Not: Save with **** marking
+// Instead: Never send in response, only mask in frontend
 ```
 
-#### Schritt 1f: Error Handling verbessern
+#### Step 1f: Improve error handling
 ```typescript
-// Unterscheide:
-- NetworkError (Host nicht erreichbar)
-- AuthenticationError (Invalid Credentials)
-- ValidationError (Ungültiges Format)
-- TimeoutError (Zu lange gewartet)
+// Distinguish:
+- NetworkError (host unreachable)
+- AuthenticationError (invalid credentials)
+- ValidationError (invalid format)
+- TimeoutError (waited too long)
 ```
 
 ---
 
-### Phase 2: **Configuration Safety (v5.2.0)** ⏱️ Nächste Woche
+### Phase 2: **Configuration Safety (v5.2.0)** ⏱️ Next Week
 
-#### Schritt 2a: Config Backup System
+#### Step 2a: Config backup system
 ```typescript
 // backend/data/backups/
 //   - 2025-12-19_14-32-45.json (Auto)
 //   - 2025-12-19_14-32-40.json (Before Save)
-// Max 10 Backups, älteste löschen
+// Max 10 backups, delete oldest
 ```
 
-#### Schritt 2b: Dependency Validation
+#### Step 2b: Dependency validation
 ```typescript
-// Beispiel:
+// Example:
 if (enableEmailMarketing && !smtpConfigured) {
-  warning: "Email Marketing braucht SMTP-Konfiguration"
+  warning: "Email Marketing requires SMTP configuration"
 }
 ```
 
-#### Schritt 2c: Health Check API
+#### Step 2c: Health check API
 ```typescript
 // GET /api/health
 {
@@ -296,7 +296,7 @@ if (enableEmailMarketing && !smtpConfigured) {
 }
 ```
 
-#### Schritt 2d: Onboarding Flag
+#### Step 2d: Onboarding flag
 ```json
 {
   "onboarding": {
@@ -310,43 +310,43 @@ if (enableEmailMarketing && !smtpConfigured) {
 
 ---
 
-### Phase 3: **Onboarding UX (v5.3.0)** ⏱️ Anfang Januar
+### Phase 3: **Onboarding UX (v5.3.0)** ⏱️ Early January
 
-#### Schritt 3a: Setup Wizard
+#### Step 3a: Setup wizard
 ```
-Step 1: Required Services (WordPress, WooCommerce, OpenAI)
+Step 1: Required services (WordPress, WooCommerce, OpenAI)
 Step 2: Communication (SMTP, Webhooks)
-Step 3: Optional Features (Social Media, Analytics, ML)
-Step 4: Review & Test All
-Step 5: Go Live
+Step 3: Optional features (Social Media, Analytics, ML)
+Step 4: Review & test all
+Step 5: Go live
 ```
 
-#### Schritt 3b: Inline Dokumentation
+#### Step 3b: Inline documentation
 ```
 Field: "WooCommerce Consumer Key"
-Help: "Wo finde ich das?
-  1. WooCommerce Dashboard öffnen
+Help: "Where do I find it?
+  1. Open WooCommerce Dashboard
   2. Settings → Apps & Extensions
-  3. REST API klicken
-  4. Unter 'Connected apps' → 'Generate new token'
-  5. Kopiere den Wert von 'Consumer Key'
+  3. Click REST API
+  4. Under 'Connected apps' → 'Generate new token'
+  5. Copy the value from 'Consumer Key'
   
-  🔒 Sicherheit: Teile diesen Wert mit niemandem!"
+  🔒 Security: Never share this value with anyone!"
 ```
 
 ---
 
-### Phase 4: **Security & Encryption (v5.4.0)** ⏱️ Mid Januar
+### Phase 4: **Security & Encryption (v5.4.0)** ⏱️ Mid January
 
-#### Schritt 4a: Encryption-at-Rest
+#### Step 4a: Encryption at rest
 ```typescript
-// Beim Save:
+// On save:
 const encrypted = encryptSecrets(credentials, masterKey);
-// Beim Load:
+// On load:
 const decrypted = decryptSecrets(encrypted, masterKey);
 ```
 
-#### Schritt 4b: Audit Logging
+#### Step 4b: Audit logging
 ```typescript
 // audit_log.json
 {
@@ -364,9 +364,9 @@ const decrypted = decryptSecrets(encrypted, masterKey);
 
 ---
 
-### Phase 5: **Multi-Tenant Ready (v6.0.0)** ⏱️ Februar
+### Phase 5: **Multi-Tenant Ready (v6.0.0)** ⏱️ February
 
-#### Schritt 5a: Database Migration
+#### Step 5a: Database migration
 ```sql
 CREATE TABLE organizations (
   id UUID PRIMARY KEY,
@@ -384,7 +384,7 @@ CREATE TABLE configurations (
 );
 ```
 
-#### Schritt 5b: Multi-Tenant API
+#### Step 5b: Multi-tenant API
 ```
 GET    /api/orgs/:orgId/config
 POST   /api/orgs/:orgId/config
@@ -396,22 +396,22 @@ POST   /api/orgs/:orgId/config/restore/:backupId
 
 ---
 
-## ✅ Qualitätssicherung
+## ✅ Quality Assurance
 
 ### Pre-Release Checklist
 
-- [ ] TypeScript: `npm run build` erfolgreich
+- [ ] TypeScript: `npm run build` successful
 - [ ] Linting: `npm run lint` (0 warnings)
 - [ ] Tests: `npm run test` (>90% coverage)
-- [ ] E2E: Playwright Tests bestanden
-- [ ] Security: OWASP Top 10 Review
-- [ ] Performance: Keine Regression vs. Baseline
-- [ ] Documentation: README + API Docs aktualisiert
-- [ ] Changelog: Alle Changes dokumentiert
-- [ ] Migration: Alte Daten migrieren erfolgreich
-- [ ] Staging: Deployed und getestet auf staging.example.com
+- [ ] E2E: Playwright tests passed
+- [ ] Security: OWASP Top 10 review
+- [ ] Performance: No regression vs. baseline
+- [ ] Documentation: README + API Docs updated
+- [ ] Changelog: All changes documented
+- [ ] Migration: Old data migrates successfully
+- [ ] Staging: Deployed and tested on staging.example.com
 
-### Test-Matrix
+### Test Matrix
 
 | Component       | Unit | Integration | E2E | Manual |
 | --------------- | ---- | ----------- | --- | ------ |
@@ -425,73 +425,73 @@ POST   /api/orgs/:orgId/config/restore/:backupId
 
 ## 🚨 Breaking Changes Management
 
-### Wenn Breaking Changes nötig sind:
+### When breaking changes are necessary:
 
-1. **Ankündigung (2 Versions früher):**
+1. **Announcement (2 versions earlier):**
    ```
    v5.1.0 Release Notes:
-   ⚠️  BREAKING in v6.0.0: connection.json wird zu PostgreSQL
-       Migrationsleitfaden: siehe docs/MIGRATION_v6.md
+   ⚠️  BREAKING in v6.0.0: connection.json will move to PostgreSQL
+       Migration guide: see docs/MIGRATION_v6.md
    ```
 
-2. **Dokumentation:**
-   - Migration Guide schreiben
-   - Vor/Nach Beispiele
-   - Troubleshooting Section
+2. **Documentation:**
+   - Write migration guide
+   - Provide before/after examples
+   - Include troubleshooting section
 
-3. **Tools bereitstellen:**
-   - Auto-Migration Script
-   - Rollback Script
-   - Validation Tool
+3. **Provide tools:**
+   - Auto-migration script
+   - Rollback script
+   - Validation tool
 
 4. **Support:**
-   - Migration Support Channel
-   - Video Walkthrough
-   - Live Support Hours
+   - Migration support channel
+   - Video walkthrough
+   - Live support hours
 
 ---
 
-## 📈 Metriken & Monitoring
+## 📈 Metrics & Monitoring
 
-Wir tracken für Updates:
+We track the following for updates:
 
 ```
-- Adoption Rate: % Nutzer auf neuester Version
-- Error Rate: % Failed Updates
-- Rollback Rate: % Updates die zurückgerollt wurden
-- Performance: Änderung in Response Time nach Update
-- User Satisfaction: Support Tickets + Feedback
+- Adoption rate: % of users on latest version
+- Error rate: % of failed updates
+- Rollback rate: % of updates that were rolled back
+- Performance: Change in response time after update
+- User satisfaction: Support tickets + feedback
 ```
 
 ---
 
-## 🔗 Zusammenhang zu bestehenden Dokumenten
+## 🔗 Relationship to Existing Documents
 
-| Dokument                                                       | Bezug zu Roadmap                                       |
-| -------------------------------------------------------------- | ------------------------------------------------------ |
-| [AGENTIC_LOOP_ARCHITECTURE.md](./AGENTIC_LOOP_ARCHITECTURE.md) | Loop Scheduling wird in v5.2 erweitert (Health Checks) |
-| [AGENTIC_CONFIGURATION.md](./AGENTIC_CONFIGURATION.md)         | Config System ist Hauptfokus v5.1-v5.4                 |
-| [Onboarding.md](./Onboarding.md)                               | Wird komplett rewritten in v5.3 (Setup Wizard)         |
-| [Troubleshooting.md](./Troubleshooting.md)                     | Erweitert um neue Error-Kategorien in v5.1             |
-| [deployment.md](./deployment.md)                               | Wird aktualisiert für neue Update-Prozess in v5.2      |
-
----
-
-## 📝 Nächste Schritte
-
-**Diese Woche:**
-1. ✅ Diese Roadmap finalisieren
-2. 🔲 connection.json Init-Script perfektionieren
-3. 🔲 v5.1.0 Implementation starten
-4. 🔲 Release Notes schreiben
-
-**Feedback erwünscht auf:**
-- Release-Dates realistisch?
-- Priorisation sinnvoll?
-- Fehlen noch wichtige Features?
+| Document                                                       | Relationship to Roadmap                                    |
+| -------------------------------------------------------------- | ---------------------------------------------------------- |
+| [AGENTIC_LOOP_ARCHITECTURE.md](./AGENTIC_LOOP_ARCHITECTURE.md) | Loop scheduling expanded in v5.2 (health checks)          |
+| [AGENTIC_CONFIGURATION.md](./AGENTIC_CONFIGURATION.md)         | Config system is main focus v5.1-v5.4                      |
+| [Onboarding.md](./Onboarding.md)                               | Completely rewritten in v5.3 (setup wizard)               |
+| [Troubleshooting.md](./Troubleshooting.md)                     | Extended with new error categories in v5.1                |
+| [deployment.md](./deployment.md)                               | Updated for new update process in v5.2                     |
 
 ---
 
-**Zuletzt aktualisiert:** Dezember 19, 2025  
-**Nächste Review:** Dezember 27, 2025  
-**Verantwortlich:** Development Team
+## 📝 Next Steps
+
+**This week:**
+1. ✅ Finalize this roadmap
+2. 🔲 Perfectionize connection.json init script
+3. 🔲 Start v5.1.0 implementation
+4. 🔲 Write release notes
+
+**Feedback welcome on:**
+- Are release dates realistic?
+- Is prioritization sensible?
+- Are there any missing important features?
+
+---
+
+**Last Updated:** December 19, 2025  
+**Next Review:** December 27, 2025  
+**Responsible:** Development Team
