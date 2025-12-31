@@ -1,236 +1,236 @@
-# Test Specializations - Analyse & Übersicht
+# Test Specializations - Analysis & Overview
 
-## 📊 Übersicht aller 10 Test-Spezialisierungen
+## 📊 Overview of all 10 Test Specializations
 
-> Diese Datei dokumentiert alle Test-Spezialisierungen mit ihren Eigenschaften und Verschlüsselungs-Status.
+> This file documents all test specializations with their properties and encryption status.
 
-### 1. 🛍️ Fashion & Mode (fashion-mode-test.json)
+### 1. 🛍️ Fashion & Style (fashion-mode-test.json)
 
-| Eigenschaft              | Wert             |
+| Property              | Value             |
 | ------------------------ | ---------------- |
 | **ID**                   | `fashion-mode`   |
-| **Branche**              | Mode & Lifestyle |
+| **Industry**              | Fashion & Lifestyle |
 | **Icon**                 | 👗                |
-| **Systempromppt-Länge**  | ~1,650 chars     |
+| **System Prompt Length**  | ~1,650 chars     |
 | **Features**             | 6                |
 | **Context Instructions** | 7                |
 | **Example Prompts**      | 4                |
 
-**Spezialisierung:** Persönlicher Stylist und Mode-Experte
-- Trend-Analyse und aktuelle Modetrends
-- Passform-Beratung nach Körpertypen
-- Outfit-Kombinationen & Styling-Tipps
-- Material- und Pflegekunde
+**Specialization:** Personal Stylist and Fashion Expert
+- Trend Analysis and Current Fashion Trends
+- Fit Consultation by Body Types
+- Outfit Combinations & Styling Tips
+- Material and Care Knowledge
 
-**Zielgruppe:** Mode-Shops, Online-Retailer, Fashion-Plattformen
+**Target Audience:** Fashion Shops, Online Retailers, Fashion Platforms
 
 ---
 
-### 2. 💄 Beauty & Kosmetik (beauty-kosmetik-test.json)
+### 2. 💄 Beauty & Cosmetics (beauty-kosmetik-test.json)
 
-| Eigenschaft              | Wert              |
+| Property              | Value              |
 | ------------------------ | ----------------- |
 | **ID**                   | `beauty-kosmetik` |
-| **Branche**              | Beauty & Wellness |
+| **Industry**              | Beauty & Wellness |
 | **Icon**                 | 💄                 |
-| **Systempromppt-Länge**  | ~1,500 chars      |
+| **System Prompt Length**  | ~1,500 chars      |
 | **Features**             | 8                 |
 | **Context Instructions** | 8                 |
 | **Example Prompts**      | 4                 |
 
-**Spezialisierung:** Hochspezialisierter Kosmetik-Experte
-- Inhaltsstoffe (INCI) und Wirkstoffe
-- Hauttypen-Bestimmung & individuelle Beratung
-- Richtige Anwendungsreihenfolge
-- Compliance & rechtlich sichere Aussagen (Health Claims!)
+**Specialization:** Highly Specialized Cosmetics Expert
+- Ingredients (INCI) and Active Substances
+- Skin Type Determination & Individual Consultation
+- Correct Application Order
+- Compliance & Legally Safe Claims (Health Claims!)
 
-**Zielgruppe:** Kosmetik-Shops, Apotheken-E-Commerce, K-Beauty Stores
+**Target Audience:** Cosmetics Shops, Pharmacy E-Commerce, K-Beauty Stores
 
 ---
 
 ### 3. 🏠 Home & Living (home-living-test.json)
 
-| Eigenschaft              | Wert                 |
+| Property              | Value                 |
 | ------------------------ | -------------------- |
 | **ID**                   | `home-living`        |
-| **Branche**              | Lifestyle & Interior |
+| **Industry**              | Lifestyle & Interior |
 | **Icon**                 | 🏠                    |
-| **Systempromppt-Länge**  | ~1,400 chars         |
+| **System Prompt Length**  | ~1,400 chars         |
 | **Features**             | 6                    |
 | **Context Instructions** | 6                    |
 | **Example Prompts**      | 4                    |
 
-**Spezialisierung:** Interior Design & Wohnexperte
-- Raumplanung & Raumgestaltung
-- Möbel & Dekoration
-- Farbkonzepte & Stilrichtungen
-- Nachhaltige & ergonomische Lösungen
+**Specialization:** Interior Design & Home Expert
+- Room Planning & Room Design
+- Furniture & Decoration
+- Color Concepts & Style Directions
+- Sustainable & Ergonomic Solutions
 
-**Zielgruppe:** Möbelhändler, Interior-Design-Plattformen, DIY-Shops
+**Target Audience:** Furniture Retailers, Interior Design Platforms, DIY Shops
 
 ---
 
-### 4. ⚽ Fitness & Ernährung (fitness-ernaehrung-test.json)
+### 4. ⚽ Fitness & Nutrition (fitness-ernaehrung-test.json)
 
-| Eigenschaft              | Wert                  |
+| Property              | Value                  |
 | ------------------------ | --------------------- |
 | **ID**                   | `fitness-ernaehrung`  |
-| **Branche**              | Gesundheit & Wellness |
+| **Industry**              | Health & Wellness |
 | **Icon**                 | ⚽                     |
-| **Systempromppt-Länge**  | ~1,700 chars          |
+| **System Prompt Length**  | ~1,700 chars          |
 | **Features**             | 7                     |
 | **Context Instructions** | 8                     |
 | **Example Prompts**      | 4                     |
 
-**Spezialisierung:** Fitness- und Ernährungsberatung
-- Trainingsplanung & Workouts
-- Ernährung & Makronährstoffe
-- Gesundheitliche Ziele & Nachverfolgung
-- Motivations- und Lifestyle-Tipps
+**Specialization:** Fitness and Nutrition Consultation
+- Training Planning & Workouts
+- Nutrition & Macronutrients
+- Health Goals & Tracking
+- Motivation and Lifestyle Tips
 
-**Zielgruppe:** Fitness-Studios, Ernährungsberater, Health-Apps
+**Target Audience:** Fitness Studios, Nutrition Consultants, Health Apps
 
 ---
 
-### 5. 🌍 Reisebüro (reisebuero-test.json)
+### 5. 🌍 Travel Agency (reisebuero-test.json)
 
-| Eigenschaft              | Wert               |
+| Property              | Value               |
 | ------------------------ | ------------------ |
 | **ID**                   | `reisebuero`       |
-| **Branche**              | Reisen & Tourismus |
+| **Industry**              | Travel & Tourism |
 | **Icon**                 | ✈️                  |
-| **Systempromppt-Länge**  | ~1,550 chars       |
+| **System Prompt Length**  | ~1,550 chars       |
 | **Features**             | 7                  |
 | **Context Instructions** | 7                  |
 | **Example Prompts**      | 4                  |
 
-**Spezialisierung:** Reiseberatungs- und Buchungsexperte
-- Zielempfehlungen basierend auf Vorlieben
-- Reiseplanung & Itinerare
-- Budget-optimierung
-- Reiseversicherungen & Dokumentation
+**Specialization:** Travel Consulting and Booking Expert
+- Destination Recommendations Based on Preferences
+- Travel Planning & Itineraries
+- Budget Optimization
+- Travel Insurance & Documentation
 
-**Zielgruppe:** Reisebüros, Online-Buchungsplattformen, Reise-Apps
+**Target Audience:** Travel Agencys, Online-Buchungsplattformen, Reise-Apps
 
 ---
 
-### 6. 🏡 Immobilien (immobilien-test.json)
+### 6. 🏡 Real Estate (immobilien-test.json)
 
-| Eigenschaft              | Wert         |
+| Property              | Value         |
 | ------------------------ | ------------ |
 | **ID**                   | `immobilien` |
-| **Branche**              | Real Estate  |
+| **Industry**              | Real Estate  |
 | **Icon**                 | 🏘️            |
-| **Systempromppt-Länge**  | ~2,000 chars |
+| **System Prompt Length**  | ~2,000 chars |
 | **Features**             | 8            |
 | **Context Instructions** | 8            |
 | **Example Prompts**      | 5            |
 
-**Spezialisierung:** Immobilienmakler & Investitionsberater
-- Marktanalyse & Preisbewertung
-- Investitionsberatung
-- Rechtliche Aspekte (Makler-Verordnung)
-- Standortbewertung & Due Diligence
+**Specialization:** Real Estatemakler & Investitionsberater
+- Market Analysis & Price Evaluation
+- Investment Consultation
+- Legal Aspects (Broker Regulations)
+- Location Assessment & Due Diligence
 
-**Zielgruppe:** Immobilienmakler, Investment-Plattformen, Finanzberater
+**Target Audience:** Real Estatemakler, Investment-Plattformen, Finanzberater
 
 ---
 
-### 7. 📚 Digitale Kurse (digitale-kurse-test.json)
+### 7. 📚 Digital Courses (digitale-kurse-test.json)
 
-| Eigenschaft              | Wert                 |
+| Property              | Value                 |
 | ------------------------ | -------------------- |
 | **ID**                   | `digitale-kurse`     |
-| **Branche**              | Bildung & E-Learning |
+| **Industry**              | Education & E-Learning |
 | **Icon**                 | 📚                    |
-| **Systempromppt-Länge**  | ~1,800 chars         |
+| **System Prompt Length**  | ~1,800 chars         |
 | **Features**             | 7                    |
 | **Context Instructions** | 7                    |
 | **Example Prompts**      | 4                    |
 
-**Spezialisierung:** E-Learning-Kursdesigner & Trainingsexperte
-- Curriculum-Entwicklung
-- Didaktische Konzepte
-- Lernziele & Assessment
-- Engagement & Retention-Strategien
+**Specialization:** E-Learning Course Designer & Training Expert
+- Curriculum Development
+- Didactic Concepts
+- Learning Objectives & Assessment
+- Engagement & Retention Strategies
 
-**Zielgruppe:** E-Learning-Plattformen, Online-Kurshersteller, Trainer
+**Target Audience:** E-Learning Platforms, Online Course Creators, Trainers
 
 ---
 
-### 8. 💻 Technik & Elektronik (technik-elektronik-test.json)
+### 8. 💻 Technology & Electronics (technik-elektronik-test.json)
 
-| Eigenschaft              | Wert                 |
+| Property              | Value                 |
 | ------------------------ | -------------------- |
 | **ID**                   | `technik-elektronik` |
-| **Branche**              | Technologie          |
+| **Industry**              | Technology          |
 | **Icon**                 | 💻                    |
-| **Systempromppt-Länge**  | ~1,650 chars         |
+| **System Prompt Length**  | ~1,650 chars         |
 | **Features**             | 8                    |
 | **Context Instructions** | 8                    |
 | **Example Prompts**      | 5                    |
 
-**Spezialisierung:** Tech-Experte & Produktberatung
-- Hardware & Spezifikationen
-- Kompatibilität & Performance
-- Use-Case-Beratung
-- Zukunftssicherheit & Upgrade-Pfade
+**Specialization:** Tech Expert & Product Consultation
+- Hardware & Specifications
+- Compatibility & Performance
+- Use Case Consultation
+- Future Proof & Upgrade Paths
 
-**Zielgruppe:** Elektronik-Shops, Tech-Retailer, Tech-Review-Plattformen
+**Target Audience:** Electronics Shops, Tech Retailers, Tech Review Platforms
 
 ---
 
-### 9. 🐾 Tierbedarf (tierbedarf-test.json)
+### 9. 🐾 Pet Supplies (tierbedarf-test.json)
 
-| Eigenschaft              | Wert         |
+| Property              | Value         |
 | ------------------------ | ------------ |
 | **ID**                   | `tierbedarf` |
-| **Branche**              | Pet Supplies |
+| **Industry**              | Pet Supplies |
 | **Icon**                 | 🐾            |
-| **Systempromppt-Länge**  | ~1,400 chars |
+| **System Prompt Length**  | ~1,400 chars |
 | **Features**             | 6            |
 | **Context Instructions** | 7            |
 | **Example Prompts**      | 4            |
 
-**Spezialisierung:** Haustier-Beratungs- & Ernährungsexperte
-- Tiergesundheit & Wohlbefinden
-- Fütterung & Ernährung nach Tierart
-- Pflege & Zubehör
-- Rassespezifische Anforderungen
+**Specialization:** Pet Consultation & Nutrition Expert
+- Animal Health & Welfare
+- Feeding & Nutrition by Animal Type
+- Care & Accessories
+- Breed-Specific Requirements
 
-**Zielgruppe:** Tierfachgeschäfte, Tierärzte, Pet-Supply-Shops
+**Target Audience:** Pet Specialty Stores, Veterinarians, Pet Supply Shops
 
 ---
 
-### 10. 🍷 Wein & Feinkost (wein-feinkost-test.json)
+### 10. 🍷 Wine & Gourmet (wein-feinkost-test.json)
 
-| Eigenschaft              | Wert               |
+| Property              | Value               |
 | ------------------------ | ------------------ |
 | **ID**                   | `wein-feinkost`    |
-| **Branche**              | Gourmet & Getränke |
+| **Industry**              | Gourmet & Beverages |
 | **Icon**                 | 🍷                  |
-| **Systempromppt-Länge**  | ~1,600 chars       |
+| **System Prompt Length**  | ~1,600 chars       |
 | **Features**             | 7                  |
 | **Context Instructions** | 7                  |
 | **Example Prompts**      | 4                  |
 
-**Spezialisierung:** Sommelière & Gourmet-Experte
-- Weintasting & Geschmacksnoten
-- Paarung von Wein & Essen
-- Terroir & Weinregionen
-- Sommelier-Beratung & Sammler-Tipps
+**Specialization:** Sommelier & Gourmet Expert
+- Wine Tasting & Flavor Notes
+- Wine & Food Pairing
+- Terroir & Wine Regions
+- Sommelier Consultation & Collector Tips
 
-**Zielgruppe:** Weinfachgeschäfte, Gourmet-Shops, Restaurants, Sommeliers
+**Target Audience:** Wine Specialty Shops, Gourmet Shops, Restaurants, Sommeliers
 
 ---
 
-## 🔐 Verschlüsselungs-Übersicht
+## 🔐 Encryption Overview
 
-### Dateigrößen & Statistiken
+### File Sizes & Statistics
 
 ```
 ┌─────────────────────────┬──────────┬────────────────┐
-│ Spezialisierung         │ Original │ Verschlüsselt  │
+│ Specialization         │ Original │ Encrypted  │
 ├─────────────────────────┼──────────┼────────────────┤
 │ beauty-kosmetik         │   4.2 KB │   ≈ 4.5 KB    │
 │ digitale-kurse          │   4.6 KB │   ≈ 4.9 KB    │
@@ -246,13 +246,13 @@
 │ TOTAL                   │  42.5 KB │   ≈ 45.4 KB   │
 └─────────────────────────┴──────────┴────────────────┘
 
-Durchschnittliche Größenzunahme: ≈ 6.8%
-(Overhead aus IV + AuthTag + Metadata)
+Average size increase: ≈ 6.8%
+(Overhead from IV + AuthTag + Metadata)
 ```
 
-### Verschlüsselungs-Status
+### Encryption Status
 
-| Datei                        | Status      | Backup Exists | Verified |
+| File                        | Status      | Backup Exists | Verified |
 | ---------------------------- | ----------- | ------------- | -------- |
 | beauty-kosmetik-test.json    | ✅ plaintext | -             | -        |
 | digitale-kurse-test.json     | ✅ plaintext | -             | -        |
@@ -265,7 +265,7 @@ Durchschnittliche Größenzunahme: ≈ 6.8%
 | tierbedarf-test.json         | ✅ plaintext | -             | -        |
 | wein-feinkost-test.json      | ✅ plaintext | -             | -        |
 
-**Status nach Encryption:** (wird mit `npm run encrypt:test-specializations` aktualisiert)
+**Status after encryption:** (will be updated with `npm run encrypt:test-specializations`)
 
 ---
 
@@ -274,7 +274,7 @@ Durchschnittliche Größenzunahme: ≈ 6.8%
 ### 1. Initial Encryption
 
 ```bash
-# Verschlüssele alle Test-Spezialisierungen
+# Verschlüssele alle Test-Specializationen
 npm run encrypt:test-specializations
 
 # Output:
@@ -288,7 +288,7 @@ npm run encrypt:test-specializations
 ### 2. Verify & Backup
 
 ```bash
-# Verifiziere alle verschlüsselten Backups
+# Verify all encrypted backups
 npm run verify:test-specializations
 
 # Output:
@@ -301,18 +301,18 @@ npm run verify:test-specializations
 ### 3. Load in Application
 
 ```typescript
-// Klartext für Development (schneller)
+// Plaintext for Development (faster)
 const spec = await manager.load('fashion-mode');
 
-// Automatisch encrypted, falls .enc existiert
-// Falls nicht, fallback zu plaintext
+// Automatically encrypted if .enc exists
+// If not, fallback to plaintext
 ```
 
 ---
 
-## 🚀 Nächste Schritte
+## 🚀 Next Steps
 
-### Phase 1: Test-Daten Verschlüsselung ✅ (IN PROGRESS)
+### Phase 1: Test Data Encryption ✅ (IN PROGRESS)
 - [ ] Run `npm run encrypt:test-specializations`
 - [ ] Run `npm run verify:test-specializations`
 - [ ] Update diesen Report mit Status
@@ -338,10 +338,10 @@ npm run test:unit testSpecializationBackup.test.ts
 
 ---
 
-## 📖 Siehe auch
+## 📖 See Also
 
-- [testSpecializationBackup.md](./testSpecializationBackup.md) - Detaillierte Dokumentation
-- [testSpecializationBackupManager.ts](./testSpecializationBackupManager.ts) - Manager Klasse
+- [testSpecializationBackup.md](./testSpecializationBackup.md) - Detailed Documentation
+- [testSpecializationBackupManager.ts](./testSpecializationBackupManager.ts) - Manager Class
 - [SPECIALIZATION_UPLOAD_ANALYSIS.md](../SPECIALIZATION_UPLOAD_ANALYSIS.md) - Upload Feature
 - [encrypt-test-specializations.ts](../scripts/encrypt-test-specializations.ts) - Encryption Script
 - [verify-test-specializations.ts](../scripts/verify-test-specializations.ts) - Verification Script
@@ -349,5 +349,5 @@ npm run test:unit testSpecializationBackup.test.ts
 ---
 
 **Version:** 1.0
-**Letzte Aktualisierung:** 2025-12-18
-**Status:** Dokumentation Abgeschlossen 📚
+**Last Updated:** 2025-12-18
+**Status:** Documentation Complete 📚
