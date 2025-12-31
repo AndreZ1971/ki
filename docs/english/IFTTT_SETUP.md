@@ -50,27 +50,27 @@
    ```
 4. Copy your **KEY** (looks like: `abc123def456...`)
 
-### 3. Add webhook URL to .env
+### 3. Add Webhook URL to .env
 
 ```env
 # IFTTT Webhooks
 IFTTT_KEY=your_key_here
 
 # Auto-generated URLs (do not change):
-# WEBHOOK_LINKEDIN becomes: https://maker.ifttt.com/trigger/linkedin_post/with/key/{IFTTT_KEY}
-# WEBHOOK_FACEBOOK becomes: https://maker.ifttt.com/trigger/facebook_post/with/key/{IFTTT_KEY}
+# WEBHOOK_LINKEDIN will automatically become: https://maker.ifttt.com/trigger/linkedin_post/with/key/{IFTTT_KEY}
+# WEBHOOK_FACEBOOK will automatically become: https://maker.ifttt.com/trigger/facebook_post/with/key/{IFTTT_KEY}
 ```
 
-### 4. Create Facebook applet
+### 4. Create Facebook Applet
 
 1. Go to: https://ifttt.com/create
 2. **If This**: Webhooks → Event: `facebook_post`
 3. **Then That**: Facebook Pages → Post new page update
-4. Select your Kaufe.es page
+4. Select your Kaufe.es Page
 5. Message: `{{Value1}}`
 6. **Finish**
 
-### 5. Backend update (change just 1 line!)
+### 5. Backend Update (Only 1 Line to Change!)
 
 Open `backend/.env`:
 
@@ -85,7 +85,7 @@ WEBHOOK_LINKEDIN=https://maker.ifttt.com/trigger/linkedin_post/with/key/your_ift
 WEBHOOK_FACEBOOK=https://maker.ifttt.com/trigger/facebook_post/with/key/your_ifttt_key_here
 ```
 
-### 6. Done! Test it! 🎉
+### 6. Done! Test! 🎉
 
 ```bash
 cd backend
@@ -103,18 +103,18 @@ curl -X POST http://localhost:3000/api/social/webhook/test \
 
 ---
 
-## 🎯 Even easier: IFTTT mobile app!
+## 🎯 Even Easier: IFTTT Mobile App!
 
-### Send posts directly from your phone:
+### Post Directly from Your Phone:
 
-1. Install the **IFTTT app** (iOS/Android)
-2. Create an applet:
+1. **Install IFTTT App** (iOS/Android)
+2. Create Applet:
    - **If This**: Button Widget
    - **Then That**: LinkedIn → Share update
-3. Place the **widget on the home screen**
-4. **Tap** → post is sent! 🚀
+3. **Place Widget on Homescreen**
+4. **Tap** → Post goes out! 🚀
 
-**It doesn’t get easier!**
+**Can't get easier than this!**
 
 ---
 
@@ -122,42 +122,42 @@ curl -X POST http://localhost:3000/api/social/webhook/test \
 
 | Feature | IFTTT | Make.com | Zapier |
 |---------|-------|----------|--------|
-| **Complexity** | 🎯 **Super simple!** | 🤯 Complicated | 🤯 Complicated |
-| **Code required** | ❌ **No code!** | ⚠️ Webhook setup | ⚠️ Webhook setup |
-| **Free plan** | ✅ **Unlimited** | ✅ 1000 ops | ❌ Only 5 Zaps |
-| **Setup time** | 🎯 **2 minutes** | ⏱️ 10 minutes | ⏱️ 10 minutes |
+| **Complexity** | 🎯 **Super easy!** | 🤯 Complicated | 🤯 Complicated |
+| **Code Needed** | ❌ **No code!** | ⚠️ Webhooks Setup | ⚠️ Webhooks Setup |
+| **Free Plan** | ✅ **Unlimited** | ✅ 1000 Ops | ❌ Only 5 Zaps |
+| **Setup Time** | 🎯 **2 Minutes** | ⏱️ 10 Minutes | ⏱️ 10 Minutes |
 | **Templates** | ✅ **Many!** | ⚠️ Few | ⚠️ Few |
-| **Mobile app** | ✅ **Yes, great!** | ❌ No | ⚠️ Basic |
+| **Mobile App** | ✅ **Yes, great!** | ❌ No | ⚠️ Basic |
 
-**IFTTT = best choice when you feel overwhelmed!** 🎯
+**IFTTT = Best choice if you're overwhelmed!** 🎯
 
 ---
 
-## 🔥 Prebuilt templates (click & use!)
+## 🔥 Pre-made Templates (Click & Use!)
 
-### Template 1: LinkedIn auto-poster
+### Template 1: LinkedIn Auto-Poster
 ```
 If: Webhook "linkedin_post" 
 Then: LinkedIn "Share update"
 Message: {{Value1}}
 ```
-**Use:** https://ifttt.com/create → copy this template!
+**Use:** https://ifttt.com/create → Copy this template!
 
-### Template 2: Facebook Page auto-poster
+### Template 2: Facebook Page Auto-Poster
 ```
 If: Webhook "facebook_post"
 Then: Facebook Pages "Post update"
 Message: {{Value1}}
 ```
 
-### Template 3: Multi-platform (1 webhook → 3 posts!)
+### Template 3: Multi-Platform (1 Webhook → 3 Posts!)
 ```
 If: Webhook "post_everywhere"
 Then: LinkedIn "Share update"
 Also: Facebook "Post update"  
 Also: Twitter "Post tweet"
 ```
-**One webhook, three platforms!** 🚀
+**One Webhook, three platforms!** 🚀
 
 ### Template 4: With backup email
 ```
@@ -169,11 +169,11 @@ Also: Email "Send me summary"
 
 ---
 
-## 💡 Super simple workflow
+## 💡 Super Simple Workflow
 
 ```
 ┌─────────────────┐
-│  Your backend   │
+│  Your Backend   │
 │   POST Request  │
 └────────┬────────┘
          │ 
@@ -185,7 +185,7 @@ Also: Email "Send me summary"
          │ 
          ↓
 ┌─────────────────┐
-│  IFTTT Applet   │  ← You created it with clicks!
+│  IFTTT Applet   │  ← You created it by clicking!
 │  (If/Then Rule) │
 └────────┬────────┘
          │ 
@@ -199,24 +199,24 @@ Also: Email "Send me summary"
 
 ---
 
-## 🎨 Frontend stays the same!
+## 🎨 Frontend Stays the Same!
 
-The frontend works **without changes**:
-- Toggle to **"🎉 Make.com"** (used for IFTTT)
-- Or change the label to **"🎯 IFTTT"**
+The frontend works **without any changes**:
+- Toggle to **"🎉 Make.com"** (will be used for IFTTT)
+- Or: Change label to **"🎯 IFTTT"**
 
-**Webhook endpoints remain the same!** `/api/social/webhook/post`
+**Webhook endpoints stay the same!** `/api/social/webhook/post`
 
 ---
 
-## 🧪 Test commands (copy & paste!)
+## 🧪 Test Commands (Copy & Paste!)
 
 ### Test LinkedIn:
 ```bash
 curl -X POST "https://maker.ifttt.com/trigger/linkedin_post/with/key/YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "value1": "🚀 Test post from Kaufe.es! #test",
+    "value1": "🚀 Test Post from Kaufe.es! #test",
     "value2": "",
     "value3": ""
   }'
@@ -233,38 +233,38 @@ curl -X POST "https://maker.ifttt.com/trigger/facebook_post/with/key/YOUR_KEY" \
   }'
 ```
 
-### Through your backend:
+### Via Your Backend:
 ```bash
 curl -X POST "http://localhost:3000/api/social/webhook/post" \
   -H "Content-Type: application/json" \
   -d '{
     "platform": "linkedin",
-    "content": "Professional e-commerce solutions! 🚀"
+    "content": "Professional E-Commerce Solutions! 🚀"
   }'
 ```
 
 ---
 
-## ❌ Troubleshooting (super easy!)
+## ❌ Troubleshooting (Super Easy!)
 
-### "Applet doesn’t run"
+### "Applet Won't Run"
 
 → IFTTT Dashboard → **Activity** → Do you see the event?
 - Yes? → Check LinkedIn connection
-- No? → Webhook URL wrong? Key correct?
+- No? → Wrong webhook URL? Key correct?
 
-### "LinkedIn won’t connect"
+### "LinkedIn Won't Connect"
 
 → **Settings** → **Connected services** → Remove LinkedIn and reconnect
 
-### "No posts visible"
+### "No Posts Visible"
 
-→ LinkedIn profile check:
+→ Check LinkedIn Profile:
 - Business account active?
-- Posting rights available?
+- Posting permissions granted?
 - Wait 1-2 minutes (LinkedIn sometimes delays)
 
-### "Key doesn’t work"
+### "Key Doesn't Work"
 
 → https://ifttt.com/maker_webhooks → **Documentation**
 → Copy key again (no spaces!)

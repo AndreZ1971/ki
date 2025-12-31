@@ -1,7 +1,7 @@
-# 🎉 Make.com setup - 1000 operations FREE!
+# 🎉 Make.com Setup - 1000 Operations FREE!
 
-**Problem:** Zapier free isn’t truly free (only 5 Zaps)  
-**Solution:** **Make.com (formerly Integromat)** - **1000 ops/month FREE!** 🎉
+**Problem:** Zapier Free is not really free (only 5 Zaps)  
+**Solution:** **Make.com (formerly Integromat)** - **1000 Ops/Month FREE!** 🎉
 
 ## 🚀 Why Make.com?
 
@@ -11,16 +11,16 @@
 - ✅ **Available immediately** - no waiting
 - ✅ **More powerful** than Zapier Free
 
-## ⏱️ Setup in 3 minutes
+## ⏱️ Setup in 3 Minutes
 
-### 1. Create a Make.com account
+### 1. Create Make.com Account
 
 1. Go to: https://www.make.com/en/register
-2. **Sign up free** (FREE plan: 1000 ops/month!)
+2. **Sign up for free** (FREE Plan: 1000 Ops/Month!)
 3. Confirm email
-4. You’re ready!
+4. Let's go!
 
-### 2. Create a scenario for LinkedIn
+### 2. Create Scenario for LinkedIn
 
 #### Step 1: New scenario
 

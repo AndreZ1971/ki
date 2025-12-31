@@ -1,7 +1,7 @@
-# ⚡ Zapier setup - NO waiting time!
+# ⚡ Zapier Setup - NO WAITING!
 
 **Problem:** Buffer API needs approval and you have to wait 📧  
-**Solution:** Zapier webhooks - **ready instantly!** ⚡
+**Solution:** Zapier Webhooks - **Ready immediately!** ⚡
 
 ## 🚀 Why Zapier?
 
@@ -11,40 +11,40 @@
 - ✅ **Free plan** - 100 tasks/month (more than enough!)
 - ✅ **All platforms** - LinkedIn, Facebook, TikTok & more
 
-## ⏱️ Setup in 3 minutes
+## ⏱️ Setup in 3 Minutes
 
-### 1. Create a Zapier account
+### 1. Create Zapier Account
 
 1. Go to: https://zapier.com/sign-up
-2. **Sign up free** (Free plan: 100 tasks/month)
+2. **Sign up for free** (Free Plan: 100 Tasks/Month)
 3. Confirm email
 
-### 2. Create a Zap for LinkedIn
+### 2. Create Zap for LinkedIn
 
 #### Step 1: Trigger (Webhooks by Zapier)
 
 1. Click **"Create Zap"**
-2. **Trigger App**: search "Webhooks by Zapier"
-3. **Event**: choose "Catch Hook"
+2. **Trigger App**: Search "Webhooks by Zapier"
+3. **Event**: Select "Catch Hook"
 4. Click **Continue**
-5. You’ll see a **webhook URL** - **COPY IT!**
+5. You'll See a **Webhook URL** - **COPY THIS!**
    ```
    Example: https://hooks.zapier.com/hooks/catch/123456/abcdef/
    ```
 
 #### Step 2: Action (LinkedIn)
 
-1. **Action App**: search "LinkedIn"
-2. **Event**: choose "Create Share Update" (create post)
-3. **Connect account**: click "Sign in to LinkedIn"
-   - Authorize LinkedIn (your business account!)
+1. **Action App**: Search "LinkedIn"
+2. **Event**: Select "Create Share Update" (Create Post)
+3. **Connect Account**: Click "Sign in to LinkedIn"
+   - Authorize LinkedIn (Your Business Account!)
 4. **Customize Post**:
-   - **Text**: choose `content` (from the webhook)
+   - **Text**: Select `content` (From the Webhook)
    - **Visibility**: `anyone` or `connections-only`
-5. Click **Test** - you should see a test post on LinkedIn!
+5. Click **Test** - You Should See a Test Post on LinkedIn!
 6. Click **Publish Zap**
 
-#### Step 3: Save webhook URL
+#### Step 3: Save Webhook URL
 
 Add the copied URL to your `.env`:
 
@@ -52,36 +52,36 @@ Add the copied URL to your `.env`:
 ZAPIER_WEBHOOK_LINKEDIN=https://hooks.zapier.com/hooks/catch/123456/abcdef/
 ```
 
-### 3. Create a Zap for Facebook
+### 3. Create Zap for Facebook
 
-**Repeat steps 1-3, but:**
-- **Action App**: choose "Facebook Pages"
+**Repeat Steps 1-3, but:**
+- **Action App**: Select "Facebook Pages"
 - **Event**: "Create Page Post"
-- **Page**: choose your Kaufe.es page (742 followers)
-- **Message**: choose `content` from the webhook
+- **Page**: Select Your Kaufe.es Page (742 Followers)
+- **Message**: Select `content` From the Webhook
 
 ```env
 ZAPIER_WEBHOOK_FACEBOOK=https://hooks.zapier.com/hooks/catch/123456/xyz789/
 ```
 
-### 4. Create a Zap for TikTok
+### 4. Create Zap for TikTok
 
-**Note:** TikTok isn’t directly available in Zapier, but you can:
+**Note:** TikTok is Not Directly Available in Zapier, But You Can:
 
-**Option A: Email to TikTok (workaround)**
+**Option A: Email to TikTok (Workaround)**
 - Trigger: Webhook
-- Action: Send Email (to yourself)
-- You post manually on TikTok
+- Action: Send Email (To Yourself)
+- You Manually Post on TikTok
 
-**Option B: Wait for Buffer approval**
-- Use Buffer later for TikTok when API is enabled
+**Option B: Wait for Buffer Approval**
+- Use Buffer Later for TikTok Once API is Released
 
 ```env
 # TikTok commented out for now
 # ZAPIER_WEBHOOK_TIKTOK=
 ```
 
-### 5. Restart server
+### 5. Restart Server
 
 ```bash
 cd backend
@@ -89,9 +89,9 @@ npm run build
 npm run dev
 ```
 
-✅ Check output:
+✅ Check Output:
 ```
-✅ Zapier routes registered successfully
+✅ Zapier Routes Successfully Registered
 ```
 
 ### 6. Test!
@@ -100,7 +100,7 @@ npm run dev
 curl http://localhost:3000/api/social/zapier/status
 ```
 
-Expected response:
+Expected Response:
 ```json
 {
   "success": true,
@@ -111,7 +111,7 @@ Expected response:
   },
   "configured": 2,
   "total": 3,
-  "message": "✅ 2/3 Zapier webhooks configured!"
+  "message": "✅ 2/3 Zapier Webhooks Configured!"
 }
 ```
 
@@ -119,7 +119,7 @@ Expected response:
 
 ## 🧪 Test commands
 
-### Test LinkedIn webhook
+### Test LinkedIn Webhook
 
 ```bash
 curl -X POST "http://localhost:3000/api/social/zapier/test" \
@@ -127,32 +127,32 @@ curl -X POST "http://localhost:3000/api/social/zapier/test" \
   -d '{"platform": "linkedin"}'
 ```
 
-**What happens:**
-1. Backend sends test message to Zapier
-2. Zapier receives webhook
-3. Zapier posts to LinkedIn
-4. You see a test post on your LinkedIn! 🎉
+**What Happens:**
+1. Backend Sends Test Message to Zapier
+2. Zapier Receives Webhook
+3. Zapier Posts to LinkedIn
+4. You See Test Post on Your LinkedIn! 🎉
 
-### Post to LinkedIn
+### Post on LinkedIn
 
 ```bash
 curl -X POST "http://localhost:3000/api/social/zapier/post" \
   -H "Content-Type: application/json" \
   -d '{
     "platform": "linkedin",
-    "content": "🚀 Professional e-commerce solutions at Kaufe.es!",
+    "content": "🚀 Professional E-Commerce Solutions at Kaufe.es!",
     "scheduleTime": "now"
   }'
 ```
 
-### Post to Facebook
+### Post on Facebook
 
 ```bash
 curl -X POST "http://localhost:3000/api/social/zapier/post" \
   -H "Content-Type: application/json" \
   -d '{
     "platform": "facebook",
-    "content": "🛍️ New products in the shop! Check it out 🚀",
+    "content": "🛍️ New Products in Store! Check us out 🚀",
     "scheduleTime": "now"
   }'
 ```
@@ -163,33 +163,33 @@ curl -X POST "http://localhost:3000/api/social/zapier/post" \
 
 | Feature | Zapier | Buffer API | Direct OAuth |
 |---------|--------|-----------|--------------|
-| **Waiting time** | ⚡ 0 minutes | ⏳ Days/weeks | 🐌 Hours |
-| **Setup time** | ⚡ 3 minutes | ⏳ Waiting | 🐌 2-3 hours |
-| **API keys** | ❌ Not needed | ⏳ Approval | ✅ Create yourself |
-| **Free** | ✅ 100/month | ✅ After approval | ✅ Yes |
+| **Wait Time** | ⚡ 0 Minutes | ⏳ Days/Weeks | 🐌 Hours |
+| **Setup Time** | ⚡ 3 Minutes | ⏳ Waiting | 🐌 2-3 Hours |
+| **API Keys** | ❌ Not Needed | ⏳ Approval | ✅ Create Yourself |
+| **Free** | ✅ 100/Month | ✅ After Approval | ✅ Yes |
 | **LinkedIn** | ✅ Immediate | ⏳ Waiting | ✅ Complicated |
 | **Facebook** | ✅ Immediate | ⏳ Waiting | ✅ Complicated |
-| **TikTok** | ⚠️ Workaround | ⏳ Waiting | ✅ Very complicated |
+| **TikTok** | ⚠️ Workaround | ⏳ Waiting | ✅ Very Complicated |
 
 ---
 
-## 🎨 Frontend features
+## 🎨 Frontend Features
 
-When Zapier mode is active:
-- ✅ "⚡ Zapier Webhooks (INSTANT!)" badge
-- ✅ Webhook status display: "2/3 webhooks configured"
-- ✅ Green ✅ for configured platforms
-- ✅ Toggle between Zapier / Buffer
+When Zapier Mode is Active:
+- ✅ "⚡ Zapier Webhooks (IMMEDIATE!)" Badge
+- ✅ Webhook Status Display: "2/3 Webhooks Configured"
+- ✅ Green ✅ on Configured Platforms
+- ✅ Toggle Between Zapier / Buffer
 
-**"🔗 Connect" button** opens:
+**"🔗 Connect" Button** Opens:
 ```
 https://zapier.com/app/zaps
-→ Create new Zap for the selected platform
+→ Create New Zap for Selected Platform
 ```
 
 ---
 
-## 🔥 Zapier workflow visualization
+## 🔥 Zapier Workflow Visualization
 
 ```
 ┌─────────────────┐

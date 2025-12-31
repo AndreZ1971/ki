@@ -1,43 +1,43 @@
 # Agentic Troubleshooting Guide
 
-> **Für alle User**: Fehlerdiagnose & Lösungen für Agentic Loops.  
-> **Für Entwickler**: Debugging Strategien & Stack Traces.
+> **For all Users**: Error diagnosis & solutions for Agentic Loops.  
+> **For Developers**: Debugging strategies & stack traces.
 
 ---
 
-## Übersicht: Error Classification
+## Overview: Error Classification
 
-Agentic Loop-Fehler fallen in 4 Kategorien:
+Agentic Loop errors fall into 4 categories:
 
-| Kategorie          | Symptom                                              | Root Cause                                       | Lösung                                              |
-| ------------------ | ---------------------------------------------------- | ------------------------------------------------ | --------------------------------------------------- |
-| **Configuration**  | App startet nicht                                    | connection.json/ml.config ungültig               | Validiere Config (Abschnitt 2)                      |
-| **External API**   | Loop läuft nicht, WooCommerce/OpenAI antwortet nicht | Service Down, Rate Limit, Auth Fehler            | Retry, Rate Limit abwarten (Abschnitt 3)            |
-| **Logic Error**    | Loop läuft, aber Anomalien werden falsch erkannt     | Bug in Analyzer, Thresholds zu hoch/niedrig      | Justiere Thresholds (Abschnitt 4)                   |
-| **Infrastructure** | Logs voll, Memory hoch, Crash                        | Storage voll, Memory Leak, zu häufige Ausführung | Bereinige Storage, reduziere Frequenz (Abschnitt 5) |
+| Category           | Symptom                                           | Root Cause                                        | Solution                                            |
+| ------------------ | ------------------------------------------------- | ------------------------------------------------- | --------------------------------------------------- |
+| **Configuration**  | App doesn't start                                 | connection.json/ml.config invalid                | Validate config (Section 2)                        |
+| **External API**   | Loop not running, WooCommerce/OpenAI not responding | Service down, rate limit, auth error            | Retry, wait for rate limit (Section 3)             |
+| **Logic Error**    | Loop runs, but anomalies detected incorrectly     | Bug in analyzer, thresholds too high/low         | Adjust thresholds (Section 4)                      |
+| **Infrastructure** | Logs full, memory high, crash                     | Storage full, memory leak, too frequent execution | Clean storage, reduce frequency (Section 5)       |
 
 ---
 
 ## 1. Quick Diagnostic Flowchart
 
 ```
-┌─ Agent läuft?
+┌─ Agent running?
 │
-├─ Nein → Gehe zu Abschnitt 2: Configuration
+├─ No → Go to Section 2: Configuration
 │
-├─ Ja, aber "Connection Failed" in Logs
-│  └─ Gehe zu Abschnitt 3: External API Errors
+├─ Yes, but "Connection Failed" in logs
+│  └─ Go to Section 3: External API Errors
 │
-├─ Ja, aber Loops machen nichts
-│  ├─ Check: mode === 'continuous'? → Abschnitt 2.4
-│  ├─ Check: intervalMs nicht zu groß? → Abschnitt 2.4
-│  ├─ Check: Schwellenwerte nicht zu hoch? → Abschnitt 4
+├─ Yes, but loops do nothing
+│  ├─ Check: mode === 'continuous'? → Section 2.4
+│  ├─ Check: intervalMs not too large? → Section 2.4
+│  ├─ Check: thresholds not too high? → Section 4
 │
-├─ Ja, aber falsche Ergebnisse
-│  └─ Gehe zu Abschnitt 4: Logic Errors
+├─ Yes, but wrong results
+│  └─ Go to Section 4: Logic Errors
 │
-└─ Ja, aber Performance-Probleme
-   └─ Gehe zu Abschnitt 5: Infrastructure
+└─ Yes, but performance issues
+   └─ Go to Section 5: Infrastructure
 ```
 
 ---
@@ -46,24 +46,24 @@ Agentic Loop-Fehler fallen in 4 Kategorien:
 
 ### 2.1 "Cannot find module 'connection.json'"
 
-**Fehler**:
+**Error**:
 ```
 Error: Cannot find module '../connection.json'
   at Module._load (internal/modules/loader.js:...)
 ```
 
-**Ursache**: Datei existiert nicht oder ist im falschen Ordner.
+**Cause**: File doesn't exist or is in the wrong folder.
 
-**Lösung**:
+**Solution**:
 ```bash
-# Richtige Pfade:
-backend/connection.json      ✅ Korrekt
-backend/config/connection.json  ❌ Falsch
+# Correct paths:
+backend/connection.json      ✅ Correct
+backend/config/connection.json  ❌ Wrong
 
-# Erstelle die Datei:
+# Create the file:
 touch backend/connection.json
 
-# Kopiere Vorlage:
+# Copy template:
 cp backend/connection.json.example backend/connection.json
 ```
 
