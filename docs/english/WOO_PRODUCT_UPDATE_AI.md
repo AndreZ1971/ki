@@ -1,32 +1,32 @@
 # 🤖 WooProductUpdate.tsx - AI/ML Integration Guide
 
-**Datum:** 11. Dezember 2025  
+**Date:** December 11, 2025  
 **Version:** 2.0.0  
 **Status:** Production Ready
 
 ---
 
-## 📋 Übersicht
+## 📋 Overview
 
-Die **WooProductUpdate** Komponente wurde um umfangreiche **KI/ML-Features** erweitert, die **Google Trends**, **Reddit Sentiment Analysis** und **OpenAI GPT-4** nutzen, um intelligente Produktaktualisierungen zu ermöglichen.
+The **WooProductUpdate** component has been extended with comprehensive **AI/ML features** that leverage **Google Trends**, **Reddit Sentiment Analysis**, and **OpenAI GPT-4** to enable intelligent product updates.
 
-### 🎯 Hauptziel
-Automatisierte, datengestützte Produkt-Updates statt statischer Anpassungen (wie früher: +5% für alle)
+### 🎯 Primary Goal
+Automated, data-driven product updates instead of static adjustments (like before: +5% for all)
 
 ---
 
-## 🔧 Architektur
+## 🔧 Architecture
 
-### **Frontend-Komponenten**
+### **Frontend Components**
 ```
 WooProductUpdate.tsx
-├── Basis-Funktionalität (erhalten)
-│   ├── Produkt-Listing
+├── Base Functionality (retained)
+│   ├── Product Listing
 │   ├── Multi-Select
-│   ├── 4 Update-Typen (prices, inventory, descriptions, all)
-│   └── Batch-Processing
+│   ├── 4 Update Types (prices, inventory, descriptions, all)
+│   └── Batch Processing
 │
-└── AI/ML-Erweiterung (neu)
+└── AI/ML Extension (new)
     ├── Auto-Apply Toggle
     ├── Trend-Pricing Analysis
     ├── Reddit Sentiment Panel
@@ -34,35 +34,35 @@ WooProductUpdate.tsx
     └── Bulk AI Analyze Button
 ```
 
-### **Backend-Services**
+### **Backend Services**
 ```
 Backend Routes
 ├── /api/products/ai/trend-pricing (POST)
-│   └── Google Trends + GPT-4 Preis-Analyse
+│   └── Google Trends + GPT-4 Price Analysis
 │
 ├── /api/products/ai/optimize-description-trends (POST)
-│   └── SEO-Optimierung mit trending Keywords
+│   └── SEO Optimization with trending Keywords
 │
 ├── /api/products/ai/reddit-sentiment (POST)
 │   └── Community Sentiment via Reddit API
 │
 └── /api/products/woo/update-single/:productId (PUT)
-    └── Einzeln-Update mit AI-Werten
+    └── Single Update with AI Values
 
 Services
-├── trendAggregatorService.ts (existierend)
-│   └── 7 Trend-Quellen (Google, YouTube, Reddit, Wikipedia, News, GitHub, StackOverflow)
+├── trendAggregatorService.ts (existing)
+│   └── 7 Trend Sources (Google, YouTube, Reddit, Wikipedia, News, GitHub, StackOverflow)
 │
-└── redditService.ts (neu)
-    ├── Post-Suche
-    ├── Sentiment-Analyse
-    ├── Keyword-Extraktion
-    └── Subreddit-Mapping
+└── redditService.ts (new)
+    ├── Post Search
+    ├── Sentiment Analysis
+    ├── Keyword Extraction
+    └── Subreddit Mapping
 ```
 
 ---
 
-## 📊 Feature-Details
+## 📊 Feature Details
 
 ### **1. 🔥 Trend-Based Pricing**
 
@@ -92,7 +92,7 @@ Services
       {"name": "reddit", "score": 90.8, "timestamp": "2025-12-11T10:30:00Z"}
     ],
     "strategy": "INCREASE",
-    "reasoning": "Hohe Google Trends + positives Reddit Sentiment",
+    "reasoning": "High Google Trends + positive Reddit Sentiment",
     "confidence": 92,
     "riskLevel": "LOW",
     "nextReviewDate": "2025-12-18"
@@ -100,11 +100,11 @@ Services
 }
 ```
 
-**Logik:**
-- Google Trends Score analysieren
-- Reddit Mentions zählen
-- GPT-4 gibt Preis-Empfehlung basierend auf Trend-Daten
-- Strategien: INCREASE (>70), MAINTAIN (30-70), DECREASE (<30)
+**Logic:**
+- Analyze Google Trends Score
+- Count Reddit Mentions
+- GPT-4 provides price recommendation based on trend data
+- Strategies: INCREASE (>70), MAINTAIN (30-70), DECREASE (<30)
 
 ---
 
@@ -231,97 +231,97 @@ const aiAutoApply = true;
 
 ---
 
-## 🔄 Update-Flows
+## 🔄 Update Flows
 
-### **Flow 1: Mit AI-Daten (Auto-Apply ON)**
+### **Flow 1: With AI Data (Auto-Apply ON)**
 ```
-1. Wähle 5 Produkte
-2. Klick "🎯 Alle analysieren"
-3. Für jedes Produkt: /api/products/ai/trend-pricing
-4. Preis automatisch übernommen (aiAutoApply=true)
-5. Toast: "5 Produkte analysiert!"
-6. Klick "🚀 Updates starten"
+1. Select 5 products
+2. Click "🎯 Analyze All"
+3. For each product: /api/products/ai/trend-pricing
+4. Price automatically applied (aiAutoApply=true)
+5. Toast: "5 products analyzed!"
+6. Click "🚀 Start Updates"
 7. Endpoint: PUT /api/products/woo/update-single/:productId
 8. Body: { regular_price: "279.99", ... }
-9. WooCommerce aktualisiert
-10. Toast: "✅ 5 Produkte mit AI-Werten aktualisiert!"
+9. WooCommerce updated
+10. Toast: "✅ 5 products updated with AI values!"
 ```
-⏱️ **Gesamtdauer:** ~10 Sekunden
+⏱️ **Total Duration:** ~10 seconds
 
 ---
 
-### **Flow 2: Manuell prüfen (Auto-Apply OFF)**
+### **Flow 2: Manual Review (Auto-Apply OFF)**
 ```
-1. Wähle 3 Produkte
-2. Klick "🔥 Trends" bei Produkt A
-3. Sehe Badge: "🔥 87/100 → €279.99 (+12%)"
-4. Bin zufrieden? Ja → nächstes Produkt
-5. Bin unsicher? Nein → warte
-6. Klick "🚀 Updates starten"
-7. System erkennt: trendData[productId] vorhanden
-8. Nutzt AI-Werte für Update
-9. Toast: "✅ 3 Produkte mit AI-Werten aktualisiert!"
+1. Select 3 products
+2. Click "🔥 Trends" on product A
+3. See badge: "🔥 87/100 → €279.99 (+12%)"
+4. Satisfied? Yes → next product
+5. Unsure? No → wait
+6. Click "🚀 Start Updates"
+7. System detects: trendData[productId] present
+8. Uses AI values for update
+9. Toast: "✅ 3 products updated with AI values!"
 ```
-⏱️ **Gesamtdauer:** ~3 Minuten (+ Prüfzeit)
+⏱️ **Total Duration:** ~3 minutes (+ review time)
 
 ---
 
-### **Flow 3: Standard-Update (Keine AI)**
+### **Flow 3: Standard Update (No AI)**
 ```
-1. Wähle Produkte
-2. Wähle Update-Typ (z.B. "Preise")
-3. Klick "🚀 Updates starten"
-4. Kein trendData vorhanden
-5. Nutzt Standard-Logik: +5% Preis
+1. Select products
+2. Choose update type (e.g., "Prices")
+3. Click "🚀 Start Updates"
+4. No trendData available
+5. Uses standard logic: +5% price
 6. Endpoint: PUT /api/products/woo/update
-7. Toast: "✅ 5 Produkte erfolgreich aktualisiert!"
+7. Toast: "✅ 5 products successfully updated!"
 ```
-⏱️ **Gesamtdauer:** ~2 Sekunden
+⏱️ **Total Duration:** ~2 seconds
 
 ---
 
-## 🔒 Sicherheit & Compliance
+## 🔒 Security & Compliance
 
-### **API-Sicherheit**
+### **API Security**
 
 #### **1. Google Trends API**
-- ✅ Public API (keine Auth erforderlich)
-- ✅ Rate-Limits: ~100 requests/Tag
-- ✅ Keine Benutzer-Daten übertragen
-- ✅ Read-only Zugriff
+- ✅ Public API (no auth required)
+- ✅ Rate Limits: ~100 requests/day
+- ✅ No user data transmitted
+- ✅ Read-only access
 
 #### **2. Reddit API**
 - ✅ Public API (Read-only)
-- ✅ User-Agent korrekt gesetzt: `KI-TrendAnalyzer/1.0`
-- ✅ Keine Authentifizierung erforderlich
-- ✅ Rate-Limits: ~60 requests/Minute
-- ✅ Keine Benutzerdaten gespeichert
-- ⚠️ Cache-Implementierung empfohlen für häufig analysierte Produkte
+- ✅ User-Agent correctly set: `KI-TrendAnalyzer/1.0`
+- ✅ No authentication required
+- ✅ Rate Limits: ~60 requests/minute
+- ✅ No user data stored
+- ⚠️ Cache implementation recommended for frequently analyzed products
 
 #### **3. OpenAI API**
-- ✅ API-Key nur im Backend (`utils/openai.ts`)
-- ✅ Nicht im Frontend sichtbar
-- ✅ Circuit Breaker aktiviert
-- ✅ Retry-Mechanismus vorhanden
-- ✅ Prompt-Injection-Schutz: Kontext begrenzt
+- ✅ API Key only in backend (`utils/openai.ts`)
+- ✅ Not visible in frontend
+- ✅ Circuit Breaker activated
+- ✅ Retry mechanism in place
+- ✅ Prompt Injection Protection: Limited context
 
 #### **4. WooCommerce API**
 - ✅ Basic Authentication (Existing)
-- ✅ API-Credentials in `config.ts`
-- ✅ HTTPS für alle Requests
-- ✅ Validierung von productIds
+- ✅ API Credentials in `config.ts`
+- ✅ HTTPS for all requests
+- ✅ Validation of productIds
 
-### **Datenschutz**
+### **Data Protection**
 
-| Daten | Speicherung | Logs | DSGVO-konform |
-|-------|-------------|------|--------------|
-| Google Trends Scores | Frontend State | ❌ Nein | ✅ Ja |
-| Reddit Post Titles | Frontend State | ❌ Nein | ✅ Ja |
-| Vorgeschlagene Preise | Frontend State | ✅ Backend logs | ✅ Ja |
-| WooCommerce Updates | DB | ✅ Revision History | ✅ Ja |
-| API-Keys | Backend Env | ❌ Nein | ✅ Ja |
+| Data | Storage | Logs | GDPR Compliant |
+|------|---------|------|----------------|
+| Google Trends Scores | Frontend State | ❌ No | ✅ Yes |
+| Reddit Post Titles | Frontend State | ❌ No | ✅ Yes |
+| Suggested Prices | Frontend State | ✅ Backend logs | ✅ Yes |
+| WooCommerce Updates | DB | ✅ Revision History | ✅ Yes |
+| API Keys | Backend Env | ❌ No | ✅ Yes |
 
-### **Input-Validierung**
+### **Input Validation**
 
 ```typescript
 // ProductId: Integer
@@ -345,63 +345,63 @@ if (!validCategories.includes(category))
 ### **Error Handling**
 
 ```typescript
-// API-Fehler werden nicht exposed
+// API errors are not exposed
 ❌ return { error: "SELECT * FROM users WHERE..." }
-✅ return { error: "Fehler bei Trend-Analyse" }
+✅ return { error: "Error in trend analysis" }
 
-// Nur sichere Felder zurückgeben
+// Only safe fields returned
 ✅ { suggestedPrice, strategy, confidence }
 ❌ { internalServerPath, databaseConnection }
 
-// Sicherheits-Headers
+// Security Headers
 ✅ fastify.register(require('@fastify/helmet'))
-✅ CORS richtig konfiguriert
-✅ Rate-Limiting aktiv
+✅ CORS correctly configured
+✅ Rate Limiting active
 ```
 
 ---
 
-## 📈 Performance & Skalierung
+## 📈 Performance & Scaling
 
-### **Response-Zeiten**
+### **Response Times**
 
-| Operation | Zeit | Bottleneck |
+| Operation | Time | Bottleneck |
 |-----------|------|-----------|
-| Trend-Pricing | 3-5s | OpenAI API |
+| Trend Pricing | 3-5s | OpenAI API |
 | Reddit Sentiment | 2-3s | Reddit API |
 | Description Optimize | 2-4s | OpenAI API |
 | Single Update | 1-2s | WooCommerce API |
 | Batch Update (10x) | 5-10s | WooCommerce API |
 
-### **Optimierungen**
+### **Optimizations**
 
 ```typescript
-// ✅ Parallel-Requests statt Sequential
+// ✅ Parallel Requests instead of Sequential
 Promise.allSettled(sources.map(s => fetchFromSource(s)))
 
-// ✅ Rate-Limiting für Bulk-Operations
-await new Promise(r => setTimeout(r, 1500)) // 1,5s Abstand
+// ✅ Rate Limiting for Bulk Operations
+await new Promise(r => setTimeout(r, 1500)) // 1.5s interval
 
-// ✅ Frontend-Caching (State)
+// ✅ Frontend Caching (State)
 setTrendData(prev => ({ ...prev, [productId]: result }))
 
-// ✅ Fallback auf Standard-Update bei Fehler
+// ✅ Fallback to Standard Update on Error
 try { aiAnalysis() } catch { standardUpdate() }
 ```
 
-### **Empfehlungen für Produktion**
+### **Production Recommendations**
 
-1. **Redis-Cache** für Trend-Daten (TTL: 6 Stunden)
-2. **Queue-System** für Bulk-Analysen (Bull/BullMQ)
-3. **Analytics-Tracking** für AI-Update-Erfolgsrate
-4. **Alerting** bei API-Ausfällen (Google/Reddit)
-5. **A/B Testing** für AI vs. Standard-Updates
+1. **Redis Cache** for trend data (TTL: 6 hours)
+2. **Queue System** for bulk analyses (Bull/BullMQ)
+3. **Analytics Tracking** for AI update success rate
+4. **Alerting** on API outages (Google/Reddit)
+5. **A/B Testing** for AI vs. Standard Updates
 
 ---
 
 ## 🧪 Testing
 
-### **Unit Tests (zu schreiben)**
+### **Unit Tests (to be written)**
 ```typescript
 describe('redditService', () => {
   it('should analyze sentiment correctly', () => {
@@ -419,7 +419,7 @@ describe('trendPricing', () => {
 })
 ```
 
-### **Integration Tests (zu schreiben)**
+### **Integration Tests (to be written)**
 ```typescript
 describe('WooProductUpdate Flow', () => {
   it('should update product with AI values', async () => {
@@ -430,7 +430,7 @@ describe('WooProductUpdate Flow', () => {
 })
 ```
 
-### **E2E Tests (zu schreiben)**
+### **E2E Tests (to be written)**
 ```typescript
 describe('Auto-Apply Flow', () => {
   it('should apply AI prices when toggle ON', () => {
@@ -447,7 +447,7 @@ describe('Auto-Apply Flow', () => {
 
 ## 🚀 Deployment
 
-### **Voraussetzungen**
+### **Prerequisites**
 - ✅ Node.js 16+
 - ✅ TypeScript 5+
 - ✅ Fastify 4.x
@@ -456,7 +456,7 @@ describe('Auto-Apply Flow', () => {
 - ✅ Google Trends accessible
 - ✅ Reddit API accessible
 
-### **Environment-Variablen**
+### **Environment Variables**
 ```bash
 # .env
 OPENAI_API_KEY=sk-...
@@ -467,7 +467,7 @@ NODE_ENV=production
 LOG_LEVEL=info
 ```
 
-### **Deploy-Schritte**
+### **Deploy Steps**
 ```bash
 # 1. Build
 npm run build
@@ -475,7 +475,7 @@ npm run build
 # 2. Test
 npm run test
 
-# 3. Deploy (z.B. Docker)
+# 3. Deploy (e.g. Docker)
 docker build -t ki-backend:latest .
 docker push registry/ki-backend:latest
 
@@ -485,7 +485,7 @@ kubectl rollout restart deployment/ki-backend
 
 ---
 
-## 📚 API-Dokumentation
+## 📚 API Documentation
 
 ### **Swagger/OpenAPI**
 ```yaml
@@ -519,25 +519,25 @@ kubectl rollout restart deployment/ki-backend
 
 ---
 
-## 🔄 Versionierung
+## 🔄 Versioning
 
-| Version | Datum | Änderungen |
-|---------|-------|-----------|
-| 1.0.0 | Okt 2025 | Initial Release (Standard Updates) |
-| 2.0.0 | Dez 2025 | AI/ML Features (Google Trends, Reddit, GPT-4) |
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | Oct 2025 | Initial Release (Standard Updates) |
+| 2.0.0 | Dec 2025 | AI/ML Features (Google Trends, Reddit, GPT-4) |
 
 ---
 
 ## 📞 Support & Troubleshooting
 
-### **Häufige Fehler**
+### **Common Errors**
 
-| Fehler | Ursache | Lösung |
-|--------|--------|--------|
-| "Google Trends API Error" | API Timeout | Retry nach 30s, oder fallback |
-| "Reddit fetch failed" | Rate-Limiting | Max 60 requests/min, Cache nutzen |
-| "OpenAI API Error" | Token exceeded | Prompt kürzen oder splitting |
-| "WooCommerce 404" | Produkt gelöscht | ProductId validieren |
+| Error | Cause | Solution |
+|-------|-------|----------|
+| "Google Trends API Error" | API Timeout | Retry after 30s, or fallback |
+| "Reddit fetch failed" | Rate-Limiting | Max 60 requests/min, use cache |
+| "OpenAI API Error" | Token exceeded | Shorten prompt or split |
+| "WooCommerce 404" | Product deleted | Validate productId |
 
 ### **Debugging**
 
@@ -555,15 +555,15 @@ dashboard.openai.com/account/usage
 
 ---
 
-## 📝 Lizenz & Attribution
+## 📝 License & Attribution
 
-- **Google Trends**: Kostenlos, Public API
-- **Reddit API**: Kostenlos, User-Agent erforderlich
-- **OpenAI**: Kostenpflichtig, API-Key erforderlich
+- **Google Trends**: Free, Public API
+- **Reddit API**: Free, User-Agent required
+- **OpenAI**: Paid, API Key required
 - **Code**: MIT (Internal Use)
 
 ---
 
-**Letztes Update:** 11. Dezember 2025
-**Autor:** GitHub Copilot
+**Last Update:** December 11, 2025
+**Author:** GitHub Copilot
 **Status:** ✅ Production Ready

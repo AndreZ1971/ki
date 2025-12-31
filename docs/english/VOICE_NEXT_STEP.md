@@ -1,26 +1,26 @@
-# SEHR WICHTIG: Next Step Sprachfähigkeit für Ari
+# CRITICAL: Next Step Voice Capability for Ari
 
-Ziel: Ari soll Shop-bezogene Gespräche führen (Frage/Antwort) mit gesprochener Ein- und Ausgabe.
+Goal: Ari should conduct shop-related conversations (question/answer) with spoken input and output.
 
-## Minimalplan (MVP)
-- Frontend: Push-to-talk Button, Audio-Capture via Web Audio; WebSocket an Backend.
-- STT: Streaming (Whisper/Azure Speech/Deepgram) -> Text; VAD zum Auto-Stopp, Timeout bei Stille.
-- Chat: Bestehender Chat-Endpoint nutzen, Guardrail-Prompt: "Antwort nur aus Shop-Daten, sonst nachfragen; Stand/Quelle nennen".
-- TTS: Neural TTS (Azure/ElevenLabs/PlayHT) als Stream zurück; im Browser via MediaSource/AudioContext abspielen.
-- Transport: Duplex-WebSocket; bei Bedarf Fallback SSE + Polling für Audio-URL.
+## Minimal Plan (MVP)
+- Frontend: Push-to-talk button, audio capture via Web Audio API; WebSocket to backend
+- STT: Streaming (Whisper/Azure Speech/Deepgram) → Text; VAD for auto-stop, timeout on silence
+- Chat: Use existing chat endpoint, guardrail prompt: "Answer only from shop data, otherwise ask for clarification; mention source/status"
+- TTS: Neural TTS (Azure/ElevenLabs/PlayHT) as stream back; play in browser via MediaSource/AudioContext
+- Transport: Duplex WebSocket; fallback to SSE + polling for audio URL if needed
 
 ## Guardrails
-- Faktentreue: Keine Antwort ohne belegte Shop-Daten; bei fehlenden Fakten explizit sagen.
-- Freshness: Antworten mit Timestamp ("Stand: <zeit>"); Cache-TTL für Produkt/Neuheiten.
-- Privacy: Keine PII-Ausgabe; Rollen/Scopes für sensitive Endpunkte.
-- Limits: Token-/Kosten-Limits; max Antwortlänge; Abbruch bei fehlender Verbindung.
+- Factual Accuracy: No answer without verified shop data; explicitly state when facts are missing
+- Freshness: Answers with timestamp ("Status: <time>"); cache TTL for products/news
+- Privacy: No PII output; roles/scopes for sensitive endpoints
+- Limits: Token/cost limits; max response length; abort on connection loss
 
 ## Eval/Tests
-- Testkatalog: Neuheiten, Verfügbarkeit, Preisänderung, Kategorien. Erwartet: Zitat aus Live-Daten oder "nicht vorhanden".
-- Audio: Latenz < 2s Ziel, Abbruch/Retry bei Paketverlust; Fallback auf Text.
+- Test Catalog: New products, availability, price changes, categories. Expected: Quote from live data or "not available"
+- Audio: Target latency < 2s, abort/retry on packet loss; fallback to text
 
 ## Next Actions
-1) WS-Endpoint für STT/TTS-Relay anlegen (Backend), bestehende Chat-Logik wiederverwenden.
-2) Frontend Push-to-talk + Waveform-Indikator implementieren; Text-Fallback beibehalten.
-3) Guardrail-Prompt und "Stand"-Metadatum in Chat-Antworten einbauen.
-4) Kleiner Load-Test (5 parallele Sessions) und Kosten-Check je Minute Audio.
+1) Create WebSocket endpoint for STT/TTS relay (Backend), reuse existing chat logic
+2) Implement frontend push-to-talk + waveform indicator; keep text fallback
+3) Add guardrail prompt and "status" metadata to chat responses
+4) Small load test (5 parallel sessions) and cost check per minute of audio
