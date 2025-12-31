@@ -1,16 +1,16 @@
-# 📊 KiteTemplates.tsx – KI & ML Integration Analyse
+# 📊 KiteTemplates.tsx – AI & ML Integration Analysis
 
 **Version:** 3.2.0  
-**Datum:** Dezember 10, 2025  
-**Status:** Analysiert & Dokumentiert ✅
+**Date:** December 10, 2025  
+**Status:** Analyzed & Documented ✅
 
 ---
 
-## 🎯 Übersicht: KiteTemplates Feature
+## 🎯 Overview: KiteTemplates Feature
 
-**Zweck:** Automatische Generierung von professionellen HTML-Templates für verschiedene Kategorien & Branchen mit KI-Unterstützung (OpenAI GPT-4o-mini).
+**Purpose:** Automatic generation of professional HTML templates for various categories & industries with AI support (OpenAI GPT-4o-mini).
 
-**Komponenten:**
+**Components:**
 - Frontend: `frontend/src/pages/MarketingContent/KiteTemplates.tsx`
 - Backend: `backend/routes/app/api/marketing/template-routes.ts`
 - ML-Service: `backend/ml/mlService.ts`
