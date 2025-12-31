@@ -1,32 +1,32 @@
 # 🔐 Specialization Persistence & Auto-Load System
 
 **Version:** 2.1  
-**Datum:** December 31, 2025  
-**Status:** ✅ Produktiv (ARI/.enc, Auto-Load aktiviert)  
-**Autor:** System Architecture Team
+**Date:** December 31, 2025  
+**Status:** ✅ Production (ARI/.enc, Auto-load activated)  
+**Author:** System Architecture Team
 
 ---
 
-## 📋 Übersicht
+## 📋 Overview
 
-Das Specialization Persistence & Auto-Load System ist eine vollständige Lösung für die sichere, persistente Speicherung und automatische Verwaltung von KI-Spezialisierungen. Es kombiniert Filesystem-basierte Persistierung mit In-Memory-Caching, Verschlüsselung und umfassenden Fehlertoleranz-Mechanismen.
+The Specialization Persistence & Auto-Load System is a comprehensive solution for secure, persistent storage and automatic management of AI specializations. Es kombiniert Filesystem-based persistence mit In-Memory-Caching, Verschlüsselung und umfassenden Fault tolerance-Mechanismen.
 
 ### Kernfunktionen
 
-- ✅ **Filesystem-Persistierung** mit strukturierter Organisation
-- ✅ **AES-256-GCM Verschlüsselung** für sensible Daten
-- ✅ **SHA-256 Integritätschecks** für alle gespeicherten Dateien
-- ✅ **In-Memory Cache** für schnellen Zugriff
-- ✅ **Auto-Load beim Server-Start** mit Fallback-Mechanismen
-- ✅ **CRUD-Operationen** für vollständige Verwaltung
-- ✅ **Fehlertoleranz** mit graceful degradation
-- ✅ **Umfassende Test-Suite** (148 Tests passed)
+- ✅ **Filesystem-Persistierung** with structured organization
+- ✅ **AES-256-GCM Encryption** for sensitive data
+- ✅ **SHA-256 Integrity Checks** for all stored files
+- ✅ **In-memory cache** for fast access
+- ✅ **Auto-load on server startup** with fallback mechanisms
+- ✅ **CRUD operations** for complete management
+- ✅ **Fault tolerance** with graceful degradation
+- ✅ **Comprehensive test suite** (148 tests passed)
 
 ---
 
-## 🏗️ Architektur
+## 🏗️ Architecture
 
-### Komponenten-Übersicht
+### Komponenten-Overview
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -74,14 +74,14 @@ Das Specialization Persistence & Auto-Load System ist eine vollständige Lösung
 
 ---
 
-## 📁 Dateisystem-Struktur
+## 📁 Filesystem Structure
 
-### Verzeichnis-Layout
+### Directory Layout
 
 ```
 data/specializations/
 │
-├── index.json              # Globales Inventar aller Spezialisierungen
+├── index.json              # Global inventory of all specializations
 │   {
 │     "specs": [
 │       {
@@ -94,20 +94,20 @@ data/specializations/
 │     ]
 │   }
 │
-├── active.json             # Aktive Spezialisierungen pro User
+├── active.json             # Active specializations per user
 │   {
 │     "user-123": "beauty-001",
 │     "user-456": "tech-002"
 │   }
 │
-├── fallback.json          # Fallback-Spezialisierungen
+├── fallback.json          # Fallback specializations
 │   {
 │     "user-123": "default-001"
 │   }
 │
-└── {userId}/              # User-spezifisches Verzeichnis
+└── {userId}/              # User-specific directory
     │
-    ├── {specId}.json      # Spezialisierungs-Daten
+    ├── {specId}.json      # Specialization data
     │   {
     │     "id": "beauty-001",
     │     "name": "Beauty Expert",
@@ -121,7 +121,7 @@ data/specializations/
     │     }
     │   }
     │
-    └── {specId}.meta.json # Metadata & Checksums
+    └── {specId}.meta.json # Metadata & checksums
         {
           "checksum": "sha256-hash",
           "size": 4096,
@@ -132,14 +132,14 @@ data/specializations/
 
 ---
 
-## 🔐 Sicherheit & Verschlüsselung
+## 🔐 Security & Encryption
 
-### AES-256-GCM Verschlüsselung
+### AES-256-GCM Encryption
 
-**Verwendung:** Test-Spezialisierungen und Backups
+**Usage:** Test specializations and backups
 
 ```typescript
-// Encryption Format
+// Encryption format
 {
   "version": "1.0",
   "algorithm": "aes-256-gcm",
@@ -156,14 +156,14 @@ data/specializations/
 ```
 
 **Features:**
-- 256-bit Schlüssel für maximale Sicherheit
-- Unique IV pro Verschlüsselung (verhindert Pattern-Erkennung)
-- Authentication Tag für Tamper-Detection
-- Original-Hash-Preservation für Integrity-Checks
+- 256-bit key for maximum security
+- Unique IV per encryption (prevents pattern recognition)
+- Authentication tag for tamper detection
+- Original hash preservation for integrity checks
 
-### SHA-256 Integritätschecks
+### SHA-256 Integrity Checks
 
-Jede gespeicherte Spezialisierung erhält einen SHA-256 Hash:
+Each stored specialization receives a SHA-256 hash:
 
 ```typescript
 const checksum = crypto
@@ -172,27 +172,27 @@ const checksum = crypto
   .digest('hex');
 ```
 
-**Verwendung:**
-- Corruption-Detection beim Laden
-- Vergleich vor/nach Updates
-- Audit-Trail für Änderungen
+**Usage:**
+- Corruption detection on load
+- Comparison before/after updates
+- Audit trail for changes
 
 ---
 
-## 🚀 API & Verwendung
+## 🚀 API & Usage
 
 ### Persistence Manager API
 
-#### Initialisierung
+#### Initialization
 
 ```typescript
 import { SpecializationPersistenceManager } from './services/specializationPersistenceManager';
 
-// Beim Server-Start
+// On server startup
 await SpecializationPersistenceManager.initialize();
 ```
 
-#### Spezialisierung persistieren
+#### Persist specialization
 
 ```typescript
 const result = await SpecializationPersistenceManager.persistSpecialization(
@@ -208,7 +208,7 @@ const result = await SpecializationPersistenceManager.persistSpecialization(
 }
 ```
 
-#### Spezialisierung laden
+#### Load specialization
 
 ```typescript
 const spec = await SpecializationPersistenceManager.loadSpecialization(
@@ -219,7 +219,7 @@ const spec = await SpecializationPersistenceManager.loadSpecialization(
 // Returns: SpecializationContext | null
 ```
 
-#### Aktive Spezialisierung setzen
+#### Set active specialization
 
 ```typescript
 const success = await SpecializationPersistenceManager.setActiveSpecialization(
@@ -230,7 +230,7 @@ const success = await SpecializationPersistenceManager.setActiveSpecialization(
 // Returns: boolean
 ```
 
-#### Aktive Spezialisierung abrufen
+#### Get active specialization
 
 ```typescript
 const result = await SpecializationPersistenceManager.getActiveSpecialization(
@@ -244,7 +244,7 @@ const result = await SpecializationPersistenceManager.getActiveSpecialization(
 }
 ```
 
-#### Alle Spezialisierungen auflisten
+#### List all specializations
 
 ```typescript
 const list = await SpecializationPersistenceManager.listSpecializations(
@@ -254,7 +254,7 @@ const list = await SpecializationPersistenceManager.listSpecializations(
 // Returns: Array<{id, name, createdAt, updatedAt}>
 ```
 
-#### Integrität validieren
+#### Validate integrity
 
 ```typescript
 const validation = await SpecializationPersistenceManager.validateIntegrity(
@@ -269,7 +269,7 @@ const validation = await SpecializationPersistenceManager.validateIntegrity(
 }
 ```
 
-#### Spezialisierung löschen
+#### Delete specialization
 
 ```typescript
 const success = await SpecializationPersistenceManager.deleteSpecialization(
@@ -284,7 +284,7 @@ const success = await SpecializationPersistenceManager.deleteSpecialization(
 
 ### Auto-Load API
 
-#### Initialisierung & Cache laden
+#### Initialization & Cache laden
 
 ```typescript
 import { 
@@ -293,21 +293,21 @@ import {
   getLoadingState 
 } from './services/specializationAutoLoad';
 
-// Auto-Load starten
+// Start auto-load
 const spec = await initializeSpecializationAutoLoad(userId);
 
 // Returns: SpecializationContext | null
 ```
 
-#### Aktive Spezialisierung aus Cache
+#### Get active specialization from cache
 
 ```typescript
 const cached = getActiveSpecialization();
 
-// Returns: SpecializationContext | null (synchron!)
+// Returns: SpecializationContext | null (synchronous!)
 ```
 
-#### Loading-State prüfen
+#### Check loading state
 
 ```typescript
 const state = getLoadingState();
@@ -315,16 +315,16 @@ const state = getLoadingState();
 // Returns: 'not-started' | 'loading' | 'loaded' | 'failed'
 ```
 
-#### Spezialisierung aktivieren
+#### Activate specialization
 
 ```typescript
 const success = await activateSpecialization(specId, userId);
 
 // Returns: boolean
-// Side-effect: Updated cache & disk
+// Side-effect: Updates cache & disk
 ```
 
-#### Cache neu laden
+#### Reload cache
 
 ```typescript
 const spec = await reloadSpecialization(userId);
@@ -333,7 +333,7 @@ const spec = await reloadSpecialization(userId);
 // Side-effect: Cache invalidated & reloaded
 ```
 
-#### Alle validieren
+#### Validate all
 
 ```typescript
 const validation = await validateAllSpecializations(userId);
@@ -346,7 +346,7 @@ const validation = await validateAllSpecializations(userId);
 }
 ```
 
-#### Verfügbare auflisten
+#### List available
 
 ```typescript
 const list = await listAvailableSpecializations(userId);
@@ -356,18 +356,18 @@ const list = await listAvailableSpecializations(userId);
 
 ---
 
-## 🔄 State-Management
+## 🔄 State Management
 
 ### Loading States
 
 ```
 ┌─────────────┐
-│ not-started │ ← Initial State
+│ not-started │ ← Initial state
 └──────┬──────┘
        │ initializeSpecializationAutoLoad()
        ↓
 ┌─────────────┐
-│   loading   │ ← Lädt von Disk
+│   loading   │ ← Loading from disk
 └──────┬──────┘
        │
        ├─ Success → ┌────────┐
@@ -381,78 +381,78 @@ const list = await listAvailableSpecializations(userId);
 
 ### Cache Invalidation
 
-Der Cache wird invalidiert bei:
-- `reloadSpecialization()` - Explizites Reload
-- `activateSpecialization()` - Neue Aktivierung
-- Server-Restart - Komplett neu geladen
+The cache is invalidated by:
+- `reloadSpecialization()` - Explicit reload
+- `activateSpecialization()` - New activation
+- Server-Restart - Completely reloaded
 
 ---
 
 ## 🧪 Testing
 
-### Test-Suite Übersicht
+### Test-Suite Overview
 
-**Gesamt:** 148 passed, 28 skipped, 0 failed
+**Total:** 148 passed, 28 skipped, 0 failed
 
 #### 1. Persistence Tests (20 Tests)
 
-**Datei:** `tests/integration/specialization-persistence.test.ts`
+**File:** `tests/integration/specialization-persistence.test.ts`
 
 **Coverage:**
-- ✅ Initialisierung & Setup
-- ✅ Persist & Load-Operationen
-- ✅ Active/Fallback-Mechanismen
-- ✅ Listing & Inventar
-- ✅ Integrity-Validierung
-- ✅ Delete-Operationen
-- ✅ Corruption-Recovery
-- ✅ Error-Handling
+- ✅ Initialization & Setup
+- ✅ Persist & load operations
+- ✅ Active/fallback mechanisms
+- ✅ Listing & inventory
+- ✅ Integrity validation
+- ✅ Delete operations
+- ✅ Corruption recovery
+- ✅ Error handling
 
-#### 2. Auto-Load Tests (in Persistence-Suite)
+#### 2. Auto-Load Tests (in Persistence suite)
 
 **Coverage:**
-- ✅ Cache-Funktionalität
-- ✅ State-Transitions
-- ✅ Activation & Reload
+- ✅ Cache functionality
+- ✅ State transitions
+- ✅ Activation & reload
 - ✅ Validation
-- ✅ Missing-Data-Handling
+- ✅ Missing data handling
 
 #### 3. Backup Manager Tests (20 Tests)
 
-**Datei:** `backend/tests/unit/testSpecializationBackup.test.ts`
+**File:** `backend/tests/unit/testSpecializationBackup.test.ts`
 
 **Coverage:**
-- ✅ Load & List Operationen
-- ✅ Encryption & Decryption
-- ✅ Hash-Generierung & Consistency
-- ✅ Integrity-Checks
-- ✅ Error-Recovery
+- ✅ Load & list operations
+- ✅ Encryption & decryption
+- ✅ Hash generation & consistency
+- ✅ Integrity checks
+- ✅ Error recovery
 - ✅ Performance (< 100ms per operation)
 
 #### 4. Encryption Flow Tests (8 Tests)
 
-**Datei:** `backend/tests/integration/testSpecializationEncryption.test.ts`
+**File:** `backend/tests/integration/testSpecializationEncryption.test.ts`
 
 **Coverage:**
-- ✅ Encrypt → Save → Load → Decrypt
-- ✅ Unicode & Special Characters
-- ✅ Large Prompts (5KB+)
-- ✅ Edge Cases (empty values)
-- ✅ Performance & Statistics
+- ✅ Encrypt → save → load → decrypt
+- ✅ Unicode & special characters
+- ✅ Large prompts (5KB+)
+- ✅ Edge cases (empty values)
+- ✅ Performance & statistics
 
-### Test-Execution
+### Test Execution
 
 ```bash
-# Alle Tests
+# All tests
 npm run test
 
-# Nur Persistence
+# Persistence only
 npm run test -- -t "Persistence"
 
-# Nur Auto-Load
+# Auto-load only
 npm run test -- -t "Auto-Load"
 
-# Nur Encryption
+# Encryption only
 npm run test -- -t "Encryption"
 ```
 
@@ -462,157 +462,157 @@ npm run test -- -t "Encryption"
 
 ### Benchmarks
 
-**Setup:** 15 Spezialisierungen, Windows 11, Node.js 24
+**Setup:** 15 Specializations, Windows 11, Node.js 24
 
-| Operation                     | Durchschnitt | Maximum |
+| Operation                     | Average | Maximum |
 | ----------------------------- | ------------ | ------- |
-| Load Single                   | 2-5ms        | 15ms    |
+| Load single                   | 2-5ms        | 15ms    |
 | Persist                       | 7-10ms       | 25ms    |
-| List All                      | 1-3ms        | 10ms    |
-| Validate Integrity (15 specs) | 25-30ms      | 60ms    |
-| Auto-Load Initialize          | 3-6ms        | 20ms    |
-| Cache Hit                     | < 1ms        | < 1ms   |
+| List all                      | 1-3ms        | 10ms    |
+| Validate integrity (15 specs) | 25-30ms      | 60ms    |
+| Auto-load initialize          | 3-6ms        | 20ms    |
+| Cache hit                     | < 1ms        | < 1ms   |
 | Encryption                    | 2-4ms        | 10ms    |
 | Decryption                    | 2-4ms        | 10ms    |
 
-### Optimierungen
+### Optimizations
 
-- **In-Memory Cache:** Vermeidet wiederholte Disk-Reads
-- **Lazy Loading:** Metadata wird nur bei Bedarf geladen
-- **Batch Operations:** Validierung nutzt Promise.all
-- **Async File-I/O:** Blockiert nicht den Event-Loop
+- **In-memory cache:** Avoids repeated disk reads
+- **Lazy loading:** Metadata loaded only when needed
+- **Batch operations:** Validation uses Promise.all
+- **Async file I/O:** Does not block the event loop
 
 ---
 
 ## 🔧 Troubleshooting
 
-### Problem: Spezialisierung nicht gefunden
+### Problem: Specialization not found
 
 **Symptom:**
 ```
-⚠️ Spezialisierung nicht gefunden: spec-001
+⚠️ Specialization not found: spec-001
 ```
 
-**Lösung:**
-1. Prüfe ob Datei existiert: `data/specializations/{userId}/{specId}.json`
-2. Validiere index.json: `validateIntegrity(userId)`
-3. Prüfe Logs auf Corruption-Warnings
+**Solution:**
+1. Prüfe ob File existiert: `data/specializations/{userId}/{specId}.json`
+2. Validate index.json: `validateIntegrity(userId)`
+3. Check logs for corruption warnings
 
-### Problem: Corrupted File
+### Problem: Corrupted file
 
 **Symptom:**
 ```
 ⚠️ Fehler beim Laden von spec-001: Unexpected token
 ```
 
-**Lösung:**
-1. Prüfe `.meta.json` Checksum
-2. Restore aus Fallback: `getActiveSpecialization()` nutzt automatisch Fallback
-3. Neuanlage falls nötig: `persistSpecialization()`
+**Solution:**
+1. Check `.meta.json` checksum
+2. Restore from fallback: `getActiveSpecialization()` automatically uses fallback
+3. Recreate if necessary: `persistSpecialization()`
 
 ### Problem: Cache out-of-sync
 
 **Symptom:**
-Cache zeigt alte Daten nach Update
+Cache shows old data after update
 
-**Lösung:**
+**Solution:**
 ```typescript
 await reloadSpecialization(userId);
 ```
 
-### Problem: Auto-Load failed State
+### Problem: Auto-load failed state
 
 **Symptom:**
 ```
 getLoadingState() === 'failed'
 ```
 
-**Lösung:**
-1. Prüfe Logs für Root-Cause
-2. Retry mit: `await initializeSpecializationAutoLoad(userId)`
-3. Fallback prüfen: `getActiveSpecialization()` gibt immer etwas zurück
+**Solution:**
+1. Check logs for root cause
+2. Retry with: `await initializeSpecializationAutoLoad(userId)`
+3. Check fallback: `getActiveSpecialization()` always returns something
 
 ---
 
 ## 🎯 Best Practices
 
-### 1. Immer initialize() aufrufen
+### 1. Always call initialize()
 
 ```typescript
-// ✅ Gut
+// ✅ Good
 await SpecializationPersistenceManager.initialize();
 const spec = await persistSpecialization(...);
 
-// ❌ Schlecht
-const spec = await persistSpecialization(...); // Kann fehlschlagen!
+// ❌ Bad
+const spec = await persistSpecialization(...); // Can fail!
 ```
 
-### 2. Errors gracefully behandeln
+### 2. Handle errors gracefully
 
 ```typescript
-// ✅ Gut
+// ✅ Good
 const spec = await loadSpecialization(id, userId);
 if (!spec) {
-  logger.warn('Spec nicht gefunden, nutze Fallback');
+  logger.warn('Spec not found, using fallback');
   const fallback = await getActiveSpecialization(userId);
   return fallback.specialization;
 }
 
-// ❌ Schlecht
+// ❌ Bad
 const spec = await loadSpecialization(id, userId);
-spec.systemPrompt; // Kann crashen!
+spec.systemPrompt; // Can crash!
 ```
 
-### 3. Cache nutzen für häufige Zugriffe
+### 3. Use cache for frequent access
 
 ```typescript
-// ✅ Gut - Cache hit
-const spec = getActiveSpecialization(); // Synchron, schnell
+// ✅ Good - Cache hit
+const spec = getActiveSpecialization(); // Synchronous, fast
 
-// ⚠️ OK - Aber langsamer
-const result = await getActiveSpecialization(userId); // Disk-Read
+// ⚠️ OK - But slower
+const result = await getActiveSpecialization(userId); // Disk read
 ```
 
-### 4. Regelmäßig validieren
+### 4. Validate regularly
 
 ```typescript
-// Täglich oder bei kritischen Operationen
+// Daily or before critical operations
 const validation = await validateIntegrity(userId);
 if (validation.corrupted > 0) {
   await alertAdmin('Corrupted specs detected!');
 }
 ```
 
-### 5. Fallbacks definieren
+### 5. Define fallbacks
 
 ```typescript
-// Beim Setup
+// During setup
 await persistSpecialization(defaultSpec, userId);
-// Wird automatisch als Fallback verwendet wenn active fehlt
+// Automatically used as fallback if active fails
 ```
 
 ---
 
-## 📚 Verwandte Dokumentation
+## 📚 Related Documentation
 
-- [SPECIALIZATION_UPLOAD_ANALYSIS.md](./SPECIALIZATION_UPLOAD_ANALYSIS.md) - Upload & Security
-- [TEST_SPECIALIZATIONS_ANALYSIS.md](./TEST_SPECIALIZATIONS_ANALYSIS.md) - Test-Daten
-- [SECURITY_AI_FEATURES.md](./SECURITY_AI_FEATURES.md) - Security-Overview
-- [architecture.md](./architecture.md) - System-Architektur
+- [SPECIALIZATION_UPLOAD_ANALYSIS.md](./SPECIALIZATION_UPLOAD_ANALYSIS.md) - Upload & security
+- [TEST_SPECIALIZATIONS_ANALYSIS.md](./TEST_SPECIALIZATIONS_ANALYSIS.md) - Test data
+- [SECURITY_AI_FEATURES.md](./SECURITY_AI_FEATURES.md) - Security overview
+- [architecture.md](./architecture.md) - System-Architecture
 
 ---
 
 ## 📞 Support
 
-Bei Fragen oder Problemen:
+For questions or problems:
 
-1. Prüfe Logs: `backend/logs/`
-2. Validiere System: `validateIntegrity()`
-3. Konsultiere diese Dokumentation
-4. Kontaktiere Development Team
+1. Check logs: `backend/logs/`
+2. Validate system: `validateIntegrity()`
+3. Consult this documentation
+4. Contact development team
 
 ---
 
-**Letzte Aktualisierung:** December 18, 2025  
+**Last Updated:** December 18, 2025  
 **Version:** 2.0  
-**Status:** ✅ Produktiv & Getestet
+**Status:** ✅ Production & Getestet

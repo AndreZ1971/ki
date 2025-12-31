@@ -1,41 +1,41 @@
-# A.R.I. Tools Documentation - ML/KI Integration Status
+# A.R.I. Tools Documentation - ML/AI Integration Status
 
-> **Fokus dieser Dokumentation**: Technische Details der ML/KI-Integration für alle Dashboard-Tools. Die User-Dokumentation mit Screenshots und Bedienanleitung befindet sich in `Bedienungsanleitung-KI-Agent.md`.
+> **Focus of this documentation**: Technical details of ML/AI integration for all dashboard tools. User documentation with screenshots and operating instructions is located in `Operating-Instructions-AI-Agent.md`.
 
-**Zuletzt aktualisiert**: 16. Dezember 2025  
-**Status**: ✅ Abgeschlossen - Notes-Feature mit Autosave, Character Counter & Quick Templates, kritische Fixes für Rate-Limiting und IP-Block-Prevention
+**Last updated**: December 16, 2025  
+**Status**: ✅ Complete - Notes-Feature mit Autosave, Character Counter & Quick Templates, kritische Fixes für Rate-Limiting und IP-Block-Prevention
 
 ---
 
-## 📊 Übersicht der Tool-Integration
+## 📊 Tool Integration Overview
 
-| Kategorie               | Tools        | ML/KI          | Status        |
+| Category               | Tools        | ML/KI          | Status        |
 | ----------------------- | ------------ | -------------- | ------------- |
-| **Analytics**           | 9 Tools      | 🟢 Ja (9/9)     | Abgeschlossen |
-| **Product Management**  | 8 Tools      | 🟢 Ja           | Abgeschlossen |
-| **Payment & Finances**  | 13 Tools     | 🟢 Ja           | Abgeschlossen |
-| **Marketing & Content** | 10 Tools     | 🟢 Ja           | Abgeschlossen |
-| **Advanced AI**         | 12 Tools     | 🟢 Ja           | Abgeschlossen |
-| **GESAMT**              | **52 Tools** | 🟢 52/52 (100%) | 0 Tools offen |
+| **Analytics**           | 9 Tools      | 🟢 Yes (9/9)     | Complete |
+| **Product Management**  | 8 Tools      | 🟢 Yes           | Complete |
+| **Payment & Finances**  | 13 Tools     | 🟢 Yes           | Complete |
+| **Marketing & Content** | 10 Tools     | 🟢 Yes           | Complete |
+| **Advanced AI**         | 12 Tools     | 🟢 Yes           | Complete |
+| **TOTAL**              | **52 Tools** | 🟢 52/52 (100%) | 0 Tools pending |
 
 ---
 
-## ✅ Fertiggestellte Tools mit voller ML/KI-Integration
+## ✅ Completed Tools with Full ML/AI Integration
 
 ### Product Management (8/8 Tools)
 
 #### 🔍 **Product Analyzer** `frontend/src/pages/ProductManagement/ProductAnalyzer.tsx`
-- **ML-Features**: 
+- **ML Features**: 
   - Circular progress indicator für Score-Anzeige
   - Expandable issue cards mit Severity-Levels (critical/warning/info)
   - AI Insights (Stärken/Schwächen/Chancen/Empfehlungen)
-- **API-Integration**: `/api/products/optimizer/analyze/{productId}`
-- **Status**: ✅ Vollständig refaktoriert (11.12.2025)
-- **Abhängigkeiten**: ProductAnalysis Component, useProductManagement Hook
-- **Änderungen**: Aus ProductBundles extrahiert, standalone Page mit Dashboard-Tile
+- **API Integration**: `/api/products/optimizer/analyze/{productId}`
+- **Status**: ✅ Complete refaktoriert (11.12.2025)
+- **Dependencies**: ProductAnalysis Component, useProductManagement Hook
+- **Changes**: Aus ProductBundles extrahiert, standalone page with dashboard tile
 
 #### 📝 **ProductAnalysis - Notes Feature** `frontend/src/pages/app/ProductAnalysis.tsx`
-- **Neue Features (16.12.2025)**:
+- **New Features (16.12.2025)**:
   - 🎯 **Notes-Feld**: Speichern von Warehouse/Lagerort-Informationen
   - 🔄 **Autosave**: Automatisches Speichern nach 2 Sekunden Inaktivität (kein Button-Klick nötig)
   - 📊 **Character Counter**: Anzeige von 0/1000 Zeichen mit Warnungen (orange >70%, rot >90%)
@@ -47,144 +47,144 @@
   - ⏰ **Last-Saved Timestamp**: Grüner Checkmark mit Uhrzeit (z.B. ✅ 14:32)
   - 💾 **WooCommerce Integration**: Speichert Notizen als meta_data mit Schlüssel 'notes'
 - **Backend Endpoint**: `POST /api/products/adviser/notes/:id`
-- **Status**: ✅ Vollständig implementiert (16.12.2025)
-- **Fehler-Fixed**:
-  - ✅ Rate-limiting Fixes (useEffect Dependency Hell)
-  - ✅ OpenAI Description Sanitization (max 500 chars, HTML removal)
-  - ✅ 404 Monitoring für IP-Block Prevention
+- **Status**: ✅ Complete implementiert (16.12.2025)
+- **Bugs Fixed**:
+  - ✅ Rate-limiting fixes (useEffect Dependency Hell)
+  - ✅ OpenAI description sanitization (max 500 chars, HTML removal)
+  - ✅ 404 monitoring für IP-block prevention
 
 #### 🤖 **Auto Product Creator** `frontend/src/pages/ProductManagement/AutoProductCreator.tsx`
-- **ML-Features**: AI-gestützte Produkterstellung mit Optimierung
-- **API-Integration**: `/api/products/creator/auto`
-- **Status**: ✅ Mit KI-Enhancement
+- **ML Features**: AI-powered product creation with optimization
+- **API Integration**: `/api/products/creator/auto`
+- **Status**: ✅ With AI enhancement
 - **Konfigurierbar**: useAIEnhancements Toggle
 
 #### 🛒 **Woo Product Create** `frontend/src/pages/ProductManagement/WooProductCreate.tsx`
-- **ML-Features**: Automatische Produktdaten-Generierung
-- **Status**: ✅ Integriert
+- **ML Features**: Automatic product data generation
+- **Status**: ✅ Integrated
 - **API**: `/api/woocommerce/products/create`
 
 #### ✏️ **Woo Product Update** `frontend/src/pages/ProductManagement/WooProductUpdate.tsx`
-- **ML-Features**: Intelligente Produktaktualisierung
-- **Status**: ✅ Integriert
+- **ML Features**: Intelligent product update
+- **Status**: ✅ Integrated
 
 #### 📑 **Categories Manager** `frontend/src/pages/ProductManagement/CategoriesManager.tsx`
-- **ML-Features**: Automatische Kategorie-Verwaltung
-- **Status**: ✅ Mit MLCategorySuggester Integration
+- **ML Features**: Automatische Category-Verwaltung
+- **Status**: ✅ Mit MLCategorySuggester integration
 - **Sub-Component**: MLCategorySuggester.tsx
 
 #### 🎁 **Freebies Creator** `frontend/src/pages/ProductManagement/CreateFreebies.tsx`
-- **ML-Features**: Automatische Gratis-Produkt-Erstellung
+- **ML Features**: Automatic free product creation
 - **Status**: ✅ Mit MLFreebieGenerator
 - **Sub-Component**: MLFreebieGenerator.tsx
 
 #### 📦 **Product Bundles** `frontend/src/pages/ProductManagement/ProductBundles.tsx`
-- **ML-Features**: Bundle-Erstellung mit KI-Vorschlägen
-- **Status**: ✅ Gereinigt (ProductAnalysis extrahiert)
+- **ML Features**: Bundle creation with AI suggestions
+- **Status**: ✅ Cleaned (ProductAnalysis extracted)
 
 #### 🚀 **Run Auto Product Creator** `frontend/src/pages/ProductManagement/RunAutoProductCreator.tsx`
-- **ML-Features**: Config-Optionen: useAIEnhancements, autoTagging, generateImages
-- **Status**: ✅ Voll funktional mit KI-Toggles
+- **ML Features**: Config options: useAIEnhancements, autoTagging, generateImages
+- **Status**: ✅ Fully functional with AI toggles
 
 ---
 
 ### Marketing & Content (10/10 Tools)
 
 #### 📧 **AI Email Generator** `frontend/src/pages/MarketingContent/ai-email-generator.tsx`
-- **ML-Features**: KI-basierte Email-Generierung
+- **ML Features**: AI-powered email generation
 - **API**: `/api/ai/email/email-draft`
-- **Status**: ✅ Vollständig
-- **Capabilities**: Template-basiert, LLM-Integration
+- **Status**: ✅ Complete
+- **Capabilities**: Template-based, LLM integration
 
 #### 🇩🇪 **German Content Generator** `frontend/src/pages/MarketingContent/GermanContentGenerator.tsx`
-- **ML-Features**: Deutsche Inhalte mit NLP
-- **Status**: ✅ Integriert
+- **ML Features**: German content with NLP
+- **Status**: ✅ Integrated
 
 #### ✉️ **Email Marketing Automation** `frontend/src/pages/MarketingContent/EmailMarketingAutomation.tsx`
-- **ML-Features**: Automatisierte Kampagnen, Personalisierung
+- **ML Features**: Automated campaigns, Personalization
 - **Status**: ✅ Mit KI
 
 #### 🎵 **Social Media Audio** `frontend/src/pages/MarketingContent/SocialMediaAudio.tsx`
-- **ML-Features**: Text-to-Speech, Audio-Generierung
-- **Status**: ✅ Integriert
+- **ML Features**: Text-to-speech, Audio generation
+- **Status**: ✅ Integrated
 
 #### 📱 **Social Media Poster** `frontend/src/pages/MarketingContent/SocialMediaPoster.tsx`
-- **ML-Features**: Automatisches Content-Posting
-- **Status**: ✅ Integriert
+- **ML Features**: Automatic content posting
+- **Status**: ✅ Integrated
 
 #### 🆓 **Free to Post Converter** `frontend/src/pages/MarketingContent/FreeToPostConverter.tsx`
-- **ML-Features**: Conversion-Optimization
+- **ML Features**: Conversion optimization
 - **Status**: ✅ Mit KI
 
 #### 💸 **Content Monetized** `frontend/src/pages/MarketingContent/ContentMonetized.tsx`
-- **ML-Features**: Automatische Monetarisierung
-- **Status**: ✅ Integriert
+- **ML Features**: Automatic monetization
+- **Status**: ✅ Integrated
 
 #### 🎨 **Kite Templates** `frontend/src/pages/MarketingContent/KiteTemplates.tsx`
-- **ML-Features**: Template-Verwaltung, Design-Vorschläge
-- **Status**: ✅ Integriert
+- **ML Features**: Template management, Design suggestions
+- **Status**: ✅ Integrated
 
 #### 📝 **Blogpost Generator** `frontend/src/pages/MarketingContent/BlogPostGenerator.tsx`
-- **ML-Features**: SEO-optimierte Blogposts, Outline-Generierung
+- **ML Features**: SEO-optimized blog posts, Outline generation
 - **API**: `/api/marketing/blogpost/generate`
-- **Status**: ✅ Vollständig
-- **Capabilities**: Keyword-Analyse, Content-Struktur, LLM-Integration
+- **Status**: ✅ Complete
+- **Capabilities**: Keyword analysis, Content structure, LLM integration
 
 #### 🖼️ **Image Analyzer** `frontend/src/pages/MarketingContent/ImageAnalyzer.tsx`
-- **ML-Features**: Bild-Qualitätsprüfung, Auto-Tagging, SEO-Analyse
+- **ML Features**: Image quality check, Auto-tagging, SEO analysis
 - **API**: `/api/marketing/image/analyze`
-- **Status**: ✅ Vollständig
-- **Capabilities**: Vision AI, Tag-Generierung, Qualitäts-Score
+- **Status**: ✅ Complete
+- **Capabilities**: Vision AI, Tag generation, Quality score
 
 ---
 
 ### Advanced AI (9/9 Tools)
 
 #### 🧠 **Context Generator** `frontend/src/pages/Advanced/ContextGenerator.tsx`
-- **ML-Features**: KI-Kontext-Generierung
-- **Status**: ✅ Mit LLM-Integration
+- **ML Features**: AI context generation
+- **Status**: ✅ Mit LLM integration
 
 #### 🔤 **String Generator** `frontend/src/pages/Advanced/StringGenerator.tsx`
-- **ML-Features**: Intelligente String-Generierung
+- **ML Features**: Intelligent string generation
 - **Status**: ✅ Mit KI
 
 #### 🔄 **Auto Framplementator** `frontend/src/pages/Advanced/AutoFramplementator.tsx`
-- **ML-Features**: Automatische Framework-Implementierung
-- **Status**: ✅ Mit KI-Enhancement
+- **ML Features**: Automatic framework implementation
+- **Status**: ✅ With AI enhancement
 - **API**: `/api/ai/framework/implement`
 
 #### 🔄 **WooCommerce Sync** `frontend/src/pages/Advanced/WooCommerceSync.tsx`
-- **ML-Features**: Intelligente Daten-Synchronisation
-- **Status**: ✅ Mit KI-Optimierung
+- **ML Features**: Intelligent data synchronization
+- **Status**: ✅ With AI optimization
 - **Dependencies**: Fastify backend, WooCommerce API
 
 #### 💾 **Memory System** `frontend/src/pages/Advanced/MemorySystem.tsx`
-- **ML-Features**: Persistent memory für KI-Kontexte, Message-Logging
+- **ML Features**: Persistent memory for AI contexts, Message logging
 - **API**: `/api/memory/stats`, `/api/memory/messages`
-- **Status**: ✅ Vollständig refaktoriert (11.12.2025)
-- **Recent Fix**: useCallback für loadStats/loadMessages - React Hook Dependencies behoben
-- **Key Patterns**: useMemo für Message-Filtering, useCallback für API-Calls
-- **Components**: Statistics Cards, Message Log Table, Memory Cleanup
+- **Status**: ✅ Complete refaktoriert (11.12.2025)
+- **Recent Fix**: useCallback for loadStats/loadMessages - React hook dependencies fixed
+- **Key Patterns**: useMemo for message filtering, useCallback for API calls
+- **Components**: Statistics cards, Message log table, Memory cleanup
 
 #### ⚙️ **System Health** `frontend/src/pages/Advanced/SystemHealth.tsx`
-- **ML-Features**: System-Monitoring mit Alerts
+- **ML Features**: System monitoring with alerts
 - **API**: `/api/monitoring/system/metrics`, `/api/monitoring/services/status`
-- **Status**: ✅ Vollständig refaktoriert (10.12.2025)
-- **Recent Updates**: buildUrl() normalization, lastUpdated timestamps, threshold alerts
+- **Status**: ✅ Complete refaktoriert (10.12.2025)
+- **Recent Updates**: buildUrl() normalization, lastUpdated timestamps, Threshold alerts
 - **Styling**: Glassmorphism, Color-coded severity levels
 - **Capabilities**: Memory tracking, CPU monitoring, Service health
 
 #### 👤 **User Management** `frontend/src/pages/app/UserManagement.tsx`
-- **ML-Features**: KI-gestützte Kundensegmentierung, MLPersonalization Integration
+- **ML Features**: AI-powered customer segmentation, MLPersonalization integration
 - **API**: `/api/woocommerce/customers`
-- **Status**: ✅ Vollständig refaktoriert (10.12.2025)
-- **Recent Updates**: Complete TypeScript rewrite (~500 lines), Kacheln-Stats, Search/Sort/Filter
+- **Status**: ✅ Complete refaktoriert (10.12.2025)
+- **Recent Updates**: Complete TypeScript rewrite (~500 lines), Tile stats, Search/sort/filter
 - **Sub-Components**: MLPersonalization modal integration
-- **Features**: Stats-Cards (Gesamtumsatz, Ø-Warenkorbwert, aktive Kunden, Top Kunde)
-- **Data Extended**: customer status, last_login, visit_count, role fields
+- **Features**: Statistics cards (Total sales, Average cart value, Active customers, Top customer)
+- **Data Extended**: Customer status, Last login, Visit count, Role fields
 
 #### 💬 **Feedback Analysis** `frontend/src/pages/app/FeedbackAnalysis.tsx`
-- **ML-Features**: 
+- **ML Features**: 
   - Sentiment-Analyse (positive/negative/neutral) mit Confidence-Scores
   - Automatische Kategorisierung (Customer, Performance, Products, Traffic, Conversion)
   - Impact-Bewertung (high/medium/low) für jedes Insight
@@ -194,9 +194,9 @@
   - `/api/analytics/feedback/reviews` (WooCommerce Reviews via REST)
   - `/api/analytics/feedback/tickets` (Support-Tickets via Plugin-REST-API)
   - `/api/analytics/feedback/analyze` (KI-Analyse)
-- **Status**: ✅ Vollständig mit ML/KI integriert
+- **Status**: ✅ Complete mit ML/KI integriert
 - **Capabilities**: Reviews + Tickets Analyse, Sentiment Detection, Pattern Recognition
-- **Features**: Stats-Cards (Bewertungen, Tickets, Sentiment, Resolution Time), Insight-Grid mit Recommendations, Next Steps Display
+- **Features**: Statistics cards (Bewertungen, Tickets, Sentiment, Resolution Time), Insight-Grid mit Recommendations, Next Steps Display
 - **UI**: Glassmorphism, Color-coded Impact/Status, Expandable Rohdaten
 
 **⚠️ PLUGIN-ANFORDERUNG - Awesome Support 6.3.6**
@@ -224,20 +224,20 @@ Die Kunden-Feedback-Analyse nutzt echte Support-Tickets aus deinem WordPress-Sys
 - Das System zeigt keine Mock-Daten oder Fallback-Tickets
 
 #### 🌐 **Real Web Analytics** `frontend/src/pages/AnalyseMetrics/RealWebAnalytics.tsx`
-- **ML-Features**:
+- **ML Features**:
   - Multi-Source Trend Analysis (Google Trends, Reddit, News, GitHub, StackOverflow)
   - KI-Report Generation mit GPT-basierter Analyse
   - Automatische Kategorisierung (Performance, Products, Traffic, Conversion, Customer)
   - Confidence Scoring & Top Trend Detection
   - Next Steps Recommendations mit Prioritäten
 - **API**: `/api/analytics/trends/analyze`, `/api/analytics/ml/report`
-- **Status**: ✅ Vollständig mit ML/KI integriert
+- **Status**: ✅ Complete mit ML/KI integriert
 - **Capabilities**: Batch Product Analysis, Time-Range Selection (today/week/month), Multi-Source Aggregation
 - **Features**: Trend Scoring, Source-Level Breakdown, KI-Insights, Average Score Tracking
 - **UI**: Time-Range Selector, Product List, Trend-Liste mit Confidence, KI-Report Display
 
 #### 🗺️ **Analytic Regioning** `frontend/src/pages/AnalyseMetrics/AnalyticRegioning.tsx`
-- **ML-Features**:
+- **ML Features**:
   - KI-Regionen-Analyse mit GPT-basierter Optimierung
   - ML-Insights für regionale Performance (type, title, value, score, detail)
   - KI-Score Anzeige (Confidence-Scoring in %)
@@ -245,27 +245,27 @@ Die Kunden-Feedback-Analyse nutzt echte Support-Tickets aus deinem WordPress-Sys
   - Automatische Identifikation von Top-Performern & Optimierungsbedarf
   - Dynamische ML-Insights vom Backend
 - **API**: `/api/analytics/regioning/ml-analysis` (POST)
-- **Status**: ✅ Vollständig mit ML/KI integriert
+- **Status**: ✅ Complete mit ML/KI integriert
 - **Capabilities**: Regional Traffic Distribution, Country Performance Ranking, Trend Detection per Region
 - **Features**: Multi-Region Selection, ML-Loading States, Error Handling, Structured Insights Rendering
 - **UI**: Region Selector (Global/Europa/Amerika/Asien), Stats Cards, Traffic Distribution Bars, Top Countries Table, KI-Insights Display
 
 #### ⭐ **Premium Audit** `frontend/src/pages/AnalyseMetrics/PremiumAudit.tsx`
-- **ML-Features**:
+- **ML Features**:
   - KI-gestützte Shop-Optimierung mit GPT-basierter Analyse
-  - ML-Insights für Audit-Kategorien (type, title, value, score, detail, priority, category)
+  - ML-Insights für Audit-Categoryn (type, title, value, score, detail, priority, category)
   - Cost-Benefit-Analyse mit KI-Confidence-Scoring
   - Automatische Prioritätsvergabe (critical/high/medium/low)
   - Category-spezifische Optimierungsvorschläge
   - Dynamische ML-Recommendations basierend auf Audit-Daten
 - **API**: `/api/audit/premium/ml-analysis` (POST)
-- **Status**: ✅ Vollständig mit ML/KI integriert
+- **Status**: ✅ Complete mit ML/KI integriert
 - **Capabilities**: Audit Score Calculation, Category Analysis, Priority-based Recommendations, Timeline Planning
 - **Features**: ML-Button mit Loading States, Error Handling, Priority-colored Insights, Category Filtering
 - **UI**: KI-Optimierung Button, Insights mit Priority-Badges, Confidence-Score-Anzeige, Category-Tags
 
 #### 🔧 **Standard Audit** `frontend/src/pages/AnalyseMetrics/StandardAudit.tsx`
-- **ML-Features**:
+- **ML Features**:
   - KI-gestützte Quick-Checks mit GPT-basierter Analyse
   - ML-Insights für Basis-Audit-Checks (type, title, value, score, detail, priority, category)
   - Schnelle KI-Optimierungsvorschläge
@@ -273,7 +273,7 @@ Die Kunden-Feedback-Analyse nutzt echte Support-Tickets aus deinem WordPress-Sys
   - Category-spezifische Quick-Checks (performance/seo/security/ux/content)
   - Confidence-Scoring für Empfehlungen
 - **API**: `/api/audit/standard/ml-analysis` (POST)
-- **Status**: ✅ Vollständig mit ML/KI integriert
+- **Status**: ✅ Complete mit ML/KI integriert
 - **Capabilities**: Quick-Fix Detection, Importance-based Checks, Progress Tracking, Next Steps Generation
 - **Features**: KI-Quick-Check Button, ML-Loading States, Error Handling, Priority-colored Insights
 - **UI**: KI-Quick-Check Button, Insights mit Priority-Badges, Confidence-Score-Anzeige, Category-Filter
@@ -284,21 +284,21 @@ Die Kunden-Feedback-Analyse nutzt echte Support-Tickets aus deinem WordPress-Sys
 
 #### 📊 **Trend Analysis** `frontend/src/pages/AnalyseMetrics/TrendAnalysis.tsx`
 
-- **ML-Features**: KI-gestützte Trend-Analyse, KI-Insights, Next Steps, Summary-Generation
+- **ML Features**: KI-gestützte Trend-Analyse, KI-Insights, Next Steps, Summary-Generation
 - **API**: `/api/analytics/ml/generate`
-- **Status**: ✅ Vollständig ML/KI-integriert (inkl. Loading/Error-Handling, Mock-Fallback)
+- **Status**: ✅ Complete ML/KI-integriert (inkl. Loading/Error-Handling, Mock-Fallback)
 
 #### 🚀 **Run Trend Analysis** `frontend/src/pages/AnalyseMetrics/RunTrendAnalysis.tsx`
 
-- **ML-Features**: Progressives KI-Trend-Scoring, Insight-Mapping, Ergebnis-Rendering
+- **ML Features**: Progressives KI-Trend-Scoring, Insight-Mapping, Ergebnis-Rendering
 - **API**: `/api/ml/test/trends` (über `VITE_API_URL` oder Dev-Proxy)
-- **Status**: ✅ Vollständig ML/KI-integriert (inkl. Simulated Fallback, Fortschrittsanzeige)
+- **Status**: ✅ Complete ML/KI-integriert (inkl. Simulated Fallback, Fortschrittsanzeige)
 
 #### 🔍 **Real Analytics** `frontend/src/pages/AnalyseMetrics/RealAnalytics.tsx`
 
-- **ML-Features**: Echtzeit-ML-Analyse mit KI-Insights, Auto-Refresh (30s), Next Steps
+- **ML Features**: Echtzeit-ML-Analyse mit KI-Insights, Auto-Refresh (30s), Next Steps
 - **API**: `/api/analytics/ml/generate`
-- **Status**: ✅ Vollständig ML/KI-integriert (Realtime-Pipeline, Fehler-/Loading-State)
+- **Status**: ✅ Complete ML/KI-integriert (Realtime-Pipeline, Fehler-/Loading-State)
 
 ---
 
@@ -308,18 +308,18 @@ Diese Tools haben Basic-APIs aber begrenzte ML/KI-Features:
 
 | Tool                  | File                   | ML-Status     | Notizen                                                    |
 | --------------------- | ---------------------- | ------------- | ---------------------------------------------------------- |
-| 📊 Shop Metrics        | ShopMetrics.tsx        | 🟢 Vollständig | ML-Analyse: `/api/analytics/metrics/ml-analysis`           |
-| 📈 Conversion Analysis | ConversionAnalysis.tsx | 🟢 Vollständig | ML-Analyse: `/api/analytics/conversion/ml-analysis`        |
-| 📋 Conversion Reported | ConversionReported.tsx | 🟢 Vollständig | ML-Analyse: `/api/analytics/conversion/ml/report-analysis` |
-| 🗺️ Analytic Regioning  | AnalyticRegioning.tsx  | 🟢 Vollständig | ML-Analyse: `/api/analytics/regioning/ml-analysis`         |
-| 🏪 Shop Health Report  | ShopHealthReport.tsx   | 🟢 Vollständig | ML-Analyse: `/api/health/ml-analysis`                      |
-| ⭐ Premium Audit       | PremiumAudit.tsx       | 🟢 Vollständig | ML-Analyse: `/api/audit/premium/ml-analysis`               |
-| 🔧 Standard Audit      | StandardAudit.tsx      | 🟢 Vollständig | ML-Analyse: `/api/audit/standard/ml-analysis`              |
-| 🔎 Mini Audit          | MiniAudit.tsx          | 🟢 Vollständig | ML-Analyse: `/api/audit/mini/ml-analysis`                  |
+| 📊 Shop Metrics        | ShopMetrics.tsx        | 🟢 Complete | ML-Analyse: `/api/analytics/metrics/ml-analysis`           |
+| 📈 Conversion Analysis | ConversionAnalysis.tsx | 🟢 Complete | ML-Analyse: `/api/analytics/conversion/ml-analysis`        |
+| 📋 Conversion Reported | ConversionReported.tsx | 🟢 Complete | ML-Analyse: `/api/analytics/conversion/ml/report-analysis` |
+| 🗺️ Analytic Regioning  | AnalyticRegioning.tsx  | 🟢 Complete | ML-Analyse: `/api/analytics/regioning/ml-analysis`         |
+| 🏪 Shop Health Report  | ShopHealthReport.tsx   | 🟢 Complete | ML-Analyse: `/api/health/ml-analysis`                      |
+| ⭐ Premium Audit       | PremiumAudit.tsx       | 🟢 Complete | ML-Analyse: `/api/audit/premium/ml-analysis`               |
+| 🔧 Standard Audit      | StandardAudit.tsx      | 🟢 Complete | ML-Analyse: `/api/audit/standard/ml-analysis`              |
+| 🔎 Mini Audit          | MiniAudit.tsx          | 🟢 Complete | ML-Analyse: `/api/audit/mini/ml-analysis`                  |
 
 **ML-Integration Status**: Alle AnalyseMetrics-Tools rufen dedizierte ML/KI-Endpunkte auf und rendern KI-Insights.
 
-**Note**: Feedback Analysis wurde aus dieser Kategorie entfernt - sie ist bereits vollständig ML/KI-integriert und unter "Advanced AI" dokumentiert!
+**Note**: Feedback Analysis wurde aus dieser Category entfernt - sie ist bereits vollständig ML/KI-integriert und unter "Advanced AI" dokumentiert!
 
 ---
 
@@ -329,7 +329,7 @@ Diese Tools haben Basic-APIs aber begrenzte ML/KI-Features:
 
 ### PaymentFinances Folder (`frontend/src/pages/PaymentFinances/`)
 
-| Tool                      | File                      | ML-Features                                                                                  | Status |
+| Tool                      | File                      | ML Features                                                                                  | Status |
 | ------------------------- | ------------------------- | -------------------------------------------------------------------------------------------- | ------ |
 | ⚡ Payment Fast            | PaymentFast.tsx           | Fraud Detection (Auto-Check), Smart Amount Suggestions, Risk Scoring                         | ✅      |
 | 🎯 Payment Simplified      | PaymentSimplified.tsx     | Simplified Payment Flow mit ML-Optimization                                                  | ✅      |
@@ -351,7 +351,7 @@ Diese Tools haben Basic-APIs aber begrenzte ML/KI-Features:
 
 ---
 
-## 🔧 FIXES & IMPROVEMENTS - 16. Dezember 2025
+## 🔧 FIXES & IMPROVEMENTS - December 16, 2025
 
 ### KRITISCHE FIXES
 
@@ -374,7 +374,7 @@ Diese Tools haben Basic-APIs aber begrenzte ML/KI-Features:
 - **Impact**: 🛡️ Shop bleibt stabil, keine Crashes mehr von großen Datenmengen
 - **Commit**: `b050bf6`
 
-#### 3. 🔐 **Bitpalast IP-Block Prevention** - 404 Monitoring
+#### 3. 🔐 **Bitpalast IP-block prevention** - 404 monitoring
 - **Problem**: IP 213.138.57.94 wurde blockiert wegen zu vielem 404-Traffic (sieht aus wie Hacker-Scan)
 - **Lösung**:
   - `setNotFoundHandler` in server.ts loggt ALLE 404s mit IP + Method + URL
@@ -429,7 +429,7 @@ Diese Tools haben Basic-APIs aber begrenzte ML/KI-Features:
 ### **AIDashboard** `frontend/src/pages/AIDashboard.tsx`
 
 - **Status**: ✅ Voll funktional
-- **Struktur**: 5 Kategorien mit insgesamt 51 Tools
+- **Struktur**: 5 Categoryn mit insgesamt 51 Tools
 - **Features**:
   - Category Filtering (all/analytics/products/payments/marketing/advanced)
   - Tool Cards mit Icons, Descriptions, Direct Navigation
@@ -527,11 +527,11 @@ Diese Tools haben Basic-APIs aber begrenzte ML/KI-Features:
 ## 📊 Statistik
 
 - **Gesamt**: 52 Tools
-- **Vollständig ML/KI-integriert**: 44 Tools (85%)
+- **Complete ML/KI-integriert**: 44 Tools (85%)
 - **Teilweise integriert**: 8 Tools (15%)
 - **Minimal/Keine Integration**: 0 Tools (0%)
 
-### Kategorie-Übersicht
+### Category-Übersicht
 
 - ✅ **Product Management**: 8/8 Tools (100%)
 - ✅ **Marketing & Content**: 10/10 Tools (100%)
@@ -543,7 +543,7 @@ Diese Tools haben Basic-APIs aber begrenzte ML/KI-Features:
 
 ## 🔗 Verwandte Dokumentation
 
-- **User-Bedienung**: `docs/Bedienungsanleitung-KI-Agent.md`
+- **User-Bedienung**: `docs/Operating-Instructions-AI-Agent.md`
 - **Deployment**: `docs/deployment.md`
 - **ML-Setup**: `docs/BACKEND_AI_SETUP.md`
 - **Architecture**: `docs/architecture.md`
@@ -551,12 +551,12 @@ Diese Tools haben Basic-APIs aber begrenzte ML/KI-Features:
 ---
 
 **Autor**: André Zabel  
-**Aktualisiert**: 16. Dezember 2025  
+**Aktualisiert**: December 16, 2025  
 **Repository**: A.R.I. - Artificial Retail Intelligence System
 
 ---
 
-## 📋 Session Summary - 16. Dezember 2025
+## 📋 Session Summary - December 16, 2025
 
 **Fokus**: Bug Fixes + Product Notes Enhancement  
 **Status**: ✅ Alle Fehler behoben, neue Features produktiv
@@ -564,11 +564,11 @@ Diese Tools haben Basic-APIs aber begrenzte ML/KI-Features:
 ### Gelöste Issues
 - ✅ Rate-Limiting Infinite Loop (useEffect Dependencies)
 - ✅ OpenAI Token Overflow (Description Sanitization)
-- ✅ IP-Blocks von Hoster (404 Monitoring)
+- ✅ IP-Blocks von Hoster (404 monitoring)
 - ✅ TypeScript Compilation (Schema Validation)
 - ✅ Server Startup (Duplicate Handler)
 
-### Neue Features
+### New Features
 - ✅ Notes-Feld für Lagerort/Warehouse-Info
 - ✅ Autosave nach 2 Sekunden
 - ✅ Character Counter + Quick Templates
