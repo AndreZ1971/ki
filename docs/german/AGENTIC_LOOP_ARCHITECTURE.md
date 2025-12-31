@@ -1,56 +1,57 @@
+````markdown
 # Agentic Loop Architecture
 
-> **Hinweis**: Für Benutzer-Dokumentation siehe [AGENTIC_LOOPS_USER_GUIDE.md](./AGENTIC_LOOPS_USER_GUIDE.md)
+> **Note**: For user documentation see [AGENTIC_LOOPS_USER_GUIDE.md](./AGENTIC_LOOPS_USER_GUIDE.md)
 
-## Übersicht
+## Overview
 
-Die Agentic Loop Architektur ermöglicht autonome Agenten, die in einem kontinuierlichen Zyklus arbeiten:
+The Agentic Loop architecture enables autonomous agents working in a continuous cycle:
 
 ```
 SENSE → THINK → ACT → LEARN → (REPEAT if needed)
          ↓       ↓      ↓        ↓
-      Daten  Analyse  Tools   Memory
+      Data  Analysis  Tools   Memory
 ```
 
-Jeder Loop kann **wiederverwendbare Tools** zur Durchführung von ACT-Operationen nutzen:
-- **WooCommerce API Tool**: Liest/schreibt Orders, Produkte, Customers
-- **AI/ML Tool**: Generiert Insights, Empfehlungen, Varianten
-- **Alert Tool**: Versendet Notifications, Logs
-- **Storage Tool**: Speichert Learnings & Patterns für zukünftige Entscheidungen
+Each loop can utilize **reusable tools** to perform ACT operations:
+- **WooCommerce API Tool**: Reads/writes orders, products, customers
+- **AI/ML Tool**: Generates insights, recommendations, variants
+- **Alert Tool**: Sends notifications, logs
+- **Storage Tool**: Persists learnings & patterns for future decisions
 
 ---
 
-## 4 Agentic Loop Implementierungen
+## 4 Agentic Loop Implementations
 
 ### 1. **Anomaly Detection Loop** 🚨
-**Datei**: `backend/agent/loops/anomalyDetectionLoop.ts`
+**File**: `backend/agent/loops/anomalyDetectionLoop.ts`
 
-**Zweck**: Erkennt Payment-Anomalien und erstellt Recovery-Actions
+**Purpose**: Detects payment anomalies and creates recovery actions
 
 **Flow**:
 
-| Phase     | Tool            | Aktion                                           |
-| --------- | --------------- | ------------------------------------------------ |
-| **SENSE** | WooCommerce API | Lade letzte 100 failed/pending Orders            |
-| **THINK** | Analyzer Tool   | Erkenne 4 Anomaly-Types (s.u.)                   |
-| **ACT**   | Alert + Storage | Erstelle Recovery-Actions, speichere Pattern     |
-| **LEARN** | Memory Tool     | Verfeinere Erkennungslogik für nächste Iteration |
+| Phase     | Tool            | Action                                          |
+| --------- | --------------- | ----------------------------------------------- |
+| **SENSE** | WooCommerce API | Load last 100 failed/pending orders             |
+| **THINK** | Analyzer Tool   | Detect 4 anomaly types (see below)              |
+| **ACT**   | Alert + Storage | Create recovery actions, save pattern           |
+| **LEARN** | Memory Tool     | Refine detection logic for next iteration       |
 
-**Erkannte Anomaly-Types**:
+**Detected Anomaly Types**:
 ```typescript
 1. failed_payment: Status = "failed" → Severity: HIGH
-   Tool: WooCommerce (Lese Order Status)
+   Tool: WooCommerce (Read order status)
    Action: Alert "Manual review required"
 
 2. unusual_amount: Total > €5000 → Severity: MEDIUM
    Tool: Amount Analyzer
    Action: Flag "Manual review for high-value order"
 
-3. repeated_attempts: Customer mit 2+ failed Payments → Severity: HIGH
-   Tool: WooCommerce (Lese Customer Order History)
+3. repeated_attempts: Customer with 2+ failed payments → Severity: HIGH
+   Tool: WooCommerce (Read customer order history)
    Action: Alert "Possible fraud / customer in distress"
 
-4. high_risk: Pattern-based (z.B. gleicher Betrag, mehrere Cards) → Severity: MEDIUM
+4. high_risk: Pattern-based (e.g., same amount, multiple cards) → Severity: MEDIUM
    Tool: Pattern Analyzer
    Action: Alert "High-risk pattern detected"
 ```
@@ -90,20 +91,20 @@ POST /api/agent/loops/anomaly-detection/run
 ---
 
 ### 2. **Product Optimization Loop** 📈
-**Datei**: `backend/agent/loops/productOptimizationLoop.ts`
+**File**: `backend/agent/loops/productOptimizationLoop.ts`
 
-**Zweck**: A/B testet Produkt-Attribute um Conversions zu verbessern
+**Purpose**: A/B tests product attributes to improve conversions
 
 **Flow**:
 
-| Phase     | Tool                 | Aktion                                                       |
+| Phase     | Tool                 | Action                                                       |
 | --------- | -------------------- | ------------------------------------------------------------ |
-| **SENSE** | WooCommerce API      | Lade 50 underperforming Products (nach Popularität sortiert) |
-| **THINK** | Variant Generator    | Erstelle 3 Varianten pro Produkt                             |
-| **ACT**   | A/B Test Tool        | Führe simulierte Tests durch, bestimme Winner                |
-| **LEARN** | Optimization Storage | Speichere erfolgreich Varianten für zukünftige Anwendung     |
+| **SENSE** | WooCommerce API      | Load 50 underperforming products (sorted by popularity)      |
+| **THINK** | Variant Generator    | Create 3 variants per product                                |
+| **ACT**   | A/B Test Tool        | Run simulated tests, determine winner                        |
+| **LEARN** | Optimization Storage | Save successful variants for future application             |
 
-**Generierte Varianten pro Produkt**:
+**Generated Variants per Product**:
 ```typescript
 1. Price Optimization:
    Original: €29.99
@@ -112,14 +113,14 @@ POST /api/agent/loops/anomaly-detection/run
    Tool: Price Analyzer
 
 2. Title Enhancement:
-   Original: "Produktname"
-   Suggested: "Produktname ⭐ Bestseller"
+   Original: "Product name"
+   Suggested: "Product name ⭐ Bestseller"
    Expected Impact: +8% Conversions
    Tool: SEO/Copywriting Tool
 
 3. Description Upgrade:
    Original: [original text]
-   Suggested: [original] + "\n✅ Sofort lieferbar\n✅ DSGVO konform\n✅ Deutsche Qualität"
+   Suggested: [original] + "\n✅ In stock\n✅ GDPR compliant\n✅ German quality"
    Expected Impact: +12% Conversions
    Tool: Copywriting Tool
 ```
@@ -163,27 +164,27 @@ POST /api/agent/loops/product-optimization/run
 
 **Tools used**:
 - 🔗 **WooCommerce API Tool**: GET `/products?orderby=popularity&order=asc`, UPDATE `/products/{id}`
-- 🤖 **Variant Generator**: Erstellt alternative Titles/Descriptions via OpenAI
-- 📊 **A/B Test Tool**: Simuliert Conversions, berechnet Significance
-- 💾 **Optimization Storage**: Speichert erfolgreiche Varianten für A/B Learning
+- 🤖 **Variant Generator**: Create alternative titles/descriptions via OpenAI
+- 📊 **A/B Test Tool**: Simulate conversions, calculate significance
+- 💾 **Optimization Storage**: Save successful variants for A/B learning
 
 ---
 
 ### 3. **Payment Recovery Loop** 💳
-**Datei**: `backend/agent/loops/paymentRecoveryLoop.ts`
+**File**: `backend/agent/loops/paymentRecoveryLoop.ts`
 
-**Zweck**: Versucht Failed Orders mit verschiedenen Strategien zu recovern
+**Purpose**: Attempts to recover failed orders with various strategies
 
 **Flow**:
 
-| Phase     | Tool                | Aktion                                       |
+| Phase     | Tool                | Action                                       |
 | --------- | ------------------- | -------------------------------------------- |
-| **SENSE** | WooCommerce API     | Lade Failed/Pending Orders (letzten 30 Tage) |
-| **THINK** | Strategy Selector   | Wähle beste Recovery-Strategie per Order     |
-| **ACT**   | Recovery Tools (4x) | Führe Strategie-Workflow aus                 |
-| **LEARN** | Strategy Storage    | Speichere Erfolgsraten per Strategie-Segment |
+| **SENSE** | WooCommerce API     | Load failed/pending orders (last 30 days)    |
+| **THINK** | Strategy Selector   | Select best recovery strategy per order      |
+| **ACT**   | Recovery Tools (4x) | Execute strategy workflow                    |
+| **LEARN** | Strategy Storage    | Save success rates per strategy segment      |
 
-**Recovery-Strategien mit jeweils eigenen Tools**:
+**Recovery Strategies with Individual Tools**:
 
 ```typescript
 Strategy 1: RETRY (Basic Retry)
@@ -261,29 +262,29 @@ POST /api/agent/loops/payment-recovery/run
 
 **Tools used**:
 - 🔗 **WooCommerce API Tool**: GET `/orders?status=failed,pending`, GET `/customers/{id}/orders`
-- 🧠 **Strategy Selector**: Decision tree basierend auf Customer Segment + Amount
-- 📧 **Email Tool**: Sends personalized recovery emails (nutzt Email Enhancement Service)
-- 💳 **Payment Tool**: Trigger retries via Payment Gateway API
+- 🧠 **Strategy Selector**: Decision tree based on customer segment + amount
+- 📧 **Email Tool**: Sends personalized recovery emails (uses email enhancement service)
+- 💳 **Payment Tool**: Trigger retries via payment gateway API
 - 🎟️ **Discount Tool**: Generate coupon codes, validate redemption
-- 💾 **Strategy Storage**: Track which strategies work für welche Kundentypen
+- 💾 **Strategy Storage**: Track which strategies work for which customer types
 
 ---
 
 ### 4. **Analytics Insights Loop** 📊
-**Datei**: `backend/agent/loops/analyticsInsightsLoop.ts`
+**File**: `backend/agent/loops/analyticsInsightsLoop.ts`
 
-**Zweck**: Analysiert Shop-Daten und generiert automatische Business-Empfehlungen
+**Purpose**: Analyzes shop data and generates automatic business recommendations
 
 **Flow**:
 
-| Phase     | Tool                        | Aktion                                  |
+| Phase     | Tool                        | Action                                  |
 | --------- | --------------------------- | --------------------------------------- |
-| **SENSE** | WooCommerce + Reporting API | Sammle Metriken für alle Zeiträume      |
-| **THINK** | Trend Analyzer + ML         | Erkenne Trends, Anomalien, Muster       |
-| **ACT**   | Insight Generator           | Erstelle Human-readable Recommendations |
-| **LEARN** | Analytics Storage           | Speichere historische Daten für Trends  |
+| **SENSE** | WooCommerce + Reporting API | Collect metrics for all time periods    |
+| **THINK** | Trend Analyzer + ML         | Detect trends, anomalies, patterns      |
+| **ACT**   | Insight Generator           | Create human-readable recommendations   |
+| **LEARN** | Analytics Storage           | Save historical data for trend analysis |
 
-**Erfasste Metriken** (vom SENSE Tool):
+**Captured Metrics** (from SENSE tool):
 
 ```typescript
 Dashboard Metrics (Last 30 Days):
@@ -408,29 +409,29 @@ POST /api/agent/loops/analytics-insights/run
 - 📊 **WooCommerce Reporting API**: GET orders, revenue, customers metrics
 - 📈 **Trend Analyzer**: YoY/MoM/WoW comparison, growth rate calculation
 - 🚨 **Anomaly Detector**: >15% deviation detection, root cause analysis
-- 🤖 **Insight Generator**: Nutzt OpenAI für human-readable recommendations
-- 💾 **Analytics Storage**: Speichert historische Daten für Trend-Analyse
+- 🤖 **Insight Generator**: Uses OpenAI for human-readable recommendations
+- 💾 **Analytics Storage**: Save historical data for trend analysis
 
 ---
 
-## 🔧 Gemeinsame Tools & Patterns
+## 🔧 Shared Tools & Patterns
 
 ### Storage / Memory Tool
 ```typescript
-// Jeder Loop kann Learnings persistent speichern
+// Each loop can persistently save learnings
 persistentMemory.remember({
   key: 'anomaly_patterns_high_risk',
   value: { pattern: 'repeated_failed_attempts', frequency: 8 },
   ttl: 604800 // 1 week
 })
 
-// Später abrufen
+// Retrieve later
 const patterns = persistentMemory.recall('anomaly_patterns_high_risk')
 ```
 
 ### Execution Logger
 ```typescript
-// Jeder Loop wird geloggt
+// Each loop is logged
 executionLogger.logExecution({
   loopName: 'payment-recovery',
   status: 'success',
@@ -441,27 +442,27 @@ executionLogger.logExecution({
   }
 })
 
-// Monitoring abrufen
+// Retrieve monitoring
 const history = executionLogger.getHistory('payment-recovery', 100)
 ```
 
 ### Loop Scheduler
 ```typescript
-// Persistente Konfiguration (backend/data/loop-schedules.json)
+// Persistent configuration (backend/data/loop-schedules.json)
 //   - anomaly-detection: daily HH:MM
 //   - payment-recovery: interval (15/30/45/60 min)
-//   - product-optimization: weekly (Wochentage + HH:MM)
+//   - product-optimization: weekly (weekdays + HH:MM)
 //   - analytics-insights: daily HH:MM
 
-// Laden & planen
+// Load & schedule
 const schedules = loopScheduleManager.getAllSchedules();
 Object.entries(schedules).forEach(([loopType, cfg]) => {
   if (!cfg.enabled) return;
-  const cron = scheduleToCron(cfg); // z.B. */30 * * * *
+  const cron = scheduleToCron(cfg); // e.g. */30 * * * *
   scheduler.scheduleLoop(loopType, cron, () => runLoop(loopType));
 });
 
-// API Update → neu planen (PUT /api/agent/monitoring/schedules/:loopType)
+// API update → reschedule (PUT /api/agent/monitoring/schedules/:loopType)
 loopScheduleManager.updateSchedule(loopType, body);
 await scheduler.rescheduleLoop(loopType, body);
 ```
@@ -470,7 +471,7 @@ await scheduler.rescheduleLoop(loopType, body);
 
 ## 📊 Monitoring & Observability
 
-Alle Loops schreiben in zentrale **ExecutionLogger** & **PersistentMemory**:
+All loops write to central **ExecutionLogger** & **PersistentMemory**:
 
 ```
 Loop Monitoring Dashboard
@@ -482,7 +483,7 @@ Loop Monitoring Dashboard
 └─ Insights (What the loop learned)
 ```
 
-Verfügbare Endpoints:
+Available endpoints:
 ```bash
 GET  /api/monitoring/agent/loops/status
 GET  /api/monitoring/agent/loops/history
@@ -497,33 +498,33 @@ POST /api/monitoring/agent/loops/{loop}/stop
 
 ## 🎯 Best Practices
 
-1. **Pro Loop: Ein verantwortlicher Tool-Set**
-   - Anomaly Detection: fokussiert auf WooCommerce API + Analyzer
-   - Product Optimization: fokussiert auf Variant Generator + A/B Tool
-   - Payment Recovery: fokussiert auf Strategy Selector + Email Tool
-   - Analytics: fokussiert auf Reporting API + Trend Analyzer
+1. **Per Loop: One responsible tool set**
+   - Anomaly Detection: focused on WooCommerce API + Analyzer
+   - Product Optimization: focused on Variant Generator + A/B Tool
+   - Payment Recovery: focused on Strategy Selector + Email Tool
+   - Analytics: focused on Reporting API + Trend Analyzer
 
-2. **Learnings speichern & abrufen**
-   - Jeder Loop speichert Erfolgsmuster in Memory
-   - Zukünftige Iterationen verbessern sich basierend auf Learnings
+2. **Save & retrieve learnings**
+   - Each loop saves success patterns in memory
+   - Future iterations improve based on learnings
 
-3. **Failures sind OK**
-   - Loops haben Built-in Retry-Logik
-   - Fehler werden geloggt + alertet
-   - Continue nächste Iteration trotz Fehler
+3. **Failures are OK**
+   - Loops have built-in retry logic
+   - Errors are logged + alerted
+   - Continue next iteration despite errors
 
 ---
 
-**Nächste Schritte:**
-- Lesen Sie [AGENTIC_LOOPS_USER_GUIDE.md](./AGENTIC_LOOPS_USER_GUIDE.md) für Shop-Admin Perspective
-- Siehe [API Documentation](./api/agent-loops.md) für Entwickler Details
+**Next Steps:**
+- Read [AGENTIC_LOOPS_USER_GUIDE.md](./AGENTIC_LOOPS_USER_GUIDE.md) for shop admin perspective
+- See [API Documentation](./api/agent-loops.md) for developer details
 
-- **THINK**: Generiert 3 Varianten pro Produkt:
-  - `price`: 10% Rabatt
-  - `title`: Fügt "⭐ Bestseller" hinzu
-  - `description`: Fügt Verfügbarkeitsmeldung hinzu
-- **ACT**: Simuliert A/B Test mit Conversion-Lift (~15%)
-- **LEARN**: Wendet Winner-Varianten an (wenn Improvement > 5%)
+- **THINK**: Generates 3 variants per product:
+  - `price`: 10% discount
+  - `title`: Adds "⭐ Bestseller"
+  - `description`: Adds availability message
+- **ACT**: Simulates A/B test with conversion lift (~15%)
+- **LEARN**: Applies winner variants (if improvement > 5%)
 
 **Output**:
 ```typescript
@@ -545,19 +546,19 @@ POST /api/agent/loops/product-optimization/run
 ---
 
 ### 3. **Payment Recovery Loop** 💳
-**Datei**: `backend/agent/loops/paymentRecoveryLoop.ts`
+**File**: `backend/agent/loops/paymentRecoveryLoop.ts`
 
-**Zweck**: Versucht Failed Orders mit verschiedenen Strategien zu recovern
+**Purpose**: Attempts to recover failed orders with various strategies
 
 **Flow**:
-- **SENSE**: Laden Failed/Pending Orders der letzten 30 Tage
-- **THINK**: Wählt beste Recovery-Strategie:
-  - Neue Kunden + hoher Betrag → **Contact** (60% erfolgsquote)
-  - Mehrfache Versuche → **Alternative Payment** (52%)
-  - Mittlere Beträge → **Discount** (45%)
-  - Kleine Beträge → **Retry** (35%)
-- **ACT**: Führt Recovery-Strategien aus
-- **LEARN**: Speichert welche Strategie bei welcher Order funktioniert
+- **SENSE**: Load failed/pending orders from last 30 days
+- **THINK**: Select best recovery strategy:
+  - New customers + high amount → **Contact** (60% success rate)
+  - Multiple attempts → **Alternative payment** (52%)
+  - Medium amounts → **Discount** (45%)
+  - Small amounts → **Retry** (35%)
+- **ACT**: Execute recovery strategies
+- **LEARN**: Save which strategy worked for which order
 
 **Output**:
 ```typescript
@@ -582,16 +583,16 @@ POST /api/agent/loops/payment-recovery/run
 ---
 
 ### 4. **Analytics Insights Loop** 📊
-**Datei**: `backend/agent/loops/analyticsInsightsLoop.ts`
+**File**: `backend/agent/loops/analyticsInsightsLoop.ts`
 
-**Zweck**: Generiert Dashboard-Insights aus Analytics-Daten
+**Purpose**: Generates dashboard insights from analytics data
 
 **Flow**:
-- **SENSE**: Sammelt Metriken (Revenue, Orders, Customers, Conversion, AOV)
-- **THINK**: Analysiert Trends & detektiert Anomalien:
-  - Wenn Veränderung > 15% → Anomalie erkannt
-- **ACT**: Generiert Insight-Karten mit Empfehlungen
-- **LEARN**: Speichert Best Practices für zukünftige Empfehlungen
+- **SENSE**: Collect metrics (revenue, orders, customers, conversion, AOV)
+- **THINK**: Analyze trends & detect anomalies:
+  - If change > 15% → Anomaly detected
+- **ACT**: Generate insight cards with recommendations
+- **LEARN**: Save best practices for future recommendations
 
 **Output**:
 ```typescript
@@ -623,9 +624,9 @@ POST /api/agent/loops/analytics-insights/run
 
 ## Base Architecture: AgenticLoop Class
 
-**Datei**: `backend/agent/agenticLoop.ts`
+**File**: `backend/agent/agenticLoop.ts`
 
-### Kernkonzepte
+### Core Concepts
 
 #### 1. **LoopStep Interface**
 ```typescript
@@ -662,15 +663,15 @@ interface LoopResult {
 }
 ```
 
-### 5-Phasen Execution Cycle
+### 5-Phase Execution Cycle
 
 ```typescript
 async execute(): Promise<LoopResult> {
   while (this.shouldContinue()) {
-    this.sense();      // Daten sammeln
-    this.think();      // Analysieren
-    this.act();        // Handeln
-    this.learn();      // Lernen
+    this.sense();      // Gather data
+    this.think();      // Analyze
+    this.act();        // Take action
+    this.learn();      // Learn
     this.context.iteration++;
   }
   return this.buildResult();
@@ -681,7 +682,7 @@ async execute(): Promise<LoopResult> {
 
 ## HTTP API
 
-### 1. Loop starten
+### 1. Start loop
 
 ```bash
 POST /api/agent/loops/:type/run
@@ -696,7 +697,7 @@ Response:
 }
 ```
 
-### 2. Loop Status abrufen
+### 2. Get loop status
 
 ```bash
 GET /api/agent/loops/status
@@ -712,7 +713,7 @@ Response:
 }
 ```
 
-### 3. Loop Schema abrufen
+### 3. Get loop schema
 
 ```bash
 GET /api/agent/loops/:type/schema
@@ -730,14 +731,14 @@ Response:
 
 ## Integration in Workflows
 
-### Beispiel: Täglich um 09:00 Anomalien checken
+### Example: Check anomalies daily at 09:00
 
 ```bash
-# Mit node-cron oder PM2 ecosystem.config.cjs
+# With node-cron or PM2 ecosystem.config.cjs
 curl -X POST http://localhost:3000/api/agent/loops/anomaly-detection/run
 ```
 
-### Beispiel: Nach jedem Produktupload Optimization starten
+### Example: Start optimization after product upload
 
 ```bash
 # In ProductUploader
@@ -750,10 +751,10 @@ const response = await fetch('/api/agent/loops/product-optimization/run', {
 
 ## Memory System
 
-Jeder Loop hat Zugang zu **Memory** für:
-- **Learnings**: Was funktioniert gut?
-- **Patterns**: Welche Anomalien treten auf?
-- **Success Rates**: Erfolgsquoten von Strategien
+Each loop has access to **Memory** for:
+- **Learnings**: What works well?
+- **Patterns**: Which anomalies occur?
+- **Success Rates**: Success rates of strategies
 
 ```typescript
 // In memory.ts
@@ -766,7 +767,7 @@ memory.store('payment-recovery-success-rates', {
 
 ---
 
-## Erweiterung: Custom Loop erstellen
+## Extension: Create Custom Loop
 
 ```typescript
 import { AgenticLoop } from '../agenticLoop';
@@ -780,18 +781,18 @@ export class CustomLoop extends AgenticLoop {
   private setupSteps(): void {
     this.addStep({
       name: 'sense',
-      description: 'Daten sammeln',
+      description: 'Gather data',
       action: async () => {
-        // Deine Logik hier
+        // Your logic here
         return data;
       }
     });
 
-    // think, act, learn, shouldContinue hinzufügen...
+    // Add think, act, learn, shouldContinue...
   }
 
   getSummary() {
-    // Ergebnisse zusammenfassen
+    // Summarize results
     return { ... };
   }
 }
@@ -801,7 +802,7 @@ export class CustomLoop extends AgenticLoop {
 
 ## Monitoring & Logging
 
-Alle Loops loggen ihre Aktivitäten:
+All loops log their activities:
 
 ```
 🔍 SENSE: Finding failed payment orders...
@@ -823,22 +824,24 @@ Alle Loops loggen ihre Aktivitäten:
 | Payment Recovery     | 6     | ⏭️ Skipped                           |
 | Analytics Insights   | 6     | ⏭️ Skipped                           |
 
-Tests sind implementiert, benötigen aber WooCommerce API Mock-Setup.
+Tests are implemented but need WooCommerce API mock setup.
 
 ---
 
-## Nächste Schritte
+## Next Steps
 
-1. ✅ 4 Agentic Loop Implementierungen
-2. ✅ HTTP Endpoints registriert
-3. ✅ Basis Tests geschrieben
-4. ⏳ Tests mit vollständigen Mocks
-5. ⏳ Scheduling (z.B. täglich 09:00 Anomaly Detection)
-6. ⏳ Dashboard-Integration für Loop Results
-7. ⏳ Machine Learning Integration für bessere Entscheidungen
+1. ✅ 4 agentic loop implementations
+2. ✅ HTTP endpoints registered
+3. ✅ Basic tests written
+4. ⏳ Tests with complete mocks
+5. ⏳ Scheduling (e.g., daily 09:00 anomaly detection)
+6. ⏳ Dashboard integration for loop results
+7. ⏳ Machine learning integration for better decisions
 
 ---
 
-**Erstellt**: 2025-01-04  
-**Architektur**: Agentic Loop Pattern (Sense → Think → Act → Learn → Repeat)  
+**Created**: 2025-01-04  
+**Architecture**: Agentic Loop Pattern (Sense → Think → Act → Learn → Repeat)  
 **Framework**: Fastify + TypeScript + WooCommerce API
+
+````

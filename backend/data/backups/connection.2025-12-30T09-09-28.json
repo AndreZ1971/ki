@@ -1,0 +1,100 @@
+{
+  "wordpress": {
+    "url": "https://kaufe-es.eu",
+    "username": "Dante-Z",
+    "appPassword": "N1sf FA3b guYH M4WZ rnwm hhkt"
+  },
+  "woocommerce": {
+    "url": "https://kaufe-es.eu",
+    "consumerKey": "ck_6fa7b4e95ac20a09bb8fe67fb0e94d50888c1fb5",
+    "consumerSecret": "cs_bd97489095b8ef324bc87c8945dc2dc836fc9c67",
+    "authMode": "basic",
+    "timeoutMs": 30000
+  },
+  "openAI": {
+    "apiKey": "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",
+    "model": "gpt-4o-mini"
+  },
+  "job": {
+    "mode": "once",
+    "intervalMs": 900000
+  },
+  "features": {
+    "enableAnalytics": true,
+    "enableAutoProducts": true,
+    "enableEmailMarketing": true
+  },
+  "socialMedia": {
+    "linkedin": {
+      "enabled": false,
+      "accessToken": "",
+      "refreshToken": ""
+    },
+    "facebook": {
+      "enabled": false,
+      "accessToken": "",
+      "pageId": ""
+    },
+    "instagram": {
+      "enabled": false,
+      "accessToken": "",
+      "businessAccountId": ""
+    },
+    "twitter": {
+      "enabled": false,
+      "apiKey": "",
+      "apiSecret": "",
+      "accessToken": "",
+      "accessTokenSecret": ""
+    },
+    "tiktok": {
+      "enabled": false,
+      "accessToken": "",
+      "refreshToken": ""
+    },
+    "youtube": {
+      "enabled": false,
+      "accessToken": "",
+      "refreshToken": "",
+      "channelId": ""
+    }
+  },
+  "reddit": {
+    "clientId": "0Fju4VBiYqB7i-EYC8S23A",
+    "clientSecret": "gVVZ2p6u8a35gu0f7BiNwd8KotYLVw"
+  },
+  "smtp": {
+    "host": "inn.bitpalast.net",
+    "port": 465,
+    "secure": true,
+    "user": "info@kaufe-es.eu",
+    "password": "010871Z71612",
+    "from": "info@kaufe-es.eu"
+  },
+  "support": {
+    "ticketsEndpoint": "/wp-json/awesome-support/v1/tickets",
+    "perPage": 20,
+    "provider": "auto",
+    "cptSlug": "wpas_ticket"
+  },
+  "ml": {
+    "enabled": true,
+    "productRecommendations": true,
+    "trendForecasting": true,
+    "dynamicPricing": false,
+    "emailOptimization": true,
+    "churnPrediction": false,
+    "sentimentAnalysis": false,
+    "fraudDetection": false,
+    "productRecMinConfidence": 0.7,
+    "productRecFallback": true,
+    "trendMinConfidence": 0.6,
+    "trendFallback": true,
+    "emailMinConfidence": 0.65,
+    "emailFallback": true,
+    "emailDefaultTime": "09:00",
+    "maxInferenceTime": 5000,
+    "cacheResults": true,
+    "cacheTtl": 3600
+  }
+}
