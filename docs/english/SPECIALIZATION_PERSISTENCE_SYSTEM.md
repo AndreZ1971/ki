@@ -9,9 +9,9 @@
 
 ## 📋 Overview
 
-The Specialization Persistence & Auto-Load System is a comprehensive solution for secure, persistent storage and automatic management of AI specializations. Es kombiniert Filesystem-based persistence mit In-Memory-Caching, Verschlüsselung und umfassenden Fault tolerance-Mechanismen.
+The Specialization Persistence & Auto-Load System is a comprehensive solution for secure, persistent storage and automatic management of AI specializations. It combines filesystem-based persistence with in-memory caching, Encryption and comprehensive Fault tolerance-Mechanisms.
 
-### Kernfunktionen
+### Core Features
 
 - ✅ **Filesystem-Persistierung** with structured organization
 - ✅ **AES-256-GCM Encryption** for sensitive data
@@ -26,7 +26,7 @@ The Specialization Persistence & Auto-Load System is a comprehensive solution fo
 
 ## 🏗️ Architecture
 
-### Komponenten-Overview
+### Component Overview
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -121,7 +121,7 @@ data/specializations/
     │     }
     │   }
     │
-    └── {specId}.meta.json # Metadata & checksums
+    └── {specId}.meta.json # Metadata & checksums checksums
         {
           "checksum": "sha256-hash",
           "size": 4096,
@@ -147,7 +147,7 @@ data/specializations/
   "authTag": "hex-encoded-authentication-tag",
   "ciphertext": "hex-encoded-encrypted-data",
   "integrity": {
-    "originalHash": "sha256-hash-of-plaintext",
+    "originalhash": "sha256-hash-of-plaintext",
     "originalSize": 1234,
     "originalFile": "spec-name.json",
     "encryptedAt": 1702920000000
@@ -167,7 +167,7 @@ Each stored specialization receives a SHA-256 hash:
 
 ```typescript
 const checksum = crypto
-  .createHash('sha256')
+  .createhash('sha256')
   .update(JSON.stringify(specialization))
   .digest('hex');
 ```
@@ -321,7 +321,7 @@ const state = getLoadingState();
 const success = await activateSpecialization(specId, userId);
 
 // Returns: boolean
-// Side-effect: Updates cache & disk
+// Side-effect: updates cache & disk
 ```
 
 #### Reload cache
@@ -358,7 +358,7 @@ const list = await listAvailableSpecializations(userId);
 
 ## 🔄 State Management
 
-### Loading States
+### Loading states
 
 ```
 ┌─────────────┐
@@ -374,7 +374,7 @@ const list = await listAvailableSpecializations(userId);
        │             │ loaded │
        │             └────────┘
        │
-       └─ Error ──→ ┌────────┐
+       └─ error ──→ ┌────────┐
                      │ failed │
                      └────────┘
 ```
@@ -406,7 +406,7 @@ The cache is invalidated by:
 - ✅ Integrity validation
 - ✅ Delete operations
 - ✅ Corruption recovery
-- ✅ Error handling
+- ✅ error handling
 
 #### 2. Auto-Load Tests (in Persistence suite)
 
@@ -424,9 +424,9 @@ The cache is invalidated by:
 **Coverage:**
 - ✅ Load & list operations
 - ✅ Encryption & decryption
-- ✅ Hash generation & consistency
+- ✅ hash generation & consistency
 - ✅ Integrity checks
-- ✅ Error recovery
+- ✅ error recovery
 - ✅ Performance (< 100ms per operation)
 
 #### 4. Encryption Flow Tests (8 Tests)
@@ -502,7 +502,7 @@ npm run test -- -t "Encryption"
 
 **Symptom:**
 ```
-⚠️ Fehler beim Laden von spec-001: Unexpected token
+⚠️ errors on load of spec-001: Unexpected token
 ```
 
 **Solution:**
