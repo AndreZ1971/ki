@@ -1,47 +1,48 @@
+````markdown
 # Agentic Tools Reference
 
-> **Für Developer**: Vollständige API-Referenz aller Tools, die von Agentic Loops verwendet werden.  
-> **Für Benutzer**: Siehe [AGENTIC_LOOPS_USER_GUIDE.md](./AGENTIC_LOOPS_USER_GUIDE.md)
+> **For Developers**: Complete API reference of all tools used by agentic loops.  
+> **For Users**: See [AGENTIC_LOOPS_USER_GUIDE.md](./AGENTIC_LOOPS_USER_GUIDE.md)
 
 ---
 
-## Übersicht
+## Overview
 
-Agentic Loops nutzen spezialisierte Tools, um Aufgaben auszuführen. Jedes Tool hat eine klare Verantwortung und kann von mehreren Loops aufgerufen werden.
+Agentic loops use specialized tools to execute tasks. Each tool has a clear responsibility and can be called by multiple loops.
 
-| Tool                        | Modul                                         | Verantwortung                                    | Loops                                  |
+| Tool                        | Module                                         | Responsibility                                   | Loops                                  |
 | --------------------------- | --------------------------------------------- | ------------------------------------------------ | -------------------------------------- |
-| **WooCommerce API Tool**    | `backend/tools/woo.ts`                        | Lesen/Schreiben von Orders, Produkten, Customers | Alle 4                                 |
-| **Analyzer Tool**           | `backend/tools/feedbackAnalysis.ts`           | Anomalie-Erkennung, Pattern-Matching             | Anomaly Detection                      |
-| **Email Enhancement Tool**  | `backend/services/emailEnhancementService.ts` | Personalisierte E-Mails, Templates               | Payment Recovery, Analytics Insights   |
-| **Strategy Selector Tool**  | `backend/agent/tools.ts`                      | Entscheidungslogik für Recovery-Strategien       | Payment Recovery                       |
-| **A/B Test Tool**           | `backend/agent/tools.ts`                      | Varianten-Simulation, Winner-Bestimmung          | Product Optimization                   |
-| **Discount Generator Tool** | `backend/agent/tools.ts`                      | Rabatt-Kalkulationen, Schwellenwert-Prüfung      | Payment Recovery, Product Optimization |
-| **Storage Tool**            | `backend/agent/memory.ts`                     | Persistente Pattern-Speicherung                  | Alle 4                                 |
-| **Analytics ML Tool**       | `backend/services/analyticsMLService.ts`      | Insight-Generierung, Vorhersagen                 | Analytics Insights                     |
-| **Alert Tool**              | `backend/error-handling/alerting.ts`          | Monitoring, Notifications, Logging               | Alle 4                                 |
+| **WooCommerce API Tool**    | `backend/tools/woo.ts`                        | Read/write orders, products, customers          | All 4                                  |
+| **Analyzer Tool**           | `backend/tools/feedbackAnalysis.ts`           | Anomaly detection, pattern matching             | Anomaly Detection                      |
+| **Email Enhancement Tool**  | `backend/services/emailEnhancementService.ts` | Personalized emails, templates                  | Payment Recovery, Analytics Insights   |
+| **Strategy Selector Tool**  | `backend/agent/tools.ts`                      | Decision logic for recovery strategies          | Payment Recovery                       |
+| **A/B Test Tool**           | `backend/agent/tools.ts`                      | Variant simulation, winner determination        | Product Optimization                   |
+| **Discount Generator Tool** | `backend/agent/tools.ts`                      | Discount calculations, threshold validation     | Payment Recovery, Product Optimization |
+| **Storage Tool**            | `backend/agent/memory.ts`                     | Persistent pattern storage                      | All 4                                  |
+| **Analytics ML Tool**       | `backend/services/analyticsMLService.ts`      | Insight generation, forecasting                 | Analytics Insights                     |
+| **Alert Tool**              | `backend/error-handling/alerting.ts`          | Monitoring, notifications, logging              | All 4                                  |
 
 ---
 
 ## 1. WooCommerce API Tool
 
-**Datei**: `backend/tools/woo.ts`
+**File**: `backend/tools/woo.ts`
 
-**Zweck**: Alle Operationen auf WooCommerce REST API
+**Purpose**: All operations on WooCommerce REST API
 
-### Verfügbare Operationen
+### Available Operations
 
 #### 1.1 Orders
 
 ```typescript
-// GET – Orders abrufen
+// GET – Retrieve orders
 getOrders(params: {
   status?: 'pending' | 'processing' | 'on-hold' | 'completed' | 'cancelled' | 'refunded' | 'failed'
   limit?: number           // Default: 100
   offset?: number          // Default: 0
   orderby?: 'id' | 'date'  // Default: 'date'
   order?: 'asc' | 'desc'   // Default: 'desc'
-  search?: string          // Nach Order-Nr oder Kundennamen suchen
+  search?: string          // Search by order number or customer name
 }): Promise<Order[]>
 ```
 
@@ -56,12 +57,12 @@ const failedOrders = await wooTool.getOrders({
 // Returns: [{ id: 8765, total: '7500.00', status: 'failed', date_created: '2025-12-17', ... }]
 ```
 
-**Fehlerbehandlung**:
+**Error Handling**:
 ```typescript
 // Timeout
 throw new Error('WooCommerce API Timeout (30s)');
 
-// Authentifizierung
+// Authentication
 throw new Error('Invalid WooCommerce credentials (check connection.json)');
 
 // Rate Limiting
@@ -70,23 +71,23 @@ throw new Error('WooCommerce API rate limit exceeded');
 
 ---
 
-#### 1.2 Produkte
+#### 1.2 Products
 
 ```typescript
-// GET – Produkte abrufen
+// GET – Retrieve products
 getProducts(params: {
-  search?: string              // Nach Name suchen
-  category?: number            // Nach Kategorie filtern
+  search?: string              // Search by name
+  category?: number            // Filter by category
   limit?: number               // Default: 50
   orderby?: 'popularity' | 'rating' | 'date'
   order?: 'asc' | 'desc'
   stock_status?: 'instock' | 'outofstock'
 }): Promise<Product[]>
 
-// GET – Ein Produkt abrufen
+// GET – Retrieve single product
 getProduct(productId: number): Promise<Product>
 
-// POST – Produkt aktualisieren
+// POST – Update product
 updateProduct(productId: number, data: {
   name?: string
   regular_price?: string
@@ -98,7 +99,7 @@ updateProduct(productId: number, data: {
 
 **Example**:
 ```typescript
-// Underperforming Products laden
+// Load underperforming products
 const underperformers = await wooTool.getProducts({
   orderby: 'popularity',
   order: 'asc',
@@ -106,14 +107,14 @@ const underperformers = await wooTool.getProducts({
   stock_status: 'instock'
 });
 
-// Preisoptimierung anwenden
+// Apply price optimization
 await wooTool.updateProduct(123, {
-  regular_price: '26.99',  // von 29.99
+  regular_price: '26.99',  // from 29.99
   sale_price: '24.99'
 });
 ```
 
-**Rückgabe-Format**:
+**Return Format**:
 ```typescript
 interface Product {
   id: number
@@ -137,30 +138,30 @@ interface Product {
 #### 1.3 Customers
 
 ```typescript
-// GET – Customers abrufen
+// GET – Retrieve customers
 getCustomers(params: {
-  search?: string      // Nach Name/Email suchen
+  search?: string      // Search by name/email
   limit?: number       // Default: 50
   role?: 'subscriber' | 'contributor' | 'author' | 'editor' | 'administrator'
 }): Promise<Customer[]>
 
-// GET – Customer-Details + Order-Historie
+// GET – Customer details + order history
 getCustomerWithOrders(customerId: number): Promise<{
   customer: Customer
   orders: Order[]
-  failureRate: number  // Prozentsatz fehlgeschlagener Zahlungen
+  failureRate: number  // Percentage of failed payments
 }>
 
-// POST – Newsletter-Opt-in setzen
+// POST – Set newsletter opt-in
 updateCustomerOptIn(customerId: number, subscribed: boolean): Promise<void>
 ```
 
 **Example**:
 ```typescript
-// Wiederholte Zahlungsausfälle erkennen
+// Detect repeated payment failures
 const customer = await wooTool.getCustomerWithOrders(234);
 if (customer.failureRate > 0.3) {
-  // Alert: "Customer 234 – 30% Zahlungsausfallquote"
+  // Alert: "Customer 234 – 30% payment failure rate"
   await alertTool.send({
     level: 'HIGH',
     message: `Customer ${customer.customer.id} has ${customer.failureRate}% payment failure rate`
@@ -170,17 +171,17 @@ if (customer.failureRate > 0.3) {
 
 ---
 
-### 1.4 Fehlerbehandlung & Retry-Logik
+### 1.4 Error Handling & Retry Logic
 
 ```typescript
-// Automatisches Retry mit Exponential Backoff
+// Automatic retry with exponential backoff
 async function wooApiCall<T>(
   endpoint: string,
   options: RequestOptions
 ): Promise<T> {
   let retries = 0;
   const maxRetries = 3;
-  const baseDelay = 1000; // 1 Sekunde
+  const baseDelay = 1000; // 1 second
 
   while (retries < maxRetries) {
     try {
@@ -201,7 +202,7 @@ async function wooApiCall<T>(
 }
 ```
 
-**Connection-Konfiguration** (aus `connection.json`):
+**Connection Configuration** (from `connection.json`):
 ```json
 {
   "woocommerce": {
@@ -218,16 +219,16 @@ async function wooApiCall<T>(
 
 ## 2. Analyzer Tool
 
-**Datei**: `backend/tools/feedbackAnalysis.ts`
+**File**: `backend/tools/feedbackAnalysis.ts`
 
-**Zweck**: Musteranalyse, Anomalieerkennung, Datenvalidierung
+**Purpose**: Pattern analysis, anomaly detection, data validation
 
-### Verfügbare Operationen
+### Available Operations
 
-#### 2.1 Anomalie-Detektion
+#### 2.1 Anomaly Detection
 
 ```typescript
-// Erkenne 4 Anomaly-Types in Orders
+// Detect 4 anomaly types in orders
 detectAnomalies(orders: Order[]): Promise<{
   anomalies: Anomaly[]
   byType: Record<AnomalyType, number>
@@ -239,7 +240,7 @@ type AnomalyType = 'failed_payment' | 'unusual_amount' | 'repeated_attempts' | '
 type Severity = 'HIGH' | 'MEDIUM' | 'LOW'
 ```
 
-**Anomaly-Typen Detail**:
+**Anomaly Types Detail**:
 
 ```typescript
 interface Anomaly {
@@ -248,7 +249,7 @@ interface Anomaly {
   severity: Severity
   reason: string
   recommendation: string
-  threshold?: number    // Welcher Wert hat Trigger ausgelöst
+  threshold?: number    // What value triggered the alert
   actualValue?: number
 }
 
@@ -295,10 +296,10 @@ interface Anomaly {
 }
 ```
 
-#### 2.2 Pattern-Matching
+#### 2.2 Pattern Matching
 
 ```typescript
-// Erkenne Muster in Daten
+// Detect patterns in data
 detectPatterns(data: {
   orders?: Order[]
   products?: Product[]
@@ -306,7 +307,7 @@ detectPatterns(data: {
 }): Promise<Pattern[]>
 
 interface Pattern {
-  type: string  // z.B. 'seasonal', 'payment_method_preference', 'churn_risk'
+  type: string  // e.g. 'seasonal', 'payment_method_preference', 'churn_risk'
   confidence: number  // 0-1
   description: string
   affectedEntities: Array<{ id: number; relevance: number }>
@@ -314,9 +315,9 @@ interface Pattern {
 }
 ```
 
-**Beispiele**:
+**Examples**:
 ```typescript
-// Pattern 1: Saisonale Verkaufsspitzen
+// Pattern 1: Seasonal sales spikes
 {
   type: 'seasonal',
   confidence: 0.92,
@@ -324,7 +325,7 @@ interface Pattern {
   recommendations: ['Schedule stock checks Friday 6pm', 'Pre-allocate payment processing capacity']
 }
 
-// Pattern 2: Zahlungsmethoden-Präferenz
+// Pattern 2: Payment method preference
 {
   type: 'payment_method_preference',
   confidence: 0.85,
@@ -332,7 +333,7 @@ interface Pattern {
   recommendations: ['Optimize Klarna checkout flow', 'Consider Klarna fees in margin calculations']
 }
 
-// Pattern 3: Churn-Risiko
+// Pattern 3: Churn risk
 {
   type: 'churn_risk',
   confidence: 0.78,
@@ -345,11 +346,11 @@ interface Pattern {
 
 ## 3. Email Enhancement Tool
 
-**Datei**: `backend/services/emailEnhancementService.ts`
+**File**: `backend/services/emailEnhancementService.ts`
 
-**Zweck**: KI-gestützte E-Mail-Generierung & Personalisierung
+**Purpose**: AI-powered email generation & personalization
 
-### Verfügbare Operationen
+### Available Operations
 
 ```typescript
 generatePersonalizedEmail(params: {
@@ -363,7 +364,7 @@ generatePersonalizedEmail(params: {
   subject: string
   html: string
   plaintext: string
-  recommendation: string  // z.B. "Best send: Friday 2pm"
+  recommendation: string  // e.g. "Best send: Friday 2pm"
 }>
 
 generateBulkEmails(
@@ -373,7 +374,7 @@ generateBulkEmails(
 ): Promise<EmailBatch>
 ```
 
-**Example - Payment Recovery Mail**:
+**Example - Payment Recovery Email**:
 ```typescript
 const email = await emailTool.generatePersonalizedEmail({
   customerId: 234,
@@ -389,17 +390,17 @@ const email = await emailTool.generatePersonalizedEmail({
 
 // Returns:
 {
-  subject: 'Max, wir helfen dir gerne weiter! 🤝 Deine Bestellung #8765',
-  html: `<p>Hallo Max,</p>
-         <p>deine Zahlung für die <strong>Premium Widget Pack</strong> konnte leider nicht verarbeitet werden.</p>
-         <p>Wir bieten dir alternativ:</p>
+  subject: 'Max, we can help! 🤝 Your order #8765',
+  html: `<p>Hi Max,</p>
+         <p>your payment for the <strong>Premium Widget Pack</strong> could not be processed.</p>
+         <p>We offer you alternatively:</p>
          <ul>
-           <li>✅ Zahlung per Klarna statt Kreditkarte</li>
-           <li>✅ 10% Rabatt auf diese Bestellung</li>
-           <li>✅ Kostenloser Versand</li>
+           <li>✅ Payment via Klarna instead of credit card</li>
+           <li>✅ 10% discount on this order</li>
+           <li>✅ Free shipping</li>
          </ul>
-         <a href="https://...">Bestellung jetzt abschließen</a>`,
-  plaintext: 'Hallo Max...',
+         <a href="https://...">Complete order now</a>`,
+  plaintext: 'Hi Max...',
   recommendation: 'Best send: Wednesday 10:00 AM (2h after failure)'
 }
 ```
@@ -408,11 +409,11 @@ const email = await emailTool.generatePersonalizedEmail({
 
 ## 4. Strategy Selector Tool
 
-**Datei**: `backend/agent/tools.ts`
+**File**: `backend/agent/tools.ts`
 
-**Zweck**: Entscheidungslogik für komplexe Recovery-Szenarien
+**Purpose**: Decision logic for complex recovery scenarios
 
-### Verfügbare Operationen
+### Available Operations
 
 ```typescript
 selectPaymentRecoveryStrategy(params: {
@@ -435,19 +436,19 @@ selectPaymentRecoveryStrategy(params: {
 ```
 ┌─ Failure Reason?
 │
-├─> insufficient_funds (geringe Saldo)
-│   ├─ orderTotal > €500 → 'contact' (persönliche Ansprache)
-│   ├─ orderTotal ≤ €500 → 'discount' (-10% Preis)
+├─> insufficient_funds (low balance)
+│   ├─ orderTotal > €500 → 'contact' (personal attention)
+│   ├─ orderTotal ≤ €500 → 'discount' (-10% price)
 │
-├─> card_declined (Kartenproblem)
+├─> card_declined (card issue)
 │   ├─ customerFailureRate > 0.3 → 'alternative_payment'
-│   └─ customerFailureRate ≤ 0.3 → 'retry' (nach 30min)
+│   └─ customerFailureRate ≤ 0.3 → 'retry' (after 30min)
 │
-├─> fraud_check (Betrugserkennung aktiv)
-│   └─ 'contact' (Verifizierung erforderlich)
+├─> fraud_check (fraud detection active)
+│   └─ 'contact' (verification required)
 │
 └─> unknown
-    └─ 'retry' (Standard bei fehlender Info)
+    └─ 'retry' (default with missing info)
 ```
 
 **Example**:
@@ -478,16 +479,16 @@ const strategy = await strategyTool.selectPaymentRecoveryStrategy({
 
 ## 5. A/B Test Tool
 
-**Datei**: `backend/agent/tools.ts`
+**File**: `backend/agent/tools.ts`
 
-**Zweck**: Variant-Simulation & Winner-Bestimmung
+**Purpose**: Variant simulation & winner determination
 
-### Verfügbare Operationen
+### Available Operations
 
 ```typescript
 simulateABTest(params: {
   productId: number
-  baselineConversionRate: number  // 0-1 (z.B. 0.08 = 8%)
+  baselineConversionRate: number  // 0-1 (e.g. 0.08 = 8%)
   variants: Variant[]
   sampleSize?: number  // Default: 1000
   confidenceLevel?: number  // Default: 0.95 (95%)
@@ -504,7 +505,7 @@ interface Variant {
   attribute: 'price' | 'title' | 'description'
   control: string
   treatment: string
-  expectedLift?: number  // z.B. 0.15 = +15%
+  expectedLift?: number  // e.g. 0.15 = +15%
 }
 ```
 
@@ -519,13 +520,13 @@ const testResult = await abTestTool.simulateABTest({
       attribute: 'price',
       control: '€29.99',
       treatment: '€26.99',
-      expectedLift: 0.15  // +15% erwartet
+      expectedLift: 0.15  // +15% expected
     },
     {
       id: 'title_badge',
       attribute: 'title',
-      control: 'Produktname',
-      treatment: 'Produktname ⭐ Bestseller',
+      control: 'Product name',
+      treatment: 'Product name ⭐ Bestseller',
       expectedLift: 0.08
     }
   ],
@@ -536,9 +537,9 @@ const testResult = await abTestTool.simulateABTest({
 // Returns:
 {
   baseline: {
-    conversions: 60,  // 6% von 1000
+    conversions: 60,  // 6% of 1000
     rate: 0.06,
-    ci: [0.048, 0.072]  // 95% Konfidenzintervall
+    ci: [0.048, 0.072]  // 95% confidence interval
   },
   variants: [
     {
@@ -547,7 +548,7 @@ const testResult = await abTestTool.simulateABTest({
       rate: 0.084,
       ci: [0.066, 0.102],
       lift: 0.40,  // +40%
-      pValue: 0.012  // statisch signifikant (< 0.05)
+      pValue: 0.012  // statistically significant (< 0.05)
     }
   ],
   winner: { id: 'price_discount_10', ... },
@@ -556,16 +557,16 @@ const testResult = await abTestTool.simulateABTest({
 }
 ```
 
-**Statistische Methode**:
+**Statistical Method**:
 ```typescript
-// Binomial Test (Standard für Conversion Rates)
+// Binomial test (standard for conversion rates)
 conversions ~ Binomial(n, p)
 
-// Konfidenzintervall (Wilson Score)
+// Confidence interval (Wilson Score)
 p_lower = (p + z²/2n - z√(p(1-p)/n + z²/4n²)) / (1 + z²/n)
 p_upper = (p + z²/2n + z√(p(1-p)/n + z²/4n²)) / (1 + z²/n)
 
-// Signifikanz (Chi-squared Test)
+// Significance (Chi-squared test)
 χ² = (observed - expected)² / expected
 p_value = P(χ² > test_statistic)
 ```
@@ -574,22 +575,22 @@ p_value = P(χ² > test_statistic)
 
 ## 6. Discount Generator Tool
 
-**Datei**: `backend/agent/tools.ts`
+**File**: `backend/agent/tools.ts`
 
-**Zweck**: Rabatt-Kalkulationen mit Margin-Schutz
+**Purpose**: Discount calculations with margin protection
 
-### Verfügbare Operationen
+### Available Operations
 
 ```typescript
 calculateOptimalDiscount(params: {
   productId: number
   currentPrice: number
-  productCost: number  // Einkaufspreis
-  targetMargin: number  // z.B. 0.30 = 30% Marge
-  conversionLift?: number  // z.B. 0.15 = +15% Conversions erwartet
+  productCost: number  // Purchase price
+  targetMargin: number  // e.g. 0.30 = 30% margin
+  conversionLift?: number  // e.g. 0.15 = +15% conversions expected
   maxDiscountPercent?: number  // Default: 25%
 }): Promise<{
-  recommendedDiscount: number  // in Prozent
+  recommendedDiscount: number  // in percent
   resultingPrice: number
   effectiveMargin: number
   estimatedRevenueLift: number  // in EUR
@@ -603,8 +604,8 @@ const discount = await discountTool.calculateOptimalDiscount({
   productId: 123,
   currentPrice: 29.99,
   productCost: 8.50,
-  targetMargin: 0.30,  // min. 30% Marge beibehalten
-  conversionLift: 0.15,  // +15% Conversions mit Rabatt erwartet
+  targetMargin: 0.30,  // maintain min. 30% margin
+  conversionLift: 0.15,  // +15% conversions with discount expected
   maxDiscountPercent: 25
 });
 
@@ -612,28 +613,28 @@ const discount = await discountTool.calculateOptimalDiscount({
 {
   recommendedDiscount: 10,  // -10%
   resultingPrice: 26.99,
-  effectiveMargin: 0.52,  // (26.99 - 8.50) / 26.99 = 68.5% Brutto-Marge! Wait, fix:
-                         // (26.99 - 8.50) / 26.99 = 0.685 → 68.5% Brutto, aber Zielspanne ist 30%
-                         // Realistisch: (26.99 - 8.50) / 26.99 = 0.685 → ✅ OK, 68.5% > 30%
-  estimatedRevenueLift: 1245.60,  // EUR pro Monat (basierend auf Historisches Volumen)
-  riskAssessment: 'safe'  // Margin ist komfortabel über Zielspanne
+  effectiveMargin: 0.52,  // (26.99 - 8.50) / 26.99 = 68.5% gross margin! Wait, fix:
+                         // (26.99 - 8.50) / 26.99 = 0.685 → 68.5% gross but target span is 30%
+                         // Realistically: (26.99 - 8.50) / 26.99 = 0.685 → ✅ OK, 68.5% > 30%
+  estimatedRevenueLift: 1245.60,  // EUR per month (based on historical volume)
+  riskAssessment: 'safe'  // Margin is comfortable above target span
 }
 ```
 
-**Schutzmaßnahmen**:
+**Protection Measures**:
 ```typescript
-// 1. Minimale Marge nicht unterschreiten
+// 1. Minimum margin not to be undercut
 if ((resultingPrice - cost) / resultingPrice < targetMargin) {
   throw new Error('Discount would violate margin targets');
 }
 
-// 2. Realistische Conversion-Lift Annahmen
+// 2. Realistic conversion lift assumptions
 if (conversionLift > 0.50) {
   console.warn('Unrealistic conversion lift (>50%); capping at 50%');
   conversionLift = 0.50;
 }
 
-// 3. Max Discount-Grenzen
+// 3. Max discount limits
 if (discountPercent > maxDiscountPercent) {
   console.warn(`Discount capped at ${maxDiscountPercent}%`);
   discountPercent = maxDiscountPercent;
@@ -644,15 +645,15 @@ if (discountPercent > maxDiscountPercent) {
 
 ## 7. Storage Tool / Memory
 
-**Datei**: `backend/agent/memory.ts`
+**File**: `backend/agent/memory.ts`
 
-**Zweck**: Persistente Pattern-Speicherung für Lerneffekte
+**Purpose**: Persistent pattern storage for learning effects
 
-### Verfügbare Operationen
+### Available Operations
 
 ```typescript
 class PersistentMemory {
-  // Speichern
+  // Save
   async savePattern(
     loopType: LoopType,
     patternKey: string,
@@ -660,34 +661,34 @@ class PersistentMemory {
     metadata?: { ttl?: number; confidence?: number }
   ): Promise<void>
 
-  // Abrufen
+  // Retrieve
   async getPattern(
     loopType: LoopType,
     patternKey: string
   ): Promise<StoredPattern | null>
 
-  // Alle Patterns eines Loops
+  // All patterns of a loop
   async getPatternsByLoop(loopType: LoopType): Promise<StoredPattern[]>
 
-  // Aktualisieren
+  // Update
   async updatePattern(
     loopType: LoopType,
     patternKey: string,
     updates: Partial<StoredPattern>
   ): Promise<void>
 
-  // Löschen
+  // Delete
   async deletePattern(
     loopType: LoopType,
     patternKey: string
   ): Promise<void>
 
-  // Bereinigung (TTL-basiert)
+  // Cleanup (TTL-based)
   async cleanup(): Promise<{ deleted: number }>
 }
 ```
 
-**Gespeicherte Patterns pro Loop**:
+**Stored Patterns per Loop**:
 
 ```typescript
 // Anomaly Detection Loop
@@ -700,7 +701,7 @@ class PersistentMemory {
     triggerCount: 15,
     recoverySuccessRate: 0.47
   },
-  metadata: { ttl: 2592000, confidence: 0.92 }  // 30 Tage
+  metadata: { ttl: 2592000, confidence: 0.92 }  // 30 days
 }
 
 // Product Optimization Loop
@@ -713,7 +714,7 @@ class PersistentMemory {
     lastWinningStrategy: 'price_discount_10',
     successRate: 0.68
   },
-  metadata: { ttl: 5184000, confidence: 0.85 }  // 60 Tage
+  metadata: { ttl: 5184000, confidence: 0.85 }  // 60 days
 }
 
 // Payment Recovery Loop
@@ -726,7 +727,7 @@ class PersistentMemory {
     alternative_payment: { successRate: 0.71 },
     contact: { successRate: 0.85 }
   },
-  metadata: { ttl: 7776000, confidence: 0.91 }  // 90 Tage
+  metadata: { ttl: 7776000, confidence: 0.91 }  // 90 days
 }
 
 // Analytics Insights Loop
@@ -739,16 +740,16 @@ class PersistentMemory {
     forecastedValue: 87.50,
     confidence: 0.78
   },
-  metadata: { ttl: 604800, confidence: 0.75 }  // 7 Tage (aktuelle Trends)
+  metadata: { ttl: 604800, confidence: 0.75 }  // 7 days (current trends)
 }
 ```
 
-**Speicherimplementierung** (Privacy-First):
+**Storage Implementation** (Privacy-first):
 ```typescript
-// In-Memory Storage (keine Datenbank)
+// In-memory storage (no database)
 private patterns: Map<string, StoredPattern> = new Map()
 
-// Serialisierung (optional: Local Disk bei Restart)
+// Serialization (optional: local disk on restart)
 async saveToFile(): Promise<void> {
   const data = JSON.stringify(Array.from(this.patterns.values()));
   await fs.writeFile('patterns.json.enc', encrypt(data));
@@ -762,24 +763,24 @@ setInterval(() => {
       this.patterns.delete(key);
     }
   }
-}, 3600000);  // 1x pro Stunde prüfen
+}, 3600000);  // Check 1x per hour
 ```
 
 ---
 
 ## 8. Analytics ML Tool
 
-**Datei**: `backend/services/analyticsMLService.ts`
+**File**: `backend/services/analyticsMLService.ts`
 
-**Zweck**: KI-gestützte Insight-Generierung & Vorhersagen
+**Purpose**: AI-powered insight generation & forecasting
 
-### Verfügbare Operationen
+### Available Operations
 
 ```typescript
 generateDashboardInsights(params: {
   timeRange: 'day' | 'week' | 'month' | 'quarter' | 'year'
   includeForecasts?: boolean
-  focusMetrics?: string[]  // z.B. ['aov', 'conversion_rate', 'churn']
+  focusMetrics?: string[]  // e.g. ['aov', 'conversion_rate', 'churn']
 }): Promise<{
   metrics: MetricSnapshot[]
   trends: Trend[]
@@ -789,12 +790,12 @@ generateDashboardInsights(params: {
 }>
 
 interface MetricSnapshot {
-  name: string  // z.B. 'average_order_value'
+  name: string  // e.g. 'average_order_value'
   value: number
   previousValue: number
-  change: number  // +/- Prozentpunkte
+  change: number  // +/- percentage points
   trend: 'up' | 'down' | 'stable'
-  sparkline: number[]  // Mini-Chart Data (letzte 12 Perioden)
+  sparkline: number[]  // Mini-chart data (last 12 periods)
 }
 
 interface Trend {
@@ -809,7 +810,7 @@ interface Forecast {
   metric: string
   forecastedValue: number
   confidenceInterval: [number, number]  // [lower, upper]
-  timeRange: string  // z.B. '+7 days'
+  timeRange: string  // e.g. '+7 days'
   method: 'linear_regression' | 'exponential_smoothing' | 'arima'
 }
 ```
@@ -874,24 +875,24 @@ interface Forecast {
 
 ## 9. Alert / Monitoring Tool
 
-**Datei**: `backend/error-handling/alerting.ts`
+**File**: `backend/error-handling/alerting.ts`
 
-**Zweck**: Notifications, Logging, Monitoring
+**Purpose**: Notifications, logging, monitoring
 
-### Verfügbare Operationen
+### Available Operations
 
 ```typescript
 interface AlertService {
-  // Einfache Alerts
+  // Simple alerts
   send(alert: AlertMessage): Promise<void>
 
-  // Log ohne Alert
+  // Log without alert
   log(level: LogLevel, message: string, metadata?: any): Promise<void>
 
-  // Batch Alerts
+  // Batch alerts
   sendBulk(alerts: AlertMessage[]): Promise<void>
 
-  // Alert History
+  // Alert history
   getAlerts(params: {
     loopType?: LoopType
     severity?: Severity
@@ -923,7 +924,7 @@ await alertService.send({
   loopType: 'payment_recovery',
   message: 'Payment Recovery Loop: 47% success rate (target: 40%)',
   context: { orderId: 8765, recoveryAttempts: 3 },
-  notifyChannels: ['log']  // Nur ins Log
+  notifyChannels: ['log']  // Only to log
 })
 
 // Alert 2: Anomaly Detection – Manual Review Needed
@@ -941,43 +942,43 @@ await alertService.send({
   loopType: 'anomaly_detection',
   message: 'WooCommerce API timeout – requests queued, will retry',
   context: { endpoint: '/orders', timeoutMs: 30000, queuedRequests: 127 },
-  notifyChannels: ['log', 'email', 'slack', 'webhook']  // Alle Kanäle
+  notifyChannels: ['log', 'email', 'slack', 'webhook']  // All channels
 })
 ```
 
 **Log Levels**:
 ```
 INFO          – Routine events, successful executions
-WARNING       – Non-critical issues (z.B. retries)
-HIGH          – Manual review recommended (z.B. anomalies)
-CRITICAL      – System failure (z.B. API down)
+WARNING       – Non-critical issues (e.g. retries)
+HIGH          – Manual review recommended (e.g. anomalies)
+CRITICAL      – System failure (e.g. API down)
 ```
 
 ---
 
-## 10. Fehlerbehandlung & Best Practices
+## 10. Error Handling & Best Practices
 
-### 10.1 Generische Error Handling Strategy
+### 10.1 Generic Error Handling Strategy
 
 ```typescript
-// Alle Tools sollten Errors wie folgt behandeln:
+// All tools should handle errors as follows:
 try {
   const result = await tool.operation();
 } catch (error) {
-  // 1. Klassifizierung
+  // 1. Classification
   if (error instanceof TimeoutError) {
-    // Retry mit Backoff
+    // Retry with backoff
     await sleep(2000);
     return await tool.operation();  // Retry 1x
   } else if (error instanceof RateLimitError) {
-    // Exponential Backoff
+    // Exponential backoff
     await sleep(Math.random() * 5000 + 5000);  // 5-10s
     return await tool.operation();
   } else if (error instanceof AuthenticationError) {
-    // Config Issue – kein Retry
+    // Config issue – no retry
     throw new Error(`Auth failed: check connection.json`);
   } else if (error instanceof ValidationError) {
-    // Input ungültig – kein Retry
+    // Invalid input – no retry
     throw error;
   } else {
     // Unknown – fallback
@@ -994,12 +995,12 @@ try {
 ### 10.2 Circuit Breaker Pattern
 
 ```typescript
-// Für kritische externe APIs (WooCommerce, OpenAI)
+// For critical external APIs (WooCommerce, OpenAI)
 class CircuitBreaker {
   state: 'closed' | 'open' | 'half-open' = 'closed'
   failureCount: number = 0
   failureThreshold: number = 5
-  resetTimeout: number = 60000  // 1 Minute
+  resetTimeout: number = 60000  // 1 minute
 
   async execute<T>(fn: () => Promise<T>): Promise<T> {
     if (this.state === 'open') {
@@ -1034,14 +1035,14 @@ const orders = await wooCircuitBreaker.execute(() => wooTool.getOrders({ limit: 
 
 ---
 
-## 11. Tool-Kombinations-Patterns
+## 11. Tool Combination Patterns
 
-Häufige Tool-Kombinationen in Loop-Workflows:
+Common tool combinations in loop workflows:
 
 ### Pattern 1: Anomaly Detection Pipeline
 ```
 WooCommerce API Tool
-  ↓ (getOrders mit status=failed,pending)
+  ↓ (getOrders with status=failed,pending)
 Analyzer Tool
   ↓ (detectAnomalies)
 Storage Tool
@@ -1084,18 +1085,18 @@ Analytics ML Tool (forecast impact)
 
 ## 12. Testing & Debugging
 
-### 12.1 Tool-Testwerkzeuge
+### 12.1 Tool Testing Tools
 
-**Manueller Test einer Tool-Operation**:
+**Manual test of a tool operation**:
 ```bash
-# Terminal – WooCommerce API Test
+# Terminal – WooCommerce API test
 curl -X GET "https://kaufe-es.eu/wp-json/wc/v3/orders?status=failed&limit=10" \
   -u "ck_...:cs_..."
 
-# Analyzer Tool testen
+# Test analyzer tool
 npm run test:analyzer
 
-# Strategy Selector testen
+# Test strategy selector
 npm run test:strategy-selector
 ```
 
@@ -1123,36 +1124,38 @@ npm run test:strategy-selector
 
 ---
 
-## 13. Zusammenfassung & Übersicht
+## 13. Summary & Overview
 
-| Tool               | Eingabe               | Verarbeitung          | Ausgabe             | Retry | Timeout |
+| Tool               | Input               | Processing          | Output             | Retry | Timeout |
 | ------------------ | --------------------- | --------------------- | ------------------- | ----- | ------- |
-| WooCommerce API    | productId, filters    | REST API Calls        | Orders/Products     | 3x    | 30s     |
-| Analyzer           | Orders[]              | Pattern Matching      | Anomalies[]         | —     | —       |
+| WooCommerce API    | productId, filters    | REST API calls        | Orders/Products     | 3x    | 30s     |
+| Analyzer           | Orders[]              | Pattern matching      | Anomalies[]         | —     | —       |
 | Email Enhancement  | customerId, context   | OpenAI API            | Email HTML          | 2x    | 20s     |
-| Strategy Selector  | Order + Customer Data | Decision Tree         | Strategy + Actions  | —     | —       |
-| A/B Test           | Product + Variants    | Binomial Test         | Winner + Stats      | —     | —       |
-| Discount Generator | Price + Cost          | Margin Calculation    | Discount %          | —     | —       |
-| Storage            | Pattern Data          | In-Memory Map         | Saved               | —     | —       |
-| Analytics ML       | Metrics               | Time Series Analysis  | Insights + Forecast | 1x    | 15s     |
-| Alert              | Alert Message         | Multi-Channel Routing | Sent                | —     | —       |
+| Strategy Selector  | Order + Customer data | Decision tree         | Strategy + actions  | —     | —       |
+| A/B Test           | Product + variants    | Binomial test         | Winner + stats      | —     | —       |
+| Discount Generator | Price + cost          | Margin calculation    | Discount %          | —     | —       |
+| Storage            | Pattern data          | In-memory map         | Saved               | —     | —       |
+| Analytics ML       | Metrics               | Time series analysis  | Insights + forecast | 1x    | 15s     |
+| Alert              | Alert message         | Multi-channel routing | Sent                | —     | —       |
 
 ---
 
-## Support & Häufige Fehler
+## Support & Common Errors
 
 **Q: "WooCommerce API Timeout"**
-A: Erhöhe `timeoutMs` in connection.json oder überprüfe Shop-Status.
+A: Increase `timeoutMs` in connection.json or check shop status.
 
 **Q: "Strategy Selector returns undefined"**
-A: Sicherstellen, dass `failureReason` einer bekannten Kategorie entspricht.
+A: Ensure `failureReason` corresponds to a known category.
 
 **Q: "A/B Test Confidence too low"**
-A: Erhöhe `sampleSize` oder `timeRange`; mehr Daten nötig.
+A: Increase `sampleSize` or `timeRange`; more data needed.
 
-**Q: "Storage Pattern expire"**
-A: TTL ist abgelaufen; `cleanup()` wird automatisch 1x/h ausgeführt.
+**Q: "Storage pattern expires"**
+A: TTL has expired; `cleanup()` runs automatically 1x/h.
 
 ---
 
-Für Fragen: [AGENTIC_LOOP_ARCHITECTURE.md](./AGENTIC_LOOP_ARCHITECTURE.md) | [AGENTIC_LOOPS_USER_GUIDE.md](./AGENTIC_LOOPS_USER_GUIDE.md)
+For questions: [AGENTIC_LOOP_ARCHITECTURE.md](./AGENTIC_LOOP_ARCHITECTURE.md) | [AGENTIC_LOOPS_USER_GUIDE.md](./AGENTIC_LOOPS_USER_GUIDE.md)
+
+````
