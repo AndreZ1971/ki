@@ -1,59 +1,59 @@
-# 🤖 Agentic Loops – Benutzerhandbuch für Shop-Admins
+# 🤖 Agentic Loops – User Guide for Shop Admins
 
-**Übersicht für Einzelne, die A.R.I. autonome Agenten nutzen möchten**
+**Overview for anyone who wants to use A.R.I. autonomous agents**
 
 ---
 
-## 📍 Wo finde ich die Loops?
+## 📍 Where do I find the loops?
 
-**Im Dashboard:**
+**In the dashboard:**
 ```
-📊 Loop Monitoring (obere rechts) 
+📊 Loop Monitoring (top right) 
   → Settings ⚙️ 
     → Agentic Loops (Tab)
 ```
 
 ---
 
-## 🚀 Was sind Agentic Loops?
+## 🚀 What are Agentic Loops?
 
-Agentic Loops sind **autonome Agenten**, die kontinuierlich arbeiten:
+Agentic Loops are **autonomous agents** that work continuously:
 
 ```
-SENSE (Daten erfassen) 
+SENSE (collect data) 
   ↓
-THINK (Analysieren & Entscheiden)
+THINK (analyze & decide)
   ↓
-ACT (Maßnahmen ergreifen)
+ACT (take actions)
   ↓
-LEARN (Muster speichern & verbessern)
+LEARN (store patterns & improve)
   ↓
 [REPEAT]
 ```
 
-Jeder Loop hat **andere Ziele** und tritt zu **anderen Zeiten** in Aktion.
+Each loop has **different goals** and runs at **different times**.
 
 ---
 
-## 🎯 Die 4 Loops im Detail
+## 🎯 The 4 loops in detail
 
 ### 1. 🚨 **Anomaly Detection Loop**
-**Was macht er?** Spürt problematische Zahlungen auf & warnt dich.
+**What does it do?** Detects problematic payments & warns you.
 
-| Feature        | Details                                                                                                                                               |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Erkennt**    | ❌ Gescheiterte Zahlungen<br/>💰 Ungewöhnlich hohe Beträge (>€5000)<br/>🔄 Wiederholte Fehlversuche (Kunde mit 2+ Failed Orders)<br/>⚠️ Hochrisiko-Muster |
-| **Häufigkeit** | Alle 15 Min (konfigurierbar)                                                                                                                          |
-| **Output**     | Liste mit Anomalien nach Schweregrad (HIGH/MEDIUM/LOW)                                                                                                |
-| **Aktion**     | Alerts, Empfehlungen (Retry / Manual Review / Alternative Payment)                                                                                    |
-| **Nutzen**     | **Umsatzrettung**: Verhindert verlorene Bestellungen durch schnelle Erkennung                                                                         |
+| Feature        | Details                                                                                                                                          |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Detects**    | ❌ Failed payments<br/>💰 Unusually high amounts (>€5000)<br/>🔄 Repeated failed attempts (customer with 2+ failed orders)<br/>⚠️ High-risk patterns |
+| **Frequency**  | Every 15 min (configurable)                                                                                                                      |
+| **Output**     | List of anomalies by severity (HIGH/MEDIUM/LOW)                                                                                                  |
+| **Action**     | Alerts, recommendations (Retry / Manual Review / Alternative Payment)                                                                            |
+| **Benefit**    | **Revenue recovery**: Prevents lost orders through fast detection                                                                                |
 
-**Shop-Admin Aktion:**
-- 🔴 **HIGH**: Sofort manuell überprüfen (möglich Betrug / Zahler in Schwierigkeit)
-- 🟡 **MEDIUM**: Weitergabe an Recovery-Team prüfen
-- 🟢 **LOW**: Informativ, kein schnelles Handeln nötig
+**Shop admin action:**
+- 🔴 **HIGH**: Check manually immediately (possible fraud / payer in trouble)
+- 🟡 **MEDIUM**: Consider routing to recovery team
+- 🟢 **LOW**: Informational, no urgent action needed
 
-**Monitoring-Ansicht:**
+**Monitoring view:**
 ```
 Anomalies Detected: 45
 ├─ failed_payment: 20 🔴
