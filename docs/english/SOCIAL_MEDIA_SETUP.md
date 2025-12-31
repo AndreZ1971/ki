@@ -1,44 +1,44 @@
-# 🚀 Social Media API Setup – Veraltet (konsolidiert)
+# 🚀 Social Media API Setup – Deprecated (consolidated)
 
-Diese Datei ist veraltet. Die konsolidierte und aktuelle Anleitung inkl. Setup & API befindet sich in:
+This file is deprecated. The consolidated and current guide including setup & API can be found in:
 
 - SOCIAL_MEDIA_GUIDE.md
 
 —
 
-Ursprünglicher Inhalt folgt unten zur Referenz.
+Original content follows below for reference.
 
-## 📋 Übersicht
+## 📋 Overview
 
-Dieses Dokument führt dich Schritt-für-Schritt durch die Integration von:
-- ✅ **Facebook Business** (742 Follower)
-- ✅ **Instagram Business** (52 Follower)
-- ✅ **TikTok Business** (2098 Follower)
+This document guides you step-by-step through the integration of:
+- ✅ **Facebook Business** (742 followers)
+- ✅ **Instagram Business** (52 followers)
+- ✅ **TikTok Business** (2098 followers)
 
-**Gesamt-Reichweite: 2892 Follower**
+**Total Reach: 2892 followers**
 
 ---
 
 ## 1️⃣ Meta (Facebook + Instagram)
 
-### Schritt 1: Meta Developer Account
-1. Gehe zu: https://developers.facebook.com/
-2. Klicke auf **"My Apps"**
-3. Klicke auf **"Create App"**
-4. Wähle **"Business"** als App-Typ
-5. App-Name: `Kaufe.es Social Manager`
+### Step 1: Meta Developer Account
+1. Go to: https://developers.facebook.com/
+2. Click on **"My Apps"**
+3. Click on **"Create App"**
+4. Choose **"Business"** as app type
+5. App Name: `Kaufe.es Social Manager`
 6. Contact Email: `info@kaufe-es.eu`
-7. Business Account: Wähle dein Kaufe.es Business Account
+7. Business Account: Select your Kaufe.es Business Account
 
-### Schritt 2: Facebook Settings
-1. In deiner neuen App → **"Settings" → "Basic"**
-2. Notiere:
+### Step 2: Facebook Settings
+1. In your new app → **"Settings" → "Basic"**
+2. Note down:
    - **App ID**: `___________________`
    - **App Secret**: (Click "Show") `___________________`
 3. **App Domains**: `kaufe-es.eu`
 4. **Website**: `https://kaufe-es.eu`
 
-### Schritt 3: Facebook Graph API aktivieren
+### Step 3: Activate Facebook Graph API
 1. **"Add Product"** → **"Facebook Login"** → **"Set Up"**
 2. **Valid OAuth Redirect URIs**:
    ```
@@ -47,35 +47,35 @@ Dieses Dokument führt dich Schritt-für-Schritt durch die Integration von:
    ```
 3. Save Changes
 
-### Schritt 4: Instagram Graph API aktivieren
+### Step 4: Activate Instagram Graph API
 1. **"Add Product"** → **"Instagram"** → **"Set Up"**
 2. In Instagram Settings:
-   - Verknüpfe deinen Instagram Business Account (@kaufe.es)
-   - Wähle deine Facebook Page (Kaufe.es)
-3. **Permissions** hinzufügen:
+   - Link your Instagram Business Account (@kaufe.es)
+   - Select your Facebook Page (Kaufe.es)
+3. Add **Permissions**:
    - `instagram_basic`
    - `instagram_content_publish`
    - `pages_read_engagement`
    - `pages_manage_posts`
 
-### Schritt 5: App überprüfen lassen
+### Step 5: Get App Reviewed
 1. **App Review** → **Permissions and Features**
-2. Beantrage folgende Permissions:
+2. Request the following permissions:
    - `pages_manage_posts`
    - `instagram_content_publish`
    - `pages_read_engagement`
-3. Fülle Fragebogen aus (warum du die API brauchst)
-4. Warte auf Approval (1-3 Tage)
+3. Fill out questionnaire (why you need the API)
+4. Wait for approval (1-3 days)
 
-### Schritt 6: Access Token generieren
+### Step 6: Generate Access Token
 1. **Tools** → **Graph API Explorer**
-2. Wähle deine App
-3. **Permissions** auswählen:
+2. Select your app
+3. Select **Permissions**:
    - `pages_manage_posts`
    - `instagram_content_publish`
 4. **Generate Access Token**
-5. Kopiere den **Page Access Token**
-6. Notiere:
+5. Copy the **Page Access Token**
+6. Note down:
    - **Page Access Token**: `___________________`
    - **Instagram Business Account ID**: `___________________`
 
@@ -83,12 +83,12 @@ Dieses Dokument führt dich Schritt-für-Schritt durch die Integration von:
 
 ## 2️⃣ TikTok for Business
 
-### Schritt 1: TikTok Developer Account
-1. Gehe zu: https://developers.tiktok.com/
-2. **Sign Up** mit deinem TikTok Business Account
-3. Bestätige E-Mail
+### Step 1: TikTok Developer Account
+1. Go to: https://developers.tiktok.com/
+2. **Sign Up** with your TikTok Business Account
+3. Confirm email
 
-### Schritt 2: App erstellen
+### Step 2: Create App
 1. **"My Apps"** → **"Create App"**
 2. App Information:
    - **App Name**: `Kaufe.es Social Manager`
@@ -96,36 +96,36 @@ Dieses Dokument führt dich Schritt-für-Schritt durch die Integration von:
    - **Website**: `https://kaufe-es.eu`
 3. Submit
 
-### Schritt 3: Credentials holen
-1. In deiner App → **"Basic Information"**
-2. Notiere:
+### Step 3: Get Credentials
+1. In your app → **"Basic Information"**
+2. Note down:
    - **Client Key**: `___________________`
    - **Client Secret**: (Click "Show") `___________________`
 
-### Schritt 4: OAuth Settings
-1. **"Manage Apps"** → Deine App → **"Basic Information"**
+### Step 4: OAuth Settings
+1. **"Manage Apps"** → Your App → **"Basic Information"**
 2. **Redirect URI**:
    ```
    https://kaufe-es.eu/api/auth/tiktok/callback
    ```
-3. **Scopes** aktivieren:
+3. Activate **Scopes**:
    - `user.info.basic`
    - `video.publish`
    - `video.list`
 
-### Schritt 5: Verifizierung
-1. TikTok erfordert **App Review**
-2. Fülle aus:
-   - App Beschreibung
-   - Use Case: "Social Media Management für E-Commerce"
-   - Screenshots deiner App
-3. Submit für Review (1-5 Tage)
+### Step 5: Verification
+1. TikTok requires **App Review**
+2. Fill out:
+   - App Description
+   - Use Case: "Social Media Management for E-Commerce"
+   - Screenshots of your app
+3. Submit for Review (1-5 days)
 
 ---
 
-## 3️⃣ Credentials in .env eintragen
+## 3️⃣ Enter Credentials in .env
 
-Wenn du alle Credentials hast, trage sie in `backend/.env` ein:
+Once you have all credentials, enter them in `backend/.env`:
 
 ```env
 # --- Meta (Facebook + Instagram) ---
@@ -154,7 +154,7 @@ curl -X POST http://localhost:3000/api/marketing/social/post \
   -H "Content-Type: application/json" \
   -d '{
     "platform": "facebook",
-    "message": "Test Post von Kaufe.es! 🚀",
+    "message": "Test Post from Kaufe.es! 🚀",
     "link": "https://kaufe-es.eu"
   }'
 ```
@@ -165,7 +165,7 @@ curl -X POST http://localhost:3000/api/marketing/social/post \
   -H "Content-Type: application/json" \
   -d '{
     "platform": "instagram",
-    "caption": "Neues Produkt! 🛍️ #kaufees",
+    "caption": "New Product! 🛍️ #kaufees",
     "image_url": "https://kaufe-es.eu/images/product.jpg"
   }'
 ```
@@ -183,26 +183,26 @@ curl -X POST http://localhost:3000/api/marketing/social/post \
 
 ---
 
-## 🎯 Nächste Schritte
+## 🎯 Next Steps
 
-1. [ ] Meta Developer Account erstellen
-2. [ ] Facebook App erstellen + Credentials notieren
-3. [ ] Instagram Business Account verknüpfen
-4. [ ] TikTok Developer Account + App erstellen
-5. [ ] Alle Credentials in `.env` eintragen
-6. [ ] Backend neu starten
-7. [ ] Test-Posts durchführen
+1. [ ] Create Meta Developer Account
+2. [ ] Create Facebook App + note credentials
+3. [ ] Link Instagram Business Account
+4. [ ] Create TikTok Developer Account + App
+5. [ ] Enter all credentials in `.env`
+6. [ ] Restart backend
+7. [ ] Perform test posts
 
 ---
 
 ## 📞 Support
 
-Bei Fragen oder Problemen:
+For questions or issues:
 - Meta Support: https://developers.facebook.com/support/
 - TikTok Support: https://developers.tiktok.com/support
-- Oder melde dich bei mir!
+- Or contact me!
 
 ---
 
 **Status:** 🟡 In Progress
-**Letzte Aktualisierung:** 2. November 2025
+**Last Update:** November 2, 2025

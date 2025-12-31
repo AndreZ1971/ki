@@ -1,28 +1,28 @@
 # 🚨 Emergency Alerting Setup Guide
 
-## Übersicht
+## Overview
 
-Das Payment Emergency System nutzt **GPT-4o-mini** zur Analyse kritischer Incidents und sendet automatisch Alarme an konfigurierte Kanäle.
+The Payment Emergency System uses **GPT-4o-mini** to analyze critical incidents and automatically sends alerts to configured channels.
 
 ---
 
-## 🎯 Unterstützte Alerting-Kanäle
+## 🎯 Supported Alerting Channels
 
 ### 1. **Slack** 💬
-- **Typ**: Instant Messaging
-- **Trigger**: Alle Notfälle (P0-P3)
-- **Format**: Rich Message mit Ticket-ID, Severity, Impact, Escalation Path
+- **Type**: Instant Messaging
+- **Trigger**: All emergencies (P0-P3)
+- **Format**: Rich Message with Ticket-ID, Severity, Impact, Escalation Path
 
 **Setup:**
 ```bash
-# 1. Slack Incoming Webhook erstellen
+# 1. Create Slack Incoming Webhook
 # https://api.slack.com/messaging/webhooks
 
-# 2. In .env eintragen
+# 2. Add to .env
 SLACK_EMERGENCY_WEBHOOK=https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXX
 ```
 
-**Slack Message Beispiel:**
+**Slack Message Example:**
 ```
 🚨 PAYMENT EMERGENCY
 
@@ -42,55 +42,55 @@ Escalation Path:
 ---
 
 ### 2. **Email** 📧
-- **Typ**: Email Notification
-- **Trigger**: Alle Notfälle (P0-P3)
-- **Format**: HTML Email mit vollständiger Incident-Analyse
+- **Type**: Email Notification
+- **Trigger**: All emergencies (P0-P3)
+- **Format**: HTML Email with complete incident analysis
 
 **Setup:**
 ```bash
-# In .env eintragen
+# Add to .env
 EMERGENCY_ALERT_EMAIL=devops@your-company.com,oncall@your-company.com
 ```
 
-**Voraussetzungen:**
-- Nutzt dein bestehendes Email-System
-- In `backend/services/emailService.ts` integrieren
-- SMTP-Konfiguration erforderlich
+**Prerequisites:**
+- Uses your existing email system
+- Integrate in `backend/services/emailService.ts`
+- SMTP configuration required
 
 ---
 
 ### 3. **PagerDuty** 📟
-- **Typ**: Incident Management & On-Call Alerting
-- **Trigger**: Nur P0/P1 (Critical/High)
-- **Format**: PagerDuty Event mit Custom Details
+- **Type**: Incident Management & On-Call Alerting
+- **Trigger**: P0/P1 only (Critical/High)
+- **Format**: PagerDuty Event with Custom Details
 
 **Setup:**
 ```bash
-# 1. PagerDuty Service erstellen
+# 1. Create PagerDuty Service
 # https://support.pagerduty.com/docs/services-and-integrations
 
-# 2. Events API v2 Integration Key kopieren
+# 2. Copy Events API v2 Integration Key
 
-# 3. In .env eintragen
+# 3. Add to .env
 PAGERDUTY_INTEGRATION_KEY=your-integration-key-here
 ```
 
 **PagerDuty Features:**
-- ✅ Automatische Incident Creation für P0/P1
-- ✅ On-Call Engineer wird sofort benachrichtigt
-- ✅ Escalation Policies werden befolgt
-- ✅ Custom Details mit Ticket-ID, Impact, Revenue Risk
+- ✅ Automatic Incident Creation for P0/P1
+- ✅ On-Call Engineer is immediately notified
+- ✅ Escalation Policies are followed
+- ✅ Custom Details with Ticket-ID, Impact, Revenue Risk
 
 ---
 
 ### 4. **Console Logging** 📋
-- **Typ**: Server Console Output
-- **Trigger**: Immer aktiv (alle Notfälle)
-- **Format**: Formatierter ASCII-Box Log
+- **Type**: Server Console Output
+- **Trigger**: Always active (all emergencies)
+- **Format**: Formatted ASCII-Box Log
 
-**Kein Setup erforderlich** - immer aktiv!
+**No setup required** - always active!
 
-**Console Output Beispiel:**
+**Console Output Example:**
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🚨 PAYMENT EMERGENCY ALERT
@@ -114,7 +114,7 @@ Alerts Sent: ✅ Slack notification sent, ✅ PagerDuty incident created, ✅ Em
 
 ---
 
-## 🔧 Konfiguration
+## 🔧 Configuration
 
 ### Backend (.env)
 ```bash
@@ -124,7 +124,7 @@ SLACK_EMERGENCY_WEBHOOK=https://hooks.slack.com/services/...
 # Email
 EMERGENCY_ALERT_EMAIL=devops@company.com
 
-# PagerDuty (nur für P0/P1)
+# PagerDuty (P0/P1 only)
 PAGERDUTY_INTEGRATION_KEY=your-key-here
 ```
 
@@ -133,23 +133,23 @@ PAGERDUTY_INTEGRATION_KEY=your-key-here
 // In backend/routes/app/api/payments.ts
 
 async function sendEmergencyAlerts(analysis: any): Promise<void> {
-  // 1. Slack → Alle Notfälle
+  // 1. Slack → All emergencies
   if (process.env.SLACK_EMERGENCY_WEBHOOK) {
     await sendSlackAlert(analysis);
   }
 
-  // 2. Email → Alle Notfälle
+  // 2. Email → All emergencies
   if (process.env.EMERGENCY_ALERT_EMAIL) {
     await sendEmailAlert(analysis);
   }
 
-  // 3. PagerDuty → Nur P0/P1
+  // 3. PagerDuty → P0/P1 only
   if (process.env.PAGERDUTY_INTEGRATION_KEY && 
       (analysis.severity === 'P0' || analysis.severity === 'P1')) {
     await sendPagerDutyAlert(analysis);
   }
 
-  // 4. Console → Immer
+  // 4. Console → Always
   console.log('🚨 PAYMENT EMERGENCY:', analysis);
 }
 ```
@@ -158,19 +158,19 @@ async function sendEmergencyAlerts(analysis: any): Promise<void> {
 
 ## 📊 Severity Levels
 
-| Severity | Priority | PagerDuty | Beschreibung |
-|----------|----------|-----------|--------------|
-| **P0** | CRITICAL | ✅ Ja | Total Outage, Umsatzverlust |
-| **P1** | HIGH | ✅ Ja | Degraded Service, hoher Impact |
-| **P2** | MEDIUM | ❌ Nein | Partielle Issues, mittlerer Impact |
-| **P3** | LOW | ❌ Nein | Minor Issues, geringer Impact |
+| Severity | Priority | PagerDuty | Description |
+|----------|----------|-----------|-------------|
+| **P0** | CRITICAL | ✅ Yes | Total Outage, Revenue Loss |
+| **P1** | HIGH | ✅ Yes | Degraded Service, High Impact |
+| **P2** | MEDIUM | ❌ No | Partial Issues, Medium Impact |
+| **P3** | LOW | ❌ No | Minor Issues, Low Impact |
 
 ---
 
-## 🚀 Erweiterte Integration
+## 🚀 Advanced Integration
 
 ### Jira/GitHub Issues
-Füge in `sendEmergencyAlerts()` hinzu:
+Add to `sendEmergencyAlerts()`:
 
 ```typescript
 // Jira Ticket
@@ -213,46 +213,46 @@ curl -X POST http://localhost:3000/api/payments/ml/emergency-analysis \
   -H "Content-Type: application/json" \
   -d '{
     "issueType": "gateway-down",
-    "description": "Payment Gateway nicht erreichbar seit 10 Minuten",
+    "description": "Payment Gateway unreachable for 10 minutes",
     "affectedCustomers": 1500,
     "financialImpact": 120000,
     "systemsAffected": ["Payment Gateway", "Checkout"]
   }'
 ```
 
-### Erwartetes Verhalten
-1. ✅ **GPT-4o-mini Analyse** läuft
-2. ✅ **Severity** wird bestimmt (P0-P3)
-3. ✅ **Slack Message** wird gesendet (falls konfiguriert)
-4. ✅ **PagerDuty Incident** wird erstellt (P0/P1 nur)
-5. ✅ **Console Log** wird ausgegeben
-6. ✅ **Email** wird gequeued (falls konfiguriert)
+### Expected Behavior
+1. ✅ **GPT-4o-mini Analysis** runs
+2. ✅ **Severity** is determined (P0-P3)
+3. ✅ **Slack Message** is sent (if configured)
+4. ✅ **PagerDuty Incident** is created (P0/P1 only)
+5. ✅ **Console Log** is output
+6. ✅ **Email** is queued (if configured)
 
 ---
 
 ## 🔒 Security Best Practices
 
-1. **Niemals** Webhook-URLs/Keys in Git committen
-2. Nutze **Environment Variables** (.env)
+1. **Never** commit Webhook-URLs/Keys to Git
+2. Use **Environment Variables** (.env)
 3. In Production: **Secrets Management** (AWS Secrets Manager, Azure Key Vault, etc.)
-4. **Rotate Keys** regelmäßig
-5. **Monitor** Failed Alerts (z.B. via Sentry)
+4. **Rotate Keys** regularly
+5. **Monitor** Failed Alerts (e.g., via Sentry)
 
 ---
 
-## 📚 Weitere Integrationen
+## 📚 Additional Integrations
 
-- **Discord**: Ähnlich wie Slack Webhook
-- **Telegram Bot**: Für mobile Alerts
-- **Twilio SMS**: Für P0 Critical Alerts
-- **Opsgenie**: Alternative zu PagerDuty
+- **Discord**: Similar to Slack Webhook
+- **Telegram Bot**: For mobile alerts
+- **Twilio SMS**: For P0 Critical Alerts
+- **Opsgenie**: Alternative to PagerDuty
 - **VictorOps/Splunk**: Enterprise Incident Management
 
 ---
 
 ## 🆘 Support
 
-Bei Fragen zur Emergency Alerting Setup:
-1. Siehe `.env.example` für alle Config-Optionen
-2. Logs prüfen: `backend/logs/emergency.log`
-3. Test-Endpoint nutzen: `/api/payments/ml/emergency-analysis`
+For questions about Emergency Alerting Setup:
+1. See `.env.example` for all config options
+2. Check logs: `backend/logs/emergency.log`
+3. Use test endpoint: `/api/payments/ml/emergency-analysis`

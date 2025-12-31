@@ -1,47 +1,47 @@
 # 🔒 Security & Best Practices - WooProductUpdate AI/ML
 
-**Datum:** 11. Dezember 2025  
-**Klassifizierung:** Internal  
-**Review-Status:** ✅ Approved
+**Date:** December 11, 2025  
+**Classification:** Internal  
+**Review Status:** ✅ Approved
 
 ---
 
 ## 🎯 Security Overview
 
-Das WooProductUpdate AI/ML System integriert **externe APIs** (Google Trends, Reddit, OpenAI) mit **E-Commerce Daten** (WooCommerce). Dieser Leitfaden dokumentiert alle **Sicherheitsmaßnahmen** und **Best Practices**.
+The WooProductUpdate AI/ML System integrates **external APIs** (Google Trends, Reddit, OpenAI) with **E-Commerce Data** (WooCommerce). This guide documents all **security measures** and **best practices**.
 
 ---
 
-## 🔐 1. API-Security
+## 🔐 1. API Security
 
 ### **1.1 Google Trends API**
 
-**Status:** ✅ Sicher  
-**Authentifizierung:** Keine (Public API)  
-**Datentyp:** Anonyme Trend-Daten
+**Status:** ✅ Secure  
+**Authentication:** None (Public API)  
+**Data Type:** Anonymous trend data
 
 ```typescript
-// ✅ SICHER: Keine sensiblen Daten
+// ✅ SECURE: No sensitive data
 const result = await googleTrends.interestOverTime({
-  keyword: productName,      // Öffentlich
-  startTime: new Date(...),  // Öffentlich
-  geo: 'DE'                  // Öffentlich
+  keyword: productName,      // Public
+  startTime: new Date(...),  // Public
+  geo: 'DE'                  // Public
 });
 
-// ❌ UNSICHER: Niemals User-IDs or Tracking
+// ❌ INSECURE: Never User-IDs or Tracking
 ❌ userId: user.id
 ❌ sessionToken: auth.token
 ```
 
-**Schutzmechanismen:**
-- ✅ Read-only Zugriff
-- ✅ Keine Authentifizierung erforderlich (keine Keys zu schützen)
-- ✅ Rate-Limits: ~100 requests/Tag (kontrollieren)
-- ✅ Keine Benutzer-Daten übertragen
+**Protection Mechanisms:**
+- ✅ Read-only access
+- ✅ No authentication required (no keys to protect)
+- ✅ Rate-Limits: ~100 requests/day (monitor)
+- ✅ No user data transmitted
 
-**Implementierung:**
+**Implementation:**
 ```typescript
-// Good: Fehlerbehandlung
+// Good: Error handling
 try {
   const result = await googleTrends.interestOverTime({...})
 } catch (error) {
@@ -49,7 +49,7 @@ try {
   return defaultScore
 }
 
-// Good: Timeout setzen
+// Good: Set timeout
 const controller = new AbortController()
 setTimeout(() => controller.abort(), 5000)
 const response = await fetch(url, { signal: controller.signal })
@@ -59,30 +59,30 @@ const response = await fetch(url, { signal: controller.signal })
 
 ### **1.2 Reddit API**
 
-**Status:** ✅ Sicher (mit Einschränkungen)  
-**Authentifizierung:** Keine (Public API, Read-only)  
-**Datentyp:** Öffentliche Posts
+**Status:** ✅ Secure (with restrictions)  
+**Authentication:** None (Public API, Read-only)  
+**Data Type:** Public posts
 
 ```typescript
-// ✅ SICHER: User-Agent korrekt
+// ✅ SECURE: Correct User-Agent
 headers: {
-  'User-Agent': 'KI-TrendAnalyzer/1.0 (by Geschäftsinhaberfirma)'
+  'User-Agent': 'KI-TrendAnalyzer/1.0 (by CompanyName)'
 }
 
-// ❌ UNSICHER: Falsche oder fehlende User-Agent
+// ❌ INSECURE: Wrong or missing User-Agent
 ❌ 'User-Agent': 'Mozilla/5.0...' (misleading)
-❌ Keine User-Agent (Reddit blockiert)
+❌ No User-Agent (Reddit blocks)
 ```
 
-**Schutzmechanismen:**
-- ✅ Read-only Zugriff (nur Daten lesen, nicht posten)
-- ✅ Keine Authentifizierung erforderlich
-- ✅ User-Agent vorhanden (Reddit requirement)
-- ✅ Rate-Limiting: 60 requests/minute (implementiert: 1,5s delay)
-- ✅ Nur öffentliche Posts gelesen
-- ❌ Keine privaten/moderierten Daten
+**Protection Mechanisms:**
+- ✅ Read-only access (only read data, don't post)
+- ✅ No authentication required
+- ✅ User-Agent present (Reddit requirement)
+- ✅ Rate-Limiting: 60 requests/minute (implemented: 1.5s delay)
+- ✅ Only public posts read
+- ❌ No private/moderated data
 
-**Implementierung:**
+**Implementation:**
 ```typescript
 // Good: Rate-Limiting
 for (const keyword of keywords) {
@@ -105,49 +105,49 @@ try {
 ```
 
 **Reddit ToS Compliance:**
-- ✅ Read-only (nicht mit Posts interagieren)
-- ✅ User-Agent vorhanden
-- ✅ Keine Daten-Scraping für Verkauf
-- ✅ Keine Benutzer-Daten sammeln
-- ✅ keine Analyse von privaten Communities
+- ✅ Read-only (don't interact with posts)
+- ✅ User-Agent present
+- ✅ No data scraping for sale
+- ✅ No user data collection
+- ✅ No analysis of private communities
 
 ---
 
 ### **1.3 OpenAI API**
 
-**Status:** ⚠️ Kritisch (API-Key erforderlich)  
-**Authentifizierung:** API-Key (GEHEIM)  
-**Datentyp:** Proprietary
+**Status:** ⚠️ Critical (API-Key required)  
+**Authentication:** API-Key (SECRET)  
+**Data Type:** Proprietary
 
 ```typescript
-// ✅ SICHER: API-Key im Backend
+// ✅ SECURE: API-Key in backend
 // .env
 OPENAI_API_KEY=sk-proj-xxx...
 
-// ❌ NIEMALS im Frontend
+// ❌ NEVER in frontend
 ❌ const key = import.meta.env.VITE_OPENAI_KEY
 ❌ fetch('/api/openai', { key: process.env.REACT_APP_API_KEY })
 ```
 
-**Schutzmechanismen:**
+**Protection Mechanisms:**
 
 1. **API-Key Management**
 ```typescript
-// ✅ Nur Backend Zugriff
+// ✅ Backend access only
 const apiKey = process.env.OPENAI_API_KEY // Server-side only
-const openai = new OpenAI({ apiKey }) // Nicht exportieren!
+const openai = new OpenAI({ apiKey }) // Don't export!
 
-// ❌ Niemals in Frontend/Client
+// ❌ Never in Frontend/Client
 // ❌ import { openai } from '@/utils/openai' (in React)
 ```
 
 2. **Prompt-Injection Prevention**
 ```typescript
-// ❌ UNSICHER: Direkte User-Input im Prompt
+// ❌ INSECURE: Direct user input in prompt
 const userInput = req.body.description // from user
-const prompt = `Optimize: ${userInput}` // SQL-Injection möglich
+const prompt = `Optimize: ${userInput}` // SQL-Injection possible
 
-// ✅ SICHER: Input-Validierung + Escaped Strings
+// ✅ SECURE: Input validation + Escaped strings
 const userInput = req.body.description
 if (!userInput?.trim() || userInput.length > 2000) {
   return 400 "Invalid input"
@@ -157,12 +157,12 @@ const prompt = `Optimize this: "${userInput.replace(/"/g, '\\"')}"` // Escaped
 
 3. **Token & Cost Control**
 ```typescript
-// ✅ Token-Limits setzen
+// ✅ Set token limits
 const response = await openai.chat.completions.create({
   model: 'gpt-4',
   messages: [...],
   max_tokens: 500, // Limit
-  temperature: 0.4, // Konsistent
+  temperature: 0.4, // Consistent
 })
 
 // ✅ Usage tracking
@@ -176,7 +176,7 @@ logger.info({
 
 4. **Circuit Breaker & Retries**
 ```typescript
-// ✅ Automatischer Fallback bei Fehler
+// ✅ Automatic fallback on error
 try {
   return await executeOpenAI(fn, 'operation-name')
 } catch (error) {
@@ -197,24 +197,24 @@ try {
 ### **2.1 Authentication**
 
 ```typescript
-// ✅ SICHER: Basic Auth über HTTPS
+// ✅ SECURE: Basic Auth over HTTPS
 const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64')
 headers: {
   'Authorization': `Basic ${auth}`,
   'Content-Type': 'application/json'
 }
 
-// ❌ UNSICHER: Credentials in URL
+// ❌ INSECURE: Credentials in URL
 ❌ fetch(`${wooUrl}?key=${consumerKey}&secret=${consumerSecret}`)
 
-// ❌ UNSICHER: HTTP statt HTTPS
-❌ http://example.com/... (unverschlüsselt!)
+// ❌ INSECURE: HTTP instead of HTTPS
+❌ http://example.com/... (unencrypted!)
 ```
 
 ### **2.2 Input Validation**
 
 ```typescript
-// ✅ SICHER: Validate all inputs
+// ✅ SECURE: Validate all inputs
 function validateProductId(id: any): number {
   if (!Number.isInteger(id) || id < 1) {
     throw new Error('Invalid product ID')
@@ -222,7 +222,7 @@ function validateProductId(id: any): number {
   return id
 }
 
-// ✅ SICHER: Validate prices
+// ✅ SECURE: Validate prices
 function validatePrice(price: any): number {
   const num = parseFloat(price)
   if (isNaN(num) || num <= 0 || num > 999999) {
@@ -231,7 +231,7 @@ function validatePrice(price: any): number {
   return num
 }
 
-// ✅ SICHER: Sanitize strings
+// ✅ SECURE: Sanitize strings
 function sanitizeDescription(desc: any): string {
   if (typeof desc !== 'string' || desc.length > 10000) {
     throw new Error('Invalid description')
@@ -243,7 +243,7 @@ function sanitizeDescription(desc: any): string {
 ### **2.3 Update Restrictions**
 
 ```typescript
-// ✅ SICHER: Nur erlaubte Felder updaten
+// ✅ SECURE: Only update allowed fields
 const allowedFields = ['regular_price', 'description', 'stock_quantity', 'name']
 const updatePayload = {}
 
@@ -253,30 +253,30 @@ for (const field of allowedFields) {
   }
 }
 
-// ❌ UNSICHER: Alle Felder akzeptieren
-const updatePayload = request.body // könnte status, author, etc. enthalten
+// ❌ INSECURE: Accept all fields
+const updatePayload = request.body // could contain status, author, etc.
 ```
 
 ### **2.4 Batch Operations**
 
 ```typescript
-// ✅ SICHER: Limit auf realistisch Anzahl
+// ✅ SECURE: Limit to realistic number
 const MAX_BATCH_SIZE = 100
 if (productIds.length > MAX_BATCH_SIZE) {
   return 400 "Too many products"
 }
 
-// ✅ SICHER: Sequential mit Error-Handling
+// ✅ SECURE: Sequential with error handling
 for (const productId of productIds) {
   try {
     await updateProduct(productId)
   } catch (error) {
     errors.push({ productId, error: error.message })
-    // Continue mit nächstem (nicht abbrechen)
+    // Continue with next (don't abort)
   }
 }
 
-// ❌ UNSICHER: Massive Parallel-Requests
+// ❌ INSECURE: Massive parallel requests
 await Promise.all(productIds.map(id => updateProduct(id))) // DDoS?
 ```
 
@@ -286,42 +286,42 @@ await Promise.all(productIds.map(id => updateProduct(id))) // DDoS?
 
 ### **3.1 What Data is Stored**
 
-| Daten | Wo | Wie lange | Sichtbarkeit |
-|-------|-----|-----------|--------------|
-| Trend Scores | Frontend State | Session | Nur User |
-| Reddit Posts | Frontend State | Session | Nur User |
-| Suggested Prices | Backend Logs | 7 Tage | Admin only |
-| WooCommerce Updates | WooCommerce DB | Unbegrenzt | Admin + Audit Trail |
-| API-Keys | Environment | Unbegrenzt (!) | Niemand (secrets) |
+| Data | Where | How Long | Visibility |
+|------|-------|----------|------------|
+| Trend Scores | Frontend State | Session | User only |
+| Reddit Posts | Frontend State | Session | User only |
+| Suggested Prices | Backend Logs | 7 days | Admin only |
+| WooCommerce Updates | WooCommerce DB | Unlimited | Admin + Audit Trail |
+| API Keys | Environment | Unlimited (!) | Nobody (secrets) |
 
 ### **3.2 PII Handling**
 
 ```typescript
-// ✅ SICHER: Keine Benutzer-Daten sammeln
+// ✅ SECURE: No user data collection
 const trendData = {
   keyword: 'product name',    // Public
   score: 87,                  // Calculated
   timestamp: '2025-12-11',    // Metadata
-  // ❌ KEINE user.id, email, IP, etc.
+  // ❌ NO user.id, email, IP, etc.
 }
 
-// ✅ SICHER: Reddit Posts sind Public (opt-in)
+// ✅ SECURE: Reddit posts are public (opt-in)
 const posts = redditService.analyzePosts(productName)
-// Posts sind public auf Reddit - kein Privacy-Issue
+// Posts are public on Reddit - no privacy issue
 
-// ✅ SICHER: Logging ohne PII
+// ✅ SECURE: Logging without PII
 logger.info({
   operation: 'trend-pricing',
   productId: 123,             // OK
   suggestedPrice: 279.99,     // OK
-  // ❌ NICHT: user.email, payment info, etc.
+  // ❌ NOT: user.email, payment info, etc.
 })
 ```
 
 ### **3.3 Data Retention**
 
 ```typescript
-// ✅ Best Practice: Delete logs nach 7 Tagen
+// ✅ Best Practice: Delete logs after 7 days
 const olderThan7Days = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
 db.logs.deleteMany({ timestamp: { $lt: olderThan7Days } })
 
@@ -330,8 +330,8 @@ const TREND_CACHE_TTL = 6 * 60 * 60 * 1000 // 6 hours
 redis.setex(`trend:${keyword}`, 21600, JSON.stringify(data))
 
 // ✅ Best Practice: Frontend cache clearing
-// State wird nur für aktuelle Session gehalten
-// Bei Page-Reload: alles weg
+// State is only kept for current session
+// On page reload: everything gone
 ```
 
 ---
@@ -341,7 +341,7 @@ redis.setex(`trend:${keyword}`, 21600, JSON.stringify(data))
 ### **4.1 Secure Error Messages**
 
 ```typescript
-// ❌ UNSICHER: Detailed errors exposed
+// ❌ INSECURE: Detailed errors exposed
 return reply.send({
   success: false,
   error: 'SELECT * failed: Syntax error near...',
@@ -349,14 +349,14 @@ return reply.send({
   database: 'mongodb://admin:pass@...'
 })
 
-// ✅ SICHER: Generic error messages
+// ✅ SECURE: Generic error messages
 return reply.send({
   success: false,
-  error: 'Fehler bei Datenbank-Operation',
+  error: 'Database operation error',
   requestId: '550e8400-e29b-41d4-a716-446655440000'
 })
 
-// ✅ SICHER: Detailliertes Logging (Backend only)
+// ✅ SECURE: Detailed logging (backend only)
 logger.error({
   requestId: '550e8400...',
   operation: 'trend-pricing',
@@ -374,7 +374,7 @@ logger.warn({
   productCount: 200,
   userId: 'user-123',
   timestamp: new Date(),
-  action: 'BLOCKED' // Wenn > MAX_BATCH_SIZE
+  action: 'BLOCKED' // If > MAX_BATCH_SIZE
 })
 
 logger.warn({
@@ -398,59 +398,59 @@ logger.info({
 
 ## 📋 5. Compliance Checklist
 
-### **DSGVO (GDPR)**
-- ✅ Keine Benutzer-Daten in APIs
-- ✅ Keine Tracking von Einzelpersonen
-- ✅ Logs werden nach 7 Tagen gelöscht
+### **GDPR (DSGVO)**
+- ✅ No user data in APIs
+- ✅ No tracking of individuals
+- ✅ Logs are deleted after 7 days
 - ✅ Privacy Policy updated
-- ✅ Consent not needed (keine PII)
+- ✅ Consent not needed (no PII)
 
 ### **Terms of Service**
-- ✅ Google Trends: Nur für Product Analytics
-- ✅ Reddit: Read-only, kein Scraping zum Verkaufen
-- ✅ OpenAI: Verwendung für interne Optimierung (OK)
-- ✅ WooCommerce: API-Keys konfiguriert
+- ✅ Google Trends: For product analytics only
+- ✅ Reddit: Read-only, no scraping for sale
+- ✅ OpenAI: Usage for internal optimization (OK)
+- ✅ WooCommerce: API keys configured
 
 ### **Payment Card Security**
-- ✅ Keine Preise direkt aus AI ohne Review (bei kritischen Produkten)
-- ✅ Audit-Trail für alle Updates
-- ✅ Manual approval für >50% Preis-Änderung (Empfehlung)
+- ✅ No prices directly from AI without review (for critical products)
+- ✅ Audit trail for all updates
+- ✅ Manual approval for >50% price changes (recommended)
 
 ---
 
 ## 🔄 6. Security Review Checklist
 
-**Vor Deployment in Production:**
+**Before Production Deployment:**
 
-- [ ] All API-Keys in `.env`, nicht in Code
-- [ ] HTTPS aktiviert für alle Endpoints
-- [ ] CORS konfiguriert (nur eigene Domain)
-- [ ] Rate-Limiting aktiv (siehe `fastify-rate-limit`)
-- [ ] Input-Validation auf allen Endpoints
-- [ ] Error-Messages sind generic (nicht detailed)
-- [ ] Logging läuft (wichtige Events tracked)
-- [ ] Firewall-Rules geprüft (wer darf API aufrufen?)
-- [ ] API-Quotas gesetzt (maximal X requests/Tag)
-- [ ] Backup-Plan für API-Ausfälle
-- [ ] Monitoring & Alerting eingerichtet
-- [ ] Penetration Test durchgeführt
+- [ ] All API keys in `.env`, not in code
+- [ ] HTTPS enabled for all endpoints
+- [ ] CORS configured (own domain only)
+- [ ] Rate-limiting active (see `fastify-rate-limit`)
+- [ ] Input validation on all endpoints
+- [ ] Error messages are generic (not detailed)
+- [ ] Logging is running (important events tracked)
+- [ ] Firewall rules checked (who can call API?)
+- [ ] API quotas set (max X requests/day)
+- [ ] Backup plan for API outages
+- [ ] Monitoring & alerting configured
+- [ ] Penetration test performed
 
 ---
 
 ## 🚀 7. Deployment Security
 
-### **Environment-Variablen**
+### **Environment Variables**
 
 ```bash
-# ✅ SICHER: In .env.local (nicht in Git)
+# ✅ SECURE: In .env.local (not in Git)
 OPENAI_API_KEY=sk-proj-xxx...
 WOOCOMMERCE_CONSUMER_KEY=ck_xxx
 WOOCOMMERCE_CONSUMER_SECRET=cs_xxx
 
-# ✅ SICHER: In Docker Secrets / K8s Secrets
+# ✅ SECURE: In Docker Secrets / K8s Secrets
 docker secret create openai_key /run/secrets/openai_key
 
-# ❌ UNSICHER: In Source Code
+# ❌ INSECURE: In source code
 // ❌ const API_KEY = "sk-proj-xxx"
 // ❌ export const secret = "password123"
 ```
@@ -490,26 +490,26 @@ spec:
 
 ## 📞 Incident Response
 
-### **Wenn OpenAI API kompromittiert wird**
+### **If OpenAI API is compromised**
 
-1. ✅ **Sofort:** Neuen API-Key generieren
-2. ✅ **Sofort:** Alten Key deaktivieren
-3. ✅ **15min:** Deploy neuer Key
-4. ✅ **1h:** Alle Requests der letzten 24h checken
-5. ✅ **End of day:** Incident Report schreiben
+1. ✅ **Immediately:** Generate new API key
+2. ✅ **Immediately:** Deactivate old key
+3. ✅ **15min:** Deploy new key
+4. ✅ **1h:** Check all requests from last 24h
+5. ✅ **End of day:** Write incident report
 
-### **Wenn Reddit API Rate-Limited wird**
+### **If Reddit API Rate-Limited**
 
-1. ✅ Cache aktivieren (6h TTL)
-2. ✅ Requests auf non-critical Zeiten verschieben
-3. ✅ Fallback auf Standard-Updates
+1. ✅ Enable cache (6h TTL)
+2. ✅ Shift requests to non-critical times
+3. ✅ Fallback to standard updates
 
-### **Wenn WooCommerce API ausfällt**
+### **If WooCommerce API Fails**
 
-1. ✅ Toast zeigen: "Updates verzögert, bitte warten"
-2. ✅ Alle Changes queuen
-3. ✅ Retry alle 5 Minuten
-4. ✅ Wenn nach 1h still down: Admin benachrichtigen
+1. ✅ Show toast: "Updates delayed, please wait"
+2. ✅ Queue all changes
+3. ✅ Retry every 5 minutes
+4. ✅ If still down after 1h: Notify admin
 
 ---
 
@@ -518,10 +518,10 @@ spec:
 - [OpenAI API Security Best Practices](https://platform.openai.com/docs/guides/security)
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 - [Reddit API Terms](https://www.reddit.com/dev/api)
-- [DSGVO Richtlinien](https://www.bfdi.bund.de/)
+- [GDPR Guidelines](https://www.bfdi.bund.de/)
 
 ---
 
-**Letztes Review:** 11. Dezember 2025  
-**Nächstes Review:** 11. Januar 2026  
+**Last Review:** December 11, 2025  
+**Next Review:** January 11, 2026  
 **Owner:** @security-team
