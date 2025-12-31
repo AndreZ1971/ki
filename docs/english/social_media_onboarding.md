@@ -1,92 +1,92 @@
 # 🌀 Social Media API Onboarding Guide
 
-Dieses Dokument dient als technischer Leitfaden für die Einrichtung von API-Schnittstellen, um automatisierte Beiträge auf den wichtigsten Social-Media-Plattformen zu veröffentlichen.
+This document serves as a technical guide for setting up API interfaces to publish automated posts on major social media platforms.
 
 ---
 
 ## 🔗 1. LinkedIn (Professional Networking)
-**Ziel:** Beiträge im Namen eines Nutzers oder einer Organisation teilen.
+**Goal:** Share posts on behalf of a user or organization.
 
-### Vorgehensweise:
-1.  **Portal:** Gehe zu [LinkedIn Developers](https://www.linkedin.com/developers/).
-2.  **App Setup:** Erstelle eine App und verknüpfe sie mit einer verifizierten Unternehmensseite.
-3.  **Produkte:** Füge das Produkt **"Share on LinkedIn"** hinzu.
-4.  **Auth-Konfiguration:** Hinterlege eine `Redirect URL` (z.B. `http://localhost:3000`).
-5.  **Token-Erhalt:**
-    * Nutze den [OAuth Token Generator](https://www.linkedin.com/developers/tools/oauth).
-    * Wähle den Scope `w_member_social`.
-    * Klicke auf "Request Access Token".
+### Procedure:
+1.  **Portal:** Go to [LinkedIn Developers](https://www.linkedin.com/developers/).
+2.  **App Setup:** Create an app and link it with a verified company page.
+3.  **Products:** Add the product **"Share on LinkedIn"**.
+4.  **Auth Configuration:** Provide a `Redirect URL` (e.g. `http://localhost:3000`).
+5.  **Token Acquisition:**
+    * Use the [OAuth Token Generator](https://www.linkedin.com/developers/tools/oauth).
+    * Select the scope `w_member_social`.
+    * Click on "Request Access Token".
 
 ---
 
 ## 🎵 2. TikTok (Short-form Video)
-**Ziel:** Direktes Veröffentlichen von Videos im Nutzer-Feed.
+**Goal:** Directly publish videos to user feeds.
 
-### Vorgehensweise:
-1.  **Portal:** Registriere dich im [TikTok for Developers Portal](https://developers.tiktok.com/).
-2.  **App-Erstellung:** Erstelle eine neue App und füge die **"Content Posting API"** hinzu.
-3.  **Review-Prozess:** Fülle die erforderlichen Informationen aus und reiche die App zur Prüfung ein.
-4.  **Scopes:** Stelle sicher, dass `video.publish` aktiviert ist.
-5.  **Token-Erhalt:** * Führe den OAuth-Flow durch: Leite den User zur TikTok-Auth-Seite.
-    * Tausche den `Authorization Code` gegen einen `Access Token` und `Refresh Token`.
+### Procedure:
+1.  **Portal:** Register at [TikTok for Developers Portal](https://developers.tiktok.com/).
+2.  **App Creation:** Create a new app and add the **"Content Posting API"**.
+3.  **Review Process:** Fill in the required information and submit the app for review.
+4.  **Scopes:** Ensure that `video.publish` is enabled.
+5.  **Token Acquisition:** * Perform the OAuth flow: Redirect the user to the TikTok auth page.
+    * Exchange the `Authorization Code` for an `Access Token` and `Refresh Token`.
 
 ---
 
 ## 📸 3. Instagram (Visual Media)
-**Ziel:** Automatisches Posten von Bildern, Reels und Karussells.
+**Goal:** Automatically post images, reels and carousels.
 
-### Vorgehensweise:
-1.  **Voraussetzung:** Instagram Business/Creator Account + Verknüpfung mit Facebook-Seite.
-2.  **Portal:** Nutze das [Meta Developer Portal](https://developers.facebook.com/).
-3.  **App-Typ:** Wähle "Business" und füge **"Instagram Graph API"** hinzu.
-4.  **Scopes:** Du benötigst `instagram_basic` und `instagram_content_publish`.
-5.  **Token-Erhalt:**
-    * Generiere einen User-Token im **Graph API Explorer**.
-    * Wähle deine Instagram-ID aus.
-    * Verlängere den Token über das Access Token Tool auf einen **Long-lived Token** (60 Tage).
+### Procedure:
+1.  **Prerequisite:** Instagram Business/Creator Account + link to Facebook page.
+2.  **Portal:** Use the [Meta Developer Portal](https://developers.facebook.com/).
+3.  **App Type:** Select "Business" and add **"Instagram Graph API"**.
+4.  **Scopes:** You need `instagram_basic` and `instagram_content_publish`.
+5.  **Token Acquisition:**
+    * Generate a user token in the **Graph API Explorer**.
+    * Select your Instagram ID.
+    * Extend the token via the Access Token Tool to a **Long-lived Token** (60 days).
 
 ---
 
 ## 🐦 4. X (Twitter)
-**Ziel:** Textbasierte Posts und Medienteilung.
+**Goal:** Text-based posts and media sharing.
 
-### Vorgehensweise:
-1.  **Portal:** Melde dich im [X Developer Portal](https://developer.x.com/) an.
-2.  **Berechtigungen:** Gehe zu den App-Einstellungen -> "User authentication settings". Ändere die App-Berechtigung von "Read" auf **"Read and Write"**.
-3.  **App-Info:** Hinterlege zwingend eine Website-URL und eine Callback-URL.
+### Procedure:
+1.  **Portal:** Sign in to the [X Developer Portal](https://developer.x.com/).
+2.  **Permissions:** Go to app settings -> "User authentication settings". Change the app permission from "Read" to **"Read and Write"**.
+3.  **App Info:** Mandatory: provide a website URL and a callback URL.
 4.  **Keys & Tokens:**
-    * Generiere unter "Keys and Tokens" den `API Key`, `API Key Secret`.
-    * Generiere den `Access Token` und das `Access Token Secret`.
-5.  **API Version:** Stelle sicher, dass dein Code die **v2 API** (`/2/tweets`) anspricht.
+    * Generate under "Keys and Tokens" the `API Key`, `API Key Secret`.
+    * Generate the `Access Token` and `Access Token Secret`.
+5.  **API Version:** Ensure that your code uses the **v2 API** (`/2/tweets`).
 
 ---
 
 ## 💙 5. Facebook (Pages)
-**Ziel:** Status-Updates und Medien auf Unternehmensseiten posten.
+**Goal:** Post status updates and media on company pages.
 
-### Vorgehensweise:
+### Procedure:
 1.  **Portal:** [Meta Developer Portal](https://developers.facebook.com/).
-2.  **Scopes:** Füge `pages_manage_posts` und `pages_read_engagement` hinzu.
-3.  **Token-Erhalt:**
-    * Öffne den **Graph API Explorer**.
-    * Wähle unter "User or Page" die spezifische Facebook-Seite aus.
-    * Generiere den **Page Access Token**.
-4.  **Permanenz:** Tausche den User-Token in einen langlebigen Token um, damit der Page-Token seine Gültigkeit nicht verliert.
+2.  **Scopes:** Add `pages_manage_posts` and `pages_read_engagement`.
+3.  **Token Acquisition:**
+    * Open the **Graph API Explorer**.
+    * Select the specific Facebook page under "User or Page".
+    * Generate the **Page Access Token**.
+4.  **Permanence:** Exchange the user token for a long-lived token so that the page token doesn't lose its validity.
 
 ---
 
 ## 🎥 6. YouTube (Video Content)
-**Ziel:** Video-Uploads und Kanal-Management.
+**Goal:** Video uploads and channel management.
 
-### Vorgehensweise:
+### Procedure:
 1.  **Portal:** [Google Cloud Console](https://console.cloud.google.com/).
-2.  **API:** Aktiviere die **"YouTube Data API v3"**.
-3.  **OAuth Screen:** Richte den OAuth-Zustimmungsbildschirm ein und füge deine E-Mail als Test-Nutzer hinzu.
-4.  **Credentials:** Erstelle eine "OAuth 2.0 Client ID" für eine Desktop-Anwendung.
-5.  **Token-Erhalt:**
-    * Nutze den [OAuth 2.0 Playground](https://developers.google.com/oauthplayground/).
+2.  **API:** Enable the **"YouTube Data API v3"**.
+3.  **OAuth Screen:** Set up the OAuth consent screen and add your email as a test user.
+4.  **Credentials:** Create an "OAuth 2.0 Client ID" for a desktop application.
+5.  **Token Acquisition:**
+    * Use the [OAuth 2.0 Playground](https://developers.google.com/oauthplayground/).
     * Scope: `https://www.googleapis.com/auth/youtube.force-ssl`.
-    * Klicke auf "Authorize" und tausche den Code gegen den `Access Token` und den **`Refresh Token`** aus.
+    * Click on "Authorize" and exchange the code for the `Access Token` and the **`Refresh Token`**.
 
 ---
-## Erstellt am: 22. Dezember 2025
+## Created on: December 22, 2025

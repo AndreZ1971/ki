@@ -1,95 +1,95 @@
-# Onboarding – Einstellungen für deinen KI-Agenten
+# Onboarding – Settings for Your AI Agent
 
 **Version:** 5.0.0-alpha (Alpha-Container MVP)
 
-Willkommen! Hier erfährst du, wie du deinen KI-Agenten als Shop-Besitzer beim ersten Mal einrichtest. Du brauchst keine technischen Vorkenntnisse – alles läuft direkt im Browser.
+Welcome! Here you'll learn how to set up your AI agent as a shop owner for the first time. You don't need any technical knowledge – everything runs directly in the browser.
 
 ---
 
-## 🎯 Schnellstart
+## 🎯 Quick Start
 
-1. **Frontend öffnen**: `https://my-working-space.de` (Production) oder `http://localhost:5173` (Entwicklung)
-2. **Einstellungen ausfüllen**: Shop-URL, WooCommerce Schlüssel, OpenAI API-Key
-3. **Verbindung testen**: Button "Verbindung testen" speichert und validiert Einstellungen
-4. **Dashboard sofort nutzen**: Änderungen werden **ohne Neustart** aktiv! 🚀
-5. **Erste Tools testen**: Probiere z.B. "Shop-Metriken" oder "Produktanalyse" aus
+1. **Open Frontend**: `https://my-working-space.de` (Production) or `http://localhost:5173` (Development)
+2. **Fill in Settings**: Shop URL, WooCommerce keys, OpenAI API Key
+3. **Test Connection**: "Test Connection" button saves and validates settings
+4. **Use Dashboard Immediately**: Changes become active **without restart**! 🚀
+5. **Test First Tools**: Try e.g. "Shop Metrics" or "Product Analysis"
 
-> 🆕 **Neu in v5.0.0-alpha**: Settings werden dynamisch geladen - keine Container-Restarts mehr nötig!
-
----
-
-## 1. Einstellungen öffnen
-
-Nach der Freischaltung deines Agenten erhältst du einen Link zu deiner persönlichen Agenten-Oberfläche.
-
-1. Öffne den Link in deinem Browser.
-2. Melde dich ggf. mit deinen Zugangsdaten an.
-3. Klicke im Menü auf „Einstellungen" oder „Settings".
+> 🆕 **New in v5.0.0-alpha**: Settings are loaded dynamically - no more container restarts needed!
 
 ---
 
-## 2. Zugangsdaten eintragen
+## 1. Open Settings
 
-Fülle alle Felder auf der Einstellungsseite sorgfältig aus:
+After activating your agent, you'll receive a link to your personal agent interface.
 
-- OpenAI API Key (falls bereitgestellt)
-- Shop-URL und Zugangsdaten (z. B. WooCommerce)
-- E-Mail-Konfiguration (für Benachrichtigungen)
-- Weitere Felder nach Bedarf (z. B. Analytics, Social Media)
-
-Hinweis: Die meisten Zugangsdaten erhältst du direkt von Woo oder deinem Support.
+1. Open the link in your browser.
+2. Log in with your credentials if necessary.
+3. Click on "Settings" in the menu.
 
 ---
 
-## 3. Einstellungen speichern
+## 2. Enter Credentials
 
-Klicke auf „Verbindung testen“. Das System:
-1. **Speichert** alle Einstellungen in `connection.json`
-2. **Validiert** WordPress & WooCommerce Verbindung
-3. **Aktiviert** die Konfiguration **sofort** (kein Neustart!)
+Fill in all fields on the settings page carefully:
 
-Bei Erfolg erscheint:
-- ✅ WordPress-Test erfolgreich
-- ✅ WooCommerce-Test erfolgreich
+- OpenAI API Key (if provided)
+- Shop URL and credentials (e.g. WooCommerce)
+- Email configuration (for notifications)
+- Additional fields as needed (e.g. Analytics, Social Media)
 
-Bei Fehlern erhältst du eine Rückmeldung, was noch fehlt oder falsch ist.
-
-> ⚡ **Alpha-Container Design**: Bei Container-Neustart werden Platzhalter wiederhergestellt. Einfach Settings erneut speichern oder JSON importieren!
-
-### Gültigkeitsregeln (wichtig bei der Ersteinrichtung)
-
-- WordPress, WooCommerce, OpenAI sind jeweils optional. Wenn du ein Feld einer Gruppe befüllst, müssen die restlichen Pflichtfelder dieser Gruppe ebenfalls korrekt sein (sonst bekommst du eine klare Fehlermeldung).
-- Job-Einstellungen: `Job-Modus` kann „einmalig“ oder „Intervall“ sein.
-	- Bei „einmalig“ wird `Job-Intervall` ignoriert.
-	- Bei „Intervall“ muss `Job-Intervall (ms)` im Bereich 10 Sekunden bis 24 Stunden liegen.
-- Die Settings-API zeigt dir im Fehlerfall an, welches Feld und welche Regel betroffen sind.
+Note: Most credentials can be obtained directly from Woo or your support team.
 
 ---
 
-## 4. System nutzen
+## 3. Save Settings
 
-Nach erfolgreicher Einrichtung kannst du alle Funktionen deines Agenten direkt im Browser nutzen – z. B. Analysen, Content-Generatoren, Shop-Checks und mehr.
+Click on "Test Connection". The system:
+1. **Saves** all settings in `connection.json`
+2. **Validates** WordPress & WooCommerce connection
+3. **Activates** the configuration **immediately** (no restart!)
+
+On success, you'll see:
+- ✅ WordPress test successful
+- ✅ WooCommerce test successful
+
+In case of errors, you'll receive feedback on what's missing or incorrect.
+
+> ⚡ **Alpha-Container Design**: On container restart, placeholders are restored. Simply save settings again or import JSON!
+
+### Validation Rules (important for initial setup)
+
+- WordPress, WooCommerce, OpenAI are each optional. If you fill in one field of a group, the remaining required fields of that group must also be correct (otherwise you'll get a clear error message).
+- Job settings: `Job Mode` can be "one-time" or "interval".
+	- For "one-time", `Job Interval` is ignored.
+	- For "interval", `Job Interval (ms)` must be in the range of 10 seconds to 24 hours.
+- The Settings API will show you in case of error which field and which rule is affected.
 
 ---
 
-## 5. Hilfe & Support
+## 4. Use the System
 
-Bei Fragen oder Problemen findest du Hilfe im Menüpunkt „Troubleshooting“ oder in der FAQ. Der Support steht dir jederzeit zur Verfügung.
-
----
-
-> **Hinweis:** Diese Anleitung wird später mit Bildern ergänzt, um jeden Schritt noch anschaulicher zu machen.
+After successful setup, you can use all functions of your agent directly in the browser – e.g. analytics, content generators, shop checks and more.
 
 ---
 
-## 6. Sicherheit & Unabhängigkeit (Das Schnellboot-Prinzip)
+## 5. Help & Support
 
-Wir wissen, wie wichtig dein Shop ist. Deshalb wurde der KI-Agent so gebaut, dass er **nicht-invasiv** arbeitet.
-
-- **Dein Shop gehört dir:** Der Agent steuert den Shop nur über offizielle Schnittstellen (API), er verändert keinen Programmcode.
-- **Kein Risiko:** Solltest du den Agenten jemals deaktivieren oder pausieren, läuft dein Shop sofort ganz normal weiter.
-- **Die Analogie:** Stell dir deinen Shop als Boot vor. Der KI-Agent ist ein leistungsstarker Außenbordmotor, der daraus ein Schnellboot macht. Nimmst du den Motor weg, sinkt das Boot nicht – es wird einfach wieder zum Ruderboot. Du behältst die volle Kontrolle.
+If you have questions or problems, you can find help in the "Troubleshooting" menu item or in the FAQ. Support is available to you at any time.
 
 ---
 
-Letzte Aktualisierung: Dezember 2025
+> **Note:** This guide will later be supplemented with images to make each step even clearer.
+
+---
+
+## 6. Security & Independence (The Speedboat Principle)
+
+We know how important your shop is. That's why the AI agent was built to work **non-invasively**.
+
+- **Your shop belongs to you:** The agent controls the shop only through official interfaces (API), it doesn't modify any program code.
+- **No risk:** Should you ever deactivate or pause the agent, your shop will immediately continue running normally.
+- **The analogy:** Imagine your shop as a boat. The AI agent is a powerful outboard motor that turns it into a speedboat. If you remove the motor, the boat doesn't sink – it simply becomes a rowboat again. You retain full control.
+
+---
+
+Last updated: December 2025
