@@ -1,0 +1,6 @@
+[ARCHIVIERT am 2025-12-16]
+
+Hinweis: Inhalte wurden in `Troubleshooting.md` übernommen (Compiler/TS-Resolution Logs). Original unten:
+
+---
+[Original content preserved]

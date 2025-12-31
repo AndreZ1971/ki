@@ -1,0 +1,227 @@
+[
+  {
+    "method": "GET",
+    "url": "/api/users",
+    "path": "/api/users",
+    "routePath": "/api/users",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/users",
+    "path": "/api/users",
+    "routePath": "/api/users",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "PUT",
+    "url": "/api/users",
+    "path": "/api/users",
+    "routePath": "/api/users",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "DELETE",
+    "url": "/api/users",
+    "path": "/api/users",
+    "routePath": "/api/users",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/auth",
+    "path": "/api/auth",
+    "routePath": "/api/auth",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/auth",
+    "path": "/api/auth",
+    "routePath": "/api/auth",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "PUT",
+    "url": "/api/auth",
+    "path": "/api/auth",
+    "routePath": "/api/auth",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "DELETE",
+    "url": "/api/auth",
+    "path": "/api/auth",
+    "routePath": "/api/auth",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/health",
+    "path": "/api/health",
+    "routePath": "/api/health",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/health",
+    "path": "/api/health",
+    "routePath": "/api/health",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "PUT",
+    "url": "/api/health",
+    "path": "/api/health",
+    "routePath": "/api/health",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "DELETE",
+    "url": "/api/health",
+    "path": "/api/health",
+    "routePath": "/api/health",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/status",
+    "path": "/api/status",
+    "routePath": "/api/status",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/status",
+    "path": "/api/status",
+    "routePath": "/api/status",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "PUT",
+    "url": "/api/status",
+    "path": "/api/status",
+    "routePath": "/api/status",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "DELETE",
+    "url": "/api/status",
+    "path": "/api/status",
+    "routePath": "/api/status",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/",
+    "path": "/",
+    "routePath": "/",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/",
+    "path": "/",
+    "routePath": "/",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "PUT",
+    "url": "/",
+    "path": "/",
+    "routePath": "/",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "DELETE",
+    "url": "/",
+    "path": "/",
+    "routePath": "/",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/health",
+    "path": "/health",
+    "routePath": "/health",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/status",
+    "path": "/status",
+    "routePath": "/status",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/status",
+    "path": "/status",
+    "routePath": "/status",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "PUT",
+    "url": "/status",
+    "path": "/status",
+    "routePath": "/status",
+    "meta": {
+      "statusCode": 200
+    }
+  },
+  {
+    "method": "DELETE",
+    "url": "/status",
+    "path": "/status",
+    "routePath": "/status",
+    "meta": {
+      "statusCode": 200
+    }
+  }
+]

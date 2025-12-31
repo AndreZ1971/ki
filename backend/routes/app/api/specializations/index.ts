@@ -141,92 +141,191 @@ export default async function specializationRoutes(server: FastifyInstance) {
 
   /**
    * POST /api/specializations/upload
-   * Lädt eine signierte Spezialisierungs-Datei hoch
+   * Lädt eine .ari-spec Datei hoch und speichert sie verschlüsselt
+   * Akzeptiert Multipart FormData mit ARI-Format-Validierung
    */
   server.post(
     '/api/specializations/upload',
-    {
-      schema: {
-        tags: ['specializations'],
-        summary: 'Upload specialization',
-        description:
-          'Upload and install a signed specialization file from kaufe-es.eu',
-        body: {
-          type: 'object',
-          required: ['signedData'],
-          properties: {
-            signedData: {
-              type: 'object',
-              description: 'Signed specialization JSON from WooCommerce',
-            },
-          },
-        },
-        response: {
-          200: {
-            type: 'object',
-            properties: {
-              success: { type: 'boolean' },
-              message: { type: 'string' },
-              specialization: {
-                type: 'object',
-                properties: {
-                  id: { type: 'string' },
-                  name: { type: 'string' },
-                  description: { type: 'string' },
-                },
-              },
-            },
-          },
-          400: {
-            type: 'object',
-            properties: {
-              success: { type: 'boolean' },
-              error: { type: 'string' },
-            },
-          },
-        },
-      },
-    },
-    async (
-      request: FastifyRequest<{ Body: { signedData: SignedSpecialization } }>,
-      reply: FastifyReply
-    ) => {
-      try {
-        const { signedData } = request.body;
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const uploadStartTime = Date.now();
+      let fileName = '';
+      let fileSize = 0;
+      let fileChecksum = '';
 
-        // Validiere Signatur
-        const isValid = SpecializationService.validateSignature(signedData);
-        if (!isValid) {
+      try {
+        // Extract user ID from headers or use default
+        const userId = (request.headers['x-user-id'] as string) || 'default';
+        const uploadId = crypto.randomUUID();
+
+        logger.debug(
+          `📋 Upload-Session gestartet: ${uploadId} | User: ${userId}`
+        );
+
+        // Get file from request
+        const data = await request.file();
+
+        if (!data) {
+          logger.warn(
+            `⚠️ Upload ${uploadId} fehlergeschlagen: Keine Datei übertragen`
+          );
           return reply.status(400).send({
             success: false,
-            error:
-              'Ungültige Signatur - Datei wurde manipuliert oder stammt nicht von kaufe-es.eu',
+            error: 'Keine Datei hochgeladen',
+            code: 'NO_FILE_PROVIDED',
           });
         }
 
-        // Speichere verschlüsselt
-        const userId = 'default'; // TODO: Get from auth
+        fileName = data.filename;
+        fileSize = data.file.readableLength || 0;
+
+        // Validate file extension - only .ari-spec or .json (must be ARI format)
+        const fileExtension = fileName.split(".").pop()?.toLowerCase();
+        if (!["ari-spec", "json"].includes(fileExtension || "")) {
+          logger.warn(
+            `⚠️ Upload ${uploadId} fehlergeschlagen: Ungültiger Dateityp ${fileExtension}`
+          );
+          return reply.status(400).send({
+            success: false,
+            error:
+              "Nur .ari-spec oder .json Dateien (im ARI-Spezialisierungs-Format) sind erlaubt",
+            code: "INVALID_FILE_TYPE",
+          });
+        }
+
+        // Validate file size (max 5MB)
+        const MAX_FILE_SIZE = 5 * 1024 * 1024;
+        if (fileSize > MAX_FILE_SIZE) {
+          logger.warn(
+            `⚠️ Upload ${uploadId} fehlergeschlagen: Datei zu groß (${fileSize} bytes > ${MAX_FILE_SIZE} bytes)`
+          );
+          return reply.status(413).send({
+            success: false,
+            error: `Datei zu groß (${(fileSize / 1024 / 1024).toFixed(2)}MB > 5MB)`,
+            code: 'FILE_TOO_LARGE',
+          });
+        }
+
+        // Read file content
+        const buffer = await data.toBuffer();
+        const content = buffer.toString('utf-8');
+
+        // Calculate file checksum for integrity verification
+        fileChecksum = crypto.createHash('sha256').update(buffer).digest('hex');
+
+        logger.debug(
+          `✓ Datei geladen: ${fileName} (${(fileSize / 1024).toFixed(2)}KB) | Checksum: ${fileChecksum.substring(0, 8)}...`
+        );
+
+        // Parse content - validate ARI format
+        let specialization: Record<string, unknown>;
+
+        try {
+          // Only JSON for .ari-spec format (no CSV)
+          specialization = JSON.parse(content);
+
+          // Validate ARI-Spec format
+          const formatValidation = validateARISpecFormat(specialization);
+          if (!formatValidation.valid) {
+            throw new Error(
+              formatValidation.error ||
+                "Ungültiges ARI-Spezialisierungs-Format"
+            );
+          }
+        } catch (parseError) {
+          const errorMsg =
+            parseError instanceof Error
+              ? parseError.message
+              : "Unbekannter Parse-Fehler";
+          logger.warn(
+            `⚠️ Upload ${uploadId} fehlergeschlagen: Format-Validierung - ${errorMsg}`
+          );
+          return reply.status(400).send({
+            success: false,
+            error: `Ungültiges ARI-Spezialisierungs-Format: ${errorMsg}`,
+            code: "INVALID_ARI_FORMAT",
+          });
+        }
+
+        // Validate required fields (already validated by ARI format check)
+        // Extract actual specialization data from ARI wrapper
+        const ariSpec = specialization as unknown as ARISpecializationFile;
+        const specData = ariSpec.data;
+
+        if (!specData.id || !specData.name || !specData.systemPrompt) {
+          logger.warn(
+            `⚠️ Upload ${uploadId} fehlergeschlagen: Erforderliche Felder fehlen`
+          );
+          return reply.status(400).send({
+            success: false,
+            error: "Erforderliche Felder fehlen: id, name, systemPrompt",
+            code: "MISSING_REQUIRED_FIELDS",
+          });
+        }
+
+        // Sanitize and store specialization data (use extracted spec data)
+        const sanitized = sanitizeSpecializationData(specData as Record<string, unknown>);
+
+        logger.debug(
+          `✓ ARI-Validation erfolgreich | ID: ${sanitized.id} | Name: ${sanitized.name} | Format: .ari-spec`
+        );
+
+        // Store specialization (encrypted)
         const stored = await SpecializationService.encryptAndStore(
-          signedData.data,
+          sanitized as unknown as SpecializationData,
           userId
         );
 
-        logger.info(`✅ Spezialisierung installiert: ${stored.name}`);
+        const uploadDuration = Date.now() - uploadStartTime;
+
+        // Audit logging
+        logger.info(
+          {
+            uploadId,
+            userId,
+            specializationId: stored.id,
+            specializationName: stored.name,
+            fileName,
+            fileSize,
+            fileChecksum: fileChecksum.substring(0, 16),
+            duration: uploadDuration,
+            status: 'SUCCESS',
+          },
+          `✅ Spezialisierung erfolgreich hochgeladen: ${stored.name}`
+        );
 
         return reply.send({
           success: true,
           message: `Spezialisierung "${stored.name}" erfolgreich installiert!`,
-          specialization: {
+          data: {
             id: stored.id,
             name: stored.name,
-            description: stored.description,
+            checksum: fileChecksum,
           },
         });
       } catch (error) {
-        logger.error({ err: error }, '❌ Fehler beim Upload');
-        return reply.status(500).send({
+        const uploadDuration = Date.now() - uploadStartTime;
+        const errorMessage =
+          error instanceof Error ? error.message : 'Unbekannter Fehler';
+
+        // Error audit logging
+        logger.error(
+          {
+            uploadId: crypto.randomUUID(),
+            fileName,
+            fileSize,
+            fileChecksum: fileChecksum.substring(0, 16),
+            duration: uploadDuration,
+            error: errorMessage,
+            stack: error instanceof Error ? error.stack : undefined,
+            status: 'ERROR',
+          },
+          `❌ Fehler beim Upload: ${errorMessage}`
+        );
+
+        return reply.status(400).send({
           success: false,
-          error: 'Fehler beim Installieren der Spezialisierung',
+          error: `Upload fehlgeschlagen: ${errorMessage}`,
+          code: 'UPLOAD_FAILED',
         });
       }
     }

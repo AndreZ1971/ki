@@ -15,27 +15,30 @@ Das WooCommerce AI Agent System bietet eine umfangreiche REST API für E-Commerc
 1. **[Products](#products)** - WooCommerce Produkt-Management
 2. **[Analytics](#analytics)** - Shop-Metriken & Reporting (inkl. Conversion, ML Insights, Trends, Real-Time)
 3. **[Audit](#audit)** - Shop Health Checks & Mini-Audits
-4. **[Email](#email)** - Email-Versand & AI-Generierung
+4. **[Email](#email-1)** - Email-Versand & AI-Generierung
 5. **[Marketing](#marketing)** - Marketing-Automation
 6. **[System](#system)** - Health Checks & Memory Management
 7. **[Customers](#customers)** - Kundenverwaltung
-8. **[Agent](#agent)** - AI Agent Interaction
+8. **[Agent](#agent-interaction)** - AI Agent Interaction
 
 ---
 
 ## Authentication
 
 ### WooCommerce API
+
 - **Type**: OAuth 1.0a
 - **Credentials**: Consumer Key + Consumer Secret
 - **Config**: `.env.production`
 
 ### WordPress API
+
 - **Type**: Basic Auth
 - **Credentials**: Username + App Password
 - **Config**: `.env.production`
 
 ### API Security
+
 - **Rate Limiting**: 100 Requests/Minute (konfigurierbar)
 - **CORS**: Konfiguriert für Frontend
 - **Helmet.js**: Security Headers aktiv
@@ -45,11 +48,13 @@ Das WooCommerce AI Agent System bietet eine umfangreiche REST API für E-Commerc
 ## Products
 
 ### List Products
+
 **GET** `/app/api/products/woo/products`
 
 Ruft alle WooCommerce-Produkte ab mit optionalen Filtern.
 
 **Query Parameters**:
+
 ```typescript
 {
   per_page?: number;  // Default: 10, Max: 100
@@ -63,7 +68,11 @@ Ruft alle WooCommerce-Produkte ab mit optionalen Filtern.
 ```
 
 **Response** (200 OK):
+
+````markdown
+
 ```json
+```
 {
   "success": true,
 
@@ -463,6 +472,7 @@ Ruft aktuelle Shop-Metriken ab (Umsatz, Bestellungen, Conversion).
 ---
 
 ### Real-Time Analytics
+
 **GET** `/app/api/analytics/real-woocommerce-analytics`
 
 Echtzeit-Daten aus WooCommerce & Google Analytics.
@@ -492,6 +502,7 @@ Echtzeit-Daten aus WooCommerce & Google Analytics.
 ---
 
 ### Conversion Analysis
+
 **GET** `/app/api/analytics/conversion-analysis`
 
 Detaillierte Conversion-Funnel-Analyse.
@@ -1287,7 +1298,7 @@ Kunden-Statistiken & Segmentierung.
 
 ---
 
-## Agent
+## Agent Interaction
 
 ### AI Agent Interaction
 **POST** `/app/api/agent`

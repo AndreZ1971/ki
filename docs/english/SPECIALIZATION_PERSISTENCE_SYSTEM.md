@@ -1,8 +1,8 @@
 # 🔐 Specialization Persistence & Auto-Load System
 
-**Version:** 2.0  
-**Datum:** December 18, 2025  
-**Status:** ✅ Produktiv  
+**Version:** 2.1  
+**Datum:** December 31, 2025  
+**Status:** ✅ Produktiv (ARI/.enc, Auto-Load aktiviert)  
 **Autor:** System Architecture Team
 
 ---
@@ -66,8 +66,9 @@ Das Specialization Persistence & Auto-Load System ist eine vollständige Lösung
 │  ├── active.json                                         │
 │  ├── fallback.json                                       │
 │  └── {userId}/                                           │
-│      ├── {specId}.json                                   │
-│      └── {specId}.meta.json                              │
+│      ├── metadata.json                                   │
+│      ├── {specId}.enc                                    │
+│      └── {specId}.meta.json (optional/historisch)        │
 └─────────────────────────────────────────────────────────┘
 ```
 

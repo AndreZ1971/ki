@@ -1,7 +1,7 @@
 # 📋 Spezialisierungs-Upload & Persistence System
 
-**Datum:** December 18, 2025  
-**Status:** ✅ **IMPLEMENTIERT** - Phase 1 & 2 Abgeschlossen
+**Datum:** December 31, 2025  
+**Status:** ✅ **IMPLEMENTIERT** - Phase 1 & 2 Abgeschlossen (aktualisiert auf .ari-spec only)
 **Security-Level:** 🔒 ENCRYPTED (Proprietary IP)
 
 ---
@@ -9,16 +9,16 @@
 ## ✅ IMPLEMENTIERUNGSSTATUS
 
 ### Phase 1: Upload & Encryption - **ABGESCHLOSSEN** ✅
-- ✅ Frontend Upload-Handler implementiert
+- ✅ Frontend Upload-Handler implementiert (.ari-spec / .json im ARI-Format)
 - ✅ Backend API-Endpoint mit Multipart-Upload
-- ✅ AES-256-GCM Verschlüsselung
+- ✅ AES-256-GCM Verschlüsselung (.enc Files)
 - ✅ Sanitization & XSS-Schutz
 - ✅ Audit-Logging
 - ✅ Integration Tests
 
 ### Phase 2: Persistence & Auto-Load - **ABGESCHLOSSEN** ✅
-- ✅ Filesystem-basierte Persistierung
-- ✅ Auto-Load-System mit Cache
+- ✅ Filesystem-basierte Persistierung (.enc pro Spec, metadata.json pro User)
+- ✅ Auto-Load-System mit Cache (Server lädt aktive Spec beim Start)
 - ✅ SHA-256 Integritätschecks
 - ✅ Fallback-Mechanismen
 - ✅ Server-Integration
@@ -49,34 +49,23 @@
 ## 🏗️ ARCHITEKTUR
 
 ### 1. Frontend Upload (Settings.tsx) - **IMPLEMENTIERT** ✅
-### 1. Frontend Upload (Settings.tsx) - **IMPLEMENTIERT** ✅
-
 **Features:**
 - ✅ Upload-Button in der Specialization Tab
-- ✅ File Input (akzeptiert `.json` und `.csv`)
-- ✅ Handler-Funktion: `handleSpecializationUpload()` - Vollständig implementiert
-- ✅ Multipart-Upload an Backend-API
+- ✅ File Input (akzeptiert `.ari-spec` oder `.json` im ARI-Format; max 5MB)
+- ✅ Handler-Funktion: `handleSpecializationUpload()`
+- ✅ Multipart-Upload an Backend-API `/api/specializations/upload`
 - ✅ Error-Handling & User-Feedback
 - ✅ i18n Labels für Upload-UI
 
-**Implementierung:**
+**Implementierung (aktuell):**
 ```tsx
-const handleSpecializationUpload = async (
-  event: React.ChangeEvent<HTMLInputElement>
-) => {
-  const file = event.target.files?.[0];
-  if (!file) return;
+const formData = new FormData();
+formData.append('file', file);
 
-  const formData = new FormData();
-  formData.append('file', file);
-
-  const response = await fetch('/api/specializations/upload', {
-    method: 'POST',
-    body: formData,
-  });
-
-  // Success handling...
-};
+const response = await fetch(`${apiUrl}/api/specializations/upload`, {
+  method: 'POST',
+  body: formData,
+});
 ```
 
 ### 2. Backend API (Backend Routes) - **IMPLEMENTIERT** ✅

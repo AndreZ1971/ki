@@ -1,6 +1,6 @@
-# 📚 Dokumentations-Übersicht (v5.1.0+)
+# 📚 Dokumentations-Übersicht (v5.5.0+)
 
-> **Status:** Diese Übersicht zeigt wie die neue Dokumentations-Struktur ab v5.1.0 organisiert ist.
+> **Status:** Aktualisiert für v5.5.0 (Subscription-UI, ARI-Spezialisierungen, Auto-Load).
 
 ---
 
