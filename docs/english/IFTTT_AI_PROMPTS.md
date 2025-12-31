@@ -1,185 +1,185 @@
-# 🤖 IFTTT Pro AI Prompts - Optimiert für jede Plattform!
+# 🤖 IFTTT Pro AI Prompts - Optimized for Every Platform!
 
-**Du hast IFTTT Pro für 4€!** 🎉 Nutze die **AI Content Transformation** um automatisch perfekte Posts für LinkedIn, Facebook & TikTok zu generieren!
+**You got IFTTT Pro for 4€!** 🎉 Use **AI Content Transformation** to automatically generate perfect posts for LinkedIn, Facebook & TikTok!
 
 ---
 
-## 🎯 So funktioniert's:
+## 🎯 How it works:
 
 ```
-Dein Backend sendet: "Grundtext"
+Your Backend sends: "Base text"
          ↓
-IFTTT AI transformiert mit Prompt
+IFTTT AI transforms with prompt
          ↓
-LinkedIn: Professionell 💼
-Facebook: Freundlich 👍
+LinkedIn: Professional 💼
+Facebook: Friendly 👍
 TikTok: Viral & Fun 🎵
 ```
 
-**Jede Plattform bekommt den PERFEKTEN Ton!** 🚀
+**Every platform gets the PERFECT tone!** 🚀
 
 ---
 
-## 💼 LinkedIn Prompt (B2B & Professionell)
+## 💼 LinkedIn Prompt (B2B & Professional)
 
 ### Applet Setup:
 1. **If This**: Webhooks → `linkedin_post`
 2. **Then That**: LinkedIn → Share update
-3. **AI Transform** aktivieren! ✨
-4. **Prompt eingeben:**
+3. **Activate AI Transform!** ✨
+4. **Enter Prompt:**
 
 ```
-Transformiere folgenden Text in einen professionellen LinkedIn-Post für ein E-Commerce Unternehmen (Kaufe.es):
+Transform the following text into a professional LinkedIn post for an e-commerce company (Kaufe.es):
 
 INPUT TEXT: {{Value1}}
 
-ANFORDERUNGEN:
-- Ton: Professionell, aber zugänglich
-- Zielgruppe: B2B-Kunden, Geschäftsführer, Einkäufer
-- Länge: 150-200 Zeichen (LinkedIn optimal)
-- Struktur: 
-  * Starke Eröffnung mit Mehrwert
-  * Kernbotschaft in der Mitte
-  * Call-to-Action am Ende
-- Emojis: Maximal 2-3, professionell (💼 ✅ 🚀 📊 💡)
-- Hashtags: 3-5 relevante B2B-Hashtags (#ECommerce #B2B #DigitalCommerce)
-- Fokus: Kompetenz, Innovation, Lösungen
+REQUIREMENTS:
+- Tone: Professional, but accessible
+- Target Audience: B2B customers, executives, buyers
+- Length: 150-200 characters (LinkedIn optimal)
+- Structure: 
+  * Strong opening with value
+  * Core message in the middle
+  * Call-to-action at the end
+- Emojis: Maximum 2-3, professional (💼 ✅ 🚀 📊 💡)
+- Hashtags: 3-5 relevant B2B hashtags (#ECommerce #B2B #DigitalCommerce)
+- Focus: Competence, innovation, solutions
 
-STIL-BEISPIELE:
-❌ NICHT: "Hey Leute! Check das aus! 🔥🔥🔥"
-✅ RICHTIG: "Wie können E-Commerce-Unternehmen ihre Conversion-Rate um 30% steigern? 💡 Unsere Analyse zeigt drei zentrale Faktoren..."
+STYLE EXAMPLES:
+❌ NOT: "Hey guys! Check this out! 🔥🔥🔥"
+✅ CORRECT: "How can e-commerce companies increase their conversion rate by 30%? 💡 Our analysis shows three key factors..."
 
-WICHTIG:
-- Keine Clickbait-Formulierungen
-- Faktenbasiert und vertrauenswürdig
-- Deutscher Sprachraum (AT/DE/CH)
-- Seriös aber nicht steif
+IMPORTANT:
+- No clickbait phrasing
+- Fact-based and trustworthy
+- German-speaking market (AT/DE/CH)
+- Serious but not stiff
 
-OUTPUT: Fertiger LinkedIn-Post, direkt verwendbar!
+OUTPUT: Finished LinkedIn post, ready to use!
 ```
 
-### Test-Input Beispiele:
+### Test-Input Examples:
 
-**Beispiel 1 - Produktlaunch:**
+**Example 1 - Product Launch:**
 ```
-Input: "Neue Produktkategorie: Bürobedarf jetzt verfügbar"
+Input: "New product category: Office supplies now available"
 
-Erwarteter Output:
-"📊 Professioneller Bürobedarf für moderne Unternehmen
+Expected Output:
+"📊 Professional office supplies for modern companies
 
-Effizienz beginnt mit der richtigen Ausstattung. Unsere neue Bürobedarf-Kategorie bietet ausgewählte Produkte für produktive Arbeitsumgebungen.
+Efficiency starts with the right equipment. Our new office supplies category offers selected products for productive work environments.
 
-→ Jetzt Sortiment entdecken: kaufe-es.eu
+→ Discover our selection now: kaufe-es.eu
 
-#ECommerce #Bürobedarf #B2B #Produktivität"
+#ECommerce #OfficeSupplies #B2B #Productivity"
 ```
 
-**Beispiel 2 - Erfolgsgeschichte:**
+**Example 2 - Success Story:**
 ```
-Input: "Kunde konnte mit unseren Lösungen 30% Kosten sparen"
+Input: "Customer was able to save 30% costs with our solutions"
 
-Erwarteter Output:
-"✅ 30% Kosteneinsparung durch optimierte Beschaffung
+Expected Output:
+"✅ 30% cost savings through optimized procurement
 
-Wie ein mittelständisches Unternehmen seine Einkaufskosten deutlich reduzieren konnte – durch strategische Partnerschaft und datengetriebene Prozesse.
+How a mid-sized company significantly reduced its purchasing costs – through strategic partnership and data-driven processes.
 
-Interessiert an ähnlichen Ergebnissen?
-→ Kontakt: info@kaufe-es.eu
+Interested in similar results?
+→ Contact: info@kaufe-es.eu
 
-#CaseStudy #Kostensenkung #B2BECommerce #Effizienz #DigitalTransformation"
+#CaseStudy #CostSavings #B2BECommerce #Efficiency #DigitalTransformation"
 ```
 
 ---
 
-## 👍 Facebook Prompt (Community & Lokal)
+## 👍 Facebook Prompt (Community & Local)
 
 ### Applet Setup:
 1. **If This**: Webhooks → `facebook_post`
 2. **Then That**: Facebook Pages → Post update
-3. **AI Transform** aktivieren! ✨
-4. **Prompt eingeben:**
+3. **Activate AI Transform!** ✨
+4. **Enter Prompt:**
 
 ```
-Transformiere folgenden Text in einen freundlichen Facebook-Post für unsere Community (Kaufe.es - 742 Follower):
+Transform the following text into a friendly Facebook post for our community (Kaufe.es - 742 followers):
 
 INPUT TEXT: {{Value1}}
 
-ANFORDERUNGEN:
-- Ton: Freundlich, einladend, nahbar
-- Zielgruppe: Lokale Kunden, Familien, Privatpersonen
-- Länge: 100-150 Zeichen (kurz & knackig!)
-- Struktur:
-  * Sympathische Ansprache
-  * Klare Botschaft
-  * Handlungsaufforderung
-- Emojis: Gerne mehr! 3-5 passende (🛍️ 💝 🎉 ⭐ 🏪)
-- Hashtags: 2-3 lokale/thematische Tags
-- Fokus: Sympathie, Vertrauen, Community
+REQUIREMENTS:
+- Tone: Friendly, inviting, approachable
+- Target Audience: Local customers, families, private individuals
+- Length: 100-150 characters (short & snappy!)
+- Structure:
+  * Friendly greeting
+  * Clear message
+  * Call to action
+- Emojis: Feel free to use more! 3-5 appropriate ones (🛍️ 💝 🎉 ⭐ 🏪)
+- Hashtags: 2-3 local/thematic tags
+- Focus: Sympathy, trust, community
 
-STIL-BEISPIELE:
-❌ NICHT: "Sehr geehrte Damen und Herren, wir freuen uns..."
-✅ RICHTIG: "Hey Leute! 🎉 Ihr habt gefragt, wir haben geliefert! Ab sofort gibt's..."
+STYLE EXAMPLES:
+❌ NOT: "Dear ladies and gentlemen, we are pleased to..."
+✅ CORRECT: "Hey folks! 🎉 You asked, we delivered! From now on there's..."
 
-WICHTIG:
-- Persönlich und authentisch
-- Direkte Ansprache ("Du" / "Ihr")
-- Lokaler Bezug wo möglich
-- Emotionen wecken
-- Zum Kommentieren anregen
+IMPORTANT:
+- Personal and authentic
+- Direct address ("you")
+- Local reference where possible
+- Stir emotions
+- Encourage commenting
 
-OUTPUT: Fertiger Facebook-Post, direkt verwendbar!
+OUTPUT: Finished Facebook post, ready to use!
 ```
 
-### Test-Input Beispiele:
+### Test-Input Examples:
 
-**Beispiel 1 - Sonderangebot:**
+**Example 1 - Special Offer:**
 ```
-Input: "20% Rabatt auf alle Haushaltsprodukte diese Woche"
+Input: "20% discount on all household products this week"
 
-Erwarteter Output:
-"🏡🎉 Frühjahrsputz-Special!
+Expected Output:
+"🏡🎉 Spring Cleaning Special!
 
-20% sparen auf ALLES für den Haushalt! 
-Nur diese Woche bei uns! 🛍️
+Save 20% on EVERYTHING for the household! 
+Only this week at us! 🛍️
 
-Was steht bei euch auf der Einkaufsliste? 👇
-→ Jetzt shoppen: kaufe-es.eu
+What's on your shopping list? 👇
+→ Shop now: kaufe-es.eu
 
-#Rabatt #Haushalt #Sparen"
-```
-
-**Beispiel 2 - Neue Produkte:**
-```
-Input: "Neue nachhaltige Produkte im Sortiment"
-
-Erwarteter Output:
-"🌱💚 Gute Nachrichten für unsere Umwelt!
-
-Ab heute: Nachhaltige Produkte in unserem Shop! 
-Von wiederverwendbaren Flaschen bis zu Bio-Textilien 🌍
-
-Welche nachhaltigen Produkte wünscht ihr euch noch? 
-→ Schaut vorbei: kaufe-es.eu
-
-#Nachhaltigkeit #Umwelt #Kaufees"
+#Discount #Household #Save"
 ```
 
-**Beispiel 3 - Community Engagement:**
+**Example 2 - New Products:**
 ```
-Input: "Umfrage: Welche Produktkategorie fehlt noch?"
+Input: "New sustainable products in our range"
 
-Erwarteter Output:
-"👋 Hey Community! Eure Meinung zählt! 
+Expected Output:
+"🌱💚 Good news for our environment!
 
-Was fehlt noch in unserem Shop? 
-🎨 Bastelbedarf?
-🏋️ Sportartikel?
-🐾 Tierbedarf?
+Starting today: Sustainable products in our shop! 
+From reusable bottles to organic textiles 🌍
 
-Schreibt uns in die Kommentare! 👇
-Eure Wünsche werden gehört! 💙
+What sustainable products do you wish for? 
+→ Stop by: kaufe-es.eu
 
-#Umfrage #Community #Kaufees"
+#Sustainability #Environment #Kaufees"
+```
+
+**Example 3 - Community Engagement:**
+```
+Input: "Poll: What product category are we missing?"
+
+Expected Output:
+"👋 Hey community! Your opinion matters! 
+
+What's missing from our shop? 
+🎨 Craft supplies?
+🏋️ Sports articles?
+🐾 Pet supplies?
+
+Write to us in the comments! 👇
+Your wishes are heard! 💙
+
+#Survey #Community #Kaufees"
 ```
 
 ---
@@ -188,136 +188,136 @@ Eure Wünsche werden gehört! 💙
 
 ### Applet Setup:
 1. **If This**: Webhooks → `tiktok_post` 
-2. **Then That**: Email (für manuelle TikTok-Posting)
-3. **AI Transform** aktivieren! ✨
-4. **Prompt eingeben:**
+2. **Then That**: Email (for manual TikTok posting)
+3. **Activate AI Transform!** ✨
+4. **Enter Prompt:**
 
 ```
-Transformiere folgenden Text in einen TikTok-optimierten Caption für unseren Account (@kaufe.es - 2098 Follower):
+Transform the following text into a TikTok-optimized caption for our account (@kaufe.es - 2098 followers):
 
 INPUT TEXT: {{Value1}}
 
-ANFORDERUNGEN:
-- Ton: Locker, witzig, authentisch, Gen Z
-- Zielgruppe: 16-30 Jahre, trendbewusst
-- Länge: 50-100 Zeichen (TikTok liebt kurz!)
-- Struktur:
-  * Hook in der ersten Zeile! (Aufmerksamkeit!)
-  * Twist oder Pointe
+REQUIREMENTS:
+- Tone: Casual, witty, authentic, Gen Z
+- Target Audience: 16-30 years old, trend-conscious
+- Length: 50-100 characters (TikTok loves short!)
+- Structure:
+  * Hook in the first line! (Grab attention!)
+  * Twist or punchline
   * Emoji-heavy
-- Emojis: VIELE! 5-10+ (🔥 💀 😭 ✨ 💅 🤡 ⚡)
-- Hashtags: 5-8 Trend-Tags (#fyp #foryou #viral #shopping)
-- Fokus: Unterhaltung, Relatable, Trends
+- Emojis: LOTS! 5-10+ (🔥 💀 😭 ✨ 💅 🤡 ⚡)
+- Hashtags: 5-8 trend tags (#fyp #foryou #viral #shopping)
+- Focus: Entertainment, relatable, trends
 
-STIL-BEISPIELE:
-❌ NICHT: "Wir freuen uns, Ihnen mitzuteilen..."
-✅ RICHTIG: "POV: Du brauchst was aus'm Laden aber bist zu faul rauszugehen 💀🛒 #relatable"
+STYLE EXAMPLES:
+❌ NOT: "We are pleased to inform you..."
+✅ CORRECT: "POV: You need something from the store but are too lazy to go out 💀🛒 #relatable"
 
-WICHTIG:
-- Memes & Trends aufgreifen
-- Self-aware & ironisch
-- Slang nutzen (aber authentisch!)
-- Cliffhanger & Neugier wecken
+IMPORTANT:
+- Pick up on memes & trends
+- Self-aware & ironic
+- Use slang (but authentically!)
+- Create cliffhangers & spark curiosity
 - "POV:", "Tell me why...", "No one:", etc.
 
-TikTok-Sprache:
+TikTok Language:
 - "fr fr" (for real)
-- "no cap" (kein Scherz)
-- "bussin" (mega gut)
-- "slay" (perfekt)
-- "bestie" (Ansprache)
+- "no cap" (no joke)
+- "bussin" (really good)
+- "slay" (perfect)
+- "bestie" (address)
 
-OUTPUT: Fertiger TikTok-Caption, direkt verwendbar!
+OUTPUT: Finished TikTok caption, ready to use!
 ```
 
-### Test-Input Beispiele:
+### Test-Input Examples:
 
-**Beispiel 1 - Produktvorstellung:**
+**Example 1 - Product Presentation:**
 ```
-Input: "Neue Gaming-Zubehör Kategorie online"
+Input: "New gaming accessories category online"
 
-Erwarteter Output:
-"POV: Du bist Gamer und brauchst new Setup 🎮⚡
+Expected Output:
+"POV: You're a gamer and need a new setup 🎮⚡
 
-ENDLICH haben wir Gaming-Stuff! 
-No cap, die Preise sind bussin 💀🔥
+FINALLY we have gaming stuff! 
+No cap, the prices are bussin 💀🔥
 
-Link in Bio! ✨
+Link in bio! ✨
 
 #gaming #gamer #setup #fyp #foryou #shopping #viral #gamingsetup"
 ```
 
-**Beispiel 2 - Humor:**
+**Example 2 - Humor:**
 ```
-Input: "Schneller Versand - Lieferung in 24h"
+Input: "Fast shipping - delivery in 24h"
 
-Erwarteter Output:
-"Tell me why ich um 3 Uhr nachts bestell hab und es am nächsten Tag schon da war 😭✨
+Expected Output:
+"Tell me why I ordered at 3 AM and it was already there the next day 😭✨
 
-Ich: *shocked Pikachu face* 
+Me: *shocked Pikachu face* 
 
-24h Versand hits different fr fr 💅🚚
+24h shipping hits different fr fr 💅🚚
 
-#shopping #schnellelieferung #relatable #fyp #foryou #blessed"
+#shopping #fastshipping #relatable #fyp #foryou #blessed"
 ```
 
-**Beispiel 3 - Trend:**
+**Example 3 - Trend:**
 ```
 Input: "Black Friday Deals coming soon"
 
-Erwarteter Output:
+Expected Output:
 "No one:
 Absolutely no one:
-Mein Bankkonto am Black Friday: 💀📉
+My bank account on Black Friday: 💀📉
 
-ABER die Deals sind zu gut 🔥🛒
-Kommt bald! 
+BUT the deals are too good 🔥🛒
+Coming soon! 
 
-Wer kann nicht widerstehen? 😭👇
+Who can resist? 😭👇
 
 #blackfriday #shopping #broke #fyp #foryou #deals #help #relatable"
 ```
 
 ---
 
-## 🎨 Universal Prompt (Alle Plattformen)
+## 🎨 Universal Prompt (All Platforms)
 
-**Wenn du EINEN Post für ALLE Plattformen nutzen willst:**
+**If you want to use ONE post for ALL platforms:**
 
 ### Multi-Platform Applet:
 1. **If This**: Webhooks → `post_everywhere`
-2. **Then That**: AI Transform mit folgendem Prompt:
+2. **Then That**: AI Transform with following prompt:
 
 ```
-Erstelle DREI verschiedene Versionen des folgenden Textes - optimiert für LinkedIn, Facebook und TikTok:
+Create THREE different versions of the following text - optimized for LinkedIn, Facebook and TikTok:
 
 INPUT TEXT: {{Value1}}
 
 FORMAT:
 ---
-LINKEDIN (Professionell 💼):
-[150-200 Zeichen, B2B-Ton, 3-5 Hashtags]
+LINKEDIN (Professional 💼):
+[150-200 characters, B2B tone, 3-5 hashtags]
 
 ---
 FACEBOOK (Community 👍):
-[100-150 Zeichen, Freundlich, 2-3 Hashtags]
+[100-150 characters, Friendly, 2-3 hashtags]
 
 ---
 TIKTOK (Viral 🎵):
-[50-100 Zeichen, Gen Z, 5-8 Hashtags]
+[50-100 characters, Gen Z, 5-8 hashtags]
 ---
 
-MARKE: Kaufe.es (E-Commerce)
-BRANCHEN-FOKUS: Online-Shopping, Produkte, Deals
+BRAND: Kaufe.es (E-Commerce)
+INDUSTRY FOCUS: Online shopping, products, deals
 
-OUTPUT: Drei fertige Posts für Copy & Paste!
+OUTPUT: Three finished posts ready for copy & paste!
 ```
 
 ---
 
-## ⚙️ IFTTT Pro Setup (mit AI)
+## ⚙️ IFTTT Pro Setup (with AI)
 
-### 1. LinkedIn mit AI:
+### 1. LinkedIn with AI:
 
 ```
 If: Webhook "linkedin_post" receives {{Value1}}
@@ -325,7 +325,7 @@ Then: AI Transform with LinkedIn-Prompt
 Then: LinkedIn "Share update" with transformed text
 ```
 
-### 2. Facebook mit AI:
+### 2. Facebook with AI:
 
 ```
 If: Webhook "facebook_post" receives {{Value1}}
@@ -333,267 +333,168 @@ Then: AI Transform with Facebook-Prompt
 Then: Facebook Pages "Post update" with transformed text
 ```
 
-### 3. TikTok mit AI + Email:
+### 3. TikTok with AI + Email:
 
 ```
 If: Webhook "tiktok_post" receives {{Value1}}
 Then: AI Transform with TikTok-Prompt
 Then: Email to info@kaufe-es.eu with transformed caption
-Subject: "🎵 TikTok Post bereit!"
+Subject: "🎵 TikTok Post ready!"
 Body: "{{TransformedText}}"
 ```
 
 ---
 
-## 🧪 Test-Commands (mit AI!)
+## 🧪 Test Commands (with AI!)
 
 ### Test LinkedIn AI:
 ```bash
-curl -X POST "https://maker.ifttt.com/trigger/linkedin_post/with/key/DEIN_KEY" \
+curl -X POST "https://maker.ifttt.com/trigger/linkedin_post/with/key/YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "value1": "Wir haben unsere Checkout-Prozesse optimiert und die Conversion um 25% gesteigert"
+    "value1": "We optimized our checkout processes and increased conversion by 25%"
   }'
 ```
 
-**AI transformiert zu:**
-> "📊 25% höhere Conversion durch optimierten Checkout
+**AI transforms to:**
+> "📊 25% higher conversion through optimized checkout
 > 
-> Kleine Änderungen, große Wirkung: Wie wir unsere E-Commerce-Performance durch datengetriebene UX-Optimierungen deutlich steigern konnten.
+> Small changes, big impact: How we significantly improved our e-commerce performance through data-driven UX optimizations.
 > 
 > Details: kaufe-es.eu
 > 
-> #ECommerce #Conversion #UXOptimierung #DigitalCommerce #Performance"
+> #ECommerce #Conversion #UXOptimization #DigitalCommerce #Performance"
 
 ### Test Facebook AI:
 ```bash
-curl -X POST "https://maker.ifttt.com/trigger/facebook_post/with/key/DEIN_KEY" \
+curl -X POST "https://maker.ifttt.com/trigger/facebook_post/with/key/YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "value1": "Neue Spielzeug-Kategorie für Kinder jetzt verfügbar"
+    "value1": "New toy category for children now available"
   }'
 ```
 
-**AI transformiert zu:**
-> "🎉🧸 Kids aufgepasst!
+**AI transforms to:**
+> "🎉🧸 Kids pay attention!
 > 
-> Neue Spielzeuge sind da! Von Lego bis Kuscheltiere - alles was das Kinderherz begehrt! 💝
+> New toys are here! From Lego to cuddly toys - everything your child's heart desires! 💝
 > 
-> Was spielt ihr am liebsten? 👇
+> What do you like to play with best? 👇
 > → kaufe-es.eu
 > 
-> #Spielzeug #Kinder #Shopping"
+> #Toys #Kids #Shopping"
 
 ### Test TikTok AI:
 ```bash
-curl -X POST "https://maker.ifttt.com/trigger/tiktok_post/with/key/DEIN_KEY" \
+curl -X POST "https://maker.ifttt.com/trigger/tiktok_post/with/key/YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "value1": "Kostenloser Versand ab 50 Euro Bestellwert"
+    "value1": "Free shipping from 50 euros order value"
   }'
 ```
 
-**AI transformiert zu:**
-> "POV: Dein Warenkorb ist bei 49,99€ 💀
+**AI transforms to:**
+> "POV: Your shopping cart is at €49.99 💀
 > 
 > Me adding random stuff for free shipping: 🤡🛒
 > 
-> Ab 50€ versandkostenfrei fr fr ⚡✨
+> Free shipping from 50€ fr fr ⚡✨
 > 
 > #shopping #relatable #onlineshopping #fyp #foryou #freeshipping #broke"
 
 ---
 
-## 💡 Pro Tips für AI Prompts
+## 💡 Pro Tips for AI Prompts
 
-### 1. **Kontext ist King:**
-Gib der AI immer:
-- Markenname (Kaufe.es)
-- Branche (E-Commerce)
-- Tonalität (professionell/freundlich/lustig)
-- Zielgruppe (B2B/Familien/Gen Z)
+### 1. **Context is King:**
+Always give the AI:
+- Brand name (Kaufe.es)
+- Industry (E-Commerce)
+- Tonality (professional/friendly/funny)
+- Target audience (B2B/families/Gen Z)
 
-### 2. **Beispiele geben:**
-❌ "Schreibe professionell"
-✅ "Beispiel: 'Wie können E-Commerce-Unternehmen...'"
+### 2. **Give Examples:**
+❌ "Write professionally"
+✅ "Example: 'How can e-commerce companies...'"
 
-### 3. **Länge definieren:**
-- LinkedIn: 150-200 Zeichen
-- Facebook: 100-150 Zeichen  
-- TikTok: 50-100 Zeichen
+### 3. **Define Length:**
+- LinkedIn: 150-200 characters
+- Facebook: 100-150 characters  
+- TikTok: 50-100 characters
 
-### 4. **Emoji-Richtlinien:**
+### 4. **Emoji Guidelines:**
 - LinkedIn: 2-3 max (💼 ✅ 📊)
 - Facebook: 3-5 (🛍️ 🎉 💝)
 - TikTok: 5-10+ (🔥 💀 ✨)
 
-### 5. **Hashtag-Strategie:**
-- LinkedIn: 3-5 Branchen-Tags
-- Facebook: 2-3 Themen-Tags
-- TikTok: 5-8 Trend-Tags (immer #fyp!)
+### 5. **Hashtag Strategy:**
+- LinkedIn: 3-5 industry tags
+- Facebook: 2-3 topic tags
+- TikTok: 5-8 trend tags (always #fyp!)
 
 ---
 
 ## 🎯 Backend Integration
 
-### Dein Backend sendet einfach:
+### Your backend simply sends:
 ```typescript
 await fetch('https://maker.ifttt.com/trigger/linkedin_post/with/key/KEY', {
   method: 'POST',
   body: JSON.stringify({
-    value1: "Einfacher Grundtext hier"
+    value1: "Simple base text here"
   })
 });
 ```
 
-### IFTTT AI macht den Rest:
-- ✅ Transformiert für LinkedIn (professionell)
-- ✅ Optimiert Länge automatisch
-- ✅ Fügt passende Emojis hinzu
-- ✅ Generiert relevante Hashtags
-- ✅ Postet direkt auf LinkedIn!
+### IFTTT AI does the rest:
+- ✅ Transforms for LinkedIn (professional)
+- ✅ Automatically optimizes length
+- ✅ Adds appropriate emojis
+- ✅ Generates relevant hashtags
+- ✅ Posts directly to LinkedIn!
 
-**Du sparst STUNDEN an Content-Erstellung!** 🚀
+**You save HOURS on content creation!** 🚀
 
 ---
 
-## 🔥 Bonus: Content-Kalender Prompts
+## 🔥 Bonus: Content Calendar Prompts
 
-### Montag - Motivation:
+### Monday - Motivation:
 ```
-Input: "Neue Woche, neue Chancen"
+Input: "New week, new opportunities"
 
-LinkedIn: "💼 Wochenstart-Impuls: 3 E-Commerce-Trends für KW..."
-Facebook: "🌟 Guten Morgen! Startet gut in die Woche!"
+LinkedIn: "💼 Weekly start impulse: 3 e-commerce trends for KW..."
+Facebook: "🌟 Good morning! Start the week well!"
 TikTok: "Monday motivation? Never heard of her 💀☕ #mondayvibes"
 ```
 
-### Mittwoch - Produkt-Spotlight:
+### Wednesday - Product Spotlight:
 ```
-Input: "Produkt der Woche: [Name]"
+Input: "Product of the week: [Name]"
 
-LinkedIn: "📊 Produktvorstellung: Wie [Name] B2B-Prozesse optimiert..."
-Facebook: "🎉 Produkt der Woche! Schon entdeckt? 👀"
+LinkedIn: "📊 Product introduction: How [Name] optimizes B2B processes..."
+Facebook: "🎉 Product of the week! Discovered it yet? 👀"
 TikTok: "POV: This product just changed your life fr fr ✨🔥"
 ```
 
-### Freitag - Weekend Vibes:
+### Friday - Weekend Vibes:
 ```
-Input: "Schönes Wochenende wünschen wir"
+Input: "We wish you a great weekend"
 
-LinkedIn: "✅ Erfolgreiche Woche! Guter Start ins Wochenende..."
-Facebook: "🎊 Wochenende! Was steht bei euch an? 🌞"
-TikTok: "Finally Friday 😭🎉 Wer macht auch nichts? 💀 #weekend"
+LinkedIn: "✅ Successful week! Great start into the weekend..."
+Facebook: "🎊 Weekend! What's on your agenda? 🌞"
+TikTok: "Finally Friday 😭🎉 Who else is doing nothing? 💀 #weekend"
 ```
 
 ---
 
 ## 📊 AI Performance Tracking
 
-### In IFTTT Pro Dashboard kannst du sehen:
+### In IFTTT Pro Dashboard you can see:
 
-- **Engagement Rate** pro AI-transformiertem Post
-- **Best performing Emojis** (AI lernt!)
-- **Optimal post length** (AI optimiert!)
-- **Hashtag Performance** (welche funktionieren?)
+- **Engagement rate** per AI-transformed post
+- **Best performing emojis** (AI learns!)
+- **Optimal post length** (AI optimizes!)
+- **Hashtag performance** (which ones work?)
 
-**Die AI wird mit jedem Post BESSER!** 📈
-
----
-
-## 🎁 Fertige Prompt-Templates (Copy & Paste!)
-
-### ⚡ Ultra-Kurz (für IFTTT Pro Limit!)
-
-#### LinkedIn (Kompakt):
-```
-Professioneller B2B-Post für Kaufe.es aus: {{Value1}}
-Ton: Seriös. 150-200 Zeichen. 2-3 Hashtags #ECommerce. 2 Emojis 💼📊
-```
-
-#### Facebook (Kompakt):
-```
-Freundlicher Community-Post für Kaufe.es aus: {{Value1}}
-Ton: Locker, sympathisch. 100-150 Zeichen. 3 Emojis 🛍️🎉. 2 Hashtags
-```
-
-#### TikTok (Kompakt) - **EMPFOHLEN!** 🎵:
-```
-Viraler Gen Z TikTok-Caption für @kaufe.es aus: {{Value1}}
-50-100 Zeichen. Slang (fr fr, no cap, bussin). Viele Emojis 🔥💀✨. POV/Tell me why Format. Hashtags: #fyp #foryou #shopping #viral
-```
-
----
-
-### 🔥 TikTok MINI-Prompt (Extra kurz!):
-```
-TikTok Caption für @kaufe.es: {{Value1}}
-Gen Z Slang + POV-Format + viele Emojis 🔥💀✨ + #fyp #foryou #shopping
-```
-
----
-
-### 💎 TikTok ONE-LINER (Kürzeste Version!):
-```
-Mache viralen TikTok-Post (Gen Z, POV, Slang, Emojis 🔥💀✨, #fyp #foryou) aus: {{Value1}}
-```
-
----
-
-### 📝 TikTok Extended (wenn mehr Platz):
-```
-Transformiere in TikTok-Caption für @kaufe.es (2098 Follower):
-Text: {{Value1}}
-Style: Gen Z (16-30J), locker, witzig
-Format: POV/Tell me why/No one
-Sprache: Slang (fr fr, no cap, bussin, slay)
-Emojis: 5-10 (🔥💀😭✨💅⚡🤡)
-Länge: 50-100 Zeichen
-Hashtags: #fyp #foryou #viral #shopping + 3 thematische
-Fokus: Relatable, meme-artig, authentisch
-```
-
----
-
-### Quick-Template LinkedIn:
-```
-Mache professionellen B2B LinkedIn-Post aus: {{Value1}}
-- 150-200 Zeichen
-- 3 Hashtags
-- 2 Emojis max
-- Marke: Kaufe.es E-Commerce
-```
-
-### Quick-Template Facebook:
-```
-Mache freundlichen Community Facebook-Post aus: {{Value1}}
-- 100-150 Zeichen  
-- 3 Emojis
-- Lokaler Bezug
-- Marke: Kaufe.es
-```
-
-### Quick-Template TikTok:
-```
-Mache viralen Gen Z TikTok-Caption aus: {{Value1}}
-- 50-100 Zeichen
-- Viele Emojis 🔥💀✨
-- Slang & Trends
-- #fyp immer dabei
-```
-
----
-
-## 🚀 Zusammenfassung
-
-**Mit IFTTT Pro AI:**
-
-✅ **Ein Text** → Drei perfekte Posts  
-✅ **Keine manuelle Anpassung** mehr nötig  
-✅ **Jede Plattform** bekommt optimalen Ton  
-✅ **Automatische Emojis** & Hashtags  
-✅ **Zeit sparen**: Von 30 Min → 30 Sekunden!  
-
-**4€/Monat = Unbezahlbar!** 🎉
-
-Copy die Prompts in deine IFTTT Applets und lass die AI die Arbeit machen! 🤖✨
+**The AI gets BETTER with every post!** 📈

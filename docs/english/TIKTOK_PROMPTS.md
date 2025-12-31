@@ -1,115 +1,115 @@
-# 🎵 TikTok IFTTT AI Prompts - Alle Längen!
+# 🎵 TikTok IFTTT AI Prompts - All Lengths!
 
-**Für IFTTT Pro mit limitierter Prompt-Eingabe!**
-
----
-
-## 🔥 Option 1: ONE-LINER (Kürzester Prompt!)
-
-**Kopiere genau das:**
-
-```
-Mache viralen TikTok-Post (Gen Z, POV, Slang, Emojis 🔥💀✨, #fyp #foryou) aus: {{Value1}}
-```
-
-**Das war's!** Die AI weiß was zu tun ist! 🚀
+**For IFTTT Pro with limited prompt input!**
 
 ---
 
-## ⚡ Option 2: MINI-Prompt (Kurz & effektiv!)
+## 🔥 Option 1: ONE-LINER (Shortest Prompt!)
+
+**Copy exactly this:**
 
 ```
-TikTok Caption für @kaufe.es: {{Value1}}
-Gen Z Slang + POV-Format + viele Emojis 🔥💀✨ + #fyp #foryou #shopping
+Make viral TikTok post (Gen Z, POV, slang, emojis 🔥💀✨, #fyp #foryou) from: {{Value1}}
 ```
+
+**That's it!** The AI knows what to do! 🚀
 
 ---
 
-## 💎 Option 3: KOMPAKT-Prompt (Etwas mehr Details)
+## ⚡ Option 2: MINI-Prompt (Short & effective!)
 
 ```
-Viraler Gen Z TikTok-Caption für @kaufe.es aus: {{Value1}}
-50-100 Zeichen. Slang (fr fr, no cap, bussin). Viele Emojis 🔥💀✨. POV/Tell me why Format. Hashtags: #fyp #foryou #shopping #viral
+TikTok caption for @kaufe.es: {{Value1}}
+Gen Z slang + POV format + lots of emojis 🔥💀✨ + #fyp #foryou #shopping
 ```
 
 ---
 
-## 📝 Option 4: EXTENDED-Prompt (Wenn Platz vorhanden)
+## 💎 Option 3: COMPACT-Prompt (Slightly more details)
 
 ```
-Transformiere in TikTok-Caption für @kaufe.es (2098 Follower):
+Viral Gen Z TikTok caption for @kaufe.es from: {{Value1}}
+50-100 characters. Slang (fr fr, no cap, bussin). Lots of emojis 🔥💀✨. POV/Tell me why format. Hashtags: #fyp #foryou #shopping #viral
+```
+
+---
+
+## 📝 Option 4: EXTENDED-Prompt (If space available)
+
+```
+Transform into TikTok caption for @kaufe.es (2098 followers):
 Text: {{Value1}}
-Style: Gen Z (16-30J), locker, witzig
+Style: Gen Z (16-30 yrs), casual, witty
 Format: POV/Tell me why/No one
-Sprache: Slang (fr fr, no cap, bussin, slay)
+Language: Slang (fr fr, no cap, bussin, slay)
 Emojis: 5-10 (🔥💀😭✨💅⚡🤡)
-Länge: 50-100 Zeichen
-Hashtags: #fyp #foryou #viral #shopping + 3 thematische
-Fokus: Relatable, meme-artig, authentisch
+Length: 50-100 characters
+Hashtags: #fyp #foryou #viral #shopping + 3 thematic
+Focus: Relatable, meme-like, authentic
 ```
 
 ---
 
-## 🧪 Test mit jedem Prompt:
+## 🧪 Test with each prompt:
 
 ### Input:
 ```json
 {
-  "value1": "Kostenloser Versand ab 50 Euro"
+  "value1": "Free shipping from 50 euros"
 }
 ```
 
-### Erwarteter Output (alle Prompts):
+### Expected Output (all prompts):
 ```
-POV: Dein Warenkorb ist bei 49,99€ 💀
+POV: Your shopping cart is at €49.99 💀
 
 Me adding random stuff for free shipping: 🤡🛒
 
-Ab 50€ versandkostenfrei fr fr ⚡✨
+Free shipping from 50€ fr fr ⚡✨
 
 #shopping #relatable #onlineshopping #fyp #foryou #freeshipping #broke
 ```
 
 ---
 
-## 🎯 Welchen Prompt nutzen?
+## 🎯 Which prompt to use?
 
-| Situation | Empfohlener Prompt | Warum? |
+| Situation | Recommended Prompt | Why? |
 |-----------|-------------------|--------|
-| **IFTTT limitiert stark** | ONE-LINER | Passt immer! |
-| **Etwas mehr Platz** | MINI-Prompt | Bessere Kontrolle |
-| **Gute Qualität nötig** | KOMPAKT | Beste Balance |
-| **Maximum Qualität** | EXTENDED | Wenn Platz da ist |
+| **IFTTT limits heavily** | ONE-LINER | Always fits! |
+| **Some more space** | MINI-Prompt | Better control |
+| **Good quality needed** | COMPACT | Best balance |
+| **Maximum quality** | EXTENDED | If space available |
 
 ---
 
 ## 🚀 IFTTT Applet Setup
 
-### Schritt 1: Applet erstellen
+### Step 1: Create applet
 1. **If This**: Webhooks → Event name: `tiktok_post`
 2. **Then That**: Email → To: `info@kaufe-es.eu`
 
-### Schritt 2: AI Transform aktivieren ✨
-3. Klicke **"Add filter"**
-4. Wähle **"AI Transform"** (Pro Feature!)
-5. **Prompt eingeben**: [Wähle einen Prompt von oben!]
+### Step 2: Activate AI Transform ✨
+3. Click **"Add filter"**
+4. Select **"AI Transform"** (Pro feature!)
+5. **Enter prompt**: [Choose one from above!]
 
-### Schritt 3: Email Setup
-6. **Subject**: `🎵 TikTok Post bereit!`
+### Step 3: Email Setup
+6. **Subject**: `🎵 TikTok Post ready!`
 7. **Body**: 
 ```
-Neuer TikTok-Post für @kaufe.es:
+New TikTok post for @kaufe.es:
 
 {{TransformedText}}
 
 ---
 Original: {{Value1}}
-Erstellt: {{OccurredAt}}
+Created: {{OccurredAt}}
 ```
 
-### Schritt 4: Fertig! ✅
+### Step 4: Done! ✅
 8. **Continue** → **Finish**
-9. Teste mit curl!
+9. Test with curl!
 
 ---
 
@@ -117,74 +117,74 @@ Erstellt: {{OccurredAt}}
 
 ### Test ONE-LINER Prompt:
 ```bash
-curl -X POST "https://maker.ifttt.com/trigger/tiktok_post/with/key/DEIN_KEY" \
+curl -X POST "https://maker.ifttt.com/trigger/tiktok_post/with/key/YOUR_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"value1": "Neue Gaming-Produkte verfügbar"}'
+  -d '{"value1": "New gaming products available"}'
 ```
 
-**Email bekommst du mit:**
+**You get email with:**
 ```
-POV: Du bist Gamer und brauchst new Setup 🎮⚡
+POV: You're a gamer and need a new setup 🎮⚡
 
-ENDLICH haben wir Gaming-Stuff! 
-No cap, die Preise sind bussin 💀🔥
+FINALLY we have gaming stuff! 
+No cap, the prices are bussin 💀🔥
 
-Link in Bio! ✨
+Link in bio! ✨
 
 #gaming #gamer #setup #fyp #foryou #shopping #viral
 ```
 
 ---
 
-## 💡 Pro Tips für kurze Prompts
+## 💡 Pro Tips for short prompts
 
-### Schlüsselwörter die AI versteht:
+### Keywords AI understands:
 
-| Wort | AI versteht |
+| Word | AI understands |
 |------|-------------|
-| **Gen Z** | Slang, Memes, Trends |
-| **POV** | "Point of View" Format |
+| **Gen Z** | Slang, memes, trends |
+| **POV** | "Point of view" format |
 | **Slang** | "fr fr", "no cap", "bussin" |
-| **Viral** | Trend-optimiert, catchy |
-| **#fyp** | TikTok-Algorithmus-optimiert |
+| **Viral** | Trend-optimized, catchy |
+| **#fyp** | TikTok algorithm-optimized |
 
-### Emoji-Kürzel:
+### Emoji Shortcuts:
 - 🔥 = trending/hot
 - 💀 = funny/dead laughing
 - ✨ = aesthetic/perfect
 - 💅 = sassy/confident
 - ⚡ = fast/energetic
 
-**Die AI kennt die Bedeutung!**
+**The AI knows the meaning!**
 
 ---
 
-## 🎁 Bonus: Multi-Post Varianten
+## 🎁 Bonus: Multi-Post Variants
 
-### Variante 1: Humor-fokus
+### Variant 1: Humor focus
 ```
-Lustiger TikTok (Gen Z, Memes, 💀🤡) aus: {{Value1}} #fyp #foryou #viral
-```
-
-### Variante 2: Produkt-fokus
-```
-TikTok Produktvorstellung (locker, Gen Z, ✨🔥) aus: {{Value1}} #shopping #fyp
+Funny TikTok (Gen Z, memes, 💀🤡) from: {{Value1}} #fyp #foryou #viral
 ```
 
-### Variante 3: Deal-fokus
+### Variant 2: Product focus
 ```
-TikTok Deal-Post (hype, FOMO, 🔥💸) aus: {{Value1}} #deals #fyp #foryou
+TikTok product presentation (casual, Gen Z, ✨🔥) from: {{Value1}} #shopping #fyp
+```
+
+### Variant 3: Deal focus
+```
+TikTok deal post (hype, FOMO, 🔥💸) from: {{Value1}} #deals #fyp #foryou
 ```
 
 ---
 
-## 🔥 Empfehlung:
+## 🔥 Recommendation:
 
-**Start mit ONE-LINER:**
+**Start with ONE-LINER:**
 ```
-Mache viralen TikTok-Post (Gen Z, POV, Slang, Emojis 🔥💀✨, #fyp #foryou) aus: {{Value1}}
+Make viral TikTok post (Gen Z, POV, slang, emojis 🔥💀✨, #fyp #foryou) from: {{Value1}}
 ```
 
-**Falls AI schwächelt → KOMPAKT-Prompt nutzen!**
+**If AI struggles → use COMPACT-Prompt instead!**
 
-**Die AI ist schlau - kurz ist oft besser!** 🚀
+**The AI is smart - short is often better!** 🚀
