@@ -1,43 +1,38 @@
-alle A.R.I. Nutzer werden gleich behandelt … das ist auch werbewirksam
+all A.R.I. users are treated equally ... that's also good for advertising
 
-teurer als bei Spotify kann sein aber der Service ist exorbitant höher als bei shopify, da weiss keiner was das tool anstellt, Ari brieft mich und ist nicht invasiv 
+more expensive than Spotify could be but the service is exorbitantly higher than Shopify, because no one knows what the tool does. Ari briefs me and is not invasive
 
-Support, Datensicherheit skallierung Auswirkung auf die performenz vom shop 
+Support, data security, scalability impact on shop performance
 
-die Vorteile können wir garnicht alle auflisten. 
+the benefits we can't even list all.
 
-lass das ganze nur 1000 Shops im ersten Quartal nutzen 
+let the whole thing only be used by 1000 shops in the first quarter
 
-1000 x 199€ x 4 = 796.000 €
+1000 x 199€ x 4 = 796,000 €
 
-100ß x 199€ x 12 = 2.388.000 € 
+1000 x 199€ x 12 = 2,388,000 €
 
-plus Umschulungs verkauf 
+plus retraining sales
 
-sie sind der obersten direktive unterworfen 
+they are subject to the top directive
 
-- Reisebüro
-- Immobilienmakler
-- technickshop
+- Travel Agency
+- Real Estate Agent
+- Tech Shop
 
-zu begin würde ich die 10 beliebtesten ( können wir uns ja aus dem Internet holen) anbieten 
-
-und dann athok je nach Frequentierung die anderen bis hin zu absoluten nieschen shops
+at the beginning I would offer the 10 most popular ones (we can get from the internet) and then based on frequency offer the others down to absolute niche shops
 
 
-den promt als download anzubieten im shop und dann in A.R.I. als upload einzubringen wäre eine Methode, die jedoch viele tücken birgt, der prompt könnte weitergegeben/verkauft werden was nicht erwünscht ist, Kopierschutz und einmal Nutzung wären auch sehr viel aufwand, und einmal Nutzung würde abschrecken , stürzt der container ab wäre das Risiko sehr gross das alles weg ist, wir wollen alles so simpel wie möglich halten ( idiotensicher für den woo support) und da wir keine db haben und auch keine einbinden werden haben wir keinen platz das zu speichern , und ich denke nicht das wir das in der shop db abgelegt bekommen 
+offering the prompt as a download in the shop and then uploading it into A.R.I. would be one method, but it has many pitfalls. The prompt could be passed on/sold, which is not desired. Copy protection and single-use would also be very much effort, and single-use would scare away users. If the container crashes, the risk would be very high that everything is lost. We want to keep everything as simple as possible (idiot-proof for woo support), and since we don't have a database and won't integrate one either, we have no place to store it. And I don't think we can get it stored in the shop database.
 
-also die Umschulung wird wirklich der grösste happen am ganzen, aber auch der interessanteste und lukrativste 
+so the retraining will really be the biggest deal of it all, but also the most interesting and lucrative one.
 
+if we do it so that A.R.I. pulls it for itself after payment, it's also very complex.
 
-wenn wir das so machen das A.R.I. sich das nach Bezahlung selber zieht ist auch sehr komplex
+for the presentation of the retrainings we should definitely make the tiles smaller, arrange them as a grid 4 x 5, this prevents too much scrolling. Add a filter and categorize the retrainings.
 
-zur Präsentation der Umschulungen sollten wir auf jedenfall die kacheln verkleinern als grid anordnen 4 x 5 das verhindert zu langes scrollen , ein filter einbauen und die Umschulungen kategoriesieren
+the description of the retraining would then appear as a pop-up and the tile itself only shows a product image with price.
 
+since the retrainings increase gradually over time, all at once would be overwhelming.
 
-die Beschreibung der Umschulung würde dann als Pop up erscheinen und die kachel an sich nur ein produktbild mit preis
-
-da sich die umschulungen erst nach und nach vermehren, alles auf einmal wäre erschlagend 
-
-
-A.R.I. ist wie eine spielekonsole die spezialsierungen sind die "spiele die man wechseln ider speichern kann, rechnisch relativ einfach, der prompt kommt via woo zum jeweiligen shop, nicht im container , der nutzer lädt die datei den prompt hoch, A.R.I. hat den schlüssel und kontrolliert den personalausweis die signatur von woo dann schreibt A.R.I. das in eine .json verschlüsselt weil A.R.I. kann es, wenn die spezialiesirung gewechselt wird jederzeit ainlesen
+A.R.I. is like a gaming console, the specializations are the "games" you can switch or save. Technically relatively simple, the prompt comes via woo to the respective shop, not in the container. The user uploads the file, uploads the prompt, A.R.I. has the key and controls the ID card, the signature from woo, then A.R.I. writes it encrypted into a .json because A.R.I. can do it. When the specialization is switched, it can read it in anytime.
