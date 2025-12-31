@@ -1,91 +1,91 @@
-# 🎯 IFTTT Setup - Am EINFACHSTEN!
+# 🎯 IFTTT Setup - The EASIEST way!
 
-**Problem:** Make.com, Zapier, Webhooks = zu kompliziert  
-**Lösung:** **IFTTT = Klick & Fertig!** Kein Code, nur Buttons! 🎯
+**Problem:** Make.com, Zapier, webhooks = too complicated  
+**Solution:** **IFTTT = click & done!** No code, just buttons! 🎯
 
-## 🚀 Warum IFTTT am einfachsten ist:
+## 🚀 Why IFTTT is the simplest:
 
-- 🎯 **Kein Code** - Nur Buttons klicken!
-- 🎯 **Echter Free Plan** - Unbegrenzt nutzbar!
-- 🎯 **Vorgefertigte Templates** - Sofort einsatzbereit!
-- 🎯 **Simple App** - Auch vom Handy bedienbar!
-- 🎯 **Alle Plattformen** - LinkedIn, Facebook, Twitter, etc.
+- 🎯 **No code** - just click buttons!
+- 🎯 **True free plan** - unlimited usage!
+- 🎯 **Prebuilt templates** - ready instantly!
+- 🎯 **Simple app** - usable from your phone!
+- 🎯 **All platforms** - LinkedIn, Facebook, Twitter, etc.
 
-## ⏱️ Setup in 2 Minuten (KEIN CODE!)
+## ⏱️ Setup in 2 minutes (NO CODE!)
 
-### 1. IFTTT Account erstellen
+### 1. Create an IFTTT account
 
-1. Gehe zu: https://ifttt.com/join
-2. **Kostenlos anmelden**
-3. Email bestätigen
-4. Fertig! 🎉
+1. Go to: https://ifttt.com/join
+2. **Sign up for free**
+3. Confirm email
+4. Done! 🎉
 
-### 2. LinkedIn Applet erstellen
+### 2. Create LinkedIn applet
 
-#### Option A: Vorgefertigtes Template nutzen (EMPFOHLEN!)
+#### Option A: Use the prebuilt template (RECOMMENDED!)
 
-1. Gehe zu: https://ifttt.com/create
-2. Klicke **"If This"**
-3. Suche **"Webhooks"**
-4. Wähle **"Receive a web request"**
+1. Go to: https://ifttt.com/create
+2. Click **"If This"**
+3. Search **"Webhooks"**
+4. Choose **"Receive a web request"**
 5. Event Name: `linkedin_post`
-6. **"Create trigger"** klicken
-7. Klicke **"Then That"**
-8. Suche **"LinkedIn"**
-9. Wähle **"Share an update"**
-10. Verbinde LinkedIn Account
-11. Message: `{{Value1}}` (das ist dein Post-Content!)
-12. **"Create action"** klicken
-13. **"Continue"** → **"Finish"** klicken
+6. Click **"Create trigger"**
+7. Click **"Then That"**
+8. Search **"LinkedIn"**
+9. Choose **"Share an update"**
+10. Connect LinkedIn account
+11. Message: `{{Value1}}` (that’s your post content!)
+12. Click **"Create action"**
+13. Click **"Continue"** → **"Finish"**
 
-**FERTIG!** 🎉 Kein Code, nur Klicks!
+**DONE!** 🎉 No code, just clicks!
 
-#### Deine Webhook URL finden:
+#### Find your webhook URL:
 
-1. Gehe zu: https://ifttt.com/maker_webhooks
-2. Klicke **"Documentation"**
-3. Du siehst deine **Webhook URL**:
+1. Go to: https://ifttt.com/maker_webhooks
+2. Click **"Documentation"**
+3. You’ll see your **webhook URL**:
    ```
    https://maker.ifttt.com/trigger/{event}/with/key/YOUR_KEY
    ```
-4. Kopiere deinen **KEY** (sieht aus wie: `abc123def456...`)
+4. Copy your **KEY** (looks like: `abc123def456...`)
 
-### 3. Webhook URL in .env eintragen
+### 3. Add webhook URL to .env
 
 ```env
 # IFTTT Webhooks
-IFTTT_KEY=dein_key_hier
+IFTTT_KEY=your_key_here
 
-# Automatisch generierte URLs (nicht ändern):
-# WEBHOOK_LINKEDIN wird automatisch: https://maker.ifttt.com/trigger/linkedin_post/with/key/{IFTTT_KEY}
-# WEBHOOK_FACEBOOK wird automatisch: https://maker.ifttt.com/trigger/facebook_post/with/key/{IFTTT_KEY}
+# Auto-generated URLs (do not change):
+# WEBHOOK_LINKEDIN becomes: https://maker.ifttt.com/trigger/linkedin_post/with/key/{IFTTT_KEY}
+# WEBHOOK_FACEBOOK becomes: https://maker.ifttt.com/trigger/facebook_post/with/key/{IFTTT_KEY}
 ```
 
-### 4. Facebook Applet erstellen
+### 4. Create Facebook applet
 
-1. Gehe zu: https://ifttt.com/create
+1. Go to: https://ifttt.com/create
 2. **If This**: Webhooks → Event: `facebook_post`
 3. **Then That**: Facebook Pages → Post new page update
-4. Wähle deine Kaufe.es Page
+4. Select your Kaufe.es page
 5. Message: `{{Value1}}`
 6. **Finish**
 
-### 5. Backend Update (nur 1 Zeile ändern!)
+### 5. Backend update (change just 1 line!)
 
-Öffne `backend/.env`:
+Open `backend/.env`:
 
 ```env
-# Ändere von:
+# Change from:
 WEBHOOK_LINKEDIN=https://hook.eu1.make.com/...
 WEBHOOK_FACEBOOK=https://hook.eu1.make.com/...
 
-# Zu:
-IFTTT_KEY=dein_ifttt_key_hier
-WEBHOOK_LINKEDIN=https://maker.ifttt.com/trigger/linkedin_post/with/key/dein_ifttt_key_hier
-WEBHOOK_FACEBOOK=https://maker.ifttt.com/trigger/facebook_post/with/key/dein_ifttt_key_hier
+# To:
+IFTTT_KEY=your_ifttt_key_here
+WEBHOOK_LINKEDIN=https://maker.ifttt.com/trigger/linkedin_post/with/key/your_ifttt_key_here
+WEBHOOK_FACEBOOK=https://maker.ifttt.com/trigger/facebook_post/with/key/your_ifttt_key_here
 ```
 
-### 6. Fertig! Testen! 🎉
+### 6. Done! Test it! 🎉
 
 ```bash
 cd backend
@@ -99,22 +99,22 @@ curl -X POST http://localhost:3000/api/social/webhook/test \
   -d '{"platform": "linkedin"}'
 ```
 
-**Check LinkedIn** → Siehst du den Test-Post? ✅
+**Check LinkedIn** → Do you see the test post? ✅
 
 ---
 
-## 🎯 Noch einfacher: IFTTT Mobile App!
+## 🎯 Even easier: IFTTT mobile app!
 
-### Posts direkt vom Handy senden:
+### Send posts directly from your phone:
 
-1. **IFTTT App** installieren (iOS/Android)
-2. Applet erstellen:
+1. Install the **IFTTT app** (iOS/Android)
+2. Create an applet:
    - **If This**: Button Widget
    - **Then That**: LinkedIn → Share update
-3. **Widget auf Homescreen** legen
-4. **Tap** → Post geht raus! 🚀
+3. Place the **widget on the home screen**
+4. **Tap** → post is sent! 🚀
 
-**Noch einfacher geht's nicht!**
+**It doesn’t get easier!**
 
 ---
 
@@ -122,101 +122,101 @@ curl -X POST http://localhost:3000/api/social/webhook/test \
 
 | Feature | IFTTT | Make.com | Zapier |
 |---------|-------|----------|--------|
-| **Komplexität** | 🎯 **Super einfach!** | 🤯 Kompliziert | 🤯 Kompliziert |
-| **Code nötig** | ❌ **Kein Code!** | ⚠️ Webhooks Setup | ⚠️ Webhooks Setup |
-| **Free Plan** | ✅ **Unbegrenzt** | ✅ 1000 Ops | ❌ Nur 5 Zaps |
-| **Setup Zeit** | 🎯 **2 Minuten** | ⏱️ 10 Minuten | ⏱️ 10 Minuten |
-| **Templates** | ✅ **Viele!** | ⚠️ Wenige | ⚠️ Wenige |
-| **Mobile App** | ✅ **Ja, super!** | ❌ Nein | ⚠️ Basic |
+| **Complexity** | 🎯 **Super simple!** | 🤯 Complicated | 🤯 Complicated |
+| **Code required** | ❌ **No code!** | ⚠️ Webhook setup | ⚠️ Webhook setup |
+| **Free plan** | ✅ **Unlimited** | ✅ 1000 ops | ❌ Only 5 Zaps |
+| **Setup time** | 🎯 **2 minutes** | ⏱️ 10 minutes | ⏱️ 10 minutes |
+| **Templates** | ✅ **Many!** | ⚠️ Few | ⚠️ Few |
+| **Mobile app** | ✅ **Yes, great!** | ❌ No | ⚠️ Basic |
 
-**IFTTT = Beste Wahl wenn du überfordert bist!** 🎯
+**IFTTT = best choice when you feel overwhelmed!** 🎯
 
 ---
 
-## 🔥 Vorgefertigte Templates (Klick & Nutzen!)
+## 🔥 Prebuilt templates (click & use!)
 
-### Template 1: LinkedIn Auto-Poster
+### Template 1: LinkedIn auto-poster
 ```
 If: Webhook "linkedin_post" 
 Then: LinkedIn "Share update"
 Message: {{Value1}}
 ```
-**Nutzen:** https://ifttt.com/create → Copy this template!
+**Use:** https://ifttt.com/create → copy this template!
 
-### Template 2: Facebook Page Auto-Poster
+### Template 2: Facebook Page auto-poster
 ```
 If: Webhook "facebook_post"
 Then: Facebook Pages "Post update"
 Message: {{Value1}}
 ```
 
-### Template 3: Multi-Platform (1 Webhook → 3 Posts!)
+### Template 3: Multi-platform (1 webhook → 3 posts!)
 ```
 If: Webhook "post_everywhere"
 Then: LinkedIn "Share update"
 Also: Facebook "Post update"  
 Also: Twitter "Post tweet"
 ```
-**Ein Webhook, drei Plattformen!** 🚀
+**One webhook, three platforms!** 🚀
 
-### Template 4: Mit Backup Email
+### Template 4: With backup email
 ```
 If: Webhook "linkedin_post"
 Then: LinkedIn "Share update"
 Also: Email "Send me summary"
 ```
-**Du bekommst Bestätigung per Email!**
+**You get confirmation via email!**
 
 ---
 
-## 💡 Super Simple Workflow
+## 💡 Super simple workflow
 
 ```
 ┌─────────────────┐
-│  Dein Backend   │
+│  Your backend   │
 │   POST Request  │
 └────────┬────────┘
          │ 
          ↓
 ┌─────────────────┐
-│   IFTTT Webhook │  ← Super einfache URL!
+│   IFTTT Webhook │  ← Super simple URL!
 │  maker.ifttt.com│
 └────────┬────────┘
          │ 
          ↓
 ┌─────────────────┐
-│  IFTTT Applet   │  ← Du hast per Klick erstellt!
+│  IFTTT Applet   │  ← You created it with clicks!
 │  (If/Then Rule) │
 └────────┬────────┘
          │ 
          ↓
 ┌─────────────────┐
-│    LinkedIn     │  ← Post erscheint! ✅
+│    LinkedIn     │  ← Post appears! ✅
 └─────────────────┘
 ```
 
-**KEINE Router, KEINE komplexen Webhooks!**
+**NO routers, NO complex webhooks!**
 
 ---
 
-## 🎨 Frontend bleibt gleich!
+## 🎨 Frontend stays the same!
 
-Das Frontend funktioniert **ohne Änderung**:
-- Toggle auf **"🎉 Make.com"** (wird für IFTTT genutzt)
-- Oder: Ändere Label zu **"🎯 IFTTT"**
+The frontend works **without changes**:
+- Toggle to **"🎉 Make.com"** (used for IFTTT)
+- Or change the label to **"🎯 IFTTT"**
 
-**Webhook-Endpoints bleiben gleich!** `/api/social/webhook/post`
+**Webhook endpoints remain the same!** `/api/social/webhook/post`
 
 ---
 
-## 🧪 Test Commands (Copy & Paste!)
+## 🧪 Test commands (copy & paste!)
 
 ### Test LinkedIn:
 ```bash
-curl -X POST "https://maker.ifttt.com/trigger/linkedin_post/with/key/DEIN_KEY" \
+curl -X POST "https://maker.ifttt.com/trigger/linkedin_post/with/key/YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "value1": "🚀 Test Post von Kaufe.es! #test",
+    "value1": "🚀 Test post from Kaufe.es! #test",
     "value2": "",
     "value3": ""
   }'
@@ -224,111 +224,111 @@ curl -X POST "https://maker.ifttt.com/trigger/linkedin_post/with/key/DEIN_KEY" \
 
 ### Test Facebook:
 ```bash
-curl -X POST "https://maker.ifttt.com/trigger/facebook_post/with/key/DEIN_KEY" \
+curl -X POST "https://maker.ifttt.com/trigger/facebook_post/with/key/YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "value1": "🛍️ Neue Produkte bei Kaufe.es!",
+    "value1": "🛍️ New products at Kaufe.es!",
     "value2": "",
     "value3": ""
   }'
 ```
 
-### Über dein Backend:
+### Through your backend:
 ```bash
 curl -X POST "http://localhost:3000/api/social/webhook/post" \
   -H "Content-Type: application/json" \
   -d '{
     "platform": "linkedin",
-    "content": "Professionelle E-Commerce Lösungen! 🚀"
+    "content": "Professional e-commerce solutions! 🚀"
   }'
 ```
 
 ---
 
-## ❌ Troubleshooting (Super einfach!)
+## ❌ Troubleshooting (super easy!)
 
-### "Applet läuft nicht"
+### "Applet doesn’t run"
 
-→ IFTTT Dashboard → **Activity** → Siehst du das Event?
-- Ja? → LinkedIn Connection überprüfen
-- Nein? → Webhook URL falsch? Key korrekt?
+→ IFTTT Dashboard → **Activity** → Do you see the event?
+- Yes? → Check LinkedIn connection
+- No? → Webhook URL wrong? Key correct?
 
-### "LinkedIn will nicht connecten"
+### "LinkedIn won’t connect"
 
-→ **Settings** → **Connected services** → LinkedIn entfernen und neu verbinden
+→ **Settings** → **Connected services** → Remove LinkedIn and reconnect
 
-### "Keine Posts sichtbar"
+### "No posts visible"
 
-→ LinkedIn Profil Check:
-- Business Account aktiv?
-- Posting-Rechte vorhanden?
-- Warte 1-2 Minuten (LinkedIn verzögert manchmal)
+→ LinkedIn profile check:
+- Business account active?
+- Posting rights available?
+- Wait 1-2 minutes (LinkedIn sometimes delays)
 
-### "Key funktioniert nicht"
+### "Key doesn’t work"
 
 → https://ifttt.com/maker_webhooks → **Documentation**
-→ Kopiere Key neu (kein Leerzeichen!)
+→ Copy key again (no spaces!)
 
 ---
 
-## 🤖 IFTTT PRO: AI Content Transformation!
+## 🤖 IFTTT PRO: AI content transformation!
 
-### 💎 Hast du IFTTT Pro für 4€?
+### 💎 Do you have IFTTT Pro for €4?
 
-**DANN NUTZE DIE AI!** 🚀
+**THEN USE THE AI!** 🚀
 
-Die AI transformiert automatisch deine Texte:
-- LinkedIn: Professionell & B2B-optimiert 💼
-- Facebook: Freundlich & Community-fokussiert 👍
-- TikTok: Viral & Gen Z-Sprache 🎵
+The AI automatically transforms your texts:
+- LinkedIn: professional & B2B-optimized 💼
+- Facebook: friendly & community-focused 👍
+- TikTok: viral & Gen Z language 🎵
 
-**Ein Text → Drei perfekte Posts!**
+**One text → three perfect posts!**
 
-👉 **Komplette AI-Prompts für alle Plattformen:**  
-📖 **Siehe: `IFTTT_AI_PROMPTS.md`** ← MUST READ!
+👉 **Complete AI prompts for all platforms:**  
+📖 **See: `IFTTT_AI_PROMPTS.md`** ← MUST READ!
 
 ---
 
-## 🎁 Bonus: IFTTT Mobile Workflow
+## 🎁 Bonus: IFTTT mobile workflow
 
-### Noch einfacher als Backend!
+### Even easier than the backend!
 
-1. **IFTTT App** öffnen
+1. Open the **IFTTT app**
 2. **Create** → **Button Widget**
-3. **Ask for Input**: "Was posten?"
+3. **Ask for Input**: "What to post?"
 4. **LinkedIn**: Share update → `{{TextField}}`
-5. **Fertig!**
+5. **Done!**
 
-**Tap → Post erscheht auf LinkedIn! 🚀**
+**Tap → post appears on LinkedIn! 🚀**
 
 ---
 
-## 🎉 Zusammenfassung
+## 🎉 Summary
 
-### Was du brauchst:
+### What you need:
 
-1. ✅ **IFTTT Account** (2 Min registrieren)
-2. ✅ **2 Applets** (je 1 Min erstellen = LinkedIn + Facebook)
-3. ✅ **IFTTT Key** in `.env` eintragen (30 Sek)
+1. ✅ **IFTTT account** (2 min signup)
+2. ✅ **2 applets** (1 min each = LinkedIn + Facebook)
+3. ✅ **IFTTT key** in `.env` (30 sec)
 4. ✅ **Test!** 🎉
 
-### Was du NICHT brauchst:
+### What you do NOT need:
 
-- ❌ **Kein Make.com** Setup
-- ❌ **Kein Zapier** Account
-- ❌ **Kein kompliziertes Webhook-Setup**
-- ❌ **Kein Router-Code**
-- ❌ **Keine Scenarios/Zaps erstellen**
+- ❌ **No Make.com** setup
+- ❌ **No Zapier** account
+- ❌ **No complex webhook setup**
+- ❌ **No router code**
+- ❌ **No scenarios/Zaps to create**
 
-### Total Time: ~5 Minuten! 🎯
+### Total time: ~5 minutes! 🎯
 
-**IFTTT = Perfekt wenn überfordert!** 
+**IFTTT = perfect when you feel overwhelmed!** 
 
-Alles per Klick, kein Code, funktioniert sofort! 🚀
+Everything by clicks, no code, works immediately! 🚀
 
 ---
 
-## 🔗 Quick Links
+## 🔗 Quick links
 
 - **IFTTT Registration**: https://ifttt.com/join
 - **Create Applet**: https://ifttt.com/create
@@ -336,4 +336,4 @@ Alles per Klick, kein Code, funktioniert sofort! 🚀
 - **Mobile App iOS**: https://apps.apple.com/app/ifttt/id660944635
 - **Mobile App Android**: https://play.google.com/store/apps/details?id=com.ifttt.ifttt
 
-**Los geht's! 🎯🚀**
+**Let’s go! 🎯🚀**

@@ -1,24 +1,24 @@
 # Agentic Configuration Guide
 
-> **Für Shop-Admins**: Wie man A.R.I. konfiguriert & Loops anpasst.  
-> **Für Entwickler**: Siehe [AGENTIC_TOOLS_REFERENCE.md](./AGENTIC_TOOLS_REFERENCE.md)
+> For shop admins: configure A.R.I. and adjust loops.
+> For developers: see AGENTIC_TOOLS_REFERENCE.md.
 
 ---
 
-## Übersicht
+## Overview
 
-Agentic Loops werden über zwei Config-Dateien gesteuert:
+Agentic Loops are configured through two files:
 
-1. **`backend/connection.json`** – Externe Integrationen (WooCommerce, OpenAI, SMTP)
-2. **`backend/agent/config/ml.config.ts`** – Loop-Verhalten & Schwellenwerte
+1. backend/connection.json – external integrations (WooCommerce, OpenAI, SMTP, Reddit)
+2. backend/agent/config/ml.config.ts – loop behavior and thresholds
 
 ---
 
-## 1. connection.json – External Credentials
+## 1. connection.json – External credentials
 
-**Datei**: `backend/connection.json`
+File: backend/connection.json
 
-### 1.1 WooCommerce Integration
+### 1.1 WooCommerce integration
 
 ```json
 {
@@ -32,33 +32,33 @@ Agentic Loops werden über zwei Config-Dateien gesteuert:
 }
 ```
 
-**Parameter erklären**:
+Field reference:
 
-| Feld             | Typ                | Bedeutung                              | Beispiel                                                   |
-| ---------------- | ------------------ | -------------------------------------- | ---------------------------------------------------------- |
-| `url`            | String             | WooCommerce Shop-URL (muss HTTPS sein) | `https://kaufe-es.eu`                                      |
-| `consumerKey`    | String             | WooCommerce REST API Key               | Generiert in WP Admin: Einstellungen → Advanced → REST API |
-| `consumerSecret` | String             | WooCommerce REST API Secret            | Generiert in WP Admin: Einstellungen → Advanced → REST API |
-| `authMode`       | `basic` \| `oauth` | Authentifizierungs-Methode             | `basic` (Standard)                                         |
-| `timeoutMs`      | Number             | Max. Wartezeit für API-Calls           | `30000` (30 Sekunden)                                      |
+| Field | Type | Meaning | Example |
+| --- | --- | --- | --- |
+| url | string | WooCommerce shop URL (must be HTTPS) | https://kaufe-es.eu |
+| consumerKey | string | WooCommerce REST API key | Generated in WP Admin → Settings → Advanced → REST API |
+| consumerSecret | string | WooCommerce REST API secret | Generated in WP Admin → Settings → Advanced → REST API |
+| authMode | basic | oauth | Authentication method | basic (default) |
+| timeoutMs | number | Max wait time for API calls | 30000 (30 seconds) |
 
-**Wie man den API-Key generiert**:
+How to generate the API key:
 
-1. WooCommerce Admin → **Einstellungen** → **Advanced** → **REST API**
-2. Klick auf **Key erstellen** / **Add Key**
-3. Gib einen Namen ein: z.B. "A.R.I. Loop Agent"
-4. **Permissions**: Wähle `Read/Write` für Orders, Products, Customers
-5. Klick **Generate**
-6. Kopiere `Consumer Key` und `Consumer Secret` in connection.json
+1. WooCommerce Admin → Settings → Advanced → REST API
+2. Click Create key / Add Key
+3. Name it e.g. "A.R.I. Loop Agent"
+4. Permissions: Read/Write for orders, products, customers
+5. Click Generate
+6. Copy consumerKey and consumerSecret into connection.json
 
-**⚠️ Sicherheit**:
-- Speichere connection.json **niemals** in Git (in `.gitignore`)
-- Nutze Environment Variables in Production: `WOO_CONSUMER_KEY`, `WOO_CONSUMER_SECRET`
-- Rotiere Keys regelmäßig (z.B. jedes Quartal)
+Security:
+- Never commit connection.json (keep it in .gitignore)
+- Use env vars in production: WOO_CONSUMER_KEY, WOO_CONSUMER_SECRET
+- Rotate keys regularly (for example quarterly)
 
 ---
 
-### 1.2 OpenAI Integration
+### 1.2 OpenAI integration
 
 ```json
 {
@@ -69,37 +69,36 @@ Agentic Loops werden über zwei Config-Dateien gesteuert:
 }
 ```
 
-**Parameter erklären**:
+Field reference:
 
-| Feld     | Typ    | Bedeutung      | Beispiel                                               |
-| -------- | ------ | -------------- | ------------------------------------------------------ |
-| `apiKey` | String | OpenAI API Key | Von https://platform.openai.com/api-keys               |
-| `model`  | String | LLM-Modell     | `gpt-4o-mini` (cost-effective) oder `gpt-4` (powerful) |
+| Field | Type | Meaning | Example |
+| --- | --- | --- | --- |
+| apiKey | string | OpenAI API key | https://platform.openai.com/api-keys |
+| model | string | LLM model | gpt-4o-mini (budget) or gpt-4 (powerful) |
 
-**Modell-Optionen**:
+Model options:
 
-| Modell        | Kosten                  | Geschwindigkeit | Use-Case                                 |
-| ------------- | ----------------------- | --------------- | ---------------------------------------- |
-| `gpt-4o-mini` | ~€0.001-0.003/1k tokens | Schnell ⚡       | Email, Varianten-Generierung (empfohlen) |
-| `gpt-4`       | ~€0.01-0.03/1k tokens   | Mittel 🟡        | Komplexe Analyse, Strategy Selection     |
-| `gpt-4-turbo` | ~€0.01/1k tokens        | Mittel 🟡        | Balanciert (alt)                         |
+| Model | Cost (per 1k tokens) | Speed | Use case |
+| --- | --- | --- | --- |
+| gpt-4o-mini | ~€0.001-0.003 | Fast | Email, variant generation (recommended) |
+| gpt-4 | ~€0.01-0.03 | Medium | Complex analysis, strategy selection |
+| gpt-4-turbo | ~€0.01 | Medium | Balanced (older) |
 
-**⚠️ Kosten-Management**:
-- Loops = ~1,000-2,000 tokens pro Durchlauf
-- Bei `intervalMs: 900000` (15min) = ~2,880-5,760 tokens/Tag
-- Geschätzter Monatskost: €0.02-0.05 mit `gpt-4o-mini`
+Cost management:
+- Loops use ~1,000–2,000 tokens per run
+- intervalMs 900000 (15 min) ≈ 2,880–5,760 tokens/day
+- Estimated monthly cost: €0.02–0.05 with gpt-4o-mini
 
-**Wie man die API-Keys erhält**:
-
-1. Gehe zu https://platform.openai.com/account/api-keys
-2. Login mit OpenAI-Account
-3. Klick **+ Create new secret key**
-4. Kopiere den Key (wird nur 1x angezeigt!)
-5. Trage ihn in connection.json ein
+How to get API keys:
+1. Go to https://platform.openai.com/account/api-keys
+2. Log in
+3. Click + Create new secret key
+4. Copy the key (shown once)
+5. Add it to connection.json
 
 ---
 
-### 1.3 SMTP / Email Konfiguration
+### 1.3 SMTP / Email
 
 ```json
 {
@@ -114,18 +113,18 @@ Agentic Loops werden über zwei Config-Dateien gesteuert:
 }
 ```
 
-**Parameter erklären**:
+Field reference:
 
-| Feld       | Typ     | Bedeutung            | Beispiel                                                           |
-| ---------- | ------- | -------------------- | ------------------------------------------------------------------ |
-| `host`     | String  | Mail-Server Hostname | `inn.bitpalast.net` oder `smtp.gmail.com`                          |
-| `port`     | Number  | SMTP-Port            | `465` (TLS), `587` (STARTTLS), `25` (unverschlüsselt)              |
-| `secure`   | Boolean | TLS-Verschlüsselung? | `true` (für Port 465), `false` für 587                             |
-| `user`     | String  | SMTP-Benutzer        | `info@kaufe-es.eu`                                                 |
-| `password` | String  | SMTP-Passwort        | Vom Mail-Provider                                                  |
-| `from`     | String  | Absender E-Mail      | `info@kaufe-es.eu` oder `"A.R.I. Recovery <recovery@kaufe-es.eu>"` |
+| Field | Type | Meaning | Example |
+| --- | --- | --- | --- |
+| host | string | Mail server hostname | inn.bitpalast.net or smtp.gmail.com |
+| port | number | SMTP port | 465 (TLS), 587 (STARTTLS), 25 (unencrypted) |
+| secure | boolean | TLS enabled | true for 465, false for 587 |
+| user | string | SMTP user | info@kaufe-es.eu |
+| password | string | SMTP password | From your provider |
+| from | string | Sender email | info@kaufe-es.eu or "A.R.I. Recovery <recovery@kaufe-es.eu>" |
 
-**Häufige Provider**:
+Common providers:
 
 ```json
 // Gmail
@@ -134,7 +133,7 @@ Agentic Loops werden über zwei Config-Dateien gesteuert:
   "port": 587,
   "secure": false,
   "user": "your-email@gmail.com",
-  "password": "your-app-password"  // Nicht dein Gmail-Passwort!
+  "password": "your-app-password"
 }
 
 // Outlook
@@ -156,16 +155,15 @@ Agentic Loops werden über zwei Config-Dateien gesteuert:
 }
 ```
 
-**Gmail App-Passwort generieren**:
-
+Gmail app password:
 1. https://myaccount.google.com/apppasswords
-2. Wähle **Mail** → **Windows PC** (egal was)
-3. Google generiert ein 16-zeichen Passwort
-4. Trage dieses (nicht dein Gmail-Passwort!) in connection.json ein
+2. Choose Mail → Windows PC
+3. Google generates a 16-char password
+4. Use that in connection.json (not your Gmail password)
 
 ---
 
-### 1.4 Reddit Integration (Optional)
+### 1.4 Reddit integration (optional)
 
 ```json
 {
@@ -176,13 +174,13 @@ Agentic Loops werden über zwei Config-Dateien gesteuert:
 }
 ```
 
-Für Social Media Listening (nicht für Loops nötig, nur für Extended Features).
+Used for social listening only.
 
 ---
 
-### 1.5 Loop Schedules (per Loop konfigurierbar)
+### 1.5 Loop schedules (per loop configurable)
 
-**Datei**: `backend/data/loop-schedules.json`
+File: backend/data/loop-schedules.json
 
 ```json
 {
@@ -198,34 +196,32 @@ Für Social Media Listening (nicht für Loops nötig, nur für Extended Features
 }
 ```
 
-**Typen & Felder**
+Fields:
 
-| Feld       | Typ      | Bedeutung                                 |
-| ---------- | -------- | ----------------------------------------- |
-| `enabled`  | boolean  | Loop aktiv (true) / pausiert (false)      |
-| `type`     | string   | `daily` \| `weekly` \| `interval`         |
-| `time`     | string   | HH:MM (für `daily` und `weekly`)          |
-| `weekdays` | string[] | z.B. `["Monday","Friday"]` (nur `weekly`) |
-| `minutes`  | number   | 15 \| 30 \| 45 \| 60 (nur `interval`)     |
+| Field | Type | Meaning |
+| --- | --- | --- |
+| enabled | boolean | Loop active (true) / paused (false) |
+| type | string | daily | weekly | interval |
+| time | string | HH:MM (daily, weekly) |
+| weekdays | string[] | e.g. ["Monday","Friday"] (weekly only) |
+| minutes | number | 15 | 30 | 45 | 60 (interval only) |
 
-**API**
+API:
+- GET  /api/agent/monitoring/schedules – all schedules
+- GET  /api/agent/monitoring/schedules/:loopType
+- PUT  /api/agent/monitoring/schedules/:loopType – update and reschedule immediately
+- POST /api/agent/monitoring/schedules/:loopType/toggle – enable/disable
 
-- GET  `/api/agent/monitoring/schedules` – alle Schedules
-- GET  `/api/agent/monitoring/schedules/:loopType`
-- PUT  `/api/agent/monitoring/schedules/:loopType` – ändern & sofort neu planen
-- POST `/api/agent/monitoring/schedules/:loopType/toggle` – aktivieren/deaktivieren
-
-**UI**
-
-Settings → Agentic Loops → ⚙️ Schedule (Modal)
-- Anomaly Detection: Daily HH:MM
-- Payment Recovery: Interval 15/30/45/60 Min
-- Product Optimization: Weekly (Wochentage + HH:MM)
-- Analytics Insights: Daily HH:MM
+UI:
+Settings → Agentic Loops → Schedule (modal)
+- Anomaly Detection: daily HH:MM
+- Payment Recovery: interval 15/30/45/60 min
+- Product Optimization: weekly (weekdays + HH:MM)
+- Analytics Insights: daily HH:MM
 
 ---
 
-### 1.6 ML Features Schalter
+### 1.6 ML feature switches
 
 ```json
 {
@@ -237,232 +233,179 @@ Settings → Agentic Loops → ⚙️ Schedule (Modal)
 }
 ```
 
-Schaltet Features an/aus. Für Loops nicht direkt relevant (werden in `ml.config.ts` gesteuert).
+Feature toggles; loops themselves are controlled in ml.config.ts.
 
 ---
 
-## 2. ml.config.ts – Loop Behavior & Thresholds
+## 2. ml.config.ts – Loop behavior and thresholds
 
-**Datei**: `backend/agent/config/ml.config.ts`
+File: backend/agent/config/ml.config.ts
+Purpose: tune loop behavior without code changes.
 
-**Zweck**: Feinjustierung von Loop-Verhalten ohne Code-Änderungen.
-
-### 2.1 Anomaly Detection Loop Config
+### 2.1 Anomaly Detection
 
 ```typescript
 export const anomalyDetectionConfig = {
-  // Eingabe-Quellen
-  orderLimit: 100,           // Max. Orders pro Durchlauf
-  maxDaysOld: 30,           // Nur Orders der letzten 30 Tage
-  
-  // Schwellenwerte für Anomalie-Erkennung
+  // Inputs
+  orderLimit: 100,
+  maxDaysOld: 30,
+
+  // Thresholds
   anomalyThresholds: {
-    unusualAmount: 5000,                    // > €5000 = Anomalie
-    repeatedFailureThreshold: 2,            // 2+ Fehler = Anomalie
-    repeatedFailureTimeWindowMinutes: 120,  // Innerhalb 2h
-    highRiskPatternMatches: 3               // 3+ Muster = Anomalie
+    unusualAmount: 5000,
+    repeatedFailureThreshold: 2,
+    repeatedFailureTimeWindowMinutes: 120,
+    highRiskPatternMatches: 3
   },
-  
-  // Schweregrade
+
+  // Severity
   severityWeights: {
-    failed_payment: 'HIGH',       // Automatisch manuelle Review
+    failed_payment: 'HIGH',
     unusual_amount: 'MEDIUM',
     repeated_attempts: 'HIGH',
     high_risk: 'MEDIUM'
   },
-  
-  // Verhalten
-  autoRecoveryEnabled: true,      // Automatisch Recovery-Strategien anwenden?
-  recoveryChainEnabled: true,     // Mehrere Recovery-Versuche nacheinander?
+
+  // Behavior
+  autoRecoveryEnabled: true,
+  recoveryChainEnabled: true,
   maxRecoveryAttempts: 3,
-  
+
   // Alerts
-  alertThreshold: 'HIGH',         // Nur HIGH+ Severity alerten
-  batchAlertsWhenAbove: 10        // Batch alerts wenn >10 Anomalien
-}
+  alertThreshold: 'HIGH',
+  batchAlertsWhenAbove: 10
+};
 ```
 
-**Empfohlene Einstellungen nach Use-Case**:
+Recommended presets:
 
 ```typescript
-// Aggressive Mode (Early Detection)
-{
-  unusualAmount: 3000,        // Niedrigere Schwelle
-  repeatedFailureThreshold: 1, // Sofort nach 1 Fehler
-  maxRecoveryAttempts: 5
-}
+// Aggressive (early detection)
+{ unusualAmount: 3000, repeatedFailureThreshold: 1, maxRecoveryAttempts: 5 }
 
-// Conservative Mode (High Precision)
-{
-  unusualAmount: 10000,       // Höhere Schwelle
-  repeatedFailureThreshold: 5, // Erst nach 5 Fehlern
-  maxRecoveryAttempts: 1      // Maximal 1 Retry
-}
+// Conservative (high precision)
+{ unusualAmount: 10000, repeatedFailureThreshold: 5, maxRecoveryAttempts: 1 }
 
-// Balanced Mode (Empfohlen)
-{
-  unusualAmount: 5000,
-  repeatedFailureThreshold: 2,
-  maxRecoveryAttempts: 3
-}
+// Balanced (default)
+{ unusualAmount: 5000, repeatedFailureThreshold: 2, maxRecoveryAttempts: 3 }
 ```
 
 ---
 
-### 2.2 Product Optimization Loop Config
+### 2.2 Product Optimization
 
 ```typescript
 export const productOptimizationConfig = {
-  // Eingabe-Quellen
-  productLimit: 50,                  // Max. Produkte pro Durchlauf
-  minOrderHistory: 30,               // Nur Produkte mit 30+ historischen Orders
-  minConversionRate: 0.02,           // Nur wenn Conversion >= 2%
-  
-  // Varianten-Generierung
+  // Inputs
+  productLimit: 50,
+  minOrderHistory: 30,
+  minConversionRate: 0.02,
+
+  // Variant generation
   variantTypesToGenerate: ['price', 'title', 'description'],
   variantsPerProduct: 3,
-  
+
   // Simulation
   abTestSampleSize: 1000,
   confidenceLevel: 0.95,
-  
-  // A/B Test Schwellenwerte
-  minLiftThreshold: 0.05,            // Min. +5% erwartet für Winner
-  statisticalSignificanceLevel: 0.05, // p < 0.05 = signifikant
-  
-  // Preis-Limits
+  minLiftThreshold: 0.05,
+  statisticalSignificanceLevel: 0.05,
+
+  // Price limits
   discountLimits: {
-    minDiscount: 5,                  // Min. -5% Rabatt
-    maxDiscount: 30,                 // Max. -30% Rabatt
-    targetMarginPercent: 30          // Mind. 30% Brutto-Marge
+    minDiscount: 5,
+    maxDiscount: 30,
+    targetMarginPercent: 30
   },
-  
-  // Kopie-Generierung
+
+  // Copy generation
   titleMaxLength: 70,
   descriptionMaxLength: 300,
-  
-  // Auto-Apply
-  autoApplyWinners: false,           // Automatisch beste Variante live schalten?
-  autoApplyConfidenceThreshold: 0.85, // Nur wenn >85% sicher
-  
-  // Alerts
-  alertThreshold: 'INFO',            // Jede Optimierung melden
-  notifyOnHighLift: 0.20             // Alert wenn Lift > 20%
-}
-```
 
-**Empfohlene Einstellungen nach Risiko-Appetit**:
-
-```typescript
-// Conservative (Manuelle Bestätigung)
-{
-  autoApplyWinners: false,
-  confidenceLevel: 0.99,             // Sehr hoch
-  minLiftThreshold: 0.10             // Min. +10%
-}
-
-// Moderate (Semi-Auto)
-{
+  // Auto-apply
   autoApplyWinners: false,
   autoApplyConfidenceThreshold: 0.85,
-  minLiftThreshold: 0.05
-}
 
-// Aggressive (Full Auto)
-{
-  autoApplyWinners: true,
-  autoApplyConfidenceThreshold: 0.75,
-  minLiftThreshold: 0.03
-}
+  // Alerts
+  alertThreshold: 'INFO',
+  notifyOnHighLift: 0.20
+};
+```
+
+Risk appetite presets:
+
+```typescript
+// Conservative (manual approval)
+{ autoApplyWinners: false, confidenceLevel: 0.99, minLiftThreshold: 0.10 }
+
+// Moderate (semi-auto)
+{ autoApplyWinners: false, autoApplyConfidenceThreshold: 0.85, minLiftThreshold: 0.05 }
+
+// Aggressive (full auto)
+{ autoApplyWinners: true, autoApplyConfidenceThreshold: 0.75, minLiftThreshold: 0.03 }
 ```
 
 ---
 
-### 2.3 Payment Recovery Loop Config
+### 2.3 Payment Recovery
 
 ```typescript
 export const paymentRecoveryConfig = {
-  // Eingabe-Quellen
+  // Inputs
   orderLimit: 50,
-  maxOrderAgeHours: 24,              // Nur Orders aus letzten 24h
-  minOrderAmount: 10,                // Nur Orders >= €10
-  
-  // Schwellenwerte für Recovery-Trigger
+  maxOrderAgeHours: 24,
+  minOrderAmount: 10,
+
+  // Triggers
   triggerThresholds: {
-    failureStatus: ['failed', 'on-hold', 'pending'], // Welche Status triggern Recovery?
-    customerFailureRateThreshold: 0.3  // Kundenhistorie > 30% Ausfallquote
+    failureStatus: ['failed', 'on-hold', 'pending'],
+    customerFailureRateThreshold: 0.3
   },
-  
-  // Recovery-Strategie Konfiguration
+
+  // Strategies
   strategies: {
-    retry: {
-      enabled: true,
-      delayMinutes: 30,              // Wie lange warten bis Retry?
-      maxAttempts: 2
-    },
-    discount: {
-      enabled: true,
-      percentages: [5, 10, 15],      // Versuche 5%, dann 10%, dann 15%
-      respectMarginLimits: true
-    },
-    alternative_payment: {
-      enabled: true,
-      preferredMethods: ['klarna', 'paypal', 'bank_transfer']
-    },
-    contact: {
-      enabled: true,
-      triggerOn: ['high_amount', 'repeated_failure'], // Manuelle Kontakt-Notwendigkeit
-      assignToTeam: 'sales'          // Welches Team kriegt die Ticket?
-    }
+    retry: { enabled: true, delayMinutes: 30, maxAttempts: 2 },
+    discount: { enabled: true, percentages: [5, 10, 15], respectMarginLimits: true },
+    alternative_payment: { enabled: true, preferredMethods: ['klarna', 'paypal', 'bank_transfer'] },
+    contact: { enabled: true, triggerOn: ['high_amount', 'repeated_failure'], assignToTeam: 'sales' }
   },
-  
-  // Email-Konfiguration
+
+  // Email
   emailTemplate: 'payment_recovery',
-  emailDelay: 5,                     // Minuten vor Email-Versand
-  includeSocialProof: true,          // "87% successfully recovered"
-  
-  // Success Tracking
-  successThreshold: 0.40,            // Target: 40% Recovery Success Rate
-  alertWhenUnder: 0.25,              // Alert wenn < 25%
-  
-  // Auto-Escalation
+  emailDelay: 5,
+  includeSocialProof: true,
+
+  // Success tracking
+  successThreshold: 0.40,
+  alertWhenUnder: 0.25,
+
+  // Escalation
   escalationEnabled: true,
-  escalateAfterFailures: 2           // Nach 2 Versuchen: Contact
-}
+  escalateAfterFailures: 2
+};
 ```
 
-**Empfohlene Einstellungen nach Business-Strategie**:
+Strategy presets:
 
 ```typescript
-// Revenue-Focused (Agg. Recovery)
-{
-  discount: { percentages: [10, 15, 20] },
-  contact: { triggerOn: ['high_amount'] },
-  strategies: { contact: { enabled: false } }  // Weniger Support-Overhead
-}
+// Revenue-focused (aggressive)
+{ discount: { percentages: [10, 15, 20] }, contact: { triggerOn: ['high_amount'] }, strategies: { contact: { enabled: false } } }
 
-// Relationship-Focused
-{
-  discount: { percentages: [5, 5] },          // Kleine Rabatte
-  contact: { enabled: true, triggerOn: ['any'] },
-  escalationEnabled: true
-}
+// Relationship-focused
+{ discount: { percentages: [5, 5] }, contact: { enabled: true, triggerOn: ['any'] }, escalationEnabled: true }
 
 // Balanced
-{
-  discount: { percentages: [5, 10, 15] },
-  contact: { triggerOn: ['high_amount', 'repeated_failure'] }
-}
+{ discount: { percentages: [5, 10, 15] }, contact: { triggerOn: ['high_amount', 'repeated_failure'] } }
 ```
 
 ---
 
-### 2.4 Analytics Insights Loop Config
+### 2.4 Analytics Insights
 
 ```typescript
 export const analyticsInsightsConfig = {
-  // Daten-Aggregation
-  daysToAnalyze: 90,                 // Rolling 90-Tage-Fenster
+  // Data aggregation
+  daysToAnalyze: 90,
   metricsToTrack: [
     'average_order_value',
     'conversion_rate',
@@ -471,106 +414,80 @@ export const analyticsInsightsConfig = {
     'repeat_customer_rate',
     'churn_rate'
   ],
-  
-  // Anomalie-Erkennung in Metriken
-  anomalyDetection: {
-    enabled: true,
-    sigma: 2.5                       // 2.5σ = ~1.2% Wahrscheinlichkeit für Fehler
-  },
-  
-  // Trend-Analyse
-  trendAnalysis: {
-    minDataPoints: 7,                // Min. 7 Datenpunkte für Trend
-    trendConfidenceThreshold: 0.70   // 70% Konfidenz mindestens
-  },
-  
-  // Forecast
+
+  // Metric anomaly detection
+  anomalyDetection: { enabled: true, sigma: 2.5 },
+
+  // Trend analysis
+  trendAnalysis: { minDataPoints: 7, trendConfidenceThreshold: 0.70 },
+
+  // Forecasting
   forecastingEnabled: true,
-  forecastMethod: 'arima',           // oder 'exponential_smoothing', 'linear_regression'
+  forecastMethod: 'arima',
   forecastDays: 7,
-  
-  // Insight-Generierung
+
+  // Insight generation
   minInsightConfidence: 0.75,
   maxInsightsPerRun: 5,
-  
-  // AI-Kopie
+
+  // AI copy
   generateRecommendations: true,
   recommendationModel: 'gpt-4o-mini',
-  
+
   // Alerting
   criticalThresholds: {
-    conversionRateDrop: 0.15,        // Alert wenn Conversion > 15% sinkt
-    churnRateIncrease: 0.25,         // Alert wenn Churn > 25% steigt
-    aovDecrease: 0.20                // Alert wenn AOV > 20% sinkt
+    conversionRateDrop: 0.15,
+    churnRateIncrease: 0.25,
+    aovDecrease: 0.20
   }
-}
+};
 ```
 
 ---
 
-## 3. Loop-Frequenzen & Scheduling
+## 3. Loop frequencies and scheduling
 
-**Recommendation**: Unterschiedliche Frequenzen je nach Loop:
+Recommended baseline:
 
 ```json
 {
-  "job": {
-    "mode": "continuous",
-    "intervalMs": 900000  // Basis-Interval
-  },
+  "job": { "mode": "continuous", "intervalMs": 900000 },
   "loopSchedules": {
-    "anomaly_detection": {
-      "frequencyMultiplier": 1,    // Jedes mal laufen
-      "intervalMs": 900000         // 15 Min
-    },
-    "product_optimization": {
-      "frequencyMultiplier": 2,    // Jedes 2. mal
-      "intervalMs": 1800000        // 30 Min
-    },
-    "payment_recovery": {
-      "frequencyMultiplier": 1,    // Jedes mal
-      "intervalMs": 900000         // 15 Min
-    },
-    "analytics_insights": {
-      "frequencyMultiplier": 4,    // Jedes 4. mal
-      "intervalMs": 3600000        // 1 Stunde
-    }
+    "anomaly_detection": { "frequencyMultiplier": 1, "intervalMs": 900000 },
+    "product_optimization": { "frequencyMultiplier": 2, "intervalMs": 1800000 },
+    "payment_recovery": { "frequencyMultiplier": 1, "intervalMs": 900000 },
+    "analytics_insights": { "frequencyMultiplier": 4, "intervalMs": 3600000 }
   }
 }
 ```
 
-**Begründung**:
-- **Anomaly Detection**: Schnell (15min) → Payment Issues hochfrequent
-- **Product Optimization**: Mittelsam (30min) → A/B Tests brauchen Zeit
-- **Payment Recovery**: Schnell (15min) → Recovery Fenster kurz
-- **Analytics Insights**: Langsam (1h) → Viele Daten-Aggregation
+Rationale:
+- Anomaly Detection: fast (15 min) because payment issues are frequent
+- Product Optimization: medium (30 min) to allow A/B tests to settle
+- Payment Recovery: fast (15 min) because recovery window is short
+- Analytics Insights: slower (1 h) due to heavy aggregation
 
 ---
 
-## 4. Monitoring & Health Checks
+## 4. Monitoring and health checks
 
-### 4.1 Configuration Validierung
-
-Nach jedem Bearbeiten von Config-Dateien:
+### 4.1 Validate configs
 
 ```bash
-# Validiere connection.json
 npm run validate:connection
-
-# Validiere ml.config.ts
 npm run validate:ml-config
-
-# Starte alle Validierungen
 npm run validate:all
 ```
 
-### 4.2 Health Check Endpoint
+### 4.2 Health check endpoint
 
 ```bash
-# Check ob alle Konfigurationen OK sind
 curl http://localhost:3000/api/agent/health
+```
 
-# Response:
+Sample response:
+
+```json
 {
   "status": "healthy",
   "components": {
@@ -584,142 +501,86 @@ curl http://localhost:3000/api/agent/health
 
 ---
 
-## 5. Best Practices & Häufige Fehler
+## 5. Best practices and common mistakes
 
-### ✅ Best Practices
+Best practices:
+1) Test before production (set mode: once in ml.config.ts, run npm run dev, trigger via API)
+2) Lower thresholds gradually (start aggressive, observe 1–2 weeks, adjust)
+3) Use environment variables (do not hardcode secrets)
+4) Take regular backups (copy connection.json)
 
-1. **Testen vor Production**:
-   ```bash
-   # Set mode: 'once' in ml.config.ts
-   npm run dev
-   # Trigger manuell via API
-   curl -X POST http://localhost:3000/api/agent/loops/anomaly-detection/run
-   ```
+Common mistakes:
 
-2. **Schwellenwerte schrittweise reduzieren**:
-   - Start: Aggressiv (frühe Erkennung)
-   - Woche 1-2: Überwache False Positive Rate
-   - Dann: Justiere nach Bedarf
-
-3. **Environment Variables nutzen**:
-   ```bash
-   # Nicht hardcodiert in connection.json:
-   export WOO_CONSUMER_KEY="ck_..."
-   export OPENAI_API_KEY="sk-..."
-   ```
-
-4. **Regelmäßige Backups**:
-   ```bash
-   cp backend/connection.json backend/connection.json.backup
-   ```
-
-### ❌ Häufige Fehler
-
-| Fehler                     | Symptom                            | Lösung                                                     |
-| -------------------------- | ---------------------------------- | ---------------------------------------------------------- |
-| **WooCommerce URL falsch** | "401 Unauthorized"                 | Check URL in connection.json (muss mit `https://` starten) |
-| **API Key abgelaufen**     | "Invalid credentials"              | Regeneriere Key in WooCommerce Admin                       |
-| **SMTP Auth falsch**       | "Email nicht versendet"            | Test mit `npm run test:smtp`                               |
-| **Schwellenwert zu hoch**  | Keine Anomalien erkannt            | Senke `unusualAmount`, `repeatedFailureThreshold`          |
-| **Loop läuft nicht**       | Mode ist `once` statt `continuous` | Ändere `"mode": "continuous"`                              |
+| Mistake | Symptom | Fix |
+| --- | --- | --- |
+| WooCommerce URL wrong | "401 Unauthorized" | Ensure https:// and correct domain |
+| API key expired | "Invalid credentials" | Regenerate key in WooCommerce Admin |
+| SMTP auth wrong | "Email not sent" | npm run test:smtp |
+| Thresholds too high | No anomalies detected | Lower unusualAmount, repeatedFailureThreshold |
+| Loop not running | job.mode is once | Set job.mode to continuous |
 
 ---
 
-## 6. Konfiguration pro Environment
+## 6. Configuration by environment
 
-### Development
+Development:
 
 ```json
 {
-  "woocommerce": {
-    "url": "http://localhost:8080",  // Local WooCommerce
-    "timeoutMs": 60000               // Längeres Timeout für Debugging
-  },
-  "job": {
-    "mode": "once",                  // Manuell triggern
-    "intervalMs": 900000
-  }
+  "woocommerce": { "url": "http://localhost:8080", "timeoutMs": 60000 },
+  "job": { "mode": "once", "intervalMs": 900000 }
 }
 ```
 
-### Staging
+Staging:
 
 ```json
 {
-  "woocommerce": {
-    "url": "https://staging-kaufe-es.eu",
-    "timeoutMs": 30000
-  },
-  "job": {
-    "mode": "continuous",
-    "intervalMs": 3600000            // 1h (Testing mit echten Daten)
-  }
+  "woocommerce": { "url": "https://staging-kaufe-es.eu", "timeoutMs": 30000 },
+  "job": { "mode": "continuous", "intervalMs": 3600000 }
 }
 ```
 
-### Production
+Production:
 
 ```json
 {
-  "woocommerce": {
-    "url": "https://kaufe-es.eu",
-    "timeoutMs": 30000
-  },
-  "job": {
-    "mode": "continuous",
-    "intervalMs": 900000             // 15min (Full Speed)
-  }
+  "woocommerce": { "url": "https://kaufe-es.eu", "timeoutMs": 30000 },
+  "job": { "mode": "continuous", "intervalMs": 900000 }
 }
 ```
 
 ---
 
-## 7. Troubleshooting Checklist
+## 7. Troubleshooting checklist
 
-Wenn Loops nicht wie erwartet laufen:
-
-- [ ] **connection.json valide?** → `npm run validate:connection`
-- [ ] **WooCommerce erreichbar?** → `curl https://kaufe-es.eu/wp-json/`
-- [ ] **API Keys aktiv?** → Check WooCommerce Admin > Advanced > REST API
-- [ ] **OpenAI Account hat Credits?** → Check https://platform.openai.com/account/billing/overview
-- [ ] **SMTP konfiguriert?** → `npm run test:smtp`
-- [ ] **ml.config.ts valide?** → `npm run validate:ml-config`
-- [ ] **Schwellenwerte zu hoch?** → Probiere aggressive Settings
-- [ ] **Loop-Mode ist `continuous`?** → Check `job.mode`
-- [ ] **Interval ist nicht zu groß?** → Min. 900000ms (15min)
-- [ ] **Logs prüfen** → `npm run logs:agent`
+- [ ] connection.json valid (npm run validate:connection)
+- [ ] WooCommerce reachable (curl https://kaufe-es.eu/wp-json/)
+- [ ] API keys active (WooCommerce Admin → Advanced → REST API)
+- [ ] OpenAI account funded (platform.openai.com/account/billing/overview)
+- [ ] SMTP configured (npm run test:smtp)
+- [ ] ml.config.ts valid (npm run validate:ml-config)
+- [ ] Thresholds not too high (try aggressive settings)
+- [ ] Loop mode set to continuous
+- [ ] Interval not too large (min 900000 ms)
+- [ ] Logs checked (npm run logs:agent)
 
 ---
 
-## 8. Wichtige Shortcuts
+## 8. Shortcuts
 
 ```bash
-# Config validieren
 npm run validate:all
-
-# Agent Logs anschauen
 npm run logs:agent
 npm run logs:agent:tail
-
-# Loop manuell triggern
 npm run trigger:anomaly-detection
 npm run trigger:payment-recovery
 npm run trigger:product-optimization
 npm run trigger:analytics-insights
-
-# Agent Health Check
 curl http://localhost:3000/api/agent/health
-
-# Agent Fehler anschauen
 curl http://localhost:3000/api/agent/errors
-
-# Config neuladen (ohne Restart)
 curl -X POST http://localhost:3000/api/agent/config/reload
-
-# Alle Patterns anschauen
 curl http://localhost:3000/api/agent/memory/patterns
-
-# Pattern löschen
 curl -X DELETE http://localhost:3000/api/agent/memory/patterns/:loopType/:patternKey
 ```
 
@@ -727,7 +588,6 @@ curl -X DELETE http://localhost:3000/api/agent/memory/patterns/:loopType/:patter
 
 ## Support
 
-**Fragen?**
-- Technische Details: [AGENTIC_TOOLS_REFERENCE.md](./AGENTIC_TOOLS_REFERENCE.md)
-- Loop-Funktionen: [AGENTIC_LOOP_ARCHITECTURE.md](./AGENTIC_LOOP_ARCHITECTURE.md)
-- User Guide: [AGENTIC_LOOPS_USER_GUIDE.md](./AGENTIC_LOOPS_USER_GUIDE.md)
+- Technical details: AGENTIC_TOOLS_REFERENCE.md
+- Loop behavior: AGENTIC_LOOP_ARCHITECTURE.md
+- User guide: AGENTIC_LOOPS_USER_GUIDE.md

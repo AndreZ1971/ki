@@ -1,6 +1,6 @@
-# Dokumentation
+# Documentation
 
-## 🎯 NÄCHSTER SCHRITT - PRIORITÄT 1
+## 🎯 NEXT STEP - PRIORITY 1
 
 ### **[AGENTIC_SYSTEMS_ROADMAP.md](./AGENTIC_SYSTEMS_ROADMAP.md)**
 **Status**: READY FOR IMPLEMENTATION  
@@ -14,18 +14,18 @@
 
 ---
 
-## 📚 Übersicht
+## 📚 Overview
 
 - **AGENTIC_SYSTEMS_ROADMAP.md** ⭐ NEW — Complete plan for Agentic Commerce Platform
-- CONTENT_MONETIZATION.md — Konsolidierte Anleitung & API für Monetarisierung
-- SOCIAL_MEDIA_GUIDE.md — Meta & TikTok Setup, .env, Test-APIs
-- Bedienungsanleitung-KI-Agent.md — Tool-Übersicht & How-To's
-- BACKEND_AI_SETUP.md — AI-Transformation & Social Media Integration
-- deployment.md — Production-Setup & Troubleshooting
-- api/ — Vollständige API-Referenz
+- CONTENT_MONETIZATION.md — Consolidated guide & API for monetization
+- SOCIAL_MEDIA_GUIDE.md — Meta & TikTok setup, .env, test APIs
+- Bedienungsanleitung-KI-Agent.md — Tool overview & how-to's
+- BACKEND_AI_SETUP.md — AI transformation & social media integration
+- deployment.md — Production setup & troubleshooting
+- api/ — Complete API reference
 
-## ⚠️ Hinweise
+## ⚠️ Notes
 
-- Einige ältere Dateien sind als "Veraltet (konsolidiert)" markiert und verweisen auf die neuen Guide-Dokumente.
-- Verwende bevorzugt die konsolidierten Guides für den aktuellen Stand.
-- **AGENTIC_SYSTEMS_ROADMAP.md ist die strategische Priorität für Q1 2025**
+- Some older files are marked as "Deprecated (consolidated)" and refer to the new guide documents.
+- Use the consolidated guides for the current state.
+- **AGENTIC_SYSTEMS_ROADMAP.md is the strategic priority for Q1 2025**

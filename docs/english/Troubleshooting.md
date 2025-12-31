@@ -1,30 +1,30 @@
-# Troubleshooting – KI-Agent Business Plattform
+# Troubleshooting – AI Agent Business Platform
 
-Hier findest du schnelle Hilfe bei typischen Problemen und Störungen rund um die KI-Agent Plattform.
+Here you will find quick help for common problems and malfunctions related to the AI Agent Platform.
 
 ---
 
-## Container startet nicht
+## Container does not start
 
-- **Prüfe, ob Docker und Docker Compose installiert sind.**
-- **Sind alle Ports frei?** (Standard: 5173 für Frontend, 3000 für Backend)
-- **Fehlermeldung im Terminal?** Logs anzeigen mit:
+- **Check if Docker and Docker Compose are installed.**
+- **Are all ports free?** (Default: 5173 for frontend, 3000 for backend)
+- **Error message in terminal?** Show logs with:
   
   
   ```bash
   docker compose logs
   ```
   
-- **Genügend Speicher/Ressourcen verfügbar?**
+- **Enough storage/resources available?**
 
 ---
 
-## Frontend lädt nicht / ist nicht erreichbar
+## Frontend does not load / is not reachable
 
-- **Ist der Container gestartet?**
-- **Rufe die URL im Browser auf:** `http://localhost:5173`
-- **Browser-Cache leeren**
-- **Logs prüfen:**
+- **Is the container started?**
+- **Call the URL in your browser:** `http://localhost:5173`
+- **Clear browser cache**
+- **Check logs:**
   
   
   ```bash
@@ -34,47 +34,47 @@ Hier findest du schnelle Hilfe bei typischen Problemen und Störungen rund um di
 
 ---
 
-## Backend/API funktioniert nicht
+## Backend/API does not work
 
-- **Backend-Container läuft?**
-- **API-URL korrekt in der Settings-UI?**
-- **Logs prüfen:**
+- **Backend container running?**
+- **API URL correct in settings UI?**
+- **Check logs:**
   
   
   ```bash
   docker compose logs backend
   ```
   
-- **connection.json korrekt ausgefüllt?**
+- **connection.json filled out correctly?**
 
 ---
 
-## Verbindung zu externen Diensten (OpenAI, Shop, E-Mail) schlägt fehl
+## Connection to external services (OpenAI, Shop, Email) fails
 
-- **API-Keys und Zugangsdaten in der `connection.json` korrekt?**
-- **Internetverbindung vorhanden?**
-- **Fehlermeldung im Log?**
-- **Rate Limits oder Zugangsbeschränkungen?**
+- **API keys and credentials in `connection.json` correct?**
+- **Internet connection available?**
+- **Error message in log?**
+- **Rate limits or access restrictions?**
 
 ---
 
-## Einstellungen lassen sich nicht speichern / Import funktioniert nicht
+## Settings cannot be saved / Import does not work
 
-- **Dateiformat der `connection.json` prüfen (UTF-8, gültige Struktur)**
-- **Import-Funktion in der Settings-UI korrekt genutzt?**
-- **Browser-Konsole auf Fehler prüfen**
+- **Check file format of `connection.json` (UTF-8, valid structure)**
+- **Import function in settings UI used correctly?**
+- **Check browser console for errors**
 
-### 400 Bad Request beim Speichern der Einstellungen
+### 400 Bad Request when saving settings
 
-- Prüfe, ob innerhalb einer Gruppe (WordPress, WooCommerce, OpenAI) nur teilweise Felder befüllt wurden. Entweder komplett korrekt ausfüllen – oder Gruppe leer lassen.
-- Wenn `Job-Modus = Intervall`: `Job-Intervall (ms)` muss zwischen 10 000 und 86 400 000 liegen (10 s–24 h). Bei `einmalig` wird das Intervall ignoriert.
-- Backend-Logs zeigen genaue Hinweise zu Feld und Regel:
+- Check if within a group (WordPress, WooCommerce, OpenAI) only some fields were filled. Either fill out completely correctly – or leave group empty.
+- If `Job Mode = Interval`: `Job Interval (ms)` must be between 10,000 and 86,400,000 (10s–24h). For `one-time`, the interval is ignored.
+- Backend logs show exact hints for field and rule:
   
   ```bash
   docker compose logs backend | grep "Validation failed"
   ```
   
-  oder gesamtes Log prüfen:
+  or check full log:
   
   ```bash
   docker compose logs -f backend
@@ -82,12 +82,12 @@ Hier findest du schnelle Hilfe bei typischen Problemen und Störungen rund um di
 
 ---
 
-## System reagiert langsam oder hängt
+## System reacts slowly or hangs
 
-- **Genügend Ressourcen (CPU/RAM) verfügbar?**
-- **Zu viele parallele Jobs oder Nutzer?**
-- **Logs auf Fehler oder Warnungen prüfen**
-- **Container neu starten:**
+- **Enough resources (CPU/RAM) available?**
+- **Too many parallel jobs or users?**
+- **Check logs for errors or warnings**
+- **Restart containers:**
   
   
   ```bash
@@ -97,12 +97,12 @@ Hier findest du schnelle Hilfe bei typischen Problemen und Störungen rund um di
 
 ---
 
-## Fehler bleibt bestehen / nichts hilft
+## Error persists / nothing helps
 
-- **Alle Logs sammeln und an den Support senden**
-- **Genaue Fehlerbeschreibung notieren**
-- **Support-Kontakt im Frontend oder per E-Mail nutzen**
+- **Collect all logs and send to support**
+- **Note exact error description**
+- **Use support contact in frontend or via email**
 
 ---
 
-Letzte Aktualisierung: Dezember 2025
+Last updated: December 2025

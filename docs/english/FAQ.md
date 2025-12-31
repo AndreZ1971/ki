@@ -1,98 +1,98 @@
-# FAQ – KI-Agent Business Plattform
+# FAQ – AI Agent Business Platform
 
-**Aktuelle Version:** 3.2.0
+**Current Version:** 3.2.0
 
-Hier findest du Antworten auf die häufigsten Fragen rund um die Nutzung, Einrichtung und Fehlerbehebung der KI-Agent Plattform.
-
----
-
-## ✨ Neu in v3.2.0
-
-**Was ist Content Monetization?**
-Content Monetization ermöglicht dir, digitale Produkte zu erstellen und zu verkaufen. Neu sind drei KI-Features:
-- **KI-Preisvorschlag**: Intelligente Preisempfehlungen basierend auf Produkttyp & Strategie
-- **KI-Produkttext Generator**: Automatische Generierung von Marketing-Texten (Headline, Body, CTA)
-- **Revenue Forecast**: Prognose für Wochengewinne und Monatsumsätze
-
-**Wie nutze ich die neuen KI-Features?**
-Gehe zu **Marketing & Content** → **Content Monetized**:
-1. Fülle die Produktdetails aus
-2. Nutze optional den 🤖 **Preisvorschlag** Button
-3. Nutze optional den ⚡ **KI-Text generieren** Button
-4. Klicke **💸 Content Monetarisieren** zum Erstellen
-
-📖 **Vollständiger Guide:** [Content Monetization Guide](./CONTENT_MONETIZATION_GUIDE.md)
+Here you will find answers to the most frequently asked questions about using, setting up and troubleshooting the AI Agent Platform.
 
 ---
 
-## Allgemein
+## ✨ New in v3.2.0
 
-**Was ist die KI-Agent Business Plattform?**
-Die Plattform automatisiert Geschäftsprozesse mit KI und bietet Tools für Analyse, Content, Marketing und Payment – alles als Container-Lösung, ohne Quellcode-Installation.
+**What is Content Monetization?**
+Content Monetization enables you to create and sell digital products. New are three AI features:
+- **AI Price Suggestion**: Intelligent price recommendations based on product type & strategy
+- **AI Product Text Generator**: Automatic generation of marketing texts (headline, body, CTA)
+- **Revenue Forecast**: Forecast for weekly profits and monthly revenue
 
-**Brauche ich Programmierkenntnisse?**
-Nein. Die Plattform ist für Endnutzer konzipiert und wird komplett als Container bereitgestellt.
+**How do I use the new AI features?**
+Go to **Marketing & Content** → **Content Monetized**:
+1. Fill in the product details
+2. Optionally use the 🤖 **Price Suggestion** button
+3. Optionally use the ⚡ **Generate AI Text** button
+4. Click **💸 Monetize Content** to create
 
----
-
-## Einrichtung & Start
-
-**Wie starte ich das System?**
-  
-1. Stelle sicher, dass Docker und Docker Compose installiert sind.
-2. Platziere die `connection.json` im Hauptverzeichnis.
-3. Starte mit `docker compose up -d`.
-4. Öffne das Frontend im Browser (`http://localhost:5173`).
-  
-
-**Wie importiere ich meine Zugangsdaten?**
-Nutze die Import-Funktion in der Settings-UI, um die `connection.json` hochzuladen. Die Felder werden automatisch befüllt.
-
-**Was mache ich bei Verbindungsproblemen?**
-  
-- Prüfe, ob alle Zugangsdaten korrekt sind.
-- Starte die Container neu.
-- Kontrolliere die Logs mit `docker compose logs`.
-- Wende dich an den Support, falls das Problem bleibt.
-  
+📖 **Complete Guide:** [Content Monetization Guide](./CONTENT_MONETIZATION_GUIDE.md)
 
 ---
 
-## Nutzung & Funktionen
+## General
 
-**Welche Tools sind enthalten?**
-  
-- Analytics & Reporting
-- Content- und E-Mail-Generatoren
-- Social Media Automation
-- Payment- und Shop-Health-Checks
-- u. v. m. (Details siehe Bedienungsanleitung)
-  
+**What is the AI Agent Business Platform?**
+The platform automates business processes with AI and offers tools for analysis, content, marketing and payment – all as a container solution, without source code installation.
 
-**Wie kann ich neue Funktionen nutzen?**
-Alle Funktionen sind direkt im Frontend verfügbar. Updates werden automatisch bereitgestellt.
+**Do I need programming knowledge?**
+No. The platform is designed for end users and is provided completely as a container.
 
 ---
 
-## Fehler & Support
+## Setup & Start
 
-**Was tun bei Fehlern oder Störungen?**
+**How do I start the system?**
   
-- Logs prüfen (`docker compose logs`)
-- Einstellungen kontrollieren
-- System neu starten
-- Support kontaktieren
+1. Ensure Docker and Docker Compose are installed.
+2. Place the `connection.json` in the main directory.
+3. Start with `docker compose up -d`.
+4. Open the frontend in your browser (`http://localhost:5173`).
   
 
-**Wie erhalte ich Updates?**
-Updates werden automatisch per Container-Update (Watchtower) installiert.
+**How do I import my credentials?**
+Use the import function in the settings UI to upload `connection.json`. The fields will be filled automatically.
+
+**What should I do if I have connection problems?**
   
-**Wo finde ich weitere Hilfe?**
+- Check if all credentials are correct.
+- Restart the containers.
+- Check the logs with `docker compose logs`.
+- Contact support if the problem persists.
   
-- Bedienungsanleitung im `docs`-Ordner
-- Support-Kontakt im Frontend
-- Weitere Dokus unter `/docs`
+
+---
+
+## Usage & Features
+
+**Which tools are included?**
+  
+- Analytics & reporting
+- Content and email generators
+- Social media automation
+- Payment and shop health checks
+- and much more (details see user guide)
+  
+
+**How can I use new features?**
+All features are available directly in the frontend. Updates are provided automatically.
+
+---
+
+## Errors & Support
+
+**What to do in case of errors or malfunctions?**
+  
+- Check logs (`docker compose logs`)
+- Check settings
+- Restart the system
+- Contact support
+  
+
+**How do I receive updates?**
+Updates are installed automatically via container update (Watchtower).
+  
+**Where can I find more help?**
+  
+- User guide in the `docs` folder
+- Support contact in the frontend
+- More documentation under `/docs`
   
 ---
   
-Letzte Aktualisierung: Dezember 2025
+Last updated: December 2025

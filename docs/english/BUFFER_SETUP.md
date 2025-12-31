@@ -1,44 +1,44 @@
-# 🚀 Buffer Setup - Die EINFACHE Lösung!
+# 🚀 Buffer setup - the SIMPLE solution!
 
-**Warum Buffer?** Keine komplizierte API-Konfiguration! Buffer hat OAuth bereits für dich gelöst.
+**Why Buffer?** No complicated API configuration! Buffer already solved OAuth for you.
 
-## ⏱️ Setup in 5 Minuten
+## ⏱️ Setup in 5 minutes
 
-### 1. Buffer Account erstellen
+### 1. Create a Buffer account
 
-1. Gehe zu: https://buffer.com/
-2. **Kostenlos anmelden** (Free Plan: 3 Accounts)
-3. Email bestätigen
+1. Go to: https://buffer.com/
+2. **Sign up for free** (Free plan: 3 accounts)
+3. Confirm email
 
-### 2. Social Media Accounts verbinden
+### 2. Connect social media accounts
 
-1. In Buffer Dashboard → **Channels** klicken
-2. **"Connect Channel"** klicken
-3. Verbinde nacheinander:
-   - **💼 LinkedIn** (Kaufe.es) - **Perfekt für B2B-Kunden!**
-   - **� Facebook Page** (Kaufe.es) - 742 Follower
-   - **🎵 TikTok Business** (@kaufe.es) - 2098 Follower
+1. In the Buffer dashboard → click **Channels**
+2. Click **"Connect Channel"**
+3. Connect one by one:
+   - **💼 LinkedIn** (Kaufe.es) - **perfect for B2B customers!**
+   - **� Facebook Page** (Kaufe.es) - 742 followers
+   - **🎵 TikTok Business** (@kaufe.es) - 2098 followers
 
-**Wichtig:** Buffer übernimmt die ganze OAuth-Komplexität! Du musst nur auf "Verbinden" klicken und autorisieren.
+**Important:** Buffer handles the entire OAuth complexity! You just click "Connect" and authorize.
 
-**Instagram?** ❌ Rausgelassen - macht Stress wegen Adresse speichern!
+**Instagram?** ❌ Left out — too much hassle with address storage!
 
-### 3. Buffer API Token holen
-1. Gehe zu: https://buffer.com/developers/apps
-2. Klicke **"Create New App"**
+### 3. Get Buffer API token
+1. Go to: https://buffer.com/developers/apps
+2. Click **"Create New App"**
 3. Name: `Kaufe.es Marketing Automation`
-4. Beschreibung: `Internal social media automation`
-5. **"Create App"** klicken
-6. **Access Token** kopieren
+4. Description: `Internal social media automation`
+5. Click **"Create App"**
+6. Copy the **Access Token**
 
-### 4. Token zu .env hinzufügen
+### 4. Add token to .env
 
 ```env
-# Buffer API (Einfach statt Meta-Hölle!)
-BUFFER_ACCESS_TOKEN=dein_access_token_hier
+# Buffer API (simple instead of the Meta maze!)
+BUFFER_ACCESS_TOKEN=your_access_token_here
 ```
 
-### 5. Backend kompilieren & starten
+### 5. Build & start backend
 
 ```bash
 cd backend
@@ -46,86 +46,86 @@ npm run build
 npm run dev
 ```
 
-### 6. Fertig! ✅
+### 6. Done! ✅
 
-Öffne das Frontend und:
-1. Gehe zu **"Social Media Poster"**
-2. Siehst du **"⚡ Buffer API (Einfach!)"** oben? → Perfekt!
-3. Deine verbundenen Accounts werden automatisch geladen
-4. Schreibe einen Post und klicke **"📤 Post Veröffentlichen"**
-
----
-
-## 🎯 Was macht Buffer für dich?
-
-### ✅ OHNE LinkedIn Developer Account
-
-- Kein OAuth App erstellen
-- Keine komplizierte API-Konfiguration
-- Keine App Review
-- Keine Permissions-Hölle
-
-### ✅ OHNE TikTok Developer Account
-
-- Keine Business Verification
-- Keine API Review warten
-- Kein Client Key/Secret Setup
-
-### ✅ OHNE Instagram-Stress
-
-- ❌ Kein Adresse-speichern-Zwang
-- ❌ Keine Business Account Verifikation
-- ❌ Keine Meta Business Suite Probleme
-
-### ✅ Einfach:
-
-1. In Buffer einloggen
-2. Accounts verbinden (3 Klicks pro Plattform)
-3. API Token kopieren
-4. Fertig!
+Open the frontend and:
+1. Go to **"Social Media Poster"**
+2. Do you see **"⚡ Buffer API (Easy!)"** at the top? → Perfect!
+3. Your connected accounts load automatically
+4. Write a post and click **"📤 Publish Post"**
 
 ---
 
-## 📊 Buffer vs. Direktes OAuth
+## 🎯 What Buffer does for you
+
+### ✅ WITHOUT a LinkedIn developer account
+
+- No OAuth app creation
+- No complicated API configuration
+- No app review
+- No permissions maze
+
+### ✅ WITHOUT a TikTok developer account
+
+- No business verification
+- No waiting for API review
+- No client key/secret setup
+
+### ✅ WITHOUT Instagram stress
+
+- ❌ No forced address storage
+- ❌ No business account verification
+- ❌ No Meta Business Suite issues
+
+### ✅ Simple:
+
+1. Log in to Buffer
+2. Connect accounts (3 clicks per platform)
+3. Copy API token
+4. Done!
+
+---
+
+## 📊 Buffer vs. direct OAuth
 
 | Feature | Buffer API | LinkedIn/Facebook/TikTok API |
 |---------|-----------|------------------------------|
-| **Setup Zeit** | ⚡ 5 Minuten | 🐌 2-3 Stunden |
-| **Developer Account** | ❌ Nicht nötig | ✅ Erforderlich |
-| **App Review** | ❌ Nicht nötig | ✅ 1-2 Wochen Wartezeit |
-| **OAuth Konfiguration** | ❌ Keine | ✅ Kompliziert |
-| **Token Refresh** | ✅ Buffer macht | ❌ Du musst implementieren |
-| **Multi-Platform** | ✅ Alles eine API | ❌ 3 verschiedene APIs |
-| **Kostenlos** | ✅ Ja (3 Accounts) | ✅ Ja |
+| **Setup time** | ⚡ 5 minutes | 🐌 2-3 hours |
+| **Developer account** | ❌ Not needed | ✅ Required |
+| **App review** | ❌ Not needed | ✅ 1-2 weeks wait |
+| **OAuth configuration** | ❌ None | ✅ Complicated |
+| **Token refresh** | ✅ Buffer handles it | ❌ You implement it |
+| **Multi-platform** | ✅ One API for all | ❌ 3 different APIs |
+| **Free** | ✅ Yes (3 accounts) | ✅ Yes |
 
-### 💼 LinkedIn + Facebook = Beste Kombi!
+### 💼 LinkedIn + Facebook = best combo!
 
 **LinkedIn** (B2B):
-- ✅ **Geschäftskunden** und professionelle Käufer
-- ✅ **Höhere Kaufkraft** für hochwertige Produkte
-- ✅ **B2B-Networking** und Empfehlungen
+- ✅ **Business customers** and professional buyers
+- ✅ **Higher purchasing power** for premium products
+- ✅ **B2B networking** and referrals
 
 **Facebook** (B2C):
-- ✅ **Große Reichweite** (742 bestehende Follower!)
-- ✅ **Lokale Kunden** und Community
-- ✅ **Einfaches Teilen** und virales Potential
+- ✅ **Wide reach** (742 existing followers!)
+- ✅ **Local customers** and community
+- ✅ **Easy sharing** and viral potential
 
-**Instagram raus?**
-- ❌ Nerviger Adresse-speichern-Zwang
-- ❌ Meta Business Suite Probleme
-- ✅ LinkedIn + Facebook + TikTok = Perfekte Mischung!
+**Instagram left out?**
+- ❌ Annoying address-storage requirement
+- ❌ Meta Business Suite issues
+- ✅ LinkedIn + Facebook + TikTok = perfect mix!
 
 ---
 
-## 🧪 Test Commands
+## 🧪 Test commands
 
-### Test ob Buffer verbunden ist:
+### Test if Buffer is connected:
 ```bash
 curl -X GET "http://localhost:3000/api/social/buffer/profiles" \
   -H "Content-Type: application/json"
 ```
 
-**Erwartete Antwort:**
+**Expected response:**
 ```json
 {
   "success": true,
@@ -155,36 +155,36 @@ curl -X GET "http://localhost:3000/api/social/buffer/profiles" \
 }
 ```
 
-### Test LinkedIn Post (B2B):
+### Test LinkedIn post (B2B):
 
 ```bash
 curl -X POST "http://localhost:3000/api/social/buffer/post" \
   -H "Content-Type: application/json" \
   -d '{
     "platform": "linkedin",
-    "content": "🚀 Professionelle E-Commerce-Lösungen für Ihr Business - Jetzt bei Kaufe.es entdecken!",
+    "content": "🚀 Professional e-commerce solutions for your business - discover at Kaufe.es now!",
     "scheduleTime": "now"
   }'
 ```
 
-### Test Facebook Post (B2C):
+### Test Facebook post (B2C):
 
 ```bash
 curl -X POST "http://localhost:3000/api/social/buffer/post" \
   -H "Content-Type: application/json" \
   -d '{
     "platform": "facebook",
-    "content": "🛍️ Neue Produkte im Shop! Schaut vorbei bei Kaufe.es 🚀",
+    "content": "🛍️ New products in the shop! Check out Kaufe.es 🚀",
     "scheduleTime": "now"
   }'
 ```
 
-**Erwartete Antwort:**
+**Expected response:**
 
 ```json
 {
   "success": true,
-  "message": "Post erfolgreich auf [platform] veröffentlicht!",
+  "message": "Post successfully published on [platform]!",
   "data": {
     "postId": "abc123",
     "platform": "linkedin",
@@ -196,80 +196,80 @@ curl -X POST "http://localhost:3000/api/social/buffer/post" \
 
 ---
 
-## 🎨 Frontend Features
+## 🎨 Frontend features
 
-Wenn Buffer Modus aktiv ist:
-- ✅ Automatische Profile-Erkennung
-- ✅ Echtzeit Follower-Zahlen von Buffer
-- ✅ **"🔗 Verbinden"** Button öffnet Buffer Dashboard
-- ✅ Toggle zwischen Buffer & OAuth Modus
+When Buffer mode is active:
+- ✅ Automatic profile detection
+- ✅ Real-time follower counts from Buffer
+- ✅ **"🔗 Connect"** button opens Buffer dashboard
+- ✅ Toggle between Buffer & OAuth mode
 
-**Toggle zum Testen:**
+**Toggle for testing:**
 ```
-Klicke auf "→ OAuth Modus" um zurück zum direkten API zu wechseln
+Click "→ OAuth Mode" to switch back to direct API
 ```
 
 ---
 
-## 💡 Tipps
+## 💡 Tips
 
-### Buffer Free Plan Limits:
+### Buffer free plan limits:
 
-- **3 Social Media Accounts** (perfekt: LinkedIn, Facebook, TikTok)
-- **10 geplante Posts** gleichzeitig
-- Unbegrenzte veröffentlichte Posts
+- **3 social media accounts** (perfect: LinkedIn, Facebook, TikTok)
+- **10 scheduled posts** at once
+- Unlimited published posts
 
-### Wenn du mehr brauchst:
-- **Buffer Essentials**: $6/Monat = 8 Accounts
-- **Buffer Team**: $12/Monat = 25 Accounts + Analytics
+### If you need more:
+- **Buffer Essentials**: $6/month = 8 accounts
+- **Buffer Team**: $12/month = 25 accounts + analytics
 
-### Bilder & Videos:
+### Images & videos:
 ```javascript
 {
   "platform": "instagram",
-  "content": "Neues Produkt! 🛍️ #kaufees",
+  "content": "New product! 🛍️ #kaufees",
   "mediaUrl": "https://kaufe-es.eu/uploads/product.jpg"
 }
 ```
 
-Buffer unterstützt:
-- **Bilder**: JPG, PNG (bis 5MB)
-- **Videos**: MP4 (bis 512MB für TikTok)
+Buffer supports:
+- **Images**: JPG, PNG (up to 5MB)
+- **Videos**: MP4 (up to 512MB for TikTok)
 
 ---
 
 ## ❌ Troubleshooting
 
-### "Buffer Access Token nicht konfiguriert"
-→ Füge `BUFFER_ACCESS_TOKEN=...` zu `backend/.env` hinzu
+### "Buffer access token not configured"
+→ Add `BUFFER_ACCESS_TOKEN=...` to `backend/.env`
 
-### "Kein LINKEDIN Account bei Buffer gefunden"
+### "No LINKEDIN account found in Buffer"
 
-→ Gehe zu https://buffer.com/app und verbinde LinkedIn dort (Company Page empfohlen!)
+→ Go to https://buffer.com/app and connect LinkedIn there (company page recommended!)
 
-### "Post fehlgeschlagen"
-→ Prüfe Buffer Dashboard → Manche Plattformen brauchen Bilder (Instagram)
+### "Post failed"
+→ Check Buffer dashboard → some platforms require images (Instagram)
 
-### Ich will doch direktes OAuth testen
-→ Klicke einfach auf **"→ OAuth Modus"** oben im Frontend!
+### I want to test direct OAuth instead
+→ Just click **"→ OAuth Mode"** at the top of the frontend!
 
 ---
 
-## 🎉 Fertig!
+## 🎉 Done!
 
-Du sparst dir:
+You avoid:
 
-- ❌ 2-3 Stunden LinkedIn/TikTok Developer Setup
-- ❌ 1-2 Wochen App Review Wartezeit
-- ❌ OAuth Token Refresh Implementierung
-- ❌ Multi-Platform API Unterschiede
+- ❌ 2-3 hours LinkedIn/TikTok developer setup
+- ❌ 1-2 weeks app review wait
+- ❌ OAuth token refresh implementation
+- ❌ Multi-platform API differences
 
-Und bekommst:
+And you get:
 
-- ✅ Sofort einsatzbereit
-- ✅ Eine API für alle Plattformen
-- ✅ Automatische Token-Verwaltung
-- ✅ Bonus: Buffer Analytics Dashboard
-- 💼 **LinkedIn B2B-Reichweite für Business-Kunden!**
+- ✅ Ready immediately
+- ✅ One API for all platforms
+- ✅ Automatic token management
+- ✅ Bonus: Buffer analytics dashboard
+- 💼 **LinkedIn B2B reach for business customers!**
 
-**Viel Erfolg beim Erreichen deiner Business-Kunden! 🚀**
+**Good luck reaching your business customers! 🚀**

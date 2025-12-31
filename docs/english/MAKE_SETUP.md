@@ -1,100 +1,100 @@
-# 🎉 Make.com Setup - 1000 Operations KOSTENLOS!
+# 🎉 Make.com setup - 1000 operations FREE!
 
-**Problem:** Zapier Free ist nicht wirklich kostenlos (nur 5 Zaps)  
-**Lösung:** **Make.com (früher Integromat)** - **1000 Ops/Monat GRATIS!** 🎉
+**Problem:** Zapier free isn’t truly free (only 5 Zaps)  
+**Solution:** **Make.com (formerly Integromat)** - **1000 ops/month FREE!** 🎉
 
-## 🚀 Warum Make.com?
+## 🚀 Why Make.com?
 
-- 🎉 **1000 Operations GRATIS** - Das sind ~33 Posts pro Tag!
-- ✅ **Visueller Editor** - Drag & Drop, kein Code
-- ✅ **Alle Plattformen** - LinkedIn, Facebook, Instagram, TikTok
-- ✅ **Sofort verfügbar** - Keine Wartezeit
-- ✅ **Leistungsstärker** als Zapier Free
+- 🎉 **1000 operations FREE** - that’s ~33 posts per day!
+- ✅ **Visual editor** - drag & drop, no code
+- ✅ **All platforms** - LinkedIn, Facebook, Instagram, TikTok
+- ✅ **Available immediately** - no waiting
+- ✅ **More powerful** than Zapier Free
 
-## ⏱️ Setup in 3 Minuten
+## ⏱️ Setup in 3 minutes
 
-### 1. Make.com Account erstellen
+### 1. Create a Make.com account
 
-1. Gehe zu: https://www.make.com/en/register
-2. **Kostenlos anmelden** (FREE Plan: 1000 Ops/Monat!)
-3. Email bestätigen
-4. Los geht's!
+1. Go to: https://www.make.com/en/register
+2. **Sign up free** (FREE plan: 1000 ops/month!)
+3. Confirm email
+4. You’re ready!
 
-### 2. Scenario für LinkedIn erstellen
+### 2. Create a scenario for LinkedIn
 
-#### Schritt 1: Neues Scenario
+#### Step 1: New scenario
 
-1. Klicke **"Create a new scenario"**
-2. Gib einen Namen ein: "LinkedIn Poster - Kaufe.es"
+1. Click **"Create a new scenario"**
+2. Enter a name: "LinkedIn Poster - Kaufe.es"
 
-#### Schritt 2: Webhook Trigger
+#### Step 2: Webhook trigger
 
-1. Klicke auf das **"+"** Symbol
-2. Suche nach **"Webhooks"**
-3. Wähle **"Custom webhook"**
-4. Klicke **"Add"** → Gib einen Namen: "LinkedIn Webhook"
-5. **Kopiere die Webhook URL!**
+1. Click the **"+"** icon
+2. Search for **"Webhooks"**
+3. Choose **"Custom webhook"**
+4. Click **"Add"** → name it: "LinkedIn Webhook"
+5. **Copy the webhook URL!**
    ```
-   Beispiel: https://hook.eu1.make.com/abc123xyz456
+   Example: https://hook.eu1.make.com/abc123xyz456
    ```
-6. Klicke **"OK"**
+6. Click **"OK"**
 
-#### Schritt 3: LinkedIn Action
+#### Step 3: LinkedIn action
 
-1. Klicke auf das **"+"** nach dem Webhook
-2. Suche nach **"LinkedIn"**
-3. Wähle **"Create a Share Update"**
-4. **Connection erstellen**:
-   - Klicke "Add"
-   - LinkedIn autorisieren (mit deinem Business Account!)
+1. Click the **"+"** after the webhook
+2. Search for **"LinkedIn"**
+3. Choose **"Create a Share Update"**
+4. **Create connection**:
+   - Click "Add"
+   - Authorize LinkedIn (with your business account!)
 5. **Configure**:
-   - **Text**: Klicke in das Feld und wähle `content` (vom Webhook)
-   - **Visibility**: `CONNECTIONS` oder `PUBLIC`
-6. **OK** klicken
+   - **Text**: click the field and choose `content` (from the webhook)
+   - **Visibility**: `CONNECTIONS` or `PUBLIC`
+6. Click **OK**
 
-#### Schritt 4: Test & Activate
+#### Step 4: Test & activate
 
-1. Klicke **"Run once"** (unten links)
-2. Sende Test-Request (siehe unten)
-3. Check LinkedIn - siehst du den Test-Post? ✅
-4. Klicke **"Scheduling"** → "ON" (Scenario aktivieren!)
+1. Click **"Run once"** (bottom left)
+2. Send test request (see below)
+3. Check LinkedIn - do you see the test post? ✅
+4. Click **"Scheduling"** → "ON" (activate scenario!)
 
-#### Schritt 5: Webhook URL speichern
+#### Step 5: Save webhook URL
 
-Füge die Webhook URL zu `.env` hinzu:
+Add the webhook URL to `.env`:
 
 ```env
 WEBHOOK_LINKEDIN=https://hook.eu1.make.com/abc123xyz456
 ```
 
-### 3. Scenario für Facebook erstellen
+### 3. Create scenario for Facebook
 
-**Wiederhole Schritte 1-5, aber:**
+**Repeat steps 1-5, but:**
 
-- **Scenario Name**: "Facebook Poster - Kaufe.es"
-- **Action**: Suche "Facebook Pages"
+- **Scenario name**: "Facebook Poster - Kaufe.es"
+- **Action**: search "Facebook Pages"
 - **Module**: "Create a Post"
-- **Page**: Wähle deine Kaufe.es Page (742 Follower)
-- **Message**: Wähle `content` vom Webhook
+- **Page**: choose your Kaufe.es page (742 followers)
+- **Message**: choose `content` from the webhook
 
 ```env
 WEBHOOK_FACEBOOK=https://hook.eu1.make.com/def789ghi012
 ```
 
-### 4. TikTok Scenario (Optional)
+### 4. TikTok scenario (optional)
 
-**Leider:** TikTok ist in Make.com nicht direkt verfügbar.
+**Unfortunately:** TikTok isn’t directly available in Make.com.
 
 **Workaround:**
-- Nutze später Buffer API (wartet auf Approval)
-- Oder: Make.com → Email → Manuell auf TikTok posten
+- Use Buffer API later (awaiting approval)
+- Or: Make.com → Email → post manually to TikTok
 
 ```env
-# TikTok vorerst auskommentiert
+# TikTok commented out for now
 # WEBHOOK_TIKTOK=
 ```
 
-### 5. Server neu starten
+### 5. Restart server
 
 ```bash
 cd backend
@@ -102,22 +102,22 @@ npm run build
 npm run dev
 ```
 
-✅ Check Output:
+✅ Check output:
 ```
-✅ Webhook Routes erfolgreich registriert
+✅ Webhook routes registered successfully
 ```
 
 ---
 
-## 🧪 Test Commands
+## 🧪 Test commands
 
-### Test Webhook Status
+### Test webhook status
 
 ```bash
 curl http://localhost:3000/api/social/webhook/status
 ```
 
-**Erwartete Antwort:**
+**Expected response:**
 ```json
 {
   "success": true,
@@ -128,11 +128,11 @@ curl http://localhost:3000/api/social/webhook/status
   },
   "configured": 2,
   "total": 3,
-  "message": "✅ 2/3 Webhooks konfiguriert!"
+  "message": "✅ 2/3 webhooks configured!"
 }
 ```
 
-### Test LinkedIn Webhook
+### Test LinkedIn webhook
 
 ```bash
 curl -X POST "http://localhost:3000/api/social/webhook/test" \
@@ -140,32 +140,32 @@ curl -X POST "http://localhost:3000/api/social/webhook/test" \
   -d '{"platform": "linkedin"}'
 ```
 
-**Was passiert:**
-1. Backend sendet Test zu Make.com
-2. Make.com empfängt Webhook
-3. Make.com postet auf LinkedIn
-4. Du siehst Test-Post! 🎉
+**What happens:**
+1. Backend sends test to Make.com
+2. Make.com receives webhook
+3. Make.com posts to LinkedIn
+4. You see a test post! 🎉
 
-### Echter LinkedIn Post
+### Real LinkedIn post
 
 ```bash
 curl -X POST "http://localhost:3000/api/social/webhook/post" \
   -H "Content-Type: application/json" \
   -d '{
     "platform": "linkedin",
-    "content": "🚀 Professionelle E-Commerce-Lösungen bei Kaufe.es! #business #ecommerce",
+    "content": "🚀 Professional e-commerce solutions at Kaufe.es! #business #ecommerce",
     "scheduleTime": "now"
   }'
 ```
 
-### Echter Facebook Post
+### Real Facebook post
 
 ```bash
 curl -X POST "http://localhost:3000/api/social/webhook/post" \
   -H "Content-Type: application/json" \
   -d '{
     "platform": "facebook",
-    "content": "🛍️ Neue Produkte im Shop! Schaut vorbei bei Kaufe.es 🚀",
+    "content": "🛍️ New products in the shop! Check out Kaufe.es 🚀",
     "scheduleTime": "now"
   }'
 ```
@@ -176,22 +176,22 @@ curl -X POST "http://localhost:3000/api/social/webhook/post" \
 
 | Feature | Make.com FREE | Zapier FREE | Buffer API |
 |---------|---------------|-------------|------------|
-| **Kosten** | 🎉 **0€** | 💰 Nur 5 Zaps | ⏳ Wartet |
-| **Operations** | 🎉 **1000/Monat** | 💔 Nur 100/Monat | ⏳ Wartet |
-| **LinkedIn** | ✅ Sofort | ✅ Begrenzt | ⏳ Wartet |
-| **Facebook** | ✅ Sofort | ✅ Begrenzt | ⏳ Wartet |
-| **Editor** | ✅ Visuell + Erweitert | ✅ Einfach | - |
-| **Wartezeit** | ⚡ 0 Minuten | ⚡ 0 Minuten | ⏳ Tage |
+| **Cost** | 🎉 **€0** | 💰 Only 5 Zaps | ⏳ Waiting |
+| **Operations** | 🎉 **1000/month** | 💔 Only 100/month | ⏳ Waiting |
+| **LinkedIn** | ✅ Immediate | ✅ Limited | ⏳ Waiting |
+| **Facebook** | ✅ Immediate | ✅ Limited | ⏳ Waiting |
+| **Editor** | ✅ Visual + advanced | ✅ Simple | - |
+| **Waiting time** | ⚡ 0 minutes | ⚡ 0 minutes | ⏳ Days |
 
-**Make.com = BESTE kostenlose Lösung!** 🎉
+**Make.com = BEST free solution!** 🎉
 
 ---
 
-## 🔥 Make.com Visualisierung
+## 🔥 Make.com visualization
 
 ```
 ┌─────────────────┐
-│  Dein Backend   │
+│  Your Backend   │
 │   (Node.js)     │
 └────────┬────────┘
          │ HTTP POST
@@ -218,50 +218,50 @@ curl -X POST "http://localhost:3000/api/social/webhook/post" \
 
 ---
 
-## 🎨 Frontend Features
+## 🎨 Frontend features
 
-- **Badge**: "🎉 Make.com (1000 GRATIS!)"
-- **Status**: "✅ 2/3 Webhooks konfiguriert"
+- **Badge**: "🎉 Make.com (1000 FREE!)"
+- **Status**: "✅ 2/3 webhooks configured"
 - **Toggle**: Make.com ↔ Buffer
-- **"🔗 Verbinden"** öffnet Make.com Dashboard
+- **"🔗 Connect"** opens Make.com dashboard
 
 ---
 
-## 💡 Pro Tipps
+## 💡 Pro tips
 
-### Make.com Free Plan Details
+### Make.com free plan details
 
-- **1000 Operations/Monat** = ~33 Posts pro Tag
-- **2 Active Scenarios** (reicht für LinkedIn + Facebook!)
-- **5 MB Datenspeicher**
-- **15 Minuten Interval** (für scheduled scenarios)
+- **1000 operations/month** = ~33 posts per day
+- **2 active scenarios** (enough for LinkedIn + Facebook!)
+- **5 MB data storage**
+- **15-minute interval** (for scheduled scenarios)
 
-### Upgrade nur wenn nötig
+### Upgrade only if needed
 
-- **Core**: $9/Monat = 10.000 Ops
-- **Pro**: $16/Monat = 10.000 Ops + mehr Features
+- **Core**: $9/month = 10,000 ops
+- **Pro**: $16/month = 10,000 ops + more features
 
-### Multi-Platform Posting
+### Multi-platform posting
 
-Erstelle ein **einziges Scenario** mit mehreren Actions:
-1. Webhook Trigger
-2. Action 1: LinkedIn Post
-3. Action 2: Facebook Post
-4. Action 3: Email Notification
+Create a **single scenario** with multiple actions:
+1. Webhook trigger
+2. Action 1: LinkedIn post
+3. Action 2: Facebook post
+4. Action 3: Email notification
 
-→ Ein Webhook postet auf BEIDEN Plattformen! 🚀
+→ One webhook posts to BOTH platforms! 🚀
 
-### Bilder & Videos
+### Images & videos
 
-Make.com unterstützt:
-- **Bilder**: JPG, PNG - über `mediaUrl` Parameter
-- **Videos**: MP4 - für Facebook
-- **Links**: Automatische Vorschau
+Make.com supports:
+- **Images**: JPG, PNG - via `mediaUrl` parameter
+- **Videos**: MP4 - for Facebook
+- **Links**: automatic preview
 
 ```json
 {
   "platform": "facebook",
-  "content": "Neues Produkt! 🛍️",
+  "content": "New product! 🛍️",
   "mediaUrl": "https://kaufe-es.eu/images/product.jpg"
 }
 ```
@@ -270,52 +270,52 @@ Make.com unterstützt:
 
 ## ❌ Troubleshooting
 
-### "Kein Webhook für LINKEDIN konfiguriert"
+### "No webhook configured for LINKEDIN"
 
-→ Füge `WEBHOOK_LINKEDIN=...` zu `backend/.env` hinzu
+→ Add `WEBHOOK_LINKEDIN=...` to `backend/.env`
 
-### Webhook funktioniert nicht
+### Webhook doesn’t work
 
-→ Check Make.com Dashboard:
-- Ist das Scenario **ON** (Scheduling aktiv)?
-- Webhook URL korrekt kopiert?
-- **Execution History** → Fehler angezeigt?
+→ Check Make.com dashboard:
+- Is the scenario **ON** (scheduling active)?
+- Webhook URL copied correctly?
+- **Execution History** → any errors shown?
 
-### Post erscheint nicht
+### Post doesn’t appear
 
-→ Make.com Dashboard → **Execution History**:
-- Klicke auf letzte Execution
-- Siehst du grüne ✅ bei allen Modulen?
-- Fehler? Dann LinkedIn Connection neu verbinden
+→ Make.com dashboard → **Execution History**:
+- Click the latest execution
+- Do you see green ✅ on all modules?
+- Errors? Then reconnect LinkedIn connection
 
 ### "Operations limit reached"
 
-→ Du hast 1000 Operations verbraucht:
-- Warte bis nächsten Monat (Reset)
-- Oder: Upgrade auf Core Plan
+→ You used 1000 operations:
+- Wait until next month (reset)
+- Or upgrade to Core plan
 
 ---
 
-## 🎉 Fertig!
+## 🎉 Done!
 
-Du hast jetzt:
+You now have:
 
-- ✅ **LinkedIn Posting** - 1000 Posts/Monat GRATIS!
-- ✅ **Facebook Posting** - Deine 742 Follower erreichen!
-- ✅ **Visueller Editor** - Einfach anpassen
-- ⏳ **TikTok** - Kommt später via Buffer
+- ✅ **LinkedIn posting** - 1000 posts/month FREE!
+- ✅ **Facebook posting** - reach your 742 followers!
+- ✅ **Visual editor** - easy to adjust
+- ⏳ **TikTok** - comes later via Buffer
 
-### Was als Nächstes?
+### What’s next?
 
-1. **Frontend öffnen**: http://localhost:5174/marketing/social-poster
-2. **Toggle auf "🎉 Make.com"** klicken
-3. **Ersten echten Post** erstellen!
-4. **Make.com Dashboard** checken → Execution History
+1. **Open frontend**: http://localhost:5174/marketing/social-poster
+2. Click **toggle to "🎉 Make.com"**
+3. Create your **first real post**!
+4. Check **Make.com dashboard** → Execution History
 
-**Make.com = Perfekte kostenlose Lösung!** 🎉
+**Make.com = perfect free solution!** 🎉
 
-### Buffer Email kommt?
+### Waiting for Buffer email?
 
-Einfach Toggle auf "⏳ Buffer" umschalten - TikTok funktioniert dann auch!
+Just switch toggle to "⏳ Buffer" - TikTok will then work too!
 
-**Viel Erfolg beim Posten! 🚀**
+**Good luck posting! 🚀**

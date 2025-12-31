@@ -1,26 +1,26 @@
 # Deployment Guide - WooCommerce AI Agent
 
-## Übersicht
+## Overview
 
-Dieser Guide beschreibt das vollständige Deployment des WooCommerce AI Agent Systems in einer Production-Umgebung. Das System läuft in Docker-Containern und ist optimiert für einen dedizierten Server.
+This guide describes the full deployment of the WooCommerce AI Agent system in a production environment. The system runs in Docker containers and is optimized for a dedicated server.
 
 ---
 
-## 1. Server-Anforderungen
+## 1. Server requirements
 
-### 1.1 Dedizierter Agent-Server
+### 1.1 Dedicated agent server
 
-**Wichtig**: WordPress und WooCommerce laufen auf einem **separaten Server**. Der Agent-Server ist ausschließlich für den AI Agent reserviert.
+**Important**: WordPress and WooCommerce run on a **separate server**. The agent server is reserved solely for the AI Agent.
 
-**Minimale Spezifikationen**:
-- **vCPU**: 3 Cores
+**Minimum specs**:
+- **vCPU**: 3 cores
 - **RAM**: 4 GB
 - **Disk**: 80 GB SSD
 - **OS**: Ubuntu 22.04 LTS / Debian 12 / Rocky Linux 9
-- **Docker**: Version 24.0+
-- **Docker Compose**: Version 2.20+
+- **Docker**: version 24.0+
+- **Docker Compose**: version 2.20+
 
-**Ressourcen-Aufteilung**:
+**Resource allocation**:
 ```
 ┌─────────────────────────────────────┐
 │  Server: 3 vCPU, 4 GB RAM           │
@@ -36,27 +36,27 @@ Dieser Guide beschreibt das vollständige Deployment des WooCommerce AI Agent Sy
 └─────────────────────────────────────┘
 ```
 
-**Warum diese Specs ausreichen**:
-- ✅ Kein WordPress/WooCommerce auf diesem Server
-- ✅ Nur AI Agent + Error-Handling + Jobs
-- ✅ Node.js optimiert mit `--max-old-space-size=2048`
-- ✅ Circuit Breaker verhindert Ressourcen-Verschwendung
-- ✅ Connection Pooling reduziert Memory-Usage
+**Why these specs are sufficient**:
+- ✅ No WordPress/WooCommerce on this server
+- ✅ Only AI Agent + error handling + jobs
+- ✅ Node.js optimized with `--max-old-space-size=2048`
+- ✅ Circuit breaker prevents resource waste
+- ✅ Connection pooling reduces memory usage
 
-### 1.2 Netzwerk-Anforderungen
+### 1.2 Network requirements
 
-**Outbound Connections**:
-- WordPress Server (REST API): Port 443 (HTTPS)
-- WooCommerce Server (REST API): Port 443 (HTTPS)
-- OpenAI API: Port 443 (HTTPS)
-- SMTP Server (Email Alerts): Port 587 (TLS)
-- Slack Webhooks: Port 443 (HTTPS)
+**Outbound connections**:
+- WordPress server (REST API): port 443 (HTTPS)
+- WooCommerce server (REST API): port 443 (HTTPS)
+- OpenAI API: port 443 (HTTPS)
+- SMTP server (email alerts): port 587 (TLS)
+- Slack webhooks: port 443 (HTTPS)
 
-**Inbound Connections** (Optional):
-- Frontend Dashboard: Port 3000 (kann hinter Reverse Proxy)
-- Health Check: Port 3000 (intern)
+**Inbound connections** (optional):
+- Frontend dashboard: port 3000 (can sit behind reverse proxy)
+- Health check: port 3000 (internal)
 
-**Firewall Rules**:
+**Firewall rules**:
 ```bash
 # Allow HTTPS Outbound
 iptables -A OUTPUT -p tcp --dport 443 -j ACCEPT
@@ -64,17 +64,17 @@ iptables -A OUTPUT -p tcp --dport 443 -j ACCEPT
 # Allow SMTP Outbound
 iptables -A OUTPUT -p tcp --dport 587 -j ACCEPT
 
-# Allow Frontend (Optional, hinter Reverse Proxy)
+# Allow Frontend (optional, behind reverse proxy)
 iptables -A INPUT -p tcp --dport 3000 -j ACCEPT
 ```
 
 ---
 
-## 2. Pre-Deployment Setup
+## 2. Pre-deployment setup
 
-### 2.1 System-Vorbereitung
+### 2.1 System preparation
 
-**1. System Updates**:
+**1. System updates**:
 ```bash
 # Ubuntu/Debian
 sudo apt update && sudo apt upgrade -y
@@ -83,7 +83,7 @@ sudo apt update && sudo apt upgrade -y
 sudo dnf update -y
 ```
 
-**2. Docker Installation**:
+**2. Install Docker**:
 ```bash
 # Ubuntu/Debian
 curl -fsSL https://get.docker.com -o get-docker.sh
@@ -99,12 +99,12 @@ docker --version
 docker-compose --version
 ```
 
-**3. Git Installation** (für Code-Updates):
+**3. Install Git** (for code updates):
 ```bash
 sudo apt install git -y
 ```
 
-**4. Verzeichnisse erstellen**:
+**4. Create directories**:
 ```bash
 mkdir -p /opt/woo-ki-agent
 mkdir -p /opt/woo-ki-agent/data
@@ -115,7 +115,7 @@ mkdir -p /opt/woo-ki-agent/data/dlq
 sudo chown -R $USER:$USER /opt/woo-ki-agent
 ```
 
-### 2.2 Repository klonen
+### 2.2 Clone repository
 
 ```bash
 cd /opt/woo-ki-agent
@@ -124,11 +124,11 @@ git clone https://github.com/AndreZ1971/ki.git .
 
 ---
 
-## 3. Environment Configuration
+## 3. Environment configuration
 
-### 3.1 Production Environment Variables
+### 3.1 Production environment variables
 
-**Datei**: `.env.production`
+**File**: `.env.production`
 
 ```bash
 # ==========================================
@@ -191,18 +191,18 @@ RATE_LIMIT_MAX=100
 RATE_LIMIT_WINDOW=60000
 ```
 
-**Sicherheitshinweis**:
+**Security note**:
 ```bash
-# Permissions setzen
+# Set permissions
 chmod 600 .env.production
 
 # Nie in Git committen!
 echo ".env.production" >> .gitignore
 ```
 
-### 3.2 Environment Variable Validation
+### 3.2 Environment variable validation
 
-**Validierungs-Script** (`scripts/validate-env.sh`):
+**Validation script** (`scripts/validate-env.sh`):
 ```bash
 #!/bin/bash
 
@@ -244,7 +244,7 @@ else
 fi
 ```
 
-**Ausführen**:
+**Run**:
 ```bash
 chmod +x scripts/validate-env.sh
 ./scripts/validate-env.sh
@@ -252,11 +252,11 @@ chmod +x scripts/validate-env.sh
 
 ---
 
-## 4. Docker Deployment
+## 4. Docker deployment
 
-### 4.1 Docker Configuration
+### 4.1 Docker configuration
 
-**Dockerfile** (bereits vorhanden):
+**Dockerfile** (already provided):
 ```dockerfile
 FROM node:18-alpine
 
@@ -283,7 +283,7 @@ EXPOSE 3000
 CMD ["node", "--max-old-space-size=2048", "dist/server.js"]
 ```
 
-**docker-compose.yml** (bereits vorhanden):
+**docker-compose.yml** (already provided):
 ```yaml
 version: '3.8'
 
@@ -309,7 +309,7 @@ services:
     ports:
       - "3000:3000"
 
-  # Optional: Watchtower für automatische Updates
+  # Optional: Watchtower for automatic updates
   watchtower:
     image: containrrr/watchtower
     volumes:
@@ -318,15 +318,15 @@ services:
     restart: unless-stopped
 ```
 
-### 4.2 Build & Deploy
+### 4.2 Build & deploy
 
-**1. Build Docker Image**:
+**1. Build Docker image**:
 ```bash
 cd /opt/woo-ki-agent
 docker-compose build --no-cache
 ```
 
-**2. Start Containers**:
+**2. Start containers**:
 ```bash
 docker-compose up -d
 ```
@@ -343,7 +343,7 @@ docker-compose logs -f ki-agent
 curl http://localhost:3000/api/health
 ```
 
-**Expected Output**:
+**Expected output**:
 ```json
 {
   "status": "healthy",
@@ -356,19 +356,19 @@ curl http://localhost:3000/api/health
 }
 ```
 
-### 4.3 Container Management
+### 4.3 Container management
 
-**Stop Containers**:
+**Stop containers**:
 ```bash
 docker-compose down
 ```
 
-**Restart Containers**:
+**Restart containers**:
 ```bash
 docker-compose restart
 ```
 
-**View Logs**:
+**View logs**:
 ```bash
 # All logs
 docker-compose logs -f
@@ -380,23 +380,23 @@ docker-compose logs --tail=100 ki-agent
 docker-compose logs --since 2025-11-01T10:00:00
 ```
 
-**Access Container Shell**:
+**Access container shell**:
 ```bash
 docker exec -it woo-ki-agent sh
 ```
 
 ---
 
-## 5. Watchtower - Auto-Updates
+## 5. Watchtower - auto-updates
 
-### 5.1 Watchtower Konfiguration
+### 5.1 Watchtower configuration
 
-**Was ist Watchtower?**
-- Automatische Docker Image Updates
-- Überwacht Docker Hub / GitHub Container Registry
-- Pulled neue Images und startet Container neu
+**What is Watchtower?**
+- Automatic Docker image updates
+- Monitors Docker Hub / GitHub Container Registry
+- Pulls new images and restarts containers
 
-**Konfiguration in docker-compose.yml**:
+**Configuration in docker-compose.yml**:
 ```yaml
 watchtower:
   image: containrrr/watchtower
@@ -407,10 +407,10 @@ watchtower:
   environment:
     - WATCHTOWER_CLEANUP=true
     - WATCHTOWER_INCLUDE_STOPPED=false
-    - WATCHTOWER_POLL_INTERVAL=300  # 5 Minuten
+    - WATCHTOWER_POLL_INTERVAL=300  # 5 minutes
 ```
 
-**Manuelle Trigger**:
+**Manual trigger**:
 ```bash
 # Force check now
 docker run --rm \
@@ -420,17 +420,17 @@ docker run --rm \
   woo-ki-agent
 ```
 
-### 5.2 Update Strategy
+### 5.2 Update strategy
 
-**Rolling Updates**:
-1. Watchtower checkt alle 5 Minuten
-2. Neues Image verfügbar → Pull
-3. Stop alter Container
-4. Start neuer Container
-5. Health Check
-6. Cleanup altes Image
+**Rolling updates**:
+1. Watchtower checks every 5 minutes
+2. New image available → pull
+3. Stop old container
+4. Start new container
+5. Health check
+6. Cleanup old image
 
-**Zero-Downtime Updates** (Optional):
+**Zero-downtime updates** (optional):
 ```yaml
 ki-agent:
   deploy:
@@ -447,9 +447,9 @@ ki-agent:
 
 ---
 
-## 6. Monitoring & Alerting Setup
+## 6. Monitoring & alerting setup
 
-### 6.1 Error-Handling Monitoring
+### 6.1 Error-handling monitoring
 
 **Circuit Breaker Status**:
 ```bash
@@ -492,9 +492,9 @@ curl http://localhost:3000/api/error-handling/dlq/stats
 }
 ```
 
-### 6.2 Email Alerting Setup
+### 6.2 Email alerting setup
 
-**SMTP Testing**:
+**SMTP testing**:
 ```bash
 # Test Email
 curl -X POST http://localhost:3000/api/test/email \
@@ -502,34 +502,34 @@ curl -X POST http://localhost:3000/api/test/email \
   -d '{"to": "admin@dein-shop.de", "subject": "Test Alert"}'
 ```
 
-**Gmail SMTP Setup**:
-1. Enable 2-Factor Authentication
-2. Create App Password: https://myaccount.google.com/apppasswords
-3. Use App Password in `.env.production`:
+**Gmail SMTP setup**:
+1. Enable 2-factor authentication
+2. Create app password: https://myaccount.google.com/apppasswords
+3. Use app password in `.env.production`:
    ```
    SMTP_USER=alerts@gmail.com
    SMTP_PASS=xxxx xxxx xxxx xxxx
    ```
 
-**Alert Types**:
-- **CRITICAL**: Payment Failures, API Outages
-- **ERROR**: Job Failures, Circuit Breaker OPEN
-- **WARNING**: High Memory, Slow Responses
-- **INFO**: Successful Deployments, Daily Reports
+**Alert types**:
+- **CRITICAL**: payment failures, API outages
+- **ERROR**: job failures, circuit breaker OPEN
+- **WARNING**: high memory, slow responses
+- **INFO**: successful deployments, daily reports
 
-### 6.3 Slack Alerting Setup
+### 6.3 Slack alerting setup
 
-**1. Create Slack App**:
+**1. Create Slack app**:
 - Go to: https://api.slack.com/apps
-- Create New App → From Scratch
-- App Name: "WooCommerce AI Agent"
-- Workspace: Your Workspace
+- Create new app → From Scratch
+- App name: "WooCommerce AI Agent"
+- Workspace: your workspace
 
-**2. Enable Incoming Webhooks**:
+**2. Enable incoming webhooks**:
 - Features → Incoming Webhooks → Activate
-- Add New Webhook to Workspace
-- Select Channel: #alerts
-- Copy Webhook URL
+- Add new webhook to workspace
+- Select channel: #alerts
+- Copy webhook URL
 
 **3. Configure in `.env.production`**:
 ```
@@ -543,7 +543,7 @@ curl -X POST $SLACK_WEBHOOK_URL \
   -d '{"text": "🚀 AI Agent deployed successfully!"}'
 ```
 
-**Alert Format**:
+**Alert format**:
 ```json
 {
   "text": "🔴 CRITICAL: Payment Failure",
@@ -560,11 +560,11 @@ curl -X POST $SLACK_WEBHOOK_URL \
 
 ---
 
-## 7. Health Checks & Monitoring
+## 7. Health checks & monitoring
 
-### 7.1 Docker Health Check
+### 7.1 Docker health check
 
-**Konfiguration** (in docker-compose.yml):
+**Configuration** (in docker-compose.yml):
 ```yaml
 healthcheck:
   test: ["CMD", "node", "healthcheck.js"]
@@ -574,7 +574,7 @@ healthcheck:
   start_period: 40s
 ```
 
-**Health Check Script** (`healthcheck.ts`):
+**Health check script** (`healthcheck.ts`):
 ```typescript
 // Simple HTTP check
 const http = require('http');
@@ -600,22 +600,22 @@ req.on('timeout', () => process.exit(1));
 req.end();
 ```
 
-**Check Status**:
+**Check status**:
 ```bash
 docker inspect --format='{{.State.Health.Status}}' woo-ki-agent
 # Output: healthy / unhealthy / starting
 ```
 
-### 7.2 System Monitoring
+### 7.2 System monitoring
 
-**API Endpoints**:
+**API endpoints**:
 
-**1. Health Check**:
+**1. Health check**:
 ```bash
 GET /api/health
 ```
 
-**2. System Stats**:
+**2. System stats**:
 ```bash
 GET /api/system/health/system
 
@@ -633,7 +633,7 @@ GET /api/system/health/system
 }
 ```
 
-**3. Memory Stats**:
+**3. Memory stats**:
 ```bash
 GET /api/system/memory/memory
 
@@ -644,9 +644,9 @@ GET /api/system/memory/memory
 }
 ```
 
-### 7.3 Log Monitoring
+### 7.3 Log monitoring
 
-**Log Files**:
+**Log files**:
 ```
 /opt/woo-ki-agent/logs/
 ├── app.log              # Application Logs
@@ -657,7 +657,7 @@ GET /api/system/memory/memory
     └── failed-job-2.json
 ```
 
-**Log Rotation** (mit Logrotate):
+**Log rotation** (with logrotate):
 ```bash
 # /etc/logrotate.d/woo-ki-agent
 /opt/woo-ki-agent/logs/*.log {
@@ -677,17 +677,17 @@ GET /api/system/memory/memory
 
 ---
 
-## 8. Backup & Recovery
+## 8. Backup & recovery
 
-### 8.1 Backup Strategy
+### 8.1 Backup strategy
 
-**Was muss gesichert werden?**
+**What needs to be backed up?**
 1. **Dead Letter Queue**: `/opt/woo-ki-agent/data/dlq/`
 2. **Logs**: `/opt/woo-ki-agent/logs/`
-3. **Environment Variables**: `.env.production`
-4. **Docker Volumes**: `data/`, `logs/`
+3. **Environment variables**: `.env.production`
+4. **Docker volumes**: `data/`, `logs/`
 
-**Backup Script** (`scripts/backup.sh`):
+**Backup script** (`scripts/backup.sh`):
 ```bash
 #!/bin/bash
 
@@ -711,7 +711,7 @@ echo "✅ Backup created: $BACKUP_FILE"
 find $BACKUP_DIR -name "backup_*.tar.gz" -mtime +30 -delete
 ```
 
-**Cron Job** (täglich um 2 Uhr):
+**Cron job** (daily at 2am):
 ```bash
 crontab -e
 
@@ -719,9 +719,9 @@ crontab -e
 0 2 * * * /opt/woo-ki-agent/scripts/backup.sh
 ```
 
-### 8.2 Disaster Recovery
+### 8.2 Disaster recovery
 
-**Restore Backup**:
+**Restore backup**:
 ```bash
 #!/bin/bash
 
@@ -746,20 +746,20 @@ docker-compose up -d
 echo "✅ Restore complete!"
 ```
 
-**Recovery Steps**:
-1. Stop Container: `docker-compose down`
-2. Restore Backup: `./scripts/restore.sh backup_20251101_020000.tar.gz`
-3. Verify Environment: `./scripts/validate-env.sh`
-4. Start Container: `docker-compose up -d`
-5. Check Health: `curl http://localhost:3000/api/health`
+**Recovery steps**:
+1. Stop container: `docker-compose down`
+2. Restore backup: `./scripts/restore.sh backup_20251101_020000.tar.gz`
+3. Verify environment: `./scripts/validate-env.sh`
+4. Start container: `docker-compose up -d`
+5. Check health: `curl http://localhost:3000/api/health`
 
 ---
 
 ## 9. Troubleshooting
 
-### 9.1 Common Issues
+### 9.1 Common issues
 
-#### **Container startet nicht**
+#### **Container does not start**
 
 **Symptom**: `docker-compose up -d` failed
 
@@ -776,14 +776,14 @@ docker-compose build --no-cache
 docker-compose up -d
 ```
 
-**Häufige Ursachen**:
-- ❌ Missing Environment Variables → Run `./scripts/validate-env.sh`
-- ❌ Port 3000 bereits belegt → `lsof -i :3000` und Process killen
-- ❌ Docker Disk Full → `docker system prune -a`
+**Common causes**:
+- ❌ Missing environment variables → run `./scripts/validate-env.sh`
+- ❌ Port 3000 already in use → `lsof -i :3000` and kill process
+- ❌ Docker disk full → `docker system prune -a`
 
-#### **Circuit Breaker OPEN**
+#### **Circuit breaker OPEN**
 
-**Symptom**: API Calls schlagen fehl mit "Circuit Breaker OPEN"
+**Symptom**: API calls fail with "Circuit Breaker OPEN"
 
 **Debug**:
 ```bash
@@ -795,14 +795,14 @@ curl https://dein-shop.de/wp-json/wc/v3/products
 ```
 
 **Fix**:
-1. Prüfe External API Status (WooCommerce/WordPress erreichbar?)
-2. Checke Credentials in `.env.production`
-3. Warte auf Auto-Recovery (60 Sekunden)
-4. Manuelles Reset: Container restart
+1. Check external API status (WooCommerce/WordPress reachable?)
+2. Verify credentials in `.env.production`
+3. Wait for auto-recovery (60 seconds)
+4. Manual reset: restart container
 
-#### **High Memory Usage**
+#### **High memory usage**
 
-**Symptom**: Container verwendet >3 GB RAM
+**Symptom**: Container uses >3 GB RAM
 
 **Debug**:
 ```bash
@@ -824,9 +824,9 @@ docker-compose build --no-cache
 docker-compose restart
 ```
 
-#### **DLQ voll mit Failed Jobs**
+#### **DLQ full of failed jobs**
 
-**Symptom**: Viele Jobs in Dead Letter Queue
+**Symptom**: Many jobs in the Dead Letter Queue
 
 **Debug**:
 ```bash
@@ -838,21 +838,21 @@ ls -la /opt/woo-ki-agent/data/dlq/
 ```
 
 **Fix**:
-1. Prüfe Job-Errors in DLQ Files
-2. Korrigiere Job-Parameter
-3. Manuelle Retry:
+1. Check job errors in DLQ files
+2. Correct job parameters
+3. Manual retry:
    ```bash
    curl -X POST http://localhost:3000/api/error-handling/dlq/retry
    ```
-4. DLQ bereinigen:
+4. Clean DLQ:
    ```bash
    rm -rf /opt/woo-ki-agent/data/dlq/*
    docker-compose restart
    ```
 
-### 9.2 Log Analysis
+### 9.2 Log analysis
 
-**Error Logs durchsuchen**:
+**Search error logs**:
 ```bash
 # All Errors
 grep "ERROR" /opt/woo-ki-agent/logs/error.log
@@ -867,7 +867,7 @@ grep "Job Failed" /opt/woo-ki-agent/logs/app.log
 grep "API Error" /opt/woo-ki-agent/logs/error.log
 ```
 
-**Docker Logs**:
+**Docker logs**:
 ```bash
 # Real-time
 docker-compose logs -f ki-agent
@@ -881,9 +881,9 @@ docker-compose logs --since 24h ki-agent
 
 ---
 
-## 10. Performance Tuning
+## 10. Performance tuning
 
-### 10.1 Node.js Optimierung
+### 10.1 Node.js optimization
 
 **Heap Size**:
 ```dockerfile
@@ -899,25 +899,25 @@ CMD ["node",
   "dist/server.js"]
 ```
 
-### 10.2 Circuit Breaker Tuning
+### 10.2 Circuit breaker tuning
 
-**Aggressive** (weniger Ausfälle tolerieren):
+**Aggressive** (tolerate fewer failures):
 ```env
-CIRCUIT_BREAKER_THRESHOLD=3         # 3 Fehler bis OPEN
-CIRCUIT_BREAKER_TIMEOUT=30000       # 30s bis HALF_OPEN
-CIRCUIT_BREAKER_SUCCESS_THRESHOLD=3 # 3 Erfolge bis CLOSED
+CIRCUIT_BREAKER_THRESHOLD=3         # 3 failures until OPEN
+CIRCUIT_BREAKER_TIMEOUT=30000       # 30s until HALF_OPEN
+CIRCUIT_BREAKER_SUCCESS_THRESHOLD=3 # 3 successes until CLOSED
 ```
 
-**Conservative** (mehr Ausfälle tolerieren):
+**Conservative** (tolerate more failures):
 ```env
-CIRCUIT_BREAKER_THRESHOLD=10        # 10 Fehler bis OPEN
-CIRCUIT_BREAKER_TIMEOUT=120000      # 2min bis HALF_OPEN
-CIRCUIT_BREAKER_SUCCESS_THRESHOLD=5 # 5 Erfolge bis CLOSED
+CIRCUIT_BREAKER_THRESHOLD=10        # 10 failures until OPEN
+CIRCUIT_BREAKER_TIMEOUT=120000      # 2min until HALF_OPEN
+CIRCUIT_BREAKER_SUCCESS_THRESHOLD=5 # 5 successes until CLOSED
 ```
 
-### 10.3 Connection Pooling
+### 10.3 Connection pooling
 
-**HTTP Keep-Alive Agents** (bereits aktiviert):
+**HTTP keep-alive agents** (already enabled):
 ```typescript
 // In backend/tools/woo.ts & wp.ts
 const KEEP_ALIVE_HTTP = new http.Agent({
@@ -930,11 +930,11 @@ const KEEP_ALIVE_HTTP = new http.Agent({
 
 ---
 
-## 11. Security Hardening
+## 11. Security hardening
 
-### 11.1 Docker Security
+### 11.1 Docker security
 
-**Non-Root User**:
+**Non-root user**:
 ```dockerfile
 # Dockerfile
 FROM node:18-alpine
@@ -949,7 +949,7 @@ USER nodejs
 WORKDIR /app
 ```
 
-**Read-Only Root Filesystem**:
+**Read-only root filesystem**:
 ```yaml
 # docker-compose.yml
 ki-agent:
@@ -961,9 +961,9 @@ ki-agent:
     - /app/logs
 ```
 
-### 11.2 Network Security
+### 11.2 Network security
 
-**Firewall Rules**:
+**Firewall rules**:
 ```bash
 # UFW (Ubuntu Firewall)
 sudo ufw allow 22/tcp        # SSH
@@ -971,7 +971,7 @@ sudo ufw allow 3000/tcp      # Frontend (Optional)
 sudo ufw enable
 ```
 
-**Docker Network Isolation**:
+**Docker network isolation**:
 ```yaml
 # docker-compose.yml
 networks:
@@ -985,9 +985,9 @@ services:
       - agent-network
 ```
 
-### 11.3 Secrets Management
+### 11.3 Secrets management
 
-**Docker Secrets** (Docker Swarm):
+**Docker secrets** (Docker Swarm):
 ```yaml
 secrets:
   openai_key:
@@ -1002,7 +1002,7 @@ services:
       - woo_consumer_key
 ```
 
-**Vault Integration** (HashiCorp Vault):
+**Vault integration** (HashiCorp Vault):
 ```bash
 # Install Vault
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
@@ -1017,9 +1017,9 @@ vault kv put secret/woo-ki-agent \
 
 ---
 
-## 12. Scaling & High Availability
+## 12. Scaling & high availability
 
-### 12.1 Horizontal Scaling
+### 12.1 Horizontal scaling
 
 **Docker Compose Scale**:
 ```bash
@@ -1045,9 +1045,9 @@ server {
 }
 ```
 
-### 12.2 Database Integration (Future)
+### 12.2 Database integration (future)
 
-**PostgreSQL** für Persistent Storage:
+**PostgreSQL** for persistent storage:
 ```yaml
 services:
   postgres:
@@ -1066,93 +1066,93 @@ services:
 
 ---
 
-## 13. Production Checklist
+## 13. Production checklist
 
-### 13.1 Pre-Deployment
+### 13.1 Pre-deployment
 
-- [ ] Server-Spezifikationen erfüllt (3 vCPU, 4 GB RAM, 80 GB Disk)
-- [ ] Docker & Docker Compose installiert
-- [ ] `.env.production` vollständig konfiguriert
-- [ ] Environment Variables validiert (`./scripts/validate-env.sh`)
-- [ ] WooCommerce API erreichbar (Test)
-- [ ] WordPress API erreichbar (Test)
-- [ ] OpenAI API Key gültig (Test)
-- [ ] SMTP Server konfiguriert (Email-Test)
-- [ ] Slack Webhook konfiguriert (Optional)
-- [ ] Backup-Strategie definiert
-- [ ] Firewall Rules konfiguriert
+- [ ] Server specs met (3 vCPU, 4 GB RAM, 80 GB disk)
+- [ ] Docker & Docker Compose installed
+- [ ] `.env.production` fully configured
+- [ ] Environment variables validated (`./scripts/validate-env.sh`)
+- [ ] WooCommerce API reachable (test)
+- [ ] WordPress API reachable (test)
+- [ ] OpenAI API key valid (test)
+- [ ] SMTP server configured (email test)
+- [ ] Slack webhook configured (optional)
+- [ ] Backup strategy defined
+- [ ] Firewall rules configured
 
-### 13.2 Post-Deployment
+### 13.2 Post-deployment
 
-- [ ] Container läuft (`docker-compose ps`)
-- [ ] Health Check erfolgreich (`curl /api/health`)
-- [ ] Error-Handling aktiv (Logs prüfen)
-- [ ] Circuit Breaker CLOSED (API Check)
-- [ ] DLQ leer (`curl /api/error-handling/dlq/stats`)
-- [ ] Email Alerts funktionieren (Test-Email)
-- [ ] Slack Alerts funktionieren (Test-Message)
-- [ ] Watchtower aktiv (Auto-Update Check)
-- [ ] Log Rotation konfiguriert
-- [ ] Backup Cron Job aktiv
-- [ ] Monitoring Dashboard erreichbar (Optional)
+- [ ] Container running (`docker-compose ps`)
+- [ ] Health check successful (`curl /api/health`)
+- [ ] Error handling active (check logs)
+- [ ] Circuit breaker CLOSED (API check)
+- [ ] DLQ empty (`curl /api/error-handling/dlq/stats`)
+- [ ] Email alerts working (test email)
+- [ ] Slack alerts working (test message)
+- [ ] Watchtower active (auto-update check)
+- [ ] Log rotation configured
+- [ ] Backup cron job active
+- [ ] Monitoring dashboard reachable (optional)
 
-### 13.3 Ongoing Maintenance
+### 13.3 Ongoing maintenance
 
 **Daily**:
-- [ ] Check Container Status
-- [ ] Review Error Logs
-- [ ] Check DLQ Stats
+- [ ] Check container status
+- [ ] Review error logs
+- [ ] Check DLQ stats
 
 **Weekly**:
-- [ ] Review Circuit Breaker Stats
-- [ ] Analyze Alert History
-- [ ] Check Disk Space
+- [ ] Review circuit breaker stats
+- [ ] Analyze alert history
+- [ ] Check disk space
 
 **Monthly**:
-- [ ] Update Docker Images
-- [ ] Review Backup Strategy
-- [ ] Security Audit
-- [ ] Performance Review
+- [ ] Update Docker images
+- [ ] Review backup strategy
+- [ ] Security audit
+- [ ] Performance review
 
 ---
 
-## 14. Support & Resources
+## 14. Support & resources
 
 ### 14.1 Documentation
 
 - **Architecture**: `docs/architecture.md`
-- **API Reference**: `docs/api/`
+- **API reference**: `docs/api/`
 - **Workflows**: `docs/workflows/`
-- **Error Handling**: `backend/error-handling/README.md`
+- **Error handling**: `backend/error-handling/README.md`
 
 ### 14.2 Monitoring URLs
 
-- **Health Check**: `http://localhost:3000/api/health`
-- **System Stats**: `http://localhost:3000/api/system/health/system`
-- **Circuit Breakers**: `http://localhost:3000/api/error-handling/circuit-breakers`
-- **DLQ Stats**: `http://localhost:3000/api/error-handling/dlq/stats`
-- **Swagger API Docs**: `http://localhost:3000/docs`
+- **Health check**: `http://localhost:3000/api/health`
+- **System stats**: `http://localhost:3000/api/system/health/system`
+- **Circuit breakers**: `http://localhost:3000/api/error-handling/circuit-breakers`
+- **DLQ stats**: `http://localhost:3000/api/error-handling/dlq/stats`
+- **Swagger API docs**: `http://localhost:3000/docs`
 
 ### 14.3 Contact
 
 **GitHub**: https://github.com/AndreZ1971/ki  
 **Issues**: https://github.com/AndreZ1971/ki/issues  
 **Version**: 1.8.0  
-**Last Update**: November 2025
+**Last update**: November 2025
 
 ---
 
-## Zusammenfassung
+## Summary
 
-Dieses Deployment-Setup bietet:
+This deployment setup provides:
 
-✅ **Production-Ready**: Docker + Watchtower + Health Checks  
-✅ **Resilient**: Circuit Breaker + Retry + DLQ  
-✅ **Monitored**: Multi-Channel Alerting (Email + Slack)  
-✅ **Secure**: Environment Variables + Secrets Management  
-✅ **Scalable**: Horizontal Scaling + Load Balancing  
-✅ **Maintainable**: Automated Backups + Log Rotation  
+✅ **Production-ready**: Docker + Watchtower + health checks  
+✅ **Resilient**: circuit breaker + retry + DLQ  
+✅ **Monitored**: multi-channel alerting (email + Slack)  
+✅ **Secure**: environment variables + secrets management  
+✅ **Scalable**: horizontal scaling + load balancing  
+✅ **Maintainable**: automated backups + log rotation  
 
-**Optimiert für**: 3 vCPU, 4 GB RAM, 80 GB Disk (Dedizierter Agent-Server)
+**Optimized for**: 3 vCPU, 4 GB RAM, 80 GB disk (dedicated agent server)
 
-**Ready for Production Deployment! 🚀**
+**Ready for production deployment! 🚀**

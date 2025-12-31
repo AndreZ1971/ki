@@ -1,10 +1,10 @@
-<!-- Last Updated: 2025-12-16 | Status: aktuell -->
-<!-- Feedback Analysis Route ist aktiv: registriert unter `/api/analytics/feedback` laut `backend/server.ts` -->
-# System-Architektur - WooCommerce AI Agent
+<!-- Last Updated: 2025-12-16 | Status: current -->
+<!-- Feedback Analysis route active: registered at `/api/analytics/feedback` per `backend/server.ts` -->
+# System Architecture - WooCommerce AI Agent
 
-## Übersicht
+## Overview
 
-Das WooCommerce AI Agent System ist eine vollständig integrierte, KI-gestützte Automatisierungsplattform für E-Commerce. Das System besteht aus drei Hauptkomponenten: Backend (AI Agent), Frontend (Admin Dashboard) und externe Integrationen (WooCommerce, WordPress, OpenAI).
+The WooCommerce AI Agent system is a fully integrated, AI-powered automation platform for e-commerce. It comprises three main components: Backend (AI Agent), Frontend (admin dashboard), and external integrations (WooCommerce, WordPress, OpenAI).
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -47,246 +47,246 @@ Das WooCommerce AI Agent System ist eine vollständig integrierte, KI-gestützte
 
 ---
 
-## 1. Backend-Architektur
+## 1. Backend architecture
 
-### 1.1 Core-Komponenten
+### 1.1 Core components
 
 #### **AI Agent System** (`backend/agent/`)
 
 **Planner** (`planner.ts`):
-- **Funktion**: GPT-4-basierte Planning Engine
-- **Aufgaben**:
-  - Analysiert Benutzeranfragen
-  - Erstellt mehrstufige Aktionspläne
-  - Wählt passende Tools aus
-  - Orchestriert Tool-Aufrufe
-- **Modell**: GPT-4 mit Tool-Use Support
-- **Context Window**: 128k Tokens
+- **Function**: GPT-4-based planning engine
+- **Responsibilities**:
+  - Analyzes user requests
+  - Builds multi-step action plans
+  - Picks suitable tools
+  - Orchestrates tool calls
+- **Model**: GPT-4 with tool-use support
+- **Context window**: 128k tokens
 
 **Memory** (`memory.ts`):
-- **Funktion**: Konversations-Kontext Management
+- **Function**: Conversation context management
 - **Features**:
-  - Message History Storage
-  - Context Window Management
-  - Memory Statistics
-  - Persistent Storage Option
-- **Kapazität**: Dynamisch basierend auf Token-Limit
+  - Message history storage
+  - Context window management
+  - Memory statistics
+  - Optional persistent storage
+- **Capacity**: Dynamic based on token limit
 
 **Tools** (`tools.ts`):
-- **Funktion**: Tool-Registry und Wrapper
-- **Tool-Kategorien**:
-  1. **WooCommerce Tools**: Product CRUD, Orders, Analytics
-  2. **WordPress Tools**: Posts, Media, Users
-  3. **OpenAI Tools**: Content Generation, Image Generation
-  4. **Job Tools**: Automated Workflows
-  5. **Google Tools**: Trends Analysis, Search Data
-- **Interface**: Standardisiertes Tool-Interface für AI Agent
+- **Function**: Tool registry and wrappers
+- **Tool categories**:
+  1. **WooCommerce tools**: product CRUD, orders, analytics
+  2. **WordPress tools**: posts, media, users
+  3. **OpenAI tools**: content generation, image generation
+  4. **Job tools**: automated workflows
+  5. **Google tools**: trends analysis, search data
+- **Interface**: standardized tool interface for the AI Agent
 
-#### **Specialization System** (`backend/services/`)
+#### **Specialization system** (`backend/services/`)
 
 **SpecializationPersistenceManager** (`specializationPersistenceManager.ts`):
-- **Funktion**: Persistente Speicherung von KI-Spezialisierungen
+- **Function**: Persistent storage of AI specializations
 - **Features**:
-  - Filesystem-basierte Persistierung (JSON)
-  - SHA-256 Integritätschecks
-  - CRUD-Operationen
-  - Active/Fallback-Verwaltung
-  - Corruption-Recovery
-- **Storage-Struktur**:
-  - `index.json` - Globales Inventar
-  - `active.json` - Aktive Spezialisierungen
-  - `fallback.json` - Fallback-Spezialisierungen
-  - `{userId}/{specId}.json` - Spezialisierungs-Daten
-  - `{userId}/{specId}.meta.json` - Metadata & Checksums
+  - Filesystem-based persistence (JSON)
+  - SHA-256 integrity checks
+  - CRUD operations
+  - Active/fallback management
+  - Corruption recovery
+- **Storage structure**:
+  - `index.json` - global inventory
+  - `active.json` - active specializations
+  - `fallback.json` - fallback specializations
+  - `{userId}/{specId}.json` - specialization data
+  - `{userId}/{specId}.meta.json` - metadata & checksums
 
 **SpecializationAutoLoad** (`specializationAutoLoad.ts`):
-- **Funktion**: Automatisches Laden beim Server-Start
+- **Function**: Automatic load on server start
 - **Features**:
-  - In-Memory Cache für aktive Spezialisierung
-  - State-Management (not-started → loading → loaded/failed)
-  - Fallback-Mechanismen
-  - Reload & Invalidation
-  - Validation für alle Spezialisierungen
-- **Performance**: < 5ms Cache-Hit, ~10-20ms Disk-Load
+  - In-memory cache for active specialization
+  - State management (not-started → loading → loaded/failed)
+  - Fallback mechanisms
+  - Reload & invalidation
+  - Validation for all specializations
+- **Performance**: < 5ms cache hit, ~10–20ms disk load
 
 **TestSpecializationBackupManager** (`security/testSpecializationBackupManager.ts`):
-- **Funktion**: Verschlüsselte Speicherung von Test-Spezialisierungen
-- **Verschlüsselung**: AES-256-GCM
+- **Function**: Encrypted storage of test specializations
+- **Encryption**: AES-256-GCM
 - **Features**:
-  - Unique IV pro Encryption
-  - Authentication Tag für Tamper-Detection
-  - Original-Hash-Preservation
-  - Backup & Restore
-- **Siehe**: [SPECIALIZATION_PERSISTENCE_SYSTEM.md](./SPECIALIZATION_PERSISTENCE_SYSTEM.md)
+  - Unique IV per encryption
+  - Authentication tag for tamper detection
+  - Original hash preservation
+  - Backup & restore
+- **See**: [SPECIALIZATION_PERSISTENCE_SYSTEM.md](./SPECIALIZATION_PERSISTENCE_SYSTEM.md)
 
-#### **Job System** (`backend/agent/jobs/`)
+#### **Job system** (`backend/agent/jobs/`)
 
-**Automatisierte Jobs** (44 verschiedene Job-Typen):
+**Automated jobs** (44 job types):
 
 1. **Product Management**:
-   - `autoProductCreator.ts` - Automatische Produkterstellung
-   - `wooCreateProduct.ts` - Einzelprodukt erstellen
-   - `wooUpdateProduct.ts` - Produkt aktualisieren
-   - `bundles.ts` - Produkt-Bundles erstellen
-   - `createFreebie.ts` - Freebie-Produkte generieren
-   - `kitsTemplates.ts` - Produkt-Kits Template-System
+   - `autoProductCreator.ts` - automatic product creation
+   - `wooCreateProduct.ts` - create single product
+   - `wooUpdateProduct.ts` - update product
+   - `bundles.ts` - create product bundles
+   - `createFreebie.ts` - generate freebie products
+   - `kitsTemplates.ts` - product kits template system
 
 2. **Content Generation**:
-   - `aiContentGenerator.ts` - AI-basierte Content-Generierung
-   - `germanContentGenerator.ts` - Deutsche Inhalte generieren
-   - `aiImageGenerator.ts` - DALL-E Bild-Generierung
+   - `aiContentGenerator.ts` - AI-based content generation
+   - `germanContentGenerator.ts` - generate German content
+   - `aiImageGenerator.ts` - DALL-E image generation
 
 3. **Analytics & Reporting**:
-   - `analyticsReporting.ts` - Analytics-Berichte
-   - `realAnalyticsReporting.ts` - Real-Time Analytics
-   - `realWooCommerceAnalytics.ts` - WooCommerce Echtzeit-Daten
-   - `conversionAnalysis.ts` - Conversion-Analyse
-   - `conversionReport.ts` - Conversion-Berichte
-   - `trendAnalysis.ts` - Trend-Analyse
-   - `googleTrendsService.ts` - Google Trends Integration
+   - `analyticsReporting.ts` - analytics reports
+   - `realAnalyticsReporting.ts` - real-time analytics
+   - `realWooCommerceAnalytics.ts` - WooCommerce real-time data
+   - `conversionAnalysis.ts` - conversion analysis
+   - `conversionReport.ts` - conversion reports
+   - `trendAnalysis.ts` - trend analysis
+   - `googleTrendsService.ts` - Google Trends integration
 
 4. **Marketing Automation**:
-   - `emailMarketingAutomation.ts` - E-Mail-Marketing
-   - `socialMediaAutomation.ts` - Social Media Automation
-   - `socialMediaAutoPoster.ts` - Auto-Posting
-   - `contentMonetizer.ts` - Content-Monetarisierung
-   - `freeToPaidConverter.ts` - Free-to-Paid Conversion
+   - `emailMarketingAutomation.ts` - email marketing
+   - `socialMediaAutomation.ts` - social media automation
+   - `socialMediaAutoPoster.ts` - auto-posting
+   - `contentMonetizer.ts` - content monetization
+   - `freeToPaidConverter.ts` - free-to-paid conversion
 
 5. **Payment & Debugging**:
-   - `paymentDebugger.ts` - Payment Debugging
-   - `paymentFixer.ts` - Payment Problem Fixing
-   - `paymentEmergency.ts` - Notfall-Payment-Fixes
-   - `paymentLiveFixer.ts` - Live Payment Fixes
-   - `paymentQuickCheck.ts` - Schnelle Payment-Checks
-   - `paymentSimpleFix.ts` - Einfache Payment-Fixes
-   - `paymentSuccess.ts` - Payment Success Handling
-   - `paymentSuccessValidator.ts` - Payment Validierung
-   - `paymentTester.ts` - Payment Testing
-   - `paymentVerifier.ts` - Payment Verifizierung
-   - `paymentIssueDetector.ts` - Issue Detection
-   - `paymentFixCompanion.ts` - Fix Companion
+   - `paymentDebugger.ts` - payment debugging
+   - `paymentFixer.ts` - payment issue fixing
+   - `paymentEmergency.ts` - emergency payment fixes
+   - `paymentLiveFixer.ts` - live payment fixes
+   - `paymentQuickCheck.ts` - quick payment checks
+   - `paymentSimpleFix.ts` - simple payment fixes
+   - `paymentSuccess.ts` - payment success handling
+   - `paymentSuccessValidator.ts` - payment validation
+   - `paymentTester.ts` - payment testing
+   - `paymentVerifier.ts` - payment verification
+   - `paymentIssueDetector.ts` - issue detection
+   - `paymentFixCompanion.ts` - fix companion
 
 6. **Shop Health & Audits**:
-   - `shopHealthReport.ts` - Shop Health Reports
-   - `miniAudit.ts` - Mini Shop Audit
-   - `standardAudit.ts` - Standard Shop Audit
-   - `premiumAudit.ts` - Premium Shop Audit
-   - `autoFixImplementer.ts` - Automatische Fehlerkorrektur
+   - `shopHealthReport.ts` - shop health reports
+   - `miniAudit.ts` - mini shop audit
+   - `standardAudit.ts` - standard shop audit
+   - `premiumAudit.ts` - premium shop audit
+   - `autoFixImplementer.ts` - automatic remediation
 
 **Job Scheduler** (`scheduler.ts`):
 - **Engine**: Node-Cron
 - **Features**:
-  - Zeitgesteuerte Job-Ausführung
-  - Wiederkehrende Tasks
-  - Job-Priorisierung
-  - Fehlerbehandlung mit Retry
+  - Time-based job execution
+  - Recurring tasks
+  - Job prioritization
+  - Error handling with retry
 
 ---
 
-### 1.2 Error-Handling System
+### 1.2 Error-handling system
 
-**Vollständiges Resilience-System** (`backend/error-handling/`):
+**Complete resilience system** (`backend/error-handling/`):
 
 #### **Circuit Breaker** (`circuit-breaker.ts`)
 
-**Funktion**: Schutz vor Kaskadenfehlern
+**Function**: Protect against cascading failures
 
 **States**:
 ```
 CLOSED → OPEN → HALF_OPEN → CLOSED
   ↓       ↓         ↓          ↓
-Normal  Block   Test    Recovered
+Normal  Block    Test     Recovered
 ```
 
-**Vorkonfigurierte Circuit Breaker**:
-- `wooCommerceBreaker` - WooCommerce API Protection
-- `wordPressBreaker` - WordPress API Protection
-- `openAIBreaker` - OpenAI API Protection
+**Preconfigured circuit breakers**:
+- `wooCommerceBreaker` - WooCommerce API protection
+- `wordPressBreaker` - WordPress API protection
+- `openAIBreaker` - OpenAI API protection
 
-**Konfiguration**:
+**Configuration**:
 ```typescript
 {
-  failureThreshold: 5,      // Fehler bis OPEN
-  successThreshold: 2,      // Erfolge bis CLOSED
+  failureThreshold: 5,      // Failures until OPEN
+  successThreshold: 2,      // Successes until CLOSED
   timeout: 60000,           // Timeout in ms
   halfOpenRequests: 3       // Requests in HALF_OPEN
 }
 ```
 
-#### **Retry Strategies** (`retry-strategies.ts`)
+#### **Retry strategies** (`retry-strategies.ts`)
 
-**Funktion**: Automatisches Retry mit Exponential Backoff
+**Function**: Automatic retry with exponential backoff
 
-**Strategien**:
-1. **standardRetry** - Standard (3 Versuche, 1s initial)
-2. **aggressiveRetry** - Aggressiv (5 Versuche, 500ms initial)
-3. **conservativeRetry** - Konservativ (3 Versuche, 2s initial)
-4. **openAIRetry** - OpenAI-optimiert (4 Versuche, 2s initial)
+**Strategies**:
+1. **standardRetry** - standard (3 attempts, 1s initial)
+2. **aggressiveRetry** - aggressive (5 attempts, 500ms initial)
+3. **conservativeRetry** - conservative (3 attempts, 2s initial)
+4. **openAIRetry** - OpenAI-optimized (4 attempts, 2s initial)
 
-**Exponential Backoff**:
+**Exponential backoff**:
 ```
 delay = initialDelay × factor^(attempt-1) × jitter
 jitter = random(0.5, 1.0)
 ```
 
-**Retryable Errors**:
-- Network Errors (ECONNRESET, ETIMEDOUT, ENOTFOUND)
-- HTTP 429 (Rate Limit)
-- HTTP 503, 504 (Service Unavailable)
+**Retryable errors**:
+- Network errors (ECONNRESET, ETIMEDOUT, ENOTFOUND)
+- HTTP 429 (rate limit)
+- HTTP 503, 504 (service unavailable)
 
 #### **Dead Letter Queue** (`dead-letter-queue.ts`)
 
-**Funktion**: Persistierung fehlgeschlagener Jobs
+**Function**: Persist failed jobs
 
 **Features**:
-- Disk-basierte Speicherung (`data/dlq/`)
-- Automatisches Retry-Scheduling
-- Max 3 Retry-Versuche
-- 5-Minuten Retry-Delays
-- Statistics & Monitoring
+- Disk-based storage (`data/dlq/`)
+- Automatic retry scheduling
+- Max 3 retry attempts
+- 5-minute retry delays
+- Statistics & monitoring
 
-**DLQ Workflow**:
+**DLQ workflow**:
 ```
 Job Failed → DLQ Storage → Wait 5min → Retry → Success/DLQ
 ```
 
-#### **Alerting System** (`alerting.ts`)
+#### **Alerting system** (`alerting.ts`)
 
-**Funktion**: Multi-Channel Alerting
+**Function**: Multi-channel alerting
 
-**Severity Levels**:
-- `INFO` - Informative Meldungen
-- `WARNING` - Warnungen
-- `ERROR` - Fehler
-- `CRITICAL` - Kritische Fehler
+**Severity levels**:
+- `INFO` - informational
+- `WARNING` - warnings
+- `ERROR` - errors
+- `CRITICAL` - critical errors
 
-**Alerting Channels**:
-1. **Console** - Immer aktiv
+**Alerting channels**:
+1. **Console** - always on
 2. **Email** - Nodemailer (SMTP)
-3. **Slack** - Webhook Integration
-4. **Webhooks** - Custom Endpoints
+3. **Slack** - webhook integration
+4. **Webhooks** - custom endpoints
 
 **Features**:
-- Rate Limiting (max 10 Alerts/Minute)
-- Alert Aggregation (dedupe in 1-Minute Window)
-- HTML Email Templates
-- Slack Formatted Messages
+- Rate limiting (max 10 alerts/minute)
+- Alert aggregation (dedupe in 1-minute window)
+- HTML email templates
+- Slack formatted messages
 
 ---
 
-### 1.3 API-Integrationen
+### 1.3 API integrations
 
-#### **WooCommerce Client** (`backend/woocommerce/client.ts`)
+#### **WooCommerce client** (`backend/woocommerce/client.ts`)
 
 **Features**:
-- OAuth 1.0a Authentication
-- Full CRUD Support (GET, POST, PUT, DELETE)
-- Circuit Breaker Protection
-- Automatic Retry
-- Error Alerting
-- Connection Pooling (Keep-Alive)
+- OAuth 1.0a authentication
+- Full CRUD support (GET, POST, PUT, DELETE)
+- Circuit breaker protection
+- Automatic retry
+- Error alerting
+- Connection pooling (keep-alive)
 
-**Geschützte Methoden**:
+**Exposed methods**:
 ```typescript
 get(endpoint: string): Promise<T>
 post(endpoint: string, data: any): Promise<T>
@@ -296,29 +296,29 @@ getCircuitState(): CircuitState
 getCircuitStats(): CircuitBreakerStats
 ```
 
-#### **WordPress Tools** (`backend/tools/wp.ts`)
+#### **WordPress tools** (`backend/tools/wp.ts`)
 
 **Tools**:
-- `wpGet` - GET Requests (Circuit Breaker + Retry)
-- `wpPost` - POST/PUT/PATCH/DELETE Requests (Circuit Breaker + Retry)
-- `wpMediaUpload` - Media Upload (5 Min Timeout, Circuit Breaker)
+- `wpGet` - GET requests (circuit breaker + retry)
+- `wpPost` - POST/PUT/PATCH/DELETE requests (circuit breaker + retry)
+- `wpMediaUpload` - media upload (5 min timeout, circuit breaker)
 
-**Authentication**: Basic Auth (Username + App Password)
-
-**Features**:
-- HTTP/HTTPS Keep-Alive Connections
-- Automatic Error Alerting
-- Tool Interface Kompatibilität
-
-#### **OpenAI Wrapper** (`backend/utils/openai.ts`)
+**Authentication**: Basic Auth (username + app password)
 
 **Features**:
-- OpenAI SDK Client
-- Circuit Breaker Protection (`openAIBreaker`)
-- OpenAI-optimierte Retry Strategy (`openAIRetry`)
-- 120s Timeout für GPT-4/DALL-E
-- Rate Limit Handling (429 Errors)
-- Error Alerting
+- HTTP/HTTPS keep-alive connections
+- Automatic error alerting
+- Tool interface compatibility
+
+#### **OpenAI wrapper** (`backend/utils/openai.ts`)
+
+**Features**:
+- OpenAI SDK client
+- Circuit breaker protection (`openAIBreaker`)
+- OpenAI-optimized retry strategy (`openAIRetry`)
+- 120s timeout for GPT-4/DALL-E
+- Rate limit handling (429 errors)
+- Error alerting
 
 **Wrapper**:
 ```typescript
@@ -331,9 +331,9 @@ executeOpenAI<T>(
 
 ---
 
-### 1.4 API-Routen
+### 1.4 API routes
 
-**Struktur** (`backend/routes/app/api/`):
+**Structure** (`backend/routes/app/api/`):
 
 ```
 /app/api/
@@ -372,32 +372,32 @@ executeOpenAI<T>(
     └── customers.ts              # WooCommerce Kunden
 ```
 
-#### **Analytics API-Endpoints**
+#### **Analytics API endpoints**
 
 **Conversion Analytics** (`/api/analytics/conversion`):
-- `GET /analysis` - Conversion-Raten und Funnel-Daten abrufen
-- `POST /analyze` - Detaillierte Conversion-Analyse durchführen
-- `GET /funnel` - Conversion-Funnel-Visualisierung mit Stufen-Daten
+- `GET /analysis` - fetch conversion rates and funnel data
+- `POST /analyze` - perform detailed conversion analysis
+- `GET /funnel` - conversion funnel visualization with stage data
 
-**Regionale Analytics** (`/api/analytics/regioning`):
-- `GET /data?region={region}` - Regionale Performance-Daten nach Region
-- `POST /ml-analysis` - ML-basierte Insights für spezifische Region
-- `GET /comparison` - Multi-Region-Vergleich mit Benchmarks
+**Regional Analytics** (`/api/analytics/regioning`):
+- `GET /data?region={region}` - regional performance data by region
+- `POST /ml-analysis` - ML-based insights for a specific region
+- `GET /comparison` - multi-region comparison with benchmarks
 
-**ML/KI Insights** (`/api/analytics/ml`):
-- `GET /report` - ML-generierte Analytics-Reports abrufen
-- `POST /generate` - KI-basierte Analyse für Custom-Daten generieren
-- `POST /report-insights` - Detaillierte Insights aus Report-Daten extrahieren
+**ML/AI Insights** (`/api/analytics/ml`):
+- `GET /report` - fetch ML-generated analytics reports
+- `POST /generate` - generate AI-based analysis for custom data
+- `POST /report-insights` - extract detailed insights from report data
 
-**Trend-Analyse** (`/api/analytics/trends`):
-- `GET /analyze/:keyword` - Trend-Score und Daten für einzelnes Keyword
-- `POST /analyze` - Batch-Trend-Analyse für mehrere Keywords
-- `GET /products` - Trending Produkte mit Trend-Scores identifizieren
-- `POST /report` - Umfassender Trend-Report mit Empfehlungen
+**Trend Analysis** (`/api/analytics/trends`):
+- `GET /analyze/:keyword` - trend score and data for a single keyword
+- `POST /analyze` - batch trend analysis for multiple keywords
+- `GET /products` - identify trending products with trend scores
+- `POST /report` - comprehensive trend report with recommendations
 
-**Echtzeit-Analytics** (`/api/analytics/real-time`):
-- `GET /dashboard` - Real-Time Dashboard-Daten (Übersicht)
-- `GET /sales` - Aktuelle Verkäufe (letzte 24 Stunden)
+**Real-time Analytics** (`/api/analytics/real-time`):
+- `GET /dashboard` - real-time dashboard overview
+- `GET /sales` - current sales (last 24 hours)
 - `GET /visitors` - Aktuelle Besucher und Session-Daten
 - `GET /performance` - Performance-Metriken (Ladezeiten, Fehlerrate)
 - `GET /products` - Top-Produkte in Echtzeit mit Verkaufszahlen
@@ -409,9 +409,9 @@ executeOpenAI<T>(
 
 ---
 
-## 2. Frontend-Architektur
+## 2. Frontend architecture
 
-### 2.1 Technologie-Stack
+### 2.1 Technology stack
 
 - **Framework**: React 18
 - **Build Tool**: Vite
@@ -419,43 +419,43 @@ executeOpenAI<T>(
 - **Routing**: React Router v6
 - **State Management**: React Hooks (useState, useEffect)
 - **HTTP Client**: Fetch API
-- **TypeScript**: Strict Mode
+- **TypeScript**: Strict mode
 
-### 2.2 Komponenten-Struktur
+### 2.2 Component structure
 
 **Pages** (`frontend/src/pages/`):
 
 1. **Analytics & Metrics**:
-   - `AnalyseMetrics/ConversionAnalysis.tsx`
-   - `AnalyseMetrics/ConversionReported.tsx`
-   - `AnalyseMetrics/RealAnalytics.tsx`
-   - `AnalyseMetrics/RealWebAnalytics.tsx`
-   - `AnalyseMetrics/TrendAnalysis.tsx`
+  - `AnalyseMetrics/ConversionAnalysis.tsx`
+  - `AnalyseMetrics/ConversionReported.tsx`
+  - `AnalyseMetrics/RealAnalytics.tsx`
+  - `AnalyseMetrics/RealWebAnalytics.tsx`
+  - `AnalyseMetrics/TrendAnalysis.tsx`
 
 2. **Product Management**:
-   - `ProductManagement/CategoriesManager.tsx`
-   - `ProductManagement/product-generator.tsx`
-   - `ProductManagement/bundles-manager.tsx`
-   - `ProductManagement/freebies-manager.tsx`
+  - `ProductManagement/CategoriesManager.tsx`
+  - `ProductManagement/product-generator.tsx`
+  - `ProductManagement/bundles-manager.tsx`
+  - `ProductManagement/freebies-manager.tsx`
 
 3. **Marketing & Content**:
-   - `MarketingContent/ai-email-generator.tsx`
-   - `MarketingContent/social-media-automation.tsx`
+  - `MarketingContent/ai-email-generator.tsx`
+  - `MarketingContent/social-media-automation.tsx`
 
 4. **System & Health**:
-   - `SystemHealth/system-monitor.tsx`
-   - `SystemHealth/shop-health-report.tsx`
+  - `SystemHealth/system-monitor.tsx`
+  - `SystemHealth/shop-health-report.tsx`
 
 **Components** (`frontend/src/components/`):
-- Wiederverwendbare UI-Komponenten
-- Shadcn/ui Integration
-- Responsive Design
+- Reusable UI components
+- Shadcn/ui integration
+- Responsive design
 
 ---
 
-## 3. Datenfluss
+## 3. Data flow
 
-### 3.1 Standard Request Flow
+### 3.1 Standard request flow
 
 ```
 User → Frontend → Backend API → Error Handling → External API → Response
@@ -465,7 +465,7 @@ Component           Route      + Retry Strategy    WordPress     /Error
                                 + Alerting         OpenAI
 ```
 
-### 3.2 Agent Request Flow
+### 3.2 Agent request flow
 
 ```
 User → Frontend → Backend API → AI Agent Planner
@@ -492,7 +492,7 @@ Request          /api/agent       GPT-4 Analysis
                                   Frontend Display
 ```
 
-### 3.3 Job Execution Flow
+### 3.3 Job execution flow
 
 ```
 Scheduler (Cron) → Job Trigger → executeWithFullProtection()
@@ -508,71 +508,71 @@ Scheduler (Cron) → Job Trigger → executeWithFullProtection()
 
 ---
 
-## 4. Technologie-Stack
+## 4. Technology stack
 
 ### 4.1 Backend
 
-| Kategorie           | Technologie | Version | Verwendung                    |
-| ------------------- | ----------- | ------- | ----------------------------- |
-| **Runtime**         | Node.js     | 18+     | Server Runtime                |
-| **Framework**       | Fastify     | 5.2.1   | REST API Server               |
-| **Language**        | TypeScript  | 5.8.3   | Type-Safe Development         |
-| **AI**              | OpenAI SDK  | Latest  | GPT-4, DALL-E, Embeddings     |
-| **HTTP Client**     | Axios       | 1.7.9   | External API Calls            |
-| **Scheduler**       | Node-Cron   | 3.0.3   | Job Scheduling                |
-| **Testing**         | Vitest      | 2.1.8   | Unit & Integration Tests      |
-| **Linting**         | ESLint      | 9.18.0  | Code Quality                  |
-| **Process Manager** | PM2         | 5.4.3   | Production Process Management |
+| Category           | Technology | Version | Usage                       |
+| ------------------ | ---------- | ------- | --------------------------- |
+| **Runtime**        | Node.js    | 18+     | Server runtime              |
+| **Framework**      | Fastify    | 5.2.1   | REST API server             |
+| **Language**       | TypeScript | 5.8.3   | Type-safe development       |
+| **AI**             | OpenAI SDK | Latest  | GPT-4, DALL-E, embeddings   |
+| **HTTP Client**    | Axios      | 1.7.9   | External API calls          |
+| **Scheduler**      | Node-Cron  | 3.0.3   | Job scheduling              |
+| **Testing**        | Vitest     | 2.1.8   | Unit & integration tests    |
+| **Linting**        | ESLint     | 9.18.0  | Code quality                |
+| **Process Manager**| PM2        | 5.4.3   | Production process manager  |
 
 ### 4.2 Frontend
 
-| Kategorie      | Technologie  | Version | Verwendung          |
-| -------------- | ------------ | ------- | ------------------- |
-| **Framework**  | React        | 18.3.1  | UI Framework        |
-| **Build Tool** | Vite         | 6.0.5   | Fast Build Tool     |
-| **UI Library** | Shadcn/ui    | Latest  | Component Library   |
-| **CSS**        | Tailwind CSS | 3.4.17  | Utility-First CSS   |
-| **Routing**    | React Router | 7.1.1   | Client-Side Routing |
-| **Icons**      | Lucide React | 0.468.0 | Icon Library        |
+| Category     | Technology  | Version | Usage                |
+| -------------| ----------- | ------- | -------------------- |
+| **Framework**| React       | 18.3.1  | UI framework         |
+| **Build Tool**| Vite       | 6.0.5   | Fast build tool      |
+| **UI Library**| Shadcn/ui  | Latest  | Component library    |
+| **CSS**      | Tailwind CSS| 3.4.17  | Utility-first CSS    |
+| **Routing**  | React Router| 7.1.1   | Client-side routing  |
+| **Icons**    | Lucide React| 0.468.0 | Icon library         |
 
 ### 4.3 DevOps
 
-| Kategorie           | Technologie    | Verwendung                  |
-| ------------------- | -------------- | --------------------------- |
-| **Container**       | Docker         | Containerization            |
-| **Orchestration**   | Docker Compose | Multi-Container Management  |
-| **Auto-Update**     | Watchtower     | Automatic Container Updates |
-| **Git Hooks**       | Husky          | Pre-Commit Hooks            |
-| **Code Formatting** | Prettier       | Code Formatting             |
+| Category           | Technology    | Usage                      |
+| ------------------ | --------------| -------------------------- |
+| **Container**      | Docker         | Containerization           |
+| **Orchestration**  | Docker Compose | Multi-container management |
+| **Auto-Update**    | Watchtower     | Automatic container updates|
+| **Git Hooks**      | Husky          | Pre-commit hooks           |
+| **Code Formatting**| Prettier       | Code formatting            |
 
 ---
 
-## 5. Sicherheit
+## 5. Security
 
-### 5.1 API-Sicherheit
+### 5.1 API security
 
 **Authentication**:
 - WooCommerce: OAuth 1.0a
-- WordPress: Basic Auth (Username + App Password)
-- OpenAI: API Key
+- WordPress: Basic Auth (username + app password)
+- OpenAI: API key
 
-**Weitere Sicherheitsmaßnahmen**:
-- CORS Configuration
-- Helmet.js (Security Headers)
-- Rate Limiting (Fastify Rate Limit)
-- Input Validation
-- Secrets in Environment Variables
+**Additional measures**:
+- CORS configuration
+- Helmet.js (security headers)
+- Rate limiting (Fastify Rate Limit)
+- Input validation
+- Secrets in environment variables
 
-### 5.2 Error Handling Security
+### 5.2 Error handling security
 
-**Keine sensiblen Daten in Logs**:
-- API Keys werden gefiltert
-- Passwörter nicht geloggt
-- Error Messages sanitized
+**No sensitive data in logs**:
+- API keys are filtered
+- Passwords not logged
+- Error messages sanitized
 
-### 5.3 Environment Variables
+### 5.3 Environment variables
 
-**Production Secrets**:
+**Production secrets**:
 ```env
 OPENAI_API_KEY=sk-...
 WOOCOMMERCE_CONSUMER_KEY=ck_...
@@ -584,9 +584,9 @@ SLACK_WEBHOOK_URL=...
 
 ---
 
-## 6. Monitoring & Observability
+## 6. Monitoring & observability
 
-### 6.1 Error-Handling Monitoring
+### 6.1 Error-handling monitoring
 
 **Circuit Breaker Stats**:
 ```typescript
@@ -608,7 +608,7 @@ SLACK_WEBHOOK_URL=...
 }
 ```
 
-### 6.2 Alerting Channels
+### 6.2 Alerting channels
 
 **Email Alerts** (Production):
 - SMTP via Nodemailer
@@ -627,7 +627,7 @@ SLACK_WEBHOOK_URL=...
 - Severity-based Formatting
 - Timestamps
 
-### 6.3 Health Checks
+### 6.3 Health checks
 
 **Docker Health Check**:
 ```bash
@@ -646,9 +646,9 @@ GET /api/system/health/system
 
 ---
 
-## 7. Skalierung & Performance
+## 7. Scaling & performance
 
-### 7.1 Ressourcen-Optimierung
+### 7.1 Resource optimization
 
 **Node.js Memory**:
 - `--max-old-space-size=2048` (2GB Heap)
@@ -665,7 +665,7 @@ GET /api/system/health/system
 - Fail-Fast bei Service-Ausfällen
 - Automatic Recovery
 
-### 7.2 Horizontal Scaling
+### 7.2 Horizontal scaling
 
 **Docker Compose Scaling**:
 ```bash
@@ -677,7 +677,7 @@ docker-compose up --scale ki-agent=3
 - Round-Robin Load Balancing
 - Health Check Integration
 
-### 7.3 Caching-Strategien
+### 7.3 Caching strategies
 
 **WooCommerce Data Caching**:
 - Product Data Cache
@@ -691,9 +691,9 @@ docker-compose up --scale ki-agent=3
 
 ---
 
-## 8. Development Workflow
+## 8. Development workflow
 
-### 8.1 Development Setup
+### 8.1 Development setup
 
 ```bash
 # Installation
@@ -719,7 +719,7 @@ npm run lint:fix
 npm run build
 ```
 
-### 8.2 Git Workflow
+### 8.2 Git workflow
 
 **Branch Strategy**:
 - `master` - Production-ready Code
@@ -753,7 +753,7 @@ npm run test:coverage
 
 ## 9. Deployment
 
-### 9.1 Docker Deployment
+### 9.1 Docker deployment
 
 **Build**:
 ```bash
@@ -770,61 +770,61 @@ docker-compose up -d
 docker-compose logs -f ki-agent
 ```
 
-### 9.2 Production Checklist
+### 9.2 Production checklist
 
-✅ Environment Variables konfiguriert  
-✅ Error-Handling aktiviert (setupErrorHandling())  
-✅ Alerting konfiguriert (Email/Slack)  
-✅ Health Checks funktionieren  
-✅ Docker Compose läuft  
-✅ Watchtower für Auto-Updates  
-✅ Logs-Rotation konfiguriert  
-✅ Backup-Strategie für DLQ  
-
----
-
-## 10. Roadmap & Future Enhancements
-
-### 10.1 Geplante Features
-
-- [ ] **Kubernetes Deployment** - K8s Manifests & Helm Charts
-- [ ] **Prometheus Metrics** - Metrics Export für Monitoring
-- [ ] **GraphQL API** - Alternative zu REST
-- [ ] **WebSocket Support** - Real-Time Updates
-- [ ] **Multi-Tenancy** - Multiple WooCommerce Shops
-- [ ] **AI Agent Workflows** - Visual Workflow Editor
-- [ ] **Advanced Analytics** - Predictive Analytics mit ML
-
-### 10.2 Performance Optimierungen
-
-- [ ] **Redis Caching** - Distributed Cache
-- [ ] **Database Integration** - PostgreSQL für Persistent Storage
-- [ ] **Queue System** - Bull/BullMQ für Job Queue
-- [ ] **CDN Integration** - CloudFlare/CloudFront
-- [ ] **API Gateway** - Kong/Tyk für Rate Limiting & Analytics
+✅ Environment variables configured  
+✅ Error handling activated (setupErrorHandling())  
+✅ Alerting configured (email/Slack)  
+✅ Health checks working  
+✅ Docker Compose running  
+✅ Watchtower for auto-updates  
+✅ Log rotation configured  
+✅ Backup strategy for DLQ  
 
 ---
 
-## 11. Support & Maintenance
+## 10. Roadmap & future enhancements
+
+### 10.1 Planned features
+
+- [ ] **Kubernetes deployment** - K8s manifests & Helm charts
+- [ ] **Prometheus metrics** - metrics export for monitoring
+- [ ] **GraphQL API** - alternative to REST
+- [ ] **WebSocket support** - real-time updates
+- [ ] **Multi-tenancy** - multiple WooCommerce shops
+- [ ] **AI Agent workflows** - visual workflow editor
+- [ ] **Advanced analytics** - predictive analytics with ML
+
+### 10.2 Performance optimizations
+
+- [ ] **Redis caching** - distributed cache
+- [ ] **Database integration** - PostgreSQL for persistent storage
+- [ ] **Queue system** - Bull/BullMQ for job queue
+- [ ] **CDN integration** - CloudFlare/CloudFront
+- [ ] **API gateway** - Kong/Tyk for rate limiting & analytics
+
+---
+
+## 11. Support & maintenance
 
 ### 11.1 Troubleshooting
 
 **Circuit Breaker OPEN**:
-- Prüfe External API Status
-- Checke Network Connectivity
-- Review Error Logs
-- Manuelles Reset möglich
+- Check external API status
+- Check network connectivity
+- Review error logs
+- Manual reset possible
 
-**DLQ voll**:
-- Prüfe Failed Jobs
-- Manuelle Retry möglich
-- Job-Parameter korrigieren
-- DLQ bereinigen
+**DLQ full**:
+- Check failed jobs
+- Manual retry possible
+- Fix job parameters
+- Clean DLQ
 
-**High Memory Usage**:
-- Node.js Heap Size erhöhen
-- Memory Leaks prüfen
-- Garbage Collection forcieren
+**High memory usage**:
+- Increase Node.js heap size
+- Check for memory leaks
+- Force garbage collection
 
 ### 11.2 Logs
 
@@ -841,17 +841,17 @@ docker-compose logs -f ki-agent
 
 ---
 
-## Zusammenfassung
+## Summary
 
-Das WooCommerce AI Agent System ist eine **production-ready**, **resilient** und **skalierbare** Automatisierungsplattform mit:
+The WooCommerce AI Agent system is a **production-ready**, **resilient**, and **scalable** automation platform with:
 
-✅ **Vollständiges Error-Handling** (Circuit Breaker, Retry, DLQ, Alerting)  
-✅ **44 automatisierte Jobs** für E-Commerce-Automatisierung  
-✅ **GPT-4 AI Agent** für intelligente Planung & Execution  
-✅ **Multi-Channel Integrationen** (WooCommerce, WordPress, OpenAI)  
-✅ **Production-hardened** mit Monitoring & Alerting  
-✅ **Docker-ready** mit Auto-Update Support  
+✅ **Comprehensive error handling** (circuit breaker, retry, DLQ, alerting)  
+✅ **44 automated jobs** for e-commerce automation  
+✅ **GPT-4 AI Agent** for intelligent planning & execution  
+✅ **Multi-channel integrations** (WooCommerce, WordPress, OpenAI)  
+✅ **Production-hardened** with monitoring & alerting  
+✅ **Docker-ready** with auto-update support  
 
 **Version**: 1.8.0  
-**Stand**: November 2025  
-**Autor**: AndreZ1971
+**As of**: November 2025  
+**Author**: AndreZ1971

@@ -1,37 +1,37 @@
-# Initialisierung und Handling der connection.json im Container
+# Initialization and handling of connection.json in the container
 
-## Ziel
+## Goal
 
-Beim Ausliefern des KI-Agenten als Container (z. B. für Kubernetes/IaaS) soll die Konfigurationsdatei `connection.json` im Backend-Verzeichnis liegen und vom Nutzer über die Settings-UI befüllt werden können.
+When shipping the AI Agent as a container (e.g., for Kubernetes/IaaS), the configuration file `connection.json` should sit in the backend directory and be fillable by the user via the settings UI.
 
-## Konzept
+## Concept
 
-- **Erstauslieferung:**
-  - Beim ersten Start des Containers wird eine leere oder mit Platzhaltern gefüllte `connection.json` im Backend-Verzeichnis angelegt.
-  - Die Datei ist für den Container-Prozess schreibbar.
-  - Der Entrypoint erstellt die Datei mit sicheren Platzhaltern automatisch (Idempotent).
-- **Kundeneinrichtung:**
-  - Der Kunde öffnet die Settings-UI, trägt die Zugangsdaten (OpenAI, WooCommerce, E-Mail etc.) ein und speichert.
-  - Die Daten werden in die `connection.json` geschrieben.
-  - Das System ist danach sofort einsatzbereit und mit dem Shop verbunden.
-  - Die API maskiert geheime Felder bei `GET` (z. B. `****`) und entmaskiert bei `POST`, d. h. unveränderte Secrets bleiben erhalten.
-  - Die Settings-UI sendet ein verschachteltes Payload (z. B. `wordpress`, `woocommerce`, `openAI` …); das Backend mappt dies auf die flache Struktur in `connection.json`.
-- **Rechte:**
-  - Die Datei muss für den Container-Prozess (z. B. Node.js) schreibbar sein.
-  - Idealerweise wird sie beim ersten Speichern vom Backend-Prozess selbst angelegt, damit die Rechte passen.
-- **Erste Schritte für den Kunden:**
-  - Nach dem Start: Settings-UI öffnen, Felder ausfüllen, speichern.
-  - Anleitung dokumentiert, welche Daten benötigt werden und wie vorzugehen ist.
+- **Initial delivery:**
+  - On first container start, create an empty or placeholder-filled `connection.json` in the backend directory.
+  - The file is writable by the container process.
+  - The entrypoint automatically creates the file with safe placeholders (idempotent).
+- **Customer setup:**
+  - The customer opens the settings UI, enters credentials (OpenAI, WooCommerce, email, etc.), and saves.
+  - The data is written into `connection.json`.
+  - The system is immediately ready and connected to the shop.
+  - The API masks secret fields on `GET` (e.g., `****`) and unmasks on `POST`, meaning unchanged secrets remain intact.
+  - The settings UI sends a nested payload (e.g., `wordpress`, `woocommerce`, `openAI` …); the backend maps this to the flat structure in `connection.json`.
+- **Permissions:**
+  - The file must be writable by the container process (e.g., Node.js).
+  - Ideally it is created by the backend process on first save so permissions are correct.
+- **First steps for the customer:**
+  - After start: open the settings UI, fill fields, save.
+  - A short guide documents which data is needed and how to proceed.
 
-## Umsetzungsmöglichkeiten
+## Implementation options
 
-- **Dockerfile/Entrypoint:**
-  - Leere oder Platzhalter-`connection.json` beim Build oder Start anlegen.
-  - Beispiel (Dockerfile):
+- **Dockerfile/entrypoint:**
+  - Create an empty or placeholder `connection.json` during build or start.
+  - Example (Dockerfile):
     ```dockerfile
     RUN echo '{ "openai": { "apiKey": "" }, "woocommerce": { "url": "", "consumerKey": "", "consumerSecret": "" }, "email": { "host": "", "port": 465, "secure": true, "user": "", "pass": "" } }' > /app/connection.json
     ```
-  - Beispiel (entrypoint.sh):
+  - Example (entrypoint.sh):
     ```sh
     [ -f /app/connection.json ] || cat > /app/connection.json <<EOF
     { ... }
@@ -39,26 +39,26 @@ Beim Ausliefern des KI-Agenten als Container (z. B. für Kubernetes/IaaS) soll d
     ```
 
 - **Kubernetes/IaaS:**
-  - Init-Container oder Volume-Mounts können genutzt werden, um die Datei bereitzustellen.
+  - Init containers or volume mounts can be used to provide the file.
 
-## Vorteile
-- Keine Secrets im Image/Quellcode
-- Nutzer kann Setup selbst durchführen
-- Sicheres, Cloud-taugliches Onboarding
+## Benefits
+- No secrets baked into the image/source
+- User can perform setup independently
+- Secure, cloud-ready onboarding
 
 ---
 
 **ToDo:**
-- Bei Auslieferung Container-Init für `connection.json` implementieren
-- Anleitung für "Erste Schritte" ergänzen
-- Rechte und Pfad im Backend-Code dokumentieren
+- Implement container init for `connection.json` during delivery
+- Add quick-start instructions
+- Document permissions and path in backend code
 
 ---
 
-## Validierungsregeln (Server)
+## Validation rules (server)
 
-- Gruppen (WordPress, WooCommerce, OpenAI) sind optional. Sobald innerhalb einer Gruppe Felder befüllt werden, müssen die Pflichtfelder dieser Gruppe gültig sein.
-- `jobMode`: "once" oder "interval".
-  - "once": `jobIntervalMs` wird ignoriert.
-  - "interval": `jobIntervalMs` muss im Bereich 10 000–86 400 000 ms (10 s–24 h) liegen.
-- Fehlerantworten enthalten Feld- und Regelhinweise zur schnellen Korrektur.
+- Groups (WordPress, WooCommerce, OpenAI) are optional. Once any field in a group is filled, the required fields of that group must be valid.
+- `jobMode`: "once" or "interval".
+  - "once": `jobIntervalMs` is ignored.
+  - "interval": `jobIntervalMs` must be within 10,000–86,400,000 ms (10 s–24 h).
+- Error responses include field and rule hints for quick correction.

@@ -1,83 +1,83 @@
 ---
 
-# ✨ Was ist Neu in Version 3.2.0?
+# ✨ What's New in Version 3.2.0?
 
-## 🎯 Content Monetization – Digitale Produkte mit KI
+## 🎯 Content Monetization – Digital Products with AI
 
-### Neue Features für Digital Product Revenue:
+### New Features for Digital Product Revenue:
 
-#### 🤖 **KI-Preisvorschlag**
-- Intelligente Preisempfehlungen basierend auf Produkttyp & Strategie
-- Automatische Berechnung des optimalen Preisbereichs
-- Ein-Klick-Übernahme der Preisempfehlung
+#### 🤖 **AI Price Suggestion**
+- Intelligent price recommendations based on product type & strategy
+- Automatic calculation of optimal price range
+- One-click adoption of price suggestion
 
-#### ⚡ **KI-Produkttext Generator**
-- Automatische Generierung von Marketing-Texten
-- Erzeugt Überschrift, Body und Call-to-Action
-- Nutzt OpenAI GPT-4o-mini für hochwertige Inhalte
+#### ⚡ **AI Product Text Generator**
+- Automatic generation of marketing texts
+- Creates headline, body and call-to-action
+- Uses OpenAI GPT-4o-mini for high-quality content
 
 #### 📊 **Revenue Forecast Badges**
-- Live-Prognose für Wochengewinne und Monatsumsätze
-- Basiert auf durchschnittlichen Tagesumsätzen der letzten 7 Tage
-- Automatische Aktualisierung
+- Live forecast for weekly profits and monthly revenue
+- Based on average daily revenue of the last 7 days
+- Automatic updates
 
-**Wo finde ich diese Features?**
-- Gehe zu **Marketing & Content** → **Content Monetized**
-- Alle Features sind direkt im Interface integriert
-- Vollständige Anleitung siehe: [Content Monetization Guide](./CONTENT_MONETIZATION_GUIDE.md)
-
----
-
-### Auto Product Creator: KI-Bildgenerierung & Bild-SEO
-
-#### Was kann ich mit der KI-Bildgenerierung machen?
-
-- Automatisch hochwertige Produktbilder per KI (DALL·E, OpenAI) generieren
-- Bilder werden direkt beim Produkt-Setup erzeugt und zugewiesen
-- Automatische SEO-Optimierung (Alt-Text, Dateiname, Tags) für jedes Bild
-
-#### Wie nutze ich die KI-Bildgenerierung?
-
-1. **Auto Product Creator starten** – Wie gewohnt Produkte automatisch generieren lassen
-2. **KI-Bild wird erzeugt** – Für jedes neue Produkt wird ein passendes Bild per KI generiert
-3. **Bild-SEO erfolgt automatisch** – Alt-Text und Dateiname werden per KI-Analyse optimiert
-4. **Produkt ist sofort mit Bild & SEO online** – Kein manuelles Hochladen oder Bearbeiten nötig
-
-**Hinweis:**
-
-- Die KI-Bildgenerierung nutzt OpenAI DALL·E. Ein OpenAI API-Key muss in der `connection.json` hinterlegt sein.
-- Die SEO-Analyse erfolgt automatisch im Hintergrund. Bei Fehlern wird ein Standard-Alt-Text verwendet.
+**Where can I find these features?**
+- Go to **Marketing & Content** → **Content Monetized**
+- All features are directly integrated in the interface
+- Complete guide see: [Content Monetization Guide](./CONTENT_MONETIZATION_GUIDE.md)
 
 ---
-# 📚 AI Business Platform - Bedienungsanleitung
 
-Komplette Übersicht aller Tools und Features der KI-gesteuerten Business-Automatisierungs-Plattform.
+### Auto Product Creator: AI Image Generation & Image SEO
 
-## 🚀 Erste Schritte: System als Container nutzen
+#### What can I do with AI image generation?
 
-So startest du die KI-Agent-Plattform als Endnutzer ganz ohne Quellcode-Installation:
+- Automatically generate high-quality product images with AI (DALL·E, OpenAI)
+- Images are created and assigned directly during product setup
+- Automatic SEO optimization (alt text, filename, tags) for each image
 
-1. **Voraussetzungen prüfen**
-   - Stelle sicher, dass Docker und Docker Compose installiert sind.
+#### How do I use AI image generation?
 
-2. **Container starten**
-   - Lade die aktuelle `connection.json` (Konfigurationsdatei) von deinem Anbieter oder Support-Team herunter.
-   - Platziere die Datei im Hauptverzeichnis.
-   - Starte die Plattform mit folgendem Befehl:
+1. **Start Auto Product Creator** – Let products be generated automatically as usual
+2. **AI image is created** – A matching image is generated with AI for each new product
+3. **Image SEO happens automatically** – Alt text and filename are optimized with AI analysis
+4. **Product is online immediately with image & SEO** – No manual uploading or editing required
+
+**Note:**
+
+- AI image generation uses OpenAI DALL·E. An OpenAI API key must be stored in `connection.json`.
+- SEO analysis happens automatically in the background. In case of errors, a default alt text is used.
+
+---
+# 📚 AI Business Platform - User Guide
+
+Complete overview of all tools and features of the AI-powered business automation platform.
+
+## 🚀 Getting Started: Using the System as a Container
+
+How to start the AI Agent Platform as an end user without source code installation:
+
+1. **Check prerequisites**
+   - Ensure Docker and Docker Compose are installed.
+
+2. **Start container**
+   - Download the current `connection.json` (configuration file) from your provider or support team.
+   - Place the file in the main directory.
+   - Start the platform with the following command:
 
    ```bash
    docker compose up -d
    ```
 
-   # Bedienungsanleitung KI-Agent
+   # AI Agent User Guide
 
-3. **Frontend öffnen**
-   - Öffne deinen Browser und rufe `http://localhost:5173` auf.
-   - Speichere die Einstellungen.
+3. **Open frontend**
+   - Open your browser and navigate to `http://localhost:5173`.
+   - Save the settings.
 
-4. **System nutzen**
-   - Alle Funktionen sind jetzt einsatzbereit.
-   - Bei Problemen wende dich an den Support.
+4. **Use the system**
+   - All functions are now ready to use.
+   - Contact support if you have any problems.
 
 ---
 
@@ -85,311 +85,311 @@ So startest du die KI-Agent-Plattform als Endnutzer ganz ohne Quellcode-Installa
 
 ### AnalyticRegioning
 
-- Identifikation von regionalen Wachstumsmöglichkeiten
+- Identification of regional growth opportunities
 
-#### Wie nutze ich AnalyticRegioning?
+#### How do I use AnalyticRegioning?
 
-1. **Datenquelle auswählen** - Wählen Sie die zu analysierenden Daten (Umsätze, Kunden, Conversions)
-2. **Regionen definieren** - Legen Sie geografische Bereiche fest (Länder, Bundesländer, Postleitzahlen)
+1. **Select data source** - Choose the data to analyze (revenue, customers, conversions)
+2. **Define regions** - Set geographic areas (countries, states, postal codes)
 
-#### Erweiterte Funktionen
+#### Advanced Features
 
-- Automatische Hotspot-Erkennung
-- Benchmarking gegen Branchendurchschnitt
-- Export der Ergebnisse als PDF/Excel
+- Automatic hotspot detection
+- Benchmarking against industry average
+- Export results as PDF/Excel
 
 ---
 
 ### ConversionAnalysis
 
-#### Was kann ich mit ConversionAnalysis machen?
+#### What can I do with ConversionAnalysis?
 
-#### Wie nutze ich ConversionAnalysis?
+#### How do I use ConversionAnalysis?
 
-1. **Conversion-Ziel definieren** - Was ist eine erfolgreiche Conversion? (Kauf, Anmeldung, Download)
-2. **Datenquellen verbinden** - Google Analytics, Shop-System, CRM
-3. **Funnel erstellen** - Definieren Sie die einzelnen Schritte zum Ziel
-4. **Analysezeitraum festlegen** - Wählen Sie den zu analysierenden Zeitraum
-5. **Auswertung starten** - Klicken Sie auf "Conversion-Analyse starten"
+1. **Define conversion goal** - What is a successful conversion? (Purchase, registration, download)
+2. **Connect data sources** - Google Analytics, shop system, CRM
+3. **Create funnel** - Define the individual steps to the goal
+4. **Set analysis period** - Choose the period to analyze
+5. **Start analysis** - Click "Start Conversion Analysis"
 
-- Funnel-Abbruchquoten
-- Zeit bis zur Conversion
-- Wert pro Conversion
+- Funnel drop-off rates
+- Time to conversion
+- Value per conversion
 
 ---
 
 ### ConversionReported
 
-#### Was kann ich mit ConversionReported machen?
+#### What can I do with ConversionReported?
 
-- Automatische Conversion-Reporting
-- Echtzeit-Benachrichtigungen bei Conversions
+- Automatic conversion reporting
+- Real-time notifications on conversions
 
-1. **Reporting-Ziele festlegen** - Welche Conversions sollen getrackt werden?
-2. **Berichtsvorlagen wählen** - Täglich, wöchentlich, monatlich
-3. **KPIs definieren** - Welche Kennzahlen sind wichtig?
-4. **Automation aktivieren** - "Automatisches Reporting aktivieren"
-5. **Dashboards einrichten** - Personalisierte Übersichts-Dashboards
+1. **Set reporting goals** - Which conversions should be tracked?
+2. **Choose report templates** - Daily, weekly, monthly
+3. **Define KPIs** - Which metrics are important?
+4. **Activate automation** - "Activate automatic reporting"
+5. **Set up dashboards** - Personalized overview dashboards
 
 #### Features
 
-- Automatische PDF-Report-Generierung
-- Echtzeit-Dashboards
-- Multi-Channel Attribution
-- Competitive Benchmarking
+- Automatic PDF report generation
+- Real-time dashboards
+- Multi-channel attribution
+- Competitive benchmarking
 
 ---
 
 ### MiniAudit
 
-#### Was kann ich mit MiniAudit machen?
+#### What can I do with MiniAudit?
 
-- Schnelle Website- und Shop-Analyse
-- Identifikation von sofort umsetzbaren Verbesserungen
-- Technische SEO-Prüfung
-- Performance-Check
+- Quick website and shop analysis
+- Identification of immediately actionable improvements
+- Technical SEO audit
+- Performance check
 
-#### Wie nutze ich MiniAudit?
+#### How do I use MiniAudit?
 
-1. **URL eingeben** - Website-URL, die analysiert werden soll
-2. **Audit-Bereiche wählen** - SEO, Performance, Security, UX
-3. **Scan starten** - Klicken Sie auf "Mini-Audit starten"
-4. **Ergebnisse prüfen** - System zeigt sofort umsetzbare Empfehlungen
-5. **Prioritäten setzen** - Sortieren nach Impact/Aufwand
-6. **Aktionsplan erstellen** - Generieren Sie einen Schritt-für-Schritt-Plan
+1. **Enter URL** - Website URL to analyze
+2. **Select audit areas** - SEO, performance, security, UX
+3. **Start scan** - Click "Start Mini Audit"
+4. **Review results** - System shows immediately actionable recommendations
+5. **Set priorities** - Sort by impact/effort
+6. **Create action plan** - Generate a step-by-step plan
 
-#### Geprüfte Bereiche
+#### Checked Areas
 
-- Ladezeiten und Performance
-- Mobile Optimierung
-- SEO-Grundlagen
-- Sicherheits-Check
-- User Experience
+- Loading times and performance
+- Mobile optimization
+- SEO basics
+- Security check
+- User experience
 
 ---
 
 ### PremiumAudit
 
-#### Was kann ich mit PremiumAudit machen?
+#### What can I do with PremiumAudit?
 
-- Umfassende Business-Analyse
-- Tiefgehende Competitive Intelligence
-- Markt- und Branchenanalyse
-- Strategische Empfehlungen
+- Comprehensive business analysis
+- In-depth competitive intelligence
+- Market and industry analysis
+- Strategic recommendations
 
-#### Wie nutze ich PremiumAudit?
+#### How do I use PremiumAudit?
 
-1. **Audit-Scope definieren** - Wählen Sie den Analyseumfang
-2. **Datenquellen verbinden** - Analytics, CRM, Social Media, Competition
-3. **Ziele festlegen** - Was möchten Sie erreichen?
-4. **Tiefenanalyse starten** - Klicken Sie auf "Premium-Audit starten"
-5. **Ergebnisbericht prüfen** - Detaillierte Analyse mit Handlungsempfehlungen
-6. **Strategie-Workshop** - Nutzen Sie die integrierte Planungs-Funktion
+1. **Define audit scope** - Choose the analysis scope
+2. **Connect data sources** - Analytics, CRM, social media, competition
+3. **Set goals** - What do you want to achieve?
+4. **Start in-depth analysis** - Click "Start Premium Audit"
+5. **Review results report** - Detailed analysis with action recommendations
+6. **Strategy workshop** - Use the integrated planning function
 
-#### Analysierte Bereiche
+#### Analyzed Areas
 
-- Wettbewerbsanalyse
-- Marktpotenzial
-- Kundenverhalten
-- Operative Effizienz
-- Finanzielle Performance
+- Competitive analysis
+- Market potential
+- Customer behavior
+- Operational efficiency
+- Financial performance
 
 ---
 
 ### RealAnalytics
 
-#### Was kann ich mit RealAnalytics machen?
+#### What can I do with RealAnalytics?
 
-- Echtzeit-Datenvisualisierung
-- Live-Performance-Monitoring
-- Sofortige Erkennung von Trends und Anomalien
-- Interaktive Dashboards
+- Real-time data visualization
+- Live performance monitoring
+- Immediate detection of trends and anomalies
+- Interactive dashboards
 
-#### Wie nutze ich RealAnalytics?
+#### How do I use RealAnalytics?
 
-1. **Datenquellen verbinden** - Verbinden Sie alle relevanten Datenquellen
-2. **Dashboards erstellen** - Drag & Drop Dashboard-Builder
-3. **Echtzeit-Metriken wählen** - Welche Daten sollen live angezeigt werden?
-4. **Alerts einrichten** - Benachrichtigungen bei kritischen Veränderungen
-5. **Monitoring starten** - Klicken Sie auf "Echtzeit-Monitoring"
-6. **Daten erkunden** - Nutzen Sie die interaktiven Visualisierungen
+1. **Connect data sources** - Connect all relevant data sources
+2. **Create dashboards** - Drag & drop dashboard builder
+3. **Choose real-time metrics** - Which data should be displayed live?
+4. **Set up alerts** - Notifications for critical changes
+5. **Start monitoring** - Click "Real-time Monitoring"
+6. **Explore data** - Use the interactive visualizations
 
-#### Live-Daten
+#### Live Data
 
-- Website-Besucher in Echtzeit
-- Live-Umsätze und Conversions
-- Social Media Engagement
-- Server-Performance
+- Website visitors in real-time
+- Live revenue and conversions
+- Social media engagement
+- Server performance
 
 ---
 
 ### RealWebAnalytics
 
-#### Was kann ich mit RealWebAnalytics machen?
+#### What can I do with RealWebAnalytics?
 
-- Detaillierte Website-Analyse
-- User Behavior Tracking
-- Customer Journey Mapping
-- Conversion-Optimierung
+- Detailed website analysis
+- User behavior tracking
+- Customer journey mapping
+- Conversion optimization
 
-#### Wie nutze ich RealWebAnalytics?
+#### How do I use RealWebAnalytics?
 
-1. **Tracking-Code installieren** - Fügen Sie den Code zu Ihrer Website hinzu
-2. **Ziele definieren** - Was sind wichtige User-Aktionen?
-3. **Segmente erstellen** - Gruppieren Sie Besucher nach Verhalten
-4. **Analyse starten** - Klicken Sie auf "Web-Analyse starten"
-5. **Heatmaps nutzen** - Sehen Sie, wo User klicken und scrollen
-6. **Session Recordings** - Beobachten Sie echte User-Sessions
+1. **Install tracking code** - Add the code to your website
+2. **Define goals** - What are important user actions?
+3. **Create segments** - Group visitors by behavior
+4. **Start analysis** - Click "Start Web Analysis"
+5. **Use heatmaps** - See where users click and scroll
+6. **Session recordings** - Watch real user sessions
 
-#### Tracking-Features
+#### Tracking Features
 
-- Click Heatmaps
-- Scroll Depth Analysis
-- User Session Recordings
-- Form Abandonment Tracking
-- A/B Test Integration
+- Click heatmaps
+- Scroll depth analysis
+- User session recordings
+- Form abandonment tracking
+- A/B test integration
 
 ---
 
 ### RunTrendAnalysis
 
-#### Was kann ich mit RunTrendAnalysis machen?
+#### What can I do with RunTrendAnalysis?
 
-- Automatische Trend-Erkennung
-- Vorhersage zukünftiger Entwicklungen
-- Saisonale Muster identifizieren
-- Prognose-Modelle erstellen
+- Automatic trend detection
+- Prediction of future developments
+- Identify seasonal patterns
+- Create forecast models
 
-#### Wie nutze ich RunTrendAnalysis?
+#### How do I use RunTrendAnalysis?
 
-1. **Daten auswählen** - Wählen Sie die zu analysierenden Zeitreihen
-2. **Analysezeitraum festlegen** - Historische Daten für die Analyse
-3. **Trend-Typ wählen** - Lineare, exponentielle oder saisonale Trends
-4. **Prognose erstellen** - Klicken Sie auf "Trend-Analyse starten"
-5. **Ergebnisse interpretieren** - System zeigt Trend-Verläufe und Prognosen
-6. **Automatisierte Reports** - Einrichten regelmäßiger Trend-Updates
+1. **Select data** - Choose the time series to analyze
+2. **Set analysis period** - Historical data for analysis
+3. **Choose trend type** - Linear, exponential or seasonal trends
+4. **Create forecast** - Click "Start Trend Analysis"
+5. **Interpret results** - System shows trend progressions and forecasts
+6. **Automated reports** - Set up regular trend updates
 
-#### Analysierte Trends für TrendAnalysis
+#### Analyzed Trends for TrendAnalysis
 
-- Umsatzentwicklung
-- Kundenwachstum
-- Markttrends
-- Saisonale Schwankungen
-- Anomalie-Erkennung
+- Revenue development
+- Customer growth
+- Market trends
+- Seasonal fluctuations
+- Anomaly detection
 
 ---
 
 ### ShopHealthReport
 
-#### Was kann ich mit ShopHealthReport machen?
+#### What can I do with ShopHealthReport?
 
-- Umfassende Shop-Gesundheitscheck
-- Technische Performance-Analyse
-- Sicherheits-Überprüfung
-- SEO-Optimierungspotentiale
+- Comprehensive shop health check
+- Technical performance analysis
+- Security audit
+- SEO optimization potential
 
-#### Wie nutze ich ShopHealthReport?
+#### How do I use ShopHealthReport?
 
-1. **Shop-URL eingeben** - URL Ihres Online-Shops
-2. **Check-Bereiche auswählen** - Performance, Security, SEO, UX
-3. **Scan starten** - Klicken Sie auf "Health-Check starten"
-4. **Health-Score prüfen** - Gesamtbewertung Ihres Shops
-5. **Problembereiche identifizieren** - Detaillierte Fehleranalyse
-6. **Optimierungsplan erstellen** - Schritt-für-Schritt Verbesserungsplan
+1. **Enter shop URL** - URL of your online shop
+2. **Select check areas** - Performance, security, SEO, UX
+3. **Start scan** - Click "Start Health Check"
+4. **Check health score** - Overall rating of your shop
+5. **Identify problem areas** - Detailed error analysis
+6. **Create optimization plan** - Step-by-step improvement plan
 
-#### Geprüfte Aspekte
+#### Checked Aspects
 
-- Ladezeiten und Performance
-- Mobile Optimization
-- Sicherheits-Lücken
-- SEO-Fehler
-- Checkout-Prozess
-- Payment-Optionen
+- Loading times and performance
+- Mobile optimization
+- Security vulnerabilities
+- SEO errors
+- Checkout process
+- Payment options
 
 ---
 
 ### ShopMetrics
 
-#### Was kann ich mit ShopMetrics machen?
+#### What can I do with ShopMetrics?
 
-- Umfassende Shop-Kennzahlen
-- Performance-Tracking
-- KPI-Überwachung
+- Comprehensive shop metrics
+- Performance tracking
+- KPI monitoring
 - Benchmarking
 
-#### Wie nutze ich ShopMetrics?
+#### How do I use ShopMetrics?
 
-1. **Shop-Daten verbinden** - Anbindung an Shop-System (Shopify, WooCommerce, etc.)
-2. **Metriken auswählen** - Wichtige Kennzahlen für Ihr Business
-3. **Dashboards einrichten** - Personalisierte Übersichten
-4. **Benchmarks setzen** - Zielwerte für Ihre KPIs
-5. **Monitoring starten** - Klicken Sie auf "Metrics-Tracking starten"
-6. **Automatische Reports** - Einrichten regelmäßiger Auswertungen
+1. **Connect shop data** - Connect to shop system (Shopify, WooCommerce, etc.)
+2. **Select metrics** - Important metrics for your business
+3. **Set up dashboards** - Personalized overviews
+4. **Set benchmarks** - Target values for your KPIs
+5. **Start monitoring** - Click "Start Metrics Tracking"
+6. **Automatic reports** - Set up regular evaluations
 
-#### Wichtige Metriken
+#### Important Metrics
 
-- Durchschnittlicher Bestellwert
-- Conversion Rate
-- Customer Lifetime Value
-- Cart Abandonment Rate
-- Return Rate
-- Traffic-Quellen
+- Average order value
+- Conversion rate
+- Customer lifetime value
+- Cart abandonment rate
+- Return rate
+- Traffic sources
 
 ---
 
 ### StandardAudit
 
-#### Was kann ich mit StandardAudit machen?
+#### What can I do with StandardAudit?
 
-- Standardisierte Business-Analyse
-- Vergleich mit Branchen-Standards
-- Identifikation von Optimierungspotentialen
-- Best Practices-Check
+- Standardized business analysis
+- Comparison with industry standards
+- Identification of optimization potential
+- Best practices check
 
-#### Wie nutze ich StandardAudit?
+#### How do I use StandardAudit?
 
-1. **Audit-Typ wählen** - Wählen Sie den gewünschten Audit-Bereich
-2. **Daten bereitstellen** - Laden Sie relevante Geschäftsdaten hoch
-3. **Branche auswählen** - Für branchenspezifische Benchmarks
-4. **Audit starten** - Klicken Sie auf "Standard-Audit starten"
-5. **Ergebnisbericht prüfen** - Detaillierte Analyse mit Vergleichswerten
-6. **Aktionsplan generieren** - Automatisch generierte Empfehlungen
+1. **Choose audit type** - Select the desired audit area
+2. **Provide data** - Upload relevant business data
+3. **Select industry** - For industry-specific benchmarks
+4. **Start audit** - Click "Start Standard Audit"
+5. **Review results report** - Detailed analysis with comparative values
+6. **Generate action plan** - Automatically generated recommendations
 
-#### Audit-Bereiche
+#### Audit Areas
 
-- Finanzielle Performance
-- Operative Effizienz
-- Marketing-Effektivität
-- Kundenzufriedenheit
-- Mitarbeiter-Produktivität
+- Financial performance
+- Operational efficiency
+- Marketing effectiveness
+- Customer satisfaction
+- Employee productivity
 
 ---
 
 ### TrendAnalysis
 
-#### Was kann ich mit TrendAnalysis machen?
+#### What can I do with TrendAnalysis?
 
-- Detaillierte Trend-Analyse
-- Saisonale Mustererkennung
-- Vorhersage zukünftiger Entwicklungen
-- Competitive Trend-Monitoring
+- Detailed trend analysis
+- Seasonal pattern recognition
+- Prediction of future developments
+- Competitive trend monitoring
 
-#### Wie nutze ich TrendAnalysis?
+#### How do I use TrendAnalysis?
 
-1. **Datenquellen auswählen** - Interne Daten und externe Marktdaten
-2. **Analysezeitraum festlegen** - Ausreichend historische Daten für valide Trends
-3. **Trend-Algorithmus wählen** - Verschiedene Analyse-Methoden
-4. **Analyse starten** - Klicken Sie auf "Trend-Analyse durchführen"
-5. **Visualisierungen nutzen** - Grafische Darstellung der Trends
-6. **Prognosen erstellen** - Zukünftige Entwicklungen vorhersagen
+1. **Select data sources** - Internal data and external market data
+2. **Set analysis period** - Sufficient historical data for valid trends
+3. **Choose trend algorithm** - Different analysis methods
+4. **Start analysis** - Click "Perform Trend Analysis"
+5. **Use visualizations** - Graphical representation of trends
+6. **Create forecasts** - Predict future developments
 
-#### Analysierte Trends
+#### Analyzed Trends
 
-- Markttrends
-- Kundenverhalten
-- Technologische Entwicklungen
-- Wettbewerbsaktivitäten
-- Wirtschaftliche Einflüsse
+- Market trends
+- Customer behavior
+- Technological developments
+- Competitive activities
+- Economic influences
 
 ---
 
