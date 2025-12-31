@@ -1,42 +1,42 @@
-# 🎯 Content Monetization API – Veraltet (konsolidiert)
+# 🎯 Content Monetization API – Deprecated (consolidated)
 
-Diese Datei ist veraltet. Die konsolidierte und aktuelle Anleitung inkl. API befindet sich in:
+This file is deprecated. The consolidated and current guide including API is located in:
 
 - CONTENT_MONETIZATION.md
 
 Version: 3.2.0 (deprecated)
-Letzte Aktualisierung: Dezember 2025
+Last Updated: December 2025
 
 —
 
-Ursprünglicher Inhalt folgt unten zur Referenz.
+Original content follows below for reference.
 
 ---
 
-## 📋 Übersicht
+## 📋 Overview
 
-Das Content Monetization System bietet eine vollständige API für:
-- Intelligente Preisempfehlungen
-- KI-gestützte Text-Generierung
-- Revenue-Prognosen
-- Digitale Produkt-Verwaltung
+The Content Monetization System provides a complete API for:
+- Intelligent price recommendations
+- AI-powered text generation
+- Revenue forecasts
+- Digital product management
 
 ---
 
-## 🔌 API-Endpoints
+## 🔌 API Endpoints
 
 ### 1. Price Recommendation
 
 **Endpoint:** `GET /api/marketing/content/price-recommendation`
 
-**Parameter:**
-| Parameter | Typ | Erforderlich | Beschreibung |
-|-----------|-----|--------------|------------|
-| `contentType` | string | ✅ | Produkttyp (digital, course, template, subscription, etc.) |
-| `strategy` | string | ✅ | Monetarisierungsstrategie (one-time, subscription, freemium, tiered) |
-| `basePrice` | number | ✅ | Basispreis als Referenz |
+**Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `contentType` | string | ✅ | Product type (digital, course, template, subscription, etc.) |
+| `strategy` | string | ✅ | Monetization strategy (one-time, subscription, freemium, tiered) |
+| `basePrice` | number | ✅ | Base price as reference |
 
-**Beispiel:**
+**Example:**
 ```bash
 curl "http://localhost:3000/api/marketing/content/price-recommendation?contentType=course&strategy=one-time&basePrice=49"
 ```
@@ -51,12 +51,12 @@ curl "http://localhost:3000/api/marketing/content/price-recommendation?contentTy
       "min": 129,
       "max": 199
     },
-    "reasoning": "Online-Kurse sollten in Premium-Segment positioniert werden mit 3x Multiplikator für Quality-Content"
+    "reasoning": "Online courses should be positioned in premium segment with 3x multiplier for quality content"
   }
 }
 ```
 
-**Fehlerfall (400):**
+**Error Case (400):**
 ```json
 {
   "success": false,
@@ -64,9 +64,9 @@ curl "http://localhost:3000/api/marketing/content/price-recommendation?contentTy
 }
 ```
 
-**Preis-Logik:**
-| Typ | Strategie | Multiplikator | Beispiel |
-|-----|-----------|---------------|---------|
+**Pricing Logic:**
+| Type | Strategy | Multiplier | Example |
+|------|----------|-----------|---------|
 | course | one-time | 3.0x | €49 → €147 |
 | template | one-time | 1.2x | €49 → €59 |
 | digital | subscription | 0.7x/month | €49 → €34/month |
@@ -81,27 +81,27 @@ curl "http://localhost:3000/api/marketing/content/price-recommendation?contentTy
 **Body:**
 ```json
 {
-  "contentTitle": "Python für Anfänger Kurs",
+  "contentTitle": "Python for Beginners Course",
   "contentType": "course",
   "monetizationStrategy": "one-time",
   "pricing": 149
 }
 ```
 
-**Parameter:**
-| Parameter | Typ | Erforderlich | Beschreibung |
-|-----------|-----|--------------|------------|
-| `contentTitle` | string | ✅ | Titel des Produkts/Contents |
-| `contentType` | string | ⭕ | Produkttyp (für bessere Anpassung) |
-| `monetizationStrategy` | string | ⭕ | Strategie (für bessere Anpassung) |
-| `pricing` | number | ⭕ | Preis (für bessere Anpassung) |
+**Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `contentTitle` | string | ✅ | Title of the product/content |
+| `contentType` | string | ⭕ | Product type (for better adaptation) |
+| `monetizationStrategy` | string | ⭕ | Strategy (for better adaptation) |
+| `pricing` | number | ⭕ | Price (for better adaptation) |
 
-**Beispiel:**
+**Example:**
 ```bash
 curl -X POST "http://localhost:3000/api/marketing/content/generate-copy" \
   -H "Content-Type: application/json" \
   -d '{
-    "contentTitle": "Python für Anfänger Kurs",
+    "contentTitle": "Python for Beginners Course",
     "contentType": "course",
     "monetizationStrategy": "one-time",
     "pricing": 149
@@ -113,26 +113,26 @@ curl -X POST "http://localhost:3000/api/marketing/content/generate-copy" \
 {
   "success": true,
   "data": {
-    "headline": "Python für Anfänger: Der komplette Schritt-für-Schritt Kurs",
-    "body": "Lerne Python von Grund auf mit 50+ praktischen Übungen. Perfekt für Einsteiger – kein Vorwissen erforderlich. Zugang auf Lebenszeit plus regelmäßige Updates.",
-    "cta": "Jetzt Kurs kaufen - Nur €149"
+    "headline": "Python for Beginners: The Complete Step-by-Step Course",
+    "body": "Learn Python from scratch with 50+ practical exercises. Perfect for beginners – no prior knowledge required. Lifetime access plus regular updates.",
+    "cta": "Buy Course Now - Only €149"
   }
 }
 ```
 
-**Fallback Response (falls OpenAI nicht verfügbar):**
+**Fallback Response (if OpenAI unavailable):**
 ```json
 {
   "success": true,
   "data": {
-    "headline": "Python für Anfänger Kurs",
-    "body": "Premium-Inhalt für dein Geschäft. Erstellt mit professioneller Qualität.",
-    "cta": "Jetzt kaufen"
+    "headline": "Python for Beginners Course",
+    "body": "Premium content for your business. Created with professional quality.",
+    "cta": "Buy now"
   }
 }
 ```
 
-**Fehlerfall (400):**
+**Error Case (400):**
 ```json
 {
   "success": false,
@@ -146,9 +146,9 @@ curl -X POST "http://localhost:3000/api/marketing/content/generate-copy" \
 
 **Endpoint:** `GET /api/marketing/content/revenue-forecast`
 
-**Parameter:** Keine erforderlich
+**Parameters:** None required
 
-**Beispiel:**
+**Example:**
 ```bash
 curl "http://localhost:3000/api/marketing/content/revenue-forecast"
 ```
@@ -166,14 +166,14 @@ curl "http://localhost:3000/api/marketing/content/revenue-forecast"
 }
 ```
 
-**Berechnung:**
+**Calculation:**
 ```
-avgDay = SUM(Tagesumsätze letzte 7 Tage) / 7
+avgDay = SUM(Daily revenue last 7 days) / 7
 forecastWeek = avgDay × 7
 forecastMonth = avgDay × 30
 ```
 
-**Fehlerfall (500):**
+**Error Case (500):**
 ```json
 {
   "success": false,
@@ -190,27 +190,27 @@ forecastMonth = avgDay × 30
 **Body:**
 ```json
 {
-  "contentTitle": "Python für Anfänger Kurs",
+  "contentTitle": "Python for Beginners Course",
   "contentType": "course",
   "monetizationStrategy": "one-time",
   "pricing": 149
 }
 ```
 
-**Parameter:**
-| Parameter | Typ | Erforderlich | Beschreibung |
-|-----------|-----|--------------|------------|
-| `contentTitle` | string | ✅ | Produktname |
-| `contentType` | string | ⭕ | Typ (für Kategorisierung) |
-| `monetizationStrategy` | string | ⭕ | Strategie |
-| `pricing` | number | ✅ | Verkaufspreis |
+**Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `contentTitle` | string | ✅ | Product name |
+| `contentType` | string | ⭕ | Type (for categorization) |
+| `monetizationStrategy` | string | ⭕ | Strategy |
+| `pricing` | number | ✅ | Selling price |
 
-**Beispiel:**
+**Example:**
 ```bash
 curl -X POST "http://localhost:3000/api/marketing/content/create-digital-product" \
   -H "Content-Type: application/json" \
   -d '{
-    "contentTitle": "Python für Anfänger Kurs",
+    "contentTitle": "Python for Beginners Course",
     "contentType": "course",
     "monetizationStrategy": "one-time",
     "pricing": 149
@@ -221,18 +221,18 @@ curl -X POST "http://localhost:3000/api/marketing/content/create-digital-product
 ```json
 {
   "success": true,
-  "message": "Digitales Produkt erfolgreich erstellt!",
+  "message": "Digital product created successfully!",
   "data": {
     "productId": 12345,
-    "productTitle": "Python für Anfänger Kurs",
+    "productTitle": "Python for Beginners Course",
     "price": 149,
-    "wooCommerceUrl": "https://shop.example.de/product/python-kurs",
+    "wooCommerceUrl": "https://shop.example.de/product/python-course",
     "createdAt": "2025-12-10T14:30:00Z"
   }
 }
 ```
 
-**Fehlerfall (400):**
+**Error Case (400):**
 ```json
 {
   "success": false,
@@ -240,7 +240,7 @@ curl -X POST "http://localhost:3000/api/marketing/content/create-digital-product
 }
 ```
 
-**Fehlerfall (500 - WooCommerce):**
+**Error Case (500 - WooCommerce):**
 ```json
 {
   "success": false,
@@ -250,20 +250,20 @@ curl -X POST "http://localhost:3000/api/marketing/content/create-digital-product
 
 ---
 
-## 🔐 Authentifizierung
+## 🔐 Authentication
 
-Alle Endpoints unterstützen:
-- Cookie-basierte Sessions
-- API Key Header (falls aktiviert)
+All endpoints support:
+- Cookie-based sessions
+- API Key header (if enabled)
 
 ```bash
-# Mit API-Key
+# With API-Key
 curl -H "X-API-Key: your-api-key" "http://localhost:3000/api/marketing/content/..."
 ```
 
 ---
 
-## 🚨 Fehlerbehandlung
+## 🚨 Error Handling
 
 ### Standard Error Responses
 
@@ -300,14 +300,14 @@ curl -H "X-API-Key: your-api-key" "http://localhost:3000/api/marketing/content/.
 
 | Endpoint | Rate Limit | Cache |
 |----------|-----------|-------|
-| `/price-recommendation` | 100/min | 1 Stunde |
-| `/generate-copy` | 50/min | Nicht gecacht |
-| `/revenue-forecast` | 100/min | 5 Minuten |
-| `/create-digital-product` | 20/min | Nicht gecacht |
+| `/price-recommendation` | 100/min | 1 hour |
+| `/generate-copy` | 50/min | Not cached |
+| `/revenue-forecast` | 100/min | 5 minutes |
+| `/create-digital-product` | 20/min | Not cached |
 
 ---
 
-## 🔧 Konfiguration
+## 🔧 Configuration
 
 ### Required Environment Variables
 
@@ -340,37 +340,37 @@ WOO_CONSUMER_SECRET=cs_...
 
 ---
 
-## 🧪 Beispiele
+## 🧪 Examples
 
 ### cURL
 
 ```bash
-# Preisvorschlag abrufen
+# Get price suggestion
 curl "http://localhost:3000/api/marketing/content/price-recommendation?contentType=course&strategy=one-time&basePrice=50"
 
-# Produkttext generieren
+# Generate product text
 curl -X POST "http://localhost:3000/api/marketing/content/generate-copy" \
   -H "Content-Type: application/json" \
-  -d '{"contentTitle":"Mein Produkt"}'
+  -d '{"contentTitle":"My Product"}'
 
-# Forecast abrufen
+# Get forecast
 curl "http://localhost:3000/api/marketing/content/revenue-forecast"
 ```
 
 ### JavaScript/Fetch
 
 ```javascript
-// Preisvorschlag
+// Price suggestion
 const priceResp = await fetch(
   '/api/marketing/content/price-recommendation?contentType=course&strategy=one-time&basePrice=50'
 );
 const priceData = await priceResp.json();
 
-// Text generieren
+// Generate text
 const copyResp = await fetch('/api/marketing/content/generate-copy', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ contentTitle: 'Python Kurs' })
+  body: JSON.stringify({ contentTitle: 'Python Course' })
 });
 const copyData = await copyResp.json();
 ```
@@ -380,7 +380,7 @@ const copyData = await copyResp.json();
 ```python
 import requests
 
-# Preisvorschlag
+# Price suggestion
 response = requests.get(
     'http://localhost:3000/api/marketing/content/price-recommendation',
     params={
@@ -395,13 +395,13 @@ print(f"Recommended: €{data['data']['recommendedPrice']}")
 
 ---
 
-## 📚 Siehe auch
+## 📚 See Also
 
 - [User Guide: Content Monetization](./CONTENT_MONETIZATION_GUIDE.md)
-- [Bedienungsanleitung](./Bedienungsanleitung-KI-Agent.md)
-- [API-Referenz](./README.md#-api-endpoints)
+- [Operating Instructions](./Bedienungsanleitung-KI-Agent.md)
+- [API Reference](./README.md#-api-endpoints)
 
 ---
 
-**Letzte Aktualisierung:** Dezember 10, 2025  
+**Last Updated:** December 10, 2025  
 **Maintenance:** Support Team

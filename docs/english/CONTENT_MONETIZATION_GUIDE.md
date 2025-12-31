@@ -1,168 +1,168 @@
-# 💸 Content Monetization – Veraltet (konsolidiert)
+# 💸 Content Monetization – Deprecated (consolidated)
 
-Diese Datei ist veraltet. Die konsolidierte und aktuelle Anleitung inkl. API befindet sich in:
+This file is deprecated. The consolidated and current guide including API is located in:
 
 - CONTENT_MONETIZATION.md
 
 Version: 3.2.0 (deprecated)
-Letzte Aktualisierung: Dezember 2025
+Last Updated: December 2025
 
 —
 
-Ursprünglicher Inhalt folgt unten zur Referenz.
+Original content follows below for reference.
 
 ---
 
-## 📋 Übersicht
+## 📋 Overview
 
-Die **Content Monetization Seite** ermöglicht es dir, digitale Produkte zu erstellen, zu verwalten und zu monetarisieren. Drei neue **KI-gestützte Features** helfen dir dabei:
+The **Content Monetization page** allows you to create, manage, and monetize digital products. Three new **AI-powered features** help you:
 
-1. **🤖 KI-Preisvorschlag** – Intelligente Preisempfehlungen basierend auf Produkttyp & Strategie
-2. **⚡ KI-Produkttext Generator** – Automatische Generierung von Überschriften, Beschreibungen & CTAs
-3. **📊 Revenue Forecast Badges** – Prognose von Wochengewinnen und monatlichen Umsätzen
-
----
-
-## 🎯 Neue KI-Features (v3.2.0)
-
-### 1️⃣ KI-Preisvorschlag
-
-**Was macht es?**
-- Analysiert Produkttyp, Monetarisierungsstrategie und Basispreis
-- Berechnet automatisch eine intelligente Preisempfehlung
-- Zeigt Preisbereich (min/max) und Begründung
-
-**Wie nutze ich es?**
-
-1. Gehe zu **Marketing & Content** → **Content Monetized**
-2. Fülle die Felder aus:
-   - **Content-Titel** (z.B. "Python Anfänger Kurs")
-   - **Content-Typ** (Digital, Download, Kurs, Template, etc.)
-   - **Monetarisierungsstrategie** (Einmalzahlung, Abo, Freemium, Preis-Stufen)
-   - **Basispreis** (z.B. 49.99€)
-3. Klicke auf **🤖 Preisvorschlag**
-4. Das System zeigt:
-   - 📌 Empfohlener Preis
-   - 📊 Preisbereich (z.B. €45 - €65)
-   - 💡 Begründung (z.B. "Online-Kurse in Premium-Segment")
-5. Klicke **Übernehmen** um den Preis zu aktualisieren
-
-**Preislogik:**
-- **Online-Kurse**: +200% Aufschlag (€149-€299)
-- **Templates/Themes**: +20% Aufschlag (€59-€79)
-- **Abo-Modelle**: -30% Rabatt (€14-€24/Monat)
-- **Freemium**: Basis + 50% (frühe Adopter Vorteil)
+1. **🤖 AI Price Suggestion** – Intelligent price recommendations based on product type & strategy
+2. **⚡ AI Product Text Generator** – Automatic generation of headlines, descriptions & CTAs
+3. **📊 Revenue Forecast Badges** – Forecast of weekly earnings and monthly revenue
 
 ---
 
-### 2️⃣ KI-Produkttext Generator
+## 🎯 New AI Features (v3.2.0)
 
-**Was macht es?**
-- Generiert professionelle Marketing-Texte automatisch
-- Erzeugt **Headline, Body-Text und Call-to-Action (CTA)**
-- Nutzt OpenAI GPT-4o-mini für hochwertige Inhalte
+### 1️⃣ AI Price Suggestion
 
-**Wie nutze ich es?**
+**What does it do?**
+- Analyzes product type, monetization strategy and base price
+- Automatically calculates an intelligent price recommendation
+- Shows price range (min/max) and justification
 
-1. Gehe zu **Marketing & Content** → **Content Monetized**
-2. Gib mindestens einen **Content-Titel** ein
-3. (Optional) Wähle **Content-Typ** und **Strategie** für bessere Ergebnisse
-4. Klicke **⚡ KI-Text generieren**
-5. Das System generiert:
+**How to use it?**
+
+1. Go to **Marketing & Content** → **Content Monetized**
+2. Fill in the fields:
+   - **Content Title** (e.g., "Python Beginner Course")
+   - **Content Type** (Digital, Download, Course, Template, etc.)
+   - **Monetization Strategy** (One-time, Subscription, Freemium, Tiered Pricing)
+   - **Base Price** (e.g., 49.99€)
+3. Click on **🤖 Price Suggestion**
+4. The system shows:
+   - 📌 Recommended price
+   - 📊 Price range (e.g., €45 - €65)
+   - 💡 Justification (e.g., "Online courses in premium segment")
+5. Click **Apply** to update the price
+
+**Pricing Logic:**
+- **Online Courses**: +200% markup (€149-€299)
+- **Templates/Themes**: +20% markup (€59-€79)
+- **Subscription Models**: -30% discount (€14-€24/month)
+- **Freemium**: Base + 50% (early adopter benefit)
+
+---
+
+### 2️⃣ AI Product Text Generator
+
+**What does it do?**
+- Generates professional marketing texts automatically
+- Creates **headline, body text and call-to-action (CTA)**
+- Uses OpenAI GPT-4o-mini for high-quality content
+
+**How to use it?**
+
+1. Go to **Marketing & Content** → **Content Monetized**
+2. Enter at least a **Content Title**
+3. (Optional) Choose **Content Type** and **Strategy** for better results
+4. Click **⚡ Generate AI Text**
+5. The system generates:
    ```
    📌 Headline:
-   "Python für Anfänger: Der komplette Schritt-für-Schritt Kurs"
+   "Python for Beginners: The Complete Step-by-Step Course"
    
    📝 Body:
-   "Lerne Python von Grund auf mit 50+ praktischen Übungen.
-    Perfekt für Einsteiger – kein Vorwissen erforderlich.
-    Zugang auf Lebenszeit + regelmäßige Updates."
+   "Learn Python from scratch with 50+ practical exercises.
+    Perfect for beginners – no prior knowledge required.
+    Lifetime access + regular updates."
    
    🎯 CTA:
-   "Jetzt Kurs kaufen - Nur €49.99"
+   "Buy Course Now - Only €49.99"
    ```
-6. Kopiere den Text in deine Produktbeschreibung
+6. Copy the text into your product description
 
-**Verfügbare Parameter:**
-- Content-Titel (erforderlich)
-- Content-Typ (beeinflusst Ton & Fokus)
-- Monetarisierungsstrategie (passt CTA an)
-- Preis (berücksichtigt Preisposition)
+**Available Parameters:**
+- Content Title (required)
+- Content Type (influences tone & focus)
+- Monetization Strategy (adapts CTA)
+- Price (considers price positioning)
 
-**Fallback-Texte:**
-Wenn OpenAI nicht verfügbar ist, verwendet das System Standard-Templates automatisch.
+**Fallback Texts:**
+If OpenAI is unavailable, the system automatically uses standard templates.
 
 ---
 
 ### 3️⃣ Revenue Forecast Badges
 
-**Was macht es?**
-- Zeigt Prognosen für Wochengewinne und Monatsumsätze
-- Basiert auf durchschnittlichen Tagesumsätzen der letzten 7 Tage
-- Aktualisiert sich automatisch
+**What does it do?**
+- Shows forecasts for weekly earnings and monthly revenue
+- Based on average daily revenue from the last 7 days
+- Updates automatically
 
-**Wo sehe ich die Badges?**
-- Oben auf der **Content Monetized Seite**
-- Grüner Badge: 📊 Forecast Woche
-- Blauer Badge: 📊 Forecast Monat
+**Where can I see the badges?**
+- At the top of the **Content Monetized page**
+- Green badge: 📊 Weekly Forecast
+- Blue badge: 📊 Monthly Forecast
 
-**Berechnung:**
+**Calculation:**
 ```
-Durchschnitt (letzte 7 Tage) = Summe Tagesumsätze / 7
-Wochenprognose = Durchschnitt × 7
-Monatsprognose = Durchschnitt × 30
+Average (last 7 days) = Sum of daily revenue / 7
+Weekly forecast = Average × 7
+Monthly forecast = Average × 30
 ```
 
-**Beispiel:**
-- Durchschnittlicher Tagesumsatz: €15
-- Wochenprognose: €15 × 7 = **€105**
-- Monatsprognose: €15 × 30 = **€450**
+**Example:**
+- Average daily revenue: €15
+- Weekly forecast: €15 × 7 = **€105**
+- Monthly forecast: €15 × 30 = **€450**
 
 ---
 
 ## 📊 Revenue Dashboard
 
-Das Dashboard zeigt deine aktuellen Umsatzdaten:
+The dashboard shows your current revenue data:
 
-| Metrik | Bedeutung |
-|--------|-----------|
-| **Heute** | Umsatz des heutigen Tages |
-| **Diese Woche** | Kumuliert seit Montag |
-| **Dieser Monat** | Kumuliert seit Monatsanfang |
-| **Gesamt** | Gesamtumsatz aller Zeiten |
-| **Produkte** | Anzahl digitaler Produkte |
-
----
-
-## 💾 Produkte Erstellen
-
-**Schritt-für-Schritt:**
-
-1. **Content-Details eingeben**
-   - Titel (erforderlich)
-   - Typ wählen (z.B. "Online-Kurs")
-   - Strategie auswählen (z.B. "Einmalzahlung")
-   - Preis setzen (erforderlich)
-
-2. **Optional: KI-Features nutzen**
-   - 🤖 Preisvorschlag erhalten
-   - ⚡ Produkttext generieren
-
-3. **Produkt Erstellen**
-   - Klicke **💸 Content Monetarisieren**
-   - Produkt wird in WooCommerce angelegt
-   - Revenue-Daten werden automatisch aktualisiert
-
-4. **Nach Erstellung**
-   - Produkt ist sofort sichtbar im Dashboard
-   - Wechsle zu WooCommerce für weitere Bearbeitung
-   - Produkt-Link wird automatisch generiert
+| Metric | Meaning |
+|--------|---------|
+| **Today** | Revenue for today |
+| **This Week** | Cumulated since Monday |
+| **This Month** | Cumulated since start of month |
+| **Total** | Total revenue of all time |
+| **Products** | Number of digital products |
 
 ---
 
-## 🔧 Technische Details
+## 💾 Create Products
 
-### API-Endpoints
+**Step-by-step:**
+
+1. **Enter Content Details**
+   - Title (required)
+   - Choose Type (e.g., "Online Course")
+   - Select Strategy (e.g., "One-time Payment")
+   - Set Price (required)
+
+2. **Optional: Use AI Features**
+   - 🤖 Get price suggestion
+   - ⚡ Generate product text
+
+3. **Create Product**
+   - Click **💸 Monetize Content**
+   - Product is created in WooCommerce
+   - Revenue data is updated automatically
+
+4. **After Creation**
+   - Product is immediately visible in dashboard
+   - Switch to WooCommerce for further editing
+   - Product link is automatically generated
+
+---
+
+## 🔧 Technical Details
+
+### API Endpoints
 
 #### Price Recommendation
 ```bash
@@ -177,7 +177,7 @@ Response:
   "data": {
     "recommendedPrice": 149,
     "range": { "min": 129, "max": 199 },
-    "reasoning": "Online-Kurse in Premium-Segment"
+    "reasoning": "Online courses in premium segment"
   }
 }
 ```
@@ -187,7 +187,7 @@ Response:
 POST /api/marketing/content/generate-copy
 
 {
-  "contentTitle": "Python Kurs",
+  "contentTitle": "Python Course",
   "contentType": "course",
   "monetizationStrategy": "one-time",
   "pricing": 149
@@ -197,9 +197,9 @@ Response:
 {
   "success": true,
   "data": {
-    "headline": "Python für Anfänger...",
-    "body": "Lerne Python von Grund auf...",
-    "cta": "Jetzt kaufen"
+    "headline": "Python for Beginners...",
+    "body": "Learn Python from scratch...",
+    "cta": "Buy now"
   }
 }
 ```
@@ -219,14 +219,14 @@ Response:
 }
 ```
 
-### Konfiguration
+### Configuration
 
-**Erforderliche Einstellungen in `connection.json`:**
+**Required Settings in `connection.json`:**
 
 ```json
 {
   "woocommerce": {
-    "url": "https://dein-shop.de",
+    "url": "https://your-shop.de",
     "consumerKey": "ck_...",
     "consumerSecret": "cs_..."
   },
@@ -239,62 +239,62 @@ Response:
 
 ---
 
-## 🆘 Häufige Fragen & Probleme
+## 🆘 Frequently Asked Questions & Issues
 
-### ❓ Der Preisvorschlag funktioniert nicht
-**Lösung:**
-- Prüfe, ob **Base Price** eingegeben ist
-- Fülle **Content-Typ** und **Strategie** aus
-- System braucht diese Parameter für Berechnung
+### ❓ Price suggestion doesn't work
+**Solution:**
+- Check if **Base Price** is entered
+- Fill in **Content Type** and **Strategy**
+- System needs these parameters for calculation
 
-### ❓ KI-Text wird nicht generiert
-**Lösung:**
-- Gib mindestens einen **Content-Titel** ein
-- Prüfe deine **OpenAI API-Verfügbarkeit**
-- Der Fallback-Text wird automatisch verwendet
+### ❓ AI text is not generated
+**Solution:**
+- Enter at least a **Content Title**
+- Check your **OpenAI API availability**
+- Fallback text will be used automatically
 
-### ❓ Revenue-Daten zeigen 0€
-**Lösung:**
-- Warte 7 Tage, bis Daten gesammelt werden
-- Prüfe WooCommerce-Verbindung in Settings
-- Manuelle Umsätze können hinzugefügt werden
+### ❓ Revenue data shows €0
+**Solution:**
+- Wait 7 days until data is collected
+- Check WooCommerce connection in Settings
+- Manual revenue can be added
 
-### ❓ Produkt wird nicht erstellt
-**Lösung:**
-- **Titel** und **Preis** sind erforderlich
-- WooCommerce-Verbindung prüfen (Settings → Verbindung)
-- Logs prüfen unter `/api/debug/logs`
+### ❓ Product is not created
+**Solution:**
+- **Title** and **Price** are required
+- Check WooCommerce connection (Settings → Connection)
+- Check logs under `/api/debug/logs`
 
 ---
 
 ## 📈 Best Practices
 
-**Preisgestaltung:**
-- Nutze den KI-Preisvorschlag als Orientierung
-- Teste unterschiedliche Preise im A/B-Test
-- Monitoriere Conversions bei Preisänderungen
+**Pricing:**
+- Use the AI price suggestion as a guideline
+- Test different prices with A/B testing
+- Monitor conversions when changing prices
 
-**Produkttext:**
-- Generiere mehrere Varianten und wähle beste aus
-- Passe Ton & Fokus manuell nach Bedarf an
-- Verwende gute Headline für höhere Click-Rates
+**Product Text:**
+- Generate multiple variants and choose the best
+- Manually adjust tone & focus as needed
+- Use good headlines for higher click rates
 
-**Revenue-Optimierung:**
-- Nutze Forecasts für Budgetplanung
-- Priorisiere Top-Performer Produkte
-- Teste neue Monetarisierungsstrategien
+**Revenue Optimization:**
+- Use forecasts for budget planning
+- Prioritize top-performing products
+- Test new monetization strategies
 
 ---
 
 ## 🚀 Roadmap
 
-**Geplant für nächste Versionen:**
-- 📦 Produkt-Bundles mit KI-Empfehlungen
-- 💳 A/B-Test Framework für Preise & Texte
-- 📧 Automatische Email-Kampagnen für Produkte
-- 🌐 Multi-Language Support für Produkttexte
-- 🎯 Customer Segmentation für gezieltes Marketing
+**Planned for upcoming versions:**
+- 📦 Product bundles with AI recommendations
+- 💳 A/B testing framework for prices & text
+- 📧 Automatic email campaigns for products
+- 🌐 Multi-language support for product text
+- 🎯 Customer segmentation for targeted marketing
 
 ---
 
-**Fragen?** Kontaktiere den Support oder nutze den KI-Chatbot Ari im Dashboard! 🤖
+**Questions?** Contact support or use the AI chatbot Ari in the dashboard! 🤖
