@@ -1,38 +1,38 @@
-# Plan für einen maximal intelligenten Shop-Chatbot
+# Plan for a Maximally Intelligent Shop Chatbot
 
-## Ziel
+## Goal
 
-- Der Chatbot soll auf alle Fragen zum Shop, System, Produkten, Bestellungen, Kunden, Systemgesundheit etc. kontextbezogen, dynamisch und intelligent antworten.
-- OpenAI (GPT-4/4o) wird für generative, natürliche Sprache genutzt.
-- Shopdaten und Systemstatus werden dynamisch aus der Datenbank/API geholt und in die Prompts integriert.
-- Begrüßung bleibt individuell konfigurierbar.
+- The chatbot should answer all questions about the shop, system, products, orders, customers, system health, etc. in a context-aware, dynamic, and intelligent manner.
+- OpenAI (GPT-4/4o) is used for generative, natural language processing.
+- Shop data and system status are dynamically fetched from the database/API and integrated into the prompts.
+- Greeting remains individually configurable.
 
 ---
 
-## Architektur-Plan
+## Architecture Plan
 
 1. **Frontend**
-   - Chatbot-Komponenten (FloatingChatbot, ChatbotWidget) bleiben wie bisher, senden User-Fragen an das Backend.
-   - Optional: Kontext (z.B. aktuelle Seite, Userrolle) mitsenden.
+   - Chatbot components (FloatingChatbot, ChatbotWidget) remain as before, sending user questions to the backend.
+   - Optional: Send context (e.g., current page, user role).
 
 2. **Backend**
-   - Route `/api/chatbot/message` nimmt Frage, Historie, Kontext entgegen.
-   - Backend erkennt, ob Shop-/Systemdaten benötigt werden (z.B. "Wie viele Bestellungen heute?").
-   - Holt relevante Daten (WooCommerce, System-API, eigene DB).
-   - Erstellt einen Prompt für OpenAI, der Shopdaten, Systemstatus und Userfrage kombiniert.
-   - Ruft OpenAI-API (z.B. GPT-4o) auf und gibt die generierte Antwort zurück.
+   - Route `/api/chatbot/message` accepts question, history, and context.
+   - Backend detects whether shop/system data is needed (e.g., "How many orders today?").
+   - Fetches relevant data (WooCommerce, System API, own DB).
+   - Creates a prompt for OpenAI that combines shop data, system status, and user question.
+   - Calls the OpenAI API (e.g., GPT-4o) and returns the generated response.
 
-3. **OpenAI Prompt-Strategie**
-   - System-Prompt: "Du bist ein KI-Shopassistent. Antworte freundlich, präzise und auf Basis folgender Shopdaten: ..."
-   - User-Prompt: Enthält die eigentliche Frage und ggf. Chat-Historie.
-   - Kontext: Shopname, aktuelle Umsätze, Produktanzahl, Systemstatus etc.
+3. **OpenAI Prompt Strategy**
+   - System Prompt: "You are an AI shop assistant. Answer friendly, precisely and based on the following shop data: ..."
+   - User Prompt: Contains the actual question and optionally chat history.
+   - Context: Shop name, current sales, product count, system status, etc.
 
 ---
 
-## Beispielcode Backend (Ausschnitt)
+## Example Backend Code (Excerpt)
 
 ```typescript
-// Im Backend: routes/app/api/chatbot-message.ts
+// In the backend: routes/app/api/chatbot-message.ts
 import { getConfig } from '@config';
 import { getShopStats, getSystemHealth } from '../services/shopData';
 import { openai } from '../utils/openai';
@@ -40,15 +40,15 @@ import { openai } from '../utils/openai';
 server.post('/message', async (request, _reply) => {
   const { message, history, userRole, context } = request.body as any;
 
-  // 1. Shopdaten holen (z.B. Umsatz, Orders, Produkte)
+  // 1. Fetch shop data (e.g., sales, orders, products)
   const stats = await getShopStats();
   const health = await getSystemHealth();
 
-  // 2. Prompt bauen
-  const systemPrompt = `Du bist ein KI-Shopassistent. Shopname: ${stats.shopName}. Umsatz heute: ${stats.salesToday} EUR. Bestellungen: ${stats.ordersToday}. Systemstatus: ${health.status}.`;
-  const userPrompt = `Frage: ${message}`;
+  // 2. Build prompt
+  const systemPrompt = `You are an AI shop assistant. Shop name: ${stats.shopName}. Sales today: ${stats.salesToday} EUR. Orders: ${stats.ordersToday}. System status: ${health.status}.`;
+  const userPrompt = `Question: ${message}`;
 
-  // 3. OpenAI-API aufrufen
+  // 3. Call OpenAI API
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o',
     messages: [
@@ -60,20 +60,20 @@ server.post('/message', async (request, _reply) => {
     temperature: 0.2
   });
 
-  const reply = completion.choices[0]?.message?.content || 'Entschuldigung, ich konnte dazu nichts finden.';
+  const reply = completion.choices[0]?.message?.content || 'Sorry, I could not find anything on that.';
   return { success: true, reply };
 });
 ```
 
 ---
 
-## Beispiel: shopData.ts (Shop- und Systemdaten holen)
+## Example: shopData.ts (Fetch Shop and System Data)
 
 ```typescript
 export async function getShopStats() {
-  // WooCommerce-API oder DB abfragen
+  // Query WooCommerce API or DB
   return {
-    shopName: 'Mein Shop',
+    shopName: 'My Shop',
     salesToday: 1234.56,
     ordersToday: 12,
     products: 87
@@ -81,7 +81,7 @@ export async function getShopStats() {
 }
 
 export async function getSystemHealth() {
-  // System-API abfragen
+  // Query System API
   return {
     status: 'healthy',
     cpu: 23,
@@ -92,23 +92,22 @@ export async function getSystemHealth() {
 
 ---
 
-## Hinweise
+## Notes
 
-- Die Begrüßung bleibt im Frontend konfigurierbar.
-- Der Bot kann für verschiedene Rollen (Admin, Kunde) unterschiedlich antworten (über userRole im Prompt).
-- Für SystemHealth kann ein spezieller Prompt genutzt werden: "Du bist ein Monitoring-Assistent..."
-- Datenschutz: Keine sensiblen Kundendaten ohne Berechtigung ausgeben!
-
----
-
-## Erweiterungen
-
-- FAQ- und Dokumentationsdatenbank einbinden
-- Kontext aus der aktuellen Seite/Session nutzen
-- Feedback- und Lernfunktion für den Bot
+- The greeting remains configurable in the frontend.
+- The bot can respond differently for different roles (admin, customer) (via userRole in the prompt).
+- For SystemHealth, a special prompt can be used: "You are a monitoring assistant..."
+- Data Protection: Do not provide sensitive customer data without authorization!
 
 ---
 
+## Extensions
+
+- Integrate FAQ and documentation database
+- Use context from the current page/session
+- Feedback and learning function for the bot
 
 ---
-Erstellt am 22.12.2025 von GitHub Copilot (GPT-4.1)
+
+---
+Created on 22.12.2025 by GitHub Copilot (GPT-4.1)

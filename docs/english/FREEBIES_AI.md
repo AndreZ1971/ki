@@ -1,6 +1,6 @@
 # 🎁 CreateFreebies AI Integration
 
-Complete ML/KI implementation for intelligent freebie idea generation with conversion rate prediction.
+Complete ML/AI implementation for intelligent freebie idea generation with conversion rate prediction.
 
 ## 📋 Overview
 
@@ -31,7 +31,7 @@ OpenAI GPT-4o-mini (AI Provider)
 ### Component Flow
 
 1. **User selects type** (ebook, checklist, templates)
-2. **User clicks "✨ KI-Ideen generieren"**
+2. **User clicks "✨ Generate AI Ideas"**
 3. **API call** with type and optional keywords
 4. **OpenAI generates** 4-5 ideas with scoring
 5. **Ideas display** in expandable cards
@@ -59,7 +59,7 @@ keywords?: string  // Optional, improves idea relevance
 }
 
 interface FreebieIdea {
-  title: string;              // "Kostenlose Keyword-Forschungs-Checkliste"
+  title: string;              // "Free Keyword Research Checklist"
   description: string;        // Full description (150-250 chars)
   conversionScore: number;    // 0-1 float, predicted conversion rate
   reason: string;            // Why this idea works
@@ -68,7 +68,7 @@ interface FreebieIdea {
 
 **Example Request:**
 ```
-GET /api/freebies/ml/generate?type=ebook&keywords=produktmanagement
+GET /api/freebies/ml/generate?type=ebook&keywords=product-management
 ```
 
 **Example Response:**
@@ -77,10 +77,10 @@ GET /api/freebies/ml/generate?type=ebook&keywords=produktmanagement
   "success": true,
   "data": [
     {
-      "title": "Produktmanagement 101 E-Book",
-      "description": "Umfassender Leitfaden mit 50 Seiten Best Practices für modernes Produktmanagement. Enthält Frameworks, Checklisten und Case Studies aus der Praxis.",
+      "title": "Product Management 101 E-Book",
+      "description": "Comprehensive 50-page guide with best practices for modern product management. Includes frameworks, checklists, and real-world case studies.",
       "conversionScore": 0.78,
-      "reason": "Hohe Nachfrage für PM-Inhalte, etablierte Lead-Generation Methode"
+      "reason": "High demand for PM content, established lead generation method"
     }
   ]
 }
@@ -115,9 +115,9 @@ const handleGenerateIdeas = async () => {
     setIdeasLoading(true);
     const response = await freebieApi.generateIdeas(freebieType);
     setIdeas(prev => ({ ...prev, [freebieType]: response.data || [] }));
-    toast.success(`✅ ${response.data.length} Freebie-Ideen generiert!`);
+    toast.success(`✅ ${response.data.length} freebie ideas generated!`);
   } catch (err) {
-    toast.error('Fehler beim Generieren');
+    toast.error('Error generating ideas');
   } finally {
     setIdeasLoading(false);
   }
@@ -134,10 +134,10 @@ const handleCreateFromSelectedIdea = async () => {
       description: selectedIdea.description,
       // ... other fields
     });
-    toast.success(`✅ "${selectedIdea.title}" erstellt!`);
+    toast.success(`✅ "${selectedIdea.title}" created!`);
     setShowCreateModal(false);
   } catch (err) {
-    toast.error('Fehler beim Erstellen');
+    toast.error('Error creating freebie');
   }
 };
 ```
@@ -291,7 +291,7 @@ Currently no caching - each request generates new ideas. Future enhancement coul
 ### Example Test Data
 
 **Type:** `ebook`
-**Keywords:** `produktmanagement`
+**Keywords:** `product-management`
 
 Expected: 4-5 ideas related to PM e-books with scores 0.6-0.9
 
