@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "build": "tsc && npm run copy-module-alias",
-    "copy-module-alias": "cp module-alias.js dist/",
+    "copy-module-alias": "node -e \"require('fs').copyFileSync('module-alias.js', 'dist/module-alias.js')\"",
     "dev": "tsc && node --watch dist/server.js",
     "dev:agent": "tsx watch agent/planner.ts",
     "start": "node dist/server.js",

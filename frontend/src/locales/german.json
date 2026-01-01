@@ -58,6 +58,18 @@
     "privacyNotice": "Datenschutz-Hinweis",
     "allCategories": "Alle Kategorien"
   },
+  "specialization": {
+    "title": "🎯 Agent-Spezialisierung wählen",
+    "subtitle": "Wähle eine Branche, um den AI-Agent optimal auf deine Produkte zu trainieren",
+    "activate": "🛒 Aktivieren",
+    "active": "✓ AKTIV",
+    "uploadSection": "📂 Upload für Trainingsdaten",
+    "uploadDescription": "Lade Produkt- oder Content-Daten hoch, damit die gewählte Spezialisierung schneller trainiert wird.",
+    "uploadButton": "Datei wählen (CSV/JSON)",
+    "uploadSuccess": "Spezialisierung erfolgreich hochgeladen",
+    "activated": "Spezialisierung aktiviert",
+    "deleted": "Spezialisierung gelöscht"
+  },
   "settings": {
     "title": "⚙️ Einstellungen",
     "subtitle": "Konfiguriere deine Shop-Verbindung und Spezialisierung",

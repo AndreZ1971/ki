@@ -17,7 +17,9 @@ interface LocaleCache {
 class I18nService {
   private cache: LocaleCache = {};
   private defaultLocale = 'english';
-  private localesPath = join(__dirname, '../../frontend/src/locales');
+  // In production (compiled): __dirname = .../backend/dist/services
+  // Need to go up to project root: ../../.. then into frontend
+  private localesPath = join(__dirname, '../../../frontend/src/locales');
 
   /**
    * Load translations for a specific locale
