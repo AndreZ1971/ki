@@ -2,7 +2,6 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import crypto from 'crypto';
 import { SpecializationService } from '../../../../services/specializationService';
 import {
-  SignedSpecialization,
   SpecializationData,
 } from '../../../../types/specialization';
 import { logger } from '../../../../logger';
