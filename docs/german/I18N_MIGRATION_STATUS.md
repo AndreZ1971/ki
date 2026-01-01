@@ -1,18 +1,84 @@
-# 🌐 i18n Migration Guide - Phase 1 Frontend
+# 🌐 i18n Migrations-Status - Vollständige Übersicht
 
-## ✅ Abgeschlossen
+**Letzte Aktualisierung:** 1. Januar 2026  
+**Projekt:** A.R.I. (Artificial Retail Intelligence)
 
-### 1. Locale-Files erweitert
-- ✅ `frontend/src/locales/german.json` - 150+ neue Übersetzungskeys
+---
+
+## ✅ Abgeschlossene Migrationen
+
+### 1. Locale-Dateien erweitert ✅
+- ✅ `frontend/src/locales/german.json` - 150+ Übersetzungs-Keys
 - ✅ `frontend/src/locales/english.json` - 150+ englische Übersetzungen
+- ✅ 13 neue i18n-Keys für Backend-API-Fehler hinzugefügt (Januar 2026)
+  - `error.invalidAriFormat`
+  - `error.missingDataField`
+  - `error.missingRequiredField`
+  - `error.noFileProvided`
+  - `error.invalidFileType`
+  - `error.fileTooLarge`
+  - `error.missingRequiredFields`
+  - `error.activationFailed`
+  - `error.deletionFailed`
+  - `error.loadingFailed`
+  - `error.uploadFailed`
+  - `specialization.uploadSuccess`
+  - `specialization.activated`
+  - `specialization.deleted`
 - ✅ Build erfolgreich getestet
 
-### 2. Shared Components konvertiert
+### 2. Backend i18n Service erstellt ✅ **NEU**
+- ✅ `backend/services/i18nService.ts` - Kompletter i18n-Service
+  - Lädt Locale-Dateien vom Frontend
+  - Unterstützt verschachtelte Keys (Punkt-Notation)
+  - Erkennt Sprache aus Request-Headern (Accept-Language, X-Language)
+  - Fallback zu Englisch bei fehlenden Übersetzungen
+  - Unterstützt Parameter-Interpolation
+
+### 3. Backend API-Routen umgestellt ✅ **NEU**
+- ✅ `backend/routes/app/api/specializations/index.ts` - Alle 16 hardcodierten Nachrichten umgestellt
+  - Alle deutschen Fehlermeldungen durch i18n-Aufrufe ersetzt
+  - Erfolgsmeldungen nutzen jetzt Übersetzungs-Keys
+  - API-Antworten unterstützen mehrere Sprachen basierend auf Request-Headern
+
+### 4. Shared Components konvertiert ✅
 - ✅ `BackButton.tsx` - nutzt `t('common.back')`
 - ✅ `LoadingButton.tsx` - nutzt `t('common.loading')`
 
-### 3. Automatisierung
+### 5. Automatisierung ✅
 - ✅ `scripts/convert-to-i18n.mjs` - Analyse-Tool erstellt
+
+---
+
+## 🎯 Backend i18n Architektur
+
+### Funktionsweise
+1. **Client sendet Request** mit `Accept-Language` oder `X-Language` Header
+2. **i18nService** erkennt Locale aus Headern (Standard: 'english')
+3. **Übersetzungs-Keys** werden aus `frontend/src/locales/{locale}.json` aufgelöst
+4. **API gibt zurück** lokalisierte Fehler-/Erfolgsmeldungen
+
+### Beispiel-Verwendung
+```typescript
+// In Route-Handler
+import { i18nService } from '../../../../services/i18nService';
+
+// Locale aus Request ermitteln
+const locale = i18nService.getLocaleFromHeaders(request.headers);
+const t = i18nService.createTranslator(locale);
+
+// Übersetzung verwenden
+return reply.status(400).send({
+  success: false,
+  error: t('error.noFileProvided')
+});
+```
+
+### Unterstützte Request-Header
+- `X-Language: de` → Deutsch
+- `X-Language: en` → Englisch  
+- `Accept-Language: de-DE,de;q=0.9` → Deutsch
+- Kein Header → Englisch (Standard)
 
 ---
 

@@ -14,7 +14,18 @@
   "error": {
     "apiLabel": "⚠️ API Fehler",
     "apiDetails": "Stelle sicher, dass die API unter {{url}} erreichbar ist",
-    "generic": "Ein Fehler ist aufgetreten"
+    "generic": "Ein Fehler ist aufgetreten",
+    "invalidAriFormat": "Ungültiges ARI-Spezialisierungs-Format",
+    "missingDataField": "Datenfeld ist erforderlich",
+    "missingRequiredField": "Erforderliches Feld fehlt",
+    "noFileProvided": "Keine Datei bereitgestellt",
+    "invalidFileType": "Nur .ari-spec oder .json Dateien sind erlaubt",
+    "fileTooLarge": "Dateigröße überschreitet das Maximum",
+    "missingRequiredFields": "Erforderliche Felder fehlen",
+    "activationFailed": "Aktivierung fehlgeschlagen",
+    "deletionFailed": "Löschen fehlgeschlagen",
+    "loadingFailed": "Laden fehlgeschlagen",
+    "uploadFailed": "Upload fehlgeschlagen"
   },
   "common": {
     "back": "Zurück",
@@ -131,7 +142,10 @@
       "active": "✓ AKTIV",
       "uploadSection": "📂 Upload für Trainingsdaten",
       "uploadDescription": "Lade Produkt- oder Content-Daten hoch, damit die gewählte Spezialisierung schneller trainiert wird.",
-      "uploadButton": "Datei wählen (CSV/JSON)"
+      "uploadButton": "Datei wählen (CSV/JSON)",
+      "uploadSuccess": "Spezialisierung erfolgreich hochgeladen",
+      "activated": "Spezialisierung aktiviert",
+      "deleted": "Spezialisierung gelöscht"
     },
     "license": {
       "title": "🔑 Lizenz-Verwaltung",

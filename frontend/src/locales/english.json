@@ -14,7 +14,18 @@
   "error": {
     "apiLabel": "⚠️ API Error",
     "apiDetails": "Ensure the API is reachable at {{url}}",
-    "generic": "An error occurred"
+    "generic": "An error occurred",
+    "invalidAriFormat": "Invalid ARI specialization format",
+    "missingDataField": "Data field is required",
+    "missingRequiredField": "Required field is missing",
+    "noFileProvided": "No file provided",
+    "invalidFileType": "Only .ari-spec or .json files are allowed",
+    "fileTooLarge": "File size exceeds maximum limit",
+    "missingRequiredFields": "Required fields are missing",
+    "activationFailed": "Activation failed",
+    "deletionFailed": "Deletion failed",
+    "loadingFailed": "Loading failed",
+    "uploadFailed": "Upload failed"
   },
   "common": {
     "back": "Back",
@@ -46,6 +57,18 @@
     "noEventsInRange": "No events in range",
     "privacyNotice": "Privacy Notice",
     "allCategories": "All Categories"
+  },
+  "specialization": {
+    "title": "🎯 Choose agent specialization",
+    "subtitle": "Select an industry to optimally train the AI agent for your products",
+    "activate": "🛒 Activate",
+    "active": "✓ ACTIVE",
+    "uploadSection": "📂 Upload training data",
+    "uploadDescription": "Upload product or content data to train your chosen specialization faster.",
+    "uploadButton": "Choose file (CSV/JSON)",
+    "uploadSuccess": "Specialization uploaded successfully",
+    "activated": "Specialization activated",
+    "deleted": "Specialization deleted"
   },
   "settings": {
     "title": "⚙️ Settings",
@@ -560,11 +583,6 @@
       "error": "Error",
       "loading": "Loading...",
       "success": "Success"
-    }
-  },
-  "pages": {
-    "productAnalysis": {
-      "title": "🔍 AI Product Analysis"
     }
   }
 }

@@ -5,6 +5,7 @@ import {
   SpecializationData,
 } from '../../../../types/specialization';
 import { logger } from '../../../../logger';
+import { i18nService } from '../../../../services/i18nService';
 
 /**
  * ARI Spezialisierungs-Dateiformat (.ari-spec)
@@ -45,14 +46,14 @@ function validateARISpecFormat(data: Record<string, unknown>): {
   if (data.format !== "ari-specialization") {
     return {
       valid: false,
-      error: 'Format muss "ari-specialization" sein',
+      error: i18nService.translate('error.invalidAriFormat'),
     };
   }
 
   if (!data.data || typeof data.data !== "object") {
     return {
       valid: false,
-      error: 'Feld "data" ist erforderlich',
+      error: i18nService.translate('error.missingDataField'),
     };
   }
 
@@ -64,7 +65,7 @@ function validateARISpecFormat(data: Record<string, unknown>): {
     if (!specData[field]) {
       return {
         valid: false,
-        error: `Erforderliches Feld fehlt: ${field}`,
+        error: `${i18nService.translate('error.missingRequiredField')}: ${field}`,
       };
     }
   }
@@ -132,7 +133,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
         );
         return reply.status(500).send({
           success: false,
-          error: 'Fehler beim Laden der Spezialisierungen',
+          error: i18nService.translate('error.loadingFailed'),
         });
       }
     }
@@ -169,7 +170,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
           );
           return reply.status(400).send({
             success: false,
-            error: 'Keine Datei hochgeladen',
+            error: i18nService.translate('error.noFileProvided'),
             code: 'NO_FILE_PROVIDED',
           });
         }
@@ -185,8 +186,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
           );
           return reply.status(400).send({
             success: false,
-            error:
-              "Nur .ari-spec oder .json Dateien (im ARI-Spezialisierungs-Format) sind erlaubt",
+            error: i18nService.translate('error.invalidFileType'),
             code: "INVALID_FILE_TYPE",
           });
         }
@@ -199,7 +199,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
           );
           return reply.status(413).send({
             success: false,
-            error: `Datei zu groß (${(fileSize / 1024 / 1024).toFixed(2)}MB > 5MB)`,
+            error: i18nService.translate('error.fileTooLarge'),
             code: 'FILE_TOO_LARGE',
           });
         }
@@ -256,7 +256,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
           );
           return reply.status(400).send({
             success: false,
-            error: "Erforderliche Felder fehlen: id, name, systemPrompt",
+            error: i18nService.translate('error.missingRequiredFields'),
             code: "MISSING_REQUIRED_FIELDS",
           });
         }
@@ -294,7 +294,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
 
         return reply.send({
           success: true,
-          message: `Spezialisierung "${stored.name}" erfolgreich installiert!`,
+          message: i18nService.translate('specialization.uploadSuccess'),
           data: {
             id: stored.id,
             name: stored.name,
@@ -323,7 +323,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
 
         return reply.status(400).send({
           success: false,
-          error: `Upload fehlgeschlagen: ${errorMessage}`,
+          error: i18nService.translate('error.uploadFailed'),
           code: 'UPLOAD_FAILED',
         });
       }
@@ -372,14 +372,14 @@ export default async function specializationRoutes(server: FastifyInstance) {
 
         return reply.send({
           success: true,
-          message: `Spezialisierung aktiviert`,
+          message: i18nService.translate('specialization.activated'),
         });
       } catch (error) {
         logger.error({ err: error }, '❌ Fehler beim Aktivieren');
         return reply.status(500).send({
           success: false,
           error:
-            error instanceof Error ? error.message : 'Fehler beim Aktivieren',
+            error instanceof Error ? error.message : i18nService.translate('error.activationFailed'),
         });
       }
     }
@@ -425,13 +425,13 @@ export default async function specializationRoutes(server: FastifyInstance) {
 
         return reply.send({
           success: true,
-          message: 'Spezialisierung gelöscht',
+          message: i18nService.translate('specialization.deleted'),
         });
       } catch (error) {
         logger.error({ err: error }, '❌ Fehler beim Löschen');
         return reply.status(500).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Fehler beim Löschen',
+          error: error instanceof Error ? error.message : i18nService.translate('error.deletionFailed'),
         });
       }
     }
@@ -484,7 +484,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
         );
         return reply.status(500).send({
           success: false,
-          error: 'Fehler beim Laden',
+          error: i18nService.translate('error.loadingFailed'),
         });
       }
     }
@@ -569,7 +569,7 @@ function sanitizeSpecializationData(
 
   // Ensure required fields are present
   if (!sanitized.id || !sanitized.name || !sanitized.systemPrompt) {
-    throw new Error('Erforderliche Felder fehlen nach Sanitization');
+    throw new Error(i18nService.translate('error.missingRequiredFields'));
   }
 
   return sanitized;
