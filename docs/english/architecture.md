@@ -716,11 +716,9 @@ npm run lint:fix
 
 # Build
 npm run build
-`
-
-### 8.2 Git workflow
 
 **Branch Strategy**:
+
 - master - production-ready code
 - develop - development branch
 - Feature branches: feature/xyz
@@ -746,7 +744,7 @@ chore: build/dependencies
 - E2E tests (Playwright - planned)
 
 **Test coverage**:
-`ash
+`Bash
 npm run test:coverage
 `
 
@@ -835,6 +833,7 @@ docker-compose logs -f ki-agent
 - DLQ: /app/data/dlq/
 
 **Log levels**:
+
 - info - normal operations
 - warn - warnings
 - error - errors
