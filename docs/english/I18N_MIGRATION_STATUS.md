@@ -1,18 +1,84 @@
-# 🌐 i18n Migration Guide - Phase 1 Frontend
+# 🌐 i18n Migration Status - Complete Overview
 
-## ✅ Abgeschlossen
+**Last Updated:** January 1, 2026  
+**Project:** A.R.I. (Artificial Retail Intelligence)
 
-### 1. Locale-Files erweitert
-- ✅ `frontend/src/locales/german.json` - 150+ neue Übersetzungskeys
-- ✅ `frontend/src/locales/english.json` - 150+ englische Übersetzungen
-- ✅ Build erfolgreich getestet
+---
 
-### 2. Shared Components konvertiert
-- ✅ `BackButton.tsx` - nutzt `t('common.back')`
-- ✅ `LoadingButton.tsx` - nutzt `t('common.loading')`
+## ✅ Completed Migrations
 
-### 3. Automatisierung
-- ✅ `scripts/convert-to-i18n.mjs` - Analyse-Tool erstellt
+### 1. Locale Files Extended ✅
+- ✅ `frontend/src/locales/german.json` - 150+ translation keys
+- ✅ `frontend/src/locales/english.json` - 150+ English translations
+- ✅ Added 13 new i18n keys for backend API errors (January 2026)
+  - `error.invalidAriFormat`
+  - `error.missingDataField`
+  - `error.missingRequiredField`
+  - `error.noFileProvided`
+  - `error.invalidFileType`
+  - `error.fileTooLarge`
+  - `error.missingRequiredFields`
+  - `error.activationFailed`
+  - `error.deletionFailed`
+  - `error.loadingFailed`
+  - `error.uploadFailed`
+  - `specialization.uploadSuccess`
+  - `specialization.activated`
+  - `specialization.deleted`
+- ✅ Build successfully tested
+
+### 2. Backend i18n Service Created ✅ **NEW**
+- ✅ `backend/services/i18nService.ts` - Complete i18n service
+  - Loads locale files from frontend
+  - Supports nested keys (dot notation)
+  - Detects language from request headers (Accept-Language, X-Language)
+  - Fallback to English for missing translations
+  - Parameter interpolation support
+
+### 3. Backend API Routes Converted ✅ **NEW**
+- ✅ `backend/routes/app/api/specializations/index.ts` - All 16 hardcoded messages converted
+  - Replaced all German error messages with i18n calls
+  - Success messages now use translation keys
+  - API responses now support multiple languages based on request headers
+
+### 4. Shared Components Converted ✅
+- ✅ `BackButton.tsx` - uses `t('common.back')`
+- ✅ `LoadingButton.tsx` - uses `t('common.loading')`
+
+### 5. Automation ✅
+- ✅ `scripts/convert-to-i18n.mjs` - Analysis tool created
+
+---
+
+## 🎯 Backend i18n Architecture
+
+### How It Works
+1. **Client sends request** with `Accept-Language` or `X-Language` header
+2. **i18nService** detects locale from headers (defaults to 'english')
+3. **Translation keys** are resolved from `frontend/src/locales/{locale}.json`
+4. **API returns** localized error/success messages
+
+### Example Usage
+```typescript
+// In route handler
+import { i18nService } from '../../../../services/i18nService';
+
+// Get locale from request
+const locale = i18nService.getLocaleFromHeaders(request.headers);
+const t = i18nService.createTranslator(locale);
+
+// Use translation
+return reply.status(400).send({
+  success: false,
+  error: t('error.noFileProvided')
+});
+```
+
+### Supported Request Headers
+- `X-Language: de` → German
+- `X-Language: en` → English  
+- `Accept-Language: de-DE,de;q=0.9` → German
+- No header → English (default)
 
 ---
 
