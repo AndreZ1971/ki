@@ -139,9 +139,11 @@ The WooCommerce AI Agent system is a fully integrated, AI-powered automation pla
 
 3. **Analytics and Reporting**:
    - nalyticsReporting.ts - analytics reports
-   - ealAnalyticsReporting.ts - real-time analytics
-   - ealWooCommerceAnalytics.ts - WooCommerce real-time data
-   - conversionAnalysis.ts - conversion analysis
+   - 
+ealAnalyticsReporting.ts - real-time analytics
+   - 
+ealWooCommerceAnalytics.ts - WooCommerce real-time data
+  - conversionAnalysis.ts - conversion analysis
    - conversionReport.ts - conversion reports
    - 	rendAnalysis.ts - trend analysis
    - googleTrendsService.ts - Google Trends integration
@@ -214,7 +216,8 @@ Normal  Block    Test     Recovered
 }
 `
 
-#### Retry strategies (etry-strategies.ts)
+#### Retry strategies (
+etry-strategies.ts)
 
 **Function**: Automatic retry with exponential backoff
 
