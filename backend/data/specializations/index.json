@@ -1,1 +1,26 @@
-{}
+{
+  "default": {
+    "specializations": [
+      {
+        "id": "technik-elektronik",
+        "name": "Technik & Elektronik - Der Ingenieur",
+        "version": "1.0.0",
+        "checksum": "2842a1e2ee5af5572af05f495667f2c14665442771366a0db31e7c2b7218c527",
+        "createdAt": 1767386932793,
+        "updatedAt": 1767386932793,
+        "size": 1797,
+        "encrypted": false
+      },
+      {
+        "id": "digitale-kurse",
+        "name": "Digitale Produkte & Kurse - Der Mentor",
+        "version": "1.0.0",
+        "checksum": "950568bba3ba3567d12853fc3aad88adb1c0722657eaf61ad91a5535ad64b33a",
+        "createdAt": 1767387846505,
+        "updatedAt": 1767387846505,
+        "size": 1852,
+        "encrypted": false
+      }
+    ]
+  }
+}

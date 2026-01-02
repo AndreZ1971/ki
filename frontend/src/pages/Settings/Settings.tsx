@@ -294,6 +294,7 @@ const Settings = () => {
   React.useEffect(() => {
     loadCredentials();
     loadLoopSchedules();
+    loadPurchasedSpecializations();
   }, []);
 
   const loadLoopSchedules = async () => {
@@ -635,6 +636,7 @@ const Settings = () => {
   ]);
 
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [purchasedSpecializations, setPurchasedSpecializations] = useState<Specialization[]>([]);
 
   const handleBack = () => {
     navigate("/");
@@ -664,6 +666,44 @@ const Settings = () => {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadPurchasedSpecializations = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/specializations/list`
+      );
+      if (!response.ok) return;
+      const data = await response.json();
+      if (data.success && data.specializations) {
+        setPurchasedSpecializations(data.specializations);
+      }
+    } catch (error) {
+      console.warn("Konnte gekaufte Spezialisierungen nicht laden:", error);
+    }
+  };
+
+  const handleSpecializationActivate = async (specId: string) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/specializations/activate`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ specId }),
+        }
+      );
+      
+      if (!response.ok) {
+        console.error("Aktivierung fehlgeschlagen");
+        return;
+      }
+
+      // Reload list to update active state
+      await loadPurchasedSpecializations();
+    } catch (error) {
+      console.error("Fehler beim Aktivieren:", error);
     }
   };
 
@@ -754,18 +794,24 @@ const Settings = () => {
         success?: boolean;
         message?: string;
         error?: string;
+        code?: string;
       };
 
       if (!response.ok) {
+        const errorDetails = responseData.error || responseData.message || `Status: ${response.status}`;
+        console.error("❌ Backend-Fehler:", {
+          status: response.status,
+          error: responseData.error,
+          message: responseData.message,
+          code: responseData.code,
+        });
         throw new Error(
-          responseData.error || 
-          responseData.message ||
-            `Upload fehlgeschlagen (Status: ${response.status})`
+          `Upload fehlgeschlagen: ${errorDetails}`
         );
       }
 
       if (!responseData.success) {
-        throw new Error(responseData.message || "Upload fehlgeschlagen");
+        throw new Error(responseData.message || responseData.error || "Upload fehlgeschlagen");
       }
 
       setConnectionMessage(
@@ -2612,69 +2658,143 @@ const Settings = () => {
               </small>
             </div>
 
-            {/* Aktive Lizenzen */}
-            <div style={{ marginTop: "40px" }}>
-              <h4 style={{ marginBottom: "20px" }}>
-                {t("settings.license.activeLicenses")}
-              </h4>
-              <div
-                style={{
-                  background: "rgba(34, 197, 94, 0.1)",
-                  border: "1px solid #22c55e",
-                  borderRadius: "8px",
-                  padding: "20px",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <div>
+            {/* Gekaufte Spezialisierungen */}
+            {purchasedSpecializations.length > 0 && (
+              <div style={{ marginTop: "40px" }}>
+                <h4 style={{ marginBottom: "20px" }}>
+                  🎯 Gekaufte Spezialisierungen
+                </h4>
+                {purchasedSpecializations.map((spec) => (
                     <div
+                      key={spec.id}
                       style={{
-                        fontSize: "18px",
-                        fontWeight: "bold",
-                        marginBottom: "5px",
+                        background: spec.isActive
+                          ? "rgba(34, 197, 94, 0.1)"
+                          : "rgba(255, 255, 255, 0.05)",
+                        border: spec.isActive
+                          ? "2px solid #22c55e"
+                          : "2px solid rgba(255, 255, 255, 0.2)",
+                        borderRadius: "12px",
+                        padding: "20px",
+                        marginBottom: "15px",
                       }}
                     >
-                      🔒 DSGVO Digitale Produkte
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <div style={{ flex: 1 }}>
+                          <div
+                            style={{
+                              fontSize: "24px",
+                              marginBottom: "8px",
+                            }}
+                          >
+                            {spec.icon}
+                          </div>
+                          <div
+                            style={{
+                              fontSize: "18px",
+                              fontWeight: "bold",
+                              marginBottom: "5px",
+                            }}
+                          >
+                            {spec.name}
+                          </div>
+                          <div
+                            style={{
+                              fontSize: "14px",
+                              color: "rgba(255,255,255,0.7)",
+                            }}
+                          >
+                            {spec.description}
+                          </div>
+                          {spec.features && spec.features.length > 0 && (
+                            <div
+                              style={{
+                                marginTop: "12px",
+                                display: "flex",
+                                flexWrap: "wrap",
+                                gap: "6px",
+                              }}
+                            >
+                              {spec.features.slice(0, 3).map((feature, i) => (
+                                <span
+                                  key={i}
+                                  style={{
+                                    fontSize: "12px",
+                                    padding: "4px 10px",
+                                    background: spec.isActive
+                                      ? "rgba(34, 197, 94, 0.2)"
+                                      : "rgba(255, 255, 255, 0.1)",
+                                    borderRadius: "12px",
+                                    color: spec.isActive
+                                      ? "#22c55e"
+                                      : "rgba(255,255,255,0.6)",
+                                  }}
+                                >
+                                  {feature}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "10px",
+                            alignItems: "flex-end",
+                          }}
+                        >
+                          {spec.isActive ? (
+                            <div
+                              style={{
+                                background: "#22c55e",
+                                color: "white",
+                                padding: "6px 16px",
+                                borderRadius: "20px",
+                                fontSize: "14px",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              ✓ AKTIV
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => handleSpecializationActivate(spec.id)}
+                              style={{
+                                background: "rgba(59, 130, 246, 0.8)",
+                                color: "white",
+                                border: "none",
+                                padding: "8px 20px",
+                                borderRadius: "20px",
+                                fontSize: "14px",
+                                fontWeight: "bold",
+                                cursor: "pointer",
+                                transition: "background 0.2s",
+                              }}
+                              onMouseEnter={(e) =>
+                                (e.currentTarget.style.background =
+                                  "rgba(59, 130, 246, 1)")
+                              }
+                              onMouseLeave={(e) =>
+                                (e.currentTarget.style.background =
+                                  "rgba(59, 130, 246, 0.8)")
+                              }
+                            >
+                              Aktivieren
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <div
-                      style={{
-                        fontSize: "14px",
-                        color: "rgba(255,255,255,0.7)",
-                      }}
-                    >
-                      Lizenz: DSGVO-2024-XXXX-XXXX
-                    </div>
-                    <div
-                      style={{
-                        fontSize: "12px",
-                        color: "rgba(255,255,255,0.5)",
-                        marginTop: "5px",
-                      }}
-                    >
-                      Aktiviert am: 31.10.2025 | Läuft ab: 31.10.2026
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      background: "#22c55e",
-                      color: "white",
-                      padding: "6px 16px",
-                      borderRadius: "20px",
-                      fontSize: "14px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    ✓ AKTIV
-                  </div>
-                </div>
+                  ))}
               </div>
-            </div>
+            )}
           </div>
         )}
 
