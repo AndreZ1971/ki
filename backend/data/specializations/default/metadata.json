@@ -1,0 +1,44 @@
+[
+  {
+    "id": "technik-elektronik",
+    "name": "Technik & Elektronik - Der Ingenieur",
+    "description": "Spezialisiert auf technische Spezifikationen, Kompatibilität und verständliche Erklärungen für Elektronik",
+    "category": "Technologie",
+    "icon": "🔌",
+    "version": "1.0.0",
+    "features": [
+      "Detaillierte technische Spezifikationen verständlich gemacht",
+      "Kompatibilitäts-Beratung",
+      "Produkt-Vergleiche",
+      "Use-Case basierte Empfehlungen",
+      "Häufige Fragen & Troubleshooting",
+      "Analogien für komplexe Konzepte",
+      "Performance-Prognosen",
+      "Zukunftssicherheits-Bewertung"
+    ],
+    "installedAt": 1767386932790,
+    "filePath": "C:\\Entwicklung\\neuer-git-ordner\\ki\\backend\\data\\specializations\\default\\technik-elektronik.enc",
+    "isActive": true
+  },
+  {
+    "id": "digitale-kurse",
+    "name": "Digitale Produkte & Kurse - Der Mentor",
+    "description": "Spezialisiert auf Online-Kurse, digitale Produkte und Transformation des Kunden",
+    "category": "Bildung & E-Learning",
+    "icon": "🎓",
+    "version": "1.0.0",
+    "features": [
+      "Outcome-fokussierte Beschreibungen",
+      "Lernziel & Curriculum Strukturierung",
+      "Zielgruppen-spezifische Ansprache",
+      "ROI & Transformation-Messaging",
+      "Voraussetzungs-Klarheit",
+      "Download & Delivery-Optionen",
+      "Erfolgs-Story Integration",
+      "Garantien & Risk-Reversal Strategien"
+    ],
+    "installedAt": 1767387846502,
+    "filePath": "C:\\Entwicklung\\neuer-git-ordner\\ki\\backend\\data\\specializations\\default\\digitale-kurse.enc",
+    "isActive": false
+  }
+]

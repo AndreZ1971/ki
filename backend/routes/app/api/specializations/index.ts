@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import crypto from 'crypto';
 import { SpecializationService } from '../../../../services/specializationService';
+import { SpecializationPersistenceManager } from '../../../../services/specializationPersistenceManager';
 import {
   SpecializationData,
 } from '../../../../types/specialization';
@@ -274,6 +275,33 @@ export default async function specializationRoutes(server: FastifyInstance) {
           userId
         );
 
+        // Sync with PersistenceManager for AutoLoad compatibility
+        const specContext = {
+          id: sanitized.id as string,
+          name: sanitized.name as string,
+          systemPrompt: sanitized.systemPrompt as string,
+          contextInstructions: (sanitized.contextInstructions as string[]) || [],
+          description: sanitized.description as string,
+          category: sanitized.category as string,
+          version: sanitized.version as string,
+          features: (sanitized.features as string[]) || [],
+        };
+
+        await SpecializationPersistenceManager.persistSpecialization(
+          specContext,
+          userId
+        );
+
+        // Set as active specialization (deactivates all others first)
+        await SpecializationService.activateSpecialization(
+          userId,
+          sanitized.id as string
+        );
+        await SpecializationPersistenceManager.setActiveSpecialization(
+          sanitized.id as string,
+          userId
+        );
+
         const uploadDuration = Date.now() - uploadStartTime;
 
         // Audit logging
@@ -289,7 +317,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
             duration: uploadDuration,
             status: 'SUCCESS',
           },
-          `✅ Spezialisierung erfolgreich hochgeladen: ${stored.name}`
+          `✅ Spezialisierung erfolgreich hochgeladen und aktiviert: ${stored.name}`
         );
 
         return reply.send({
@@ -368,7 +396,14 @@ export default async function specializationRoutes(server: FastifyInstance) {
         const { specId } = request.body;
         const userId = 'default'; // TODO: Get from auth
 
+        // Activate in both systems
         await SpecializationService.activateSpecialization(userId, specId);
+        await SpecializationPersistenceManager.setActiveSpecialization(
+          specId,
+          userId
+        );
+
+        logger.info(`✅ Spezialisierung aktiviert: ${specId} (User: ${userId})`);
 
         return reply.send({
           success: true,

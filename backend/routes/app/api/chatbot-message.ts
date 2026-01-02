@@ -5,6 +5,7 @@ import * as dotenv from 'dotenv';
 import { getConfig } from '@config';
 import { getShopStats, getSystemHealth } from '../../../services/shopData';
 import { getOpenAIClient, executeOpenAI } from '../../../utils/openaiHelper';
+import { SpecializationService } from '../../../services/specializationService';
 
 dotenv.config();
 
@@ -178,7 +179,12 @@ export default async function chatbotMessageRoute(server: FastifyInstance) {
       try {
         const stats = await getShopStats();
         const health = await getSystemHealth();
-        const systemPrompt = `Du bist ein KI-Shopassistent für das System A.R.I. Antworte immer bevorzugt mit Hinweisen auf interne Shop- und Systemfunktionen. Verweise NIEMALS auf externe Tools wie Gmail, Outlook, Thunderbird, Google Sheets, SQL-Clients oder Webmail. Nutze stattdessen folgende interne Tools:
+        
+        // Load active specialization if available
+        const userId = 'default'; // TODO: Get from auth
+        const activeSpec = await SpecializationService.getActiveSpecialization(userId);
+        
+        let systemPrompt = `Du bist ein KI-Shopassistent für das System A.R.I. Antworte immer bevorzugt mit Hinweisen auf interne Shop- und Systemfunktionen. Verweise NIEMALS auf externe Tools wie Gmail, Outlook, Thunderbird, Google Sheets, SQL-Clients oder Webmail. Nutze stattdessen folgende interne Tools:
 
       - E-Mails: Über das interne E-Mail-Modul im Menü "Kommunikation" (inkl. Vorlagen, Versand, Kampagnen)
       - E-Mail-Kampagnen: Im Modul "E-Mail Marketing Automation" (Planung, Versand, Automatisierung)
@@ -190,6 +196,22 @@ export default async function chatbotMessageRoute(server: FastifyInstance) {
       - Automatisierungen: Im Modul "Automation"
 
       Shopname: ${stats.shopName}. Umsatz heute: ${stats.salesToday} EUR. Bestellungen: ${stats.ordersToday}. Produkte: ${stats.products}. Systemstatus: ${health.status}. CPU: ${health.cpu}%. RAM: ${health.memory}%. Antworte freundlich, präzise und auf Basis dieser Shopdaten.`;
+      
+        // Override with specialization systemPrompt if active
+        if (activeSpec && activeSpec.systemPrompt) {
+          systemPrompt = `${activeSpec.systemPrompt}
+
+📊 Aktuelle Shop-Daten:
+Shopname: ${stats.shopName}
+Umsatz heute: ${stats.salesToday} EUR
+Bestellungen: ${stats.ordersToday}
+Produkte: ${stats.products}
+Systemstatus: ${health.status}
+CPU: ${health.cpu}%
+RAM: ${health.memory}%
+
+${activeSpec.contextInstructions ? activeSpec.contextInstructions.join('\n') : ''}`;
+        }
         const userPrompt = `Frage: ${message}`;
         const openai = getOpenAIClient();
         const completion = await executeOpenAI(

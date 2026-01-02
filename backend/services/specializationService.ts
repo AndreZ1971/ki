@@ -10,6 +10,20 @@ import {
 import { logger } from '../logger';
 
 /**
+ * Lädt connection.json für Secrets
+ */
+function loadConnectionConfig(): { specialization?: { encryptionKey?: string } } {
+  try {
+    const configPath = path.join(process.cwd(), 'connection.json');
+    const configData = fs.readFileSync(configPath, 'utf-8');
+    return JSON.parse(configData);
+  } catch (error) {
+    logger.warn('⚠️ connection.json nicht gefunden, nutze Fallback');
+    return {};
+  }
+}
+
+/**
  * Public Key von kaufe-es.eu für Signatur-Validierung
  * TODO: In Produktion aus Environment-Variable laden
  */
@@ -21,9 +35,12 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyVxQ9jK5pZ7N2rH8kE3v
 -----END PUBLIC KEY-----`;
 
 const ENCRYPTION_ALGORITHM = 'aes-256-gcm';
+
+// Lade Encryption Key aus connection.json
+const config = loadConnectionConfig();
 const ENCRYPTION_KEY = Buffer.from(
-  process.env.SPEC_ENCRYPTION_KEY || 'default-32-byte-key-change-me!',
-  'utf-8'
+  config.specialization?.encryptionKey || 'default-32-byte-key-change-me!',
+  'hex'
 ).subarray(0, 32);
 
 const DATA_DIR = path.join(process.cwd(), 'data', 'specializations');
