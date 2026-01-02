@@ -28,6 +28,11 @@ chmod -R 755 /app/data 2>/dev/null || true
 
 # 3. CONNECTION.JSON INITIALISIEREN (ALLE FELDER - VOLLSTÄNDIG)
 echo "[Entrypoint] 📝 Erstelle connection.json mit ALLEN erforderlichen Feldern..."
+
+# 🔐 Generiere sicheren Encryption Key für Spezialisierungen (32 Bytes = 64 Hex Chars)
+SPEC_ENCRYPTION_KEY=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+echo "[Entrypoint] 🔐 Generiere Verschlüsselungs-Key für Spezialisierungen..."
+
 cat <<'CONNECTION_JSON' > /app/connection.json
 {
   "_description": "A.R.I. Configuration File - ALLE Felder müssen in UI gefüllt werden",
@@ -173,11 +178,20 @@ cat <<'CONNECTION_JSON' > /app/connection.json
     "updatedAt": "2025-12-19T00:00:00Z",
     "environment": "production",
     "backups": []
+  },
+
+  "specialization": {
+    "_comment": "ARI Specialization Encryption - Auto-generiert beim Container-Start",
+    "encryptionKey": "SPEC_KEY_PLACEHOLDER"
   }
 }
 CONNECTION_JSON
 
+# 🔐 Ersetze Placeholder mit echtem Key
+sed -i "s/SPEC_KEY_PLACEHOLDER/$SPEC_ENCRYPTION_KEY/g" /app/connection.json
+
 echo "[Entrypoint] ✅ connection.json erfolgreich erstellt"
+echo "[Entrypoint] 🔐 Verschlüsselungs-Key für Spezialisierungen generiert"
 
 # 4. BERECHTIGUNGEN FÜR CONNECTION.JSON
 echo "[Entrypoint] 🔒 Setze Berechtigungen für connection.json..."
