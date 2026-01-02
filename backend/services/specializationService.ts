@@ -17,7 +17,7 @@ function loadConnectionConfig(): { specialization?: { encryptionKey?: string } }
     const configPath = path.join(process.cwd(), 'connection.json');
     const configData = fs.readFileSync(configPath, 'utf-8');
     return JSON.parse(configData);
-  } catch (error) {
+  } catch {
     logger.warn('⚠️ connection.json nicht gefunden, nutze Fallback');
     return {};
   }
