@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import FormData from "form-data";
 
 /**
  * Integration Tests für Spezialisierungs-Upload
@@ -58,7 +57,6 @@ describe("Specialization Upload API", () => {
         const response = await fetch(uploadEndpoint, {
           method: "POST",
           body: form,
-          headers: form.getHeaders(),
         });
 
         expect(response.status).toBe(200);
@@ -95,7 +93,6 @@ ${specialization.id},${specialization.name},${specialization.description},"${spe
         const response = await fetch(uploadEndpoint, {
           method: "POST",
           body: form,
-          headers: form.getHeaders(),
         });
 
         expect(response.status).toBe(200);
@@ -125,7 +122,6 @@ ${specialization.id},${specialization.name},${specialization.description},"${spe
         const response = await fetch(uploadEndpoint, {
           method: "POST",
           body: form,
-          headers: form.getHeaders(),
         });
 
         expect(response.status).toBe(400);
@@ -156,7 +152,6 @@ ${specialization.id},${specialization.name},${specialization.description},"${spe
         const response = await fetch(uploadEndpoint, {
           method: "POST",
           body: form,
-          headers: form.getHeaders(),
         });
 
         expect(response.status).toBe(400);
@@ -188,7 +183,6 @@ ${specialization.id},${specialization.name},${specialization.description},"${spe
         const response = await fetch(uploadEndpoint, {
           method: "POST",
           body: form,
-          headers: form.getHeaders(),
         });
 
         expect(response.status).toBe(413);
@@ -220,7 +214,6 @@ ${specialization.id},${specialization.name},${specialization.description},"${spe
         const response = await fetch(uploadEndpoint, {
           method: "POST",
           body: form,
-          headers: form.getHeaders(),
         });
 
         expect(response.status).toBe(400);
@@ -262,7 +255,6 @@ ${specialization.id},${specialization.name},${specialization.description},"${spe
         const response = await fetch(uploadEndpoint, {
           method: "POST",
           body: form,
-          headers: form.getHeaders(),
         });
 
         expect(response.status).toBe(400);
@@ -360,7 +352,6 @@ ${specialization.id},${specialization.name},${specialization.description},"${spe
         const response = await fetch(uploadEndpoint, {
           method: "POST",
           body: form,
-          headers: form.getHeaders(),
         });
 
         if (response.status === 200) {

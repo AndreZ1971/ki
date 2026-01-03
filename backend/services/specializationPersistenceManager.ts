@@ -19,7 +19,42 @@ import { SpecializationContext } from '../types/specialization';
  *       ├── [specializationId].enc
  *       ├── [specializationId].meta.json
  *       └── fallback.json (Letzte funktionierende Version)
+ *
+ * CONCURRENCY CONTROL:
+ * - Mutex-basiertes Locking verhindert Race Conditions
+ * - Separate Locks für active.json, index.json und Spezialisierungen
+ * - Write-to-temp + Rename für atomic operations
  */
+
+/**
+ * SimpleMutex - Verhindert concurrent writes auf kritische Dateien
+ */
+class SimpleMutex {
+  private locks = new Map<string, Promise<void>>();
+
+  async acquire(key: string): Promise<() => void> {
+    // Warte auf bestehenden Lock
+    while (this.locks.has(key)) {
+      await this.locks.get(key);
+    }
+
+    // Erstelle neuen Lock
+    let resolver: () => void = () => {};
+    const lockPromise = new Promise<void>((resolve) => {
+      resolver = resolve;
+    });
+
+    this.locks.set(key, lockPromise);
+
+    // Rückgabe Unlock-Funktion
+    return () => {
+      this.locks.delete(key);
+      resolver();
+    };
+  }
+}
+
+const fileMutex = new SimpleMutex();
 
 interface SpecializationMetadata {
   id: string;
@@ -105,7 +140,8 @@ export class SpecializationPersistenceManager {
   }
 
   /**
-   * Speichert eine Spezialisierung persistent
+   * Speichert eine Spezialisierung persistent (mit Atomic Write)
+   * 🔒 Thread-safe mit Mutex + Write-to-Temp-Rename Pattern
    */
   static async persistSpecialization(
     specialization: SpecializationContext,
@@ -115,6 +151,7 @@ export class SpecializationPersistenceManager {
     id?: string;
     fallbackReady: boolean;
   }> {
+    const unlock = await fileMutex.acquire(`spec-${userId}-${specialization.id}`);
     try {
       const specializationId = specialization.id;
       const userDir = path.join(this.DATA_DIR, userId);
@@ -128,9 +165,12 @@ export class SpecializationPersistenceManager {
         .update(JSON.stringify(specialization))
         .digest('hex');
 
-      // Speichere Spezialisierung als JSON (wird von SpecializationService verschlüsselt)
+      // Speichere Spezialisierung mit atomic write (write-to-temp + rename)
       const specFile = path.join(userDir, `${specializationId}.json`);
-      await fs.writeFile(specFile, JSON.stringify(specialization, null, 2));
+      const tempSpecFile = `${specFile}.tmp`;
+      
+      await fs.writeFile(tempSpecFile, JSON.stringify(specialization, null, 2));
+      await fs.rename(tempSpecFile, specFile);
 
       // Speichere Metadaten
       const metadata: SpecializationMetadata = {
@@ -145,7 +185,10 @@ export class SpecializationPersistenceManager {
       };
 
       const metaFile = path.join(userDir, `${specializationId}.meta.json`);
-      await fs.writeFile(metaFile, JSON.stringify(metadata, null, 2));
+      const tempMetaFile = `${metaFile}.tmp`;
+      
+      await fs.writeFile(tempMetaFile, JSON.stringify(metadata, null, 2));
+      await fs.rename(tempMetaFile, metaFile);
 
       // Update Index
       const index = await this.loadIndex();
@@ -164,7 +207,7 @@ export class SpecializationPersistenceManager {
 
       await this.saveIndex(index);
 
-      // Speichere auch als Fallback
+      // Speichere auch als Fallback (atomic)
       const fallbackData = {
         specializationId,
         userId,
@@ -172,13 +215,13 @@ export class SpecializationPersistenceManager {
         timestamp: Date.now(),
         checksum,
       };
-      await fs.writeFile(
-        this.FALLBACK_FILE,
-        JSON.stringify(fallbackData, null, 2)
-      );
+      const tempFallbackFile = `${this.FALLBACK_FILE}.tmp`;
+      
+      await fs.writeFile(tempFallbackFile, JSON.stringify(fallbackData, null, 2));
+      await fs.rename(tempFallbackFile, this.FALLBACK_FILE);
 
       logger.info(
-        `✅ Spezialisierung persistiert: ${specializationId} (User: ${userId})`
+        `✅ Spezialisierung persistiert: ${specializationId} (User: ${userId}) [atomic write]`
       );
 
       return {
@@ -197,6 +240,8 @@ export class SpecializationPersistenceManager {
         success: false,
         fallbackReady: false,
       };
+    } finally {
+      unlock();
     }
   }
 
@@ -242,12 +287,14 @@ export class SpecializationPersistenceManager {
   }
 
   /**
-   * Setzt die aktive Spezialisierung
+   * Setzt die aktive Spezialisierung (mit Concurrency Lock)
+   * 🔒 Thread-safe: Mehrere concurrent Requests werden serialisiert
    */
   static async setActiveSpecialization(
     specializationId: string,
     userId: string = 'default'
   ): Promise<boolean> {
+    const unlock = await fileMutex.acquire(`active-${userId}`);
     try {
       const activeSpec: ActiveSpecialization = {
         userId,
@@ -269,6 +316,8 @@ export class SpecializationPersistenceManager {
         '❌ Fehler beim Setzen der aktiven Spezialisierung'
       );
       return false;
+    } finally {
+      unlock();
     }
   }
 
@@ -431,12 +480,14 @@ export class SpecializationPersistenceManager {
   }
 
   /**
-   * Löscht eine Spezialisierung
+   * Löscht eine Spezialisierung (mit Concurrency Lock)
+   * 🔒 Thread-safe: Verhindert conflicts bei concurrent deletes
    */
   static async deleteSpecialization(
     specializationId: string,
     userId: string = 'default'
   ): Promise<boolean> {
+    const unlock = await fileMutex.acquire(`spec-${userId}-${specializationId}`);
     try {
       const userDir = path.join(this.DATA_DIR, userId);
       const specFile = path.join(userDir, `${specializationId}.json`);
@@ -466,6 +517,8 @@ export class SpecializationPersistenceManager {
         `❌ Fehler beim Löschen der Spezialisierung: ${specializationId}`
       );
       return false;
+    } finally {
+      unlock();
     }
   }
 
@@ -482,11 +535,24 @@ export class SpecializationPersistenceManager {
   }
 
   private static async saveIndex(index: SpecializationIndex): Promise<void> {
+    // 🔒 Atomic write mit Locking
+    const unlock = await fileMutex.acquire('index.json');
     try {
-      await fs.writeFile(this.INDEX_FILE, JSON.stringify(index, null, 2));
+      const content = JSON.stringify(index, null, 2);
+      const tempFile = `${this.INDEX_FILE}.tmp`;
+
+      // Schreibe in temp-Datei
+      await fs.writeFile(tempFile, content, 'utf-8');
+
+      // Atomar verschiebe temp zu final
+      await fs.rename(tempFile, this.INDEX_FILE);
+
+      logger.debug(`✓ Index atomar gespeichert (${content.length} bytes)`);
     } catch (_error) {
       logger.error({ err: _error }, '❌ Fehler beim Speichern des Index');
       throw _error;
+    } finally {
+      unlock();
     }
   }
 
@@ -504,14 +570,29 @@ export class SpecializationPersistenceManager {
   private static async saveActiveFile(
     data: ActiveSpecialization | null
   ): Promise<void> {
+    // 🔒 Atomic write mit Locking
+    const unlock = await fileMutex.acquire('active.json');
     try {
-      await fs.writeFile(this.ACTIVE_FILE, JSON.stringify(data, null, 2));
+      const content = JSON.stringify(data, null, 2);
+      const tempFile = `${this.ACTIVE_FILE}.tmp`;
+
+      // Schreibe in temp-Datei
+      await fs.writeFile(tempFile, content, 'utf-8');
+
+      // Atomar verschiebe temp zu final (rename ist atomar)
+      await fs.rename(tempFile, this.ACTIVE_FILE);
+
+      logger.debug(
+        `✓ Active-File atomar gespeichert (${content.length} bytes)`
+      );
     } catch (_error) {
       logger.error(
         { err: _error },
         '❌ Fehler beim Speichern des Active-Files'
       );
       throw _error;
+    } finally {
+      unlock();
     }
   }
 
