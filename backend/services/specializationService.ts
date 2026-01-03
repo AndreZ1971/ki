@@ -25,14 +25,20 @@ function loadConnectionConfig(): { specialization?: { encryptionKey?: string } }
 
 /**
  * Public Key von kaufe-es.eu für Signatur-Validierung
- * TODO: In Produktion aus Environment-Variable laden
+ * Lädt aus SPEC_PUBLIC_KEY Env-Variable (Produktion) oder fallback
  */
-const KAUFE_ES_PUBLIC_KEY =
-  process.env.SPEC_PUBLIC_KEY ||
-  `-----BEGIN PUBLIC KEY-----
+const KAUFE_ES_PUBLIC_KEY = (() => {
+  const envKey = process.env.SPEC_PUBLIC_KEY;
+  if (envKey) {
+    logger.info('✅ Public Key aus SPEC_PUBLIC_KEY Env-Variable geladen');
+    return envKey;
+  }
+  logger.warn('⚠️ Verwende Fallback Public Key (nicht für Produktion empfohlen)');
+  return `-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyVxQ9jK5pZ7N2rH8kE3v
 9wQ4mF5gN7pL2sT6vU8xY9jR3kL7mN4pQ8sV6wX5yZ9jT7mL8pN9sR4vK7mT6pU9
 -----END PUBLIC KEY-----`;
+})();
 
 const ENCRYPTION_ALGORITHM = 'aes-256-gcm';
 
