@@ -407,6 +407,9 @@
     "greeting": "Hi, ich bin Ari. 🤖 Ich bin dein neuer digitaler Mitarbeiter. Ich schlafe nie, mache keine Kaffeepausen und kenne deine Lagerbestände auswendig."
   },
   "pages": {
+    "productAnalysis": {
+      "title": "🔍 KI-Produktanalyse"
+    },
     "blogpost": {
       "title": "📝 KI-Blogpost Generator",
       "topic": "Thema",
@@ -586,32 +589,6 @@
       "error": "Fehler",
       "loading": "Lädt...",
       "success": "Erfolgreich"
-    }
-  },
-  "pages": {
-    "productAnalysis": {
-      "title": "🔍 KI-Produktanalyse"
-    },
-    "blogpost": {
-      "title": "📝 KI-Blogpost Generator",
-      "topic": "Thema",
-      "keywords": "Keywords (kommagetrennt)",
-      "seo": "SEO-Optimierung",
-      "length": "Länge",
-      "lengthShort": "Kurz",
-      "lengthMedium": "Mittel",
-      "lengthLong": "Lang",
-      "language": "Sprache",
-      "generate": "Blogpost generieren",
-      "generating": "Generiere...",
-      "result": "Ergebnis",
-      "error": "Fehler beim Generieren"
-    },
-    "analytics": {
-      "title": "📈 Analytics Generator",
-      "generate": "Analyse generieren",
-      "generating": "Generiere Analyse...",
-      "error": "Fehler bei der Analytics-Generierung"
     }
   }
 }

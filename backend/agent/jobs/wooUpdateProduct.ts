@@ -2,12 +2,13 @@ import { logger } from '../../logger.js';
 
 /**
  * Aktualisiert ein bestehendes Produkt in WooCommerce
+ * TODO: Echte WooCommerce API Integration (Implementation pending)
  */
 export async function run(): Promise<void> {
   try {
     logger.info('Starte wooUpdateProduct Job');
     
-    // TODO: Echte WooCommerce API Integration
+    // Placeholder: Integration with WooCommerce REST API for product updates
     // const productId = ...;
     // const updateData = { ... };
     // await wooCommerceAPI.put(`products/${productId}`, updateData);

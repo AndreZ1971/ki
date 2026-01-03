@@ -117,9 +117,9 @@ export default async function specializationRoutes(server: FastifyInstance) {
         },
       },
     },
-    async (_request: FastifyRequest, reply: FastifyReply) => {
+    async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const userId = 'default'; // TODO: Get from auth
+        const userId = request.user?.id || request.headers['x-user-id'] || 'default';
         const specializations =
           await SpecializationService.getInstalledSpecializations(userId);
 
@@ -394,7 +394,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
     ) => {
       try {
         const { specId } = request.body;
-        const userId = 'default'; // TODO: Get from auth
+        const userId = request.user?.id || request.headers['x-user-id'] || 'default';
 
         // Activate in both systems
         await SpecializationService.activateSpecialization(userId, specId);
@@ -454,7 +454,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
     ) => {
       try {
         const { specId } = request.params;
-        const userId = 'default'; // TODO: Get from auth
+        const userId = request.user?.id || request.headers['x-user-id'] || 'default';
 
         await SpecializationService.deleteSpecialization(userId, specId);
 
@@ -502,9 +502,9 @@ export default async function specializationRoutes(server: FastifyInstance) {
         },
       },
     },
-    async (_request: FastifyRequest, reply: FastifyReply) => {
+    async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const userId = 'default'; // TODO: Get from auth
+        const userId = request.user?.id || request.headers['x-user-id'] || 'default';
         const active =
           await SpecializationService.getActiveSpecialization(userId);
 
