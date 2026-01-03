@@ -250,30 +250,57 @@ export default async function categoryRoutes(server: FastifyInstance) {
         );
 
         const rawContent = completion.choices[0]?.message?.content || '';
+        console.log('🔍 [CategorySuggest] OpenAI Response:', rawContent.substring(0, 200));
 
         let parsed: { suggestions?: CategorySuggestion[] } = {};
         try {
           parsed = JSON.parse(rawContent);
         } catch (_parseError) {
-          console.warn('⚠️ [CategorySuggest] Konnte JSON nicht direkt parsen, sende Fallback', _parseError);
+          console.warn('⚠️ [CategorySuggest] Konnte JSON nicht direkt parsen, versuche zu reparieren', _parseError);
+          // Fallback: versuche JSON in der Response zu finden
+          const jsonMatch = rawContent.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            try {
+              parsed = JSON.parse(jsonMatch[0]);
+            } catch (e2) {
+              console.error('❌ JSON-Reparatur fehlgeschlagen:', e2);
+            }
+          }
         }
 
-        const suggestions = (parsed.suggestions || []).filter(s => s.name).slice(0, maxSuggestions).map(s => ({
-          name: s.name,
-          confidence: Math.min(Math.max(s.confidence ?? 0.5, 0), 1),
-          reason: s.reason || 'Automatisch vorgeschlagen'
-        }));
+        const suggestions = (parsed.suggestions || [])
+          .filter(s => s && s.name && typeof s.name === 'string')
+          .slice(0, maxSuggestions)
+          .map(s => ({
+            name: String(s.name).trim(),
+            confidence: Math.min(Math.max(Number(s.confidence) || 0.5, 0), 1),
+            reason: s.reason || 'Automatisch vorgeschlagen'
+          }));
 
+        // Fallback mit bekannten Kategorien falls AI fehlschlägt
         if (suggestions.length === 0) {
-          return reply.code(502).send({ success: false, error: 'Keine gültigen Vorschläge erhalten' });
+          console.warn('⚠️ [CategorySuggest] Keine gültigen AI-Vorschläge, nutze Fallback');
+          const categories = await fetchWooCategories();
+          const fallbackSuggestions = categories
+            .sort((a, b) => b.productCount - a.productCount)
+            .slice(0, maxSuggestions)
+            .map(cat => ({
+              name: cat.name,
+              confidence: 0.6,
+              reason: 'Häufigste Kategorie (Fallback)'
+            }));
+          
+          if (fallbackSuggestions.length > 0) {
+            return reply.send({ success: true, suggestions: fallbackSuggestions });
+          }
         }
 
         return reply.send({ success: true, suggestions });
       } catch (_error) {
-        console.error('Category ML Suggest Error:', _error);
+        console.error('❌ Category ML Suggest Error:', _error);
         return reply.status(500).send({
           success: false,
-          error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
+          error: _error instanceof Error ? _error.message : 'Kategorievorschläge konnten nicht generiert werden'
         });
       }
     }
