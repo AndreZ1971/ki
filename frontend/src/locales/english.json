@@ -2,6 +2,16 @@
   "welcome": "Welcome",
   "language": "Language",
   "change_language": "Change language",
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "username": "Username",
+    "password": "Password",
+    "secureLogin": "Secure Login for A.R.I.",
+    "loginError": "Login failed",
+    "securityNote": "Your data is securely encrypted",
+    "defaultCredentials": "Default login"
+  },
   "header": {
     "title": "🚀 A.R.I. Artificial Retail Intelligence System",
     "subtitle": "Realtime analytics & AI content generation",

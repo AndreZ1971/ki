@@ -2,6 +2,16 @@
   "welcome": "Willkommen",
   "language": "Sprache",
   "change_language": "Sprache wechseln",
+  "auth": {
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "username": "Benutzername",
+    "password": "Passwort",
+    "secureLogin": "Sicherer Login für A.R.I.",
+    "loginError": "Anmeldung fehlgeschlagen",
+    "securityNote": "Ihre Daten sind sicher verschlüsselt",
+    "defaultCredentials": "Standard-Login"
+  },
   "header": {
     "title": "🚀 A.R.I. Artificial Retail Intelligence System",
     "subtitle": "Realtime Analytics & KI-Content-Generierung",
