@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <title>Cache clearen...</title>
+</head>
+<body>
+    <h1>localStorage wird geleert...</h1>
+    <script>
+        localStorage.clear();
+        sessionStorage.clear();
+        // Navigation zu /login nach 1 Sekunde
+        setTimeout(() => {
+            window.location.href = '/login';
+        }, 1000);
+    </script>
+</body>
+</html>

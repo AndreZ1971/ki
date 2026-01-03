@@ -37,31 +37,50 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const checkAuth = async () => {
+    console.log('🔐 checkAuth called');
     try {
       const token = localStorage.getItem('authToken');
+      console.log('🔐 token from localStorage:', token ? 'exists' : 'null');
+      
       if (!token) {
+        console.log('🔐 No token, setting isLoading to false');
+        setUser(null);
         setIsLoading(false);
         return;
       }
+
+      console.log('🔐 Token exists, fetching /api/auth/me');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        console.log('🔐 Timeout reached, aborting fetch');
+        controller.abort();
+      }, 5000);
 
       const response = await fetch('http://localhost:3000/api/auth/me', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
+      console.log('🔐 /api/auth/me response:', response.status);
 
       if (response.ok) {
         const userData = await response.json();
+        console.log('🔐 Auth successful, user:', userData.user.username);
         setUser(userData.user);
       } else {
+        console.log('🔐 Auth failed, removing token');
         localStorage.removeItem('authToken');
         setUser(null);
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
+      console.error('🔐 Auth check failed:', error);
       localStorage.removeItem('authToken');
       setUser(null);
     } finally {
+      console.log('🔐 Setting isLoading to false');
       setIsLoading(false);
     }
   };
