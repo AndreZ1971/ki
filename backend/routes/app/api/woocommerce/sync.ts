@@ -118,11 +118,11 @@ const syncRoutes: FastifyPluginAsync = async (fastify) => {
         type,
       };
 
-      return {
+      return reply.send({
         success: true,
         data: result,
         message: `Sync (${type}) erfolgreich`,
-      };
+      });
     } catch (error: any) {
       const status = error?.response?.status || 500;
       const data = error?.response?.data;

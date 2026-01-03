@@ -1,0 +1,266 @@
+Bug's
+
+https://my-working-space.de/marketing/email-automation
+
+index-M6dz3u_J.js:364  GET https://my-working-space.de/api/customers/segments 404 (Not Found)
+(anonym) @ index-M6dz3u_J.js:364
+(anonym) @ index-M6dz3u_J.js:364
+tl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+Bl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+Bl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+Bl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+Bl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+Bl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+Bl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+Bl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+Bl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+Bl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+Bl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+Bl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+sd @ index-M6dz3u_J.js:8
+(anonym) @ index-M6dz3u_J.js:8
+D @ index-M6dz3u_J.js:1Fehler nachvollziehen
+index-M6dz3u_J.js:364 Fehler beim Laden der Kundensegmente: Error: API Error 404
+    at index-M6dz3u_J.js:364:78653
+------------------------------------------------------------------------------------------
+
+https://my-working-space.de/advanced/woocommerce-sync
+
+index-M6dz3u_J.js:183  POST https://my-working-space.de/api/woocommerce/sync 500 (Internal Server Error)
+PY @ index-M6dz3u_J.js:183
+sync @ index-M6dz3u_J.js:183
+(anonym) @ index-M6dz3u_J.js:364
+Bd @ index-M6dz3u_J.js:8
+(anonym) @ index-M6dz3u_J.js:8
+sn @ index-M6dz3u_J.js:8
+Gd @ index-M6dz3u_J.js:8
+Np @ index-M6dz3u_J.js:9
+jp @ index-M6dz3u_J.js:9Fehler nachvollziehen
+index-M6dz3u_J.js:183 API Error [/api/woocommerce/sync]: Error: HTTP Error: 500
+    at PY (index-M6dz3u_J.js:183:74471)
+    at async index-M6dz3u_J.js:364:61564
+
+-------------------------------------------------------------------------------------------
+
+https://my-working-space.de/marketing/ai-email-generator
+
+index-M6dz3u_J.js:182 
+ GET https://my-working-space.de/api/woocommerce/subscribers 500 (Internal Server Error)
+le	@	index-M6dz3u_J.js:182
+(anonym)	@	index-M6dz3u_J.js:182
+tl	@	index-M6dz3u_J.js:8
+Vl	@	index-M6dz3u_J.js:8
+Bl	@	index-M6dz3u_J.js:8
+Vl	@	index-M6dz3u_J.js:8
+Bl	@	index-M6dz3u_J.js:8
+Vl	@	index-M6dz3u_J.js:8
+Bl	@	index-M6dz3u_J.js:8
+Vl	@	index-M6dz3u_J.js:8
+Bl	@	index-M6dz3u_J.js:8
+Vl	@	index-M6dz3u_J.js:8
+Bl	@	index-M6dz3u_J.js:8
+Vl	@	index-M6dz3u_J.js:8
+Bl	@	index-M6dz3u_J.js:8
+Vl	@	index-M6dz3u_J.js:8
+Bl	@	index-M6dz3u_J.js:8
+Vl	@	index-M6dz3u_J.js:8
+Bl	@	index-M6dz3u_J.js:8
+Vl	@	index-M6dz3u_J.js:8
+Bl	@	index-M6dz3u_J.js:8
+Vl	@	index-M6dz3u_J.js:8
+Bl	@	index-M6dz3u_J.js:8
+Vl	@	index-M6dz3u_J.js:8
+Bl	@	index-M6dz3u_J.js:8
+Vl	@	index-M6dz3u_J.js:8
+sd	@	index-M6dz3u_J.js:8
+(anonym)	@	index-M6dz3u_J.js:8
+D	@	index-M6dz3u_J.js:1
+
+-------------------------------------------------------------------------------------------
+
+https://my-working-space.de/products/categories-manager
+
+vorschläge bei online kurse schlägt fehl
+
+Browserconsole bleibt leer
+
+-------------------------------------------------------------------------------------------
+
+https://my-working-space.de/analytics/real-analytics
+
+anzahl der user stimmt nicht
+
+Browserconsole bleibt leer
+
+-------------------------------------------------------------------------------------------
+
+https://my-working-space.de/analytics/trend-analysis
+
+einfach nochmal genauer testen
+
+Browserconsole bleibt leer
+
+-------------------------------------------------------------------------------------------
+
+https://my-working-space.de/analytics/conversion-reported
+
+einfach nochmal genauer testen
+
+Browserconsole bleibt leer
+
+-------------------------------------------------------------------------------------------
+
+https://my-working-space.de/analytics/feedback-analysis
+
+ausgabe der Rohdaten ???
+
+-------------------------------------------------------------------------------------------
+
+https://my-working-space.de/products/analyzer
+
+
+
+Nein.
+Priorität
+Testname
+Testbeschreibung
+
+1
+
+Hoch
+High
+Successful POST Request
+Validate that a valid POST request with required fields returns a success status code and the expected JSON response structure.
+
+2
+
+Hoch
+High
+Missing Required Fields
+Check the API response when attempting to create a product without mandatory fields, ensuring it returns an appropriate error message and status code.
+
+3
+
+Mittel
+Medium
+Invalid Data Types
+Send a POST request with invalid data types in the request body and confirm the API responds with a validation error and an appropriate status code.
+
+4
+
+Mittel
+Medium
+Duplicate Product Creation
+Test the scenario where the same product is submitted multiple times in succession and verify that the system returns a conflict or error status appropriately.
+
+5
+
+Niedrig
+Low
+Product Creation with Optional Fields
+Ensure that a POST request with optional parameters, such as tags or additional attributes, succeeds and the product is created correctly.
+
+
+Grenztests
+
+Nein.
+Priorität
+Testname
+Testbeschreibung
+
+1
+
+Mittel
+Medium
+Minimum Length for String Fields
+Test how the API handles minimal length conditions for string fields in the POST request and ensure proper validation messages are returned.
+
+2
+
+Mittel
+Medium
+Maximum Length for String Fields
+Test the API's behavior by hitting the maximum allowed character limits for string fields in the POST request, checking for valid responses or errors.
+
+3
+
+Mittel
+Medium
+Numbers in String Fields
+Submit a POST request where numeric values are incorrectly sent as strings in fields expecting numeric types to check error handling.
+
+4
+
+Niedrig
+Low
+Character Encoding
+Send special characters in string fields through a POST request to verify that the API properly processes and stores the data without errors.
+
+5
+
+Niedrig
+Low
+Exceeding Maximum Inputs
+Attempt to send a payload larger than the expected limit for a POST request to validate how the API responds to overly large requests and any error messages.
+
+Access to fetch at 'http://localhost:3000/api/products/woo/products?per_page=100' from origin 'https://my-working-space.de' has been blocked by CORS policy: Permission was denied for this request to access the `unknown` address space.Fehler nachvollziehen
+index-M6dz3u_J.js:192  GET http://localhost:3000/api/products/woo/products?per_page=100 net::ERR_FAILED
+(anonym) @ index-M6dz3u_J.js:192
+(anonym) @ index-M6dz3u_J.js:192
+tl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+Bl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+Bl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+Bl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+Bl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+Bl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+Bl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+Bl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+Bl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+Bl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+Bl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+Bl @ index-M6dz3u_J.js:8
+Vl @ index-M6dz3u_J.js:8
+sd @ index-M6dz3u_J.js:8
+od @ index-M6dz3u_J.js:8
+Od @ index-M6dz3u_J.js:8
+Cd @ index-M6dz3u_J.js:8
+id @ index-M6dz3u_J.js:8
+td @ index-M6dz3u_J.js:8
+Fu @ index-M6dz3u_J.js:8
+Pu @ index-M6dz3u_J.js:8
+Dd @ index-M6dz3u_J.js:8
+D @ index-M6dz3u_J.js:1Fehler nachvollziehen
+index-M6dz3u_J.js:192 ❌ Fehler beim Laden der Produkte: TypeError: Failed to fetch
+    at index-M6dz3u_J.js:192:660
+    at index-M6dz3u_J.js:192:1356
+    at tl (index-M6dz3u_J.js:8:92059)
+    at Vl (index-M6dz3u_J.js:8:107253)
+    at Bl (index-M6dz3u_J.js:8:107137)
+    at Vl (index-M6dz3u_J.js:8:108018)
+    at Bl (index-M6dz3u_J.js:8:107137)
+    at Vl (index-M6dz3u_J.js:8:107233)
+    at Bl (index-M6dz3u_J.js:8:107137)
+    at Vl (index-M6dz3u_J.js:8:107233)

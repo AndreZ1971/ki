@@ -51,6 +51,7 @@ import conversionRoutesMarketing from './routes/app/api/marketing/conversion-rou
 import contentRoutes from './routes/app/api/marketing/content-routes';
 import mlMarketingRoutes from './routes/app/api/marketing/ml-marketing';
 import { emailEnhancementRoutes } from './routes/app/api/marketing/email-enhancement';
+import emailMarketingRoutes from './routes/app/api/marketing/email-marketing';
 
 // 🔥 SPECIALIZATIONS ROUTES
 import specializationRoutes from './routes/app/api/specializations';
@@ -468,6 +469,9 @@ async function buildServer() {
 
     await server.register(contentRoutes); // Already has full paths
     console.log('✅ Content Routes erfolgreich registriert');
+
+    await server.register(emailMarketingRoutes); // Already has /api/customers/segments endpoint
+    console.log('✅ Email Marketing Routes erfolgreich registriert');
 
     await server.register(templateRoutes); // Already has full paths
     console.log('✅ Template Routes erfolgreich registriert');
