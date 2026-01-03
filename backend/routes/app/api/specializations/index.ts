@@ -119,7 +119,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const userId = request.user?.id || request.headers['x-user-id'] || 'default';
+        const userId = request.user?.id || (typeof request.headers['x-user-id'] === 'string' ? request.headers['x-user-id'] : undefined) || 'default';
         const specializations =
           await SpecializationService.getInstalledSpecializations(userId);
 
@@ -394,7 +394,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
     ) => {
       try {
         const { specId } = request.body;
-        const userId = request.user?.id || request.headers['x-user-id'] || 'default';
+        const userId = request.user?.id || (typeof request.headers['x-user-id'] === 'string' ? request.headers['x-user-id'] : undefined) || 'default';
 
         // Activate in both systems
         await SpecializationService.activateSpecialization(userId, specId);
@@ -454,7 +454,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
     ) => {
       try {
         const { specId } = request.params;
-        const userId = request.user?.id || request.headers['x-user-id'] || 'default';
+        const userId = request.user?.id || (typeof request.headers['x-user-id'] === 'string' ? request.headers['x-user-id'] : undefined) || 'default';
 
         await SpecializationService.deleteSpecialization(userId, specId);
 
@@ -504,7 +504,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const userId = request.user?.id || request.headers['x-user-id'] || 'default';
+        const userId = request.user?.id || (typeof request.headers['x-user-id'] === 'string' ? request.headers['x-user-id'] : undefined) || 'default';
         const active =
           await SpecializationService.getActiveSpecialization(userId);
 

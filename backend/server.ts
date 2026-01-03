@@ -57,6 +57,9 @@ import specializationRoutes from './routes/app/api/specializations';
 import blogpostRoutes from './routes/app/api/marketing/blogpost-routes';
 import imageAnalysisRoutes from './routes/app/api/marketing/image-analysis-routes';
 
+// 🔐 AUTH ROUTES
+import authRoutes from './routes/app/api/auth';
+
 // 🔐 SPECIALIZATION PERSISTENCE & AUTO-LOAD
 import { SpecializationPersistenceManager } from './services/specializationPersistenceManager';
 import { initializeSpecializationAutoLoad as _initializeSpecializationAutoLoad } from './services/specializationAutoLoad';
@@ -391,6 +394,10 @@ async function buildServer() {
     // ✅ USER MANAGEMENT ROUTES
     await server.register(userRoutes, { prefix: '/api' });
     console.log('✅ User Management Routes erfolgreich registriert');
+
+    // 🔐 AUTH ROUTES (Public - no auth required)
+    await server.register(authRoutes, { prefix: '/api/auth' });
+    console.log('✅ Auth Routes erfolgreich registriert');
 
     await server.register(aiEmailRoutes, { prefix: '/api/ai/email' });
     console.log('✅ AI Email Routes erfolgreich registriert');

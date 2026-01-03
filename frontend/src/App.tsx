@@ -1,6 +1,9 @@
 import UserManagement from "./pages/app/UserManagement";
 // src/App.tsx
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Login from "./pages/auth/Login";
 
 // Pages
 import AIDashboard from "./pages/AIDashboard";
@@ -78,162 +81,167 @@ import "./App.css";
 function App() {
   return (
     <div className="App">
-      <Router>
-        <Routes>
-          {/* Haupt-Dashboard als Startseite */}
-          <Route path="/" element={<AIDashboard />} />
+      <AuthProvider>
+        <Router>
+          <Routes>
+            {/* Public Route - Login */}
+            <Route path="/login" element={<Login />} />
 
-          {/* Analytics Routes */}
+            {/* Protected Routes */}
+            <Route path="/" element={<ProtectedRoute><AIDashboard /></ProtectedRoute>} />
 
-          <Route
-            path="/analytics/analytic-regioning"
-            element={<AnalyticRegioning />}
-          />
-          <Route
-            path="/analytics/conversion-analysis"
-            element={<ConversionAnalysis />}
-          />
-          <Route
-            path="/analytics/conversion-reported"
-            element={<ConversionReported />}
-          />
-          <Route path="/analytics/mini-audit" element={<MiniAudit />} />
-          <Route path="/analytics/premium-audit" element={<PremiumAudit />} />
-          <Route path="/analytics/real-analytics" element={<RealAnalytics />} />
+            {/* Analytics Routes */}
+
+            <Route
+              path="/analytics/analytic-regioning"
+              element={<ProtectedRoute><AnalyticRegioning /></ProtectedRoute>}
+            />
+            <Route
+              path="/analytics/conversion-analysis"
+              element={<ProtectedRoute><ConversionAnalysis /></ProtectedRoute>}
+            />
+            <Route
+              path="/analytics/conversion-reported"
+              element={<ProtectedRoute><ConversionReported /></ProtectedRoute>}
+            />
+          <Route path="/analytics/mini-audit" element={<ProtectedRoute><MiniAudit /></ProtectedRoute>} />
+          <Route path="/analytics/premium-audit" element={<ProtectedRoute><PremiumAudit /></ProtectedRoute>} />
+          <Route path="/analytics/real-analytics" element={<ProtectedRoute><RealAnalytics /></ProtectedRoute>} />
           <Route
             path="/analytics/real-web-analytics"
-            element={<RealWebAnalytics />}
+            element={<ProtectedRoute><RealWebAnalytics /></ProtectedRoute>}
           />
           <Route
             path="/analytics/run-trend-analysis"
-            element={<RunTrendAnalysis />}
+            element={<ProtectedRoute><RunTrendAnalysis /></ProtectedRoute>}
           />
           <Route
             path="/analytics/shop-health-report"
-            element={<ShopHealthReport />}
+            element={<ProtectedRoute><ShopHealthReport /></ProtectedRoute>}
           />
-          <Route path="/analytics/shop-metrics" element={<ShopMetrics />} />
-          <Route path="/analytics/standard-audit" element={<StandardAudit />} />
-          <Route path="/analytics/trend-analysis" element={<TrendAnalysis />} />
+          <Route path="/analytics/shop-metrics" element={<ProtectedRoute><ShopMetrics /></ProtectedRoute>} />
+          <Route path="/analytics/standard-audit" element={<ProtectedRoute><StandardAudit /></ProtectedRoute>} />
+          <Route path="/analytics/trend-analysis" element={<ProtectedRoute><TrendAnalysis /></ProtectedRoute>} />
           {/* Feedback Analysis Route */}
           <Route
             path="/analytics/feedback-analysis"
-            element={<FeedbackAnalysis />}
+            element={<ProtectedRoute><FeedbackAnalysis /></ProtectedRoute>}
           />
 
           {/* Marketing Content Routes */}
           <Route
             path="/marketing/ai-email-generator"
-            element={<AIEmailGenerator />}
+            element={<ProtectedRoute><AIEmailGenerator /></ProtectedRoute>}
           />
           <Route
             path="/marketing/content-monetized"
-            element={<ContentMonetized />}
+            element={<ProtectedRoute><ContentMonetized /></ProtectedRoute>}
           />
           <Route
             path="/marketing/email-automation"
-            element={<EmailMarketingAutomation />}
+            element={<ProtectedRoute><EmailMarketingAutomation /></ProtectedRoute>}
           />
           <Route
             path="/marketing/free-to-post"
-            element={<FreeToPostConverter />}
+            element={<ProtectedRoute><FreeToPostConverter /></ProtectedRoute>}
           />
           <Route
             path="/marketing/german-content"
-            element={<GermanContentGenerator />}
+            element={<ProtectedRoute><GermanContentGenerator /></ProtectedRoute>}
           />
-          <Route path="/marketing/kite-templates" element={<KiteTemplates />} />
+          <Route path="/marketing/kite-templates" element={<ProtectedRoute><KiteTemplates /></ProtectedRoute>} />
           <Route
             path="/marketing/social-audio"
-            element={<SocialMediaAudio />}
+            element={<ProtectedRoute><SocialMediaAudio /></ProtectedRoute>}
           />
           <Route
             path="/marketing/social-poster"
-            element={<SocialMediaPoster />}
+            element={<ProtectedRoute><SocialMediaPoster /></ProtectedRoute>}
           />
           <Route
             path="/marketing/BlogPostGenerator"
-            element={<BlogPostGenerator />}
+            element={<ProtectedRoute><BlogPostGenerator /></ProtectedRoute>}
           />
-          <Route path="/marketing/image-analyzer" element={<ImageAnalyzer />} />
+          <Route path="/marketing/image-analyzer" element={<ProtectedRoute><ImageAnalyzer /></ProtectedRoute>} />
 
           {/* Product Management Routes */}
           <Route
             path="/products/auto-creator"
-            element={<AutoProductCreator />}
+            element={<ProtectedRoute><AutoProductCreator /></ProtectedRoute>}
           />
-          <Route path="/products/analyzer" element={<ProductAnalyzer />} />
+          <Route path="/products/analyzer" element={<ProtectedRoute><ProductAnalyzer /></ProtectedRoute>} />
           <Route
             path="/products/categories-manager"
-            element={<CategoriesManager />}
+            element={<ProtectedRoute><CategoriesManager /></ProtectedRoute>}
           />
           <Route
             path="/products/create-freebies"
-            element={<CreateFreebies />}
+            element={<ProtectedRoute><CreateFreebies /></ProtectedRoute>}
           />
-          <Route path="/products/bundles" element={<ProductBundles />} />
+          <Route path="/products/bundles" element={<ProtectedRoute><ProductBundles /></ProtectedRoute>} />
           <Route
             path="/products/run-auto-creator"
-            element={<RunAutoProductCreator />}
+            element={<ProtectedRoute><RunAutoProductCreator /></ProtectedRoute>}
           />
           <Route
             path="/products/run-create-freebies"
-            element={<RunCreateFreebies />}
+            element={<ProtectedRoute><RunCreateFreebies /></ProtectedRoute>}
           />
-          <Route path="/products/woo-create" element={<WooProductCreate />} />
-          <Route path="/products/woo-update" element={<WooProductUpdate />} />
+          <Route path="/products/woo-create" element={<ProtectedRoute><WooProductCreate /></ProtectedRoute>} />
+          <Route path="/products/woo-update" element={<ProtectedRoute><WooProductUpdate /></ProtectedRoute>} />
 
           {/* ML Routes */}
-          <Route path="/ml/dashboard" element={<MLDashboard />} />
+          <Route path="/ml/dashboard" element={<ProtectedRoute><MLDashboard /></ProtectedRoute>} />
 
           {/* Advanced Tools Routes */}
           <Route
             path="/advanced/auto-framplementator"
-            element={<AutoFramplementator />}
+            element={<ProtectedRoute><AutoFramplementator /></ProtectedRoute>}
           />
           <Route
             path="/advanced/context-generator"
-            element={<ContextGenerator />}
+            element={<ProtectedRoute><ContextGenerator /></ProtectedRoute>}
           />
-          <Route path="/advanced/memory-system" element={<MemorySystem />} />
+          <Route path="/advanced/memory-system" element={<ProtectedRoute><MemorySystem /></ProtectedRoute>} />
           <Route
             path="/advanced/string-generator"
-            element={<StringGenerator />}
+            element={<ProtectedRoute><StringGenerator /></ProtectedRoute>}
           />
-          <Route path="/advanced/system-health" element={<SystemHealth />} />
+          <Route path="/advanced/system-health" element={<ProtectedRoute><SystemHealth /></ProtectedRoute>} />
           <Route
             path="/advanced/woocommerce-sync"
-            element={<WooCommerceSync />}
+            element={<ProtectedRoute><WooCommerceSync /></ProtectedRoute>}
           />
 
           {/* Payment & Finances Routes */}
-          <Route path="/payments/delivery" element={<PaymentDelivery />} />
-          <Route path="/payments/emergency" element={<PaymentEmergency />} />
-          <Route path="/payments/expansion" element={<PaymentExpansion />} />
-          <Route path="/payments/fast" element={<PaymentFast />} />
+          <Route path="/payments/delivery" element={<ProtectedRoute><PaymentDelivery /></ProtectedRoute>} />
+          <Route path="/payments/emergency" element={<ProtectedRoute><PaymentEmergency /></ProtectedRoute>} />
+          <Route path="/payments/expansion" element={<ProtectedRoute><PaymentExpansion /></ProtectedRoute>} />
+          <Route path="/payments/fast" element={<ProtectedRoute><PaymentFast /></ProtectedRoute>} />
           <Route
             path="/payments/issued-detector"
-            element={<PaymentIssuedDetector />}
+            element={<ProtectedRoute><PaymentIssuedDetector /></ProtectedRoute>}
           />
-          <Route path="/payments/quick-check" element={<PaymentQuickCheck />} />
-          <Route path="/payments/simplified" element={<PaymentSimplified />} />
-          <Route path="/payments/success" element={<PaymentSuccess />} />
-          <Route path="/payments/tester" element={<PaymentTester />} />
-          <Route path="/payments/user-favor" element={<PaymentUserFavor />} />
-          <Route path="/payments/validation" element={<PaymentValidation />} />
-          <Route path="/payments/verifier" element={<PaymentVerifier />} />
+          <Route path="/payments/quick-check" element={<ProtectedRoute><PaymentQuickCheck /></ProtectedRoute>} />
+          <Route path="/payments/simplified" element={<ProtectedRoute><PaymentSimplified /></ProtectedRoute>} />
+          <Route path="/payments/success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
+          <Route path="/payments/tester" element={<ProtectedRoute><PaymentTester /></ProtectedRoute>} />
+          <Route path="/payments/user-favor" element={<ProtectedRoute><PaymentUserFavor /></ProtectedRoute>} />
+          <Route path="/payments/validation" element={<ProtectedRoute><PaymentValidation /></ProtectedRoute>} />
+          <Route path="/payments/verifier" element={<ProtectedRoute><PaymentVerifier /></ProtectedRoute>} />
 
           {/* Settings Seiten */}
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/settings/ml" element={<MLSettings />} />
+          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/settings/ml" element={<ProtectedRoute><MLSettings /></ProtectedRoute>} />
 
           {/* Agentic Loop Monitoring */}
-          <Route path="/app/loop-monitoring" element={<LoopMonitoring />} />
+          <Route path="/app/loop-monitoring" element={<ProtectedRoute><LoopMonitoring /></ProtectedRoute>} />
 
           {/* User Management Route */}
-          <Route path="/users" element={<UserManagement />} />
+          <Route path="/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
         </Routes>
       </Router>
+      </AuthProvider>
     </div>
   );
 }

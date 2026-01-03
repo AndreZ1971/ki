@@ -181,7 +181,7 @@ export default async function chatbotMessageRoute(server: FastifyInstance) {
         const health = await getSystemHealth();
         
         // Load active specialization if available
-        const userId = request.user?.id || request.headers['x-user-id'] || 'default';
+        const userId = request.user?.id || (typeof request.headers['x-user-id'] === 'string' ? request.headers['x-user-id'] : undefined) || 'default';
         const activeSpec = await SpecializationService.getActiveSpecialization(userId);
         
         let systemPrompt = `Du bist ein KI-Shopassistent für das System A.R.I. Antworte immer bevorzugt mit Hinweisen auf interne Shop- und Systemfunktionen. Verweise NIEMALS auf externe Tools wie Gmail, Outlook, Thunderbird, Google Sheets, SQL-Clients oder Webmail. Nutze stattdessen folgende interne Tools:
