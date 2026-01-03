@@ -414,6 +414,70 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
       });
     }
   });
+
+  // GET: Newsletter Subscriber aus WooCommerce (aus Kundenliste)
+  fastify.get('/subscribers', async (request, reply) => {
+    try {
+      if (!isWooConfigured()) {
+        return reply.status(503).send({
+          success: false,
+          code: 'WOO_NOT_CONFIGURED',
+          message: 'WooCommerce ist noch nicht konfiguriert.',
+        });
+      }
+
+      console.log('📥 Fetching newsletter subscribers from WooCommerce...');
+
+      const woo = getConfig().woocommerce || {};
+      const auth = Buffer.from(
+        `${woo.consumerKey || ''}:${woo.consumerSecret || ''}`
+      ).toString('base64');
+      const wooUrl = (woo.url || '').endsWith('/')
+        ? (woo.url || '').slice(0, -1)
+        : woo.url || '';
+
+      // Fetch alle Kunden (Newsletter-Subscriber sind Kunden mit aktivem Opt-In)
+      const response = await fetch(
+        `${wooUrl}/wp-json/wc/v3/customers?per_page=100`,
+        {
+          headers: {
+            Authorization: `Basic ${auth}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const customers = await response.json();
+      
+      // Extrahiere Newsletter-Subscriber (alle mit E-Mail)
+      const subscribers = customers
+        .filter((c: any) => c.email && c.email.trim())
+        .map((c: any) => ({
+          id: c.id,
+          email: c.email,
+          first_name: c.first_name,
+          last_name: c.last_name,
+          subscribed_at: c.date_created,
+        }));
+
+      console.log(`✅ ${subscribers.length} Newsletter-Subscriber gefunden`);
+
+      return reply.send({
+        success: true,
+        data: subscribers,
+      });
+    } catch (error) {
+      console.error('❌ Newsletter Subscriber Fehler:', error);
+      reply.status(500).send({
+        success: false,
+        error: 'Konnte Newsletter-Subscriber nicht laden',
+      });
+    }
+  });
 };
 
 export default customersRoutes;
