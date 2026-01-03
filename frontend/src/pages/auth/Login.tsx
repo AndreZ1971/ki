@@ -35,7 +35,7 @@ const Login: React.FC = () => {
 
     try {
       await login(username, password);
-      navigate('/dashboard');
+      navigate('/');
     } catch (err: any) {
       setError(err.message || t('auth.loginError'));
     } finally {
@@ -103,7 +103,7 @@ const Login: React.FC = () => {
               autoComplete="username"
               autoFocus
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
               disabled={isLoading}
               InputProps={{
                 startAdornment: (
@@ -124,7 +124,7 @@ const Login: React.FC = () => {
               id="password"
               autoComplete="current-password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
               disabled={isLoading}
               InputProps={{
                 startAdornment: (

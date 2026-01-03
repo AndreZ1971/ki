@@ -1,6 +1,6 @@
 // backend/routes/app/api/auth/index.ts
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { generateToken } from '../../../../middleware/authMiddleware';
+import { generateToken, authMiddleware } from '../../../../middleware/authMiddleware';
 import { logger } from '../../../../logger';
 import crypto from 'crypto';
 
@@ -81,7 +81,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
   );
 
   // Get current user endpoint
-  fastify.get('/me', async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.get('/me', { preHandler: authMiddleware }, async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       // authMiddleware should have already populated request.user
       if (!request.user) {
