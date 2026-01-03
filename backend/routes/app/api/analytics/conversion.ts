@@ -64,17 +64,31 @@ export default async function conversionRoutes(fastify: FastifyInstance) {
           }
         });
         const customers = Array.from(customerMap.values());
+        
         // Conversion-Kennzahlen berechnen
         const totalOrders = orders.length;
         const totalCustomers = customers.length;
         const totalSales = orders.reduce(
-          (sum: number, o: any) => sum + parseFloat(o.total),
+          (sum: number, o: any) => {
+            const total = o.total ? parseFloat(String(o.total)) : 0;
+            return sum + (isNaN(total) ? 0 : total);
+          },
           0
         );
         const avgOrderValue = totalOrders > 0 ? totalSales / totalOrders : 0;
-        // Conversion-Rate: Anteil Kunden, die bestellt haben (vereinfachte Logik)
+        
+        // Conversion-Rate: Anteil Kunden, die bestellt haben
         const conversionRate =
           totalCustomers > 0 ? (totalOrders / totalCustomers) * 100 : 0;
+          
+        console.log('✅ [ConversionAnalysis]:', {
+          totalOrders,
+          totalCustomers,
+          totalSales,
+          avgOrderValue,
+          conversionRate
+        });
+        
         return reply.send({
           success: true,
           data: {
@@ -88,7 +102,7 @@ export default async function conversionRoutes(fastify: FastifyInstance) {
           },
         });
       } catch (error) {
-        console.error('Conversion Analysis Error:', error);
+        console.error('❌ Conversion Analysis Error:', error);
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Unbekannter Fehler',

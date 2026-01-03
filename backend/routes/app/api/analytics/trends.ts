@@ -76,19 +76,31 @@ export default async function trendsRoutes(fastify: FastifyInstance) {
 
     // Hole aktuelle Produkttrends für Kontext
     const config = getConfig();
-    const WC_API_URL = config.woocommerce?.url || '';
-    const WC_CONSUMER_KEY = config.woocommerce?.consumerKey || '';
-    const WC_CONSUMER_SECRET = config.woocommerce?.consumerSecret || '';
+    const wooConfig = config.woocommerce || {};
+    const wooUrl = (wooConfig.url || '').replace(/\/+$/, ''); // Remove trailing slashes
+    const auth = Buffer.from(`${wooConfig.consumerKey || ''}:${wooConfig.consumerSecret || ''}`).toString('base64');
+    
     const now = new Date();
     const after = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-    const ordersUrl = `${WC_API_URL}/wp-json/wc/v3/orders?after=${after.toISOString()}&per_page=100&consumer_key=${WC_CONSUMER_KEY}&consumer_secret=${WC_CONSUMER_SECRET}`;
+    
     let orders = [];
     try {
-      const res = await fetch(ordersUrl);
+      const res = await fetch(
+        `${wooUrl}/wp-json/wc/v3/orders?after=${after.toISOString()}&per_page=100`,
+        {
+          headers: {
+            'Authorization': `Basic ${auth}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
       if (res.ok) {
         orders = await res.json();
+      } else {
+        console.warn(`⚠️ [trends] Orders API returned ${res.status}`);
       }
-    } catch (_err) {
+    } catch (err) {
+      console.warn('⚠️ [trends] Fehler beim Laden von Orders:', err);
       // Ignoriere Fehler, KI kann auch ohne Kontext antworten
     }
     // Aggregiere Top-Produkte

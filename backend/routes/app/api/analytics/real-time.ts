@@ -131,20 +131,63 @@ function aggregateTopProducts(orders: any[]) {
 }
 
 function computeUniqueCustomers(orders: any[], customers: any[]) {
+  // Priorität 1: Direkter Customer-Count aus WooCommerce
   if (Array.isArray(customers) && customers.length > 0) {
+    console.log('✅ [uniqueCustomers] Nutze direkten Customer-Count:', customers.length);
     return customers.length;
   }
 
+  console.warn('⚠️ [uniqueCustomers] Keine direkten Customer-Daten, berechne aus Orders');
+
+  // Priorität 2: Eindeutige Billingingadressen (=kaufende Personen)
+  const uniqueBillingAddresses = new Set<string>();
   const ids = new Set<string>();
   const emails = new Set<string>();
 
   for (const order of orders) {
-    if (order?.customer_id) ids.add(String(order.customer_id));
+    // Eindeutige ID des Kunden
+    if (order?.customer_id && order.customer_id > 0) {
+      ids.add(String(order.customer_id));
+    }
+    
+    // E-Mail ist reliable Identifier
     const email = order?.billing?.email;
-    if (email) emails.add(String(email).toLowerCase());
+    if (email && typeof email === 'string') {
+      emails.add(email.toLowerCase().trim());
+    }
+    
+    // Billing-Adresse als Fingerprint
+    const billing = order?.billing;
+    if (billing?.first_name && billing?.last_name && billing?.email) {
+      const fingerprint = `${billing.first_name}|${billing.last_name}|${billing.email}`.toLowerCase();
+      uniqueBillingAddresses.add(fingerprint);
+    }
   }
 
-  return Math.max(ids.size, emails.size);
+  // Nutze die zuverlässigste Metrik
+  const emailCount = emails.size;
+  const idCount = ids.size;
+  const addressCount = uniqueBillingAddresses.size;
+
+  // Fallback-Logik: 
+  // - Wenn Emails > IDs, nutze Emails (=Gast-Orders haben keine IDs)
+  // - Wenn Adressen > Emails, nutze Adressen (=mehrere Accounts pro Email)
+  // - Fallback auf Orders-Länge als Worst-Case
+  
+  let uniqueCount = Math.max(emailCount, idCount, addressCount);
+  if (uniqueCount === 0) {
+    uniqueCount = orders.length; // Pessimistischer Fallback
+  }
+
+  console.log('🔍 [uniqueCustomers] Berechnung:', {
+    totalOrders: orders.length,
+    byId: idCount,
+    byEmail: emailCount,
+    byBillingAddress: addressCount,
+    selected: uniqueCount
+  });
+
+  return uniqueCount;
 }
 
 export default async function realTimeRoutes(fastify: FastifyInstance) {
