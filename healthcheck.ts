@@ -5,14 +5,12 @@ import process from 'process';
 let logger: { info: (...args: unknown[]) => void; error: (...args: unknown[]) => void } = console;
 
 try {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const loaded = require('./backend/dist/logger');
   if (loaded?.logger) {
     logger = loaded.logger;
   }
 } catch (_err) {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const loaded = require('./backend/logger');
     if (loaded?.logger) {
       logger = loaded.logger;

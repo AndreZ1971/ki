@@ -71,7 +71,7 @@ const StandardAudit = () => {
       calculateSummary([]);
     }
     setLoading(false);
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     loadAuditData();
