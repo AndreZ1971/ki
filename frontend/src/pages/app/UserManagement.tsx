@@ -617,15 +617,16 @@ const UserManagement: React.FC = () => {
           <div
             style={{
               background:
-                "linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02))",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
+                "linear-gradient(135deg, rgba(45, 50, 75, 0.95), rgba(50, 55, 80, 0.92))",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
               borderRadius: "16px",
               padding: "32px",
               maxWidth: "600px",
               width: "90%",
               maxHeight: "85vh",
               overflowY: "auto",
-              boxShadow: "0 25px 50px rgba(0, 0, 0, 0.3)",
+              boxShadow: "0 25px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 122, 255, 0.15)",
+              backdropFilter: "blur(10px)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -643,14 +644,23 @@ const UserManagement: React.FC = () => {
               <button
                 onClick={closeModal}
                 style={{
-                  background: "rgba(255, 59, 48, 0.2)",
-                  border: "1px solid rgba(255, 59, 48, 0.5)",
+                  background: "rgba(255, 59, 48, 0.15)",
+                  border: "1px solid rgba(255, 59, 48, 0.4)",
                   borderRadius: "8px",
                   color: "#ff3b30",
                   cursor: "pointer",
                   padding: "8px 12px",
                   fontSize: "16px",
                   fontWeight: "bold",
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(255, 59, 48, 0.25)";
+                  e.currentTarget.style.boxShadow = "0 0 12px rgba(255, 59, 48, 0.3)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "rgba(255, 59, 48, 0.15)";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               >
                 ✕
@@ -669,7 +679,7 @@ const UserManagement: React.FC = () => {
                 <div
                   style={{
                     fontSize: "12px",
-                    color: "rgba(255,255,255,0.6)",
+                    color: "rgba(255,255,255,0.85)",
                     marginBottom: "4px",
                   }}
                 >
@@ -683,7 +693,7 @@ const UserManagement: React.FC = () => {
                 <div
                   style={{
                     fontSize: "12px",
-                    color: "rgba(255,255,255,0.6)",
+                    color: "rgba(255,255,255,0.85)",
                     marginBottom: "4px",
                   }}
                 >
@@ -697,7 +707,7 @@ const UserManagement: React.FC = () => {
                 <div
                   style={{
                     fontSize: "12px",
-                    color: "rgba(255,255,255,0.6)",
+                    color: "rgba(255,255,255,0.85)",
                     marginBottom: "4px",
                   }}
                 >
@@ -717,7 +727,7 @@ const UserManagement: React.FC = () => {
                 <div
                   style={{
                     fontSize: "12px",
-                    color: "rgba(255,255,255,0.6)",
+                    color: "rgba(255,255,255,0.85)",
                     marginBottom: "4px",
                   }}
                 >
@@ -731,7 +741,7 @@ const UserManagement: React.FC = () => {
                 <div
                   style={{
                     fontSize: "12px",
-                    color: "rgba(255,255,255,0.6)",
+                    color: "rgba(255,255,255,0.85)",
                     marginBottom: "4px",
                   }}
                 >
@@ -745,7 +755,7 @@ const UserManagement: React.FC = () => {
                 <div
                   style={{
                     fontSize: "12px",
-                    color: "rgba(255,255,255,0.6)",
+                    color: "rgba(255,255,255,0.85)",
                     marginBottom: "4px",
                   }}
                 >
@@ -778,7 +788,7 @@ const UserManagement: React.FC = () => {
                   padding: "12px",
                   marginBottom: "24px",
                   fontSize: "13px",
-                  color: "rgba(255,255,255,0.7)",
+                  color: "rgba(255,255,255,0.9)",
                 }}
               >
                 ⏱️ Letzter Login:{" "}
@@ -854,20 +864,22 @@ const UserManagement: React.FC = () => {
               style={{
                 width: "100%",
                 padding: "12px",
-                background: "rgba(255, 255, 255, 0.1)",
-                border: "1px solid rgba(255, 255, 255, 0.2)",
+                background: "rgba(0, 122, 255, 0.15)",
+                border: "1px solid rgba(0, 122, 255, 0.3)",
                 borderRadius: "8px",
-                color: "white",
+                color: "#007aff",
                 cursor: "pointer",
                 fontSize: "14px",
                 fontWeight: "600",
                 transition: "all 0.2s",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(255, 255, 255, 0.15)";
+                e.currentTarget.style.background = "rgba(0, 122, 255, 0.25)";
+                e.currentTarget.style.boxShadow = "0 0 12px rgba(0, 122, 255, 0.3)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
+                e.currentTarget.style.background = "rgba(0, 122, 255, 0.15)";
+                e.currentTarget.style.boxShadow = "none";
               }}
             >
               Schließen
