@@ -29,6 +29,9 @@ vi.mock("../../backend/error-handling", () => ({
 
 // Provide config with a fake OpenAI API key before importing SUT
 vi.mock("../../backend/config", () => ({
+  getConfig: vi.fn(() => ({
+    openAI: { apiKey: "sk-test-1234567890" },
+  })),
   default: {
     openAI: { apiKey: "sk-test-1234567890" },
   },
