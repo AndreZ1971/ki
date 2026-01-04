@@ -129,7 +129,7 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
             setLastSavedTime(timeStr);
           }
         } catch (err) {
-          console.error("❌ Autosave Fehler:", err);
+          
         }
       };
 
@@ -160,7 +160,7 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
           _setProducts(mapped);
         }
       } catch (err) {
-        console.error("Fehler beim Laden der Produkte:", err);
+        
       } finally {
         _setProductsLoading(false);
       }
@@ -173,7 +173,7 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
   const fetchAnalysis = useCallback(async () => {
     // ✅ Verhindere parallele Requests
     if (loading) {
-      console.warn("⚠️ Analyse läuft bereits, Request ignoriert");
+      
       return;
     }
 
@@ -189,14 +189,14 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
 
     try {
       const url = buildUrl(`/api/products/adviser/analyze/${productId}`);
-      console.log("📤 Sende Analyze Request zu:", url);
+      
 
       const res = await fetch(url, {
         method: "POST",
         signal: abortControllerRef.current.signal,
       });
 
-      console.log("📥 Response Status:", res.status, res.statusText);
+      
 
       // 🚨 KRITISCH: 404 oder andere Fehler sofort erkennen
       if (res.status === 404) {
@@ -212,7 +212,7 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
       }
 
       const data = await res.json();
-      console.log("📋 Response Data:", data);
+      
 
       if (!res.ok) {
         const errorMsg = data?.error || data?.message || `HTTP ${res.status}`;
@@ -222,19 +222,18 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
       if (data.success && (data.analysis || data.data)) {
         const analysisData = data.analysis || data.data;
         setResult(analysisData as AnalysisResult);
-        console.log("✅ Analyse erfolgreich:", analysisData);
+        
       } else {
         throw new Error(data.error || "Analyse fehlgeschlagen");
       }
     } catch (err) {
       // ✅ Ignoriere aborted requests
       if (err instanceof Error && err.name === "AbortError") {
-        console.log("🔄 Request wurde abgebrochen (neuer Request gestartet)");
         return;
       }
 
       const message = err instanceof Error ? err.message : "Unbekannter Fehler";
-      console.error("❌ Analyse-Fehler:", err);
+      
       setError(`Produkt konnte nicht analysiert werden: ${message}`);
     } finally {
       setLoading(false);
@@ -288,7 +287,7 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Notizen speichern fehlgeschlagen";
-      console.error("❌ Notizen speichern Fehler:", message);
+      
     } finally {
       setNotesSaving(false);
     }
@@ -298,7 +297,7 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
     async (action: "restock" | "price" | "steering") => {
       // ✅ Verhindere parallele Actions
       if (actionLoading || loading) {
-        console.warn("⚠️ Aktion/Analyse läuft bereits");
+        
         return;
       }
 
@@ -1528,3 +1527,4 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
     </div>
   );
 };
+
