@@ -4,6 +4,7 @@ import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
 import { BackButton, LoadingButton } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
+import { apiClient } from '../../lib/api-client';
 import './page.css';
 
 interface ProductCreationResult {
@@ -74,11 +75,8 @@ const RunAutoProductCreator = () => {
   const fetchTrendingKeywords = async () => {
     setLoadingKeywords(true);
     try {
-      const response = await fetch(`/api/trends/trending-keywords?category=${selectedCategory}`);
-      if (response.ok) {
-        const data = await response.json();
-        setTrendingKeywords(data.keywords || []);
-      }
+      const data = await apiClient.get(`/api/trends/trending-keywords?category=${selectedCategory}`);
+      setTrendingKeywords(data.keywords || []);
     } catch (err) {
       console.error('Fehler beim Laden von Trending Keywords:', err);
     } finally {
@@ -118,16 +116,10 @@ const RunAutoProductCreator = () => {
         generateImages: config.generateImages
       };
 
-      const response = await fetch('/api/products/auto-create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
+      const data = await apiClient.post('/api/products/auto-create', payload);
       clearInterval(progressInterval);
 
-      if (!response.ok || !data.success) {
+      if (!data.success) {
         throw new Error(data.error || 'Fehler bei der Produkterstellung');
       }
 

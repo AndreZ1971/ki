@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiClient } from '../../lib/api-client';
 import './page.css';
 
 interface AuditCategory {
@@ -51,9 +52,7 @@ const PremiumAudit = () => {
   const fetchAudit = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/audit/premium');
-      if (!res.ok) throw new Error('Fehler beim Laden der Audit-Daten');
-      const data = await res.json();
+      const data = await apiClient.get('/api/audit/premium');
       setAuditData(data.categories || []);
       setRecommendations(data.recommendations || []);
       if (data.categories && data.categories.length > 0) {
@@ -91,14 +90,7 @@ const PremiumAudit = () => {
         overallScore: overallScore
       };
       
-      const res = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      
-      if (!res.ok) throw new Error('Fehler beim Laden der KI-Analyse');
-      const data = await res.json();
+      const data = await apiClient.post(apiUrl, payload);
       setMlInsights(data.mlInsights || []);
     } catch (err: any) {
       setMlError(err.message || 'KI-Analyse konnte nicht geladen werden.');
@@ -113,9 +105,7 @@ const PremiumAudit = () => {
     setScanLoading(true);
     setScanError(null);
     try {
-      const res = await fetch('/api/audit/premium/scan', { method: 'POST' });
-      if (!res.ok) throw new Error('Audit konnte nicht gestartet werden');
-      await res.json();
+      await apiClient.post('/api/audit/premium/scan', {});
       await fetchAudit();
     } catch (e: any) {
       setScanError(e.message || 'Unbekannter Fehler');
