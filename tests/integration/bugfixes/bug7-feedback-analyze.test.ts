@@ -299,7 +299,7 @@ describe('Bug #7: Feedback Analysis Endpoint', () => {
     it('should handle errors gracefully without 404', async () => {
       const errorServer = Fastify({ logger: false });
 
-      errorServer.post('/api/analytics/feedback/analyze', async (request, reply) => {
+      errorServer.post('/api/analytics/feedback/analyze', async (_request, _reply) => {
         throw new Error('Data aggregation failed');
       });
 

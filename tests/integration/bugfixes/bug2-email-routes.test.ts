@@ -134,7 +134,7 @@ describe('Bug #2: Email Marketing Route Registration', () => {
     it('should handle requests gracefully even on errors', async () => {
       const errorServer = Fastify({ logger: false });
       
-      errorServer.get('/api/customers/segments', async (request, reply) => {
+      errorServer.get('/api/customers/segments', async (_request, _reply) => {
         // Simulate internal error
         throw new Error('Database connection failed');
       });
