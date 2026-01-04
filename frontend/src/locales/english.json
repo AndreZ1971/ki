@@ -237,6 +237,212 @@
       "marketing": "📢 Marketing & Content",
       "advanced": "⚡ Advanced AI",
       "all": "All Tools"
+    },
+    "tools": {
+      "shopMetrics": {
+        "title": "📊 Live Shop Metrics",
+        "description": "Real-time metrics of your shop - revenue, conversion, customers"
+      },
+      "conversionAnalysis": {
+        "title": "📈 Conversion Analysis",
+        "description": "Detailed analysis of conversion rates and optimization"
+      },
+      "feedbackAnalysis": {
+        "title": "💬 Feedback Analysis",
+        "description": "AI-powered analysis of customer reviews and support tickets"
+      },
+      "conversionReported": {
+        "title": "📋 Conversion Reported",
+        "description": "Automatic conversion reports and export"
+      },
+      "trendAnalysis": {
+        "title": "📊 Trend Analysis",
+        "description": "Detect market and sales trends automatically"
+      },
+      "runTrendAnalysis": {
+        "title": "🚀 Run Trend Analysis",
+        "description": "Run trend analysis immediately"
+      },
+      "realAnalytics": {
+        "title": "🔍 Real Analytics",
+        "description": "Real-time analytics with deep insights"
+      },
+      "realWebAnalytics": {
+        "title": "🌐 Real Web Analytics",
+        "description": "Web commerce analytics and tracking"
+      },
+      "analyticRegioning": {
+        "title": "🗺️ Analytic Regioning",
+        "description": "Regional analytics and geo-targeting"
+      },
+      "shopHealthReport": {
+        "title": "🏪 Shop Health Report",
+        "description": "Complete health check of your shop"
+      },
+      "premiumAudit": {
+        "title": "⭐ Premium Audit",
+        "description": "Premium shop audit with optimization recommendations"
+      },
+      "standardAudit": {
+        "title": "🔧 Standard Audit",
+        "description": "Basic audit for quick shop optimization"
+      },
+      "miniAudit": {
+        "title": "🔎 Mini Audit",
+        "description": "Quick check of the most important shop metrics"
+      },
+      "autoProductCreator": {
+        "title": "🤖 Auto Product Creator",
+        "description": "Automatic product creation and optimization"
+      },
+      "runAutoProductCreator": {
+        "title": "🚀 Run Product Creator",
+        "description": "Start automatic product creation immediately"
+      },
+      "wooProductCreate": {
+        "title": "🛒 Woo Product Creator",
+        "description": "Direct product creation in WooCommerce"
+      },
+      "wooProductUpdate": {
+        "title": "✏️ Woo Product Updater",
+        "description": "Automatic product updates and synchronization"
+      },
+      "productAnalysis": {
+        "title": "🔍 Product Analyzer",
+        "description": "AI-powered product analysis with optimization suggestions"
+      },
+      "categoriesManager": {
+        "title": "📑 Categories Manager",
+        "description": "Automatic category management and optimization"
+      },
+      "createFreebies": {
+        "title": "🎁 Freebies Creator",
+        "description": "Create free products automatically"
+      },
+      "runCreateFreebies": {
+        "title": "🚀 Run Freebies Creator",
+        "description": "Start freebies creation immediately"
+      },
+      "productBundles": {
+        "title": "📦 Product Bundles",
+        "description": "Create and manage product bundles automatically"
+      },
+      "paymentFast": {
+        "title": "⚡ Payment Fast",
+        "description": "Fast payment processing and confirmation"
+      },
+      "paymentSimplified": {
+        "title": "🎯 Payment Simplified",
+        "description": "Simplified payment flows for better conversion"
+      },
+      "paymentTester": {
+        "title": "🧪 Payment Tester",
+        "description": "Test payment processes automatically"
+      },
+      "paymentVerifier": {
+        "title": "✅ Payment Verifier",
+        "description": "Automatic payment verification and validation"
+      },
+      "paymentSuccess": {
+        "title": "🎉 Payment Success",
+        "description": "Manage successful payment completions"
+      },
+      "paymentValidation": {
+        "title": "🔐 Payment Validation",
+        "description": "Secure payment validation and fraud check"
+      },
+      "paymentIssuedDetector": {
+        "title": "📋 Payment Issued Detector",
+        "description": "Detect and handle payment issues automatically"
+      },
+      "paymentUserFavor": {
+        "title": "❤️ Payment User Favor",
+        "description": "Personalized payment experiences for customers"
+      },
+      "paymentDelisoger": {
+        "title": "📦 Payment Delivery",
+        "description": "Payment delivery and shipping processing"
+      },
+      "paymentEnergency": {
+        "title": "🚨 Payment Emergency",
+        "description": "Emergency system for payment problems"
+      },
+      "paymentFrompansion": {
+        "title": "📈 Payment Expansion",
+        "description": "Payment system expansion and scaling"
+      },
+      "paymentQuickcheck": {
+        "title": "⚡ Payment Quick Check",
+        "description": "Quick payment status check"
+      },
+      "aiEmailGenerator": {
+        "title": "📧 AI Email Generator",
+        "description": "Create professional marketing emails in seconds"
+      },
+      "germanContentGenerator": {
+        "title": "📝 Content Generator",
+        "description": "Content creation for local marketing"
+      },
+      "emailMarketingAutomation": {
+        "title": "✉️ Email Marketing Automation",
+        "description": "Complete email marketing automation"
+      },
+      "socialMediaAudio": {
+        "title": "🎵 Social Media Audio",
+        "description": "Create audio posts for social media automatically"
+      },
+      "socialMediaPoster": {
+        "title": "📱 Social Media Poster",
+        "description": "Automatic posting to social media channels"
+      },
+      "freeToPostConverter": {
+        "title": "🆓 Free to Post Converter",
+        "description": "Convert free users to active posters"
+      },
+      "contentMonetized": {
+        "title": "💸 Content Monetized",
+        "description": "Automatic content monetization"
+      },
+      "kiteTemplates": {
+        "title": "🎨 Kite Templates",
+        "description": "Professional templates for all marketing channels"
+      },
+      "blogpostGenerator": {
+        "title": "📝 Blogpost Generator",
+        "description": "Create AI-based, SEO-optimized blog posts for your marketing"
+      },
+      "imageAnalyzer": {
+        "title": "🖼️ ImageAnalyzer",
+        "description": "AI image evaluation, automatic tagging, quality check & image SEO"
+      },
+      "contextGenerator": {
+        "title": "🧠 Context Generator",
+        "description": "Generate AI contexts for better results"
+      },
+      "stringGenerator": {
+        "title": "🔤 String Generator",
+        "description": "Intelligent string generation for various use cases"
+      },
+      "autoFramplementator": {
+        "title": "🔄 Auto Framplementator",
+        "description": "Automatic framework implementation"
+      },
+      "woocommerceSync": {
+        "title": "🔄 WooCommerce Sync",
+        "description": "Automatic synchronization with WooCommerce"
+      },
+      "memorySystem": {
+        "title": "💾 Memory System",
+        "description": "AI memory for personalized results"
+      },
+      "systemHealth": {
+        "title": "⚙️ System Health",
+        "description": "System status and performance monitoring"
+      },
+      "userManagement": {
+        "title": "👤 User Management",
+        "description": "Manage and analyze all users in the system"
+      }
     }
   },
   "tools": {
