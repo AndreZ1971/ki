@@ -2,7 +2,7 @@
 
 ## Overview
 
-The specialization system extends A.R.I. with industry-specific prompts and context. Specializations are sold on **kaufe-es.eu**, delivered as signed JSON files, and locally installed in each A.R.I. instance.
+The specialization system extends A.R.I. with industry-specific prompts and context. Specializations are sold on **kaufe-es.eu**, delivered as signed JSON files, and installed locally in each A.R.I. instance.
 
 ---
 
@@ -11,11 +11,11 @@ The specialization system extends A.R.I. with industry-specific prompts and cont
 ### **Central (kaufe-es.eu)**
 - WooCommerce shop with digital products
 - After purchase: Generation of a signed JSON file
-- Download link sent via email to customers
+- Download link via email to customers
 
 ### **Decentralized (each A.R.I.)**
 - Upload function in Settings
-- Signature validation (Public key hardcoded)
+- Signature validation (public key hardcoded)
 - AES-256 encryption
 - Local storage in `/data/specializations/{userId}/{specId}.enc`
 - AI integration: System prompt injection
@@ -159,7 +159,7 @@ Uploads a signed specialization file.
 ---
 
 ### **POST `/api/specializations/activate`**
-Activates an installed specialization (only one can be active at a time).
+Activates an installed specialization (only one can be active).
 
 **Request Body:**
 ```json
@@ -207,7 +207,7 @@ Returns the currently active specialization.
 }
 ```
 
-If none is active: `{ "success": true, "specialization": null }`
+If none active: `{ "success": true, "specialization": null }`
 
 ---
 
@@ -237,7 +237,7 @@ const response = await openai.chat.completions.create({
 [
   { role: 'system', content: 'You are a professional e-commerce assistant.' },
   { role: 'system', content: '## ACTIVE SPECIALIZATION: Travel Agency Specialization\n\nYou are a highly specialized AI assistant for the travel and tourism industry...' },
-  { role: 'system', content: '### ADDITIONAL CONTEXT INSTRUCTIONS:\n1. Prioritize safety warnings...\n2. Always mention cancellation terms...' },
+  { role: 'system', content: '### ADDITIONAL CONTEXT INSTRUCTIONS:\n1. Prioritize safety information...\n2. Always mention cancellation policies...' },
   { role: 'user', content: '[Context: Specialization "Travel Agency Specialization" active]\n\nCreate a description for a round trip through Vietnam' }
 ]
 ```
@@ -254,7 +254,7 @@ const enhancedPrompt = await AISpecializationHelper.enhanceUserPrompt(userPrompt
 // Check if specialization is active
 const hasSpec = await AISpecializationHelper.hasActiveSpecialization(userId);
 
-// Get name of active specialization
+// Name of active specialization
 const name = await AISpecializationHelper.getActiveSpecializationName(userId);
 
 // Invalidate cache (after activation)
@@ -273,8 +273,8 @@ AISpecializationHelper.invalidateCache();
 - ✅ Grid with all installed specializations
 - ✅ Activate button (only one can be active)
 - ✅ Delete button
-- ✅ Status indicator (ACTIVE badge)
-- ✅ Feature list (truncated to 3 + "more...")
+- ✅ Status display (ACTIVE badge)
+- ✅ Feature list (shortened to 3 + "more...")
 - ✅ Hover effects
 
 ---
@@ -285,16 +285,16 @@ AISpecializationHelper.invalidateCache();
 
 1. Open `backend/data/test-specializations/reisebuero-test.json`
 2. Go to **Settings → Specialization**
-3. Click "📤 Select file"
-4. Choose `reisebuero-test.json`
-5. Result: **Mock signature** will be accepted (as public key is not validated in test environment)
+3. Click "📤 Choose File"
+4. Select `reisebuero-test.json`
+5. Result: **Mock signature** is accepted (since public key is not validated in test environment)
 
 ### **Production: Real Signature**
 
 For production:
 1. kaufe-es.eu must generate an **RSA-2048 keypair**
 2. Store **private key** on kaufe-es.eu backend (signs specializations)
-3. Add **public key** to A.R.I. backend (`SPEC_PUBLIC_KEY` environment variable)
+3. Enter **public key** in A.R.I. backend (`SPEC_PUBLIC_KEY` ENV variable)
 
 ---
 
@@ -302,7 +302,7 @@ For production:
 
 **Algorithm:** AES-256-GCM
 
-**Key:** 32-byte key from environment variable `SPEC_ENCRYPTION_KEY`
+**Key:** 32-byte key from ENV variable `SPEC_ENCRYPTION_KEY`
 
 **Storage Format:**
 ```json
@@ -318,14 +318,14 @@ For production:
 ## 🚀 Deployment Checklist
 
 ### **Backend**
-- [ ] Set `SPEC_PUBLIC_KEY` in environment (kaufe-es.eu public key)
-- [ ] Set `SPEC_ENCRYPTION_KEY` in environment (32-byte key)
+- [ ] Set `SPEC_PUBLIC_KEY` in ENV (kaufe-es.eu public key)
+- [ ] Set `SPEC_ENCRYPTION_KEY` in ENV (32-byte key)
 - [ ] Create `/data/specializations/` directory (automatic, but verify)
 - [ ] Enable API route `/api/specializations/*`
 
 ### **Frontend**
-- [ ] `VITE_API_URL` correctly configured
-- [ ] Update link to kaufe-es.eu marketplace (verify URL)
+- [ ] Configure `VITE_API_URL` correctly
+- [ ] Adjust link to kaufe-es.eu marketplace (verify URL)
 
 ### **kaufe-es.eu**
 - [ ] Create WooCommerce products (digital downloads)
@@ -336,16 +336,16 @@ For production:
 
 ## 📝 Example Specializations (Ideas)
 
-- ✈️ **Travel Agency** (implemented)
+- ✈️ **Travel Agency** (fully implemented)
 - 🏠 **Real Estate**
 - 🛠️ **Tech Shop / Electronics**
-- 👗 **Fashion & Clothing**
+- 👗 **Fashion & Apparel**
 - 🍕 **Gastronomy / Restaurant**
 - 💼 **B2B / Wholesale**
-- 🎨 **Creative Industry / Artist**
+- 🎨 **Creative Industry / Artists**
 - 🏋️ **Fitness / Sports Equipment**
 - 📚 **Education / E-Learning**
-- 🏥 **Health / Pharmacy**
+- 🏥 **Healthcare / Pharmacy**
 
 ---
 
@@ -359,7 +359,7 @@ For production:
 - **Solution:** Call `GET /api/specializations/list`, check response
 - **Solution:** Check `metadata.json` in `/data/specializations/default/`
 
-**Problem:** AI not using specialization
+**Problem:** AI doesn't use specialization
 - **Solution:** Call `AISpecializationHelper.invalidateCache()`
 - **Solution:** Check if specialization is active (`isActive: true`)
 
@@ -373,7 +373,7 @@ For production:
 - [ ] Tracking: Which specializations are most popular?
 - [ ] Conversion: Uploads → Activations
 - [ ] Usage: How often is active specialization used in AI calls?
-- [ ] Feedback: User ratings for specializations
+- [ ] Feedback: User rating for specializations
 
 ---
 
@@ -385,7 +385,7 @@ For production:
 - [ ] Specialization version management (updates)
 
 **Q2 2025:**
-- [ ] Community marketplace (users can create/sell their own specializations)
+- [ ] Community marketplace (users can create/sell own specializations)
 - [ ] A/B testing for specializations
 - [ ] Specialization combinations (e.g., "Travel Agency + Sustainability")
 
