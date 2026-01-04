@@ -1,12 +1,12 @@
 # Agent Workflows Documentation - WooCommerce AI Agent
 
-## Übersicht
+## Overview
 
-Das WooCommerce AI Agent System verfügt über **44 automatisierte Job-Workflows** für E-Commerce-Automatisierung. Diese Jobs werden entweder zeitgesteuert (Cron), manuell oder durch Events getriggert.
+The WooCommerce AI Agent System features **44 automated job workflows** for e-commerce automation. These jobs are triggered either time-based (Cron), manually, or through events.
 
 ---
 
-## Job-Kategorien
+## Job Categories
 
 1. **[Product Management](#product-management)** (11 Jobs)
 2. **[Content Generation](#content-generation)** (3 Jobs)
@@ -19,49 +19,49 @@ Das WooCommerce AI Agent System verfügt über **44 automatisierte Job-Workflows
 
 ## Job Scheduler
 
-### Scheduler-Konfiguration
+### Scheduler Configuration
 
-**Datei**: `backend/scheduler.ts`
+**File**: `backend/scheduler.ts`
 
 **Engine**: Node-Cron (https://www.npmjs.com/package/node-cron)
 
-**Beispiel-Konfiguration**:
+**Example Configuration**:
 ```typescript
 import cron from 'node-cron';
 
-// Alle 2 Minuten
+// Every 2 minutes
 cron.schedule('*/2 * * * *', async () => {
   await ordersCheckJob();
 });
 
-// Täglich um 8:00 Uhr
+// Daily at 8:00 AM
 cron.schedule('0 8 * * *', async () => {
   await dailyAnalyticsJob();
 });
 
-// Jeden Montag um 10:00 Uhr
+// Every Monday at 10:00 AM
 cron.schedule('0 10 * * 1', async () => {
   await weeklyReportJob();
 });
 ```
 
-**Cron-Syntax**:
+**Cron Syntax**:
 ```
 ┌───────────── Minute (0 - 59)
-│ ┌───────────── Stunde (0 - 23)
-│ │ ┌───────────── Tag im Monat (1 - 31)
-│ │ │ ┌───────────── Monat (1 - 12)
-│ │ │ │ ┌───────────── Wochentag (0 - 7) (0 & 7 = Sonntag)
+│ ┌───────────── Hour (0 - 23)
+│ │ ┌───────────── Day of month (1 - 31)
+│ │ │ ┌───────────── Month (1 - 12)
+│ │ │ │ ┌───────────── Day of week (0 - 7) (0 & 7 = Sunday)
 │ │ │ │ │
 * * * * *
 ```
 
-**Häufige Patterns**:
-- `*/5 * * * *` - Alle 5 Minuten
-- `0 * * * *` - Jede Stunde
-- `0 0 * * *` - Täglich um Mitternacht
-- `0 9 * * 1-5` - Werktags um 9:00 Uhr
-- `0 0 1 * *` - Am 1. jeden Monats
+**Common Patterns**:
+- `*/5 * * * *` - Every 5 minutes
+- `0 * * * *` - Every hour
+- `0 0 * * *` - Daily at midnight
+- `0 9 * * 1-5` - Weekdays at 9:00 AM
+- `0 0 1 * *` - First day of each month
 
 ---
 
@@ -69,41 +69,41 @@ cron.schedule('0 10 * * 1', async () => {
 
 ### 1. Auto Product Creator
 
-**Datei**: `backend/agent/jobs/autoProductCreator.ts`
+**File**: `backend/agent/jobs/autoProductCreator.ts`
 
-**Zweck**: Automatische Produkterstellung basierend auf Google Trends
+**Purpose**: Automatic product creation based on Google Trends
 
 **Workflow**:
 ```
-1. Google Trends Analyse
+1. Google Trends Analysis
    ↓
-2. Trend-Bewertung (Demand Score, Competition)
+2. Trend Evaluation (Demand Score, Competition)
    ↓
-3. Trend-Filterung (Score ≥ 70, Competition ≤ 40)
+3. Trend Filtering (Score ≥ 70, Competition ≤ 40)
    ↓
-4. AI Content-Generierung (GPT-4)
+4. AI Content Generation (GPT-4)
    ↓
-5. Produkt-Erstellung in WooCommerce
+5. Product Creation in WooCommerce
    ↓
 6. Optional: Auto-Publish
 ```
 
-**Konfiguration**:
+**Configuration**:
 ```typescript
 interface AutoProductConfig {
-  keyword: string;           // Haupt-Keyword
-  geo: string;              // Land (DE, US, etc.)
-  maxProducts: number;      // Max. Produkte pro Run
-  minDemandScore: number;   // Min. Nachfrage (0-100)
-  maxCompetition: number;   // Max. Wettbewerb (0-100)
-  autoPublish: boolean;     // Direkt veröffentlichen?
+  keyword: string;           // Main keyword
+  geo: string;              // Country (DE, US, etc.)
+  maxProducts: number;      // Max products per run
+  minDemandScore: number;   // Min demand (0-100)
+  maxCompetition: number;   // Max competition (0-100)
+  autoPublish: boolean;     // Publish immediately?
 }
 ```
 
-**Beispiel**:
+**Example**:
 ```typescript
 await autoProductCreatorJob({
-  keyword: 'digitale produkte',
+  keyword: 'digital products',
   geo: 'DE',
   maxProducts: 3,
   minDemandScore: 70,
@@ -120,10 +120,10 @@ await autoProductCreatorJob({
   "products": [
     {
       "id": 789,
-      "name": "DSGVO Checkliste 2025",
+      "name": "GDPR Checklist 2025",
       "status": "draft",
       "trend": {
-        "keyword": "dsgvo checkliste",
+        "keyword": "gdpr checklist",
         "demandScore": 85,
         "competition": 30
       }
@@ -134,7 +134,7 @@ await autoProductCreatorJob({
 
 **Scheduler**:
 ```typescript
-// Täglich um 6:00 Uhr neue Trends prüfen
+// Daily at 6:00 AM to check for new trends
 cron.schedule('0 6 * * *', async () => {
   await autoProductCreatorJob();
 });
@@ -144,13 +144,13 @@ cron.schedule('0 6 * * *', async () => {
 
 ### 2. WooCommerce Product Creator
 
-**Datei**: `backend/agent/jobs/wooCreateProduct.ts`
+**File**: `backend/agent/jobs/wooCreateProduct.ts`
 
-**Zweck**: Einzelnes Produkt in WooCommerce erstellen
+**Purpose**: Create single product in WooCommerce
 
 **Workflow**:
 ```
-1. Validierung (Name, Preis required)
+1. Validation (Name, Price required)
    ↓
 2. AI Description Generation (Optional)
    ↓
@@ -177,7 +177,7 @@ interface ProductInput {
 }
 ```
 
-**Verwendung**:
+**Usage**:
 ```typescript
 await wooCreateProductJob({
   name: 'Premium WordPress Theme',
@@ -193,9 +193,9 @@ await wooCreateProductJob({
 
 ### 3. WooCommerce Product Updater
 
-**Datei**: `backend/agent/jobs/wooUpdateProduct.ts`
+**File**: `backend/agent/jobs/wooUpdateProduct.ts`
 
-**Zweck**: Bestehende Produkte aktualisieren
+**Purpose**: Update existing products
 
 **Workflow**:
 ```
@@ -210,7 +210,7 @@ await wooCreateProductJob({
 5. Verification
 ```
 
-**Beispiel**:
+**Example**:
 ```typescript
 await wooUpdateProductJob({
   id: 123,
@@ -224,33 +224,33 @@ await wooUpdateProductJob({
 
 ### 4. Product Bundles Creator
 
-**Datei**: `backend/agent/jobs/bundles.ts`
+**File**: `backend/agent/jobs/bundles.ts`
 
-**Zweck**: Automatische Produktbundle-Erstellung
+**Purpose**: Automatic product bundle creation
 
 **Workflow**:
 ```
-1. Analyse: Top-Selling Products
+1. Analysis: Top-Selling Products
    ↓
-2. Bundle-Vorschläge (AI-basiert)
+2. Bundle Suggestions (AI-based)
    ↓
-3. Bundle-Produkt erstellen
+3. Create Bundle Product
    ↓
 4. Discount Calculation (15-30%)
    ↓
 5. Cross-Sell Configuration
 ```
 
-**Bundle-Typen**:
-- **Thematic Bundles**: Zusammenhängende Produkte
-- **Price-Based Bundles**: Produkte in ähnlicher Preisklasse
-- **Bestseller Bundles**: Top-Produkte kombiniert
+**Bundle Types**:
+- **Thematic Bundles**: Related products
+- **Price-Based Bundles**: Products in similar price range
+- **Bestseller Bundles**: Top products combined
 
-**Beispiel**:
+**Example**:
 ```typescript
 await createBundleJob({
   type: 'thematic',
-  theme: 'DSGVO Starter Pack',
+  theme: 'GDPR Starter Pack',
   products: [123, 456, 789],
   discount: 20,
   autoPublish: false
@@ -261,9 +261,9 @@ await createBundleJob({
 
 ### 5. Freebie Creator
 
-**Datei**: `backend/agent/jobs/createFreebie.ts`
+**File**: `backend/agent/jobs/createFreebie.ts`
 
-**Zweck**: Kostenlose Lead-Magnets erstellen
+**Purpose**: Create free lead magnets
 
 **Workflow**:
 ```
@@ -278,17 +278,17 @@ await createBundleJob({
 5. Landing Page Integration
 ```
 
-**Freebie-Typen**:
-- **Checklists**: DSGVO-Checkliste, SEO-Checklist
-- **Templates**: Datenschutzerklärung, Cookie-Policy
-- **Guides**: "7 DSGVO-Fehler vermeiden"
+**Freebie Types**:
+- **Checklists**: GDPR Checklist, SEO Checklist
+- **Templates**: Privacy Policy, Cookie Policy
+- **Guides**: "7 GDPR Mistakes to Avoid"
 - **Workbooks**: Interactive PDFs
 
-**Beispiel**:
+**Example**:
 ```typescript
 await createFreebieJob({
   type: 'checklist',
-  topic: 'DSGVO für Einsteiger',
+  topic: 'GDPR for Beginners',
   format: 'pdf',
   pages: 5,
   autoEmailSequence: true
@@ -299,28 +299,28 @@ await createFreebieJob({
 
 ### 6. Product Categories Manager
 
-**Datei**: `backend/agent/jobs/getCategories.ts`
+**File**: `backend/agent/jobs/getCategories.ts`
 
-**Zweck**: Kategorien-Management & Optimierung
+**Purpose**: Category management & optimization
 
 **Features**:
-- Automatische Kategorie-Erstellung
-- Kategorie-SEO Optimierung
-- Product-Kategorisierung (AI)
-- Unused Categories Cleanup
+- Automatic category creation
+- Category SEO optimization
+- Product categorization (AI)
+- Unused categories cleanup
 
 ---
 
 ### 7. Kits & Templates Manager
 
-**Datei**: `backend/agent/jobs/kitsTemplates.ts`
+**File**: `backend/agent/jobs/kitsTemplates.ts`
 
-**Zweck**: Produkt-Kits & Templates verwalten
+**Purpose**: Manage product kits & templates
 
 **Use Cases**:
-- Starter-Kits für Anfänger
-- Professional-Kits für Fortgeschrittene
-- Industry-specific Templates
+- Starter kits for beginners
+- Professional kits for advanced users
+- Industry-specific templates
 
 ---
 
@@ -328,9 +328,9 @@ await createFreebieJob({
 
 ### 8. AI Content Generator
 
-**Datei**: `backend/agent/jobs/aiContentGenerator.ts`
+**File**: `backend/agent/jobs/aiContentGenerator.ts`
 
-**Zweck**: AI-basierte Content-Generierung mit GPT-4
+**Purpose**: AI-based content generation with GPT-4
 
 **Workflow**:
 ```
@@ -345,20 +345,20 @@ await createFreebieJob({
 5. Publishing (WordPress/WooCommerce)
 ```
 
-**Content-Typen**:
-- **Product Descriptions**: Optimiert für Conversion
-- **Blog Posts**: SEO-optimierte Artikel
-- **Category Descriptions**: Kategorie-Texte
-- **Email Copy**: Marketing-Emails
-- **Social Media**: Posts für Facebook, Instagram, LinkedIn
+**Content Types**:
+- **Product Descriptions**: Optimized for conversion
+- **Blog Posts**: SEO-optimized articles
+- **Category Descriptions**: Category texts
+- **Email Copy**: Marketing emails
+- **Social Media**: Posts for Facebook, Instagram, LinkedIn
 
-**Beispiel**:
+**Example**:
 ```typescript
 await aiContentGeneratorJob({
   type: 'product_description',
   product: {
-    name: 'DSGVO Audit Service',
-    keywords: ['dsgvo', 'audit', 'compliance']
+    name: 'GDPR Audit Service',
+    keywords: ['gdpr', 'audit', 'compliance']
   },
   tone: 'professional',
   length: 'medium',
@@ -371,11 +371,11 @@ await aiContentGeneratorJob({
 {
   "success": true,
   "content": {
-    "title": "Professioneller DSGVO-Audit Service",
-    "description": "Unser DSGVO-Audit Service hilft Ihnen...",
-    "seo_title": "DSGVO-Audit | Professionelle Compliance-Prüfung",
-    "meta_description": "Stellen Sie DSGVO-Compliance sicher...",
-    "keywords": ["dsgvo audit", "compliance prüfung"]
+    "title": "Professional GDPR Audit Service",
+    "description": "Our GDPR Audit Service helps you...",
+    "seo_title": "GDPR Audit | Professional Compliance Check",
+    "meta_description": "Ensure GDPR compliance...",
+    "keywords": ["gdpr audit", "compliance check"]
   }
 }
 ```
@@ -384,23 +384,23 @@ await aiContentGeneratorJob({
 
 ### 9. German Content Generator
 
-**Datei**: `backend/agent/jobs/germanContentGenerator.ts`
+**File**: `backend/agent/jobs/germanContentGenerator.ts`
 
-**Zweck**: Deutsche Content-Generierung mit lokalem SEO
+**Purpose**: German content generation with local SEO
 
-**Spezialisierungen**:
-- **DSGVO-Content**: Rechtssichere Texte
-- **German SEO**: Lokale Keywords
-- **Cultural Adaptation**: Deutsche Kundenansprache
-- **Legal Compliance**: Impressum, Datenschutz
+**Specializations**:
+- **GDPR Content**: Legally compliant texts
+- **German SEO**: Local keywords
+- **Cultural Adaptation**: German customer approach
+- **Legal Compliance**: Imprint, Privacy Policy
 
 ---
 
 ### 10. AI Image Generator
 
-**Datei**: `backend/agent/jobs/aiImageGenerator.ts`
+**File**: `backend/agent/jobs/aiImageGenerator.ts`
 
-**Zweck**: Produkt-Bilder mit DALL-E generieren
+**Purpose**: Generate product images with DALL-E
 
 **Workflow**:
 ```
@@ -415,7 +415,7 @@ await aiContentGeneratorJob({
 5. Product Image Assignment
 ```
 
-**Beispiel**:
+**Example**:
 ```typescript
 await aiImageGeneratorJob({
   product_id: 123,
@@ -431,18 +431,18 @@ await aiImageGeneratorJob({
 
 ### 11. Analytics Reporting
 
-**Datei**: `backend/agent/jobs/analyticsReporting.ts`
+**File**: `backend/agent/jobs/analyticsReporting.ts`
 
-**Zweck**: Automatisierte Analytics-Berichte
+**Purpose**: Automated analytics reports
 
-**Report-Typen**:
-- **Daily Report**: Täglich um 8:00 Uhr
-- **Weekly Report**: Montags um 9:00 Uhr
-- **Monthly Report**: Am 1. des Monats
-- **Custom Reports**: On-Demand
+**Report Types**:
+- **Daily Report**: Daily at 8:00 AM
+- **Weekly Report**: Mondays at 9:00 AM
+- **Monthly Report**: First of month
+- **Custom Reports**: On-demand
 
-**Metriken**:
-- Umsatz & Orders
+**Metrics**:
+- Revenue & Orders
 - Conversion Rate
 - Top Products
 - Customer Acquisition
@@ -451,12 +451,12 @@ await aiImageGeneratorJob({
 
 **Scheduler**:
 ```typescript
-// Täglich um 8:00 Uhr
+// Daily at 8:00 AM
 cron.schedule('0 8 * * *', async () => {
   await analyticsReportingJob({ period: 'daily' });
 });
 
-// Montags um 9:00 Uhr
+// Mondays at 9:00 AM
 cron.schedule('0 9 * * 1', async () => {
   await analyticsReportingJob({ period: 'weekly' });
 });
@@ -466,64 +466,64 @@ cron.schedule('0 9 * * 1', async () => {
 
 ### 12. Real-Time Analytics
 
-**Datei**: `backend/agent/jobs/realAnalyticsReporting.ts`
+**File**: `backend/agent/jobs/realAnalyticsReporting.ts`
 
-**Zweck**: Echtzeit-Daten aus WooCommerce & Google Analytics
+**Purpose**: Real-time data from WooCommerce & Google Analytics
 
 **Features**:
-- Live Visitor Count
-- Current Orders
-- Real-Time Revenue
-- Active Sessions
-- Cart Abandonment Rate
+- Live visitor count
+- Current orders
+- Real-time revenue
+- Active sessions
+- Cart abandonment rate
 
 ---
 
 ### 13. Real WooCommerce Analytics
 
-**Datei**: `backend/agent/jobs/realWooCommerceAnalytics.ts`
+**File**: `backend/agent/jobs/realWooCommerceAnalytics.ts`
 
-**Zweck**: WooCommerce-spezifische Echtzeit-Analysen
+**Purpose**: WooCommerce-specific real-time analytics
 
-**Metriken**:
-- Order Processing Status
-- Stock Levels
-- Payment Status
-- Shipping Status
+**Metrics**:
+- Order processing status
+- Stock levels
+- Payment status
+- Shipping status
 
 ---
 
 ### 14. Conversion Analysis
 
-**Datei**: `backend/agent/jobs/conversionAnalysis.ts`
+**File**: `backend/agent/jobs/conversionAnalysis.ts`
 
-**Zweck**: Detaillierte Conversion-Funnel-Analyse
+**Purpose**: Detailed conversion funnel analysis
 
-**Funnel-Stages**:
+**Funnel Stages**:
 ```
 Visitors → Product Views → Add to Cart → Checkout → Purchase
 ```
 
 **Output**:
-- Drop-Off Rates per Stage
-- Optimization Recommendations
-- A/B Test Suggestions
+- Drop-off rates per stage
+- Optimization recommendations
+- A/B test suggestions
 
 ---
 
 ### 15. Conversion Report
 
-**Datei**: `backend/agent/jobs/conversionReport.ts`
+**File**: `backend/agent/jobs/conversionReport.ts`
 
-**Zweck**: Conversion-Report-Generierung mit AI-Insights
+**Purpose**: Conversion report generation with AI insights
 
 ---
 
 ### 16. Trend Analysis
 
-**Datei**: `backend/agent/jobs/trendAnalysis.ts`
+**File**: `backend/agent/jobs/trendAnalysis.ts`
 
-**Zweck**: Google Trends Integration & Trend-Forecasting
+**Purpose**: Google Trends integration & trend forecasting
 
 **Workflow**:
 ```
@@ -538,10 +538,10 @@ Visitors → Product Views → Add to Cart → Checkout → Purchase
 5. Trend Recommendations
 ```
 
-**Beispiel**:
+**Example**:
 ```typescript
 await trendAnalysisJob({
-  keyword: 'digitale produkte',
+  keyword: 'digital products',
   geo: 'DE',
   timeframe: '30days'
 });
@@ -553,11 +553,11 @@ await trendAnalysisJob({
   "success": true,
   "trendingProducts": [
     {
-      "keyword": "dsgvo checkliste",
+      "keyword": "gdpr checklist",
       "demandScore": 85,
       "competition": 30,
       "trend": "rising",
-      "relatedKeywords": ["dsgvo audit", "datenschutz"]
+      "relatedKeywords": ["gdpr audit", "data protection"]
     }
   ]
 }
@@ -567,9 +567,9 @@ await trendAnalysisJob({
 
 ### 17. Google Trends Service
 
-**Datei**: `backend/agent/jobs/googleTrendsService.ts`
+**File**: `backend/agent/jobs/googleTrendsService.ts`
 
-**Zweck**: Google Trends API Wrapper
+**Purpose**: Google Trends API wrapper
 
 ---
 
@@ -577,16 +577,16 @@ await trendAnalysisJob({
 
 ### 18. Email Marketing Automation
 
-**Datei**: `backend/agent/jobs/emailMarketingAutomation.ts`
+**File**: `backend/agent/jobs/emailMarketingAutomation.ts`
 
-**Zweck**: Automatisierte Email-Marketing-Kampagnen
+**Purpose**: Automated email marketing campaigns
 
-**Email-Typen**:
-1. **Welcome Series**: Neue Subscriber
-2. **Abandoned Cart**: Warenkorb-Abbruch
-3. **Post-Purchase**: Nach Kauf
-4. **Win-Back**: Inaktive Kunden
-5. **Newsletter**: Monatliche Updates
+**Email Types**:
+1. **Welcome Series**: New subscribers
+2. **Abandoned Cart**: Cart abandonment
+3. **Post-Purchase**: After purchase
+4. **Win-Back**: Inactive customers
+5. **Newsletter**: Monthly updates
 
 **Workflow**:
 ```
@@ -603,7 +603,7 @@ await trendAnalysisJob({
 6. Send & Track
 ```
 
-**Beispiel - Abandoned Cart**:
+**Example - Abandoned Cart**:
 ```typescript
 await emailMarketingAutomationJob({
   type: 'abandoned_cart',
@@ -617,22 +617,22 @@ await emailMarketingAutomationJob({
 });
 ```
 
-**Email-Templates**:
+**Email Templates**:
 ```typescript
 const TEMPLATES = {
   welcome: {
-    subject: "🎉 Willkommen bei kaufe-es.eu",
+    subject: "🎉 Welcome to kaufe-es.eu",
     body: `
-      <h1>Willkommen!</h1>
-      <p>Danke für Ihre Anmeldung...</p>
-      <a href="{{shop_url}}">Zu unseren Produkten</a>
+      <h1>Welcome!</h1>
+      <p>Thank you for signing up...</p>
+      <a href="{{shop_url}}">Browse our products</a>
     `
   },
   abandoned_cart: {
-    subject: "😢 Sie haben etwas vergessen...",
+    subject: "😢 You forgot something...",
     body: `
-      <h1>Ihr Warenkorb wartet!</h1>
-      <p>Sie haben {{product_name}} im Warenkorb...</p>
+      <h1>Your cart is waiting!</h1>
+      <p>You left {{product_name}} in your cart...</p>
       <strong>{{discount_code}}</strong>
     `
   }
@@ -641,7 +641,7 @@ const TEMPLATES = {
 
 **Scheduler**:
 ```typescript
-// Alle 30 Minuten Abandoned Carts prüfen
+// Check for abandoned carts every 30 minutes
 cron.schedule('*/30 * * * *', async () => {
   await checkAbandonedCarts();
 });
@@ -651,29 +651,29 @@ cron.schedule('*/30 * * * *', async () => {
 
 ### 19. Social Media Automation
 
-**Datei**: `backend/agent/jobs/socialMediaAutomation.ts`
+**File**: `backend/agent/jobs/socialMediaAutomation.ts`
 
-**Zweck**: Automatische Social Media Post-Planung
+**Purpose**: Automatic social media post scheduling
 
-**Plattformen**:
+**Platforms**:
 - Facebook
 - Instagram
 - LinkedIn
 - Twitter (X)
 
-**Post-Typen**:
-- Product Launches
-- Blog Post Sharing
+**Post Types**:
+- Product launches
+- Blog post sharing
 - Testimonials
-- Tips & Tricks
+- Tips & tricks
 
 ---
 
 ### 20. Social Media Auto-Poster
 
-**Datei**: `backend/agent/jobs/socialMediaAutoPoster.ts`
+**File**: `backend/agent/jobs/socialMediaAutoPoster.ts`
 
-**Zweck**: Automatisches Posten von Content
+**Purpose**: Automatic content posting
 
 **Workflow**:
 ```
@@ -692,7 +692,7 @@ cron.schedule('*/30 * * * *', async () => {
 
 **Scheduler**:
 ```typescript
-// Täglich um 9:00, 14:00, 18:00 Uhr
+// Daily at 9:00 AM, 2:00 PM, 6:00 PM
 cron.schedule('0 9,14,18 * * *', async () => {
   await socialMediaAutoPosterJob();
 });
@@ -702,13 +702,13 @@ cron.schedule('0 9,14,18 * * *', async () => {
 
 ### 21. Content Monetizer
 
-**Datei**: `backend/agent/jobs/contentMonetizer.ts`
+**File**: `backend/agent/jobs/contentMonetizer.ts`
 
-**Zweck**: Bestehenden Content monetarisieren
+**Purpose**: Monetize existing content
 
-**Strategien**:
-- Blog Posts → Lead Magnets
-- Free Content → Premium Upgrades
+**Strategies**:
+- Blog posts → Lead magnets
+- Free content → Premium upgrades
 - Webinars → Courses
 - Checklists → Consulting
 
@@ -716,9 +716,9 @@ cron.schedule('0 9,14,18 * * *', async () => {
 
 ### 22. Free-to-Paid Converter
 
-**Datei**: `backend/agent/jobs/freeToPaidConverter.ts`
+**File**: `backend/agent/jobs/freeToPaidConverter.ts`
 
-**Zweck**: Freemium-Users zu Paid Customers konvertieren
+**Purpose**: Convert freemium users to paid customers
 
 **Workflow**:
 ```
@@ -739,28 +739,28 @@ cron.schedule('0 9,14,18 * * *', async () => {
 
 ### 23-35. Payment Jobs (13 Jobs)
 
-**Payment-Debugging & Fixing Suite**:
+**Payment Debugging & Fixing Suite**:
 
 **Jobs**:
-- `paymentDebugger.ts` - Payment-Fehler diagnostizieren
-- `paymentFixer.ts` - Automatische Payment-Fixes
-- `paymentEmergency.ts` - Notfall-Payment-Recovery
-- `paymentLiveFixer.ts` - Live Payment-Probleme lösen
-- `paymentQuickCheck.ts` - Schnelle Payment-Validierung
-- `paymentSimpleFix.ts` - Einfache Payment-Korrekturen
-- `paymentSuccess.ts` - Payment Success Handling
-- `paymentSuccessValidator.ts` - Payment-Validierung
-- `paymentTester.ts` - Payment Gateway Testing
-- `paymentVerifier.ts` - Payment-Verifizierung
-- `paymentIssueDetector.ts` - Automatische Issue Detection
-- `paymentFixCompanion.ts` - Payment Fix Assistent
+- `paymentDebugger.ts` - Diagnose payment errors
+- `paymentFixer.ts` - Automatic payment fixes
+- `paymentEmergency.ts` - Emergency payment recovery
+- `paymentLiveFixer.ts` - Fix live payment issues
+- `paymentQuickCheck.ts` - Quick payment validation
+- `paymentSimpleFix.ts` - Simple payment corrections
+- `paymentSuccess.ts` - Payment success handling
+- `paymentSuccessValidator.ts` - Payment validation
+- `paymentTester.ts` - Payment gateway testing
+- `paymentVerifier.ts` - Payment verification
+- `paymentIssueDetector.ts` - Automatic issue detection
+- `paymentFixCompanion.ts` - Payment fix assistant
 
 **Common Payment Issues**:
-- Fehlgeschlagene Transaktionen
-- Timeout-Fehler
-- Gateway-Verbindungsprobleme
-- Webhook-Fehler
-- Währungs-Konvertierungsfehler
+- Failed transactions
+- Timeout errors
+- Gateway connection problems
+- Webhook errors
+- Currency conversion errors
 
 **Workflow (paymentDebugger)**:
 ```
@@ -779,12 +779,12 @@ cron.schedule('0 9,14,18 * * *', async () => {
 
 **Scheduler**:
 ```typescript
-// Alle 5 Minuten Payment-Probleme prüfen
+// Check payment issues every 5 minutes
 cron.schedule('*/5 * * * *', async () => {
   await paymentIssueDetectorJob();
 });
 
-// Bei kritischen Fehlern: Live Fixer
+// Critical errors: Live fixer
 cron.schedule('*/1 * * * *', async () => {
   await paymentLiveFixerJob();
 });
@@ -796,19 +796,19 @@ cron.schedule('*/1 * * * *', async () => {
 
 ### 36. Shop Health Report
 
-**Datei**: `backend/agent/jobs/shopHealthReport.ts`
+**File**: `backend/agent/jobs/shopHealthReport.ts`
 
-**Zweck**: Umfassender Shop-Gesundheitscheck
+**Purpose**: Comprehensive shop health check
 
-**Check-Kategorien**:
-1. **Performance**: Page Load, Server Response Time
-2. **SEO**: Meta Tags, Sitemap, Robots.txt
-3. **Security**: SSL, Firewall, Updates
-4. **User Experience**: Navigation, Checkout Flow
-5. **Technical**: Broken Links, 404 Errors
-6. **Inventory**: Stock Levels, Out-of-Stock
-7. **Payments**: Gateway Status
-8. **Marketing**: Email Lists, Campaigns
+**Check Categories**:
+1. **Performance**: Page load, server response time
+2. **SEO**: Meta tags, sitemap, robots.txt
+3. **Security**: SSL, firewall, updates
+4. **User Experience**: Navigation, checkout flow
+5. **Technical**: Broken links, 404 errors
+6. **Inventory**: Stock levels, out-of-stock
+7. **Payments**: Gateway status
+8. **Marketing**: Email lists, campaigns
 
 **Workflow**:
 ```
@@ -853,7 +853,7 @@ cron.schedule('*/1 * * * *', async () => {
 
 **Scheduler**:
 ```typescript
-// Täglich um 3:00 Uhr (nachts, wenig Traffic)
+// Daily at 3:00 AM (night, low traffic)
 cron.schedule('0 3 * * *', async () => {
   await shopHealthReportJob();
 });
@@ -863,116 +863,116 @@ cron.schedule('0 3 * * *', async () => {
 
 ### 37. Mini Audit
 
-**Datei**: `backend/agent/jobs/miniAudit.ts`
+**File**: `backend/agent/jobs/miniAudit.ts`
 
-**Zweck**: Schneller Basis-Audit (5 Min)
+**Purpose**: Quick basic audit (5 min)
 
 **Checks**:
 - Basic SEO
-- SSL Status
-- Broken Links (Top 20 Pages)
-- Critical Security Issues
+- SSL status
+- Broken links (top 20 pages)
+- Critical security issues
 
 ---
 
 ### 38. Standard Audit
 
-**Datei**: `backend/agent/jobs/standardAudit.ts`
+**File**: `backend/agent/jobs/standardAudit.ts`
 
-**Zweck**: Standard-Audit (15 Min)
+**Purpose**: Standard audit (15 min)
 
 **Checks**:
-- Mini Audit +
-- Performance Analysis
-- Mobile Responsiveness
-- Basic Analytics Review
+- Mini audit +
+- Performance analysis
+- Mobile responsiveness
+- Basic analytics review
 
 ---
 
 ### 39. Premium Audit
 
-**Datei**: `backend/agent/jobs/premiumAudit.ts`
+**File**: `backend/agent/jobs/premiumAudit.ts`
 
-**Zweck**: Umfassender Premium-Audit (30-60 Min)
+**Purpose**: Comprehensive premium audit (30-60 min)
 
 **Checks**:
-- Standard Audit +
-- Deep SEO Analysis
-- Competitor Analysis
-- Conversion Funnel Optimization
-- A/B Testing Recommendations
-- Custom Reports
+- Standard audit +
+- Deep SEO analysis
+- Competitor analysis
+- Conversion funnel optimization
+- A/B testing recommendations
+- Custom reports
 
 ---
 
 ### 40. Auto Fix Implementer
 
-**Datei**: `backend/agent/jobs/autoFixImplementer.ts`
+**File**: `backend/agent/jobs/autoFixImplementer.ts`
 
-**Zweck**: Automatische Fehlerkorrektur
+**Purpose**: Automatic error correction
 
 **Auto-Fixes**:
-- Broken Links → Redirect to Similar Content
-- Missing Meta Descriptions → AI-Generated
-- Out-of-Stock → Auto-Hide or Alternative Suggestion
-- 404 Errors → Custom 404 Page with Search
-- Slow Images → Compression & Lazy Loading
+- Broken links → Redirect to similar content
+- Missing meta descriptions → AI-generated
+- Out-of-stock → Auto-hide or alternative suggestion
+- 404 errors → Custom 404 page with search
+- Slow images → Compression & lazy loading
 
 ---
 
-## Weitere Jobs
+## Additional Jobs
 
 ### 41-44. Utility Jobs
 
 **WordPress Analytics Service** (`wordpressAnalyticsService.ts`):
-- WordPress-spezifische Analytics
-- Post Performance
-- Comment Analysis
+- WordPress-specific analytics
+- Post performance
+- Comment analysis
 
 **Run Scripts** (`runAutoProductCreator.ts`, `runCreateFreebie.ts`, `runTrendAnalysis.ts`):
-- Standalone Execution Scripts
-- CLI-Tools für manuelle Ausführung
+- Standalone execution scripts
+- CLI tools for manual execution
 
 ---
 
 ## Job Execution
 
-### Manueller Job-Start
+### Manual Job Start
 
 ```typescript
-// Import Job
+// Import job
 import { autoProductCreatorJob } from './backend/agent/jobs/autoProductCreator';
 
 // Execute
 await autoProductCreatorJob({
-  keyword: 'digitale produkte',
+  keyword: 'digital products',
   geo: 'DE',
   maxProducts: 5
 });
 ```
 
-### API-Trigger
+### API Trigger
 
 ```bash
 POST /app/api/jobs/trigger
 {
   "job": "autoProductCreator",
   "config": {
-    "keyword": "digitale produkte",
+    "keyword": "digital products",
     "geo": "DE"
   }
 }
 ```
 
-### Event-Trigger
+### Event Trigger
 
 ```typescript
-// Bei neuem Order
+// On new order
 eventEmitter.on('order.created', async (order) => {
   await postPurchaseEmailJob(order);
 });
 
-// Bei Warenkorb-Abbruch
+// On cart abandonment
 eventEmitter.on('cart.abandoned', async (cart) => {
   await abandonedCartEmailJob(cart);
 });
@@ -984,7 +984,7 @@ eventEmitter.on('cart.abandoned', async (cart) => {
 
 ### Circuit Breaker Integration
 
-Alle Jobs nutzen das Error-Handling System:
+All jobs use the error handling system:
 
 ```typescript
 import { executeWithFullProtection } from '../error-handling';
@@ -1005,7 +1005,7 @@ export async function myJob(config) {
 
 ### Dead Letter Queue
 
-Bei Job-Failures:
+On job failures:
 ```
 1. Job Failed
    ↓
@@ -1022,7 +1022,7 @@ Bei Job-Failures:
 
 ## Job Monitoring
 
-### Job-Status API
+### Job Status API
 
 ```bash
 GET /app/api/jobs/status
@@ -1049,7 +1049,7 @@ GET /app/api/jobs/status
 }
 ```
 
-### Job-Logs
+### Job Logs
 
 ```bash
 GET /app/api/jobs/logs/:jobName
@@ -1062,42 +1062,42 @@ GET /app/api/jobs/logs/:jobName
 ### 1. Job Design
 
 ✅ **DO**:
-- Idempotent Jobs (wiederholbar ohne Nebenwirkungen)
-- Error Handling (Circuit Breaker, Retry, DLQ)
+- Idempotent jobs (repeatable without side effects)
+- Error handling (Circuit Breaker, Retry, DLQ)
 - Logging (Start, End, Errors)
-- Progress Reporting
-- Timeout Configuration
+- Progress reporting
+- Timeout configuration
 
 ❌ **DON'T**:
-- Lange-laufende Jobs ohne Progress Updates
-- Hardcoded Credentials
-- Unhandled Exceptions
-- Blocking Operations ohne Timeout
+- Long-running jobs without progress updates
+- Hardcoded credentials
+- Unhandled exceptions
+- Blocking operations without timeout
 
 ### 2. Scheduler Configuration
 
 ✅ **DO**:
-- Off-Peak Hours für heavy Jobs (nachts)
-- Staggered Start Times (nicht alle Jobs gleichzeitig)
-- Appropriate Intervals (nicht zu häufig)
-- Resource Monitoring
+- Off-peak hours for heavy jobs (night)
+- Staggered start times (not all jobs simultaneously)
+- Appropriate intervals (not too frequent)
+- Resource monitoring
 
 ❌ **DON'T**:
-- Peak Hours für heavy Jobs
-- Overlapping Heavy Jobs
-- Too Frequent Execution (< 1 Min)
+- Peak hours for heavy jobs
+- Overlapping heavy jobs
+- Too frequent execution (< 1 min)
 
 ### 3. Error Handling
 
 ✅ **DO**:
-- Use Circuit Breaker für External APIs
-- Retry mit Exponential Backoff
-- Dead Letter Queue für Failed Jobs
-- Alert Admin bei Critical Failures
+- Use circuit breaker for external APIs
+- Retry with exponential backoff
+- Dead Letter Queue for failed jobs
+- Alert admin on critical failures
 
 ❌ **DON'T**:
-- Infinite Retries
-- Silent Failures
+- Infinite retries
+- Silent failures
 - Ignore DLQ
 
 ---
@@ -1127,7 +1127,7 @@ export async function myNewJob(config?: Partial<MyJobConfig>) {
 
   return await executeWithFullProtection(
     async () => {
-      // Job Logic here
+      // Job logic here
       logger.info('✅ myNewJob completed');
       return { success: true };
     },
@@ -1144,21 +1144,21 @@ export async function myNewJob(config?: Partial<MyJobConfig>) {
 
 ---
 
-## Zusammenfassung
+## Summary
 
-Das WooCommerce AI Agent System bietet:
+The WooCommerce AI Agent System offers:
 
-✅ **44 automatisierte Workflows** für E-Commerce  
-✅ **Cron-basiertes Scheduling** mit Node-Cron  
-✅ **Circuit Breaker Integration** für alle Jobs  
-✅ **Dead Letter Queue** für Failed Job Recovery  
-✅ **Multi-Channel Alerting** bei Job-Failures  
-✅ **AI-Integration** (GPT-4, DALL-E) für Content  
-✅ **Google Trends** für Trend-basierte Automation  
-✅ **Email Automation** mit personalisierten Kampagnen  
-✅ **Payment Debugging Suite** (13 Jobs)  
-✅ **Shop Health Monitoring** mit Auto-Fix  
+✅ **44 automated workflows** for e-commerce  
+✅ **Cron-based scheduling** with Node-Cron  
+✅ **Circuit Breaker integration** for all jobs  
+✅ **Dead Letter Queue** for failed job recovery  
+✅ **Multi-channel alerting** on job failures  
+✅ **AI integration** (GPT-4, DALL-E) for content  
+✅ **Google Trends** for trend-based automation  
+✅ **Email automation** with personalized campaigns  
+✅ **Payment debugging suite** (13 jobs)  
+✅ **Shop health monitoring** with auto-fix  
 
 **Version**: 1.8.0  
-**Stand**: November 2025  
-**Autor**: AndreZ1971
+**Last Update**: November 2025  
+**Author**: AndreZ1971

@@ -1,8 +1,8 @@
 # API Documentation - WooCommerce AI Agent
 
-## Übersicht
+## Overview
 
-Das WooCommerce AI Agent System bietet eine umfangreiche REST API für E-Commerce-Automatisierung, Analytics, Content-Generierung und Marketing-Automation.
+The WooCommerce AI Agent System provides a comprehensive REST API for e-commerce automation, analytics, content generation, and marketing automation.
 
 **Base URL**: `http://localhost:3000` (Development) | `https://your-domain.com` (Production)
 
@@ -10,15 +10,15 @@ Das WooCommerce AI Agent System bietet eine umfangreiche REST API für E-Commerc
 
 ---
 
-## API-Kategorien
+## API Categories
 
-1. **[Products](#products)** - WooCommerce Produkt-Management
-2. **[Analytics](#analytics)** - Shop-Metriken & Reporting (inkl. Conversion, ML Insights, Trends, Real-Time)
+1. **[Products](#products)** - WooCommerce Product Management
+2. **[Analytics](#analytics)** - Shop Metrics & Reporting (incl. Conversion, ML Insights, Trends, Real-Time)
 3. **[Audit](#audit)** - Shop Health Checks & Mini-Audits
-4. **[Email](#email-1)** - Email-Versand & AI-Generierung
-5. **[Marketing](#marketing)** - Marketing-Automation
+4. **[Email](#email-1)** - Email Sending & AI Generation
+5. **[Marketing](#marketing)** - Marketing Automation
 6. **[System](#system)** - Health Checks & Memory Management
-7. **[Customers](#customers)** - Kundenverwaltung
+7. **[Customers](#customers)** - Customer Management
 8. **[Agent](#agent-interaction)** - AI Agent Interaction
 
 ---
@@ -39,9 +39,9 @@ Das WooCommerce AI Agent System bietet eine umfangreiche REST API für E-Commerc
 
 ### API Security
 
-- **Rate Limiting**: 100 Requests/Minute (konfigurierbar)
-- **CORS**: Konfiguriert für Frontend
-- **Helmet.js**: Security Headers aktiv
+- **Rate Limiting**: 100 Requests/Minute (configurable)
+- **CORS**: Configured for Frontend
+- **Helmet.js**: Security Headers active
 
 ---
 
@@ -51,7 +51,7 @@ Das WooCommerce AI Agent System bietet eine umfangreiche REST API für E-Commerc
 
 **GET** `/app/api/products/woo/products`
 
-Ruft alle WooCommerce-Produkte ab mit optionalen Filtern.
+Retrieves all WooCommerce products with optional filters.
 
 **Query Parameters**:
 
@@ -59,9 +59,9 @@ Ruft alle WooCommerce-Produkte ab mit optionalen Filtern.
 {
   per_page?: number;  // Default: 10, Max: 100
   page?: number;      // Default: 1
-  search?: string;    // Suche in Name/Beschreibung
+  search?: string;    // Search in name/description
   status?: 'publish' | 'draft' | 'pending' | 'private';
-  category?: number;  // Kategorie-ID
+  category?: number;  // Category ID
   orderby?: 'date' | 'title' | 'price' | 'popularity';
   order?: 'asc' | 'desc';
 }
@@ -69,39 +69,9 @@ Ruft alle WooCommerce-Produkte ab mit optionalen Filtern.
 
 **Response** (200 OK):
 
-````markdown
-
 ```json
-```
 {
   "success": true,
-
-**Error Responses**:
-
-```json
-// 503 Service Unavailable – WooCommerce nicht konfiguriert
-{
-  "success": false,
-  "error": "WooCommerce ist nicht konfiguriert"
-}
-```
-
-```json
-// 502 Bad Gateway – Upstream-Fehler (Shop antwortet nicht / Auth fehlgeschlagen)
-{
-  "success": false,
-  "error": "WooCommerce API Error",
-  "details": {
-    "status": 401,
-    "message": "Unauthorized"
-  }
-}
-```
-
-**Hinweise**:
-- Die Implementierung nutzt die WordPress/WooCommerce REST API direkt (Basic Auth). Fallbacks: Query-String-Auth und Abruf ohne `role`-Filter.
-- Leere Ergebnisse können auf fehlende Berechtigungen oder Shop-Restriktionen des `role`-Parameters hindeuten.
-
   "data": [
     {
       "id": 123,
@@ -111,8 +81,8 @@ Ruft alle WooCommerce-Produkte ab mit optionalen Filtern.
       "status": "publish",
       "featured": false,
       "catalog_visibility": "visible",
-      "description": "Ein hochwertiges WordPress Theme...",
-      "short_description": "Premium Theme für WordPress",
+      "description": "A high-quality WordPress theme...",
+      "short_description": "Premium Theme for WordPress",
       "sku": "WP-THEME-001",
       "price": "49.99",
       "regular_price": "49.99",
@@ -158,12 +128,38 @@ Ruft alle WooCommerce-Produkte ab mit optionalen Filtern.
 }
 ```
 
+**Error Responses**:
+
+```json
+// 503 Service Unavailable – WooCommerce not configured
+{
+  "success": false,
+  "error": "WooCommerce is not configured"
+}
+```
+
+```json
+// 502 Bad Gateway – Upstream error (shop not responding / auth failed)
+{
+  "success": false,
+  "error": "WooCommerce API Error",
+  "details": {
+    "status": 401,
+    "message": "Unauthorized"
+  }
+}
+```
+
+**Notes**:
+- The implementation uses the WordPress/WooCommerce REST API directly (Basic Auth). Fallbacks: Query-String-Auth and retrieval without `role` filter.
+- Empty results may indicate missing permissions or shop restrictions on the `role` parameter.
+
 ---
 
 ### Get Single Product
 **GET** `/app/api/products/woo/products/:id`
 
-Ruft ein einzelnes Produkt nach ID ab.
+Retrieves a single product by ID.
 
 **Path Parameters**:
 - `id` (number) - WooCommerce Product ID
@@ -185,7 +181,7 @@ Ruft ein einzelnes Produkt nach ID ab.
 ### Create Product
 **POST** `/app/api/products/woo/products`
 
-Erstellt ein neues WooCommerce-Produkt.
+Creates a new WooCommerce product.
 
 **Request Body**:
 ```json
@@ -193,8 +189,8 @@ Erstellt ein neues WooCommerce-Produkt.
   "name": "New Digital Product",
   "type": "simple",
   "regular_price": "29.99",
-  "description": "Ausführliche Produktbeschreibung...",
-  "short_description": "Kurze Beschreibung",
+  "description": "Detailed product description...",
+  "short_description": "Short description",
   "categories": [
     { "id": 15 }
   ],
@@ -242,7 +238,7 @@ Erstellt ein neues WooCommerce-Produkt.
 ### Update Product
 **PUT** `/app/api/products/woo/products/:id`
 
-Aktualisiert ein bestehendes Produkt.
+Updates an existing product.
 
 **Path Parameters**:
 - `id` (number) - Product ID
@@ -274,7 +270,7 @@ Aktualisiert ein bestehendes Produkt.
 ### Delete Product
 **DELETE** `/app/api/products/woo/products/:id`
 
-Löscht ein Produkt (permanent oder in Trash).
+Deletes a product (permanently or move to trash).
 
 **Path Parameters**:
 - `id` (number) - Product ID
@@ -303,7 +299,7 @@ Löscht ein Produkt (permanent oder in Trash).
 ### Bulk Create Products
 **POST** `/app/api/products/woo/products/bulk`
 
-Erstellt mehrere Produkte gleichzeitig.
+Creates multiple products at once.
 
 **Request Body**:
 ```json
@@ -347,7 +343,7 @@ Erstellt mehrere Produkte gleichzeitig.
 ### AI Product Description
 **POST** `/app/api/products/woo/products/ai-description`
 
-Generiert AI-optimierte Produktbeschreibungen mit GPT-4.
+Generates AI-optimized product descriptions with GPT-4.
 
 **Request Body**:
 ```json
@@ -364,10 +360,10 @@ Generiert AI-optimierte Produktbeschreibungen mit GPT-4.
 {
   "success": true,
   "description": {
-    "short": "Ein professionelles, responsives WordPress Theme...",
-    "long": "Entdecken Sie unser Premium WordPress Theme, das perfekt für...",
+    "short": "A professional, responsive WordPress theme...",
+    "long": "Discover our premium WordPress theme, perfect for...",
     "seo_title": "Premium WordPress Theme - Responsive & E-Commerce Ready",
-    "meta_description": "Das beste WordPress Theme für E-Commerce..."
+    "meta_description": "The best WordPress theme for e-commerce..."
   }
 }
 ```
@@ -377,7 +373,7 @@ Generiert AI-optimierte Produktbeschreibungen mit GPT-4.
 ### List Categories
 **GET** `/app/api/products/woo/categories`
 
-Ruft alle WooCommerce-Kategorien ab.
+Retrieves all WooCommerce categories.
 
 **Query Parameters**:
 ```typescript
@@ -397,7 +393,7 @@ Ruft alle WooCommerce-Kategorien ab.
       "name": "Themes",
       "slug": "themes",
       "parent": 0,
-      "description": "WordPress Themes Kategorie",
+      "description": "WordPress Themes Category",
       "count": 45,
       "image": {
         "src": "https://shop.de/wp-content/uploads/category.jpg"
@@ -414,13 +410,13 @@ Ruft alle WooCommerce-Kategorien ab.
 ### Shop Metrics
 **GET** `/app/api/analytics/metrics/shop-metrics`
 
-Ruft aktuelle Shop-Metriken ab (Umsatz, Bestellungen, Conversion).
+Retrieves current shop metrics (revenue, orders, conversion).
 
 **Query Parameters**:
 ```typescript
 {
   period?: '7days' | '30days' | '90days' | 'year';  // Default: 30days
-  compare?: boolean;  // Vergleich mit Vorperiode
+  compare?: boolean;  // Compare with previous period
 }
 ```
 
@@ -475,7 +471,7 @@ Ruft aktuelle Shop-Metriken ab (Umsatz, Bestellungen, Conversion).
 
 **GET** `/app/api/analytics/real-woocommerce-analytics`
 
-Echtzeit-Daten aus WooCommerce & Google Analytics.
+Real-time data from WooCommerce & Google Analytics.
 
 **Response** (200 OK):
 ```json
@@ -505,7 +501,7 @@ Echtzeit-Daten aus WooCommerce & Google Analytics.
 
 **GET** `/app/api/analytics/conversion-analysis`
 
-Detaillierte Conversion-Funnel-Analyse.
+Detailed conversion funnel analysis.
 
 **Response** (200 OK):
 ```json
@@ -528,7 +524,7 @@ Detaillierte Conversion-Funnel-Analyse.
       {
         "stage": "add_to_cart_to_checkout",
         "drop_off_rate": 62.5,
-        "recommendation": "Vereinfache den Checkout-Prozess"
+        "recommendation": "Simplify checkout process"
       }
     ]
   }
@@ -542,7 +538,7 @@ Detaillierte Conversion-Funnel-Analyse.
 ### Get Settings (masked)
 **GET** `/app/api/settings/connection`
 
-Gibt die aktuelle Konfiguration zurück. Geheimfelder sind maskiert (`****`). Struktur entspricht dem UI (verschachtelte Gruppen):
+Returns the current configuration. Secret fields are masked (`****`). Structure corresponds to the UI (nested groups):
 
 **Response** (200 OK):
 ```json
@@ -559,9 +555,9 @@ Gibt die aktuelle Konfiguration zurück. Geheimfelder sind maskiert (`****`). St
 ### Save Settings
 **POST** `/app/api/settings/connection`
 
-Nimmt ein verschachteltes Payload entgegen (wie im UI) und mappt es serverseitig auf die flache `connection.json`. Maskierte Felder (`****`) behalten ihren vorhandenen Secret-Wert.
+Accepts a nested payload (as in UI) and maps it server-side to flat `connection.json`. Masked fields (`****`) retain their existing secret value.
 
-**Request Body** (Beispiel):
+**Request Body** (Example):
 ```json
 {
   "wordpress": { "url": "https://shop.de", "user": "admin", "appPassword": "xxxx xxxx xxxx xxxx" },
@@ -573,10 +569,10 @@ Nimmt ein verschachteltes Payload entgegen (wie im UI) und mappt es serverseitig
 ```
 
 **Validation**:
-- Gruppen (WordPress, WooCommerce, OpenAI) sind optional. Wenn Felder innerhalb einer Gruppe befüllt werden, müssen die Pflichtfelder dieser Gruppe gültig sein.
+- Groups (WordPress, WooCommerce, OpenAI) are optional. If fields within a group are filled, required fields of that group must be valid.
 - `job.mode`: `"once" | "interval"`
-  - `once`: `job.intervalMs` wird ignoriert
-  - `interval`: `job.intervalMs` ∈ [10 000, 86 400 000] (10 s–24 h)
+  - `once`: `job.intervalMs` is ignored
+  - `interval`: `job.intervalMs` ∈ [10 000, 86 400 000] (10 s–24 h)
 
 **Error Response** (400 Bad Request):
 ```json
@@ -594,7 +590,7 @@ Nimmt ein verschachteltes Payload entgegen (wie im UI) und mappt es serverseitig
 ### Analytics: Conversion
 
 #### GET /api/analytics/conversion/analysis
-Conversion-Raten und Funnel-Daten abrufen.
+Retrieve conversion rates and funnel data.
 
 **Response** (200 OK):
 ```json
@@ -613,7 +609,7 @@ Conversion-Raten und Funnel-Daten abrufen.
 ```
 
 #### POST /api/analytics/conversion/analyze
-Detaillierte Conversion-Analyse für spezifischen Zeitraum.
+Detailed conversion analysis for specific time period.
 
 **Request Body**:
 ```json
@@ -628,7 +624,7 @@ Detaillierte Conversion-Analyse für spezifischen Zeitraum.
 ```
 
 #### GET /api/analytics/conversion/funnel
-Conversion-Funnel-Visualisierung mit Stufen-Daten.
+Conversion funnel visualization with stage data.
 
 **Response** (200 OK):
 ```json
@@ -645,10 +641,10 @@ Conversion-Funnel-Visualisierung mit Stufen-Daten.
 
 ---
 
-### Analytics: Regionale Daten
+### Analytics: Regional Data
 
 #### GET /api/analytics/regioning/data?region={region}
-Regionale Performance-Daten für spezifische Region.
+Regional performance data for specific region.
 
 **Response** (200 OK):
 ```json
@@ -665,7 +661,7 @@ Regionale Performance-Daten für spezifische Region.
 ```
 
 #### POST /api/analytics/regioning/ml-analysis
-ML-basierte Insights für spezifische Region.
+ML-based insights for specific region.
 
 **Request Body**:
 ```json
@@ -677,17 +673,17 @@ ML-basierte Insights für spezifische Region.
 ```
 
 #### GET /api/analytics/regioning/comparison
-Multi-Region-Vergleich mit Benchmarks.
+Multi-region comparison with benchmarks.
 
 ---
 
-### Analytics: ML/KI Insights
+### Analytics: ML/AI Insights
 
 #### GET /api/analytics/ml/report
-ML-generierte Analytics-Reports abrufen.
+Retrieve ML-generated analytics reports.
 
 #### POST /api/analytics/ml/generate
-KI-basierte Analyse für Custom-Daten generieren.
+Generate AI-based analysis for custom data.
 
 **Request Body**:
 ```json
@@ -699,14 +695,14 @@ KI-basierte Analyse für Custom-Daten generieren.
 ```
 
 #### POST /api/analytics/ml/report-insights
-Detaillierte Insights aus Report-Daten extrahieren.
+Extract detailed insights from report data.
 
 ---
 
-### Analytics: Trend-Analyse
+### Analytics: Trend Analysis
 
 #### GET /api/analytics/trends/analyze/:keyword
-Trend-Score und Daten für einzelnes Keyword.
+Trend score and data for single keyword.
 
 **Response** (200 OK):
 ```json
@@ -721,7 +717,7 @@ Trend-Score und Daten für einzelnes Keyword.
 ```
 
 #### POST /api/analytics/trends/analyze
-Batch-Trend-Analyse für mehrere Keywords.
+Batch trend analysis for multiple keywords.
 
 **Request Body**:
 ```json
@@ -735,17 +731,17 @@ Batch-Trend-Analyse für mehrere Keywords.
 ```
 
 #### GET /api/analytics/trends/products
-Trending Produkte mit Trend-Scores identifizieren.
+Identify trending products with trend scores.
 
 #### POST /api/analytics/trends/report
-Umfassender Trend-Report mit Empfehlungen.
+Comprehensive trend report with recommendations.
 
 ---
 
-### Analytics: Echtzeit-Daten
+### Analytics: Real-Time Data
 
 #### GET /api/analytics/real-time/dashboard
-Real-Time Dashboard-Daten (Übersicht).
+Real-time dashboard data (overview).
 
 **Response** (200 OK):
 ```json
@@ -760,23 +756,23 @@ Real-Time Dashboard-Daten (Übersicht).
 ```
 
 #### GET /api/analytics/real-time/sales
-Aktuelle Verkäufe (letzte 24 Stunden).
+Current sales (last 24 hours).
 
 #### GET /api/analytics/real-time/visitors
-Aktuelle Besucher und Session-Daten.
+Current visitors and session data.
 
 #### GET /api/analytics/real-time/performance
-Performance-Metriken (Ladezeiten, Fehlerrate).
+Performance metrics (load times, error rate).
 
 #### GET /api/analytics/real-time/products
-Top-Produkte in Echtzeit mit Verkaufszahlen.
+Top products in real-time with sales figures.
 
 ---
 
 ### Trend Analysis (Legacy)
 **GET** `/app/api/analytics/trend-analysis`
 
-Google Trends Integration für Keyword-Trends.
+Google Trends integration for keyword trends.
 
 **Query Parameters**:
 ```typescript
@@ -805,13 +801,11 @@ Google Trends Integration für Keyword-Trends.
       }
     ],
     "recommendations": [
-      "Keyword 'wordpress theme' zeigt steigende Nachfrage"
+      "Keyword 'wordpress theme' shows rising demand"
     ]
   }
 }
 ```
-
----
 
 ---
 
@@ -820,7 +814,7 @@ Google Trends Integration für Keyword-Trends.
 ### Mini Audit
 **GET** `/api/audit/mini`
 
-Schneller Shop-Health-Check mit Basis-Metriken.
+Quick shop health check with basic metrics.
 
 **Response** (200 OK):
 ```json
@@ -846,7 +840,7 @@ Schneller Shop-Health-Check mit Basis-Metriken.
 ### Shop Scan
 **POST** `/api/audit/mini/scan`
 
-Detaillierter Shop-Scan mit Problemerkennung.
+Detailed shop scan with issue detection.
 
 **Request Body**:
 ```json
@@ -879,7 +873,7 @@ Detaillierter Shop-Scan mit Problemerkennung.
 ### Audit Summary
 **GET** `/api/audit/mini/summary`
 
-Audit-Zusammenfassung mit priorisierten Empfehlungen.
+Audit summary with prioritized recommendations.
 
 **Response** (200 OK):
 ```json
@@ -907,7 +901,7 @@ Audit-Zusammenfassung mit priorisierten Empfehlungen.
 ### Reviews Analytics
 **GET** `/app/api/analytics/reviews`
 
-Produktbewertungen & Sentiment-Analyse.
+Product reviews & sentiment analysis.
 
 **Response** (200 OK):
 ```json
@@ -944,7 +938,7 @@ Produktbewertungen & Sentiment-Analyse.
 ### Send Email
 **POST** `/app/api/email/email-sender`
 
-Versendet Emails mit Nodemailer.
+Sends emails with Nodemailer.
 
 **Request Body**:
 ```json
@@ -977,7 +971,7 @@ Versendet Emails mit Nodemailer.
 ### AI Email Generator
 **POST** `/app/api/ai/email/ai-email`
 
-Generiert personalisierte Marketing-Emails mit GPT-4.
+Generates personalized marketing emails with GPT-4.
 
 **Request Body**:
 ```json
@@ -1001,10 +995,10 @@ Generiert personalisierte Marketing-Emails mit GPT-4.
 {
   "success": true,
   "email": {
-    "subject": "Exklusives Angebot: Premium WordPress Theme",
+    "subject": "Exclusive Offer: Premium WordPress Theme",
     "html": "<html>...</html>",
-    "text": "Hallo John, wir haben ein exklusives Angebot...",
-    "preview_text": "Sparen Sie 20% auf unser Premium Theme"
+    "text": "Hello John, we have an exclusive offer...",
+    "preview_text": "Save 20% on our Premium Theme"
   }
 }
 ```
@@ -1016,7 +1010,7 @@ Generiert personalisierte Marketing-Emails mit GPT-4.
 ### Marketing Automation
 **POST** `/app/api/marketing/marketing-routes`
 
-Startet Marketing-Automation-Workflows.
+Starts marketing automation workflows.
 
 **Request Body**:
 ```json
@@ -1058,7 +1052,7 @@ Startet Marketing-Automation-Workflows.
 ### Health Check
 **GET** `/app/api/health`
 
-Prüft System-Health Status.
+Checks system health status.
 
 **Response** (200 OK):
 ```json
@@ -1080,7 +1074,7 @@ Prüft System-Health Status.
 ### System Metrics
 **GET** `/app/api/system/health/system`
 
-Detaillierte System-Metriken.
+Detailed system metrics.
 
 **Response** (200 OK):
 ```json
@@ -1114,7 +1108,7 @@ Detaillierte System-Metriken.
 ### Memory Stats
 **GET** `/app/api/system/memory/memory`
 
-AI Agent Memory Management Stats.
+AI Agent memory management stats.
 
 **Response** (200 OK):
 ```json
@@ -1138,7 +1132,7 @@ AI Agent Memory Management Stats.
 ### Circuit Breaker Status
 **GET** `/app/api/error-handling/circuit-breakers`
 
-Status aller Circuit Breakers.
+Status of all circuit breakers.
 
 **Response** (200 OK):
 ```json
@@ -1175,7 +1169,7 @@ Status aller Circuit Breakers.
 ### Dead Letter Queue Stats
 **GET** `/app/api/error-handling/dlq/stats`
 
-Dead Letter Queue Statistiken.
+Dead Letter Queue statistics.
 
 **Response** (200 OK):
 ```json
@@ -1202,14 +1196,14 @@ Dead Letter Queue Statistiken.
 ### List Customers
 **GET** `/app/api/woocommerce/customers`
 
-Ruft WooCommerce-Kunden ab.
+Retrieves WooCommerce customers.
 
 **Query Parameters**:
 ```typescript
 {
   per_page?: number;  // Default: 10
   page?: number;      // Default: 1
-  search?: string;    // Suche in Name/Email
+  search?: string;    // Search in name/email
   orderby?: 'registered_date' | 'name' | 'email';
 }
 ```
@@ -1249,7 +1243,7 @@ Ruft WooCommerce-Kunden ab.
 ### Customer Subscribers
 **GET** `/app/api/woocommerce/subscribers`
 
-Ruft Newsletter-Subscriber ab.
+Retrieves newsletter subscribers.
 
 **Response** (200 OK):
 ```json
@@ -1275,7 +1269,7 @@ Ruft Newsletter-Subscriber ab.
 ### Customer Stats
 **GET** `/app/api/woocommerce/stats`
 
-Kunden-Statistiken & Segmentierung.
+Customer statistics & segmentation.
 
 **Response** (200 OK):
 ```json
@@ -1303,12 +1297,12 @@ Kunden-Statistiken & Segmentierung.
 ### AI Agent Interaction
 **POST** `/app/api/agent`
 
-Interagiert mit dem AI Agent (GPT-4 Planning Engine).
+Interacts with the AI Agent (GPT-4 Planning Engine).
 
 **Request Body**:
 ```json
 {
-  "message": "Erstelle ein neues Produkt: Premium WordPress Theme für E-Commerce",
+  "message": "Create a new product: Premium WordPress Theme for E-Commerce",
   "context": {
     "user_id": 123,
     "session_id": "sess_abc123"
@@ -1321,7 +1315,7 @@ Interagiert mit dem AI Agent (GPT-4 Planning Engine).
 {
   "success": true,
   "response": {
-    "message": "Ich habe das Produkt erfolgreich erstellt.",
+    "message": "I have successfully created the product.",
     "steps_executed": [
       {
         "step": 1,
@@ -1355,7 +1349,7 @@ Interagiert mit dem AI Agent (GPT-4 Planning Engine).
 
 ### Standard Error Format
 
-Alle API-Fehler folgen diesem Format:
+All API errors follow this format:
 
 ```json
 {
@@ -1372,7 +1366,7 @@ Alle API-Fehler folgen diesem Format:
 
 ### HTTP Status Codes
 
-| Code | Bedeutung             | Verwendung                         |
+| Code | Meaning               | Usage                              |
 | ---- | --------------------- | ---------------------------------- |
 | 200  | OK                    | Successful GET/PUT/DELETE          |
 | 201  | Created               | Successful POST (resource created) |
@@ -1386,14 +1380,14 @@ Alle API-Fehler folgen diesem Format:
 
 ### Error Codes
 
-| Code                    | Bedeutung                                       | Action                          |
-| ----------------------- | ----------------------------------------------- | ------------------------------- |
-| `CIRCUIT_BREAKER_OPEN`  | Service Circuit Breaker ist OPEN                | Warten (Auto-Recovery nach 60s) |
-| `RATE_LIMIT_EXCEEDED`   | Rate Limit überschritten                        | Warten und erneut versuchen     |
-| `INVALID_INPUT`         | Ungültige Eingabedaten                          | Request-Body korrigieren        |
-| `RESOURCE_NOT_FOUND`    | Ressource nicht gefunden                        | ID prüfen                       |
-| `EXTERNAL_API_ERROR`    | Fehler bei externer API (WooCommerce/WordPress) | Credentials prüfen              |
-| `AUTHENTICATION_FAILED` | Authentifizierung fehlgeschlagen                | API Keys prüfen                 |
+| Code                    | Meaning                                      | Action                       |
+| ----------------------- | -------------------------------------------- | ---------------------------- |
+| `CIRCUIT_BREAKER_OPEN`  | Service circuit breaker is OPEN              | Wait (auto-recovery after 60s) |
+| `RATE_LIMIT_EXCEEDED`   | Rate limit exceeded                          | Wait and retry               |
+| `INVALID_INPUT`         | Invalid input data                           | Correct request body         |
+| `RESOURCE_NOT_FOUND`    | Resource not found                           | Check ID                     |
+| `EXTERNAL_API_ERROR`    | External API error (WooCommerce/WordPress)   | Check credentials            |
+| `AUTHENTICATION_FAILED` | Authentication failed                        | Check API keys               |
 
 ---
 
@@ -1447,7 +1441,7 @@ Link: <...page=2>; rel="next", <...page=15>; rel="last"
 
 ### Swagger UI
 
-Interaktive API-Dokumentation verfügbar unter:
+Interactive API documentation available at:
 
 ```
 http://localhost:3000/docs
@@ -1491,22 +1485,22 @@ curl -X GET "http://localhost:3000/api/health"
 
 **Current Version**: v1 (implicit in routes)
 
-**Future Versioning** (geplant):
+**Future Versioning** (planned):
 ```
 /api/v1/products
 /api/v2/products
 ```
 
 **Deprecation Policy**:
-- Deprecated Endpoints erhalten 6 Monate Warning
-- `Deprecation` Header bei deprecated Endpoints
-- Changelog in Documentation
+- Deprecated endpoints receive 6 months warning
+- `Deprecation` header on deprecated endpoints
+- Changelog in documentation
 
 ---
 
 ## WebSocket Support (Future)
 
-**Geplant für v2.0**:
+**Planned for v2.0**:
 ```javascript
 const ws = new WebSocket('ws://localhost:3000/ws');
 
@@ -1522,7 +1516,7 @@ ws.on('message', (data) => {
 
 ## SDK & Client Libraries (Future)
 
-**Geplante SDKs**:
+**Planned SDKs**:
 - **JavaScript/TypeScript**: npm package
 - **Python**: pip package
 - **PHP**: composer package
