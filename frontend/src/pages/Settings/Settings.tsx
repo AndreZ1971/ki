@@ -723,16 +723,14 @@ const Settings = () => {
     // Validate file type - only .ari-spec or .json (which must be .ari-spec format)
     const fileExtension = file.name.split(".").pop()?.toLowerCase();
     if (!["ari-spec", "json"].includes(fileExtension || "")) {
-      setConnectionMessage(
-        "❌ Nur .ari-spec oder .json Dateien (im ARI-Spezialisierungs-Format) sind erlaubt"
-      );
+      setConnectionMessage(t("error.specializationFileInvalid"));
       return;
     }
 
     // Validate file size (max 5MB)
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
-      setConnectionMessage("❌ Datei zu groß (Maximum: 5MB)");
+      setConnectionMessage(t("error.specializationFileTooLarge"));
       return;
     }
 
@@ -754,9 +752,7 @@ const Settings = () => {
       try {
         specialization = JSON.parse(fileContent);
       } catch (_error) {
-        setConnectionMessage(
-          "❌ Ungültiges JSON-Format. Bitte überprüfe die Datei."
-        );
+        setConnectionMessage(t("error.specializationFormatInvalid"));
         setTestingConnection(false);
         return;
       }
@@ -768,9 +764,7 @@ const Settings = () => {
         !specialization.issuer ||
         !specialization.data
       ) {
-        setConnectionMessage(
-          "❌ Datei ist nicht im ARI-Spezialisierungs-Format. Erforderlich: format, version, issuer, data"
-        );
+        setConnectionMessage(t("error.specializationAriFormatInvalid"));
         setTestingConnection(false);
         return;
       }
@@ -866,7 +860,7 @@ const Settings = () => {
       console.log("🔍 Verbindungstest:", data);
     } catch (error) {
       setConnectionStatus("error");
-      setConnectionMessage("❌ Verbindungsfehler - Backend nicht erreichbar");
+      setConnectionMessage(t("error.connectionBackendError"));
       console.error("❌ Verbindungsfehler:", error);
     } finally {
       setTestingConnection(false);
@@ -976,9 +970,7 @@ const Settings = () => {
     if (renewalUrl) {
       window.open(renewalUrl, "_blank");
     } else {
-      setConnectionMessage(
-        "❌ Erneuerungslink nicht verfügbar. Kontaktieren Sie den Support."
-      );
+      setConnectionMessage(t("settings.subscription.renewalUnavailable"));
     }
   };
 
@@ -2588,7 +2580,7 @@ const Settings = () => {
                       fontWeight: "600",
                     }}
                   >
-                    📅 Gültig bis:
+                    {t("settings.subscription.validUntil")}
                   </label>
                   <div
                     style={{
@@ -2605,7 +2597,7 @@ const Settings = () => {
                           month: "long",
                           day: "numeric",
                         })
-                      : "Platzhalter: Wird von Automattic aktualisiert"}
+                      : t("settings.subscription.placeholder")}
                   </div>
                 </div>
 
@@ -2616,8 +2608,7 @@ const Settings = () => {
                     display: "block",
                   }}
                 >
-                  Nach Ablauf wird dein Container automatisch von Kubernetes
-                  beendet.
+                  {t("settings.subscription.containerExpiration")}
                 </small>
               </div>
 
@@ -2641,8 +2632,8 @@ const Settings = () => {
                 }}
               >
                 {renewalUrl
-                  ? "🔄 Subscription erneuern"
-                  : "⏳ Erneuerungslink wird von Automattic bereitgestellt"}
+                  ? t("settings.subscription.renewButton")
+                  : t("settings.subscription.renewPending")}
               </button>
 
               <small
@@ -2653,8 +2644,7 @@ const Settings = () => {
                   textAlign: "center",
                 }}
               >
-                Automattic wird die Erneuerungs-URL und Laufzeit-Daten
-                automatisch aktualisieren
+                {t("settings.subscription.renewalInfo")}
               </small>
             </div>
 
@@ -2662,7 +2652,7 @@ const Settings = () => {
             {purchasedSpecializations.length > 0 && (
               <div style={{ marginTop: "40px" }}>
                 <h4 style={{ marginBottom: "20px" }}>
-                  🎯 Gekaufte Spezialisierungen
+                  {t("settings.subscription.purchasedTitle")}
                 </h4>
                 {purchasedSpecializations.map((spec) => (
                     <div
@@ -2761,7 +2751,7 @@ const Settings = () => {
                                 fontWeight: "bold",
                               }}
                             >
-                              ✓ AKTIV
+                              {t("settings.subscription.active")}
                             </div>
                           ) : (
                             <button
@@ -2786,7 +2776,7 @@ const Settings = () => {
                                   "rgba(59, 130, 246, 0.8)")
                               }
                             >
-                              Aktivieren
+                              {t("settings.subscription.activate")}
                             </button>
                           )}
                         </div>
