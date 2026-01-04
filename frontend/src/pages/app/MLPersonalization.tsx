@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { apiClient } from '../../lib/api-client';
 
 interface MLPersonalizationOffer {
   title: string;
@@ -24,10 +25,9 @@ export const MLPersonalization: React.FC<MLPersonalizationProps> = ({
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(
+      const data = await apiClient.get(
         `/api/personalization/ml/offers?userId=${userId}`
       );
-      const data = await res.json();
       if (data.success && data.offers) {
         setOffers(data.offers);
       } else {

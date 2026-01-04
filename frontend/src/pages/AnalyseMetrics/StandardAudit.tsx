@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { apiClient } from '../../lib/api-client';
 import "./page.css";
 
 interface AuditCheck {
@@ -62,10 +63,7 @@ const StandardAudit = () => {
   const loadAuditData = React.useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/audit/standard");
-      if (!res.ok)
-        throw new Error(t("analytics.standardAudit.errorLoadingData"));
-      const data = await res.json();
+      const data = await apiClient.get("/api/audit/standard");
       setAuditChecks(data.checks || []);
       calculateSummary(data.checks || []);
     } catch (_e) {
@@ -151,14 +149,7 @@ const StandardAudit = () => {
               },
       };
 
-      const res = await fetch(apiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) throw new Error("Fehler beim Laden der KI-Analyse");
-      const data = await res.json();
+      const data = await apiClient.post(apiUrl, payload);
       setMlInsights(data.mlInsights || []);
     } catch (err: any) {
       setMlError(err.message || "KI-Analyse konnte nicht geladen werden.");
@@ -208,9 +199,7 @@ const StandardAudit = () => {
   const runQuickScan = async () => {
     setScanInProgress(true);
     try {
-      const res = await fetch("/api/audit/standard/scan", { method: "POST" });
-      if (!res.ok) throw new Error("Scan konnte nicht gestartet werden");
-      await res.json();
+      await apiClient.post("/api/audit/standard/scan", {});
       await loadAuditData();
     } catch (_e) {
       // Fehlerhandling optional

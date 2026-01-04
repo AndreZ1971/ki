@@ -584,6 +584,7 @@ const WooProductUpdate = () => {
                         type="checkbox" 
                         checked={selectedProducts.includes(product.id)}
                         onChange={() => toggleProduct(product.id)}
+                        aria-label={`Produkt ${product.name} auswählen`}
                       />
                     </label>
                     <span className="product-name">{product.name}</span>

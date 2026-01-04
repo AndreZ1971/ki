@@ -3,6 +3,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useProductManagement } from '../../hooks/useProductManagement';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
 import { ProductAnalysis } from '../app/ProductAnalysis';
+import { apiClient } from '../../lib/api-client';
 import './page.css';
 
 interface Product {
@@ -39,22 +40,17 @@ const ProductAnalyzer: React.FC = () => {
     const fetchProducts = async () => {
       try {
         console.log('📥 Lade Produkte von:', `${apiBase}/api/products/woo/products?per_page=100`);
-        const res = await fetch(`${apiBase}/api/products/woo/products?per_page=100`);
-        console.log('📦 Response Status:', res.status, res.statusText);
-        
-        const data = await res.json();
+        const data = await apiClient.get(`${apiBase}/api/products/woo/products?per_page=100`);
         console.log('📋 Response Data:', data);
         
         // Handle both response formats
         let productsArray = null;
         let errorMsg = null;
         
-        if (res.ok && data.success && Array.isArray(data.data)) {
+        if (data.success && Array.isArray(data.data)) {
           productsArray = data.data;
         } else if (data.error) {
           errorMsg = data.error;
-        } else if (!res.ok) {
-          errorMsg = `HTTP ${res.status}: ${res.statusText}`;
         }
         
         if (!productsArray && !errorMsg) {
@@ -98,15 +94,10 @@ const ProductAnalyzer: React.FC = () => {
     setEditedProduct(null);
     setSaveError(null);
     try {
-      const res = await fetch(`${apiBase}/api/products/woo/products/${selectedProductId}?ts=${Date.now()}`, {
-        headers: {
-          'Cache-Control': 'no-cache'
-        }
-      });
-      const data = await res.json();
+      const data = await apiClient.get(`${apiBase}/api/products/woo/products/${selectedProductId}?ts=${Date.now()}`);
       setProductDebug(data);
       const productPayload = data?.data ?? data;
-      if (res.ok && productPayload && Object.keys(productPayload).length > 0) {
+      if (data.success && productPayload && Object.keys(productPayload).length > 0) {
         setProductDetails(productPayload);
         setEditedProduct(productPayload);
       } else {
@@ -127,9 +118,8 @@ const ProductAnalyzer: React.FC = () => {
     setAnalysisError(null);
     setAnalysis(null);
     try {
-      const res = await fetch(`${apiBase}/api/products/adviser/analyze/${selectedProductId}`, { method: 'POST' });
-      const data = await res.json();
-      if (res.ok && data) {
+      const data = await apiClient.post(`${apiBase}/api/products/adviser/analyze/${selectedProductId}`, {});
+      if (data) {
         setAnalysis(data);
       } else {
         setAnalysisError(data.error || 'Analyse fehlgeschlagen');
@@ -154,13 +144,8 @@ const ProductAnalyzer: React.FC = () => {
         description: editedProduct.description,
         short_description: editedProduct.short_description,
       };
-      const res = await fetch(`${apiBase}/api/products/woo/products/${selectedProductId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updateData)
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
+      const data = await apiClient.put(`${apiBase}/api/products/woo/products/${selectedProductId}`, updateData);
+      if (data.success) {
         setProductDetails(data.data);
         setEditedProduct(data.data);
         setEditMode(false);

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { apiClient } from '../../lib/api-client';
 
 interface MLPaymentInsight {
   type: "anomaly" | "churn" | "fraud";
@@ -24,8 +25,7 @@ export const MLPaymentAnalyzer: React.FC<MLPaymentAnalyzerProps> = ({
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/payment/ml/analyze?paymentId=${paymentId}`);
-      const data = await res.json();
+      const data = await apiClient.get(`/api/payment/ml/analyze?paymentId=${paymentId}`);
       if (data.success && data.insights) {
         setInsights(data.insights);
       } else {
@@ -40,7 +40,7 @@ export const MLPaymentAnalyzer: React.FC<MLPaymentAnalyzerProps> = ({
 
   return (
     <div className="ml-payment-analyzer">
-      <button onClick={fetchInsights} disabled={loading}></button>
+      <button onClick={fetchInsights} disabled={loading}>{t("ml.paymentAnalyzer.analyzeButton")}</button>
       {loading && <div>{t("ml.paymentAnalyzer.analyzing")}</div>}
       {error && <div className="error">{error}</div>}
       {insights.length > 0 && (
