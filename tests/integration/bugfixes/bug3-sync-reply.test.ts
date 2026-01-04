@@ -146,7 +146,7 @@ describe('Bug #3: WooCommerce Sync Response Handling', () => {
     it('should NOT work with plain object return (anti-pattern)', async () => {
       const wrongServer = Fastify({ logger: false });
 
-      wrongServer.post('/api/woocommerce/sync-wrong', async (request, reply) => {
+      wrongServer.post('/api/woocommerce/sync-wrong', async (_request, _reply) => {
         // WRONG: Plain object return (anti-pattern from bug)
         return { success: true, data: {} };
       });

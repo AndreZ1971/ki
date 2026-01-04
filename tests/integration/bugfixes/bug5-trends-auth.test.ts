@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
 /**
  * Bug #5: Trend Analysis - WooCommerce Auth Method Wrong

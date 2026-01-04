@@ -260,8 +260,8 @@ describe('Bug #8: OpenAI JSON Parsing Fallbacks', () => {
 
     it('should never return 502 error to user', () => {
       // Simulated endpoint behavior
-      async function suggestCategories(productName: string) {
-        let openaiResponse = '{"broken json'; // Simulated broken response
+      async function suggestCategories(_productName: string) {
+        const openaiResponse = '{"broken json'; // Simulated broken response
 
         try {
           const repaired = repairJSON(openaiResponse);
