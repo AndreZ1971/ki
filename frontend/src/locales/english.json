@@ -35,7 +35,13 @@
     "activationFailed": "Activation failed",
     "deletionFailed": "Deletion failed",
     "loadingFailed": "Loading failed",
-    "uploadFailed": "Upload failed"
+    "uploadFailed": "Upload failed",
+    "specializationFileInvalid": "❌ Only .ari-spec or .json files (in ARI specialization format) are allowed",
+    "specializationFileTooLarge": "❌ File too large (Maximum: 5MB)",
+    "specializationFormatInvalid": "❌ Invalid JSON format. Please check the file.",
+    "specializationAriFormatInvalid": "❌ File is not in ARI specialization format. Required: format, version, issuer, data",
+    "connectionBackendError": "❌ Connection error - Backend not reachable",
+    "connectionFailed": "❌ Connection failed. Check your credentials."
   },
   "common": {
     "back": "Back",
@@ -177,6 +183,22 @@
       "activateLicense": "🔓 Activate License",
       "activating": "⏳ Activating license...",
       "activeLicenses": "📋 Active Licenses"
+    },
+    "subscription": {
+      "title": "⏱️ Subscription & Runtime",
+      "subtitle": "Manage your container runtime and specializations",
+      "validUntil": "📅 Valid until:",
+      "placeholder": "Placeholder: Will be updated by Automattic",
+      "containerExpiration": "After expiration, your container will automatically be terminated by Kubernetes.",
+      "renewButton": "🔄 Renew Subscription",
+      "renewPending": "⏳ Renewal link will be provided by Automattic",
+      "renewalInfo": "Automattic will automatically update the renewal URL and runtime data",
+      "purchasedTitle": "🎯 Purchased Specializations",
+      "active": "✓ ACTIVE",
+      "activate": "Activate",
+      "renewalUnavailable": "❌ Renewal link not available. Please contact support.",
+      "subscriptionSuccessful": "✅ Subscription renewed successfully",
+      "renewalFailed": "❌ Renewal failed"
     },
     "social": {
       "title": "📱 Connect Social Media Accounts",

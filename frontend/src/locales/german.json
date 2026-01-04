@@ -35,7 +35,13 @@
     "activationFailed": "Aktivierung fehlgeschlagen",
     "deletionFailed": "Löschen fehlgeschlagen",
     "loadingFailed": "Laden fehlgeschlagen",
-    "uploadFailed": "Upload fehlgeschlagen"
+    "uploadFailed": "Upload fehlgeschlagen",
+    "specializationFileInvalid": "❌ Nur .ari-spec oder .json Dateien (im ARI-Spezialisierungs-Format) sind erlaubt",
+    "specializationFileTooLarge": "❌ Datei zu groß (Maximum: 5MB)",
+    "specializationFormatInvalid": "❌ Ungültiges JSON-Format. Bitte überprüfe die Datei.",
+    "specializationAriFormatInvalid": "❌ Datei ist nicht im ARI-Spezialisierungs-Format. Erforderlich: format, version, issuer, data",
+    "connectionBackendError": "❌ Verbindungsfehler - Backend nicht erreichbar",
+    "connectionFailed": "❌ Verbindung fehlgeschlagen. Prüfe deine Zugangsdaten."
   },
   "common": {
     "back": "Zurück",
@@ -177,6 +183,22 @@
       "activateLicense": "🔓 Lizenz aktivieren",
       "activating": "⏳ Aktiviere Lizenz...",
       "activeLicenses": "📋 Aktive Lizenzen"
+    },
+    "subscription": {
+      "title": "⏱️ Subscription & Laufzeit",
+      "subtitle": "Verwalte deine Container-Laufzeit und Spezialisierungen",
+      "validUntil": "📅 Gültig bis:",
+      "placeholder": "Platzhalter: Wird von Automattic aktualisiert",
+      "containerExpiration": "Nach Ablauf wird dein Container automatisch von Kubernetes beendet.",
+      "renewButton": "🔄 Subscription erneuern",
+      "renewPending": "⏳ Erneuerungslink wird von Automattic bereitgestellt",
+      "renewalInfo": "Automattic wird die Erneuerungs-URL und Laufzeit-Daten automatisch aktualisieren",
+      "purchasedTitle": "🎯 Gekaufte Spezialisierungen",
+      "active": "✓ AKTIV",
+      "activate": "Aktivieren",
+      "renewalUnavailable": "❌ Erneuerungslink nicht verfügbar. Kontaktieren Sie den Support.",
+      "subscriptionSuccessful": "✅ Subscription erfolgreich erneuert",
+      "renewalFailed": "❌ Erneuerung fehlgeschlagen"
     },
     "social": {
       "title": "📱 Social Media Konten verbinden",
