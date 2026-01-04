@@ -128,8 +128,8 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
             });
             setLastSavedTime(timeStr);
           }
-        } catch (err) {
-          
+        } catch {
+          // Auto-save failed silently
         }
       };
 
@@ -159,8 +159,8 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
           }));
           _setProducts(mapped);
         }
-      } catch (err) {
-        
+      } catch {
+        // Product loading failed silently
       } finally {
         _setProductsLoading(false);
       }
@@ -284,10 +284,8 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
         minute: "2-digit",
       });
       setLastSavedTime(timeStr);
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Notizen speichern fehlgeschlagen";
-      
+    } catch {
+      // Note saving failed silently
     } finally {
       setNotesSaving(false);
     }
