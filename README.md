@@ -1,13 +1,28 @@
 # 🚀 ARI - Artificial Retail Intelligence System
 
-**Version:** 5.1.0  
-**Status:** Full i18n Multi-Language Support ✅ | Alpha-Container MVP - Live Testing Phase 🧪
+**Version:** 5.1.1 🐛  
+**Status:** Production-Ready | Bugfix Release | Full i18n Multi-Language Support ✅
 
-Ein **AI-gestütztes Business Automation System** für WooCommerce/WordPress mit 50+ spezialisierten Tools, KI-Agent, Agentic Loops, modernem Dashboard und **vollständiger Mehrsprachunterstützung (Deutsch/Englisch)**.
+Ein **AI-gestütztes Business Automation System** für WooCommerce/WordPress mit 130+ API-Endpoints, 50+ spezialisierten Tools, KI-Agent, Agentic Loops, modernem Dashboard und **vollständiger Mehrsprachunterstützung (Deutsch/Englisch)**.
 
 ---
 
-## 🌍 **Neu in Version 5.1.0: Vollständige Mehrsprachunterstützung!**
+## 🔥 **NEU in Version 5.1.1: Production Bugfix Release**
+
+### 🐛 **8 kritische Bugs behoben (Januar 2026)**
+
+✅ **Analytics-Module:** User-Count Berechnungen korrigiert  
+✅ **API-Routing:** Fehlende Route-Registrierungen hinzugefügt  
+✅ **WooCommerce Integration:** Auth-Fehler behoben  
+✅ **Error-Handling:** Fastify-kompatible Responses  
+✅ **OpenAI Integration:** JSON-Parsing mit Fallbacks  
+✅ **Server-Stabilität:** 0 Fehler beim Startup
+
+**Details:** [🇩🇪 Production Bugfix Summary](docs/german/PRODUCTION_BUGFIX_SUMMARY.md) | [🇬🇧 Production Bugfix Summary](docs/english/PRODUCTION_BUGFIX_SUMMARY.md)
+
+---
+
+## 🌍 **Version 5.1.0: Vollständige Mehrsprachunterstützung!**
 
 ### 🇩🇪 🇬🇧 **Multi-Language i18n Implementation**
 
