@@ -1,59 +1,58 @@
-````markdown
-# 🤖 Backend AI Transformation - THE BEST Solution!
+# 🤖 Backend AI-Transformation - The BEST Solution!
 
 **Version:** 5.0.0-alpha  
-**Problem solved:** Make.com limited, IFTTT AI doesn't work? **Your backend does it now!** 🚀
+**Problem Solved:** Make.com limited, IFTTT AI not working? **Your backend does it now!** 🚀
 
-> ℹ️ **Alpha container MVP**: Configuration resets on container restart. Use settings UI or import JSON.
+> ℹ️ **Alpha-Container MVP**: Configuration resets on container restart. Use Settings UI or import JSON.
 
 ---
 
 ## ✨ What's New?
 
-### Your backend now has **built-in AI**!
+### Your Backend Now Has **Built-in AI**!
 
 ```
 User Input: "New products available"
          ↓
-Backend AI transforms automatically:
+Backend AI automatically transforms:
          ↓
-    LinkedIn: "📊 Product news for B2B customers..."
+    LinkedIn: "📊 Product innovations for B2B customers..."
     Facebook: "🎉 Hey folks! New products are here..."
     TikTok: "POV: You need new stuff 🔥💀 #fyp"
 ```
 
-**Each platform gets the PERFECT tone - automatically!** 🎯
+**Every platform gets the PERFECT tone - automatically!** 🎯
 
 ---
 
-## 🎯 Advantages of this Solution
+## 🎯 Advantages of This Solution
 
-| Feature               | IFTTT/Make.com        | **Your Backend**                           |
-| --------------------- | --------------------- | ------------------------------------------ |
-| **AI Transformation** | ❌ Limited/broken      | ✅ **Works perfectly!**                    |
-| **Platform Support**  | ❌ Many missing        | ✅ **ALL platforms!**                      |
-| **Control**           | ❌ Service dependent   | ✅ **100% in your hands!**                 |
-| **Costs**             | 💸 €4/month           | 💰 **Only OpenAI costs (~€0.01/post!)**    |
-| **Flexibility**       | ❌ Fixed prompts       | ✅ **Adjust anytime!**                     |
-| **Debugging**         | ❌ Black box           | ✅ **Full logs!**                          |
+| Feature | IFTTT/Make.com | **Your Backend** |
+|---------|----------------|------------------|
+| **AI-Transformation** | ❌ Limited/broken | ✅ **Works perfectly!** |
+| **Platform Support** | ❌ Many missing | ✅ **ALL platforms!** |
+| **Control** | ❌ Dependent on service | ✅ **100% in your hands!** |
+| **Costs** | 💸 4€/month | 💰 **Only OpenAI costs (~0.01€/post!)** |
+| **Flexibility** | ❌ Fixed prompts | ✅ **Customizable anytime!** |
+| **Debugging** | ❌ Black box | ✅ **Full logs!** |
 
 ---
 
-## 🚀 How it Works
+## 🚀 How It Works
 
-### 1. Backend does AI transformation
+### 1. Backend Performs AI-Transformation
 
 **New in `backend/utils/social-ai-transform.ts`:**
 
 ```typescript
-// Transforms "New products" → platform-specific post
+// Transforms "New products" → Platform-specific post
 await transformContentForPlatform({
   platform: 'linkedin',
   content: "New products available"
 });
 
 // Output: 
-// "📊 Product news for modern businesses
+// "📊 Product innovations for modern businesses
 //  
 //  Efficiency starts with the right equipment...
 //  → kaufe-es.eu
@@ -61,7 +60,7 @@ await transformContentForPlatform({
 //  #ECommerce #B2B #Productivity"
 ```
 
-### 2. Automatically integrated in webhook
+### 2. Automatically Integrated in Webhook
 
 **Updated: `backend/routes/app/api/social/webhook-routes.ts`:**
 
@@ -69,7 +68,7 @@ await transformContentForPlatform({
 // AI is now DEFAULT enabled! ✨
 const { useAI = true } = request.body;
 
-// Backend transforms automatically
+// Backend automatically transforms
 const transformed = await transformContentForPlatform({
   platform: 'linkedin', // or facebook, tiktok, twitter, instagram
   content: "Simple text"
@@ -89,19 +88,19 @@ curl -X POST "http://localhost:3000/api/social/webhook/post" \
   -H "Content-Type: application/json" \
   -d '{
     "platform": "linkedin",
-    "content": "New product category office supplies",
+    "content": "New office supplies category",
     "useAI": true
   }'
 ```
 
 **Backend does:**
-1. ✨ AI transforms: "New product category..." → Professional LinkedIn post
+1. ✨ AI transforms: "New category..." → Professional LinkedIn post
 2. 📤 Sends to Make.com webhook
 3. 🚀 Make.com posts on LinkedIn
 
 **Result:**
 ```
-📊 Professional office supplies for modern businesses
+📊 Professional Office Supplies for Modern Businesses
 
 Efficiency starts with the right equipment. 
 Our new office supplies category offers selected 
@@ -134,11 +133,11 @@ curl -X POST "http://localhost:3000/api/social/webhook/post" \
 
 **AI Output:**
 ```
-📊 Innovation in the product line
+📊 Innovation in Product Line
 
 Modern businesses rely on thoughtful solutions. 
 Our new product line combines quality with 
-cost-effectiveness.
+economic efficiency.
 
 Interested? → info@kaufe-es.eu
 
@@ -150,7 +149,7 @@ Interested? → info@kaufe-es.eu
 - Length: 150-200 characters
 - Emojis: 2-3 max (💼 ✅ 📊 🚀)
 - Hashtags: 3-5 B2B-focused
-- Audience: Executives, buyers
+- Target audience: CEOs, purchasers
 
 ---
 
@@ -162,7 +161,7 @@ Interested? → info@kaufe-es.eu
 ```
 🎉🛍️ MEGA SAVINGS WEEK!
 
-20% off EVERYTHING - only this week! 
+20% off EVERYTHING - this week only! 
 Whether household, office or lifestyle! 💝
 
 What's on your shopping list? 👇
@@ -176,21 +175,21 @@ What's on your shopping list? 👇
 - Length: 100-150 characters
 - Emojis: 3-5 (🛍️ 🎉 💝 ⭐)
 - Hashtags: 2-3 thematic
-- Audience: Local customers, families
+- Target audience: Local customers, families
 
 ---
 
 ### 🎵 TikTok (Viral & Gen Z)
 
-**Input:** "Free shipping from €50"
+**Input:** "Free shipping over 50 euros"
 
 **AI Output:**
 ```
-POV: Your shopping cart is at €49.99 💀
+POV: Your cart is at 49.99€ 💀
 
 Me adding random stuff for free shipping: 🤡🛒
 
-Free shipping from €50 fr fr ⚡✨
+Free shipping from 50€ fr fr ⚡✨
 
 Who else does this? 😭👇
 
@@ -198,12 +197,12 @@ Who else does this? 😭👇
 ```
 
 **Characteristics:**
-- Tone: Relaxed, witty, Gen Z
+- Tone: Casual, funny, Gen Z
 - Length: 50-100 characters
 - Format: POV/Tell me why/No one
 - Slang: "fr fr", "no cap", "bussin"
 - Emojis: 5-10+ (🔥 💀 😭 ✨ 💅)
-- Hashtags: 5-8 including #fyp #foryou
+- Hashtags: 5-8 incl. #fyp #foryou
 
 ---
 
@@ -215,7 +214,7 @@ Who else does this? 😭👇
 ```
 Black Friday is around the corner 🔥
 
-Deals so good, even your bank account will sweat 💸
+Deals so good, even your bank account is excited 💸
 
 Coming soon: kaufe-es.eu
 
@@ -223,7 +222,7 @@ Coming soon: kaufe-es.eu
 ```
 
 **Characteristics:**
-- Tone: Short, punchy
+- Tone: Short, concise
 - Length: 100-150 characters (max 280)
 - Emojis: 2-4
 - Hashtags: 1-3 max
@@ -232,19 +231,19 @@ Coming soon: kaufe-es.eu
 
 ### 📸 Instagram (Visual & Lifestyle)
 
-**Input:** "Sustainable products new in range"
+**Input:** "Sustainable products new in assortment"
 
 **AI Output:**
 ```
 🌱✨ Live sustainably, shop consciously
 
-Our new eco collection is here! 
+Our new eco-collection is here! 
 From reusable essentials to organic textiles 💚
 
 Together for our planet 🌍
 → Discover now: kaufe-es.eu
 
-#Sustainability #EcoFriendly #Sustainability #GreenLiving #Kaufees #Environment #BioBewusst #ZeroWaste
+#Sustainability #EcoFriendly #GreenLiving #Kaufees #Environment #OrganicConscious #ZeroWaste
 ```
 
 **Characteristics:**
@@ -257,25 +256,25 @@ Together for our planet 🌍
 
 ## ⚙️ Setup
 
-### 1. Set OpenAI API key
+### 1. Set OpenAI API Key
 
 ```env
 # .env
 OPENAI_API_KEY=sk-proj-...
 ```
 
-### 2. Set webhook URLs (Make.com)
+### 2. Set Webhook URLs (Make.com)
 
 ```env
 # Facebook works for you!
 WEBHOOK_FACEBOOK=https://hook.eu2.make.com/6anru85au6iq4zu62yvrbebpbichuscr
 
-# Optional: LinkedIn, TikTok if Make.com works later
+# Optional: LinkedIn, TikTok when Make.com works
 WEBHOOK_LINKEDIN=https://hook.eu2.make.com/...
 WEBHOOK_TIKTOK=https://hook.eu2.make.com/...
 ```
 
-### 3. Start server
+### 3. Start Server
 
 ```bash
 cd backend
@@ -285,17 +284,17 @@ npm run dev
 ### 4. Test!
 
 ```bash
-# Test with AI transformation
+# Test with AI-Transformation
 curl -X POST "http://localhost:3000/api/social/webhook/post" \
   -H "Content-Type: application/json" \
   -d '{
     "platform": "facebook",
-    "content": "New gaming products available",
+    "content": "New gaming products are here",
     "useAI": true
   }'
 ```
 
-**Check Facebook page** → AI-transformed post is there! ✅
+**Check Facebook Page** → AI-transformed post is there! ✅
 
 ---
 
@@ -307,16 +306,16 @@ curl -X POST "http://localhost:3000/api/social/webhook/post" \
 # Input
 {
   "platform": "linkedin",
-  "content": "New smart home category available",
+  "content": "New Smart Home category available",
   "useAI": true
 }
 
 # AI Output (LinkedIn)
-📊 Smart home for modern businesses
+📊 Smart Home for Modern Businesses
 
 Intelligent building technology increases efficiency. 
-Our new smart home category offers professional 
-IoT solutions for offices and operations.
+Our new Smart Home category offers professional 
+IoT solutions for offices and businesses.
 
 → Consultation: info@kaufe-es.eu
 
@@ -329,20 +328,20 @@ IoT solutions for offices and operations.
 # Input
 {
   "platform": "facebook",
-  "content": "Flash sale: 30% off electronics today",
+  "content": "Flash Sale: 30% off electronics today",
   "useAI": true
 }
 
 # AI Output (Facebook)
 ⚡🎉 FLASH SALE ALARM!
 
-30% off ALL electronics items! 
+30% off ALL electronics! 
 But only TODAY! ⏰💝
 
-Worth being quick! 🛍️
+Being quick pays off! 🛍️
 → kaufe-es.eu
 
-#FlashSale #Electronics #Deals
+#FlashSale #Electronics #Bargains
 ```
 
 ### Scenario 3: Engagement Post
@@ -369,21 +368,21 @@ Most liked answer gets featured fr fr 🔥
 
 ## 💡 Pro Tips
 
-### 1. AI is smart enough:
+### 1. AI Is Smart Enough
 
-**Short input is enough:**
+**Short input is sufficient:**
 ```json
 {"content": "New products", "platform": "linkedin"}
 ```
 
-**AI makes full context from it:**
+**AI makes it full context:**
 ```
-📊 Product news for modern businesses
+📊 Product Innovations for Modern Businesses
 
 Efficiency starts with the right equipment...
 ```
 
-### 2. Context helps though:
+### 2. Context Helps Though
 
 **Better input:**
 ```json
@@ -401,40 +400,40 @@ Gaming gear is here! Mice, keyboards, headsets
 No cap, the prices are bussin 💀🔥
 ```
 
-### 3. Fallback when AI fails:
+### 3. Fallback on AI Error
 
-If OpenAI is down or error:
+If OpenAI is down or errors:
 - ✅ Backend uses **original content** as fallback
-- ✅ Post goes out anyway!
-- ✅ No downtime!
+- ✅ Post still goes out!
+- ✅ No outage!
 
 ---
 
 ## 📊 Costs
 
-### OpenAI API (gpt-4o-mini):
+### OpenAI API (gpt-4o-mini)
 
-| Usage        | Cost                 |
-| ------------ | -------------------- |
-| **1 post**   | ~$0.0001 (€0.01!)    |
-| **100 posts** | ~$0.01 (€0.01!)      |
-| **1000 posts** | ~$0.10 (€0.10!)      |
+| Usage | Costs |
+|-------|-------|
+| **1 Post** | ~$0.0001 (0.01 cent!) |
+| **100 Posts** | ~$0.01 (1 cent!) |
+| **1000 Posts** | ~$0.10 (10 cents!) |
 
-**Comparison:**
-- IFTTT Pro: €4/month = **400x more expensive!**
+**In comparison:**
+- IFTTT Pro: 4€/month = **400x more expensive!**
 - Make.com: Free but limited
-- **Your solution: ~€0.10/month** for 1000 posts! 🎉
+- **Your solution: ~0.10€/month** with 1000 posts! 🎉
 
 ---
 
-## 🔧 Customize the Prompts
+## 🔧 Customizing Prompts
 
-### Edit prompts:
+### Edit Prompts
 
 **File:** `backend/utils/social-ai-transform.ts`
 
 ```typescript
-linkedin: `Transform the following text into a professional LinkedIn post for Kaufe.es (e-commerce):
+linkedin: `Transform the following text into a professional LinkedIn post for Kaufe.es (E-Commerce):
 
 INPUT: "${content}"
 
@@ -444,10 +443,10 @@ REQUIREMENTS:
 - Emojis: 2-3 max (💼 ✅ 📊 🚀)
 // ... more requirements
 
-OUTPUT: Just the finished post, no explanations!`
+OUTPUT: Only the finished post, no explanations!`
 ```
 
-**Change as you like!** Rebuild backend:
+**Change as you like!** Recompile backend:
 
 ```bash
 npm run build
@@ -458,7 +457,7 @@ npm run dev
 
 ## 🚀 Frontend Integration
 
-### Frontend just sends:
+### Frontend Simply Sends
 
 ```typescript
 // Frontend: SocialMediaPoster.tsx
@@ -473,29 +472,29 @@ await fetch('http://localhost:3000/api/social/webhook/post', {
 });
 ```
 
-**Backend handles the rest!** ✨
+**Backend does the rest!** ✨
 
 ---
 
 ## 🎯 Summary
 
-### What you now have:
+### What You Have Now
 
-✅ **AI transformation directly in your backend**  
+✅ **AI-Transformation directly in backend**  
 ✅ **All platforms supported** (LinkedIn, Facebook, TikTok, Twitter, Instagram)  
 ✅ **Independent of IFTTT/Make.com limitations**  
-✅ **100% control & customization**  
-✅ **Fallback when AI fails**  
-✅ **Extremely cheap** (~€0.01 per 100 posts!)  
-✅ **Always-adjustable prompts**  
+✅ **100% control & customizability**  
+✅ **Fallback on AI errors**  
+✅ **Extremely cheap** (~0.01€ per 100 posts!)  
+✅ **Prompts customizable anytime**  
 
-### Make.com setup stays simple:
+### Make.com Setup Remains Simple
 
-1. **Facebook webhook:** Already works! ✅
-2. **LinkedIn/TikTok:** When Make.com works, just set webhook URL!
-3. **AI does the content optimization** - Make.com just "passes through"!
+1. **Facebook Webhook:** Already works! ✅
+2. **LinkedIn/TikTok:** When Make.com works later, just set webhook URL!
+3. **AI does content optimization** - Make.com just "pass-through"!
 
-**Best solution: Backend AI + Make.com webhooks = Perfect!** 🎉🚀
+**Best solution: Backend AI + Make.com Webhooks = Perfect!** 🎉🚀
 
 ---
 
@@ -508,12 +507,10 @@ await fetch('http://localhost:3000/api/social/webhook/post', {
      -d '{"platform": "facebook", "content": "Test!", "useAI": true}'
    ```
 
-2. ✅ **Check Facebook:** Do you see the AI-transformed post?
+2. ✅ **Facebook Check:** Do you see the AI-transformed post?
 
-3. ✅ **Enable in frontend:** Set `useAI: true`
+3. ✅ **Enable Frontend:** Set `useAI: true`
 
 4. 🎉 **Profit!** Every post automatically perfectly optimized!
 
-**You're now independent from third-party AI limitations!** 🚀
-
-````
+**You're now independent of third-party AI limitations!** 🚀
