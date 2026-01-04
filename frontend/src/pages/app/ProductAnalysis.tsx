@@ -1,5 +1,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { formatTime, formatDateTime } from "../../lib/i18n-utils";
+import "./page.css";
+import "./ProductAnalysis.css";
 
 // ✅ Typen für Produktanalyse
 interface Product {
@@ -442,15 +444,11 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
   };
 
   return (
-    <div style={{ padding: "24px" }}>
+    <div className="app-page">
       {/* Header */}
-      <div style={{ marginBottom: "32px" }}>
-        <h2
-          style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "8px" }}
-        >
-          🔍 Produktanalyse & KI-Optimierung
-        </h2>
-        <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "14px" }}>
+      <div className="product-analysis-header">
+        <h2>🔍 Produktanalyse & KI-Optimierung</h2>
+        <p>
           Detaillierte Analyse Ihres Produkts mit intelligenten
           Verbesserungsvorschlägen
         </p>
@@ -460,39 +458,9 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
       <button
         onClick={fetchAnalysis}
         disabled={loading}
-        style={{
-          padding: "12px 24px",
-          background: loading
-            ? "rgba(0, 122, 255, 0.3)"
-            : "linear-gradient(135deg, rgba(0, 122, 255, 0.3), rgba(52, 199, 89, 0.2))",
-          border: loading
-            ? "1px solid rgba(0, 122, 255, 0.5)"
-            : "1px solid rgba(0, 122, 255, 0.5)",
-          borderRadius: "8px",
-          color: "#007aff",
-          cursor: loading ? "not-allowed" : "pointer",
-          fontSize: "14px",
-          fontWeight: "600",
-          opacity: loading ? 0.6 : 1,
-          transition: "all 0.2s",
-          marginBottom: "24px",
-        }}
-        onMouseEnter={(e) => {
-          if (!loading) {
-            e.currentTarget.style.background =
-              "linear-gradient(135deg, rgba(0, 122, 255, 0.4), rgba(52, 199, 89, 0.3))";
-            e.currentTarget.style.boxShadow = "0 0 16px rgba(0, 122, 255, 0.3)";
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (!loading) {
-            e.currentTarget.style.background =
-              "linear-gradient(135deg, rgba(0, 122, 255, 0.3), rgba(52, 199, 89, 0.2))";
-            e.currentTarget.style.boxShadow = "none";
-          }
-        }}
+        className="product-analysis-btn"
       >
-        {loading ? "⏳ Analyse läuft..." : "🤖 Mit KI analysieren"}
+        {loading ? "⏳ Analysiere..." : "🔍 Analyse starten"}
       </button>
 
       {/* Error */}
