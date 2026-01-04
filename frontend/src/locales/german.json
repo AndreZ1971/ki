@@ -237,6 +237,212 @@
       "marketing": "📢 Marketing & Content",
       "advanced": "⚡ Advanced AI",
       "all": "Alle Tools"
+    },
+    "tools": {
+      "shopMetrics": {
+        "title": "📊 Live Shop Metrics",
+        "description": "Echtzeit-Kennzahlen deines Shops - Umsatz, Conversion, Kunden"
+      },
+      "conversionAnalysis": {
+        "title": "📈 Conversion Analysis",
+        "description": "Detaillierte Analyse der Conversion-Raten und Optimierung"
+      },
+      "feedbackAnalysis": {
+        "title": "💬 Feedback Analysis",
+        "description": "KI-gestützte Analyse von Kundenbewertungen und Support-Tickets"
+      },
+      "conversionReported": {
+        "title": "📋 Conversion Reported",
+        "description": "Automatische Conversion-Reports und Export"
+      },
+      "trendAnalysis": {
+        "title": "📊 Trend Analysis",
+        "description": "Erkenne Markt- und Verkaufstrends automatisch"
+      },
+      "runTrendAnalysis": {
+        "title": "🚀 Run Trend Analysis",
+        "description": "Führe Trend-Analyse sofort aus"
+      },
+      "realAnalytics": {
+        "title": "🔍 Real Analytics",
+        "description": "Echtzeit-Analytics mit tiefgehenden Insights"
+      },
+      "realWebAnalytics": {
+        "title": "🌐 Real Web Analytics",
+        "description": "Web-Commerce Analytics und Tracking"
+      },
+      "analyticRegioning": {
+        "title": "🗺️ Analytic Regioning",
+        "description": "Regionale Analytics und Geo-Targeting"
+      },
+      "shopHealthReport": {
+        "title": "🏪 Shop Health Report",
+        "description": "Kompletter Gesundheits-Check deines Shops"
+      },
+      "premiumAudit": {
+        "title": "⭐ Premium Audit",
+        "description": "Premium-Shop-Audit mit Optimierungsempfehlungen"
+      },
+      "standardAudit": {
+        "title": "🔧 Standard Audit",
+        "description": "Basis-Audit für schnelle Shop-Optimierung"
+      },
+      "miniAudit": {
+        "title": "🔎 Mini Audit",
+        "description": "Schneller Check der wichtigsten Shop-Kennzahlen"
+      },
+      "autoProductCreator": {
+        "title": "🤖 Auto Product Creator",
+        "description": "Automatische Erstellung und Optimierung von Produkten"
+      },
+      "runAutoProductCreator": {
+        "title": "🚀 Run Product Creator",
+        "description": "Starte automatische Produkterstellung sofort"
+      },
+      "wooProductCreate": {
+        "title": "🛒 Woo Product Creator",
+        "description": "Direkte Produkterstellung in WooCommerce"
+      },
+      "wooProductUpdate": {
+        "title": "✏️ Woo Product Updater",
+        "description": "Automatische Produkt-Updates und Synchronisation"
+      },
+      "productAnalysis": {
+        "title": "🔍 Product Analyzer",
+        "description": "KI-gestützte Produktanalyse mit Optimierungsvorschlägen"
+      },
+      "categoriesManager": {
+        "title": "📑 Categories Manager",
+        "description": "Automatische Kategorie-Verwaltung und Optimierung"
+      },
+      "createFreebies": {
+        "title": "🎁 Freebies Creator",
+        "description": "Erstelle automatisch Gratis-Produkte"
+      },
+      "runCreateFreebies": {
+        "title": "🚀 Run Freebies Creator",
+        "description": "Starte Freebies-Erstellung sofort"
+      },
+      "productBundles": {
+        "title": "📦 Product Bundles",
+        "description": "Erstelle und verwalte Produkt-Bundles automatisch"
+      },
+      "paymentFast": {
+        "title": "⚡ Payment Fast",
+        "description": "Schnelle Payment-Verarbeitung und Bestätigung"
+      },
+      "paymentSimplified": {
+        "title": "🎯 Payment Simplified",
+        "description": "Vereinfachte Payment-Abläufe für bessere Conversion"
+      },
+      "paymentTester": {
+        "title": "🧪 Payment Tester",
+        "description": "Teste Payment-Prozesse automatisch"
+      },
+      "paymentVerifier": {
+        "title": "✅ Payment Verifier",
+        "description": "Automatische Payment-Verifikation und Validierung"
+      },
+      "paymentSuccess": {
+        "title": "🎉 Payment Success",
+        "description": "Erfolgreiche Payment-Abschlüsse verwalten"
+      },
+      "paymentValidation": {
+        "title": "🔐 Payment Validation",
+        "description": "Sichere Payment-Validierung und Fraud-Check"
+      },
+      "paymentIssuedDetector": {
+        "title": "📋 Payment Issued Detector",
+        "description": "Erkenne und behandle Payment-Probleme automatisch"
+      },
+      "paymentUserFavor": {
+        "title": "❤️ Payment User Favor",
+        "description": "Personalized Payment-Erfahrungen für Kunden"
+      },
+      "paymentDelisoger": {
+        "title": "📦 Payment Delivery",
+        "description": "Payment-Delivery und Versandabwicklung"
+      },
+      "paymentEnergency": {
+        "title": "🚨 Payment Emergency",
+        "description": "Notfall-System für Payment-Probleme"
+      },
+      "paymentFrompansion": {
+        "title": "📈 Payment Expansion",
+        "description": "Payment-System Erweiterung und Skalierung"
+      },
+      "paymentQuickcheck": {
+        "title": "⚡ Payment Quick Check",
+        "description": "Schneller Payment-Status Check"
+      },
+      "aiEmailGenerator": {
+        "title": "📧 AI Email Generator",
+        "description": "Erstelle professionelle Marketing-E-Mails in Sekunden"
+      },
+      "germanContentGenerator": {
+        "title": "📝 Content Generator",
+        "description": "Content-Erstellung für lokales Marketing"
+      },
+      "emailMarketingAutomation": {
+        "title": "✉️ Email Marketing Automation",
+        "description": "Komplette Email-Marketing Automatisierung"
+      },
+      "socialMediaAudio": {
+        "title": "🎵 Social Media Audio",
+        "description": "Audio-Beiträge für Social Media automatisch erstellen"
+      },
+      "socialMediaPoster": {
+        "title": "📱 Social Media Poster",
+        "description": "Automatisches Posting auf Social Media Kanäle"
+      },
+      "freeToPostConverter": {
+        "title": "🆓 Free to Post Converter",
+        "description": "Konvertiere Free-User zu aktiven Postern"
+      },
+      "contentMonetized": {
+        "title": "💸 Content Monetized",
+        "description": "Automatische Content-Monetarisierung"
+      },
+      "kiteTemplates": {
+        "title": "🎨 Kite Templates",
+        "description": "Professionelle Templates für alle Marketing-Kanäle"
+      },
+      "blogpostGenerator": {
+        "title": "📝 Blogpost Generator",
+        "description": "Erstelle KI-basierte, SEO-optimierte Blogposts für dein Marketing"
+      },
+      "imageAnalyzer": {
+        "title": "🖼️ ImageAnalyzer",
+        "description": "KI-Bildbewertung, automatisches Tagging, Qualitätsprüfung & Bild-SEO"
+      },
+      "contextGenerator": {
+        "title": "🧠 Context Generator",
+        "description": "Generiere KI-Kontexte für bessere Ergebnisse"
+      },
+      "stringGenerator": {
+        "title": "🔤 String Generator",
+        "description": "Intelligente String-Generierung für verschiedene Use-Cases"
+      },
+      "autoFramplementator": {
+        "title": "🔄 Auto Framplementator",
+        "description": "Automatische Framework-Implementierung"
+      },
+      "woocommerceSync": {
+        "title": "🔄 WooCommerce Sync",
+        "description": "Automatische Synchronisation mit WooCommerce"
+      },
+      "memorySystem": {
+        "title": "💾 Memory System",
+        "description": "KI-Gedächtnis für personalisierte Ergebnisse"
+      },
+      "systemHealth": {
+        "title": "⚙️ System Health",
+        "description": "System-Status und Performance-Monitoring"
+      },
+      "userManagement": {
+        "title": "👤 User Management",
+        "description": "Verwalte und analysiere alle Nutzer im System"
+      }
     }
   },
   "tools": {
