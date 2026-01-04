@@ -1,244 +1,219 @@
-# 🚀 A.R.I. - Artificial Retail Intelligence
+# 🤖 A.R.I. - Artificial Retail Intelligence
 
-**Version:** 6.0.0  
-**Status:** Production-Ready
-
-AI-gestütztes Automatisierungssystem für WooCommerce-Shops. Automatisiert Produkterstellung, Content-Generierung, Analytics und Marketing über WooCommerce/WordPress REST API.
+> **Dein Online-Shop arbeitet 24/7 für dich – während du schläfst.**
 
 ---
 
-## 📋 Features
+## 💡 Die Idee
 
-### 🤖 Automatisierung
-- **44 Job Workflows** für Produkt-Management, Content, Analytics, Marketing und Shop-Health
-- **Cron-basiertes Scheduling** mit node-cron
-- **Circuit Breakers** für automatische Fehlerbehandlung
-- **Dead Letter Queue** mit automatischem Retry
+Stell dir vor, du betreibst einen Online-Shop. Jeden Tag dieselben wiederkehrenden Aufgaben: Produktbeschreibungen schreiben, Social-Media-Posts erstellen, Analytics checken, E-Mails an Kunden schicken, Conversion-Rates analysieren, neue Produkte hochladen...
 
-### 📊 Analytics & Reporting
-- Shop-Metriken (Umsatz, Bestellungen, Conversion-Rate)
-- Echtzeit-Analytics (Live-Besucher, aktuelle Orders)
-- Conversion-Funnel-Analyse mit Drop-Off-Detection
-- Google Trends Integration für Keyword-Recherche
+**Was wäre, wenn dein Shop das alles selbst könnte?**
 
-### 🎨 Content & Marketing
-- **GPT-4o-mini Integration** für Produktbeschreibungen, E-Mails, Blog-Posts
-- **DALL-E Integration** für automatische Bildgenerierung
-- **Social Media Automation** (Facebook, Instagram, LinkedIn, Twitter)
-- **Email Marketing** (Abandoned Cart, Welcome Series, Win-Back)
-
-### 🏗️ Architektur
-- **Stateless Design** - Keine persistente Datenspeicherung
-- **Zero-Data Architecture** - Alle Daten werden über WooCommerce API abgerufen
-- **Kubernetes-Ready** - Horizontale Skalierung möglich
-- **Multi-Language** - Deutsch & Englisch (react-i18next)
+A.R.I. ist kein weiteres WordPress-Plugin. Es ist dein **digitaler Business-Partner** – ein KI-Agent, der deinen WooCommerce-Shop selbstständig optimiert, vermarktet und skaliert. Während du dich auf die großen Entscheidungen konzentrierst, kümmert sich A.R.I. um den Rest.
 
 ---
 
-## 🚀 Installation
+## 🎯 Das Problem
 
-### Voraussetzungen
-- Node.js 18+
-- Docker & Docker Compose (optional)
-- WooCommerce-Shop mit aktivierter REST API
-- OpenAI API Key
+Als Shop-Betreiber kennst du das:
 
-### 1. Repository klonen
+- 😰 **Überwältigung**: Zu viele Tools, zu viele Tabs, zu wenig Zeit
+- 📝 **Content-Marathon**: Hunderte Produktbeschreibungen, die sich nicht von selbst schreiben
+- 📊 **Daten-Chaos**: Analytics-Dashboards voller Zahlen – aber was bedeuten sie wirklich?
+- 💸 **Verlorene Sales**: Abandoned Carts, die du nie nachverfolgen kannst
+- 🔄 **Routine-Hölle**: Dieselben Aufgaben jeden Tag, Woche für Woche
+- 🚀 **Keine Skalierung**: Du bist der Flaschenhals deines eigenen Erfolgs
+
+**Die Wahrheit:** Du verbringst 80% deiner Zeit mit Aufgaben, die eine KI besser, schneller und konstanter erledigen könnte.
+
+---
+
+## ✨ Die Lösung
+
+A.R.I. übernimmt die gesamte operative Arbeit deines Shops:
+
+### 🛍️ **Produkte**
+Neue Produkte? A.R.I. analysiert Google Trends, generiert SEO-optimierte Beschreibungen, erstellt passende Bilder mit DALL-E und lädt alles automatisch hoch. Perfekt formatiert, markenkonform, verkaufsfördernd.
+
+### 📈 **Analytics**
+Keine Dashboard-Paralyse mehr. A.R.I. analysiert deine Zahlen kontinuierlich, erkennt Anomalien und sagt dir konkret: *"Deine Conversion-Rate bei Produkt X ist um 15% gesunken – hier sind 3 Maßnahmen"*.
+
+### 📧 **Marketing**
+Abandoned Cart? A.R.I. schickt automatisch personalisierte Recovery-Mails. Neue Produktkategorie? A.R.I. postet auf Instagram, Facebook und LinkedIn – mit KI-generierten Texten und Bildern.
+
+### 🔄 **Automatisierung**
+Einmal konfiguriert, läuft A.R.I. selbstständig. 44 spezialisierte Workflows arbeiten im Hintergrund – ohne dass du einen Finger rührst.
+
+### 🌍 **Multi-Channel**
+WooCommerce, WordPress, Social Media, E-Mail – alles aus einer Zentrale. Deutsch und Englisch. Mobile und Desktop.
+
+---
+
+## 🎁 Was du bekommst
+
+**Statt 8 Stunden Admin-Arbeit pro Tag:**
+- ⏰ Mehr Zeit für Strategie und Wachstum
+- 💰 Höhere Conversion durch KI-optimierte Texte
+- 📊 Datenbasierte Entscheidungen statt Bauchgefühl
+- 🚀 Skalierung ohne mehr Arbeitsstunden
+- 😌 Ruhiger Schlaf – dein Shop läuft auch nachts
+
+**Konkret:**
+- 🤖 **44 Automatisierte Workflows** erledigen Routine-Tasks
+- 📝 **GPT-4 Content-Engine** schreibt verkaufsstarke Texte
+- 🎨 **DALL-E Bildgenerierung** erstellt Produkt-Visuals
+- 📊 **Echtzeit-Analytics** mit KI-gestützten Empfehlungen
+- 📧 **Email-Automation** für Abandoned Carts, Welcome-Series, Win-Back
+- 📱 **Social Media Autopilot** postet auf 5+ Plattformen
+- 🌍 **Multi-Language** – Deutsch & Englisch out-of-the-box
+
+---
+
+## ⚡ Quick Start
+## ⚡ Quick Start
+
+**In 5 Minuten einsatzbereit:**
+
+### 1️⃣ Installation
 ```bash
 git clone https://github.com/AndreZ1971/ki.git
 cd ki
-```
-
-### 2. Konfiguration erstellen
-
-Erstelle `connection.json` im Root-Verzeichnis:
-
-```json
-{
-  "woocommerce": {
-    "url": "https://dein-shop.de",
-    "consumerKey": "ck_...",
-    "consumerSecret": "cs_..."
-  },
-  "openai": {
-    "apiKey": "sk-proj-...",
-    "model": "gpt-4o-mini"
-  },
-  "wordpress": {
-    "url": "https://dein-shop.de",
-    "username": "admin",
-    "appPassword": "xxxx xxxx xxxx xxxx"
-  }
-}
-```
-
-### 3. Installation & Start
-
-**Mit Docker (empfohlen):**
-```bash
 docker compose up -d
 ```
 
-**Ohne Docker:**
-```bash
-# Backend
-cd backend
-npm install
-npm run build
-npm start
+### 2️⃣ Konfiguration
+Öffne http://localhost:5173, gehe zu **Settings** und verbinde:
+- Deinen WooCommerce-Shop (API Key + Secret)
+- WordPress (Username + App Password)
+- OpenAI API Key (für Content-Generation)
 
-# Frontend (neues Terminal)
-cd frontend
-npm install
-npm run dev
-```
-
-### 4. Zugriff
-- **Frontend:** http://localhost:5173
-- **Backend API:** http://localhost:3000
-- **Swagger Docs:** http://localhost:3000/documentation
+### 3️⃣ Fertig
+A.R.I. analysiert deinen Shop und schlägt dir die ersten Optimierungen vor. Klick auf "Starten" und lehn dich zurück.
 
 ---
 
-## 📡 API Endpoints
+## 🎮 Was kann A.R.I. konkret?
 
-### Produkte
-- `GET /api/products` - Alle Produkte abrufen
-- `POST /api/products` - Produkt erstellen
-- `PUT /api/products/:id` - Produkt aktualisieren
-- `DELETE /api/products/:id` - Produkt löschen
+### 📦 **Produkt-Management**
+- Neue Produkte aus Google Trends automatisch erstellen
+- SEO-optimierte Beschreibungen generieren
+- Produktbilder mit DALL-E erstellen
+- Kategorien intelligent organisieren
+- Preise dynamisch optimieren
 
-### Analytics
-- `GET /api/analytics/dashboard` - Dashboard-Metriken
-- `GET /api/analytics/conversion` - Conversion-Analyse
-- `GET /api/analytics/real-time` - Echtzeit-Daten
+### 📊 **Analytics & Insights**
+- Shop-Metriken in Echtzeit (Umsatz, Orders, Conversion)
+- Conversion-Funnel-Analyse mit Drop-Off-Detection
+- Anomalie-Erkennung (z.B. plötzlicher Traffic-Einbruch)
+- KI-generierte Handlungsempfehlungen
+- Custom Reports auf Knopfdruck
 
-### Content & AI
-- `POST /api/marketing/content/generate-copy` - AI Produkttext
-- `POST /api/marketing/ai-images` - DALL-E Bildgenerierung
-- `POST /api/marketing/social/post` - Social Media Post
+### 📧 **E-Mail Marketing**
+- Abandoned Cart Recovery (personalisiert)
+- Welcome-Serie für neue Kunden
+- Win-Back-Kampagnen für inaktive Kunden
+- Newsletter-Automation
+- A/B-Testing von Subject Lines
 
-### Jobs & Automation
-- `GET /api/jobs` - Alle Jobs anzeigen
-- `POST /api/jobs/:jobId/run` - Job manuell ausführen
-- `GET /api/jobs/:jobId/status` - Job-Status abrufen
+### 📱 **Social Media**
+- Automatische Posts auf Facebook, Instagram, LinkedIn, Twitter
+- Content-Kalender mit KI-Vorschlägen
+- Bild-Generierung für jeden Post
+- Hashtag-Optimierung
+- Best-Time-to-Post Analyse
 
-**Vollständige Dokumentation:** [docs/german/api/README.md](docs/german/api/README.md)
-
----
-
-## 🔧 Konfiguration
-
-### Umgebungsvariablen
-
-Das System benötigt **keine** Datenbank-Zugangsdaten. Alle Daten werden über die WooCommerce REST API abgerufen.
-
-**Backend (.env optional):**
-```env
-NODE_ENV=production
-PORT=3000
-LOG_LEVEL=info
-```
-
-### WooCommerce REST API aktivieren
-
-1. WordPress Admin → WooCommerce → Einstellungen → Erweitert → REST API
-2. "Schlüssel hinzufügen" klicken
-3. Berechtigungen: "Lesen/Schreiben"
-4. Consumer Key und Secret kopieren → `connection.json`
-
-### OpenAI API Key
-
-1. https://platform.openai.com/api-keys
-2. "Create new secret key"
-3. Key kopieren → `connection.json`
+### 🤖 **Agentic Workflows**
+- **Payment Recovery Loop**: Holt fehlgeschlagene Zahlungen zurück
+- **Product Optimization Loop**: Testet automatisch Preise, Titel, Beschreibungen
+- **Anomaly Detection Loop**: Erkennt Probleme, bevor sie kritisch werden
+- **Analytics Insights Loop**: Liefert kontinuierlich Optimierungsvorschläge
 
 ---
 
-## 🧪 Testing
+## 🏗️ Technologie
 
-```bash
-# Alle Tests
-npm test
+**Für Tech-Interessierte:**
 
-# E2E Tests
-npm run test:e2e
+- **Frontend**: React 18 + TypeScript + Vite
+- **Backend**: Node.js + Fastify + TypeScript
+- **KI**: OpenAI GPT-4o-mini + DALL-E 3
+- **Integration**: WooCommerce REST API + WordPress REST API
+- **Architektur**: Stateless, Zero-Data, Kubernetes-Ready
+- **Multi-Language**: react-i18next (DE/EN)
+- **Container**: Docker + Docker Compose
+- **Resilience**: Circuit Breakers + Dead Letter Queue + Retry Logic
 
-# Coverage Report
-npm run test:coverage
+**130+ API Endpoints** | **350 Tests** | **Production-Ready**
 
-# Tests im Watch-Modus
-npm run test:watch
-```
-
-**Test-Abdeckung:** 350/350 Tests ✅
-
----
-
-## 📋 Dokumentation
-
-| Dokument | Beschreibung |
-|----------|--------------|
-| [API Referenz](docs/german/api/README.md) | Vollständige API-Dokumentation |
-| [Workflows](docs/german/workflows/README.md) | 44 Job-Workflows im Detail |
-| [Bedienungsanleitung](docs/german/Bedienungsanleitung-KI-Agent.md) | Komplette Anleitung für alle Features |
-| [Deployment Guide](docs/german/deployment.md) | Production-Setup & Troubleshooting |
-| [Social Media Setup](docs/german/SOCIAL_MEDIA_GUIDE.md) | Meta, TikTok, LinkedIn Integration |
-
-**English Documentation:** [README_EN.md](README_EN.md)
+Vollständige API-Dokumentation: `/docs/german/api/README.md`
 
 ---
 
-## 🔒 Datenschutz
+## 📚 Dokumentation
 
-### Zero-Data Architektur
-- Keine Datenbank - alle Daten werden über WooCommerce API abgerufen
+| Was brauchst du? | Wo findest du es? |
+|------------------|-------------------|
+| **Erste Schritte** | [Bedienungsanleitung](docs/german/Bedienungsanleitung-KI-Agent.md) |
+| **API Reference** | [API Docs](docs/german/api/README.md) |
+| **Workflows** | [44 Job-Workflows erklärt](docs/german/workflows/README.md) |
+| **Deployment** | [Production Setup](docs/german/deployment.md) |
+| **Social Media Setup** | [Meta, TikTok, LinkedIn Integration](docs/german/SOCIAL_MEDIA_GUIDE.md) |
+| **English Docs** | [README_EN.md](README_EN.md) |
+
+---
+
+## 🔒 Datenschutz & Sicherheit
+
+**Zero-Data Architektur:**
+- Keine Datenbank – alle Daten bleiben in deinem WooCommerce-Shop
 - Keine persistente Speicherung von Kundendaten
 - Temporäre Daten nur im RAM (max. 5000 Events)
-- Server-Neustart löscht alle temporären Daten
+- Server-Neustart = alle Daten gelöscht
 
-### OpenAI API Nutzung
-- Produktbeschreibungen, E-Mails und Content werden an GPT-4o-mini gesendet
-- OpenAI speichert API-Daten gemäß deren Datenschutzrichtlinien
-- API-Daten werden **nicht** für Model-Training verwendet
+**OpenAI API:**
+- Produktbeschreibungen & Content werden an GPT-4 gesendet
+- OpenAI verwendet API-Daten **nicht** für Model-Training
+- DSGVO-konform bei korrekter Datenschutzerklärung
 
-**DSGVO-Hinweis:** Als Betreiber müssen Sie die AI-Nutzung in Ihrer Datenschutzerklärung erwähnen.
+**Deine Daten gehören dir.** A.R.I. ist nur ein Werkzeug.
 
 ---
 
-## 📝 Changelog
+## 💬 Support & Community
 
-### v6.0.0 (Januar 2026)
-- ✅ Production-Ready Release
+- 📖 **Dokumentation**: [/docs](./docs)
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/AndreZ1971/ki/issues)
+- 📧 **Kontakt**: info@kaufe-es.eu
+
+---
+
+## 📈 Versionen
+
+**v6.0.0** (Januar 2026) – Production-Ready Release
 - ✅ 350/350 Tests passing
-- ✅ 44 automatisierte Job-Workflows
-- ✅ Premium Spezialisierungen (10 Branchen)
-- ✅ Circuit Breakers & Dead Letter Queue
+- ✅ 44 automatisierte Workflows
+- ✅ Premium Spezialisierungen
 - ✅ Multi-Language Support (DE/EN)
 
-### v5.1.1 (Januar 2026)
-- 🐛 8 kritische Bugfixes (Analytics, Routing, Auth)
+**v5.1.1** (Januar 2026) – Bugfix Release
+- 🐛 8 kritische Bugfixes
 - ✅ Server-Stabilität: 0 Fehler beim Start
 
-### v5.1.0 (Dezember 2025)
-- 🌍 100% i18n Coverage (64 Pages)
-- 🇩🇪🇬🇧 Deutsch & Englisch Support
-- 💾 LocalStorage Language Persistence
-
-### v5.0.0-alpha (November 2025)
-- 🔄 Dynamic Config Reload
-- 🐋 Container-ready Architecture
-
----
-
-## 📞 Support
-
-- **Dokumentation:** [/docs](./docs)
-- **Issues:** [GitHub Issues](https://github.com/AndreZ1971/ki/issues)
-- **Email:** info@kaufe-es.eu
+Vollständiger Changelog: [CHANGELOG.md](CHANGELOG.md)
 
 ---
 
 ## 📄 Lizenz
 
 ISC License
+
+---
+
+<div align="center">
+
+**Gebaut mit ❤️ für Shop-Betreiber, die ihre Zeit für wichtigere Dinge nutzen wollen.**
+
+[⭐ Star uns auf GitHub](https://github.com/AndreZ1971/ki) • [🚀 Get Started](#-quick-start) • [📚 Docs](./docs)
+
+</div>
