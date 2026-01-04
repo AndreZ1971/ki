@@ -1,136 +1,103 @@
-# 🚀 ARI - Artificial Retail Intelligence System
+# 🚀 A.R.I. - AI-powered WooCommerce Automation Platform
 
-**Version:** 5.1.1 🐛  
-**Status:** Production-Ready | Bugfix Release | Full i18n Multi-Language Support ✅
+**Version:** 6.0.0  
+**Status:** Production-Ready
 
-Ein **AI-gestütztes Business Automation System** für WooCommerce/WordPress mit 130+ API-Endpoints, 50+ spezialisierten Tools, KI-Agent, Agentic Loops, modernem Dashboard und **vollständiger Mehrsprachunterstützung (Deutsch/Englisch)**.
-
----
-
-## 🔥 **NEU in Version 5.1.1: Production Bugfix Release**
-
-### 🐛 **8 kritische Bugs behoben (Januar 2026)**
-
-✅ **Analytics-Module:** User-Count Berechnungen korrigiert  
-✅ **API-Routing:** Fehlende Route-Registrierungen hinzugefügt  
-✅ **WooCommerce Integration:** Auth-Fehler behoben  
-✅ **Error-Handling:** Fastify-kompatible Responses  
-✅ **OpenAI Integration:** JSON-Parsing mit Fallbacks  
-✅ **Server-Stabilität:** 0 Fehler beim Startup
-
-**Details:** [🇩🇪 Production Bugfix Summary](docs/german/PRODUCTION_BUGFIX_SUMMARY.md) | [🇬🇧 Production Bugfix Summary](docs/english/PRODUCTION_BUGFIX_SUMMARY.md)
+AI-gestütztes Business Automation System für WooCommerce/WordPress mit 130+ API-Endpoints, 44 automatisierten Workflows, ML-basierter Analytics und vollständiger Mehrsprachunterstützung.
 
 ---
 
-## 🌍 **Version 5.1.0: Vollständige Mehrsprachunterstützung!**
+## 📋 Features
 
-### 🇩🇪 🇬🇧 **Multi-Language i18n Implementation**
+### 🤖 **Automatisierung**
+- **44 Job Workflows**: Produkt-Management, Content-Generierung, Analytics, Marketing, Payment-Management, Shop-Health
+- **Cron-basiertes Scheduling**: Node-Cron für zeitgesteuerte Jobs
+- **Circuit Breakers**: Automatische Fehlerbehandlung bei API-Ausfällen
+- **Dead Letter Queue**: Automatisches Retry für fehlgeschlagene Jobs
 
-✅ **100% Frontend Coverage** - Alle 64 Seiten konvertiert zur react-i18next  
-✅ **Deutsch + Englisch** - Komplette Übersetzungen für beide Sprachen  
-✅ **Language Switcher** - Einfache Sprachumschaltung via 🇩🇪🇬🇧 Buttons  
-✅ **LocalStorage Persistence** - Sprachpräferenz wird gespeichert  
-✅ **Zero Breaking Changes** - Vollständig abwärtskompatibel
+### 📊 **Analytics & Reporting**
+- Shop-Metriken (Umsatz, Bestellungen, Conversion)
+- Echtzeit-Analytics (Live-Besucher, aktuelle Orders)
+- Conversion-Funnel-Analyse mit Drop-Off-Detection
+- Google Trends Integration für Keyword-Analyse
 
-**Unterstützte Seiten (alle konvertiert):**
-- Dashboard, Settings (alle 5 Tabs), Analytics, Payment-Module
-- Product Management, Marketing Tools, AI Agent Interface
-- Agentic Loops, License Management, Specializations
-- 58+ weitere funktionale Seiten
+### 🎨 **Content & Marketing**
+- AI Content Generator (GPT-4o-mini) für Produktbeschreibungen, Blog-Posts, E-Mails
+- AI Image Generator (DALL-E) mit automatischem SEO
+- Social Media Auto-Poster (Facebook, Instagram, LinkedIn, Twitter)
+- Email Marketing Automation (Abandoned Cart, Welcome Series, Win-Back)
 
-**Translation Keys:** 150+ Struktur-Keys für konsistente Übersetzungen
+### 🏗️ **Architektur**
+- **Stateless Design**: Keine persistente Datenspeicherung
+- **Kubernetes-Ready**: Horizontale Skalierung, Container-Orchestrierung
+- **Multi-Language**: Deutsch & Englisch (react-i18next)
+- **Error Handling**: Circuit Breakers, Retry-Logik, DLQ
 
-**Details:** Siehe [I18N_COVERAGE_REPORT.md](docs/I18N_COVERAGE_REPORT.md)
+### 🤖 **44 Automated Job Workflows**
 
----
+**Product Management** (11 jobs):
+- Auto Product Creator (Google Trends integration)
+- WooCommerce Product Creator/Updater
+- Product Bundles Creator (15-30% discount)
+- Freebie Creator (lead magnets)
+- Categories Manager, Kits & Templates
 
-## ✨ Was ist neu in Version 5.0.0-alpha?
+**Content Generation** (3 jobs):
+- AI Content Generator (GPT-4, SEO-optimized)
+- German Content Generator (local compliance)
+- AI Image Generator (DALL-E)
 
-### 🔄 **Dynamic Config Reload** (NEU)
+**Analytics & Reporting** (7 jobs):
+- Daily/Weekly/Monthly reports
+- Real-time analytics & conversion analysis
+- Google Trends integration & forecasting
 
-- **Live-Update ohne Restart**: Änderungen in Settings UI werden sofort aktiv
-- **getConfig()**: Dynamisches Nachladen von connection.json bei jeder API-Anfrage
-- **Auth-Modus Switching**: Unterstützung für 'basic' (Header) und 'query' (URL-Parameter)
-- **Shop-Metrics Dashboard**: Zeigt echte Shop-Daten unmittelbar nach Settings-Speicherung
+**Marketing Automation** (5 jobs):
+- Email Marketing (abandoned cart, welcome series, win-back)
+- Social Media Auto-Poster (Facebook, Instagram, LinkedIn, Twitter)
+- Content Monetizer & Free-to-Paid Converter
 
-### 🐋 **Alpha-Container Philosophie** (MVP)
+**Pa🎨 **Premium Specializations Marketplace**
 
-- **Ephemeral Design**: Jeder Container-Start mit frischen Platzhaltern
-- **UI-Driven Onboarding**: Kunden konfigurieren via Settings-Interface
-- **K8s-Ready**: Repair/Update Container für Production (Roadmap)
-- **Stateless Architecture**: Keine Persistierung über Container-Restarts
+**10 Industry Specializations** (99€-149€ each):
+- 🏨 **Travel & Hospitality**: Seasonal pricing, local attractions, travel tips
+- 🏠 **Real Estate**: Property descriptions, legal compliance, location analysis
+- 💻 **Tech & Electronics**: Spec tables, compatibility charts, tech support
+- 👗 **Fashion & Apparel**: Size guides, material care, style recommendations
+- 💄 **Beauty & Cosmetics**: INCI ingredient descriptions, health claims compliance
+- 🏋️ **Sports & Fitness**: Training programs, nutrition plans, equipment guides
+- 🍽️ **Food & Beverage**: Recipe ideas, allergen warnings, nutritional info
+- 🏠 **Home & Garden**: DIY guides, maintenance tips, seasonal recommendations
+- 📚 **Education & Courses**: Learning objectives, curriculum outlines, certification paths
+- 🎮 **Gaming & Entertainment**: Platform compatibility, game guides, community features
 
----
+**Revenue Forecast:** 30% adoption × 3 specializations × 124€ avg = 2.23M€ year 1
 
-## 🎯 Version 4.1.0 Features
+### 📊 **130+ API Endpoints**
 
-### 🤖 **Agentic Loop Framework**
+**Categories:**
+- Products (list, create, update, delete, bulk operations, AI descriptions)
+- Analytics (shop metrics, conversion analysis, real-time data, trends)
+- Audit (mini/standard/premium, shop scan, health reports)
+- Email (send, AI generation, marketing automation)
+- Marketing (workflows, social media, content monetization)
+- System (health checks, circuit breakers, DLQ stats, memory management)
+- Customers (list, stats, segmentation, subscribers)
+- Agent (GPT-4 planning engine, tool execution)
 
-Autonome KI-Agenten für kontinuierliche Geschäftsprozesse:
+### 🤖 **AI Integration**
 
-**4 spezialisierte Loop-Typen:**
+- **GPT-4o-mini**: Product descriptions, email copy, content generation
+- **DALL-E**: Product image generation with auto-SEO
+- **Google Trends**: Keyword analysis, demand scoring, competition analysis
+- **ML Analytics**: Conversion predictions, anomaly detection, trend forecasting
 
-1. **Anomaly Detection Loop** 🚨
-   - Erkennt Payment-Anomalien automatisch
-   - Typen: failed_payment, unusual_amount, repeated_attempts, high_risk
-   - Endpoint: `POST /api/agent/loops/anomaly-detection/run`
+### 📈 **Error Handling & Resilience**
 
-2. **Product Optimization Loop** 📈
-   - A/B testet Produktattribute automatisch
-   - Optimiert: Preis (-10%), Titel (+Bestseller), Beschreibung (+Benefits)
-   - Endpoint: `POST /api/agent/loops/product-optimization/run`
-
-3. **Payment Recovery Loop** 💳
-   - Versucht Failed Orders mit verschiedenen Strategien
-   - Strategien: Retry, Discount, Alternative Payment, Contact
-   - Success Rate: bis zu 60% bei Contact-Strategie
-   - Endpoint: `POST /api/agent/loops/payment-recovery/run`
-
-4. **Analytics Insights Loop** 📊
-   - Generiert automatisch Dashboard-Insights
-   - Erkennt Anomalien und Trends
-   - Liefert Empfehlungen für Maßnahmen
-   - Endpoint: `POST /api/agent/loops/analytics-insights/run`
-
-**Architektur:** Sense → Think → Act → Learn → Repeat Zyklus  
-**Dokumentation:** [AGENTIC_LOOP_ARCHITECTURE.md](docs/AGENTIC_LOOP_ARCHITECTURE.md)
-
-### 🔍 Product Analyzer & Optimizer (v4.0.0)
-
-- **Intelligentes Modal**: Vollständige Produktdetails mit scrollbarem Layout
-- **KI-Analyse Integration**: Produktanalyse mit Score, Metriken und personalisierten Empfehlungen
-- **Dropdown-Selection**: Benutzerfreundliche Produktauswahl mit Live-Daten
-- **Action Board**: Direkte Maßnahmen (Restock, Pricing, Steering) aus der Analyse heraus
-- **Light Theme**: Optimiert für Lesbarkeit mit weißem Hintergrund und dunkler Schrift
-
-### ⚡ Performance & Resilience (v4.0.0)
-
-- **30s Timeout**: Großzügigere Timeouts für langsame WooCommerce-Instanzen
-- **60s Cache**: Intelligente Caching-Schicht für Shop-Metriken und Produktdaten
-- **Fallback-System**: Zeigt gecachte Daten bei temporären Verbindungsproblemen
-- **Error Handling**: Klare Fehlermeldungen statt silent failures
-
-### 🛠️ Backend-Verbesserungen
-
-- **WooCommerce Service**: Zentralisierte Credentials-Verwaltung (Env + connection.json)
-- **Shop Metrics Cache**: Resiliente Metriken auch bei Shop-Ausfällen
-- **Type Safety**: Vollständige TypeScript-Typisierung für WooCommerce-Entities
-- **Agentic Loops**: 4 spezialisierte autonome Agenten für Payment, Products & Analytics
-
----
-
-## 🎯 Core Features
-
-### 📊 **50+ spezialisierte Marketing Tools**
-- Image Analyzer (Bild-Analyse mit KI)
-- Auto Product Creator (Produkt-Automatisierung)
-- Social Media Poster (Multi-Platform Publishing)
-- Conversion Analyzer (Funnel-Analyse)
-- Revenue Analytics (Echtzeitdaten)
-- Und viele mehr...
-
-### 🤖 **KI-Chatbot Ari**
-- Integrierter AI-Agent für alle Tools
+- **Circuit Breakers**: Auto-recovery from WooCommerce/OpenAI failures (60s cooldown)
+- **Dead Letter Queue**: Failed jobs automatically retry (max 3x, 5min intervals)
+- **Rate Limiting**: 100 req/min global, 60 req/min per IP, 10 req/min AI endpoints
+- **Caching**: 60s cache for shop metrics, fallback on connection issuesent für alle Tools
 - Motivation & Support für Daily Tasks
 - Versteht Kontext über alle Bereiche
 
@@ -356,24 +323,48 @@ curl http://localhost:3000/health
 http://localhost:3000/documentation
 ```
 
-### System Logs
-```bash
-# Docker
-docker compose logs -f ki
+### S6.0.0 (Januar 2026) - Production Release
+- ✅ **350/350 tests passing** - Complete test coverage
+- ✅ **2 months production runtime** - Zero downtime on Hetzner
+- ✅ **Zero-data architecture** - GDPR-compliant by design
+- ✅ **Premium specializations** - Marketplace with 10 industries
+- ✅ **44 automated workflows** - Cron-based job scheduling
+- ✅ **Circuit breakers** - Auto-recovery from API failures
+- ✅ **Documentation cleanup** - Removed 57 outdated files (21,000 lines)
+- 🎯 **Release Tag**: [v6.0.0](https://github.com/AndreZ1971/ki/releases/tag/v6.0.0)
 
-# Lokal
-npm run start 2>&1 | tee logs.txt
-```
+### v5.1.1 (Januar 2026) - Bugfix Release
+- 🐛 Fixed 8 critical bugs (analytics, routing, auth, error handling)
+- ✅ Server stability: 0 errors on startup
+- 📚 Production bugfix summary documentation
 
----
+### v5.1.0 (Dezember 2025) - i18n Release
+- 🌍 100% frontend coverage (64 pages)
+- 🇩🇪🇬🇧 German + English translations
+- 💾 LocalStorage language persistence
+- 🔄 Zero breaking changes
 
-## 🤝 Contribution
+### v5.0.0-alpha (November 2025)
+- 🔄 Dynamic config reload (no restart required)
+- 🐋 Container-ready architecture
+- ⚡ Live Settings UI updates
 
-Contributions sind willkommen! Bitte beachte:
+### v4.1.0
+- 🤖 Agentic Loop Framework (removed in v6.0.0)
+- 📊 Anomaly detection & product optimization
 
-1. Fork das Repository
-2. Erstelle einen Feature-Branch (`git checkout -b feature/xy`)
-3. Committe deine Änderungen (`git commit -m 'Add feature'`)
+### v4.0.0
+- 🔍 Product Analyzer & Optimizer
+- ⚡ Performance improvements (30s timeout, 60s cache)
+- 🛠️ WooCommerce service centralization
+
+### v3.2.0
+- ✨ AI price suggestions & product text generator
+- 📈 Revenue forecast badges
+- 🎨 Content Monetization UI
+
+### v3.0.0 - Initial Release
+- 📊 Core marketing tools & analytics dashboardungen (`git commit -m 'Add feature'`)
 4. Pushe zum Branch (`git push origin feature/xy`)
 5. Öffne einen Pull Request
 
@@ -411,16 +402,8 @@ Contributions sind willkommen! Bitte beachte:
 ## 📞 Support & Kontakt
 
 - **Dokumentation**: [/docs](./docs)
-- **Issues**: GitHub Issues
-- **Email**: support@kaufe-es.eu
-- **Chat**: KI-Agent Ari im Dashboard
+- **Email**: info@kaufe-es.eu
 
 ---
 
 ## 📄 Lizenz
-
-Proprietär © 2025 Kaufe-es GmbH
-
----
-
-**Made with ❤️ for e-commerce automation**
