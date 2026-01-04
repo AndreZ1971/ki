@@ -5,6 +5,7 @@ import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
 import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
+import { apiClient } from '../../lib/api-client';
 import './page.css';
 
 type GeneratedResult = {
@@ -62,27 +63,20 @@ const GermanContentGenerator: React.FC = () => {
     setError(null);
 
     try {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/marketing/content/german`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contentType,
-          topic,
-          targetAudience,
-          tone,
-          lengthMode,
-          formality,
-          includeSeo,
-          includeFaqs,
-          includeCtas,
-          keywords,
-          avoidTerms
-        })
+      const result = await apiClient.post('/api/marketing/content/german', {
+        contentType,
+        topic,
+        targetAudience,
+        tone,
+        lengthMode,
+        formality,
+        includeSeo,
+        includeFaqs,
+        includeCtas,
+        keywords,
+        avoidTerms
       });
 
-      if (!response.ok) throw new Error(`API Error: ${response.status}`);
-
-      const result = await response.json();
       setGeneratedContent(result);
       showToast('Content erfolgreich generiert!', 'success');
     } catch (err) {

@@ -4,6 +4,7 @@ import { useToast } from '../../hooks/useToast';
 import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
 import { productApi } from '../../services/productApi';
+import { apiClient } from '../../lib/api-client';
 import type { UpdateType } from '../../types/product';
 import './page.css';
 
@@ -64,10 +65,8 @@ const WooProductUpdate = () => {
       try {
         setLoadingProducts(true);
         console.log('[WooProductUpdate] Requesting products from /api/products/woo/list');
-        const response = await fetch('/api/products/woo/list');
-        console.log('[WooProductUpdate] Response:', response);
-        const data = await response.json();
-        console.log('[WooProductUpdate] Response JSON:', data);
+        const data = await apiClient.get('/api/products/woo/list');
+        console.log('[WooProductUpdate] Response:', data);
         if (data.success && data.data) {
           setProducts(data.data);
           setSelectedProducts(data.data.map((p: ProductItem) => p.id));
@@ -100,18 +99,12 @@ const WooProductUpdate = () => {
   const analyzeTrendPricing = async (product: ProductItem) => {
     try {
       setAiLoading(true);
-      const response = await fetch('/api/products/ai/trend-pricing', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productId: product.id,
-          productName: product.name,
-          currentPrice: product.price,
-          category: 'general'
-        })
+      const result = await apiClient.post('/api/products/ai/trend-pricing', {
+        productId: product.id,
+        productName: product.name,
+        currentPrice: product.price,
+        category: 'general'
       });
-
-      const result = await response.json();
       
       if (result.success) {
         setTrendData(prev => ({
@@ -146,16 +139,10 @@ const WooProductUpdate = () => {
       setAiLoading(true);
       setSelectedProductForAnalysis(product);
       
-      const response = await fetch('/api/products/ai/reddit-sentiment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productName: product.name,
-          category: 'general'
-        })
+      const result = await apiClient.post('/api/products/ai/reddit-sentiment', {
+        productName: product.name,
+        category: 'general'
       });
-
-      const result = await response.json();
       
       if (result.success) {
         setRedditData(result.data);
@@ -179,17 +166,11 @@ const WooProductUpdate = () => {
 
     try {
       setAiLoading(true);
-      const response = await fetch('/api/products/ai/optimize-description-trends', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productName: product.name,
-          currentDescription: product.description,
-          category: 'general'
-        })
+      const result = await apiClient.post('/api/products/ai/optimize-description-trends', {
+        productName: product.name,
+        currentDescription: product.description,
+        category: 'general'
       });
-
-      const result = await response.json();
       
       if (result.success) {
         // Speichere optimierte Beschreibung
@@ -262,17 +243,8 @@ const WooProductUpdate = () => {
           if (Object.keys(updatePayload).length === 0) continue;
 
           try {
-            const response = await fetch(`/api/products/woo/update-single/${productId}`, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(updatePayload)
-            });
-
-            if (response.ok) {
-              successCount++;
-            } else {
-              errorCount++;
-            }
+            await apiClient.put(`/api/products/woo/update-single/${productId}`, updatePayload);
+            successCount++;
           } catch (error) {
             errorCount++;
             console.error(`Update failed for product ${productId}:`, error);

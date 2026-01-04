@@ -4,6 +4,7 @@ import { useToast } from '../../hooks/useToast';
 import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
 import { productApi, categoryApi } from '../../services/productApi';
+import { apiClient } from '../../lib/api-client';
 import type { Product, Category } from '../../types/product';
 import './page.css';
 
@@ -68,18 +69,13 @@ const WooProductCreate = () => {
 
     try {
       setAiLoading(true);
-      const response = await fetch('/api/products/ai/generate-description', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productName: productData.name,
-          category: productData.category,
-          tone: 'professional',
-          length: 'medium'
-        })
+      const data = await apiClient.post('/api/products/ai/generate-description', {
+        productName: productData.name,
+        category: productData.category,
+        tone: 'professional',
+        length: 'medium'
       });
 
-      const data = await response.json();
       if (data.success) {
         setProductData({ ...productData, description: data.data.description });
         toast.success(`✨ KI-Beschreibung generiert (${data.data.metadata.wordCount} Wörter)`);
@@ -102,19 +98,14 @@ const WooProductCreate = () => {
 
     try {
       setAiLoading(true);
-      const response = await fetch('/api/products/ai/quality-score', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productName: productData.name,
-          description: productData.description,
-          price: productData.price || 0,
-          category: productData.category,
-          images: 0
-        })
+      const data = await apiClient.post('/api/products/ai/quality-score', {
+        productName: productData.name,
+        description: productData.description,
+        price: productData.price || 0,
+        category: productData.category,
+        images: 0
       });
 
-      const data = await response.json();
       if (data.success) {
         setQualityScore(data.data);
         toast.success(`📊 Qualitäts-Score: ${data.data.overallScore}%`);
@@ -135,17 +126,12 @@ const WooProductCreate = () => {
 
     try {
       setAiLoading(true);
-      const response = await fetch('/api/products/ai/seo-optimize', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productName: productData.name,
-          description: productData.description,
-          category: productData.category
-        })
+      const data = await apiClient.post('/api/products/ai/seo-optimize', {
+        productName: productData.name,
+        description: productData.description,
+        category: productData.category
       });
 
-      const data = await response.json();
       if (data.success) {
         setSeoSuggestions(data.data);
         toast.success('🔍 SEO-Vorschläge geladen');
@@ -168,17 +154,12 @@ const WooProductCreate = () => {
       setAiLoading(true);
       toast.info('🎨 Generiere Produktbild... (dauert 10-15 Sek.)');
       
-      const response = await fetch('/api/products/ai/generate-image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productName: productData.name,
-          description: productData.description,
-          style: 'professional'
-        })
+      const data = await apiClient.post('/api/products/ai/generate-image', {
+        productName: productData.name,
+        description: productData.description,
+        style: 'professional'
       });
 
-      const data = await response.json();
       if (data.success) {
         setGeneratedImageUrl(data.data.imageUrl);
         toast.success('🎨 Produktbild generiert! ✓ Mit Produkt gespeichert');
@@ -199,17 +180,12 @@ const WooProductCreate = () => {
 
     try {
       setAiLoading(true);
-      const response = await fetch('/api/products/ai/suggest-pricing', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productName: productData.name,
-          category: productData.category,
-          description: productData.description
-        })
+      const data = await apiClient.post('/api/products/ai/suggest-pricing', {
+        productName: productData.name,
+        category: productData.category,
+        description: productData.description
       });
 
-      const data = await response.json();
       if (data.success) {
         setProductData({ ...productData, price: data.data.suggestedPrice });
         toast.success(`💰 Empfohlener Preis: ${data.data.suggestedPrice}€ (Konfidenz: ${data.data.confidence}%)`);
