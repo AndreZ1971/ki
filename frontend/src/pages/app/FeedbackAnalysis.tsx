@@ -88,7 +88,7 @@ const FeedbackAnalysis: React.FC = () => {
       {summary && (
         <div className="metric-card full-width" style={{margin: '32px 0'}}>
           <h3>🧾 Zusammenfassung</h3>
-          <div style={{fontSize: '1.1rem', color: '#2c3e50', marginBottom: 12}}>{summary.text || summary.summary || 'Keine Zusammenfassung verfügbar.'}</div>
+          <div style={{fontSize: '1.1rem', color: '#f5f7ff', marginBottom: 12}}>{summary.text || summary.summary || 'Keine Zusammenfassung verfügbar.'}</div>
           {summary.sentiment && (
             <div style={{fontWeight: 700, color: summary.sentiment === 'positive' ? '#27ae60' : summary.sentiment === 'negative' ? '#e74c3c' : '#f39c12'}}>
               Stimmung: {summary.sentiment === 'positive' ? '😊 Positiv' : summary.sentiment === 'negative' ? '😟 Negativ' : '😐 Neutral'}
@@ -123,7 +123,7 @@ const FeedbackAnalysis: React.FC = () => {
             return (
               <div className="metric-card" key={i}>
                 <div className="metric-icon" style={{fontSize: '2.2rem'}}>{icon}</div>
-                <div className="metric-label" style={{fontSize: '1.1rem', fontWeight: 700, color: '#2c3e50'}}>{category}</div>
+                <div className="metric-label" style={{fontSize: '1.1rem', fontWeight: 700, color: '#f5f7ff'}}>{category}</div>
                 <div className="metric-value" style={{fontSize: '0.95rem', lineHeight: '1.5', color: '#34495e', marginTop: 8}}>
                   {finding}
                 </div>
@@ -134,7 +134,7 @@ const FeedbackAnalysis: React.FC = () => {
                     borderRadius: 6, 
                     marginTop: 12, 
                     fontSize: '0.9rem',
-                    color: '#2c3e50',
+                    color: '#f5f7ff',
                     borderLeft: '3px solid #3498db'
                   }}>
                     💡 <strong>Empfehlung:</strong> {recommendation}
@@ -254,7 +254,7 @@ const FeedbackAnalysis: React.FC = () => {
                 borderLeft: '4px solid #ffc107'
               }}>
                 <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: 8}}>
-                  <strong style={{color: '#2c3e50', fontSize: '1.05rem'}}>{review.author}</strong>
+                  <strong style={{color: '#f5f7ff', fontSize: '1.05rem'}}>{review.author}</strong>
                   <span style={{color: '#ffc107', fontSize: '1.1rem'}}>
                     {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
                   </span>
@@ -283,7 +283,7 @@ const FeedbackAnalysis: React.FC = () => {
                   borderLeft: `4px solid ${statusColor}`
                 }}>
                   <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8}}>
-                    <strong style={{color: '#2c3e50', fontSize: '1.05rem'}}>{ticket.title}</strong>
+                    <strong style={{color: '#f5f7ff', fontSize: '1.05rem'}}>{ticket.title}</strong>
                     <div style={{display: 'flex', gap: 8}}>
                       <span style={{
                         background: priorityColor,

@@ -528,7 +528,7 @@ const PremiumAudit = () => {
           >
             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 24}}>
               <div>
-                <h2 style={{margin: 0, marginBottom: 8, color: '#2c3e50', fontSize: '1.5em'}}>
+                <h2 style={{margin: 0, marginBottom: 8, color: '#f5f7ff', fontSize: '1.5em'}}>
                   {selectedRecommendation.title}
                 </h2>
                 <span 
@@ -563,7 +563,7 @@ const PremiumAudit = () => {
             </div>
 
             <div style={{marginBottom: 24}}>
-              <h3 style={{margin: '0 0 12px 0', color: '#2c3e50'}}>📝 Beschreibung</h3>
+              <h3 style={{margin: '0 0 12px 0', color: '#f5f7ff'}}>📝 Beschreibung</h3>
               <p style={{margin: 0, color: '#555', lineHeight: 1.6}}>{selectedRecommendation.description}</p>
             </div>
 
@@ -585,13 +585,13 @@ const PremiumAudit = () => {
             <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24}}>
               <div style={{background: '#f8f9fa', padding: 16, borderRadius: 8}}>
                 <div style={{color: '#6c757d', fontSize: '0.9em', marginBottom: 4}}>Kategorie</div>
-                <div style={{fontSize: '1.1em', fontWeight: 600, color: '#2c3e50'}}>
+                <div style={{fontSize: '1.1em', fontWeight: 600, color: '#f5f7ff'}}>
                   {auditData.find(cat => cat.id === selectedRecommendation.category)?.name || 'N/A'}
                 </div>
               </div>
               <div style={{background: '#f8f9fa', padding: 16, borderRadius: 8}}>
                 <div style={{color: '#6c757d', fontSize: '0.9em', marginBottom: 4}}>Geschätzter Aufwand</div>
-                <div style={{fontSize: '1.1em', fontWeight: 600, color: '#2c3e50'}}>
+                <div style={{fontSize: '1.1em', fontWeight: 600, color: '#f5f7ff'}}>
                   {selectedRecommendation.estimatedTime}
                 </div>
               </div>

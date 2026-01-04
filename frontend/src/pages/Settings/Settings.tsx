@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import "../AnalyseMetrics/page.css";
+import "./Settings.css";
 import { LoopScheduleEditor } from "../../components/LoopScheduleEditor";
 
 // Loop Schedule Types

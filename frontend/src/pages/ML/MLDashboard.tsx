@@ -264,7 +264,7 @@ const MLDashboard: React.FC = () => {
           transition={{ delay: 0.4 }}
           className="metric-card full-width"
         >
-          <h3 style={{ marginBottom: '20px', color: '#2c3e50', fontSize: '1.5rem', fontWeight: '800' }}>
+          <h3 style={{ marginBottom: '20px', color: '#f5f7ff', fontSize: '1.5rem', fontWeight: '800' }}>
             📈 Konfidenz-Verlauf
           </h3>
           {confidenceData.length ? (
@@ -297,7 +297,7 @@ const MLDashboard: React.FC = () => {
           className="metric-card full-width"
           style={{ marginTop: '20px' }}
         >
-          <h3 style={{ marginBottom: '20px', color: '#2c3e50', fontSize: '1.5rem', fontWeight: '800' }}>
+          <h3 style={{ marginBottom: '20px', color: '#f5f7ff', fontSize: '1.5rem', fontWeight: '800' }}>
             ⚡ Performance-Verlauf
           </h3>
           {performanceData.length ? (
@@ -333,7 +333,7 @@ const MLDashboard: React.FC = () => {
           className="metric-card"
           style={{ marginBottom: '20px' }}
         >
-          <h3 style={{ marginBottom: '20px', color: '#2c3e50', fontSize: '1.5rem', fontWeight: '800' }}>
+          <h3 style={{ marginBottom: '20px', color: '#f5f7ff', fontSize: '1.5rem', fontWeight: '800' }}>
             🎯 Feature-Verteilung
           </h3>
           {featureDistribution.length ? (
@@ -375,7 +375,7 @@ const MLDashboard: React.FC = () => {
           transition={{ delay: 0.7 }}
           className="metric-card"
         >
-          <h3 style={{ marginBottom: '20px', color: '#2c3e50', fontSize: '1.5rem', fontWeight: '800' }}>
+          <h3 style={{ marginBottom: '20px', color: '#f5f7ff', fontSize: '1.5rem', fontWeight: '800' }}>
             🕒 Letzte Predictions
           </h3>
           <div style={{ maxHeight: '280px', overflowY: 'auto' }}>
@@ -438,7 +438,7 @@ const MLDashboard: React.FC = () => {
           transition={{ delay: 0.8 }}
           className="metric-card full-width"
         >
-          <h3 style={{ marginBottom: '20px', color: '#2c3e50', fontSize: '1.5rem', fontWeight: '800' }}>
+          <h3 style={{ marginBottom: '20px', color: '#f5f7ff', fontSize: '1.5rem', fontWeight: '800' }}>
             🧠 Aktive Modelle
           </h3>
           <div className="metrics-grid">
