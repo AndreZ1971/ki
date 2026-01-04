@@ -1,129 +1,151 @@
+/**
+ * App.css - ARI v6.0.0
+ * Verwendet Design Token System
+ */
+
+@import './design-tokens.css';
+@import './components.css';
+
 .App {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 20px;
+  padding: var(--spacing-lg);
   text-align: center;
   width: 100%;
 }
 
 .App-header {
-  margin-bottom: 40px;
-  color: white;
+  margin-bottom: var(--spacing-2xl);
+  color: var(--text-primary);
 }
 
 .App-header h1 {
-  font-size: 3rem;
-  margin-bottom: 10px;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  font-size: var(--text-4xl);
+  font-weight: var(--font-bold);
+  margin-bottom: var(--spacing-sm);
+  text-shadow: var(--shadow-sm);
 }
 
 .App-header p {
-  font-size: 1.2rem;
-  opacity: 0.9;
+  font-size: var(--text-lg);
+  color: var(--text-secondary);
 }
 
 /* Email Generator Styles */
 .email-generator {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  background: var(--glass-bg-primary);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--blur-md);
+  -webkit-backdrop-filter: var(--blur-md);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
   width: 100%;
   max-width: 600px;
 }
 
 .email-generator h2 {
-  color: #333;
-  margin-bottom: 20px;
-  font-size: 1.8rem;
+  color: var(--heading-primary);
+  margin-bottom: var(--spacing-lg);
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
 }
 
 .email-generator form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--spacing-lg);
 }
 
 .email-generator form > div {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
+  gap: var(--spacing-xs);
 }
 
 .email-generator label {
-  font-weight: 600;
-  color: #555;
-  font-size: 0.9rem;
+  font-weight: var(--font-semibold);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
 }
 
 .email-generator input,
 .email-generator select {
   width: 100%;
-  padding: 12px;
-  border: 2px solid #e1e5e9;
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--glass-bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  font-family: var(--font-primary);
+  transition: all var(--transition-fast);
 }
 
 .email-generator input:focus,
 .email-generator select:focus {
   outline: none;
-  border-color: #007acc;
+  border-color: var(--color-info);
+  background: var(--glass-bg-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .email-generator button {
-  padding: 14px;
-  background: linear-gradient(135deg, #007acc, #005a9e);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--gradient-blue);
   color: white;
   border: none;
-  border-radius: 6px;
-  font-size: 1.1rem;
-  font-weight: 600;
+  border-radius: var(--radius-md);
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  margin-top: 10px;
+  transition: all var(--transition-base);
+  margin-top: var(--spacing-sm);
+  box-shadow: var(--shadow-sm);
 }
 
 .email-generator button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0,122,204,0.3);
+  box-shadow: var(--shadow-md);
 }
 
 .email-generator button:disabled {
-  background: #ccc;
+  opacity: 0.5;
   cursor: not-allowed;
   transform: none;
 }
 
 .result {
-  background: #f8f9fa;
-  padding: 25px;
-  border-radius: 8px;
-  margin-top: 25px;
+  background: var(--glass-bg-secondary);
+  border: 1px solid var(--glass-border);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  margin-top: var(--spacing-lg);
   text-align: left;
-  border-left: 4px solid #007acc;
+  border-left: 4px solid var(--color-info);
 }
 
 .result h3 {
-  color: #333;
-  margin-bottom: 15px;
+  color: var(--heading-primary);
+  margin-bottom: var(--spacing-md);
+  font-weight: var(--font-bold);
 }
 
 .result h4 {
-  color: #555;
-  margin: 15px 0 10px 0;
+  color: var(--heading-secondary);
+  margin: var(--spacing-md) 0 var(--spacing-sm) 0;
+  font-weight: var(--font-semibold);
 }
 
 .result ul {
-  padding-left: 20px;
+  padding-left: var(--spacing-lg);
 }
 
 .result li {
-  margin-bottom: 5px;
-  color: #666;
+  margin-bottom: var(--spacing-xs);
+  color: var(--text-tertiary);
 }

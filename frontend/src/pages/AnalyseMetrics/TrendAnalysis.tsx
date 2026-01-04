@@ -365,7 +365,7 @@ const TrendAnalysis = () => {
               <div
                 style={{
                   fontSize: "1.1rem",
-                  color: "#2c3e50",
+                  color: "#f5f7ff",
                   marginBottom: 12,
                 }}
               >
@@ -497,7 +497,7 @@ const TrendAnalysis = () => {
                           marginBottom: 4,
                         }}
                       >
-                        <span style={{ fontWeight: 700, color: "#2c3e50" }}>
+                        <span style={{ fontWeight: 700, color: "#f5f7ff" }}>
                           {analysis.timeRange === "7d" && "📅 7-Tage Analyse"}
                           {analysis.timeRange === "30d" && "📅 30-Tage Analyse"}
                           {analysis.timeRange === "90d" && "📅 90-Tage Analyse"}
@@ -511,7 +511,7 @@ const TrendAnalysis = () => {
                       </div>
                       <div
                         style={{
-                          color: "#2c3e50",
+                          color: "#f5f7ff",
                           fontSize: "0.95rem",
                           lineHeight: "1.4",
                           marginBottom: 8,

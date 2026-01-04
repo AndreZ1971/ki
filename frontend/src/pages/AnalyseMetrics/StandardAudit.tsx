@@ -795,7 +795,7 @@ const StandardAudit = () => {
                   style={{
                     margin: 0,
                     marginBottom: 8,
-                    color: "#2c3e50",
+                    color: "#f5f7ff",
                     fontSize: "1.5em",
                   }}
                 >
@@ -847,7 +847,7 @@ const StandardAudit = () => {
             </div>
 
             <div style={{ marginBottom: 24 }}>
-              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>
+              <h3 style={{ margin: "0 0 12px 0", color: "#f5f7ff" }}>
                 📝 Beschreibung
               </h3>
               <p style={{ margin: 0, color: "#555", lineHeight: 1.6 }}>
@@ -856,7 +856,7 @@ const StandardAudit = () => {
             </div>
 
             <div style={{ marginBottom: 24 }}>
-              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>
+              <h3 style={{ margin: "0 0 12px 0", color: "#f5f7ff" }}>
                 🔧 Lösung
               </h3>
               <p style={{ margin: 0, color: "#555", lineHeight: 1.6 }}>
@@ -888,7 +888,7 @@ const StandardAudit = () => {
                   style={{
                     fontSize: "1.1em",
                     fontWeight: 600,
-                    color: "#2c3e50",
+                    color: "#f5f7ff",
                   }}
                 >
                   {selectedCheck.category.charAt(0).toUpperCase() +

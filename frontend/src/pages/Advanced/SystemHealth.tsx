@@ -156,7 +156,7 @@ const SystemHealth: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h3 style={{ color: "white", marginBottom: "20px" }}>
+          <h3 style={{ color: "var(--text-primary)", marginBottom: "20px" }}>
             ⚙️ Monitoring-Einstellungen
           </h3>
 
@@ -194,7 +194,7 @@ const SystemHealth: React.FC = () => {
                 fontSize: "11px",
                 opacity: 0.6,
                 marginTop: "5px",
-                color: "white",
+                color: "var(--text-primary)",
               }}
             >
               Benachrichtigung bei Überschreitung
@@ -210,7 +210,11 @@ const SystemHealth: React.FC = () => {
             }}
           >
             <h4
-              style={{ color: "white", fontSize: "14px", marginBottom: "10px" }}
+              style={{
+                color: "var(--text-primary)",
+                fontSize: "14px",
+                marginBottom: "10px",
+              }}
             >
               📊 Monitoring-Bereiche
             </h4>
@@ -220,7 +224,7 @@ const SystemHealth: React.FC = () => {
                 flexDirection: "column",
                 gap: "8px",
                 fontSize: "12px",
-                color: "white",
+                color: "var(--text-primary)",
               }}
             >
               <div
@@ -266,7 +270,7 @@ const SystemHealth: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h3 style={{ color: "white", marginBottom: "20px" }}>
+          <h3 style={{ color: "var(--text-primary)", marginBottom: "20px" }}>
             📊 Live-Status
           </h3>
           {healthStatus ? (
@@ -298,7 +302,7 @@ const SystemHealth: React.FC = () => {
                   style={{
                     fontSize: "20px",
                     fontWeight: "bold",
-                    color: "white",
+                    color: "var(--text-primary)",
                     textTransform: "capitalize",
                   }}
                 >
@@ -325,7 +329,7 @@ const SystemHealth: React.FC = () => {
                       justifyContent: "space-between",
                       marginBottom: "8px",
                       fontSize: "13px",
-                      color: "white",
+                      color: "var(--text-primary)",
                     }}
                   >
                     <span>💻 CPU</span>
@@ -360,7 +364,7 @@ const SystemHealth: React.FC = () => {
                       justifyContent: "space-between",
                       marginBottom: "8px",
                       fontSize: "13px",
-                      color: "white",
+                      color: "var(--text-primary)",
                     }}
                   >
                     <span>🧠 Memory</span>
@@ -395,7 +399,7 @@ const SystemHealth: React.FC = () => {
                       justifyContent: "space-between",
                       marginBottom: "8px",
                       fontSize: "13px",
-                      color: "white",
+                      color: "var(--text-primary)",
                     }}
                   >
                     <span>💾 Disk</span>
@@ -430,7 +434,7 @@ const SystemHealth: React.FC = () => {
                     paddingTop: "15px",
                     borderTop: "1px solid rgba(255,255,255,0.1)",
                     fontSize: "13px",
-                    color: "white",
+                    color: "var(--text-primary)",
                   }}
                 >
                   <span>🌐 Network:</span>
@@ -453,7 +457,7 @@ const SystemHealth: React.FC = () => {
                     justifyContent: "space-between",
                     paddingTop: "10px",
                     fontSize: "13px",
-                    color: "white",
+                    color: "var(--text-primary)",
                   }}
                 >
                   <span>⏱️ Uptime:</span>
@@ -506,7 +510,7 @@ const SystemHealth: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           style={{ marginTop: "20px" }}
         >
-          <h3 style={{ color: "white", marginBottom: "20px" }}>
+          <h3 style={{ color: "var(--text-primary)", marginBottom: "20px" }}>
             🔌 Services Status
           </h3>
           <div
@@ -544,7 +548,7 @@ const SystemHealth: React.FC = () => {
                   <div>
                     <div
                       style={{
-                        color: "white",
+                        color: "var(--text-primary)",
                         fontWeight: "bold",
                         fontSize: "14px",
                       }}
@@ -565,7 +569,7 @@ const SystemHealth: React.FC = () => {
                 {service.responseTime > 0 && (
                   <div
                     style={{
-                      color: "white",
+                      color: "var(--text-primary)",
                       fontSize: "12px",
                       background: "rgba(255,255,255,0.1)",
                       padding: "4px 10px",

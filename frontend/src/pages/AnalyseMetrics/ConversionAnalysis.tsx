@@ -180,19 +180,8 @@ const ConversionAnalysis = () => {
           <button
             onClick={handleMLAnalyze}
             disabled={mlLoading || !conversionData}
-            style={{
-              padding: "10px 20px",
-              background: mlLoading
-                ? "#ccc"
-                : "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              cursor: mlLoading ? "not-allowed" : "pointer",
-              fontWeight: "bold",
-              fontSize: "14px",
-              whiteSpace: "nowrap",
-            }}
+            className={`btn btn-purple ${mlLoading ? "disabled" : ""}`}
+            style={{ whiteSpace: "nowrap" }}
           >
             {mlLoading
               ? `${t("common.analyzing")}`
@@ -271,63 +260,24 @@ const ConversionAnalysis = () => {
       {/* KI-Insights Sektion */}
       {mlInsights.length > 0 && (
         <div className="analysis-section">
-          <div
-            className="metric-card full-width"
-            style={{
-              borderLeft: "4px solid #667eea",
-              backgroundColor: "#f8f9ff",
-            }}
-          >
+          <div className="metric-card full-width analysis-insights-card">
             <h3>🤖 KI-Erkenntnisse</h3>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-                gap: "15px",
-                marginTop: "15px",
-              }}
-            >
+            <div className="analysis-insights-grid">
               {mlInsights.map((insight, idx) => (
                 <div
                   key={idx}
-                  style={{
-                    padding: "12px",
-                    borderRadius: "6px",
-                    borderLeft:
-                      "3px solid " +
-                      (insight.priority === "critical"
-                        ? "#f44336"
-                        : insight.priority === "high"
-                          ? "#ff9800"
-                          : insight.priority === "medium"
-                            ? "#ffc107"
-                            : "#4caf50"),
-                    backgroundColor:
-                      insight.priority === "critical"
-                        ? "#ffebee"
-                        : insight.priority === "high"
-                          ? "#fff3e0"
-                          : insight.priority === "medium"
-                            ? "#fffde7"
-                            : "#e8f5e9",
-                  }}
+                  className={`analysis-insight-card analysis-insight-${
+                    insight.priority || "low"
+                  }`}
                 >
-                  <div style={{ fontWeight: "bold", marginBottom: "4px" }}>
-                    {insight.title}
-                  </div>
+                  <div className="analysis-insight-title">{insight.title}</div>
                   {insight.value && (
-                    <div style={{ fontSize: "12px", color: "#666" }}>
+                    <div className="analysis-insight-meta">
                       Wert: {insight.value}
                     </div>
                   )}
                   {insight.detail && (
-                    <div
-                      style={{
-                        fontSize: "12px",
-                        color: "#666",
-                        marginTop: "4px",
-                      }}
-                    >
+                    <div className="analysis-insight-meta" style={{ marginTop: "4px" }}>
                       {insight.detail}
                     </div>
                   )}

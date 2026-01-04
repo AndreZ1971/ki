@@ -4,10 +4,22 @@
    GLOBALE TEXT-KONTRAST FIXES
    ============================================ */
 
-/* Alle weißen Texte auf weißem/hellem Hintergrund dunkel machen */
+/* Auf dunklen Glas-Hintergründen helle Schrift erzwingen */
+.analytics-page,
+.analytics-page * {
+  color: var(--text-primary, #f5f7ff);
+}
+
+.analytics-page h1,
+.analytics-page h2,
+.analytics-page h3,
+.analytics-page h4 {
+  color: var(--heading-primary, #f9fbff) !important;
+}
+
 .analytics-page .loading-spinner {
-  color: #2c3e50 !important;
-  text-shadow: 0 2px 4px rgba(255,255,255,0.3) !important;
+  color: var(--heading-primary, #f9fbff) !important;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.35) !important;
 }
 
 .analytics-page .error-message {
@@ -15,7 +27,7 @@
   background: rgba(220, 53, 69, 0.95) !important;
 }
 
-/* Buttons mit hellem Hintergrund - dunkler Text */
+/* Buttons auf dunklem Hintergrund -> helle Schrift */
 .back-button.floating-back {
   color: white !important;
 }
@@ -24,17 +36,17 @@
    METRIC CARDS - Text immer lesbar
    ============================================ */
 
-/* Standard Metric Cards - dunkler Text auf hellem Hintergrund */
-.metric-card .metric-value {
-  color: #2c3e50 !important;
-}
-
-.metric-card .metric-value-small {
-  color: #2c3e50 !important;
-}
-
+/* Standard Metric Cards - helle Schrift auf dunklem Glas */
+.metric-card h3,
+.metric-card .metric-value,
+.metric-card .metric-value-small,
 .metric-card .metric-label {
-  color: #6c757d !important;
+  color: var(--text-primary, #f5f7ff) !important;
+}
+
+.metric-card .metric-subtitle,
+.metric-card .metric-label {
+  color: var(--text-muted, rgba(255,255,255,0.75)) !important;
 }
 
 /* Spezielle Cards mit dunklem Hintergrund - heller Text */
@@ -50,11 +62,12 @@
    ============================================ */
 
 /* Labels und Text in Forms */
+/* Labels auf dunklen Hintergründen deutlich heller */
 .settings-group label,
 .form-group label,
 .checkbox-label,
 label {
-  color: #2c3e50 !important;
+  color: var(--text-primary) !important;
 }
 
 /* Input Felder */
@@ -63,14 +76,14 @@ input[type="number"],
 input[type="email"],
 textarea,
 select {
-  color: #2c3e50 !important;
-  background: white !important;
-  border: 1px solid #ced4da !important;
+  color: var(--text-primary) !important;
+  background: var(--glass-bg-secondary) !important;
+  border: 1px solid var(--glass-border) !important;
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: #6c757d !important;
+  color: var(--text-tertiary) !important;
 }
 
 /* Disabled Inputs */

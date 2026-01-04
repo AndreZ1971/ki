@@ -402,7 +402,7 @@ const ConversionReported = () => {
             <div
               style={{
                 fontSize: "0.95rem",
-                color: "#2c3e50",
+                color: "#f5f7ff",
                 lineHeight: "1.6",
                 marginBottom: 8,
               }}

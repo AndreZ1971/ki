@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { formatDate, formatDateTime } from "../../lib/i18n-utils";
 import { useNavigate } from "react-router-dom";
 import "./page.css";
+import "./UserManagement.css";
 import { MLPersonalization } from "./MLPersonalization";
 
 // ✅ Typen für WooCommerce Kunden
@@ -599,200 +600,81 @@ const UserManagement: React.FC = () => {
       {/* Details Modal */}
       {selectedUser && (
         <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(0, 0, 0, 0.7)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000,
-            backdropFilter: "blur(4px)",
-          }}
+          className="user-management-modal-backdrop"
           onClick={closeModal}
         >
           <div
-            style={{
-              background:
-                "linear-gradient(135deg, rgba(45, 50, 75, 0.95), rgba(50, 55, 80, 0.92))",
-              border: "1px solid rgba(255, 255, 255, 0.2)",
-              borderRadius: "16px",
-              padding: "32px",
-              maxWidth: "600px",
-              width: "90%",
-              maxHeight: "85vh",
-              overflowY: "auto",
-              boxShadow: "0 25px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 122, 255, 0.15)",
-              backdropFilter: "blur(10px)",
-            }}
+            className="user-management-modal"
             onClick={(e) => e.stopPropagation()}
           >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "24px",
-              }}
-            >
-              <h2 style={{ margin: 0, fontSize: "24px" }}>
+            <div className="user-management-header">
+              <h2 className="user-management-title">
                 👤 {selectedUser.name}
               </h2>
               <button
                 onClick={closeModal}
-                style={{
-                  background: "rgba(255, 59, 48, 0.15)",
-                  border: "1px solid rgba(255, 59, 48, 0.4)",
-                  borderRadius: "8px",
-                  color: "#ff3b30",
-                  cursor: "pointer",
-                  padding: "8px 12px",
-                  fontSize: "16px",
-                  fontWeight: "bold",
-                  transition: "all 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(255, 59, 48, 0.25)";
-                  e.currentTarget.style.boxShadow = "0 0 12px rgba(255, 59, 48, 0.3)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(255, 59, 48, 0.15)";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
+                className="user-management-close"
               >
                 ✕
               </button>
             </div>
             {/* Kunden-Details */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "16px",
-                marginBottom: "24px",
-              }}
-            >
-              <div>
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: "rgba(255,255,255,0.85)",
-                    marginBottom: "4px",
-                  }}
-                >
+            <div className="user-info-grid">
+              <div className="user-info-field">
+                <div className="user-info-label">
                   📧 Email
                 </div>
-                <div style={{ fontSize: "14px", fontWeight: "500" }}>
-                  {selectedUser.email}
-                </div>
+                <div className="user-info-value">{selectedUser.email}</div>
               </div>
-              <div>
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: "rgba(255,255,255,0.85)",
-                    marginBottom: "4px",
-                  }}
-                >
+              <div className="user-info-field">
+                <div className="user-info-label">
                   📊 Bestellungen
                 </div>
-                <div style={{ fontSize: "14px", fontWeight: "500" }}>
+                <div className="user-info-value">
                   {selectedUser.orders_count}
                 </div>
               </div>
-              <div>
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: "rgba(255,255,255,0.85)",
-                    marginBottom: "4px",
-                  }}
-                >
+              <div className="user-info-field">
+                <div className="user-info-label">
                   💰 Gesamtumsatz
                 </div>
-                <div
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "500",
-                    color: "#34c759",
-                  }}
-                >
+                <div className="user-info-value" style={{ color: "#34c759" }}>
                   {parseFloat(selectedUser.total_spent || "0").toFixed(2)} €
                 </div>
               </div>
-              <div>
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: "rgba(255,255,255,0.85)",
-                    marginBottom: "4px",
-                  }}
-                >
+              <div className="user-info-field">
+                <div className="user-info-label">
                   👁️ Shopbesuche
                 </div>
-                <div style={{ fontSize: "14px", fontWeight: "500" }}>
+                <div className="user-info-value">
                   {selectedUser.visit_count ?? "–"}
                 </div>
               </div>
-              <div>
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: "rgba(255,255,255,0.85)",
-                    marginBottom: "4px",
-                  }}
-                >
+              <div className="user-info-field">
+                <div className="user-info-label">
                   📅 Registriert
                 </div>
-                <div style={{ fontSize: "14px", fontWeight: "500" }}>
+                <div className="user-info-value">
                   {formatDate(new Date(selectedUser.date_created))}
                 </div>
               </div>
-              <div>
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: "rgba(255,255,255,0.85)",
-                    marginBottom: "4px",
-                  }}
-                >
+              <div className="user-info-field">
+                <div className="user-info-label">
                   🔐 Status
                 </div>
                 <div
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "500",
-                    color:
-                      selectedUser.status === "aktiv" ? "#34c759" : "#ff9500",
-                    display: "inline-block",
-                    padding: "4px 12px",
-                    background:
-                      selectedUser.status === "aktiv"
-                        ? "rgba(52, 199, 89, 0.2)"
-                        : "rgba(255, 149, 0, 0.2)",
-                    borderRadius: "6px",
-                  }}
+                  className={`status-badge ${selectedUser.status === "aktiv" ? "success" : "warning"}`}
                 >
                   {selectedUser.status || "aktiv"}
                 </div>
               </div>
             </div>
             {selectedUser.last_login && (
-              <div
-                style={{
-                  background: "rgba(255, 255, 255, 0.03)",
-                  borderRadius: "8px",
-                  padding: "12px",
-                  marginBottom: "24px",
-                  fontSize: "13px",
-                  color: "rgba(255,255,255,0.9)",
-                }}
-              >
-                ⏱️ Letzter Login:{" "}
-                {formatDateTime(new Date(selectedUser.last_login))}
+              <div className="last-login-info">
+                <span className="last-login-text">
+                  ⏱️ Letzter Login:{" "}
+                  {formatDateTime(new Date(selectedUser.last_login))}
+                </span>
               </div>
             )}
             {selectedUser.cart &&
@@ -805,6 +687,7 @@ const UserManagement: React.FC = () => {
                       fontWeight: "600",
                       marginBottom: "12px",
                       textTransform: "uppercase",
+                      color: "rgba(255,255,255,0.95)",
                     }}
                   >
                     🛒 Warenkorb
@@ -830,7 +713,7 @@ const UserManagement: React.FC = () => {
                               : "none",
                         }}
                       >
-                        <span>{product.name}</span>
+                        <span style={{ color: "rgba(255,255,255,0.95)" }}>{product.name}</span>
                         <span style={{ color: "#34c759", fontWeight: "600" }}>
                           {product.price.toFixed(2)} €
                         </span>
@@ -853,6 +736,7 @@ const UserManagement: React.FC = () => {
                   fontWeight: "600",
                   marginBottom: "16px",
                   textTransform: "uppercase",
+                  color: "rgba(255,255,255,0.95)",
                 }}
               >
                 🤖 KI-Personalisierte Angebote
