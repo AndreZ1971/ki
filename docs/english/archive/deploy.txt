@@ -1,9 +1,0 @@
-[ARCHIVIERT am 2025-12-16]
-
-Hinweis: Inhalte wurden durch `deployment.md` und `DEPLOY_SUPPORT.md` abgedeckt.
-Originalinhalt unten zur Referenz:
-
----
-Dockerfile (Root - für Backend)
-
-[Original content preserved]

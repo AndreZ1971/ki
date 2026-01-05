@@ -1,242 +1,389 @@
-# 🚀 A.R.I. - Artificial Retail Intelligence
+# 🤖 A.R.I. - Artificial Retail Intelligence
 
-**Version:** 6.0.0  
-**Status:** Production-Ready
+<div align="center">
 
-AI-powered automation system for WooCommerce shops. Automates product creation, content generation, analytics, and marketing via WooCommerce/WordPress REST API.
+![Version](https://img.shields.io/badge/version-6.0.0-blue.svg)
+![Tests](https://img.shields.io/badge/tests-350%2F350-success.svg)
+![ML Integration](https://img.shields.io/badge/ML%20Integration-100%25-green.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
----
+**The Digital Employee for Your Online Store**
 
-## 📋 Features
+A system that analyzes, optimizes, and grows your WooCommerce shop –  
+without you having to deal with technology, servers, or configuration.
 
-### 🤖 Automation
-- **44 Job Workflows** for product management, content, analytics, marketing, and shop health
-- **Cron-based scheduling** with node-cron
-- **Circuit breakers** for automatic error handling
-- **Dead letter queue** with automatic retry
+[🚀 Installation](#installation) • [📚 Documentation](#documentation) • [💬 Support](#support) • [🔧 Features](#features)
 
-### 📊 Analytics & Reporting
-- Shop metrics (revenue, orders, conversion rate)
-- Real-time analytics (live visitors, current orders)
-- Conversion funnel analysis with drop-off detection
-- Google Trends integration for keyword research
-
-### 🎨 Content & Marketing
-- **GPT-4o-mini integration** for product descriptions, emails, blog posts
-- **DALL-E integration** for automatic image generation
-- **Social media automation** (Facebook, Instagram, LinkedIn, Twitter)
-- **Email marketing** (abandoned cart, welcome series, win-back)
-
-### 🏗️ Architecture
-- **Stateless design** - No persistent data storage
-- **Zero-data architecture** - All data retrieved via WooCommerce API
-- **Kubernetes-ready** - Horizontal scaling possible
-- **Multi-language** - German & English (react-i18next)
+</div>
 
 ---
 
-## 🚀 Installation
+## 📋 Table of Contents
 
-### Prerequisites
-- Node.js 18+
-- Docker & Docker Compose (optional)
-- WooCommerce shop with enabled REST API
-- OpenAI API Key
-
-### 1. Clone repository
-```bash
-git clone https://github.com/AndreZ1971/ki.git
-cd ki
-```
-
-### 2. Create configuration
-
-Create `connection.json` in root directory:
-
-```json
-{
-  "woocommerce": {
-    "url": "https://your-shop.com",
-    "consumerKey": "ck_...",
-    "consumerSecret": "cs_..."
-  },
-  "openai": {
-    "apiKey": "sk-proj-...",
-    "model": "gpt-4o-mini"
-  },
-  "wordpress": {
-    "url": "https://your-shop.com",
-    "username": "admin",
-    "appPassword": "xxxx xxxx xxxx xxxx"
-  }
-}
-```
-
-### 3. Installation & Start
-
-**With Docker (recommended):**
-```bash
-docker compose up -d
-```
-
-**Without Docker:**
-```bash
-# Backend
-cd backend
-npm install
-npm run build
-npm start
-
-# Frontend (new terminal)
-cd frontend
-npm install
-npm run dev
-```
-
-### 4. Access
-- **Frontend:** http://localhost:5173
-- **Backend API:** http://localhost:3000
-- **Swagger Docs:** http://localhost:3000/documentation
+- [The Vision](#the-vision)
+- [The Problem](#the-problem)
+- [The Solution](#the-solution)
+- [Features](#features)
+- [What Changes for You?](#what-changes-for-you)
+- [Technology](#technology)
+- [Tool Overview](#tool-overview)
+- [Status & Roadmap](#status--roadmap)
+- [Documentation](#documentation)
+- [Support](#support)
 
 ---
 
-## 📡 API Endpoints
+## 🎯 The Vision
 
-### Products
-- `GET /api/products` - Get all products
-- `POST /api/products` - Create product
-- `PUT /api/products/:id` - Update product
-- `DELETE /api/products/:id` - Delete product
+Shop owners spend most of their time on tasks that are repetitive and bring little joy:
 
-### Analytics
-- `GET /api/analytics/dashboard` - Dashboard metrics
-- `GET /api/analytics/conversion` - Conversion analysis
-- `GET /api/analytics/real-time` - Real-time data
+- ✍️ Writing product descriptions
+- 📱 Creating social media posts
+- 📊 Analyzing data (which product is really performing well?)
+- 📧 Writing emails (follow-ups, upsells, welcome series)
+- 📈 Planning and implementing campaigns
+- 🔍 Recognizing trends before the competition does
 
-### Content & AI
-- `POST /api/marketing/content/generate-copy` - AI product copy
-- `POST /api/marketing/ai-images` - DALL-E image generation
-- `POST /api/marketing/social/post` - Social media post
+**A.R.I. gives you this time back.**
 
-### Jobs & Automation
-- `GET /api/jobs` - List all jobs
-- `POST /api/jobs/:jobId/run` - Run job manually
-- `GET /api/jobs/:jobId/status` - Get job status
+## ⚠️ The Problem
 
-**Full documentation:** [docs/english/api/README.md](docs/english/api/README.md)
+### Do You Know This Situation?
 
----
+Your shop is thriving, but you're stuck. Conversion could be better. Customer communication is chaotic. Your bestseller products don't know they're bestsellers. And somehow you lack the capacity to reach the next growth level.
 
-## 🔧 Configuration
+**All the work is on you. You are the bottleneck.**
 
-### Environment Variables
+This isn't scalable. This isn't sustainable. And it's not necessary, because:
 
-The system does **not** require database credentials. All data is retrieved via WooCommerce REST API.
+> **80% of these tasks can be done better, faster, and more consistently with the help of AI.**
 
-**Backend (.env optional):**
-```env
-NODE_ENV=production
-PORT=3000
-LOG_LEVEL=info
-```
+## ✅ The Solution
 
-### Enable WooCommerce REST API
+**A.R.I. helps you with the operational work of your shop. Simple. Intelligent. Around the clock.**
 
-1. WordPress Admin → WooCommerce → Settings → Advanced → REST API
-2. Click "Add key"
-3. Permissions: "Read/Write"
-4. Copy Consumer Key and Secret → `connection.json`
+### 📦 Product Management
+New products? A.R.I. analyzes trends, writes SEO texts, generates images, organizes everything – **ready to sell**. You approve, done.
 
-### OpenAI API Key
+### 📊 Real Insights
+No more dashboard paralysis. A.R.I. tells you concretely: *"Your top product has an image problem – here are 3 concrete measures."* You make the decision, A.R.I. implements it.
 
-1. https://platform.openai.com/api-keys
-2. "Create new secret key"
-3. Copy key → `connection.json`
+### 📧 Intelligent Customer Relationships
+Abandoned carts? Customers who haven't bought anything in a long time? A.R.I. knows them and writes them personalized messages – without you ever lifting a finger.
 
----
+### 📱 Visible Everywhere
+Your shop is on Facebook, Instagram, LinkedIn, TikTok, email. A.R.I. posts smartly, at the right time, with images and texts that work.
 
-## 🧪 Testing
+### 🔄 Constantly Getting Better
+**44 specialized processes** run in the background. Your shop gets better every day – without your intervention.
 
-```bash
-# All tests
-npm test
+## 🚀 Features
 
-# E2E tests
-npm run test:e2e
+### 🤖 Agentic Loop Framework
 
-# Coverage report
-npm run test:coverage
+4 specialized loop types work autonomously in the background:
 
-# Watch mode
-npm run test:watch
-```
+#### 1. Anomaly Detection Loop 🚨
+- Automatically detects payment anomalies
+- **Types:** `failed_payment`, `unusual_amount`, `repeated_attempts`, `high_risk`
+- Real-time monitoring & alerting
 
-**Test coverage:** 350/350 tests ✅
+#### 2. Product Optimization Loop 📈
+- Automatically A/B tests product attributes
+- **Optimizes:** Price (-10%), title (+Bestseller), description (+Benefits)
+- Continuous conversion improvement
+
+#### 3. Payment Recovery Loop 💳
+- Attempts failed orders with different strategies
+- **Strategies:** Retry, Discount, Alternative Payment, Contact
+- **Success Rate:** up to 60% with contact strategy
+
+#### 4. Analytics Insights Loop 📊
+- Automatically generates dashboard insights
+- Detects anomalies and trends
+- Delivers recommendations for actions
 
 ---
 
-## 📋 Documentation
+### 🛡️ Enterprise-Grade Error Handling
 
-| Document | Description |
-|----------|-------------|
-| [API Reference](docs/english/api/README.md) | Complete API documentation |
-| [Workflows](docs/english/workflows/README.md) | 44 job workflows in detail |
-| [User Guide](docs/english/AI-Agent-User-Guide.md) | Complete guide for all features |
-| [Deployment Guide](docs/english/deployment.md) | Production setup & troubleshooting |
-| [Social Media Setup](docs/english/SOCIAL_MEDIA_GUIDE.md) | Meta, TikTok, LinkedIn integration |
-
----
-
-## 🔒 Privacy
-
-### Zero-Data Architecture
-- No database - all data retrieved via WooCommerce API
-- No persistent storage of customer data
-- Temporary data only in RAM (max. 5000 events)
-- Server restart deletes all temporary data
-
-### OpenAI API Usage
-- Product descriptions, emails, and content are sent to GPT-4o-mini
-- OpenAI stores API data according to their privacy policy
-- API data is **not** used for model training
-
-**GDPR Notice:** As an operator, you must mention AI usage in your privacy policy.
+| Feature | Description |
+|---------|-------------|
+| **Circuit Breaker** | Protection against cascade failures (`CLOSED` → `OPEN` → `HALF_OPEN`) |
+| **Retry Strategies** | Exponential backoff with jitter |
+| **Dead Letter Queue** | Automatic recovery of failed jobs |
+| **Multi-Channel Alerting** | Email, Slack, Webhooks |
 
 ---
 
-## 📝 Changelog
+### 🔧 51+ Intelligent Tools
 
-### v6.0.0 (January 2026)
-- ✅ Production-ready release
-- ✅ 350/350 tests passing
-- ✅ 44 automated job workflows
-- ✅ Premium specializations (10 industries)
-- ✅ Circuit breakers & dead letter queue
-- ✅ Multi-language support (DE/EN)
+> **Important:** All tools work assistively – drafts, analyses, and hints are generated; approvals and live changes require your click.
 
-### v5.1.1 (January 2026)
-- 🐛 8 critical bugfixes (analytics, routing, auth)
-- ✅ Server stability: 0 errors on startup
+## 🎁 What Changes for You?
 
-### v5.1.0 (December 2025)
-- 🌍 100% i18n coverage (64 pages)
-- 🇩🇪🇬🇧 German & English support
-- 💾 LocalStorage language persistence
+| Area | Improvement |
+|------|-------------|
+| ⏰ **Time** | You get your time back – **5–10 hours per week** less admin work |
+| 💰 **Numbers** | Conversion increases, customers are better served, repeat purchases grow |
+| 📊 **Insights** | You understand your business better – clear, actionable insights instead of data clutter |
+| 🚀 **Scaling** | You can scale – without hiring more people |
 
-### v5.0.0-alpha (November 2025)
-- 🔄 Dynamic config reload
-- 🐋 Container-ready architecture
+### Concretely Implemented Through:
+
+- ✅ Optimized product texts (SEO-optimized, sales-promoting)
+- ✅ AI-generated product images (DALL-E integration)
+- ✅ Real-time analytics with real recommendations
+- ✅ Email automation (carts, welcome series, reactivation)
+- ✅ Social media posts (6 platforms)
+- ✅ Anomaly detection (problems are reported to you before they become critical)
+
+## ⚙️ Technology
+
+### Backend Stack
+
+| Technology | Version | Usage |
+|------------|---------|-------|
+| Node.js | 18+ | Server Runtime |
+| Fastify | 5.2.1 | REST API Framework |
+| TypeScript | 5.8.3 | Type-Safe Development |
+| OpenAI SDK | Latest | GPT-4, DALL-E, Embeddings |
+| Vitest | 2.1.8 | Testing Framework |
+
+### Frontend Stack
+
+| Technology | Version | Usage |
+|------------|---------|-------|
+| React | 18.3.1 | UI Framework |
+| Vite | 6.0.5 | Build Tool |
+| Shadcn/ui | Latest | Component Library |
+| Tailwind CSS | 3.4.17 | Styling |
+| Framer Motion | Latest | Animations |
+
+### 🤖 AI & ML Integration
+
+- **GPT-4:** Planning Engine, Content Generation
+- **GPT-4o-mini:** Fast analyses, user-favor detection
+- **DALL-E:** Automatic image generation
+- **Embeddings:** Semantic search & matching
+- **Custom ML:** Trend analysis, sentiment detection, pattern recognition
+
+### 🧠 AI Agent System
+
+| Component | Description |
+|-----------|-------------|
+| **Planner** | GPT-4 planning engine for multi-step action plans |
+| **Memory** | Conversation context management (128k token window) |
+| **Tools** | 51+ specialized tools for WooCommerce, WordPress, OpenAI |
+| **Scheduler** | Cron-based automation for 44 job types |
+
+### 🛡️ Error Handling & Resilience
+
+- **Circuit Breaker:** `Failure` → `OPEN` → `HALF_OPEN` → `Recovery Flow`
+- **Retry Logic:** Exponential backoff with jitter
+- **Dead Letter Queue:** Disk-based persistence of failed jobs
+- **Alerting:** Email/Slack/Webhook multi-channel notifications
+
+## 🔧 Tool Overview
+
+### 📊 Analytics (13 Tools)
+
+- **Shop Metrics:** Live KPIs (revenue, orders, conversion)
+- **Conversion Analysis:** Funnel analysis with drop-off detection
+- **Feedback Analysis:** Review & ticket sentiment analysis
+- **Trend Analysis:** AI-powered trend detection
+- **Real Analytics:** Real-time dashboard
+- **Shop Health Report:** 360° shop audit
+- **Premium/Standard/Mini Audit:** Various audit depths
+
+### 📦 Product Management (8 Tools)
+
+- **Product Analyzer:** ML-based product optimization
+- **Auto Product Creator:** AI content generation
+- **Categories Manager:** Intelligent category management
+- **Product Bundles:** Bundle creation with AI suggestions
+- **Freebies Creator:** Automatic free products
+- **Notes Feature:** Storage location tracking with autosave
+
+### 💳 Payment & Finances (13 Tools)
+
+- **Payment Verifier:** ML-based transaction verification
+- **Payment Tester:** Automated payment flow tests
+- **Payment Emergency:** AI emergency analysis with GPT-4o-mini
+- **Payment Expansion:** AI expansion planning
+- **Payment Success:** Success rate tracking
+- **+8 more payment tools** with ML integration
+
+### 📧 Marketing & Content (10 Tools)
+
+- **AI Email Generator:** Personalized email drafts
+- **Social Media Poster:** 6 platforms (LinkedIn, Facebook, Instagram, TikTok, X, YouTube)
+- **Blogpost Generator:** SEO-optimized blog posts
+- **Image Analyzer:** AI image quality check
+- **German Content Generator:** German marketing texts
+- **+5 more content tools**
+
+### 🧠 Advanced AI (9 Tools)
+
+- **Context Generator:** AI prompt optimization
+- **Memory System:** Persistent AI context
+- **System Health:** Real-time monitoring
+- **User Management:** Customer intelligence with ML personalization
+- **Real Web Analytics:** Multi-source trend analysis
+- **+4 more advanced tools**
+
+> **💡 Important:** All tools work assistively – approvals always require your click!
+
+## 📊 Status & Roadmap
+
+### ✅ Current Status
+
+| Metric | Status |
+|--------|--------|
+| **Version** | 6.0.0 – Production-Ready |
+| **Tests** | 350/350 ✅ |
+| **Workflows** | 44 automated jobs |
+| **Languages** | German & English |
+| **Stable since** | December 2025 |
+
+### 🤖 ML/AI Integration Status
+
+| Category | Tools | ML/AI | Status |
+|----------|-------|-------|--------|
+| Analytics | 13 | 🟢 13/13 | **100%** |
+| Products | 8 | 🟢 8/8 | **100%** |
+| Payments | 13 | 🟢 13/13 | **100%** |
+| Marketing | 10 | 🟢 10/10 | **100%** |
+| Advanced | 9 | 🟢 9/9 | **100%** |
+| **TOTAL** | **53** | **🟢 53/53** | **100%** |
+
+### 🆕 Recent Updates (December 16, 2025)
+
+#### ✅ Critical Fixes:
+- Rate-limiting protection (useEffect dependency hell solved)
+- OpenAI description overflow fix (max 500 chars, HTML sanitization)
+- IP-block prevention (404 monitoring implemented)
+- TypeScript compilation fixes
+- Duplicate handler fix
+
+#### ✅ New Features:
+- Product notes with autosave
+- Character counter (0/1000 with warnings)
+- Quick templates for fast notes
+- Last-saved timestamp display
+
+### 🗺️ Roadmap
+
+<details>
+<summary><strong>Q1 2026</strong></summary>
+
+- [ ] Kubernetes deployment support
+- [ ] Prometheus metrics export
+- [ ] GraphQL API alternative
+- [ ] WebSocket real-time updates
+
+</details>
+
+<details>
+<summary><strong>Q2 2026</strong></summary>
+
+- [ ] Multi-tenancy (multiple shops)
+- [ ] Redis caching layer
+- [ ] PostgreSQL integration
+- [ ] Advanced ML models (custom training)
+
+</details>
+
+<details>
+<summary><strong>Q3 2026</strong></summary>
+
+- [ ] Mobile app (iOS/Android)
+- [ ] Voice control integration
+- [ ] Predictive analytics dashboard
+- [ ] A/B testing framework
+
+</details>
 
 ---
 
-## 📞 Support
+## 🛡️ Security & Compliance
 
-- **Documentation:** [/docs](./docs)
-- **Issues:** [GitHub Issues](https://github.com/AndreZ1971/ki/issues)
+### 🔐 Authentication
+
+| Service | Method |
+|---------|--------|
+| **WooCommerce** | OAuth 1.0a |
+| **WordPress** | Basic Auth with Application Passwords |
+| **OpenAI** | API Key Authentication |
+
+### 🔒 Privacy
+
+- ✅ **GDPR-compliant:** All tools with privacy notices
+- ✅ **OpenAI:** 30-day retention, RAM-only processing
+- ✅ **No cookies:** Session-based authentication
+- ✅ **Encryption:** AES-256-GCM for sensitive data
+
+---
+
+## 📚 Documentation
+
+| Document | Description | Link |
+|----------|-------------|------|
+| 📖 **User Manual** | Complete user guide | [docs/english/USER_MANUAL.md](docs/english/USER_MANUAL.md) |
+| 🔧 **Tool Documentation** | All 53 tools in detail | [docs/english/TOOLS_DOCUMENTATION.md](docs/english/TOOLS_DOCUMENTATION.md) |
+| 💡 **User FAQ** | Frequently asked questions for shop owners | [docs/english/USER_FAQ.md](docs/english/USER_FAQ.md) |
+| 🛠️ **Developer FAQ** | Technical FAQ for developers | [docs/english/DEVELOPER_FAQ.md](docs/english/DEVELOPER_FAQ.md) |
+| 🛡️ **Security** | Security & best practices | [docs/english/SECURITY.md](docs/english/SECURITY.md) |
+| 🧪 **Testing** | Test coverage & quality | [docs/english/TESTING.md](docs/english/TESTING.md) |
+| 🚀 **Deployment** | Server setup & installation | [docs/english/DEPLOYMENT_GUIDE.md](docs/english/DEPLOYMENT_GUIDE.md) |
+
+---
+
+## 💬 Support
+
+### 📧 Commercial Support
+
 - **Email:** info@kaufe-es.eu
+- **Website:** [kaufe-es.eu](https://kaufe-es.eu)
+
+### 🤝 Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) before your first PR.
 
 ---
 
 ## 📄 License
 
-ISC License
+MIT License - see [LICENSE](LICENSE) for details.
+
+---
+
+## 🙏 Credits
+
+<div align="center">
+
+**Developed with ❤️ by André Zabel ([@AndreZ1971](https://github.com/AndreZ1971))**
+
+### Powered by:
+
+![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)
+![WooCommerce](https://img.shields.io/badge/WooCommerce-96588A?style=for-the-badge&logo=woocommerce&logoColor=white)
+![WordPress](https://img.shields.io/badge/WordPress-21759B?style=for-the-badge&logo=wordpress&logoColor=white)
+![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![Fastify](https://img.shields.io/badge/Fastify-000000?style=for-the-badge&logo=fastify&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+
+</div>
+
+---
+
+<div align="center">
+
+### 🎯 Built for shop owners who want to use their time for the important decisions.
+
+[🚀 Installation](docs/english/DEPLOYMENT_GUIDE.md) • [📚 Documentation](docs/english/USER_MANUAL.md) • [💬 Support](#support)
+
+**⭐ If you like A.R.I., give this project a star!**
+
+</div>

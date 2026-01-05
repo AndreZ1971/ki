@@ -1,95 +1,155 @@
-# Onboarding – Einstellungen für deinen KI-Agenten
+# 🎉 Willkommen bei A.R.I.!
 
-**Version:** 5.0.0-alpha (Alpha-Container MVP)
+**Dein digitaler Shop-Assistent ist bereit**
 
-Willkommen! Hier erfährst du, wie du deinen KI-Agenten als Shop-Besitzer beim ersten Mal einrichtest. Du brauchst keine technischen Vorkenntnisse – alles läuft direkt im Browser.
+Herzlich willkommen! Du hast gerade den Schlüssel zu automatisiertem Shop-Wachstum bekommen. Diese Anleitung zeigt dir in wenigen Minuten, wie du loslegst.
 
----
-
-## 🎯 Schnellstart
-
-1. **Frontend öffnen**: `https://my-working-space.de` (Production) oder `http://localhost:5173` (Entwicklung)
-2. **Einstellungen ausfüllen**: Shop-URL, WooCommerce Schlüssel, OpenAI API-Key
-3. **Verbindung testen**: Button "Verbindung testen" speichert und validiert Einstellungen
-4. **Dashboard sofort nutzen**: Änderungen werden **ohne Neustart** aktiv! 🚀
-5. **Erste Tools testen**: Probiere z.B. "Shop-Metriken" oder "Produktanalyse" aus
-
-> 🆕 **Neu in v5.0.0-alpha**: Settings werden dynamisch geladen - keine Container-Restarts mehr nötig!
+> **Gute Nachricht:** Du brauchst KEINE technischen Kenntnisse. Alles funktioniert im Browser – einfach einloggen und losgeht's! 🚀
 
 ---
 
-## 1. Einstellungen öffnen
+## ✨ Das erwartet dich jetzt
 
-Nach der Freischaltung deines Agenten erhältst du einen Link zu deiner persönlichen Agenten-Oberfläche.
+Mit A.R.I. sparst du dir jede Woche **5–10 Stunden** Admin-Arbeit:
 
-1. Öffne den Link in deinem Browser.
-2. Melde dich ggf. mit deinen Zugangsdaten an.
-3. Klicke im Menü auf „Einstellungen" oder „Settings".
+- 📊 **Analytische Insights** – Verstehe dein Business wirklich
+- 📝 **KI-generierte Texte** – Produktbeschreibungen, E-Mails, Social Media in Sekunden
+- 🎨 **AI-Bilder** – Automatisch generierte Produktfotos
+- 🔄 **Automatisierte Prozesse** – 44 spezialisierte Jobs laufen im Hintergrund
+- 💰 **Bessere Zahlen** – Conversion steigt, Kunden sind zufriedener
 
----
-
-## 2. Zugangsdaten eintragen
-
-Fülle alle Felder auf der Einstellungsseite sorgfältig aus:
-
-- OpenAI API Key (falls bereitgestellt)
-- Shop-URL und Zugangsdaten (z. B. WooCommerce)
-- E-Mail-Konfiguration (für Benachrichtigungen)
-- Weitere Felder nach Bedarf (z. B. Analytics, Social Media)
-
-Hinweis: Die meisten Zugangsdaten erhältst du direkt von Woo oder deinem Support.
+**Alles ohne Code. Alles im Browser. Alles mit deinem Klick.**
 
 ---
 
-## 3. Einstellungen speichern
+## 🚀 Los geht's! 5 Schritte zum Start
 
-Klicke auf „Verbindung testen“. Das System:
-1. **Speichert** alle Einstellungen in `connection.json`
-2. **Validiert** WordPress & WooCommerce Verbindung
-3. **Aktiviert** die Konfiguration **sofort** (kein Neustart!)
+### Schritt 1: Login
 
-Bei Erfolg erscheint:
-- ✅ WordPress-Test erfolgreich
-- ✅ WooCommerce-Test erfolgreich
+Du hast eine E-Mail mit deinem persönlichen Link erhalten.
 
-Bei Fehlern erhältst du eine Rückmeldung, was noch fehlt oder falsch ist.
+1. **Klick auf den Link** aus deiner Willkommens-E-Mail
+2. **Logge dich ein** mit deinen Zugangsdaten
+3. **Du landest auf dem Dashboard** 🎉
 
-> ⚡ **Alpha-Container Design**: Bei Container-Neustart werden Platzhalter wiederhergestellt. Einfach Settings erneut speichern oder JSON importieren!
-
-### Gültigkeitsregeln (wichtig bei der Ersteinrichtung)
-
-- WordPress, WooCommerce, OpenAI sind jeweils optional. Wenn du ein Feld einer Gruppe befüllst, müssen die restlichen Pflichtfelder dieser Gruppe ebenfalls korrekt sein (sonst bekommst du eine klare Fehlermeldung).
-- Job-Einstellungen: `Job-Modus` kann „einmalig“ oder „Intervall“ sein.
-	- Bei „einmalig“ wird `Job-Intervall` ignoriert.
-	- Bei „Intervall“ muss `Job-Intervall (ms)` im Bereich 10 Sekunden bis 24 Stunden liegen.
-- Die Settings-API zeigt dir im Fehlerfall an, welches Feld und welche Regel betroffen sind.
+```
+[SCREENSHOT: Login-Bildschirm mit A.R.I. Logo]
+```
 
 ---
 
-## 4. System nutzen
+### Schritt 2: Das Dashboard erkunden
 
-Nach erfolgreicher Einrichtung kannst du alle Funktionen deines Agenten direkt im Browser nutzen – z. B. Analysen, Content-Generatoren, Shop-Checks und mehr.
+Nach dem Login siehst du dein **A.R.I. Kommando-Zentrum**:
 
----
+```
+[SCREENSHOT: Dashboard-Übersicht mit allen Menüpunkten]
+```
 
-## 5. Hilfe & Support
+**Das findest du hier:**
 
-Bei Fragen oder Problemen findest du Hilfe im Menüpunkt „Troubleshooting“ oder in der FAQ. Der Support steht dir jederzeit zur Verfügung.
-
----
-
-> **Hinweis:** Diese Anleitung wird später mit Bildern ergänzt, um jeden Schritt noch anschaulicher zu machen.
-
----
-
-## 6. Sicherheit & Unabhängigkeit (Das Schnellboot-Prinzip)
-
-Wir wissen, wie wichtig dein Shop ist. Deshalb wurde der KI-Agent so gebaut, dass er **nicht-invasiv** arbeitet.
-
-- **Dein Shop gehört dir:** Der Agent steuert den Shop nur über offizielle Schnittstellen (API), er verändert keinen Programmcode.
-- **Kein Risiko:** Solltest du den Agenten jemals deaktivieren oder pausieren, läuft dein Shop sofort ganz normal weiter.
-- **Die Analogie:** Stell dir deinen Shop als Boot vor. Der KI-Agent ist ein leistungsstarker Außenbordmotor, der daraus ein Schnellboot macht. Nimmst du den Motor weg, sinkt das Boot nicht – es wird einfach wieder zum Ruderboot. Du behältst die volle Kontrolle.
+| Bereich | Wofür? |
+|---------|--------|
+| 📊 **Analytics** | Kennzahlen, Reports, Trends |
+| 📦 **Produkte** | Produktanalyse, Auto-Creator, Bundles |
+| 💳 **Zahlungen** | Payment-Health, Recovery, Analytics |
+| 📧 **Marketing** | E-Mail, Social Media, Content |
+| 🧠 **KI Tools** | Alle fortgeschrittenen Features |
+| ⚙️ **Einstellungen** | Dein Shop & API-Keys verbinden |
 
 ---
 
-Letzte Aktualisierung: Dezember 2025
+### Schritt 3: Einstellungen konfigurieren
+
+Damit A.R.I. mit deinem Shop kommunizieren kann, musst du deine Shop-Daten verbinden:
+
+1. Gehe zu **Einstellungen** (⚙️ unten links)
+2. Gib deine **Shop-URL** ein
+3. Verbinde deine **WooCommerce-Zugangsdaten**
+4. Speichere die Änderungen
+
+```
+[SCREENSHOT: Settings-Seite ausgefüllt]
+```
+
+> **Wo finde ich meine Shop-Daten?**  
+> Alle Details gibt es im Bereich "Einstellungen" – dort sind auch Links zu deinem WooCommerce Admin.
+
+---
+
+### Schritt 4: Dein erstes Tool testen
+
+Bereit, A.R.I. in Aktion zu sehen? Probiere **"Shop-Metriken"** aus:
+
+1. Gehe zu **Analytics** → **Shop-Metriken**
+2. Klick auf **"Bericht generieren"**
+3. Warte ~10 Sekunden
+4. **Boom!** 💥 Du siehst live-Daten aus deinem Shop
+
+```
+[SCREENSHOT: Shop-Metriken Report fertig]
+```
+
+---
+
+### Schritt 5: Dein zweites Tool – Produktbeschreibung generieren
+
+Jetzt wird's spannend:
+
+1. Gehe zu **Produkte** → **Woo Product Create**
+2. Gib einen Produktnamen ein (z.B. "Elegante Lederhandschuhe")
+3. Klick auf 🤖 **"KI-Beschreibung generieren"**
+4. Nach 2–3 Sekunden hast du eine SEO-optimierte Beschreibung
+5. Du kannst sie noch bearbeiten und dann speichern
+
+```
+[SCREENSHOT: KI-generierte Produktbeschreibung]
+```
+
+> **Das ist das Prinzip:** A.R.I. schlägt vor – du entscheidest! Immer unter deiner Kontrolle.
+
+---
+
+## 🎯 Was jetzt?
+
+Du hast die Basics verstanden. Jetzt kannst du:
+
+- ✅ Alle 52 Tools erkunden
+- ✅ Deine ersten Workflows starten
+- ✅ Produkttexte, E-Mails, Posts in Sekunden generieren
+- ✅ Echte Einblicke in deinen Shop bekommen
+
+**Tipp:** Nimm dir Zeit, die Tools auszuprobieren. Sie sind alle dafür da, dir Zeit zu sparen – nicht um dich zu überfordern!
+
+---
+
+## ❓ Du brauchst Hilfe?
+
+**Support-Kontakt:**
+- 📧 **E-Mail:** support@kaufe-es.eu
+- 💬 **Live-Chat:** Im Frontend (unten rechts)
+- 📱 **Telefon:** +49 XXX XXXXXXX (Business Hours)
+
+Wir sind für dich da! 🙌
+
+---
+
+## 🛡️ Ein wichtiger Punkt: Deine Sicherheit & Kontrolle
+
+Wir wissen, wie wichtig dein Shop ist. Daher wurde A.R.I. mit folgendem Prinzip gebaut:
+
+**A.R.I. macht Vorschläge – DU triffst die Entscheidungen.**
+
+- ✅ Alle Texte sind Entwürfe, bis DU sie freigibst
+- ✅ Keine automatischen Veränderungen an deinem Shop
+- ✅ Du kannst A.R.I. jederzeit pausieren oder deaktivieren
+- ✅ Dein Shop läuft völlig normal weiter – mit oder ohne A.R.I.
+
+**Die Analogie:** Stell dir deinen Shop als Boot vor. A.R.I. ist der Außenbordmotor, der es schneller macht. Nimmst du den Motor ab? Dein Boot sinkt nicht – es wird einfach wieder zum Ruderboot. Du hast jederzeit die Kontrolle.
+
+---
+
+**Viel Spaß mit A.R.I.! 🚀**  
+Dein kaufe-es Team
+
+Version: 6.0.0 | Januar 2026

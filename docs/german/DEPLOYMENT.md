@@ -1,29 +1,29 @@
-# 🚀 A.R.I. - Kubernetes & Deployment Architecture
+# 🚀 A.R.I. - Kubernetes & Deployment Architektur
 
 **Version:** 1.0.0  
-**Date:** January 2026  
-**Target Audience:** Automattic Engineering Team, DevOps, Kubernetes Administrators
+**Datum:** Januar 2026  
+**Zielgruppe:** Automattic Engineering Team, DevOps, Kubernetes-Administratoren
 
-> **Core Concept:** A.R.I. provides production-ready containers. Automattic orchestrates everything.
+> **Kernkonzept:** A.R.I. liefert Production-Ready Container. Automattic orchestriert alles.
 
 ---
 
-## 📋 Table of Contents
+## 📋 Inhaltsverzeichnis
 
-1. [System Architecture](#system-architecture)
+1. [System-Architektur](#system-architektur)
 2. [Container Specification](#container-specification)
 3. [Container Lifecycle](#container-lifecycle)
 4. [Health Checks & Recovery](#health-checks--recovery)
-5. [Update & Repair Strategy](#update--repair-strategy)
+5. [Update & Repair Strategie](#update--repair-strategie)
 6. [Kubernetes Integration](#kubernetes-integration)
 7. [Docker-Compose Reference](#docker-compose-reference)
 8. [Disaster Recovery](#disaster-recovery)
 
 ---
 
-## 🏗️ System Architecture
+## 🏗️ System-Architektur
 
-### High-Level Flow: Payment Flow → Kubernetes → Container → Customer
+### High-Level Flow: Zahlungsflow → Kubernetes → Container → Kunde
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -51,16 +51,16 @@
 │                                      │  └────────────────┘  │   │
 │                                      │  ┌────────────────┐  │   │
 │                                      │  │ PersistentVol. │  │   │
-│                                      │  │ (if needed)    │  │   │
+│                                      │  │ (wenn nötig)   │  │   │
 │                                      │  └────────────────┘  │   │
 │                                      └──────────────────────┘   │
 │                                                   │               │
 │                                                   ▼               │
 │  ┌───────────────┐                ┌──────────────────────┐      │
-│  │    Customer   │◀───────────────│ Link to A.R.I.       │      │
+│  │    Kunde      │◀───────────────│ Link zu A.R.I.       │      │
 │  │ WooCommerce   │                │ + Onboarding         │      │
-│  │ Dashboard     │                │ + User Manual         │      │
-│  └───────────────┘                │ + User FAQ            │      │
+│  │ Dashboard     │                │ + Bedienungsanleitung│      │
+│  └───────────────┘                │ + User FAQ           │      │
 │                                    │ + Social-Media Guide │      │
 │                                    └──────────────────────┘      │
 └─────────────────────────────────────────────────────────────────┘
@@ -70,43 +70,43 @@
 
 ## 📦 Container Specification
 
-### What must every A.R.I. container be able to do?
+### Was muss jeder A.R.I. Container können?
 
-#### 1. **Startup Sequence**
+#### 1. **Startup-Sequenz**
 
 ```yaml
-# Timeline when container starts
-1. Kubernetes sets Environment Variables
-   - SHOP_URL: "https://customer-shop.com"
+# Zeitablauf beim Container-Start
+1. Kubernetes setzt Environment Variables
+   - SHOP_URL: "https://kunden-shop.de"
    - CONTAINER_ID: "abc123xyz"
    - MODE: "normal|repair|update"
 
-2. Container starts (Dockerfile ENTRYPOINT)
-   - Base services start (Nginx, Node.js, Fastify)
-   - connection.json is checked
+2. Container startet (Dockerfile ENTRYPOINT)
+   - Base-Services starten (Nginx, Node.js, Fastify)
+   - connection.json wird geprüft
 
-3. Depending on MODE:
-   - MODE=normal: Empty connection.json with placeholders
-   - MODE=repair: Checks if old connection.json exists
-   - MODE=update: Checks if old connection.json exists
+3. Je nach MODE:
+   - MODE=normal: Leere connection.json mit Platzhaltern
+   - MODE=repair: Prüft ob alte connection.json existiert
+   - MODE=update: Prüft ob alte connection.json existiert
 
-4. Frontend is served
-   - Customer sees Onboarding (if connection.json empty)
-   - Or Dashboard (if connection.json filled)
+4. Frontend wird ausgeliefert
+   - Kunde sieht Onboarding (wenn connection.json leer)
+   - Oder Dashboard (wenn connection.json gefüllt)
 
-5. Health Checks start
-   - Container responds to /health (Liveness)
-   - Container responds to /ready (Readiness)
+5. Health Checks starten
+   - Container antwortet auf /health (Liveness)
+   - Container antwortet auf /ready (Readiness)
 ```
 
 #### 2. **Connection.json Format**
 
-**Path:** `backend/connection.json`
+**Pfad:** `backend/connection.json`
 
 ```json
 {
   "woocommerce": {
-    "shop_url": "https://customer-shop.com",
+    "shop_url": "https://kunden-shop.de",
     "consumer_key": "[PLACEHOLDER_UNTIL_ONBOARDED]",
     "consumer_secret": "[PLACEHOLDER_UNTIL_ONBOARDED]",
     "validated": false,
@@ -134,18 +134,18 @@
 }
 ```
 
-**Important:** 
-- `subscription` part is **delivered by Automattic**
-- Customer fills `woocommerce` + `openai` via Onboarding
-- `specializations` is later managed by customer
+**Wichtig:** 
+- `subscription` Teil wird von **Automattic mitgeliefert**
+- Kunde füllt `woocommerce` + `openai` über Onboarding
+- `specializations` wird später von Kunde verwaltet
 
-#### 3. **Required Files in Container**
+#### 3. **Erforderliche Dateien im Container**
 
-| File/Folder | Purpose | Kubernetes |
-|-------------|---------|-----------|
-| `/app/backend/connection.json` | Configuration | New at start; Copy at Repair |
+| Datei/Ordner | Zweck | Kubernetes |
+|--------------|-------|-----------|
+| `/app/backend/connection.json` | Konfiguration | Neu bei Start; Kopie bei Repair |
 | `/app/backend/config/` | Secrets & Config | As ConfigMap |
-| `/app/frontend/dist/` | React Frontend | Build in container |
+| `/app/frontend/dist/` | React Frontend | Build im Container |
 | `/app/data/logs/` | Logs | Optional: PersistentVolume |
 | `/app/.env.production` | Environment | ConfigMap/Secret |
 | `/.healthcheck.js` | Health Endpoint | Must exist |
@@ -154,123 +154,123 @@
 
 ## 🔄 Container Lifecycle
 
-### Normal Case: New Container (Customer purchases subscription)
+### Normalfall: Neuer Container (Kunde bucht Abo)
 
 ```
-1. PAYMENT CONFIRMED
+1. ZAHLUNG BESTÄTIGT
    ↓
 2. Automattic Webhook → Kubernetes API
-   Payload (Example):
+   Payload (Beispiel):
    {
      "event": "subscription.created",
      "customer_id": "cust_12345",
      "subscription_id": "sub_67890",
-     "shop_url": "https://my-shop.com",
+     "shop_url": "https://mein-shop.de",
      "active_until": "2026-02-05",
      "container_version": "v6.0.0"
    }
    ↓
-3. Kubernetes creates:
-   - ConfigMap (with shop_url, subscription_id, etc.)
-   - Deployment (with A.R.I. container image)
-   - Service (ingress for external accessibility)
+3. Kubernetes erstellt:
+   - ConfigMap (mit shop_url, subscription_id, etc.)
+   - Deployment (mit A.R.I. Container Image)
+   - Service (Ingress für externe Erreichbarkeit)
    ↓
-4. Container starts
-   - Reads Environment Variables from ConfigMap
-   - Creates connection.json with placeholders
-   - Writes subscription info to connection.json (from ConfigMap)
+4. Container startet
+   - Liest Environment Variables von ConfigMap
+   - Erstellt connection.json mit Platzhaltern
+   - Schreibt Subscription-Info in connection.json (von ConfigMap)
    ↓
-5. Frontend loads
-   - Customer sees: "Welcome! Step 1: Connect WooCommerce"
-   - This is the integrated Onboarding (Onboarding.md delivered)
+5. Frontend lädt
+   - Kunde sieht: "Willkommen! Schritt 1: WooCommerce verbinden"
+   - Das ist das integrierte Onboarding (Onboarding.md delivered)
    ↓
-6. Customer enters data
+6. Kunde gibt Daten ein
    - WooCommerce API Keys
    - OpenAI API Key
-   - Optional: Upload specialization
+   - Optional: Spezialisierung hochladen
    ↓
-7. Connection.json is filled
-   - Frontend sends data via POST /api/config/save
-   - Backend saves to connection.json
+7. Connection.json wird gefüllt
+   - Frontend sendet Daten via POST /api/config/save
+   - Backend speichert in connection.json
    ↓
-8. Container is READY
+8. Container ist READY
    - Health Checks green ✅
-   - All 52 tools available
+   - Alle 52 Tools verfügbar
 ```
 
 ---
 
-### Repair Case: Container is sick
+### Repair-Fall: Container ist krank
 
 ```
-SCENARIO: Container crashed, is unreachable, malware, etc.
+SZENARIO: Container crashed, ist unerreichbar, Malware, etc.
 
 1. Kubernetes Health Check: FAILED
    (Liveness Probe: GET /health → No Response)
    ↓
-2. Kubernetes waits 3x (default restart policy)
+2. Kubernetes wartet 3x (default restart policy)
    ↓
-3. Container is still down
+3. Container ist noch immer down
    ↓
-4. Automattic Orchestration (not A.R.I.):
-   - Checks: Is there still an old container?
-   - If YES: Extract connection.json from old container
-   - If NO: Customer must do Onboarding again
+4. Automattic Orchestration (nicht A.R.I.):
+   - Prüft: Gibt es noch einen alten Container?
+   - Falls JA: connection.json aus altem Container extrahieren
+   - Falls NEIN: Kunde muss Onboarding neu machen
    ↓
-5. Kubernetes starts NEW container with:
+5. Kubernetes startet NEUEN Container mit:
    - Mode: repair
-   - Old connection.json (if available) as volume/ConfigMap
+   - Alte connection.json (wenn vorhanden) als Volume/ConfigMap
    ↓
-6. Container starts (Repair mode)
-   - Checks: Does connection.json already exist?
-   - If YES: Uses it (Customer notices NOTHING!)
-   - If NO: connection.json with placeholders
+6. Container startet (Repair-Mode)
+   - Prüft: Liegt schon connection.json vor?
+   - Falls JA: Nutzt diese (Kunde merkt NICHTS!)
+   - Falls NEIN: connection.json mit Platzhaltern
    ↓
-7. Old container is DELETED
+7. Alter Container wird GELÖSCHT
    ↓
-8. Customer notices: NOTHING
-   - Dashboard was briefly down (< 1 minute)
-   - Now available again with same data
-   - Zero downtime through preparation
+8. Kunde bemerkt: NICHTS
+   - Dashboard war kurz weg (< 1 Minute)
+   - Jetzt wieder verfügbar mit gleichen Daten
+   - Zero Downtime durch Preparation
 ```
 
-**Important:** No support, no ticket, no phone call. Just automatic healing!
+**Wichtig:** Kein Support, kein Ticket, kein Anruf. Nur automatisches Healing!
 
 ---
 
-### Update Case: New version available
+### Update-Fall: Neue Version verfügbar
 
 ```
-SCENARIO: A.R.I. v6.0.1 is available (better tools, bugfixes)
+SZENARIO: A.R.I. v6.0.1 ist verfügbar (bessere Tools, Bugfixes)
 
-1. A.R.I. Team releases new container version
+1. A.R.I. Team gibt neue Container-Version frei
    - Image: ari:v6.0.1
-   - All security patches included
-   - No technical debt accumulated
+   - Alle Sicherheits-Patches enthalten
+   - Keine technischen Schulden angehäuft
    ↓
-2. Automattic rolls out (Kubernetes Rolling Update)
-   - Strategy: Blue-Green or RollingUpdate (doesn't matter, we have connection.json!)
+2. Automattic rollt aus (Kubernetes Rolling Update)
+   - Strategy: Blue-Green oder RollingUpdate (egal, wir haben connection.json!)
    ↓
-3. New container (v6.0.1) starts with:
+3. Neuer Container (v6.0.1) startet mit:
    - Mode: update
-   - Old connection.json (v6.0.0 container) as input
+   - Alte connection.json (v6.0.0 Container) als Input
    ↓
-4. Container checks on startup:
-   - Does connection.json exist?
-   - If YES: Copies it 1:1 to new version
-   - If NO: Onboarding flow
+4. Container prüft auf Startup:
+   - Liegt connection.json vor?
+   - Falls JA: Kopiert sie 1:1 in neue Version
+   - Falls NEIN: Onboarding-Flow
    ↓
-5. Old container is DELETED
+5. Alter Container wird GELÖSCHT
    ↓
-6. Customer sees:
-   - Dashboard was briefly down
-   - Now back with 10 new tools + bugfixes!
-   - Data is exactly as before
+6. Kunde sieht:
+   - Dashboard war kurz weg
+   - Jetzt wieder da mit 10 neuen Tools + Bugfixes!
+   - Daten sind exakt wie vorher
    - ZERO DOWNTIME!
    ↓
-7. Typical customer feedback:
-   - "Wow, there were suddenly new features there!"
-   - Didn't even notice anything happened
+7. Typisches Kundenfeedback:
+   - "Wow, da waren plötzlich neue Features da!"
+   - Hat nicht mal mitbekommen, dass was passiert ist
 ```
 
 ---
@@ -386,77 +386,77 @@ app.get('/ready', (req, res) => {
 
 ---
 
-## 🔄 Update & Repair Strategy
+## 🔄 Update & Repair Strategie
 
-### Minimal Docker-Compose Change
+### Minimale Docker-Compose Änderung
 
-**This is the secret: Only change the `docker-compose.yml`!**
+**Das ist das Geheimnis: Nur die `docker-compose.yml` ändern!**
 
 #### Normal: Deployment with New Version
 
 ```yaml
-# OLD (v6.0.0)
+# ALT (v6.0.0)
 services:
   app:
     image: ari:v6.0.0
     container_name: woo-app-prod
     # ...
 
-# NEW (v6.0.1) - only 1 line changed!
+# NEU (v6.0.1) - nur 1 Zeile geändert!
 services:
   app:
-    image: ari:v6.0.1      # ← ONLY THIS LINE
+    image: ari:v6.0.1      # ← NUR DIESE ZEILE
     container_name: woo-app-prod
     # ...
 ```
 
-**This triggers Kubernetes:**
+**Das triggert Kubernetes:**
 1. Pull new image
-2. Start new container (connection.json is copied)
-3. Old container is deleted
-4. **= Zero downtime!**
+2. Start new container (connection.json wird kopiert)
+3. Old container wird deleted
+4. **= Zero Downtime!**
 
-#### Repair: With old connection.json
+#### Repair: Mit alter connection.json
 
 ```yaml
-# If container is sick:
+# Wenn Container krank ist:
 services:
   app:
     image: ari:v6.0.0
     container_name: woo-app-prod
     volumes:
-      # connection.json from old container as volume
+      # connection.json aus altem Container als Volume
       - ./backup/connection.json:/app/backend/connection.json:rw
-      # ← Kubernetes mounts this automatically
+      # ← Kubernetes mountet das automatisch
     environment:
       - CONTAINER_MODE=repair
     # ...
 ```
 
-**Result:**
-- New container starts
-- Finds connection.json
-- Copies it
-- Customer sees nothing!
+**Resultat:**
+- Neuer Container startet
+- Findet connection.json
+- Kopiert sie
+- Kunde sieht nichts!
 
 ---
 
 ## 🔧 Kubernetes Integration
 
-### What Automattic must implement
+### Was Automattic implementieren muss
 
 #### 1. **Webhook Listener** (Payment → Kubernetes)
 
 ```yaml
-# Automattic needs this:
+# Automattic braucht das:
 Endpoint: POST /webhooks/ari-deployment
 Payload:
 {
   "event": "subscription.created",
   "customer_id": "cust_xyz",
   "subscription_id": "sub_123",
-  "shop_url": "https://customer-shop.com",
-  "shop_name": "My Shop",
+  "shop_url": "https://customer-shop.de",
+  "shop_name": "Mein Shop",
   "active_until": "2026-02-05",
   "container_version": "v6.0.0",
   "container_config": {
@@ -468,23 +468,23 @@ Payload:
   }
 }
 
-Action:
-→ Create Kubernetes namespace: cust-xyz-prod
-→ Create ConfigMap with subscription-info
-→ Start Deployment with A.R.I. image v6.0.0
+Aktion:
+→ Erstelle Kubernetes Namespace: cust-xyz-prod
+→ Erstelle ConfigMap mit subscription-info
+→ Starte Deployment mit A.R.I. Image v6.0.0
 ```
 
 #### 2. **Kubernetes ConfigMap Template**
 
 ```yaml
-# Automattic creates this per webhook:
+# Automattic erstellt das per Webhook:
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: ari-config-cust-xyz
   namespace: cust-xyz-prod
 data:
-  SHOP_URL: "https://customer-shop.com"
+  SHOP_URL: "https://customer-shop.de"
   CUSTOMER_ID: "cust_xyz"
   SUBSCRIPTION_ID: "sub_123"
   ACTIVE_UNTIL: "2026-02-05"
@@ -495,7 +495,7 @@ data:
 #### 3. **Kubernetes Deployment Template**
 
 ```yaml
-# Automattic creates this per webhook:
+# Automattic erstellt das per Webhook:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -514,7 +514,7 @@ spec:
     spec:
       containers:
       - name: ari
-        image: ari:v6.0.0  # ← Automattic sets the correct version
+        image: ari:v6.0.0  # ← Automattic setzt die richtige Version
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
@@ -553,13 +553,13 @@ spec:
         configMap:
           name: ari-config-cust-xyz
       - name: data
-        emptyDir: {}  # or PersistentVolumeClaim if needed
+        emptyDir: {}  # oder PersistentVolumeClaim wenn nötig
 ```
 
 #### 4. **Kubernetes Service & Ingress**
 
 ```yaml
-# Service (internal)
+# Service (intern)
 apiVersion: v1
 kind: Service
 metadata:
@@ -575,7 +575,7 @@ spec:
   type: ClusterIP
 
 ---
-# Ingress (external, with Let's Encrypt)
+# Ingress (extern, mit Let's Encrypt)
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -587,10 +587,10 @@ spec:
   ingressClassName: nginx
   tls:
   - hosts:
-    - ari.customer-shop.com
+    - ari.customer-shop.de
     secretName: ari-tls-cust-xyz
   rules:
-  - host: ari.customer-shop.com
+  - host: ari.customer-shop.de
     http:
       paths:
       - path: /
@@ -604,22 +604,22 @@ spec:
 
 ### Automattic Automation Checklist
 
-- [ ] Implement webhook listener (POST /webhooks/ari-deployment)
-- [ ] Kubernetes API client (Go/Python) for deployment creation
-- [ ] ConfigMap generator (from payment data)
-- [ ] Ingress generator (FQDN for each customer)
-- [ ] TLS/Certificate management (Let's Encrypt)
-- [ ] Subscription query (for connection.json sync)
-- [ ] Logging aggregation (where do container logs go?)
-- [ ] Monitoring & alerting (if containers break)
-- [ ] Automated backup of connection.json
-- [ ] Cleanup routine (when subscription ends: delete container)
+- [ ] Webhook-Listener implementieren (POST /webhooks/ari-deployment)
+- [ ] Kubernetes API Client (Go/Python) für Deployment-Erstellung
+- [ ] ConfigMap-Generator (aus Zahlungsdaten)
+- [ ] Ingress-Generator (FQDN für jeden Kunden)
+- [ ] TLS/Certificate Management (Let's Encrypt)
+- [ ] Subscription-Abfrage (für connection.json sync)
+- [ ] Logging Aggregation (wo landen die Container-Logs?)
+- [ ] Monitoring & Alerting (falls Container kaputt gehen)
+- [ ] Automated Backup von connection.json
+- [ ] Cleanup-Routine (wenn Abo endet: Container löschen)
 
 ---
 
 ## 📋 Docker-Compose Reference
 
-### Current Production docker-compose.yml
+### Aktuelle Production docker-compose.yml
 
 ```yaml
 version: '3.8'
@@ -642,7 +642,7 @@ services:
       - ./.env.production:/app/.env.production:ro
     networks:
       - kaufe-es-network
-    healthcheck:                      # ← SHOULD BE ADDED
+    healthcheck:                      # ← SOLLTE HINZUGEFÜGT WERDEN
       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 10s
       timeout: 5s
@@ -663,7 +663,7 @@ services:
       - app
     networks:
       - kaufe-es-network
-    healthcheck:                      # ← SHOULD BE ADDED
+    healthcheck:                      # ← SOLLTE HINZUGEFÜGT WERDEN
       test: ["CMD", "curl", "-f", "http://localhost:80/"]
       interval: 10s
       timeout: 5s
@@ -689,119 +689,119 @@ volumes:
     driver: local
 ```
 
-### ⚠️ Notes
+### ⚠️ Hinweise
 
-**Current Status:**
-- ❌ Health checks missing (should be added)
-- ✅ Restart policy is reasonable
-- ✅ Volumes for persistence are there
-- ✅ Watchtower for monitoring
+**Aktuelle Status:**
+- ❌ Health Checks fehlen (sollten hinzugefügt werden)
+- ✅ Restart Policy ist sinnvoll
+- ✅ Volumes für Persistenz sind da
+- ✅ Watchtower für Monitoring
 
-**For Kubernetes, Automattic needs:**
-- New namespaces per customer
-- PersistentVolumeClaim for `backend/data/`
-- ConfigMap instead of `env_file`
-- Secret for sensitive data
-- Health checks (already documented above)
+**Für Kubernetes braucht Automattic:**
+- Neue Namespaces pro Kunde
+- PersistentVolumeClaim für `backend/data/`
+- ConfigMap statt `env_file`
+- Secret für sensitive Daten
+- Health Checks (sind schon oben dokumentiert)
 
 ---
 
 ## 🆘 Disaster Recovery
 
-### Scenario 1: connection.json is completely gone
+### Szenario 1: connection.json ist komplett weg
 
 ```
-Situation: Container was deleted, no backup
-Solution: Customer must do Onboarding again
+Situation: Container wurde gelöscht, kein Backup
+Lösung: Kunde muss Onboarding erneut machen
 
-1. New container starts (Mode: normal)
-2. connection.json is empty with placeholders
-3. Customer enters data again
-4. Everything is back (in < 5 minutes)
+1. Neuer Container startet (Mode: normal)
+2. connection.json ist leer mit Platzhaltern
+3. Kunde gibt Daten erneut ein
+4. Alles ist wieder da (in < 5 Minuten)
 
-No data loss!
-- WooCommerce data: In WooCommerce shop (source of truth)
-- OpenAI keys: Customer has (in OpenAI account)
-- Specializations: Customer can upload again
+Kein Datenverlust!
+- WooCommerce Daten: Sind in WooCommerce Shop (Quelle der Wahrheit)
+- OpenAI Keys: Hat Kunde selbst (in OpenAI Account)
+- Spezialisierungen: Kann Kunde erneut hochladen
 ```
 
-### Scenario 2: Container is infected/attacked
+### Szenario 2: Container ist infiziert/angegriffen
 
 ```
-Situation: Malware/hack detected
-Solution: Kill & replace
+Situation: Malware/Hack erkannt
+Lösung: Kill & Replace
 
-1. Automattic detects: Container is suspicious
-2. Deletes immediately
-3. Starts new one with old connection.json
-4. Customer notices: Brief downtime
+1. Automattic erkennt: Container ist verdächtig
+2. Löscht sofort den Container
+3. Startet Neuen mit alter connection.json
+4. Kunde merkt: Kurzer Ausfall
 
-Everything clean, no data lost!
+Alles sauber, keine Daten verloren!
 ```
 
-### Scenario 3: Update fails
+### Szenario 3: Update schlägt fehl
 
 ```
-Situation: New container (v6.0.1) doesn't start
-Solution: Automatic rollback
+Situation: Neuer Container (v6.0.1) startet nicht
+Lösung: Automatisches Rollback
 
-1. Kubernetes sees: New version is broken
-2. Health checks fail
-3. Kubernetes automatically rolls back to v6.0.0
-4. Service is available again
+1. Kubernetes sieht: Neue Version ist kaputt
+2. Health Checks schlagen fehl
+3. Kubernetes rollt automatisch zurück zu v6.0.0
+4. Service ist wieder verfügbar
 
-Customer notices: Brief downtime, then back
+Kunde merkt: Kurzer Ausfall, dann wieder da
 ```
 
-### Scenario 4: Subscription ends
+### Szenario 4: Abo läuft ab
 
 ```
-Situation: Customer doesn't pay, subscription ends 2/5/2026
-Solution: Clean offboarding
+Situation: Kunde zahlt nicht, Abo endet am 5.2.2026
+Lösung: Sauberes Offboarding
 
-1. Automattic observes: Subscription ends today
-2. Option 1: Container stays, shows "Subscription expired" message
-3. Option 2: Container is deleted (Automattic decides)
-4. Data: connection.json can be backed up upon customer request
+1. Automattic beobachtet: Abo endet heute
+2. Option 1: Container bleibt, zeigt "Abo abgelaufen" Message
+3. Option 2: Container wird deleted (Automattic entscheidet)
+4. Daten: connection.json kann auf Kundenrequest backed up werden
 
-No surprises!
+Keine Überraschungen!
 ```
 
 ---
 
-## 📞 Automattic Contact
+## 📞 Automattic Kontakt
 
-**For Kubernetes integration questions:**
-- Documentation: This file (DEPLOYMENT.md)
-- Requirements: Pass container version in webhook
-- Health checks: Already implemented in A.R.I.
-- Secrets management: Automattic decides strategy
+**Für Fragen zur Kubernetes-Integration:**
+- Documentation: Diese Datei (DEPLOYMENT.md)
+- Anforderungen: Container-Version im Webhook mitteilen
+- Health Checks: Schon implementiert in A.R.I.
+- Secrets Management: Automattic entscheidet die Strategie
 
-**What Automattic can still do:**
-- API endpoints for subscription status (later)
-- Monitoring dashboard (logs, metrics)
-- Backup strategy for connection.json
-- Custom scaling (more than 1 replica per customer? → architecture change needed)
-
----
-
-## 🎯 Summary: The Brilliance of the Architecture
-
-| Aspect | Solution | Advantage |
-|--------|----------|-----------|
-| **Zero downtime** | Blue-Green container swap | Customer notices nothing |
-| **Disaster recovery** | Kill & replace | No tedious repairs |
-| **Support** | Automatic + data exchange | No tickets! |
-| **Updates** | New image version | No tech debt |
-| **Scaling** | 1 container = 1 customer | Isolated & clean |
-| **Configuration** | connection.json | Single source of truth |
-| **Kubernetes** | Simple docker-compose → K8s | Minimal adjustments |
-| **DevOps** | Only change image version | Super maintainable |
-
-**This is real IaaS with minimal overhead!**
+**Was Automattic noch tun kann:**
+- API Endpoints für Subscription-Status (später)
+- Monitoring Dashboard (logs, metrics)
+- Backup-Strategie für connection.json
+- Custom Scaling (mehr als 1 Replica pro Kunde? → Architektur-Change nötig)
 
 ---
 
-**Last Updated:** January 2026  
+## 🎯 Zusammenfassung: Die Genialität der Architektur
+
+| Aspekt | Lösung | Vorteil |
+|--------|--------|---------|
+| **Zero Downtime** | Blue-Green Container-Swap | Kunde merkt nichts |
+| **Disaster Recovery** | Kill & Replace | Keine aufwendigen Repairs |
+| **Support** | Automatisch + Datenaustausch | Keine Tickets! |
+| **Updates** | Neue Image-Version | Keine tech. Schulden |
+| **Skalierung** | 1 Container = 1 Kunde | Isoliert & sauber |
+| **Konfiguration** | connection.json | Single Source of Truth |
+| **Kubernetes** | Einfache Docker-Compose → K8s | Minimale Anpassungen |
+| **DevOps** | Nur Image-Version ändern | Super wartbar |
+
+**Das ist echtes IaaS mit minimalem Overhead!**
+
+---
+
+**Letzte Aktualisierung:** Januar 2026  
 **Version:** 1.0.0  
-**For:** Automattic Engineering Team
+**Für:** Automattic Engineering Team

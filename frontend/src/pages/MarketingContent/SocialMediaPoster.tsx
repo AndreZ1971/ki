@@ -33,8 +33,8 @@ const SocialMediaPoster: React.FC = () => {
   const [editingContent, setEditingContent] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [postStats, setPostStats] = useState({ scheduled: 0, published: 0, engagement: 0 });
-  const [webhookConfig, setWebhookConfig] = useState<Record<string, boolean>>({ linkedin: false, facebook: false, tiktok: false });
-  const [webhookConfiguredCount, setWebhookConfiguredCount] = useState(0);
+  const [platformTokens, setPlatformTokens] = useState<Record<string, boolean>>({ linkedin: false, facebook: false, instagram: false, twitter: false, tiktok: false, youtube: false });
+  const [tokensConfiguredCount, setTokensConfiguredCount] = useState(0);
   const [aiTransformOnPublish, setAiTransformOnPublish] = useState(true);
   
   // Integration Options (for manual posting)
@@ -91,17 +91,25 @@ const SocialMediaPoster: React.FC = () => {
       .catch(err => console.error('Status check failed:', err));
   }, [apiBase]);
 
-  // Webhook-Status (Make/Zapier/n8n) laden
+  // Social Media Token-Status aus Settings laden
   React.useEffect(() => {
-    fetch(`${apiBase}/api/social/webhook/status`)
+    fetch(`${apiBase}/api/settings/connection`)
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          setWebhookConfig(data.webhooks || {});
-          setWebhookConfiguredCount(data.configured || 0);
+          const tokens = {
+            linkedin: !!(data.connection?.linkedinAccessToken),
+            facebook: !!(data.connection?.facebookAccessToken),
+            instagram: !!(data.connection?.instagramAccessToken),
+            twitter: !!(data.connection?.twitterAccessToken),
+            tiktok: !!(data.connection?.tiktokAccessToken),
+            youtube: !!(data.connection?.youtubeAccessToken)
+          };
+          setPlatformTokens(tokens);
+          setTokensConfiguredCount(Object.values(tokens).filter(Boolean).length);
         }
       })
-      .catch(err => console.error('Webhook status check failed:', err));
+      .catch(err => console.error('Token status check failed:', err));
   }, [apiBase]);
 
   const handleGenerateWithAI = async () => {
@@ -150,23 +158,22 @@ const SocialMediaPoster: React.FC = () => {
 
   const handlePublishPost = async (platform: string, content: string) => {
     try {
-      const supportedWebhookPlatforms = ['linkedin', 'facebook', 'tiktok'];
-      if (!supportedWebhookPlatforms.includes(platform)) {
+      const supportedPlatforms = ['linkedin', 'facebook', 'instagram', 'twitter', 'tiktok', 'youtube'];
+      if (!supportedPlatforms.includes(platform)) {
         showToast('Diese Plattform wird noch nicht unterstützt', 'error');
         return;
       }
-      if (!webhookConfig[platform]) {
-        showToast(`${platform.charAt(0).toUpperCase() + platform.slice(1)} ist nicht aktiviert. Siehe Bedienungsanleitung.`, 'error');
+      if (!platformTokens[platform]) {
+        showToast(`${platform.charAt(0).toUpperCase() + platform.slice(1)}-Token nicht konfiguriert. Bitte unter Settings → Social Media einrichten.`, 'error');
         return;
       }
 
-      const response = await fetch(`${apiBase}/api/social/webhook/post`, {
+      const response = await fetch(`${apiBase}/api/social/post`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           platform,
           content,
-          scheduleTime: 'now',
           useAI: aiTransformOnPublish
         })
       });
@@ -349,7 +356,7 @@ const SocialMediaPoster: React.FC = () => {
           <div className="social-poster-info-box" style={{ marginTop: '10px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                🔌 <strong>Aktivierte Plattformen:</strong> {webhookConfiguredCount}/3
+                🔌 <strong>Aktivierte Plattformen:</strong> {tokensConfiguredCount}/6
                 <span
                   title={
                     'Einige Plattformen sind zum Versand nicht aktiviert. ' +
@@ -370,8 +377,8 @@ const SocialMediaPoster: React.FC = () => {
               </label>
             </div>
             <div style={{ marginTop: 6, fontSize: 12, opacity: 0.8 }}>
-              LinkedIn: {webhookConfig.linkedin ? '✅' : '❌'} · Facebook: {webhookConfig.facebook ? '✅' : '❌'} · TikTok: {webhookConfig.tiktok ? '✅' : '❌'}
-              {!webhookConfiguredCount && (
+              LinkedIn: {platformTokens.linkedin ? '✅' : '❌'} · Facebook: {platformTokens.facebook ? '✅' : '❌'} · TikTok: {platformTokens.tiktok ? '✅' : '❌'}
+              {!tokensConfiguredCount && (
                 <span> · Tipp: Siehe Bedienungsanleitung für Informationen</span>
               )}
             </div>
@@ -479,25 +486,12 @@ const SocialMediaPoster: React.FC = () => {
                       >
                         ✎ Bearbeiten
                       </button>
-                      {(() => {
-                        const supportedWebhookPlatforms = ['linkedin', 'facebook', 'tiktok'];
-                        const isSupported = supportedWebhookPlatforms.includes(post.platform);
-                        const isConfigured = isSupported && !!webhookConfig[post.platform];
-                        const disabled = !isSupported || !isConfigured;
-                        const title = !isSupported
-                          ? 'Diese Plattform wird noch nicht unterstützt'
-                          : (!isConfigured ? 'Diese Plattform ist nicht aktiviert' : '');
-                        return (
-                          <button
-                            onClick={() => handlePublishPost(post.platform, post.content)}
-                            className="social-poster-btn social-poster-btn-primary"
-                            disabled={disabled}
-                            title={title}
-                          >
-                            📤 Publish
-                          </button>
-                        );
-                      })()}
+                      <button
+                        onClick={() => handlePublishPost(post.platform, post.content)}
+                        className="social-poster-btn social-poster-btn-primary"
+                      >
+                        📤 Publish
+                      </button>
                     </>
                   )}
                 </div>
