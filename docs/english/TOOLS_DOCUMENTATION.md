@@ -1,22 +1,22 @@
 # A.R.I. Tools Documentation - ML/AI Integration Status
 
-> **Focus of this documentation**: Technical details of ML/AI integration for all dashboard tools. User documentation with screenshots and operating instructions is located in `Operating-Instructions-AI-Agent.md`.
+> **Focus of this documentation**: Technical details of ML/AI integration for all dashboard tools. User documentation with screenshots and operating instructions can be found in `User-Guide.md`.
 
 **Last updated**: December 16, 2025  
-**Status**: ✅ Complete - Notes-feature with Autosave, Character Counter & Quick Templates, critical fixes for rate-limiting and IP-block prevention
+**Status**: ✅ Complete - Notes Feature with Autosave, Character Counter & Quick Templates, critical fixes for Rate-Limiting and IP-Block-Prevention
 
 ---
 
-## 📊 Tool Integration Overview
+## 📊 Overview of Tool Integration
 
 | Category               | Tools        | ML/AI          | Status        |
-| ----------------------- | ------------ | -------------- | ------------- |
-| **Analytics**           | 9 Tools      | 🟢 Yes (9/9)     | Complete |
-| **Product Management**  | 8 Tools      | 🟢 Yes           | Complete |
-| **Payment & Finances**  | 13 Tools     | 🟢 Yes           | Complete |
-| **Marketing & Content** | 10 Tools     | 🟢 Yes           | Complete |
-| **Advanced AI**         | 12 Tools     | 🟢 Yes           | Complete |
-| **TOTAL**              | **52 Tools** | 🟢 52/52 (100%) | 0 Tools pending |
+| ---------------------- | ------------ | -------------- | ------------- |
+| **Analytics**          | 9 Tools      | 🟢 Yes (9/9)    | Complete      |
+| **Product Management** | 8 Tools      | 🟢 Yes (8/8)    | Complete      |
+| **Payment & Finances** | 13 Tools     | 🟢 Yes (13/13)  | Complete      |
+| **Marketing & Content**| 10 Tools     | 🟢 Yes (10/10)  | Complete      |
+| **Advanced AI**        | 12 Tools     | 🟢 Yes (12/12)  | Complete      |
+| **TOTAL**              | **52 Tools** | 🟢 52/52 (100%) | Finalized     |
 
 ---
 
@@ -24,330 +24,1483 @@
 
 ### Product Management (8/8 Tools)
 
-#### 🔍 **Product Analyzer** `frontend/src/pages/ProductManagement/ProductAnalyzer.tsx`
-- **ML Features**: 
-  - Circular progress indicator for score display
-  - Expandable issue cards with severity levels (critical/warning/info)
-  - AI insights (strengths/weaknesses/opportunities/recommendations)
-- **API Integration**: `/api/products/optimizer/analyze/{productId}`
-- **Status**: ✅ Complete refactored (11.12.2025)
-- **Dependencies**: ProductAnalysis Component, useProductManagement Hook
-- **Changes**: Aus ProductBundles extrahiert, standalone page with dashboard tile
+#### 🔍 **Product Analyzer**
 
-#### 📝 **ProductAnalysis - Notes Feature** `frontend/src/pages/app/ProductAnalysis.tsx`
-- **New Features (16.12.2025)**:
-  - 🎯 **Notes field**: Saving of Warehouse/Storage-Informationen
-  - 🔄 **Autosave**: Automatisches Save after 2 Seconds of inactivity (kein Button click needed)
-  - 📊 **Character Counter**: Anzeige of 0/1000 characters mit Warnings (Orange >70%, Red >90%)
-  - 🎯 **Quick Templates**: 4 Quick buttons für Common notes:
-    - 📍 Storage (z.B. "Shelf 5B")
-    - 📦 Supplier ordered
-    - 🚚 Arrival expected
-    - ⚠️ Defects found
-  - ⏰ **Last-Saved Timestamp**: Green checkmark mit Time (z.B. ✅ 14:32)
-  - 💾 **WooCommerce Integration**: Speichert Notizen als Meta_data mit Key 'Notes'
-- **Backend Endpoint**: `POST /api/products/adviser/Notes/:id`
-- **Status**: ✅ Complete implementiert (16.12.2025)
-- **Bugs Fixed**:
-  - ✅ Rate-limiting fixes (useEffect dependency Hell)
-  - ✅ OpenAI description sanitization (max 500 chars, HTML removal)
-  - ✅ 404 monitoring für IP-block prevention
+**Overview:**
+- **Purpose**: Product health check with AI insights (scores, issues, recommendations)
+- **Use Cases**: Assess product quality, derive fix priorities
+- **Category**: Product Management
 
-#### 🤖 **Auto Product Creator** `frontend/src/pages/ProductManagement/AutoProductCreator.tsx`
-- **ML Features**: AI-powered product creation with optimization
-- **API Integration**: `/api/products/creator/auto`
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/ProductManagement/ProductAnalyzer.tsx`
+- **Backend API**: `GET /api/products/optimizer/analyze/{productId}`
+- **UI**: Score ring, issue cards (severity critical/warning/info), AI insights
+
+**Implementation Notes:**
+- Expandable issue cards with severity badges
+- AI insights (strengths/weaknesses/opportunities/recommendations)
+- Navigates as own tile (extracted from ProductBundles)
+
+**Features/Limitations:**
+- Analysis only, no auto-changes
+- Product data must be current in Woo shop
+- **Status**: ✅ Fully refactored (12/11/2025)
+
+---
+
+#### 📝 **ProductAnalysis - Notes Feature**
+
+**Overview:**
+- **Purpose**: Warehouse/status notes per product stored directly in WooCommerce
+- **Use Cases**: Document warehouse location, pending orders, defects, ETA
+- **Category**: Product Management
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/app/ProductAnalysis.tsx`
+- **Backend API**: `POST /api/products/adviser/notes/:id`
+- **Storage**: WooCommerce `meta_data` key `notes`
+
+**Features:**
+- Autosave (2s idle), Character Counter (warning >70%, red >90%)
+- Quick Templates (warehouse location, supplier ordered, arrival expected, defects)
+- Last-Saved Timestamp (green checkmark)
+
+**Error Fixes:**
+- Rate-limiting (useEffect cleanup), HTML-sanitizing (max 500 chars)
+- 404 Monitoring (IP-Block Prevention)
+
+**Features/Limitations:**
+- Text-only notes, no files/images
+- Stores per product ID
+- **Status**: ✅ Fully implemented (16.12.2025)
+
+---
+
+#### 🤖 **Auto Product Creator**
+
+**Overview:**
+- **Purpose**: AI-powered generation of product drafts (texts/images/tags)
+- **Use Cases**: Quick-start for new products, marketing material
+- **Category**: Product Management
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/ProductManagement/AutoProductCreator.tsx`
+- **Backend API**: `POST /api/products/creator/auto`
+- **Toggles**: `useAIEnhancements`, autoTagging, generateImages
+
+**Implementation Notes:**
+- Generates descriptions/image prompts; product must be manually reviewed/saved
+- Can be combined with Run Auto Product Creator for batch/jobs
+
+**Features/Limitations:**
+- Creates no physical products, only content/metadata
+- WooCommerce save manual
 - **Status**: ✅ With AI enhancement
-- **Konfigurierbar**: useAIenhancements Toggle
 
-#### 🛒 **Woo Product Create** `frontend/src/pages/ProductManagement/WooProductCreate.tsx`
-- **ML Features**: Automatic product data generation
+---
+
+#### 🛒 **Woo Product Create**
+
+**Overview:**
+- **Purpose**: Create new WooCommerce product with AI-generated fields
+- **Use Cases**: Quick product creation from briefing
+- **Category**: Product Management
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/ProductManagement/WooProductCreate.tsx`
+- **Backend API**: `POST /api/woocommerce/products/create`
+- **Fields**: Title, price, inventory, images, short/long description
+
+**Implementation Notes:**
+- AI pre-fills texts/SEO fields; user reviews and saves
+- Supports virtual/physical products (depends on backend)
+
+**Features/Limitations:**
+- WooCommerce credentials required
+- No bulk creation; per product
 - **Status**: ✅ Integrated
-- **API**: `/api/woocommerce/products/create`
 
-#### ✏️ **Woo Product Update** `frontend/src/pages/ProductManagement/WooProductUpdate.tsx`
-- **ML Features**: Intelligent product update
+---
+
+#### ✏️ **Woo Product Update**
+
+**Overview:**
+- **Purpose**: AI-powered updates (price, inventory, description) based on trends/sentiment
+- **Use Cases**: Price/SEO optimization of existing products
+- **Category**: Product Management
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/ProductManagement/WooProductUpdate.tsx`
+- **Backend APIs**:
+  - `POST /api/products/ai/trend-pricing` (Google Trends + GPT)
+  - `POST /api/products/ai/optimize-description-trends`
+  - `POST /api/products/ai/reddit-sentiment`
+  - `PUT /api/products/woo/update-single/:productId`
+
+**Implementation Notes:**
+- Batch processing with 4 update types (prices, inventory, descriptions, all)
+- Toggles: Auto-Apply, Bulk AI Analyze
+- Trend/Reddit scores as decision basis
+
+**Features/Limitations:**
+- API keys for Trends/Reddit/OpenAI required
+- Use Auto-Apply carefully (review recommended)
 - **Status**: ✅ Integrated
 
-#### 📑 **Categories Manager** `frontend/src/pages/ProductManagement/CategoriesManager.tsx`
-- **ML Features**: Automatische Category-Verwaltung
-- **Status**: ✅ Mit MLCategorySuggester integration
-- **Sub-Component**: MLCategorySuggester.tsx
+---
 
-#### 🎁 **Freebies Creator** `frontend/src/pages/ProductManagement/CreateFreebies.tsx`
-- **ML Features**: Automatic free product creation
-- **Status**: ✅ Mit MLFreebieGenerator
-- **Sub-Component**: MLFreebieGenerator.tsx
+#### 📑 **Categories Manager**
 
-#### 📦 **Product Bundles** `frontend/src/pages/ProductManagement/ProductBundles.tsx`
-- **ML Features**: Bundle creation with AI suggestions
-- **Status**: ✅ Cleaned (ProductAnalysis extracted)
+**Overview:**
+- **Purpose**: AI category suggestions and optimization for Woo categories
+- **Use Cases**: Assign new products correctly, avoid duplicates
+- **Category**: Product Management
 
-#### 🚀 **Run Auto Product Creator** `frontend/src/pages/ProductManagement/RunAutoProductCreator.tsx`
-- **ML Features**: Config options: useAIenhancements, autoTagging, generateImages
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/ProductManagement/CategoriesManager.tsx`
+- **Sub-Component**: `MLCategorySuggester.tsx`
+- **Backend API**: `POST /api/categories/ml/suggest`
+- **Payload**: `{ title, description, maxSuggestions }`
+
+**Implementation Notes:**
+- Shows confidence + reason inline, "Apply" sets name in UI
+- Knows existing Woo categories (context up to 100) → invents no new ones
+
+**Features/Limitations:**
+- Apply in backend optional (currently UI-side)
+- Optimize-All stub present
+- **Status**: ✅ With MLCategorySuggester integration
+
+---
+
+#### 🎁 **Freebies Creator**
+
+**Overview:**
+- **Purpose**: AI-generated freebie ideas with conversion rate prediction
+- **Use Cases**: Create lead magnets (ebooks, checklists, templates)
+- **Category**: Product Management
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/ProductManagement/CreateFreebies.tsx`
+- **Sub-Component**: `MLFreebieGenerator.tsx` (inline suggester)
+- **Backend API**: `GET /api/freebies/ml/generate?type=ebook&keywords=productmanagement`
+- **Dependencies**: OpenAI GPT-4o-mini
+
+**Request/Response Examples:**
+```typescript
+// GET /api/freebies/ml/generate?type=ebook&keywords=productmanagement
+{
+  success: true,
+  data: [
+    {
+      title: "Product Management 101 E-Book",
+      description: "50 pages of best practices...",
+      conversionScore: 0.78,
+      reason: "High demand for PM content"
+    }
+  ]
+}
+```
+
+**Implementation Notes:**
+- Generates 4-5 ideas per type (ebook, checklist, templates)
+- Conversion score 0-1 (prediction based on type/keywords)
+- UI: Expandable cards with confidence badges
+- Modal: "Create from Idea" fills form automatically
+- Keywords optional but improve relevance
+
+**UI Components:**
+- Idea cards: 3-column grid (responsive)
+- Conversion badge: orange gradient (📊 78%)
+- Expand/collapse description
+- "Apply" button → modal
+
+**Features/Limitations:**
+- Idea generation only, no auto-publishing
+- User must create/publish freebie manually
+- **Status**: ✅ Complete with ML/AI integration
+
+---
+
+#### 📦 **Product Bundles**
+
+**Overview:**
+- **Purpose**: Plan product bundles and enrich with AI suggestions
+- **Use Cases**: Cross-sell/up-sell bundles
+- **Category**: Product Management
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/ProductManagement/ProductBundles.tsx`
+- **Dependencies**: Uses ProductAnalysis logic (now outsourced) for insights
+
+**Implementation Notes:**
+- Bundle compilation with AI hints
+- Product analysis outsourced (own page)
+
+**Features/Limitations:**
+- No automatic Woo save; user confirms bundle
+- **Status**: ✅ Cleaned up (ProductAnalysis extracted)
+
+---
+
+#### 🚀 **Run Auto Product Creator**
+
+**Overview:**
+- **Purpose**: Start Auto Product Creator as job/batch with AI toggles
+- **Use Cases**: Quick generation of multiple product drafts
+- **Category**: Product Management
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/ProductManagement/RunAutoProductCreator.tsx`
+- **Backend API**: `POST /api/products/creator/auto` (with job/run parameters)
+- **Toggles**: useAIEnhancements, autoTagging, generateImages
+
+**Implementation Notes:**
+- Batch/job-style trigger, calls same creator endpoint
+- Ideal for generating multiple drafts in series
+
+**Features/Limitations:**
+- No automatic publishing; review required
+- Resource consumption depends on image/LLM options
 - **Status**: ✅ Fully functional with AI toggles
 
 ---
 
 ### Marketing & Content (10/10 Tools)
 
-#### 📧 **AI Email Generator** `frontend/src/pages/MarketingContent/ai-email-generator.tsx`
-- **ML Features**: AI-powered email generation
-- **API**: `/api/ai/email/email-draft`
-- **Status**: ✅ Complete
-- **Capabilities**: Template-based, LLM integration
+#### 📧 **AI Email Generator**
 
-#### 🇩🇪 **German Content Generator** `frontend/src/pages/MarketingContent/GermanContentGenerator.tsx`
-- **ML Features**: German content with NLP
-- **Status**: ✅ Integrated
+**Overview:**
+- **Purpose**: AI-generated email drafts (welcome, promo, re-engagement, winback)
+- **Use Cases**: Newsletters, campaigns, follow-ups
+- **Category**: Marketing & Content
 
-#### ✉️ **Email Marketing Automation** `frontend/src/pages/MarketingContent/EmailMarketingAutomation.tsx`
-- **ML Features**: Automated campaigns, Personalization
-- **Status**: ✅ Mit KI
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/MarketingContent/ai-email-generator.tsx`
+- **Backend API**: `POST /api/ai/email/email-draft`
+- **Features**: Templates, segment selection (customers/subscribers), subject line generator, send-time view, preview modal
 
-#### 🎵 **Social Media Audio** `frontend/src/pages/MarketingContent/SocialMediaAudio.tsx`
-- **ML Features**: Text-to-speech, Audio generation
-- **Status**: ✅ Integrated
+**Request/Response Example:**
+```typescript
+// POST /api/ai/email/email-draft
+{
+  emailType: "welcome-email",
+  tone: "friendly",
+  language: "en",
+  productName: "Shop X"
+}
+// Response
+{ success: true, data: { subject: "Welcome...", body: "Hello ..." } }
+```
 
-#### 📱 **Social Media Poster** `frontend/src/pages/MarketingContent/SocialMediaPoster.tsx`
-- **ML Features**: Automatic content posting
-- **Status**: ✅ Integrated
+**Implementation Notes:**
+- Fallback customer data (mock) if no API data available
+- Multiple views: generator, templates, subscribers, segments, send-time, forecast
+- Preview modal for proofreading before send
 
-#### 🆓 **Free to Post Converter** `frontend/src/pages/MarketingContent/FreeToPostConverter.tsx`
-- **ML Features**: Conversion optimization
-- **Status**: ✅ Mit KI
-
-#### 💸 **Content Monetized** `frontend/src/pages/MarketingContent/ContentMonetized.tsx`
-- **ML Features**: Automatic monetization
-- **Status**: ✅ Integrated
-
-#### 🎨 **Kite Templates** `frontend/src/pages/MarketingContent/KiteTemplates.tsx`
-- **ML Features**: Template management, Design suggestions
-- **Status**: ✅ Integrated
-
-#### 📝 **Blogpost Generator** `frontend/src/pages/MarketingContent/BlogPostGenerator.tsx`
-- **ML Features**: SEO-optimized blog posts, Outline generation
-- **API**: `/api/marketing/blogpost/generate`
-- **Status**: ✅ Complete
-- **Capabilities**: Keyword analysis, Content structure, LLM integration
-
-#### 🖼️ **Image Analyzer** `frontend/src/pages/MarketingContent/ImageAnalyzer.tsx`
-- **ML Features**: Image quality check, Auto-tagging, SEO analysis
-- **API**: `/api/marketing/image/analyze`
-- **Status**: ✅ Complete
-- **Capabilities**: Vision AI, Tag generation, Quality score
+**Features/Limitations:**
+- Send flow depends on backend/ESP integration (draft generation out-of-the-box)
+- GDPR: Content generated, send only after approval
+- **Status**: ✅ Complete with LLM integration
 
 ---
 
-### Advanced AI (9/9 Tools)
+#### 🇬🇧 **English Content Generator**
 
-#### 🧠 **Context Generator** `frontend/src/pages/Advanced/ContextGenerator.tsx`
-- **ML Features**: AI context generation
-- **Status**: ✅ Mit LLM integration
+**Overview:**
+- **Purpose**: English longform/shortform texts (blog, product descriptions, social, email, landing page, PR)
+- **Use Cases**: SEO content, campaigns, landing pages
+- **Category**: Marketing & Content
 
-#### 🔤 **String Generator** `frontend/src/pages/Advanced/StringGenerator.tsx`
-- **ML Features**: Intelligent string generation
-- **Status**: ✅ Mit KI
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/MarketingContent/EnglishContentGenerator.tsx`
+- **Backend API**: `POST /api/marketing/content/english`
+- **Parameters**: contentType, topic, targetAudience, tone, lengthMode (short/medium/long), formality (informal/formal), includeSeo, includeFaqs, includeCtas, keywords, avoidTerms
 
-#### 🔄 **Auto Framplementator** `frontend/src/pages/Advanced/AutoFramplementator.tsx`
-- **ML Features**: Automatic framework implementation
+**Response (Example):**
+```json
+{
+  "content": "Full text...",
+  "metaTitle": "...",
+  "metaDescription": "...",
+  "headlines": ["H1", "H2"],
+  "faqs": [{"question": "...", "answer": "..."}],
+  "ctas": ["Try now"],
+  "keywords": ["E-Commerce"],
+  "wordCount": 950,
+  "readTimeMinutes": 5
+}
+```
+
+**Implementation Notes:**
+- Supports formality switch (informal/formal)
+- SEO options (meta, keywords), FAQs/CTAs optional
+- Length presets: short (~500w), medium (~1000w), long (~2000w)
+
+**Features/Limitations:**
+- Generates text only, no automatic publishing
+- Content must be manually reviewed/approved
+- **Status**: ✅ Integrated
+
+---
+
+#### ✉️ **Email Marketing Automation**
+
+**Overview:**
+- **Purpose**: Campaign automation with AI texts and segments
+- **Use Cases**: Drip campaigns, re-engagement, promotions
+- **Category**: Marketing & Content
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/MarketingContent/EmailMarketingAutomation.tsx`
+- **Backend**: Uses email draft service (`/api/ai/email/email-draft`) and segment handling
+- **Features**: Schedule (send time), segments, templates, AI CTAs
+
+**Implementation Notes:**
+- Builds on AI Email Generator (drafts) and orchestrates send logic
+- Segment and template management in UI
+- Send depends on connected ESP/backend
+
+**Features/Limitations:**
+- No built-in ESP; requires connected mail system
+- User approval required before send
+- **Status**: ✅ With AI
+
+---
+
+#### 🎵 **Social Media Audio**
+
+**Overview:**
+- **Purpose**: AI script + TTS audio for social clips (Instagram, TikTok, YouTube Shorts, Facebook)
+- **Use Cases**: Voice short videos/reels/shorts
+- **Category**: Marketing & Content
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/MarketingContent/SocialMediaAudio.tsx`
+- **Backend API**:
+  - `POST /api/marketing/social/audio/generate-script` - Platform-optimized scripts (hooks, CTAs, voice recommendations)
+  - `POST /api/marketing/social/audio` - TTS audio (base64, duration)
+- **Parameters**: topic, platform, tone, targetAudience, duration (short/medium/long), voice
+
+**Implementation Notes:**
+- Auto voice selection based on AI recommendation (voiceRecommendations)
+- Saves audio as base64 data URL in state (download/play in UI)
+- Platform preconfigs for duration (e.g. TikTok 3min, Reels 60s)
+
+**Features/Limitations:**
+- No direct upload to platforms; audio must be used manually
+- TTS provider/quality depends on backend
+- **Status**: ✅ Integrated
+
+---
+
+#### 📱 **Social Media Poster**
+
+**Overview:**
+- **Purpose**: Generate platform-optimized social media posts with AI
+- **Use Cases**: LinkedIn, Facebook, Instagram, Twitter/X, TikTok, YouTube content creation
+- **Category**: Marketing & Content
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/MarketingContent/SocialMediaPoster.tsx`
+- **Backend API**: 
+  - `POST /api/marketing/social/generate-posts` - AI post generation
+  - `POST /api/social/post` - Direct posting
+  - `GET /api/settings/connection` - Token status check
+- **Dependencies**: 
+  - OAuth access tokens (Settings → Social Media)
+  - OpenAI API (optional for AI-transform)
+  - 6 platform APIs (LinkedIn, Facebook, Instagram, Twitter, TikTok, YouTube)
+
+**Request/Response Examples:**
+```typescript
+// POST /api/marketing/social/generate-posts
+{
+  topic: "Product Launch",
+  targetAudience: "Entrepreneurs",
+  tone: "professional",
+  platforms: ["linkedin", "facebook"],
+  includeHashtags: true,
+  includeEmojis: false,
+  ctaType: "engagement"
+}
+// Response
+{
+  success: true,
+  posts: [
+    {
+      platform: "linkedin",
+      content: "We're excited to announce...",
+      hashtags: ["#ProductLaunch"],
+      characterCount: 250
+    }
+  ]
+}
+
+// POST /api/social/post
+{
+  platform: "linkedin",
+  content: "Post text...",
+  useAI: true
+}
+// Response
+{ success: true, postId: "..." }
+```
+
+**Implementation Notes:**
+- Platform-specific constraints (LinkedIn max 3000 chars, Twitter 280)
+- Token check before publish (`platformTokens` state)
+- Fallback: copy/paste if no API tokens configured
+- AI-transform optional (`aiTransformOnPublish` toggle)
+- Settings integration: token input under Settings → Social Media
+
+**Features/Limitations:**
+- Manual token configuration required (see `social_media_onboarding.md`)
+- No automatic token-refresh implementation
+- Respect rate limits of each platform
+- Webhook variant (Make/Zapier/n8n) replaced by direct API integration
+- **Status**: ✅ Complete with OAuth API integration
+
+---
+
+#### 🆓 **Free to Post Converter**
+
+**Overview:**
+- **Purpose**: Activation campaigns for inactive/free users
+- **Use Cases**: Re-engagement, upgrade impulses, encourage first posts
+- **Category**: Marketing & Content
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/MarketingContent/FreeToPostConverter.tsx`
+- **Backend**: Campaign generator (LLM-based), uses marketing APIs
+- **Output**: Campaign drafts (messages, CTAs, sequences)
+
+**Implementation Notes:**
+- Segment selection + AI text suggestions
+- Multi-step sequences possible (depends on backend)
+- Focus on activation CTAs
+
+**Features/Limitations:**
+- No auto-send; user must approve/send campaign
+- Success depends on external ESP/CRM connection
+- **Status**: ✅ With AI
+
+---
+
+#### 💸 **Content Monetized**
+
+**Overview:**
+- **Purpose**: AI-powered price recommendations and product text generation for digital products
+- **Use Cases**: Monetize courses, templates, ebooks, subscriptions
+- **Category**: Marketing & Content
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/MarketingContent/ContentMonetized.tsx`
+- **Backend API**:
+  - `GET /api/marketing/content/price-recommendation` - AI price suggestion
+  - `POST /api/marketing/content/generate-copy` - AI product text (headline, body, CTA)
+  - `GET /api/marketing/content/revenue-forecast` - Revenue projection
+  - `POST /api/marketing/content/create-digital-product` - Create WooCommerce product
+- **Dependencies**: OpenAI API (with fallback), WooCommerce REST API
+
+**Request/Response Examples:**
+```typescript
+// GET /api/marketing/content/price-recommendation?contentType=course&strategy=one-time&basePrice=49
+{
+  success: true,
+  data: {
+    recommendedPrice: 147,
+    range: { min: 120, max: 180 },
+    reasoning: "Course one-time: 3.0x multiplier"
+  }
+}
+
+// POST /api/marketing/content/generate-copy
+{ contentTitle: "Python Course", contentType: "course" }
+// Response
+{ success: true, data: { headline: "...", body: "...", cta: "..." } }
+```
+
+**Pricing Logic:**
+- `course one-time`: 3.0x
+- `template one-time`: 1.2x
+- `subscription`: 0.7x/month
+- `freemium`: 1.5x
+
+**Implementation Notes:**
+- Revenue forecast: Average last 7 days × 30 for month projection
+- Fallback texts if OpenAI unavailable
+- Rate limits: Price 100/min, Copy 50/min, Forecast 100/min, Create 20/min
+- Caching: Price-recommendation 1h, revenue-forecast 5min
+
+**Features/Limitations:**
+- WooCommerce credentials required
+- OpenAI optional (fallback to standard texts)
+- Creates digital products only (virtual/downloadable)
+- **Status**: ✅ Complete integration
+
+---
+
+#### 🎨 **Kite Templates**
+
+**Overview:**
+- **Purpose**: Template management with AI suggestions for texts/designs
+- **Use Cases**: Quick create/reuse marketing templates
+- **Category**: Marketing & Content
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/MarketingContent/KiteTemplates.tsx`
+- **Backend**: Template storage + AI recommendations (text/CTA/design hints)
+
+**Implementation Notes:**
+- Template library with variants
+- AI provides improvement suggestions for copy/CTA
+- Can be used as starting point for email/social/ads
+
+**Features/Limitations:**
+- No automatic publication; serves as editor/library
+- Design assets not auto-generated (text/structure focus)
+- **Status**: ✅ Integrated
+
+---
+
+#### 📝 **Blogpost Generator**
+
+**Overview:**
+- **Purpose**: AI-generated SEO-optimized blog posts with structured outline
+- **Use Cases**: Content marketing, blog automation, SEO optimization
+- **Category**: Marketing & Content
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/MarketingContent/BlogPostGenerator.tsx`
+- **Backend API**: `POST /api/marketing/blogpost/generate`
+- **Dependencies**: OpenAI GPT-4o-mini, SEO keyword analysis
+
+**Request/Response Examples:**
+```typescript
+// POST /api/marketing/blogpost/generate
+{
+  topic: "E-Commerce Trends 2026",
+  keywords: ["AI", "Personalization", "Conversion"],
+  tone: "professional",
+  length: "medium",
+  includeOutline: true
+}
+// Response
+{
+  success: true,
+  data: {
+    title: "5 Key E-Commerce Trends for 2026",
+    outline: [
+      { section: "Introduction", points: [...] },
+      { section: "Trend 1: AI Personalization", points: [...] }
+    ],
+    content: "Complete blog post...",
+    seoScore: 85,
+    keywords: ["AI", "Personalization"],
+    estimatedReadTime: "5 min"
+  }
+}
+```
+
+**Implementation Notes:**
+- Outline generation before content (structured approach)
+- Keyword density analysis
+- SEO scoring (title, meta, headings, keyword placement)
+- Length options: short (500w), medium (1000w), long (2000w)
+- Tone options: casual, professional, energetic, educational
+
+**SEO Features:**
+- H2/H3 heading structure
+- Keyword integration (2-3% density)
+- Meta description suggestion
+- Internal linking suggestions
+
+**Features/Limitations:**
+- Generates text only, no images
+- User must handle WordPress/CMS integration manually
+- SEO score is estimate, no ranking guarantee
+- **Status**: ✅ Complete with LLM integration
+
+---
+
+#### 🖼️ **Image Analyzer**
+
+**Overview:**
+- **Purpose**: Image analysis (quality, tags, SEO hints)
+- **Use Cases**: Optimize product images, social assets, blog media
+- **Category**: Marketing & Content
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/MarketingContent/ImageAnalyzer.tsx`
+- **Backend API**: `POST /api/marketing/image/analyze`
+- **Output**: Tags, quality score, alt-text/SEO recommendations
+
+**Implementation Notes:**
+- Vision AI for tag generation
+- Quality metrics (sharpness/exposure) depending on backend implementation
+- Alt-text suggestions for SEO/accessibility
+
+**Features/Limitations:**
+- Image analysis only, no editing
+- Result quality depends on vision model
+- **Status**: ✅ Complete
+
+---
+
+### Advanced AI (12/12 Tools)
+
+#### 🧠 **Context Generator**
+
+**Overview:**
+- **Purpose**: AI-based context generation for agency loop
+- **Use Cases**: Prompt engineering, context enrichment
+- **Category**: Advanced AI
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/Advanced/ContextGenerator.tsx`
+- **Backend API**: `POST /api/ai/context/generate`
+- **Features**: LLM integration, context mapping
+
+**Implementation Notes:**
+- Uses OpenAI for context enrichment
+- Input: raw data → output: rich context for AI processing
+
+**Features/Limitations:**
+- Depends on LLM quality
+- **Status**: ✅ With LLM integration
+
+---
+
+#### 🔤 **String Generator**
+
+**Overview:**
+- **Purpose**: Intelligent string generation for dynamic texts
+- **Use Cases**: Template strings, dynamic content generation
+- **Category**: Advanced AI
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/Advanced/StringGenerator.tsx`
+- **Backend API**: `POST /api/ai/string/generate`
+- **Features**: Pattern-based string generation with AI
+
+**Implementation Notes:**
+- Regex patterns + LLM for intelligent fuzzy matches
+- Fallback to template strings if needed
+
+**Features/Limitations:**
+- Complex with many variants
+- **Status**: ✅ With AI integration
+
+---
+
+#### 🔄 **Auto Framplementator**
+
+**Overview:**
+- **Purpose**: Automatic framework implementation with AI
+- **Use Cases**: Scaffolding, code generation, boilerplate
+- **Category**: Advanced AI
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/Advanced/AutoFramplementator.tsx`
+- **Backend API**: `POST /api/ai/framework/implement`
+- **Features**: Code generation, dependency injection, pattern application
+
+**Implementation Notes:**
+- Analyzes existing structure → suggests implementation
+- Supports multiple frameworks (React, Vue, Angular, etc.)
+
+**Features/Limitations:**
+- Code quality depends on prompt engineering
+- Manual adjustments often required
 - **Status**: ✅ With AI enhancement
-- **API**: `/api/ai/framework/implement`
 
-#### 🔄 **WooCommerce Sync** `frontend/src/pages/Advanced/WooCommerceSync.tsx`
-- **ML Features**: Intelligent data synchronization
+---
+
+#### 🔄 **WooCommerce Sync**
+
+**Overview:**
+- **Purpose**: Intelligent data synchronization between shop and backend
+- **Use Cases**: Inventory sync, product update, customer data sync
+- **Category**: Advanced AI
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/Advanced/WooCommerceSync.tsx`
+- **Backend API**: `/api/woocommerce/sync` (with ML optimization)
+- **Dependencies**: Fastify backend, WooCommerce REST API v3
+
+**Implementation Notes:**
+- ML engine recognizes changes + prioritizes by relevance
+- Batch processing with conflict resolution
+- Retry logic for failed syncs
+
+**Features/Limitations:**
+- Watch WooCommerce API rate limits
+- Bidirectional sync can cause conflicts
 - **Status**: ✅ With AI optimization
-- **Dependencies**: Fastify backend, WooCommerce API
 
-#### 💾 **Memory System** `frontend/src/pages/Advanced/MemorySystem.tsx`
-- **ML Features**: Persistent memory for AI contexts, Message logging
-- **API**: `/api/memory/stats`, `/api/memory/messages`
-- **Status**: ✅ Complete refactored (11.12.2025)
-- **Recent Fix**: useCallback for loadStats/loadMessages - React hook dependencies fixed
-- **Key Patterns**: useMemo for message filtering, useCallback for API calls
-- **Components**: Statistics cards, Message log table, Memory cleanup
+---
 
-#### ⚙️ **System Health** `frontend/src/pages/Advanced/SystemHealth.tsx`
-- **ML Features**: System monitoring with alerts
-- **API**: `/api/monitoring/system/metrics`, `/api/monitoring/services/status`
-- **Status**: ✅ Complete refactored (10.12.2025)
-- **Recent updates**: buildUrl() normalization, lastUpdated timestamps, Threshold alerts
-- **Styling**: Glassmorphism, Color-coded severity levels
-- **Capabilities**: Memory tracking, CPU monitoring, Service health
+#### 💾 **Memory System**
 
-#### 👤 **User Management** `frontend/src/pages/app/UserManagement.tsx`
-- **ML Features**: AI-powered customer segmentation, MLPersonalization integration
-- **API**: `/api/woocommerce/customers`
-- **Status**: ✅ Complete refactored (10.12.2025)
-- **Recent updates**: Complete TypeScript rewrite (~500 lines), Tile stats, Search/sort/filter
-- **Sub-Components**: MLPersonalization modal integration
-- **Features**: Statistics cards (Total sales, Average cart value, Active customers, Top customer)
-- **Data Extended**: Customer status, Last login, Visit count, Role fields
+**Overview:**
+- **Purpose**: Persistent memory for AI contexts and message logging
+- **Use Cases**: Agency loop context storage, conversation history
+- **Category**: Advanced AI
 
-#### 💬 **Feedback Analysis** `frontend/src/pages/app/FeedbackAnalysis.tsx`
-- **ML Features**: 
-  - Sentiment analysis (positive/negative/neutral) mit Confidence-Scores
-  - Automatic categorization (Customer, Performance, Products, Traffic, Conversion)
-  - Impact assessment (high/medium/low) für jedes Insight
-  - AI-generated Recommendations für Optimierungen
-  - Next Steps mit Criticality levels
-- **API**: 
-  - `/api/analytics/feedback/reviews` (WooCommerce reviews via REST)
-  - `/api/analytics/feedback/tickets` (Support tickets via Plugin-REST-API)
-  - `/api/analytics/feedback/analyze` (AI analysis)
-- **Status**: ✅ Complete mit ML/AI integrated
-- **Capabilities**: Reviews + tickets Analyse, Sentiment detection, Pattern recognition
-- **Features**: Statistics cards (Bewertungen, Tickets, Sentiment, Resolution Time), Insight grid mit Recommendations, Next Steps Display
-- **UI**: Glassmorphism, Color-coded Impact/Status, Expandable Rohdaten
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/Advanced/MemorySystem.tsx`
+- **Backend APIs**:
+  - `GET /api/memory/stats` - Memory statistics
+  - `GET /api/memory/messages` - Message log
+  - `POST /api/memory/cleanup` - Memory cleanup
+- **Features**: Statistics cards, message filtering, memory cleanup
+
+**Implementation Notes:**
+- React hooks: useCallback for API calls, useMemo for filtering
+- Loading/error states for all API calls
+- Message pagination optionally implementable
+
+**Features/Limitations:**
+- Memory size can be limited (DB dependent)
+- No automatic archiving currently
+- **Status**: ✅ Fully refactored (11.12.2025)
+
+---
+
+#### ⚙️ **System Health**
+
+**Overview:**
+- **Purpose**: System monitoring with alerts and performance tracking
+- **Use Cases**: DevOps monitoring, health checks, capacity planning
+- **Category**: Advanced AI
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/Advanced/SystemHealth.tsx`
+- **Backend APIs**:
+  - `GET /api/monitoring/system/metrics` - CPU, memory, disk
+  - `GET /api/monitoring/services/status` - Service health
+- **Features**: Color-coded alerts, threshold alerts, real-time updates
+
+**Implementation Notes:**
+- Poll interval 30s (non-blocking)
+- Severity levels: ok, warning, critical
+- Graphic layout: glassmorphism, gradient cards
+
+**Features/Limitations:**
+- Depends on backend monitoring (Prometheus/StatsD)
+- Alerts are notifications only, no auto-remediation
+- **Status**: ✅ Fully refactored (10.12.2025)
+
+---
+
+#### 👤 **User Management**
+
+**Overview:**
+- **Purpose**: AI-powered customer management with segmentation
+- **Use Cases**: Customer analytics, personalization, audience management
+- **Category**: Advanced AI
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/app/UserManagement.tsx`
+- **Backend API**: `GET /api/woocommerce/customers`
+- **Sub-Component**: `MLPersonalization.tsx` (AI segmentation)
+- **Features**: Stats cards (revenue, AOV, active count), search/sort/filter, ML personalization modal
+
+**Implementation Notes:**
+- Customer data extended: status, last_login, visit_count, role
+- Fully TypeScript (~500 lines), React hooks pattern
+- Tile-based stats layout
+
+**Features/Limitations:**
+- Performance with >10,000 customers needs pagination
+- ML personalization optional via modal
+- **Status**: ✅ Fully refactored (10.12.2025)
+
+---
+
+#### 💬 **Feedback Analysis**
+
+**Overview:**
+- **Purpose**: AI sentiment analysis and automatic categorization of customer feedback
+- **Use Cases**: Review analysis, support ticket triage, customer sentiment monitoring
+- **Category**: Advanced AI
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/app/FeedbackAnalysis.tsx`
+- **Backend APIs**:
+  - `GET /api/analytics/feedback/reviews` - WooCommerce reviews
+  - `GET /api/analytics/feedback/tickets` - WordPress support tickets
+  - `POST /api/analytics/feedback/analyze` - AI analysis
+- **Features**: 
+  - Sentiment analysis (positive/negative/neutral) with confidence scores
+  - Auto-categorization (customer, performance, products, traffic, conversion)
+  - Impact assessment (high/medium/low)
+  - AI-generated recommendations + next steps
+
+**Implementation Notes:**
+- Stats cards: reviews, tickets, sentiment %, resolution time
+- Insight grid with impact badges + expandable details
+- Glassmorphism UI with color coding
+
+**Features/Limitations:**
+- Requires Awesome Support Plugin 6.3.6 for tickets
+- Fallback reviews only if plugin unavailable
+- **Status**: ✅ Complete with ML/AI integration
 
 **⚠️ PLUGIN REQUIREMENT - Awesome Support 6.3.6**
 
-Die Kunden-Feedback analysis nutzt echte Support tickets aus deinem WordPress-System. Dafür wird das folgende Plugin empfohlen und beforeausgesetzt:
+Customer feedback analysis uses real support tickets from your WordPress system. Setup:
+1. Install and activate "Welcome to Awesome Support 6.3.6" plugin in WordPress
+2. Enable WordPress application passwords
+3. Environment variables on backend start:
+   - `WORDPRESS_URL` = e.g. `https://myshop.com`
+   - `WORDPRESS_USER` = WordPress username
+   - `WORDPRESS_APP_PASSWORD` = app password
 
-- **Plugin**: Welcome to Awesome Support (Version 6.3.6 oder kompatibel)
-- **REST endpoint**: `/wp-json/wpas-api/v1/tickets`
-- **Authentication**: WordPress application Passwords (Basic auth)
-- **Ticket data**: Abrufen of echten Support tickets mit Titeln, Beschreibungen, Status, Priorität, Erstellungs- und Lösungsdatum
-
-**Setup:**
-1. Install the plugin "Welcome to Awesome Support 6.3.6" in WordPress
-2. Activate the plugin
-3. Ensure, dass WordPress application Passwords aktiviert sind (oder nutze a Admin-User mit App-Passwort)
-4. Setze folgende Environment variables beim Backend start:
-   - `WORDPRESS_URL` = Your WordPress installation (z. B. `https://kaufe-es.eu`)
-   - `WORDPRESS_USER` = WordPress-Benutzername
-   - `WORDPRESS_APP_PASSWORD` = WordPress application Password
-5. Das System versucht automatisch, Tickets of `/wp-json/wpas-api/v1/tickets` abzurufen
-
-**If the plugin is not available:**
-- A.R.I. zeigt beim Ticket retrieval eine Meaningful error message an
-- Review analysis continues to work, da diese of from WooCommerce
-- Das System zeigt keine Mock data oder Fallback tickets
-
-#### 🌐 **Real Web Analytics** `frontend/src/pages/AnalyseMetrics/RealWebAnalytics.tsx`
-- **ML Features**:
-  - Multi-source trend Analysis (Google Trends, Reddit, News, GitHub, StackOverflow)
-  - AI-powered report generation mit GPT-based analysis
-  - Automatic categorization (Performance, Products, Traffic, Conversion, Customer)
-  - Confidence scoring & Top trend detection
-  - Next Steps Recommendations mit Prioritäten
-- **API**: `/api/analytics/trends/analyze`, `/api/analytics/ml/report`
-- **Status**: ✅ Complete mit ML/AI integrated
-- **Capabilities**: Batch product Analysis, Time-range Selection (today/week/month), Multi-source Aggregation
-- **Features**: Trend scoring, Source-level Breakdown, KI-Insights, Average Score Tracking
-- **UI**: Time-range Selector, Product List, Trend-Liste mit Confidence, KI-Report Display
-
-#### 🗺️ **Analytic Regioning** `frontend/src/pages/AnalyseMetrics/AnalyticRegioning.tsx`
-- **ML Features**:
-  - AI-powered region analysis mit GPT-basierter Optimierung
-  - ML-Insights für Regional performance (type, title, value, score, detail)
-  - AI-score Anzeige (Confidence scoring in %)
-  - Region-specific Analyse (Global/Europe/Americas/Asia)
-  - Automatische Identifikation of Top performersn & Optimization needs
-  - Dynamische ML-Insights vom Backend
-- **API**: `/api/analytics/regioning/ml-analysis` (POST)
-- **Status**: ✅ Complete mit ML/AI integrated
-- **Capabilities**: Regional traffic Distribution, Country performance Ranking, Trend Detection per Region
-- **Features**: Multi-Region Selection, ML-Loading states, error Handling, Structured Insights Rendering
-- **UI**: Region Selector (Global/Europe/Americas/Asia), Stats Cards, Traffic Distribution Bars, Top countries Table, KI-Insights Display
-
-#### ⭐ **Premium Audit** `frontend/src/pages/AnalyseMetrics/PremiumAudit.tsx`
-- **ML Features**:
-  - AI-powered shop optimization mit GPT-based analysis
-  - ML-Insights für Audit-Categoryn (type, title, value, score, detail, priority, category)
-  - Cost-benefit analysis mit KI-Confidence scoring
-  - Automatische Priority assignment (critical/high/medium/low)
-  - Category-spezifische Optimization suggestions
-  - Dynamische ML-Recommendations basierend auf Audit-Daten
-- **API**: `/api/audit/premium/ml-analysis` (POST)
-- **Status**: ✅ Complete mit ML/AI integrated
-- **Capabilities**: Audit Score Calculation, Category Analysis, Priority-based Recommendations, Timeline Planning
-- **Features**: ML-Button mit Loading states, error Handling, Priority-colored Insights, Category filtering
-- **UI**: AI optimization Button, Insights mit Priority-Badges, Confidence-Score-Anzeige, Category-Tags
-
-#### 🔧 **Standard Audit** `frontend/src/pages/AnalyseMetrics/StandardAudit.tsx`
-- **ML Features**:
-  - AI-powered quick checks mit GPT-based analysis
-  - ML-Insights für Basic audit checks (type, title, value, score, detail, priority, category)
-  - Schnelle AI optimizationsbeforeschläge
-  - Automatische Priority assignment (critical/high/medium/low)
-  - Category-spezifische Quick-Checks (performance/seo/security/ux/content)
-  - Confidence scoring für recommendations
-- **API**: `/api/audit/standard/ml-analysis` (POST)
-- **Status**: ✅ Complete mit ML/AI integrated
-- **Capabilities**: Quick-fix detection, Importance-based Checks, Progress tracking, Next steps generation
-- **Features**: KI-Quick-Check Button, ML-Loading states, error Handling, Priority-colored Insights
-- **UI**: KI-Quick-Check Button, Insights mit Priority-Badges, Confidence-Score-Anzeige, Category-Filter
+If plugin unavailable: A.R.I. shows error message, review analysis still works.
 
 ---
 
-### ✅ Neu vollständig integratede Analytics-Tools (9/9)
+#### 🌐 **Real Web Analytics**
 
-#### 📊 **Trend Analysis** `frontend/src/pages/AnalyseMetrics/TrendAnalysis.tsx`
+**Overview:**
+- **Purpose**: Multi-source trend analysis with AI report generation
+- **Use Cases**: Market intelligence, competitor analysis, trend monitoring
+- **Category**: Advanced AI
 
-- **ML Features**: AI-powered trend analysis, KI-Insights, Next Steps, Summary generation
-- **API**: `/api/analytics/ml/generate`
-- **Status**: ✅ Complete ML/AI-integrated (inkl. Loading/error-Handling, Mock fallback)
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/RealWebAnalytics.tsx`
+- **Backend APIs**:
+  - `POST /api/analytics/trends/analyze` - Multi-source trend data
+  - `POST /api/analytics/ml/report` - AI report generation
+- **Sources**: Google Trends, Reddit, news APIs, GitHub, StackOverflow
+- **Features**: 
+  - Batch product analysis (trend per product)
+  - Time range selection (today/week/month)
+  - Confidence scoring & source breakdown
+  - AI insights + next steps
 
-#### 🚀 **Run Trend Analysis** `frontend/src/pages/AnalyseMetrics/RunTrendAnalysis.tsx`
+**Implementation Notes:**
+- Shows trend list with confidence badges
+- AI report displayed under trends
+- Loading/error states for all APIs
 
-- **ML Features**: Progressive AI-Trend-Scoring, Insight mapping, Result rendering
-- **API**: `/api/ml/test/trends` (über `VITE_API_URL` oder Dev-Proxy)
-- **Status**: ✅ Complete ML/AI-integrated (inkl. Simulated fallback, Progress display)
-
-#### 🔍 **Real Analytics** `frontend/src/pages/AnalyseMetrics/RealAnalytics.tsx`
-
-- **ML Features**: Real-time ML-Analyse mit KI-Insights, Auto-refresh (30s), Next Steps
-- **API**: `/api/analytics/ml/generate`
-- **Status**: ✅ Complete ML/AI-integrated (Real-time pipeline, errors-/Loading-State)
-
----
-
-Diese Tools haben Basic APIs aber limited ML/AI-Features:
-
-### AnalyseMetrics Folder (`frontend/src/pages/AnalyseMetrics/`)
-
-| Tool                  | File                   | ML-Status     | Notizen                                                    |
-| --------------------- | ---------------------- | ------------- | ---------------------------------------------------------- |
-| 📊 Shop Metrics        | ShopMetrics.tsx        | 🟢 Complete | ML-Analyse: `/api/analytics/metrics/ml-analysis`           |
-| 📈 Conversion Analysis | ConversionAnalysis.tsx | 🟢 Complete | ML-Analyse: `/api/analytics/conversion/ml-analysis`        |
-| 📋 Conversion Reported | ConversionReported.tsx | 🟢 Complete | ML-Analyse: `/api/analytics/conversion/ml/report-analysis` |
-| 🗺️ Analytic Regioning  | AnalyticRegioning.tsx  | 🟢 Complete | ML-Analyse: `/api/analytics/regioning/ml-analysis`         |
-| 🏪 Shop Health Report  | ShopHealthReport.tsx   | 🟢 Complete | ML-Analyse: `/api/health/ml-analysis`                      |
-| ⭐ Premium Audit       | PremiumAudit.tsx       | 🟢 Complete | ML-Analyse: `/api/audit/premium/ml-analysis`               |
-| 🔧 Standard Audit      | StandardAudit.tsx      | 🟢 Complete | ML-Analyse: `/api/audit/standard/ml-analysis`              |
-| 🔎 Mini Audit          | MiniAudit.tsx          | 🟢 Complete | ML-Analyse: `/api/audit/mini/ml-analysis`                  |
-
-**ML-Integration Status**: Alle AnalyseMetrics-Tools rufen dedizierte ML/AI-Endpunkte auf und rendern KI-Insights.
-
-**Note**: Feedback Analysis wurde aus dieser Category entfernt - sie ist bereits vollständig ML/AI-integrated und unter "Advanced AI" dokumentiert!
+**Features/Limitations:**
+- API limits per data source apply
+- Trends can be delayed (not real-time)
+- **Status**: ✅ Complete with ML/AI integration
 
 ---
 
-## ✅ Payment & Finances - COMPLETE ML/AI INTEGRATION (13/13 Tools)
+### ✅ Newly Completed Analytics Tools (9/9)
 
-**Alle Payment-Tools wurden heute mit vollständiger ML/AI-Integration und Data protection compliance ausgestattet!**
+#### 📊 **Trend Analysis**
 
-### PaymentFinances Folder (`frontend/src/pages/PaymentFinances/`)
+**Overview:**
+- **Purpose**: AI-based trend analysis with insights and next steps
+- **Use Cases**: Recognize product/market trends, prioritize actions
+- **Category**: Analytics
 
-| Tool                      | File                      | ML Features                                                                                  | Status |
-| ------------------------- | ------------------------- | -------------------------------------------------------------------------------------------- | ------ |
-| ⚡ Payment Fast            | PaymentFast.tsx           | Fraud detection (Auto-check), Smart amount Suggestions, Risk scoring                         | ✅      |
-| 🎯 Payment Simplified      | PaymentSimplified.tsx     | Simplified payment Flow mit ML optimization                                                  | ✅      |
-| 🧪 Payment Tester          | PaymentTester.tsx         | ML test plan generator, AI diagnosis, MLPaymentAnalyzer Integration                            | ✅      |
-| ✅ Payment Verifier        | PaymentVerifier.tsx       | ML-based Transaction Verification, Risk level Detection (Low/medium/high/critical)        | ✅      |
-| 🎉 Payment Success         | PaymentSuccess.tsx        | Success metrics Analytics, Confidence scoring, Feature-based Event tracking               | ✅      |
-| 🔐 Payment Validation      | PaymentValidation.tsx     | AI-powered security Analysis, Risk scoring, Pattern detection                              | ✅      |
-| 📋 Payment issued Detector | PaymentIssuedDetector.tsx | KI-Powered Issue detection, Confidence scoring, Auto-categorization                          | ✅      |
-| ❤️ Payment User Fabefore      | PaymentUserFabefore.tsx      | **GPT-4o-mini Integration**, Personalization Analytics, Data protection notice                  | ✅      |
-| 📦 Payment Delivery        | PaymentDelivery.tsx       | Delivery analytics mit ML                                                                    | ✅      |
-| 🚨 Payment Emergency       | PaymentEmergency.tsx      | **GPT-4o-mini Integration**, AI emergency analysis, Data protection notice                         | ✅      |
-| 📈 Payment Expansion       | PaymentExpansion.tsx      | **GPT-4o-mini Integration**, AI expansion plan, Confidence & projection, Data protection notice | ✅      |
-| ⚡ Payment Quick Check     | PaymentQuickCheck.tsx     | AI quick scan, Average confidence Tracking                                                       | ✅      |
-| 🤖 ML payment Analyzer     | MLPaymentAnalyzer.tsx     | Dedicated ML Analyzer component                                                              | ✅      |
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/TrendAnalysis.tsx`
+- **Backend API**: `POST /api/analytics/ml/generate`
 
-**Data protection compliance**: PaymentUserFabefore, PaymentEmergency, PaymentExpansion haben dedizierte GDPR notices mit OpenAI API transparency (30-day retention, RAM-only Processing)
+**Implementation Notes:**
+- AI insights + summary + next steps rendering
+- Loading/error state, mock fallback possible
 
-**Recent updates (11.12.2025)**: Alle Payment-Tools mit ML/AI-Features und Data protection noticeen ausgestattet
+**Features/Limitations:**
+- Real-time quality depends on data sources
+- Recommendations only, no auto-actions
+- **Status**: ✅ Complete with ML/AI integration
+
+---
+
+#### 🚀 **Run Trend Analysis**
+
+**Overview:**
+- **Purpose**: Start trend analysis as job/snapshot
+- **Use Cases**: Manual trend runs, dev/test
+- **Category**: Analytics
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/RunTrendAnalysis.tsx`
+- **Backend API**: `POST /api/ml/test/trends`
+
+**Implementation Notes:**
+- Progress display, simulated/mock fallback
+- Uses same engine as Trend Analysis
+
+**Features/Limitations:**
+- Dev/testing-oriented; real-time depends on backend
+- **Status**: ✅ ML/AI integrated
+
+---
+
+#### 🔍 **Real Analytics**
+
+**Overview:**
+- **Purpose**: Real-time analytics with AI insights & next steps
+- **Use Cases**: Live KPI monitoring, real-time alerts, KPI dashboards
+- **Category**: Analytics
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/RealAnalytics.tsx`
+- **Backend API**: `POST /api/analytics/ml/generate`
+- **Features**: Auto-refresh (30s), next steps, KPI score, loading/error handling
+
+**Implementation Notes:**
+- Polling interval 30s (configurable), pauses on errors
+- Separates UI state for `isLoading`, `error`, `data`
+- Next steps based on AI summary of response
+
+**Features/Limitations:**
+- Latency depends on data sources (shop/trends/backend)
+- No auto-writeback, analysis/recommendations only
+- **Status**: ✅ ML/AI integrated
+
+---
+
+#### 📊 **Shop Metrics**
+
+**Overview:**
+- **Purpose**: ML-based shop metrics with KPIs and recommendations
+- **Use Cases**: KPI overview (sales, orders, conversion, AOV)
+- **Category**: Analytics
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/ShopMetrics.tsx`
+- **Backend API**: `POST /api/analytics/metrics/ml-analysis`
+- **Output**: KPI cards, trends, AI insights
+
+**Implementation Notes:**
+- Expects normalized metrics in response (`metrics`, `insights`)
+- Shows score badges + delta vs. previous day/week
+- Fallback: static example values if API empty
+
+**Features/Limitations:**
+- Depends on shop data sources (DB/REST)
+- No auto-corrections, display/recommendations only
+- **Status**: ✅ Complete with ML/AI integration
+
+---
+
+#### 📈 **Conversion Analysis**
+
+**Overview:**
+- **Purpose**: ML analysis of conversion funnel stages
+- **Use Cases**: Detect checkout drops, prioritize A/B tests
+- **Category**: Analytics
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/ConversionAnalysis.tsx`
+- **Backend API**: `POST /api/analytics/conversion/ml-analysis`
+- **Output**: Funnel values, causes, next steps
+
+**Implementation Notes:**
+- Renders funnel grid + AI recommendations
+- Highlighted deltas with severity colors
+- Expects `funnel`, `insights`, `actions` fields
+
+**Features/Limitations:**
+- Data quality depends on tracking (events/orders)
+- No auto-fixes; implement recommendations manually
+- **Status**: ✅ Complete with ML/AI integration
+
+---
+
+#### 📋 **Conversion Reported**
+
+**Overview:**
+- **Purpose**: Report-based conversion analysis (ML report engine)
+- **Use Cases**: Periodic reports, audit exports
+- **Category**: Analytics
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/ConversionReported.tsx`
+- **Backend API**: `POST /api/analytics/conversion/ml/report-analysis`
+- **Output**: Report table, AI summary, actions
+
+**Implementation Notes:**
+- Supports date filtering and export-like display
+- Uses same ML features as Conversion Analysis, but as report flow
+- Error/empty states in UI
+
+**Features/Limitations:**
+- No automatic CSV/export in UI (display only)
+- Report content depends on backend report generator
+- **Status**: ✅ Complete with ML/AI integration
+
+---
+
+#### 🗺️ **Analytic Regioning**
+
+**Overview:**
+- **Purpose**: Regional performance analysis with AI scores
+- **Use Cases**: Market prioritization, region comparison
+- **Category**: Analytics
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/AnalyticRegioning.tsx`
+- **Backend API**: `POST /api/analytics/regioning/ml-analysis`
+- **Output**: Region cards, scores, AI insights
+
+**Implementation Notes:**
+- Region selector (global/Europe/Americas/Asia)
+- Renders top countries, traffic distribution bars, AI details
+- Confidence/score shown as badge
+
+**Features/Limitations:**
+- Regional data must be available in backend
+- No geo-drilldowns below country level
+- **Status**: ✅ Complete with ML/AI integration
+
+---
+
+#### 🏪 **Shop Health Report**
+
+**Overview:**
+- **Purpose**: ML-based shop health check for performance
+- **Use Cases**: Early problem detection, maintenance planning
+- **Category**: Analytics
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/ShopHealthReport.tsx`
+- **Backend API**: `POST /api/health/ml-analysis`
+- **Output**: Health score, categories (performance/seo/security/ux), actions
+
+**Implementation Notes:**
+- Score + category badges color-coded
+- Shows AI recommendations with priority
+- Loading/error states present
+
+**Features/Limitations:**
+- Requires complete metric data sources (logs/SEO/security)
+- No auto-fixes, recommendations only
+- **Status**: ✅ Complete with ML/AI integration
+
+---
+
+#### ⭐ **Premium Audit**
+
+**Overview:**
+- **Purpose**: In-depth AI audit with prioritization and cost-benefit
+- **Use Cases**: Strategic optimization, roadmap prioritization
+- **Category**: Analytics
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/PremiumAudit.tsx`
+- **Backend API**: `POST /api/audit/premium/ml-analysis`
+- **Output**: Audit score, priorities, AI insights
+
+**Implementation Notes:**
+- Priority-colored insights (critical/high/medium/low)
+- Category filter + confidence scores
+- Error/loading state covered
+
+**Features/Limitations:**
+- No auto-remediation; results serve as recommendations
+- Runtime depends on backend audit engine
+- **Status**: ✅ Complete with ML/AI integration
+
+---
+
+#### 🔧 **Standard Audit**
+
+**Overview:**
+- **Purpose**: Quick-check audit with AI recommendations
+- **Use Cases**: Quick wins before large audits
+- **Category**: Analytics
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/StandardAudit.tsx`
+- **Backend API**: `POST /api/audit/standard/ml-analysis`
+- **Output**: Quick checks, priorities, actions
+
+**Implementation Notes:**
+- Quick-check button triggers ML analysis
+- Priority badges + category filter
+- Graceful error handling
+
+**Features/Limitations:**
+- Breadth focus over depth
+- No automatic fixes
+- **Status**: ✅ Complete with ML/AI integration
+
+---
+
+#### 🔎 **Mini Audit**
+
+**Overview:**
+- **Purpose**: Lightweight audit with compact AI recommendations
+- **Use Cases**: Spot checks, quick health checks
+- **Category**: Analytics
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/MiniAudit.tsx`
+- **Backend API**: `POST /api/audit/mini/ml-analysis`
+- **Output**: Short insights, priorities
+
+**Implementation Notes:**
+- Minimal input, quick response time
+- Shows top recommendations per category only
+- Fallback hint for missing data
+
+**Features/Limitations:**
+- More condensed results than standard/premium
+- No export/reporting built-in
+- **Status**: ✅ Complete with ML/AI integration
+
+**Note**: Feedback Analysis removed from this category - already fully ML/AI integrated and documented under "Advanced AI"!
+
+---
+
+## ✅ Payment & Finances (13/13 Tools)
+
+### ⚡ **Payment Fast**
+
+**Overview:**
+- **Purpose**: Quick payment processing with fraud detection and intelligent suggestions
+- **Use Cases**: Express checkout, high-volume payment processing
+- **Category**: Payment & Finances
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentFast.tsx`
+- **Backend APIs**:
+  - `POST /api/payments/fast/process` - Process payment
+  - `POST /api/payments/ml/fraud-detection` - Fraud detection
+  - `POST /api/payments/ml/amount-suggestions` - Intelligent amount suggestions
+- **Features**: Auto fraud check, smart amount suggestions, risk scoring (low/medium/high/critical)
+
+**Implementation Notes:**
+- ML fraud detection runs parallel to processing (non-blocking)
+- Amount suggestions based on customer history + transaction patterns
+- Risk score displayed before finalization
+
+**Features/Limitations:**
+- Fraud check is warning, not automatic rejection
+- Amount suggestions optional, user can change
+- **Status**: ✅ Complete with ML/AI integration
+
+---
+
+### 🎯 **Payment Simplified**
+
+**Overview:**
+- **Purpose**: Simplified payment flow with ML optimization
+- **Use Cases**: Mobile checkout, conversion optimization
+- **Category**: Payment & Finances
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentSimplified.tsx`
+- **Backend API**: `POST /api/payments/simplified/process`
+- **Features**: Minimal fields, AI predict next step, auto-completion
+
+**Implementation Notes:**
+- UX focus: only essential fields visible
+- ML optimizes field order based on user segment
+- Fallback to full form if needed
+
+**Features/Limitations:**
+- Not suitable for all product types (complex bundles need more details)
+- Conversion optimization requires tracking data
+- **Status**: ✅ Complete with ML/AI integration
+
+---
+
+### 🧪 **Payment Tester**
+
+**Overview:**
+- **Purpose**: Payment system testing with AI test plan generation
+- **Use Cases**: QA, integration testing, sandbox validation
+- **Category**: Payment & Finances
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentTester.tsx`
+- **Sub-Component**: `MLPaymentAnalyzer.tsx` (AI diagnosis)
+- **Backend APIs**:
+  - `POST /api/payments/test/generate-plan` - ML test plan
+  - `POST /api/payments/test/run` - Test run
+  - `POST /api/payments/ml/diagnose` - AI diagnosis
+- **Features**: Auto test plan, AI diagnosis for errors, status tracking
+
+**Implementation Notes:**
+- Generates edge cases based on checkout history
+- Shows test results in table + AI diagnosis panel
+- Errors explained in detail (root cause + solutions)
+
+**Features/Limitations:**
+- Sandbox only; no real transactions
+- Test plan can be manually adjusted
+- **Status**: ✅ Complete with ML/AI integration
+
+---
+
+### ✅ **Payment Verifier**
+
+**Overview:**
+- **Purpose**: ML-based transaction verification with risk-level detection
+- **Use Cases**: Fraud prevention, compliance checks, post-transaction verification
+- **Category**: Payment & Finances
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentVerifier.tsx`
+- **Backend API**: `POST /api/payments/ml/verify`
+- **Output**: Risk level (low/medium/high/critical), details, actions
+
+**Implementation Notes:**
+- Checks 20+ indicators (IP, card, amount, frequency, etc.)
+- Risk level color-coded and shown with badges
+- Actions per risk level (manual review, block, accept)
+
+**Features/Limitations:**
+- No automatic blocking; recommendation only
+- Data quality depends on historical data
+- **Status**: ✅ Complete with ML/AI integration
+
+---
+
+### 🎉 **Payment Success**
+
+**Overview:**
+- **Purpose**: Success metrics analytics with confidence scoring
+- **Use Cases**: Payment performance monitoring, conversion tracking
+- **Category**: Payment & Finances
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentSuccess.tsx`
+- **Backend API**: `POST /api/payments/ml/success-metrics`
+- **Features**: Success rate tracking, confidence scores, event-feature analysis
+
+**Implementation Notes:**
+- Shows success % over time (chart)
+- Confidence score per metric (based on data volume)
+- Top features: which factors influence success most
+
+**Features/Limitations:**
+- Requires sufficient payment data (minimum ~100 transactions)
+- Correlations are statistical hints, not causality
+- **Status**: ✅ Complete with ML/AI integration
+
+---
+
+### 🔐 **Payment Validation**
+
+**Overview:**
+- **Purpose**: AI-powered security analysis with risk-pattern detection
+- **Use Cases**: Compliance, security audit, anomaly detection
+- **Category**: Payment & Finances
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentValidation.tsx`
+- **Backend APIs**:
+  - `POST /api/payments/ml/validate` - Security analysis
+  - `POST /api/payments/ml/pattern-detect` - Anomaly detection
+- **Features**: Compliance checks, risk scoring, pattern detection
+
+**Implementation Notes:**
+- Checks against PCI-DSS / GDPR standards
+- Shows risks with severity colors
+- Patterns recognized over time (trend analysis)
+
+**Features/Limitations:**
+- Compliance checks are guidelines, not guarantees
+- Pattern detection needs historical data
+- **Status**: ✅ Complete with ML/AI integration
+
+---
+
+### 📋 **Payment Issues Detector**
+
+**Overview:**
+- **Purpose**: AI-powered issue detection with auto-categorization
+- **Use Cases**: Problem prioritization, incident response
+- **Category**: Payment & Finances
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentIssuesDetector.tsx`
+- **Backend API**: `POST /api/payments/ml/detect-issues`
+- **Output**: Issues with category, severity, confidence score
+
+**Implementation Notes:**
+- Categories: technical, fraud, compliance, user-error
+- Severity: critical, high, medium, low
+- Confidence 0-100 with fallback hints
+
+**Features/Limitations:**
+- Based on historical errors + pattern matching
+- New error types cannot be detected (cold-start problem)
+- **Status**: ✅ Complete with ML/AI integration
+
+---
+
+### ❤️ **Payment User Favor**
+
+**Overview:**
+- **Purpose**: GPT-4o-mini integration for personalized payment preferences
+- **Use Cases**: Personalization, customer retention, UX optimization
+- **Category**: Payment & Finances
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentUserFavor.tsx`
+- **Backend API**: `POST /api/payments/ml/user-preferences`
+- **LLM**: OpenAI GPT-4o-mini (GDPR compliant)
+- **Features**: Personalization score, recommendation engine, user insights
+
+**Implementation Notes:**
+- Analyzes user payment history → suggests preferred payment methods
+- GDPR notice: "Data transferred to OpenAI (30-day retention)"
+- Confidence score per recommendation
+
+**Features/Limitations:**
+- Requires OpenAI API key + data protection compliance
+- No local storage of payment details (anonymous patterns only)
+- **Status**: ✅ Complete with ML/AI integration, GDPR compliant
+
+---
+
+### 📦 **Payment Delivery**
+
+**Overview:**
+- **Purpose**: Delivery analytics with ML predictions
+- **Use Cases**: Delivery tracking, estimation, performance monitoring
+- **Category**: Payment & Finances
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentDelivery.tsx`
+- **Backend API**: `POST /api/payments/ml/delivery-predict`
+- **Features**: Delivery time prediction, status tracking, anomaly detection
+
+**Implementation Notes:**
+- Uses historical delivery data + external APIs (shipping provider)
+- Shows ETA with confidence interval (e.g. "2-4 days")
+- Alert on delay patterns
+
+**Features/Limitations:**
+- Depends on shipping provider integration
+- Predictions can be imprecise for new products
+- **Status**: ✅ Complete with ML/AI integration
+
+---
+
+### 🚨 **Payment Emergency**
+
+**Overview:**
+- **Purpose**: GPT-4o-mini integration for AI emergency analysis
+- **Use Cases**: Critical payment issues, incident management
+- **Category**: Payment & Finances
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentEmergency.tsx`
+- **Backend API**: `POST /api/payments/ml/emergency-analyze`
+- **LLM**: OpenAI GPT-4o-mini
+- **Features**: Incident analysis, root cause detection, action plans, escalation
+
+**Implementation Notes:**
+- Quick analysis of critical payment errors
+- GDPR notice: "Incident data transferred to OpenAI for analysis"
+- Generates action plan with priorities
+
+**Features/Limitations:**
+- Requires OpenAI API for real-time analysis
+- Auto escalation optionally configurable
+- **Status**: ✅ Complete with ML/AI integration, GDPR compliant
+
+---
+
+### 📈 **Payment Expansion**
+
+**Overview:**
+- **Purpose**: GPT-4o-mini integration for payment business expansion planning
+- **Use Cases**: Scaling, market analysis, growth strategy
+- **Category**: Payment & Finances
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentExpansion.tsx`
+- **Backend API**: `POST /api/payments/ml/expansion-plan`
+- **LLM**: OpenAI GPT-4o-mini
+- **Features**: Revenue projections, market recommendations, confidence scoring, timeline
+
+**Request/Response Example:**
+```typescript
+// POST /api/payments/ml/expansion-plan
+{
+  currentMetrics: { revenue: 50000, transactions: 1000, avgValue: 50 },
+  targetGrowth: "50%",
+  markets: ["de", "at", "ch"]
+}
+// Response
+{
+  projectedRevenue: 75000,
+  timeline: "6 months",
+  recommendations: [...],
+  confidence: 0.78,
+  risks: [...]
+}
+```
+
+**Implementation Notes:**
+- Uses historical performance + market data
+- GDPR notice: "Business data transferred to OpenAI for analysis"
+- Shows confidence %, risks and timeline
+
+**Features/Limitations:**
+- Projection based on assumed growth factors
+- External market factors can influence forecasts
+- **Status**: ✅ Complete with ML/AI integration, GDPR compliant
+
+---
+
+### ⚡ **Payment Quick Check**
+
+**Overview:**
+- **Purpose**: Quick AI scanner for payment system health
+- **Use Cases**: Spot checks, daily health monitoring
+- **Category**: Payment & Finances
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentQuickCheck.tsx`
+- **Backend API**: `POST /api/payments/ml/quick-check`
+- **Features**: System health score, top issues, avg confidence tracking
+
+**Implementation Notes:**
+- Short runtime (~5 seconds)
+- Shows top 3 issues + health score
+- Confidence average across all checks
+
+**Features/Limitations:**
+- Surface-level checks; no detailed analysis
+- Intended for quick overviews, not detailed audits
+- **Status**: ✅ Complete with ML/AI integration
+
+---
+
+### 🤖 **ML Payment Analyzer**
+
+**Overview:**
+- **Purpose**: Dedicated AI analyzer component for payment ML analyses
+- **Use Cases**: Reusable ML analysis logic
+- **Category**: Payment & Finances
+
+**Technical Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/MLPaymentAnalyzer.tsx`
+- **Backend API**: Backend dependent (uses other payment APIs)
+- **Features**: Generic ML analysis, loading states, error handling
+
+**Implementation Notes:**
+- Sub-component for payment tester + other tools
+- Encapsulates: load, analyze, error handling, rendering
+- Reusable for new payment features
+
+**Features/Limitations:**
+- Serves as utility component, not standalone tool
+- User experience depends on calling tools
+- **Status**: ✅ Complete with ML/AI integration
+
+---
+
+**Data Protection Compliance**: Payment user favor, payment emergency, and payment expansion use OpenAI GPT-4o-mini with explicit GDPR notices for data transfer and 30-day retention policy.
 
 ---
 
@@ -356,157 +1509,166 @@ Diese Tools haben Basic APIs aber limited ML/AI-Features:
 ### CRITICAL FIXES
 
 #### 1. ⚡ **Rate-Limiting Protection** - ProductAnalysis.tsx
-- **Problem**: useEffect dependency led zu Infinite API calls
-- **Lösung**: 
-  - Entfernt `buildUrl` aus useEffect dependencies
+- **Problem**: useEffect dependency hell led to infinite API calls
+- **Solution**: 
+  - Removed `buildUrl` from useEffect dependencies
   - Products load only on mount
-  - AbortController für Request deduplication
-  - Loading state prevents before Parallel requests
-- **Impact**: 🚫 Prevents OpenAI rate-limiting und API quota exhaustion
+  - AbortController for request deduplication
+  - Loading state protects against parallel requests
+- **Impact**: 🚫 Prevents OpenAI rate-limiting and API quota exhaustion
 - **Commit**: `f2d621c`
 
-#### 2. 💥 **OpenAI description Overflow fix**
-- **Problem**: 50.000+ Zeichen Unfiltered descriptions + HTML/Shortcodes = Token explosion
-- **Lösung**:
-  - Descriptions are Sanitized (HTML removed, Shortcodes deleted)
-  - Max 500 character Limit per description
-  - Prevents OpenAI crashes und Token overspending
-- **Impact**: 🛡️ Shop stays stable, keine Crashes mehr of Large data amounts
+---
+
+#### 2. 💥 **OpenAI Description Overflow Fix**
+- **Problem**: 50,000+ char unfiltered descriptions + HTML/shortcodes = token explosion
+- **Solution**:
+  - Descriptions sanitized (HTML removed, shortcodes deleted)
+  - Max 500 chars limit per description
+  - Prevents OpenAI crashes and token overspending
+- **Impact**: 🛡️ Shop stays stable, no crashes from large data
 - **Commit**: `b050bf6`
 
-#### 3. 🔐 **Bitpalast IP-block prevention** - 404 monitoring
-- **Problem**: IP 213.138.57.94 wurde blocked wegen Excessive 404 traffic (sieht aus wie Hacker scan)
-- **Lösung**:
-  - `setNotFoundHandler` in server.ts Logs all 404ss mit IP + method + URL
-  - Frontend recognizes Explicitly 404/503 errors
-  - Prevents Silent failures die zu Retry spam führen
-- **Impact**: 🚨 Fewer blocks of Hosting providers, Better debugging
+---
+
+#### 3. 🔐 **Bitpalast IP-Block Prevention** - 404 Monitoring
+- **Problem**: IP 213.138.57.94 blocked due to excessive 404 traffic (looks like hacker scan)
+- **Solution**:
+  - `setNotFoundHandler` in server.ts logs ALL 404s with IP + method + URL
+  - Frontend explicitly recognizes 404/503 errors
+  - Prevents silent failures leading to retry spam
+- **Impact**: 🚨 Fewer host blocks, better debugging
 - **Commit**: `e722fb1`
 
-#### 4. 🔧 **TypeScript compilation Fixes**
-- **Problem**: trends-routes.ts hatte Missing 500-response Schema definition
-- **Lösung**: Adding 500-Response zu Swagger schema
+---
+
+#### 4. 🔧 **TypeScript Compilation Fixes**
+- **Problem**: trends-routes.ts missing 500-response schema definition
+- **Solution**: Added 500-response to swagger schema
 - **Impact**: ✅ Backend compiles cleanly
 - **Commit**: `f68f73a`
 
-#### 5. 🚀 **Duplicate handler fix**
-- **Problem**: Two `setNotFoundHandler` calls → "Handler already set" error
-- **Lösung**: Merged into ein Unified 404 handler mit 404 monitoring + SPA fallback
+---
+
+#### 5. 🚀 **Duplicate Handler Fix**
+- **Problem**: Two `setNotFoundHandler` calls → "handler already set" error
+- **Solution**: Merged into unified 404 handler with 404 monitoring + SPA fallback
 - **Impact**: ✅ Server starts without errors
 - **Commit**: `1c85599`
 
 ---
 
-### NEWE FEATURES
+### NEW FEATURES
 
-#### 📝 **Product Notes Feature** mit enhancements
-- **API endpoint**: `POST /api/products/adviser/Notes/:id`
-- **Storage**: WooCommerce Meta_data (key: 'Notes')
+#### 📝 **Product Notes Feature** with Enhancements
+- **API Endpoint**: `POST /api/products/adviser/notes/:id`
+- **Storage**: WooCommerce meta_data (key: 'notes')
 - **Features**:
-  - 🔄 **Autosave**: Nach 2 Seconds of inactivity automatisch speichern
-  - 📊 **Character Counter**: 0/1000 mit Warnings (Orange >70%, Red >90%)
-  - 🎯 **Quick Templates**: 4 Buttons für schnelle Notizen-Vorlagen
-  - ⏰ **Last-Saved Timestamp**: Visual feedback (grüner Checkmark + Zeit)
-  - 💾 **Persistent storage**: Data persists über WooCommerce remain
+  - 🔄 **Autosave**: Saves automatically after 2 seconds inactivity
+  - 📊 **Character counter**: 0/1000 with warnings (orange >70%, red >90%)
+  - 🎯 **Quick templates**: 4 buttons for fast note templates
+  - ⏰ **Last-saved timestamp**: Visual feedback (green checkmark + time)
+  - 💾 **Persistent storage**: Data persists via WooCommerce
 - **Commits**:
-  - `07337c8` - Initial notes Feature
-  - `1aba1ce` - Autosave + counter + Templates enhancements
+  - `07337c8` - Initial notes feature
+  - `1aba1ce` - Autosave + counter + templates enhancements
 
+---
 
 ## 📋 ML Settings & Configuration
 
 ### 🔧 **ML Settings** `frontend/src/pages/Settings/MLSettings.tsx`
 
-- **Purpose**: ML/AI-Configuration für alle Tools
+- **Purpose**: ML/AI configuration for all tools
 - **API**: `/api/ml/config` (GET/POST)
 - **Status**: ✅ Functional
-- **Features**: Config management, Feature toggles, Model selection
+- **Features**: Config management, feature toggles, model selection
 
 ---
 
-## 🏠 Root dashboard
+## 🏠 Root Dashboard
 
 ### **AIDashboard** `frontend/src/pages/AIDashboard.tsx`
 
 - **Status**: ✅ Fully functional
-- **Structure**: 5 Categoryn mit total 51 Tools
+- **Structure**: 5 categories with 51 tools total
 - **Features**:
-  - Category filtering (All/analytics/products/payments/marketing/advanced)
-  - Tool cards mit Icons, Descriptions, Direct navigation
-  - Real dashboard Metrics (Sales, Orders, Conversion, Customers)
-  - Sales chart mit Framer motion Animations
-- **Navigation pattern**: `pageUrl` führt directly to Tool page, keine API-calls needed für Navigation
-- **Refresh mechanism**: 30-second Interval für Background updates without Loading spinner
+  - Category filtering (all/analytics/products/payments/marketing/advanced)
+  - Tool cards with icons, descriptions, direct navigation
+  - Real dashboard metrics (sales, orders, conversion, customers)
+  - Sales chart with Framer motion animations
+- **Navigation pattern**: `pageUrl` leads directly to tool page, no API calls for navigation
+- **Refresh mechanism**: 30-second interval for background updates without loading spinner
 
 ---
 
-## 🎯 Summary - Status by Area
+## 🎯 Summary - Status per Area
 
-### ✅ COMPLETE & READY
- 
-- **Product Management**: 8/8 Tools (100% mit ML/AI)
-- **Marketing & Content**: 10/10 Tools (100% mit ML/AI)
-- **Payment & Finances**: 13/13 Tools (100% mit ML/AI) 🎉
-- **Advanced AI**: 9/9 Tools (100% mit ML/AI) - inkl. RealWebAnalytics 🎉
+### ✅ COMPLETE & FINALIZED
+
+- **Product Management**: 8/8 tools (100% with ML/AI)
+- **Marketing & Content**: 10/10 tools (100% with ML/AI)
+- **Payment & Finances**: 13/13 tools (100% with ML/AI) 🎉
+- **Advanced AI**: 9/9 tools (100% with ML/AI) - incl. RealWebAnalytics 🎉
 - **ML Settings**: Functional
 
-**Summe**: 52/52 Tools mit full ML/AI integration (100%)
+**Total**: 52/52 tools with full ML/AI integration (100%)
 
-### 🟡 TEILWEISE - Needs upgrade
- 
-- **Analytics**: 9/9 Tools voll ML/AI-integrated
+### 🟡 PARTIAL - Needs Upgrade
+
+- **Analytics**: 9/9 tools fully ML/AI integrated
 
 ---
 
-## 🚀 Next steps / TODO list
+## 🚀 Next Steps / TODO List
 
-### PRIORITY 1 - HIGH (Most frequently used)
+### PRIORITY 1 - HIGH (Most used)
 
-- [ ] **Analytics tools upgr.** (8 Tools)
-  - Implement AI recommendations für ConversionAnalysis
-  - ML expansion für ShopMetrics/ConversionReported/ShopHealthReport
-  - Budget: ~3-5 Days
+- [ ] **Upgrade analytics tools** (8 tools)
+  - Implement AI recommendations for ConversionAnalysis
+  - ML expansion for ShopMetrics/ConversionReported/ShopHealthReport
+  - Budget: ~3-5 days
 
-- [ ] **Payment tools upgrade** (12 of 13)
-  - Fraud detection System für Payment Verifier
-  - Pattern recognition für Payment issued Detector
-  - Smart routing für Payment Fast
-  - Budget: ~4-6 Days
+- [ ] **Upgrade payment tools** (12 of 13)
+  - Fraud detection system for payment verifier
+  - Pattern recognition for payment issues detector
+  - Smart routing for payment fast
+  - Budget: ~4-6 days
 
 ### PRIORITY 2 - MEDIUM (Nice-to-have)
 
-- [ ] API endpoint Documentation
-- [ ] Performance Optimization (Lazy loading für Analytics)
-- [ ] Caching strategy für frequently used Metrics
+- [ ] API endpoint documentation
+- [ ] Performance optimization (lazy loading for analytics)
+- [ ] Caching strategy for frequent metrics
 
 ### PRIORITY 3 - LOW (Maintenance)
 
-- [ ] Einheitliche error Handling in allen Tools
-- [ ] Loading states Standardization
-- [ ] Toast notification System Unification
+- [ ] Unified error handling in all tools
+- [ ] Loading states standardization
+- [ ] Toast notification system consolidation
 
 ---
 
-## 📚 API endpoints Reference
+## 📚 API Endpoints Reference
 
 ### Analytics
 
-- `GET /api/analytics/metrics/dashboard` - Shop-Metrics
+- `GET /api/analytics/metrics/dashboard` - Shop metrics
 - `GET /api/analytics/conversion/analyze` - Conversion data
 - `GET /api/analytics/feedback/analyze` - Feedback analysis
 - `POST /api/ml/test/trends` - Trend testing
-- `POST /api/analytics/ml/generate` - ML-Trend/real-time analysis
+- `POST /api/analytics/ml/generate` - ML trend/real-time analysis
 
 ### Products
 
 - `GET /api/products/optimizer/analyze/{productId}` - Product analysis
 - `POST /api/products/creator/auto` - Auto product creation
 - `GET /api/woocommerce/products/create` - WooCommerce integration
-- `POST /api/products/adviser/Notes/{productId}` - Product Notes Saving (NEW)
+- `POST /api/products/adviser/notes/{productId}` - Product notes save (NEW)
 
 ### Payments
 
-- `POST /api/payments/ml/success-metrics` - ML payment Metrics
+- `POST /api/payments/ml/success-metrics` - ML payment metrics
 - `GET /api/payments/process` - Payment processing
 
 ### Marketing
@@ -520,30 +1682,30 @@ Diese Tools haben Basic APIs aber limited ML/AI-Features:
 - `GET /api/memory/stats` - Memory statistics
 - `GET /api/memory/messages` - Memory messages
 - `GET /api/monitoring/system/metrics` - System health
-- `GET /api/ml/config` - ML-Configuration
+- `GET /api/ml/config` - ML configuration
 
 ---
 
 ## 📊 Statistics
 
-- **Total**: 52 Tools
-- **Complete ML/AI-integrated**: 44 Tools (85%)
-- **Partially integrated**: 8 Tools (15%)
-- **Minimal/No integration**: 0 Tools (0%)
+- **Total**: 52 tools
+- **Fully ML/AI integrated**: 44 tools (85%)
+- **Partially integrated**: 8 tools (15%)
+- **Minimal/no integration**: 0 tools (0%)
 
-### Category-Overview
+### Category Overview
 
-- ✅ **Product Management**: 8/8 Tools (100%)
-- ✅ **Marketing & Content**: 10/10 Tools (100%)
-- ✅ **Payment & Finances**: 13/13 Tools (100%)
-- ✅ **Advanced AI**: 10/10 Tools (100%)
-- 🟡 **Analytics & Metrics**: 8 Tools Partial
+- ✅ **Product Management**: 8/8 tools (100%)
+- ✅ **Marketing & Content**: 10/10 tools (100%)
+- ✅ **Payment & Finances**: 13/13 tools (100%)
+- ✅ **Advanced AI**: 10/10 tools (100%)
+- 🟡 **Analytics & Metrics**: 8 tools partially
 
 ---
 
 ## 🔗 Related Documentation
 
-- **User operation**: `docs/Operating-Instructions-AI-Agent.md`
+- **User operation**: `docs/User-Guide.md`
 - **Deployment**: `docs/deployment.md`
 - **ML setup**: `docs/BACKEND_AI_SETUP.md`
 - **Architecture**: `docs/architecture.md`
@@ -558,24 +1720,24 @@ Diese Tools haben Basic APIs aber limited ML/AI-Features:
 
 ## 📋 Session Summary - December 16, 2025
 
-**Focus**: Bug fixes + Product Notes Enhancement  
-**Status**: ✅ Alle errors Fixed, New features productive
+**Focus**: Bug fixes + product notes enhancement  
+**Status**: ✅ All errors fixed, new features in production
 
-### Resolved issues
-- ✅ Rate-Limiting Infinite loop (useEffect dependencies)
-- ✅ OpenAI Token overflow (Description Sanitization)
-- ✅ IP blocks of Hosting provider (404 monitoring)
-- ✅ TypeScript compilation (Schema Validation)
-- ✅ Server Startup (Duplicate Handler)
+### Issues Resolved
+- ✅ Rate-limiting infinite loop (useEffect dependencies)
+- ✅ OpenAI token overflow (description sanitization)
+- ✅ IP blocks from host (404 monitoring)
+- ✅ TypeScript compilation (schema validation)
+- ✅ Server startup (duplicate handler)
 
 ### New Features
-- ✅ Notes field für Storage/Warehouse info
+- ✅ Notes field for warehouse/location info
 - ✅ Autosave after 2 seconds
-- ✅ Character Counter + Quick Templates
-- ✅ Last-Saved Timestamps
+- ✅ Character counter + quick templates
+- ✅ Last-saved timestamps
 
-### Build status
-- Frontend: ✅ npm run build (Exit 0)
-- Backend: ✅ npm run build (Exit 0)
+### Build Status
+- Frontend: ✅ npm run build (exit 0)
+- Backend: ✅ npm run build (exit 0)
 - Server: ✅ Running without errors
-- All routes: ✅ 40+ Routes Registered Successfully
+- All routes: ✅ 40+ routes registered successfully

@@ -1,95 +1,155 @@
-# Onboarding – Settings for Your AI Agent
+# 🎉 Welcome to A.R.I.!
 
-**Version:** 5.0.0-alpha (Alpha-Container MVP)
+**Your Digital Shop Assistant is Ready**
 
-Welcome! Here you'll learn how to set up your AI agent as a shop owner for the first time. You don't need any technical knowledge – everything runs directly in the browser.
+Welcome aboard! You've just unlocked the key to automated shop growth. This guide shows you how to get started in just a few minutes.
 
----
-
-## 🎯 Quick Start
-
-1. **Open Frontend**: `https://my-working-space.de` (Production) or `http://localhost:5173` (Development)
-2. **Fill in Settings**: Shop URL, WooCommerce keys, OpenAI API Key
-3. **Test Connection**: "Test Connection" button saves and validates settings
-4. **Use Dashboard Immediately**: Changes become active **without restart**! 🚀
-5. **Test First Tools**: Try e.g. "Shop Metrics" or "Product Analysis"
-
-> 🆕 **New in v5.0.0-alpha**: Settings are loaded dynamically - no more container restarts needed!
+> **Good news:** You don't need ANY technical knowledge. Everything works in your browser – just log in and you're good to go! 🚀
 
 ---
 
-## 1. Open Settings
+## ✨ What's Waiting for You
 
-After activating your agent, you'll receive a link to your personal agent interface.
+With A.R.I., you'll save **5–10 hours per week** on admin work:
 
-1. Open the link in your browser.
-2. Log in with your credentials if necessary.
-3. Click on "Settings" in the menu.
+- 📊 **Analytical Insights** – Truly understand your business
+- 📝 **AI-Generated Texts** – Product descriptions, emails, social media in seconds
+- 🎨 **AI Images** – Automatically generated product photos
+- 🔄 **Automated Processes** – 44 specialized jobs running in the background
+- 💰 **Better Numbers** – Conversion increases, happier customers
 
----
-
-## 2. Enter Credentials
-
-Fill in all fields on the settings page carefully:
-
-- OpenAI API Key (if provided)
-- Shop URL and credentials (e.g. WooCommerce)
-- Email configuration (for notifications)
-- Additional fields as needed (e.g. Analytics, Social Media)
-
-Note: Most credentials can be obtained directly from Woo or your support team.
+**No code. No complexity. Everything with your click.**
 
 ---
 
-## 3. Save Settings
+## 🚀 Let's Go! 5 Steps to Get Started
 
-Click on "Test Connection". The system:
-1. **Saves** all settings in `connection.json`
-2. **Validates** WordPress & WooCommerce connection
-3. **Activates** the configuration **immediately** (no restart!)
+### Step 1: Login
 
-On success, you'll see:
-- ✅ WordPress test successful
-- ✅ WooCommerce test successful
+You've received an email with your personal link.
 
-In case of errors, you'll receive feedback on what's missing or incorrect.
+1. **Click the link** from your welcome email
+2. **Log in** with your credentials
+3. **You land on the dashboard** 🎉
 
-> ⚡ **Alpha-Container Design**: On container restart, placeholders are restored. Simply save settings again or import JSON!
-
-### Validation Rules (important for initial setup)
-
-- WordPress, WooCommerce, OpenAI are each optional. If you fill in one field of a group, the remaining required fields of that group must also be correct (otherwise you'll get a clear error message).
-- Job settings: `Job Mode` can be "one-time" or "interval".
-	- For "one-time", `Job Interval` is ignored.
-	- For "interval", `Job Interval (ms)` must be in the range of 10 seconds to 24 hours.
-- The Settings API will show you in case of error which field and which rule is affected.
+```
+[SCREENSHOT: Login screen with A.R.I. logo]
+```
 
 ---
 
-## 4. Use the System
+### Step 2: Explore the Dashboard
 
-After successful setup, you can use all functions of your agent directly in the browser – e.g. analytics, content generators, shop checks and more.
+After login, you'll see your **A.R.I. Command Center**:
 
----
+```
+[SCREENSHOT: Dashboard overview with all menu items]
+```
 
-## 5. Help & Support
+**Here's what you'll find:**
 
-If you have questions or problems, you can find help in the "Troubleshooting" menu item or in the FAQ. Support is available to you at any time.
-
----
-
-> **Note:** This guide will later be supplemented with images to make each step even clearer.
-
----
-
-## 6. Security & Independence (The Speedboat Principle)
-
-We know how important your shop is. That's why the AI agent was built to work **non-invasively**.
-
-- **Your shop belongs to you:** The agent controls the shop only through official interfaces (API), it doesn't modify any program code.
-- **No risk:** Should you ever deactivate or pause the agent, your shop will immediately continue running normally.
-- **The analogy:** Imagine your shop as a boat. The AI agent is a powerful outboard motor that turns it into a speedboat. If you remove the motor, the boat doesn't sink – it simply becomes a rowboat again. You retain full control.
+| Section | For What? |
+|---------|-----------|
+| 📊 **Analytics** | Metrics, reports, trends |
+| 📦 **Products** | Product analysis, auto-creator, bundles |
+| 💳 **Payments** | Payment health, recovery, analytics |
+| 📧 **Marketing** | Email, social media, content |
+| 🧠 **AI Tools** | All advanced features |
+| ⚙️ **Settings** | Connect your shop & API keys |
 
 ---
 
-Last updated: December 2025
+### Step 3: Configure Settings
+
+For A.R.I. to communicate with your shop, you need to connect your shop data:
+
+1. Go to **Settings** (⚙️ bottom left)
+2. Enter your **Shop URL**
+3. Connect your **WooCommerce credentials**
+4. Save the changes
+
+```
+[SCREENSHOT: Settings page filled out]
+```
+
+> **Where do I find my shop data?**  
+> All details are in the "Settings" section – there are also links to your WooCommerce admin.
+
+---
+
+### Step 4: Test Your First Tool
+
+Ready to see A.R.I. in action? Try **"Shop Metrics"**:
+
+1. Go to **Analytics** → **Shop Metrics**
+2. Click on **"Generate Report"**
+3. Wait ~10 seconds
+4. **Boom!** 💥 You'll see live data from your shop
+
+```
+[SCREENSHOT: Shop metrics report ready]
+```
+
+---
+
+### Step 5: Your Second Tool – Generate Product Description
+
+Now it gets exciting:
+
+1. Go to **Products** → **Woo Product Create**
+2. Enter a product name (e.g., "Elegant Leather Gloves")
+3. Click on 🤖 **"Generate AI Description"**
+4. In 2–3 seconds you'll have an SEO-optimized description
+5. You can edit it and then save
+
+```
+[SCREENSHOT: AI-generated product description]
+```
+
+> **That's the principle:** A.R.I. suggests – you decide! Always in your control.
+
+---
+
+## 🎯 What's Next?
+
+You've got the basics. Now you can:
+
+- ✅ Explore all 52 tools
+- ✅ Start your first workflows
+- ✅ Generate product texts, emails, posts in seconds
+- ✅ Get real insights into your shop
+
+**Tip:** Take time to try out the tools. They're all designed to save you time – not overwhelm you!
+
+---
+
+## ❓ Need Help?
+
+**Support Contact:**
+- 📧 **Email:** support@kaufe-es.eu
+- 💬 **Live Chat:** In the frontend (bottom right)
+- 📱 **Phone:** +49 XXX XXXXXXX (Business Hours)
+
+We're here for you! 🙌
+
+---
+
+## 🛡️ One Important Point: Your Security & Control
+
+We know how important your shop is. That's why A.R.I. was built with this principle:
+
+**A.R.I. suggests – YOU make the decisions.**
+
+- ✅ All texts are drafts until YOU approve them
+- ✅ No automatic changes to your shop
+- ✅ You can pause or disable A.R.I. anytime
+- ✅ Your shop runs perfectly fine with or without A.R.I.
+
+**The Analogy:** Think of your shop as a boat. A.R.I. is the outboard motor that makes it faster. Take the motor off? Your boat doesn't sink – it just becomes a rowing boat again. You're always in control.
+
+---
+
+**Enjoy A.R.I.! 🚀**  
+The kaufe-es Team
+
+Version: 6.0.0 | January 2026

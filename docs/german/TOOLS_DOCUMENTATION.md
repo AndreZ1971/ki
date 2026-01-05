@@ -12,11 +12,11 @@
 | Kategorie               | Tools        | ML/KI          | Status        |
 | ----------------------- | ------------ | -------------- | ------------- |
 | **Analytics**           | 9 Tools      | 🟢 Ja (9/9)     | Abgeschlossen |
-| **Product Management**  | 8 Tools      | 🟢 Ja           | Abgeschlossen |
-| **Payment & Finances**  | 13 Tools     | 🟢 Ja           | Abgeschlossen |
-| **Marketing & Content** | 10 Tools     | 🟢 Ja           | Abgeschlossen |
-| **Advanced AI**         | 12 Tools     | 🟢 Ja           | Abgeschlossen |
-| **GESAMT**              | **52 Tools** | 🟢 52/52 (100%) | 0 Tools offen |
+| **Product Management**  | 8 Tools      | 🟢 Ja (8/8)     | Abgeschlossen |
+| **Payment & Finances**  | 13 Tools     | 🟢 Ja (13/13)   | Abgeschlossen |
+| **Marketing & Content** | 10 Tools     | 🟢 Ja (10/10)   | Abgeschlossen |
+| **Advanced AI**         | 12 Tools     | 🟢 Ja (12/12)   | Abgeschlossen |
+| **GESAMT**              | **52 Tools** | 🟢 52/52 (100%) | Fertiggestellt |
 
 ---
 
@@ -24,330 +24,1392 @@
 
 ### Product Management (8/8 Tools)
 
-#### 🔍 **Product Analyzer** `frontend/src/pages/ProductManagement/ProductAnalyzer.tsx`
-- **ML-Features**: 
-  - Circular progress indicator für Score-Anzeige
-  - Expandable issue cards mit Severity-Levels (critical/warning/info)
-  - AI Insights (Stärken/Schwächen/Chancen/Empfehlungen)
-- **API-Integration**: `/api/products/optimizer/analyze/{productId}`
+#### 🔍 **Product Analyzer**
+
+**Übersicht:**
+- **Zweck**: Produkt-Health-Check mit KI-Insights (Scores, Issues, Empfehlungen)
+- **Use Cases**: Produktqualität bewerten, Fix-Prioritäten ableiten
+- **Kategorie**: Product Management
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/ProductManagement/ProductAnalyzer.tsx`
+- **Backend API**: `GET /api/products/optimizer/analyze/{productId}`
+- **UI**: Score-Ring, Issue-Cards (Severity critical/warning/info), AI Insights
+
+**Implementation Notes:**
+- Expandable Issue Cards mit Severity-Badges
+- AI Insights (Stärken/Schwächen/Chancen/Empfehlungen)
+- Navigiert als eigene Tile (aus ProductBundles extrahiert)
+
+**Besonderheiten/Limitationen:**
+- Nur Analyse, keine Auto-Änderung
+- Produktdaten müssen aktuell im Woo-Shop vorliegen
 - **Status**: ✅ Vollständig refaktoriert (11.12.2025)
-- **Abhängigkeiten**: ProductAnalysis Component, useProductManagement Hook
-- **Änderungen**: Aus ProductBundles extrahiert, standalone Page mit Dashboard-Tile
 
-#### 📝 **ProductAnalysis - Notes Feature** `frontend/src/pages/app/ProductAnalysis.tsx`
-- **Neue Features (16.12.2025)**:
-  - 🎯 **Notes-Feld**: Speichern von Warehouse/Lagerort-Informationen
-  - 🔄 **Autosave**: Automatisches Speichern nach 2 Sekunden Inaktivität (kein Button-Klick nötig)
-  - 📊 **Character Counter**: Anzeige von 0/1000 Zeichen mit Warnungen (orange >70%, rot >90%)
-  - 🎯 **Quick Templates**: 4 schnelle Buttons für häufige Notizen:
-    - 📍 Lagerort (z.B. "Regal 5B")
-    - 📦 Lieferant bestellt
-    - 🚚 Ankunft erwartet
-    - ⚠️ Mängel vorhanden
-  - ⏰ **Last-Saved Timestamp**: Grüner Checkmark mit Uhrzeit (z.B. ✅ 14:32)
-  - 💾 **WooCommerce Integration**: Speichert Notizen als meta_data mit Schlüssel 'notes'
-- **Backend Endpoint**: `POST /api/products/adviser/notes/:id`
+#### 📝 **ProductAnalysis - Notes Feature**
+
+**Übersicht:**
+- **Zweck**: Lager-/Status-Notizen pro Produkt direkt in WooCommerce speichern
+- **Use Cases**: Lagerort, Bestellung offen, Mängel, ETA dokumentieren
+- **Kategorie**: Product Management
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/app/ProductAnalysis.tsx`
+- **Backend API**: `POST /api/products/adviser/notes/:id`
+- **Speicherort**: WooCommerce `meta_data` key `notes`
+
+**Features:**
+- Autosave (2s Idle), Character Counter (Warn >70%, rot >90%)
+- Quick Templates (Lagerort, Lieferant bestellt, Ankunft erwartet, Mängel)
+- Last-Saved Timestamp (grüner Check)
+
+**Fehler-Fixes:**
+- Rate-Limiting (useEffect Bereinigung), HTML-Sanitizing (max 500 chars)
+- 404 Monitoring (IP-Block Prevention)
+
+**Besonderheiten/Limitationen:**
+- Rein textuelle Notizen, keine Dateien/Bilder
+- Speichert pro Produkt-ID
 - **Status**: ✅ Vollständig implementiert (16.12.2025)
-- **Fehler-Fixed**:
-  - ✅ Rate-limiting Fixes (useEffect Dependency Hell)
-  - ✅ OpenAI Description Sanitization (max 500 chars, HTML removal)
-  - ✅ 404 Monitoring für IP-Block Prevention
 
-#### 🤖 **Auto Product Creator** `frontend/src/pages/ProductManagement/AutoProductCreator.tsx`
-- **ML-Features**: AI-gestützte Produkterstellung mit Optimierung
-- **API-Integration**: `/api/products/creator/auto`
+#### 🤖 **Auto Product Creator**
+
+**Übersicht:**
+- **Zweck**: KI-gestützte Generierung von Produktentwürfen (Texte/Bilder/Tags)
+- **Use Cases**: Schnellstart für neue Produkte, Marketing-Material
+- **Kategorie**: Product Management
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/ProductManagement/AutoProductCreator.tsx`
+- **Backend API**: `POST /api/products/creator/auto`
+- **Toggles**: `useAIEnhancements`, autoTagging, generateImages
+
+**Implementation Notes:**
+- Erzeugt Beschreibungen/Bild-Prompts; Produkt muss manuell geprüft/gespeichert werden
+- Kombinierbar mit Run Auto Product Creator für Batch/Jobs
+
+**Besonderheiten/Limitationen:**
+- Erstellt keine physischen Produkte, nur Content/Metadaten
+- WooCommerce-Speichern manuell
 - **Status**: ✅ Mit KI-Enhancement
-- **Konfigurierbar**: useAIEnhancements Toggle
 
-#### 🛒 **Woo Product Create** `frontend/src/pages/ProductManagement/WooProductCreate.tsx`
-- **ML-Features**: Automatische Produktdaten-Generierung
+#### 🛒 **Woo Product Create**
+
+**Übersicht:**
+- **Zweck**: Neues WooCommerce-Produkt anlegen mit KI-generierten Feldern
+- **Use Cases**: Schnelles Anlegen von Produkten aus Briefing
+- **Kategorie**: Product Management
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/ProductManagement/WooProductCreate.tsx`
+- **Backend API**: `POST /api/woocommerce/products/create`
+- **Felder**: Titel, Preis, Lager, Bilder, Kurz-/Langbeschreibung
+
+**Implementation Notes:**
+- KI füllt Texte/SEO-Felder vor; User prüft und speichert
+- Unterstützt virtuelle/physische Produkte (abhängig vom Backend)
+
+**Besonderheiten/Limitationen:**
+- WooCommerce-Credentials nötig
+- Keine Massenanlage; pro Produkt
 - **Status**: ✅ Integriert
-- **API**: `/api/woocommerce/products/create`
 
-#### ✏️ **Woo Product Update** `frontend/src/pages/ProductManagement/WooProductUpdate.tsx`
-- **ML-Features**: Intelligente Produktaktualisierung
+#### ✏️ **Woo Product Update**
+
+**Übersicht:**
+- **Zweck**: KI-gestützte Updates (Preis, Inventory, Beschreibung) basierend auf Trends/Sentiment
+- **Use Cases**: Preis-/SEO-Optimierung bestehender Produkte
+- **Kategorie**: Product Management
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/ProductManagement/WooProductUpdate.tsx`
+- **Backend APIs**:
+  - `POST /api/products/ai/trend-pricing` (Google Trends + GPT)
+  - `POST /api/products/ai/optimize-description-trends`
+  - `POST /api/products/ai/reddit-sentiment`
+  - `PUT /api/products/woo/update-single/:productId`
+
+**Implementation Notes:**
+- Batch-Processing mit 4 Update-Typen (prices, inventory, descriptions, all)
+- Toggles: Auto-Apply, Bulk AI Analyze
+- Trend-/Reddit-Scores als Entscheidungsbasis
+
+**Besonderheiten/Limitationen:**
+- API Keys für Trends/Reddit/OpenAI nötig
+- Auto-Apply mit Vorsicht nutzen (Review empfohlen)
 - **Status**: ✅ Integriert
 
-#### 📑 **Categories Manager** `frontend/src/pages/ProductManagement/CategoriesManager.tsx`
-- **ML-Features**: Automatische Kategorie-Verwaltung
+#### 📑 **Categories Manager**
+
+**Übersicht:**
+- **Zweck**: KI-Kategorie-Vorschläge und Optimierung für Woo-Kategorien
+- **Use Cases**: Neue Produkte richtig zuordnen, Dubletten vermeiden
+- **Kategorie**: Product Management
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/ProductManagement/CategoriesManager.tsx`
+- **Sub-Component**: `MLCategorySuggester.tsx`
+- **Backend API**: `POST /api/categories/ml/suggest`
+- **Payload**: `{ title, description, maxSuggestions }`
+
+**Implementation Notes:**
+- Zeigt Confidence + Reason inline, "Übernehmen" setzt Namen im UI
+- Kennt vorhandene Woo-Kategorien (Kontext bis 100) → erfindet keine neuen
+
+**Besonderheiten/Limitationen:**
+- Apply im Backend optional (derzeit UI-seitig)
+- Optimize-All Stub vorhanden
 - **Status**: ✅ Mit MLCategorySuggester Integration
-- **Sub-Component**: MLCategorySuggester.tsx
 
-#### 🎁 **Freebies Creator** `frontend/src/pages/ProductManagement/CreateFreebies.tsx`
-- **ML-Features**: Automatische Gratis-Produkt-Erstellung
-- **Status**: ✅ Mit MLFreebieGenerator
-- **Sub-Component**: MLFreebieGenerator.tsx
+#### 🎁 **Freebies Creator**
 
-#### 📦 **Product Bundles** `frontend/src/pages/ProductManagement/ProductBundles.tsx`
-- **ML-Features**: Bundle-Erstellung mit KI-Vorschlägen
-- **Status**: ✅ Gereinigt (ProductAnalysis extrahiert)
+**Übersicht:**
+- **Zweck**: KI-generierte Freebie-Ideen mit Conversion-Rate-Vorhersage
+- **Use Cases**: Lead Magnets (Ebooks, Checklisten, Templates) erstellen
+- **Kategorie**: Product Management
 
-#### 🚀 **Run Auto Product Creator** `frontend/src/pages/ProductManagement/RunAutoProductCreator.tsx`
-- **ML-Features**: Config-Optionen: useAIEnhancements, autoTagging, generateImages
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/ProductManagement/CreateFreebies.tsx`
+- **Sub-Component**: `MLFreebieGenerator.tsx` (Inline-Suggester)
+- **Backend API**: `GET /api/freebies/ml/generate?type=ebook&keywords=produktmanagement`
+- **Dependencies**: OpenAI GPT-4o-mini
+
+**Request/Response Examples:**
+```typescript
+// GET /api/freebies/ml/generate?type=ebook&keywords=produktmanagement
+{
+  success: true,
+  data: [
+    {
+      title: "Produktmanagement 101 E-Book",
+      description: "50 Seiten Best Practices...",
+      conversionScore: 0.78,
+      reason: "Hohe Nachfrage für PM-Inhalte"
+    }
+  ]
+}
+```
+
+**Implementation Notes:**
+- Generiert 4-5 Ideen pro Typ (ebook, checklist, templates)
+- Conversion Score 0-1 (Vorhersage basierend auf Typ/Keywords)
+- UI: Expandable Cards mit Confidence Badges
+- Modal: "Create from Idea" füllt Formular automatisch aus
+- Keywords optional aber verbessern Relevanz
+
+**UI Components:**
+- Idea Cards: 3-Spalten Grid (responsive)
+- Conversion Badge: Orange Gradient (📊 78%)
+- Expand/Collapse Beschreibung
+- "Übernehmen" Button → Modal
+
+**Besonderheiten/Limitationen:**
+- Nur Ideen-Generierung, kein Auto-Publishing
+- User muss Freebie manuell erstellen/freigeben
+- **Status**: ✅ Vollständig mit ML/KI integriert
+
+#### 📦 **Product Bundles**
+
+**Übersicht:**
+- **Zweck**: Produkt-Bundles planen und mit KI-Vorschlägen anreichern
+- **Use Cases**: Cross-Sell/Up-Sell Bundles
+- **Kategorie**: Product Management
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/ProductManagement/ProductBundles.tsx`
+- **Dependencies**: nutzt ProductAnalysis-Logik (jetzt ausgelagert) für Insights
+
+**Implementation Notes:**
+- Bundle-Zusammenstellung mit KI-Hinweisen
+- Produktanalyse ausgelagert (eigene Page)
+
+**Besonderheiten/Limitationen:**
+- Keine automatische Woo-Speicherung; Nutzer bestätigt Bundle
+- **Status**: ✅ Bereinigt (ProductAnalysis extrahiert)
+
+#### 🚀 **Run Auto Product Creator**
+
+**Übersicht:**
+- **Zweck**: Startet Auto Product Creator als Job/Batch mit KI-Toggles
+- **Use Cases**: Schnelle Generierung mehrerer Produktentwürfe
+- **Kategorie**: Product Management
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/ProductManagement/RunAutoProductCreator.tsx`
+- **Backend API**: `POST /api/products/creator/auto` (mit Job/Run-Parametern)
+- **Toggles**: useAIEnhancements, autoTagging, generateImages
+
+**Implementation Notes:**
+- Batch/Job-Style Trigger, ruft denselben Creator-Endpunkt
+- Ideal, um mehrere Entwürfe in Serie zu erzeugen
+
+**Besonderheiten/Limitationen:**
+- Kein automatisches Publizieren; Review nötig
+- Ressourcenverbrauch je nach Bild/LLM-Optionen
 - **Status**: ✅ Voll funktional mit KI-Toggles
 
 ---
 
 ### Marketing & Content (10/10 Tools)
 
-#### 📧 **AI Email Generator** `frontend/src/pages/MarketingContent/ai-email-generator.tsx`
-- **ML-Features**: KI-basierte Email-Generierung
-- **API**: `/api/ai/email/email-draft`
-- **Status**: ✅ Vollständig
-- **Capabilities**: Template-basiert, LLM-Integration
+#### 📧 **AI Email Generator**
 
-#### 🇩🇪 **German Content Generator** `frontend/src/pages/MarketingContent/GermanContentGenerator.tsx`
-- **ML-Features**: Deutsche Inhalte mit NLP
+**Übersicht:**
+- **Zweck**: KI-generierte E-Mail-Entwürfe (Welcome, Promo, Re-Engagement, Winback)
+- **Use Cases**: Newsletter, Kampagnen, Follow-ups
+- **Kategorie**: Marketing & Content
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/MarketingContent/ai-email-generator.tsx`
+- **Backend API**: `POST /api/ai/email/email-draft`
+- **Features**: Templates, Segment-Auswahl (Kunden/Subscriber), Subject-Line-Generator, Send-Time-View, Preview Modal
+
+**Request/Response Example:**
+```typescript
+// POST /api/ai/email/email-draft
+{
+  emailType: "welcome-email",
+  tone: "friendly",
+  language: "de",
+  productName: "Shop X"
+}
+// Response
+{ success: true, data: { subject: "Willkommen...", body: "Hallo ..." } }
+```
+
+**Implementation Notes:**
+- Fallback-Kundendaten (Mock) falls keine API-Daten
+- Mehrere Views: Generator, Templates, Subscribers, Segments, Send-Time, Forecast
+- Preview Modal zum Gegenlesen vor Versand
+
+**Besonderheiten/Limitationen:**
+- Versand-Flow abhängig von Backend/ESP-Integration (nur Draft-Generation out-of-the-box)
+- DSGVO: Inhalte generiert, Versand erst nach Freigabe
+- **Status**: ✅ Vollständig mit LLM-Integration
+
+#### 🇩🇪 **German Content Generator**
+
+**Übersicht:**
+- **Zweck**: Deutsche Longform/Shortform-Texte (Blog, Produktbeschreibungen, Social, E-Mail, Landing Page, PR)
+- **Use Cases**: SEO-Content, Kampagnen, Landing-Pages
+- **Kategorie**: Marketing & Content
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/MarketingContent/GermanContentGenerator.tsx`
+- **Backend API**: `POST /api/marketing/content/german`
+- **Parameters**: contentType, topic, targetAudience, tone, lengthMode (short/medium/long), formality (du/sie), includeSeo, includeFaqs, includeCtas, keywords, avoidTerms
+
+**Response (Beispiel):**
+```json
+{
+  "content": "Vollständiger Text...",
+  "metaTitle": "...",
+  "metaDescription": "...",
+  "headlines": ["H1", "H2"],
+  "faqs": [{"question": "...", "answer": "..."}],
+  "ctas": ["Jetzt testen"],
+  "keywords": ["E-Commerce"],
+  "wordCount": 950,
+  "readTimeMinutes": 5
+}
+```
+
+**Implementation Notes:**
+
+- Supports formality switch (du/sie)
+- SEO-Optionen (Meta, Keywords), FAQs/CTAs optional
+- Length presets: short (~500w), medium (~1000w), long (~2000w)
+
+**Besonderheiten/Limitationen:**
+- Generiert nur Text, kein automatisches Publizieren
+- Inhalte müssen manuell geprüft/freigegeben werden
 - **Status**: ✅ Integriert
 
-#### ✉️ **Email Marketing Automation** `frontend/src/pages/MarketingContent/EmailMarketingAutomation.tsx`
-- **ML-Features**: Automatisierte Kampagnen, Personalisierung
+#### ✉️ **Email Marketing Automation**
+
+**Übersicht:**
+
+- **Zweck**: Kampagnen-Automatisierung mit KI-Texten und Segmenten
+- **Use Cases**: Drip-Kampagnen, Re-Engagement, Promotions
+- **Kategorie**: Marketing & Content
+
+**Technische Details:**
+
+- **Frontend**: `frontend/src/pages/MarketingContent/EmailMarketingAutomation.tsx`
+- **Backend**: nutzt E-Mail Draft Service (`/api/ai/email/email-draft`) und Segment-Handling
+- **Features**: Zeitplan (Send-Time), Segmente, Vorlagen, KI-CTAs
+
+**Implementation Notes:**
+- Baut auf AI Email Generator auf (Drafts) und orchestriert Versandlogik
+- Segment- und Template-Management im UI
+- Versand hängt von angebundenem ESP/Backend ab
+
+**Besonderheiten/Limitationen:**
+- Kein eigener ESP enthalten; benötigt angebundenes Mailsystem
+- Freigabe durch User erforderlich vor Versand
 - **Status**: ✅ Mit KI
 
-#### 🎵 **Social Media Audio** `frontend/src/pages/MarketingContent/SocialMediaAudio.tsx`
-- **ML-Features**: Text-to-Speech, Audio-Generierung
+#### 🎵 **Social Media Audio**
+
+**Übersicht:**
+- **Zweck**: KI-Skript + TTS-Audio für Social Clips (Instagram, TikTok, YouTube Shorts, Facebook)
+- **Use Cases**: Kurzvideos/Reels/Shorts vertonen
+- **Kategorie**: Marketing & Content
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/MarketingContent/SocialMediaAudio.tsx`
+- **Backend API**:
+  - `POST /api/marketing/social/audio/generate-script` - Plattform-optimierte Skripte (Hooks, CTAs, Voice-Empfehlungen)
+  - `POST /api/marketing/social/audio` - TTS-Audio (Base64, Duration)
+- **Parameters**: topic, platform, tone, targetAudience, duration (short/medium/long), voice
+
+**Implementation Notes:**
+- Auto-Voice-Auswahl basierend auf KI-Empfehlung (voiceRecommendations)
+- Speichert Audio als Base64-Data-URL im State (Download/Play im UI)
+- Plattform-Preconfigs für Dauer (z.B. TikTok 3min, Reels 60s)
+
+**Besonderheiten/Limitationen:**
+- Kein direkter Upload zu Plattformen; Audio muss manuell genutzt werden
+- TTS-Provider/Qualität abhängig vom Backend
 - **Status**: ✅ Integriert
 
-#### 📱 **Social Media Poster** `frontend/src/pages/MarketingContent/SocialMediaPoster.tsx`
-- **ML-Features**: Automatisches Content-Posting
-- **Status**: ✅ Integriert
+#### 📱 **Social Media Poster**
 
-#### 🆓 **Free to Post Converter** `frontend/src/pages/MarketingContent/FreeToPostConverter.tsx`
-- **ML-Features**: Conversion-Optimization
+**Übersicht:**
+- **Zweck**: Generiert plattform-optimierte Social Media Posts mit KI
+- **Use Cases**: LinkedIn, Facebook, Instagram, Twitter/X, TikTok, YouTube Content-Erstellung
+- **Kategorie**: Marketing & Content
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/MarketingContent/SocialMediaPoster.tsx`
+- **Backend API**: 
+  - `POST /api/marketing/social/generate-posts` - KI Post-Generierung
+  - `POST /api/social/post` - Direktes Posting
+  - `GET /api/settings/connection` - Token-Status prüfen
+- **Dependencies**: 
+  - OAuth Access Tokens (Settings → Social Media)
+  - OpenAI API (optional für AI-Transform)
+  - 6 Plattform-APIs (LinkedIn, Facebook, Instagram, Twitter, TikTok, YouTube)
+
+**Request/Response Examples:**
+```typescript
+// POST /api/marketing/social/generate-posts
+{
+  topic: "Produktlaunch",
+  targetAudience: "Unternehmer",
+  tone: "professional",
+  platforms: ["linkedin", "facebook"],
+  includeHashtags: true,
+  includeEmojis: false,
+  ctaType: "engagement"
+}
+// Response
+{
+  success: true,
+  posts: [
+    {
+      platform: "linkedin",
+      content: "Wir freuen uns...",
+      hashtags: ["#ProductLaunch"],
+      characterCount: 250
+    }
+  ]
+}
+
+// POST /api/social/post
+{
+  platform: "linkedin",
+  content: "Post text...",
+  useAI: true
+}
+// Response
+{ success: true, postId: "..." }
+```
+
+**Implementation Notes:**
+- Plattform-spezifische Constraints (LinkedIn max 3000 chars, Twitter 280)
+- Token-Check vor Publish (`platformTokens` state)
+- Fallback: Copy/Paste wenn keine API-Tokens konfiguriert
+- AI-Transform optional (`aiTransformOnPublish` toggle)
+- Settings-Integration: Token-Eingabe unter Settings → Social Media
+
+**Besonderheiten/Limitationen:**
+- Manuelle Token-Konfiguration erforderlich (siehe `social_media_onboarding.md`)
+- Keine automatische Token-Refresh-Implementierung
+- Rate-Limits der jeweiligen Plattform beachten
+- Webhook-Variante (Make/Zapier/n8n) wurde durch direkte API-Integration ersetzt
+- Status**: ✅ Vollständig mit OAuth-API integriert
+
+#### 🆓 **Free to Post Converter**
+
+**Übersicht:**
+- **Zweck**: Aktivierungskampagnen für inaktive/Free-User
+- **Use Cases**: Re-Engagement, Upgrade-Impulse, erste Posts fördern
+- **Kategorie**: Marketing & Content
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/MarketingContent/FreeToPostConverter.tsx`
+- **Backend**: Kampagnen-Generator (LLM-basiert), nutzt Marketing-APIs
+- **Output**: Kampagnen-Entwürfe (Messages, CTAs, Sequenzen)
+
+**Implementation Notes:**
+- Segment-Auswahl + KI-Textvorschläge
+- Mehrstufige Sequenzen möglich (abhängig vom Backend)
+- Fokus auf Aktivierungs-CTAs
+
+**Besonderheiten/Limitationen:**
+- Kein Auto-Senden; User muss Kampagne freigeben/versenden
+- Erfolg abhängig von externer ESP/CRM-Anbindung
 - **Status**: ✅ Mit KI
 
-#### 💸 **Content Monetized** `frontend/src/pages/MarketingContent/ContentMonetized.tsx`
-- **ML-Features**: Automatische Monetarisierung
+#### 💸 **Content Monetized**
+
+**Übersicht:**
+- **Zweck**: KI-gestützte Preisempfehlungen und Produkttext-Generierung für digitale Produkte
+- **Use Cases**: Kurse, Templates, Ebooks, Subscriptions monetarisieren
+- **Kategorie**: Marketing & Content
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/MarketingContent/ContentMonetized.tsx`
+- **Backend API**:
+  - `GET /api/marketing/content/price-recommendation` - KI-Preisvorschlag
+  - `POST /api/marketing/content/generate-copy` - KI-Produkttext (Headline, Body, CTA)
+  - `GET /api/marketing/content/revenue-forecast` - Umsatzprognose
+  - `POST /api/marketing/content/create-digital-product` - WooCommerce Produkt erstellen
+- **Dependencies**: OpenAI API (mit Fallback), WooCommerce REST API
+
+**Request/Response Examples:**
+```typescript
+// GET /api/marketing/content/price-recommendation?contentType=course&strategy=one-time&basePrice=49
+{
+  success: true,
+  data: {
+    recommendedPrice: 147,
+    range: { min: 120, max: 180 },
+    reasoning: "Course one-time: 3.0x multiplier"
+  }
+}
+
+// POST /api/marketing/content/generate-copy
+{ contentTitle: "Python Kurs", contentType: "course" }
+// Response
+{ success: true, data: { headline: "...", body: "...", cta: "..." } }
+```
+
+**Preislogik:**
+- `course one-time`: 3.0x
+- `template one-time`: 1.2x
+- `subscription`: 0.7x/Monat
+- `freemium`: 1.5x
+
+**Implementation Notes:**
+- Revenue Forecast: Durchschnitt letzte 7 Tage × 30 für Monatsprognose
+- Fallback-Texte wenn OpenAI nicht verfügbar
+- Rate Limits: Price 100/min, Copy 50/min, Forecast 100/min, Create 20/min
+- Cache: Price-Recommendation 1h, Revenue-Forecast 5min
+
+**Besonderheiten/Limitationen:**
+- WooCommerce-Credentials erforderlich
+- OpenAI optional (Fallback auf Standard-Texte)
+- Erstellt nur digitale Produkte (virtual/downloadable)
+- **Status**: ✅ Vollständig integriert
+
+#### 🎨 **Kite Templates**
+
+**Übersicht:**
+- **Zweck**: Vorlagenverwaltung mit KI-Vorschlägen für Texte/Designs
+- **Use Cases**: Schnelles Erstellen/Wiederverwenden von Marketing-Templates
+- **Kategorie**: Marketing & Content
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/MarketingContent/KiteTemplates.tsx`
+- **Backend**: Template-Storage + KI-Empfehlungen (Text/CTA/Design-Hints)
+
+**Implementation Notes:**
+- Template-Library mit Varianten
+- KI gibt Verbesserungs-Hinweise für Copy/CTA
+- Kann als Ausgangspunkt für Email/Social/Ads genutzt werden
+
+**Besonderheiten/Limitationen:**
+- Keine automatische Publikation; dient als Editor/Library
+- Design-Assets nicht auto-generiert (Texte/Struktur im Fokus)
 - **Status**: ✅ Integriert
 
-#### 🎨 **Kite Templates** `frontend/src/pages/MarketingContent/KiteTemplates.tsx`
-- **ML-Features**: Template-Verwaltung, Design-Vorschläge
-- **Status**: ✅ Integriert
+#### 📝 **Blogpost Generator**
 
-#### 📝 **Blogpost Generator** `frontend/src/pages/MarketingContent/BlogPostGenerator.tsx`
-- **ML-Features**: SEO-optimierte Blogposts, Outline-Generierung
-- **API**: `/api/marketing/blogpost/generate`
-- **Status**: ✅ Vollständig
-- **Capabilities**: Keyword-Analyse, Content-Struktur, LLM-Integration
+**Übersicht:**
+- **Zweck**: KI-generierte SEO-optimierte Blogposts mit strukturiertem Outline
+- **Use Cases**: Content Marketing, Blog-Automatisierung, SEO-Optimierung
+- **Kategorie**: Marketing & Content
 
-#### 🖼️ **Image Analyzer** `frontend/src/pages/MarketingContent/ImageAnalyzer.tsx`
-- **ML-Features**: Bild-Qualitätsprüfung, Auto-Tagging, SEO-Analyse
-- **API**: `/api/marketing/image/analyze`
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/MarketingContent/BlogPostGenerator.tsx`
+- **Backend API**: `POST /api/marketing/blogpost/generate`
+- **Dependencies**: OpenAI GPT-4o-mini, SEO-Keyword-Analyse
+
+**Request/Response Examples:**
+```typescript
+// POST /api/marketing/blogpost/generate
+{
+  topic: "E-Commerce Trends 2026",
+  keywords: ["AI", "Personalisierung", "Conversion"],
+  tone: "professional",
+  length: "medium",
+  includeOutline: true
+}
+// Response
+{
+  success: true,
+  data: {
+    title: "Die 5 wichtigsten E-Commerce Trends 2026",
+    outline: [
+      { section: "Einleitung", points: [...] },
+      { section: "Trend 1: KI-Personalisierung", points: [...] }
+    ],
+    content: "Vollständiger Blogpost...",
+    seoScore: 85,
+    keywords: ["AI", "Personalisierung"],
+    estimatedReadTime: "5 min"
+  }
+}
+```
+
+**Implementation Notes:**
+- Outline-Generierung vor Content (strukturierter Ansatz)
+- Keyword-Dichte-Analyse
+- SEO-Scoring (Title, Meta, Headings, Keyword-Placement)
+- Length-Options: short (500w), medium (1000w), long (2000w)
+- Tone-Optionen: casual, professional, energetic, educational
+
+**SEO Features:**
+- H2/H3 Heading-Struktur
+- Keyword-Integration (2-3% Dichte)
+- Meta-Description Vorschlag
+- Internal Linking Suggestions
+
+**Besonderheiten/Limitationen:**
+- Generiert nur Text, keine Bilder
+- User muss WordPress/CMS-Integration selbst vornehmen
+- SEO-Score ist Schätzung, keine Garantie für Rankings
+- **Status**: ✅ Vollständig mit LLM-Integration
+
+#### 🖼️ **Image Analyzer**
+
+**Übersicht:**
+- **Zweck**: Bildanalyse (Qualität, Tags, SEO-Hinweise)
+- **Use Cases**: Produktbilder, Social Assets, Blog Media optimieren
+- **Kategorie**: Marketing & Content
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/MarketingContent/ImageAnalyzer.tsx`
+- **Backend API**: `POST /api/marketing/image/analyze`
+- **Output**: Tags, Qualitäts-Score, Alt-Text/SEO-Empfehlungen
+
+**Implementation Notes:**
+- Vision-AI zur Tag-Generierung
+- Qualitätsmetriken (Schärfe/Belichtung) je nach Backend-Implementation
+- Alt-Text-Vorschläge für SEO/Accessibility
+
+**Besonderheiten/Limitationen:**
+- Keine Bildbearbeitung; nur Analyse/Empfehlungen
+- Ergebnisqualität abhängig vom Vision-Modell
 - **Status**: ✅ Vollständig
-- **Capabilities**: Vision AI, Tag-Generierung, Qualitäts-Score
 
 ---
 
-### Advanced AI (9/9 Tools)
+### Advanced AI (12/12 Tools)
 
-#### 🧠 **Context Generator** `frontend/src/pages/Advanced/ContextGenerator.tsx`
-- **ML-Features**: KI-Kontext-Generierung
+#### 🧠 **Context Generator**
+
+**Übersicht:**
+- **Zweck**: KI-basierte Kontext-Generierung für Agentur-Loop
+- **Use Cases**: Prompt Engineering, Context Enrichment
+- **Kategorie**: Advanced AI
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/Advanced/ContextGenerator.tsx`
+- **Backend API**: `POST /api/ai/context/generate`
+- **Features**: LLM-Integration, Context Mapping
+
+**Implementation Notes:**
+- Nutzt OpenAI für Kontext-Anreicherung
+- Eingabe: Raw Data → Ausgabe: Rich Context für KI-Verarbeitung
+
+**Besonderheiten/Limitationen:**
+- Abhängig von LLM-Qualität
 - **Status**: ✅ Mit LLM-Integration
 
-#### 🔤 **String Generator** `frontend/src/pages/Advanced/StringGenerator.tsx`
-- **ML-Features**: Intelligente String-Generierung
-- **Status**: ✅ Mit KI
+#### 🔤 **String Generator**
 
-#### 🔄 **Auto Framplementator** `frontend/src/pages/Advanced/AutoFramplementator.tsx`
-- **ML-Features**: Automatische Framework-Implementierung
+**Übersicht:**
+- **Zweck**: Intelligente String-Generierung für dynamische Texte
+- **Use Cases**: Template-Strings, Dynamic Content Generation
+- **Kategorie**: Advanced AI
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/Advanced/StringGenerator.tsx`
+- **Backend API**: `POST /api/ai/string/generate`
+- **Features**: Pattern-basierte String-Generierung mit KI
+
+**Implementation Notes:**
+- Regex-Patterns + LLM für intelligente Fuzzy-Matches
+- Fallback auf Template-Strings wenn nötig
+
+**Besonderheiten/Limitationen:**
+- Komplex bei sehr vielen Varianten
+- **Status**: ✅ Mit KI-Integration
+
+#### 🔄 **Auto Framplementator**
+
+**Übersicht:**
+- **Zweck**: Automatische Framework-Implementierung mit KI
+- **Use Cases**: Scaffolding, Code Generation, Boilerplate
+- **Kategorie**: Advanced AI
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/Advanced/AutoFramplementator.tsx`
+- **Backend API**: `POST /api/ai/framework/implement`
+- **Features**: Code Generation, Dependency Injection, Pattern Application
+
+**Implementation Notes:**
+- Analysiert bestehende Struktur → schlägt Implementierung vor
+- Unterstützt mehrere Frameworks (React, Vue, Angular, etc.)
+
+**Besonderheiten/Limitationen:**
+- Code-Qualität abhängig von Prompt-Engineering
+- Manuelle Anpassungen oft erforderlich
 - **Status**: ✅ Mit KI-Enhancement
-- **API**: `/api/ai/framework/implement`
 
-#### 🔄 **WooCommerce Sync** `frontend/src/pages/Advanced/WooCommerceSync.tsx`
-- **ML-Features**: Intelligente Daten-Synchronisation
+#### 🔄 **WooCommerce Sync**
+
+**Übersicht:**
+- **Zweck**: Intelligente Daten-Synchronisation zwischen Shop und Backend
+- **Use Cases**: Inventory Sync, Product Update, Customer Data Sync
+- **Kategorie**: Advanced AI
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/Advanced/WooCommerceSync.tsx`
+- **Backend API**: `/api/woocommerce/sync` (mit ML-Optimierung)
+- **Dependencies**: Fastify backend, WooCommerce REST API v3
+
+**Implementation Notes:**
+- ML-Engine erkennt Änderungen + priorisiert nach Relevanz
+- Batch-Verarbeitung mit Konflikt-Auflösung
+- Retry-Logik für fehlgeschlagene Syncs
+
+**Besonderheiten/Limitationen:**
+- API-Rate-Limits von WooCommerce beachten
+- Bidirektionale Sync kann zu Konflikten führen
 - **Status**: ✅ Mit KI-Optimierung
-- **Dependencies**: Fastify backend, WooCommerce API
 
-#### 💾 **Memory System** `frontend/src/pages/Advanced/MemorySystem.tsx`
-- **ML-Features**: Persistent memory für KI-Kontexte, Message-Logging
-- **API**: `/api/memory/stats`, `/api/memory/messages`
+#### 💾 **Memory System**
+
+**Übersicht:**
+- **Zweck**: Persistentes Memory für KI-Kontexte und Message-Logging
+- **Use Cases**: Agentur-Loop Kontext-Speicher, Konversations-History
+- **Kategorie**: Advanced AI
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/Advanced/MemorySystem.tsx`
+- **Backend APIs**:
+  - `GET /api/memory/stats` - Memory-Statistiken
+  - `GET /api/memory/messages` - Message-Log
+  - `POST /api/memory/cleanup` - Memory-Bereinigung
+- **Features**: Statistics Cards, Message Filtering, Memory Cleanup
+
+**Implementation Notes:**
+- React Hooks: useCallback für API-Calls, useMemo für Filterung
+- Loading/Error-States für alle API-Calls
+- Message-Pagination optional implementierbar
+
+**Besonderheiten/Limitationen:**
+- Speichergröße kann begrenzt sein (DB-abhängig)
+- Keine automatische Archivierung derzeit
 - **Status**: ✅ Vollständig refaktoriert (11.12.2025)
-- **Recent Fix**: useCallback für loadStats/loadMessages - React Hook Dependencies behoben
-- **Key Patterns**: useMemo für Message-Filtering, useCallback für API-Calls
-- **Components**: Statistics Cards, Message Log Table, Memory Cleanup
 
-#### ⚙️ **System Health** `frontend/src/pages/Advanced/SystemHealth.tsx`
-- **ML-Features**: System-Monitoring mit Alerts
-- **API**: `/api/monitoring/system/metrics`, `/api/monitoring/services/status`
+#### ⚙️ **System Health**
+
+**Übersicht:**
+- **Zweck**: System-Monitoring mit Alerts und Performance-Tracking
+- **Use Cases**: DevOps Monitoring, Health-Checks, Capacity Planning
+- **Kategorie**: Advanced AI
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/Advanced/SystemHealth.tsx`
+- **Backend APIs**:
+  - `GET /api/monitoring/system/metrics` - CPU, Memory, Disk
+  - `GET /api/monitoring/services/status` - Service Health
+- **Features**: Color-coded Alerts, Threshold Alerts, Real-Time Updates
+
+**Implementation Notes:**
+- Poll-Interval 30s (non-blocking)
+- Severity-Levels: ok, warning, critical
+- Grafisches Layout: Glassmorphism, Gradient Cards
+
+**Besonderheiten/Limitationen:**
+- Abhängig von Backend-Monitoring (Prometheus/StatsD)
+- Alerts sind nur Benachrichtigungen, keine Auto-Remediation
 - **Status**: ✅ Vollständig refaktoriert (10.12.2025)
-- **Recent Updates**: buildUrl() normalization, lastUpdated timestamps, threshold alerts
-- **Styling**: Glassmorphism, Color-coded severity levels
-- **Capabilities**: Memory tracking, CPU monitoring, Service health
 
-#### 👤 **User Management** `frontend/src/pages/app/UserManagement.tsx`
-- **ML-Features**: KI-gestützte Kundensegmentierung, MLPersonalization Integration
-- **API**: `/api/woocommerce/customers`
+#### 👤 **User Management**
+
+**Übersicht:**
+- **Zweck**: KI-gestützte Kundenverwaltung mit Segmentierung
+- **Use Cases**: Customer Analytics, Personalization, Audience Management
+- **Kategorie**: Advanced AI
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/app/UserManagement.tsx`
+- **Backend API**: `GET /api/woocommerce/customers`
+- **Sub-Component**: `MLPersonalization.tsx` (KI-Segmentierung)
+- **Features**: Stats-Cards (Revenue, AOV, Active Count), Search/Sort/Filter, ML-Personalization Modal
+
+**Implementation Notes:**
+- Customer Data Extended: status, last_login, visit_count, role
+- Vollständig TypeScript (~500 Zeilen), React Hooks Pattern
+- Kachel-basiertes Stats-Layout
+
+**Besonderheiten/Limitationen:**
+- Performance bei >10.000 Kunden braucht Pagination
+- ML-Personalization optional via Modal
 - **Status**: ✅ Vollständig refaktoriert (10.12.2025)
-- **Recent Updates**: Complete TypeScript rewrite (~500 lines), Kacheln-Stats, Search/Sort/Filter
-- **Sub-Components**: MLPersonalization modal integration
-- **Features**: Stats-Cards (Gesamtumsatz, Ø-Warenkorbwert, aktive Kunden, Top Kunde)
-- **Data Extended**: customer status, last_login, visit_count, role fields
 
-#### 💬 **Feedback Analysis** `frontend/src/pages/app/FeedbackAnalysis.tsx`
-- **ML-Features**: 
+#### 💬 **Feedback Analysis**
+
+**Übersicht:**
+- **Zweck**: KI-Sentiment-Analyse und automatische Kategorisierung von Kundenfeedback
+- **Use Cases**: Review Analysis, Support Ticket Triage, Customer Sentiment Monitoring
+- **Kategorie**: Advanced AI
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/app/FeedbackAnalysis.tsx`
+- **Backend APIs**:
+  - `GET /api/analytics/feedback/reviews` - WooCommerce Reviews
+  - `GET /api/analytics/feedback/tickets` - WordPress Support Tickets
+  - `POST /api/analytics/feedback/analyze` - KI-Analyse
+- **Features**: 
   - Sentiment-Analyse (positive/negative/neutral) mit Confidence-Scores
-  - Automatische Kategorisierung (Customer, Performance, Products, Traffic, Conversion)
-  - Impact-Bewertung (high/medium/low) für jedes Insight
-  - KI-generierte Recommendations für Optimierungen
-  - Next Steps mit Criticality-Levels
-- **API**: 
-  - `/api/analytics/feedback/reviews` (WooCommerce Reviews via REST)
-  - `/api/analytics/feedback/tickets` (Support-Tickets via Plugin-REST-API)
-  - `/api/analytics/feedback/analyze` (KI-Analyse)
-- **Status**: ✅ Vollständig mit ML/KI integriert
-- **Capabilities**: Reviews + Tickets Analyse, Sentiment Detection, Pattern Recognition
-- **Features**: Stats-Cards (Bewertungen, Tickets, Sentiment, Resolution Time), Insight-Grid mit Recommendations, Next Steps Display
-- **UI**: Glassmorphism, Color-coded Impact/Status, Expandable Rohdaten
+  - Auto-Kategorisierung (Customer, Performance, Products, Traffic, Conversion)
+  - Impact-Bewertung (high/medium/low)
+  - AI-generated Recommendations + Next Steps
+
+**Implementation Notes:**
+- Stats-Cards: Bewertungen, Tickets, Sentiment %, Resolution Time
+- Insight-Grid mit Impact-Badges + Expandable Details
+- Glassmorphism UI mit Color-Coding
+
+**Besonderheiten/Limitationen:**
+- Benötigt Awesome Support Plugin 6.3.6 für Tickets
+- Fallback nur Reviews wenn Plugin nicht verfügbar
+- **Status**: ✅ Vollständig ML/KI-integriert
 
 **⚠️ PLUGIN-ANFORDERUNG - Awesome Support 6.3.6**
 
-Die Kunden-Feedback-Analyse nutzt echte Support-Tickets aus deinem WordPress-System. Dafür wird das folgende Plugin empfohlen und vorausgesetzt:
-
-- **Plugin**: Welcome to Awesome Support (Version 6.3.6 oder kompatibel)
-- **REST-Endpunkt**: `/wp-json/wpas-api/v1/tickets`
-- **Authentifizierung**: WordPress Application Passwords (Basis-Auth)
-- **Ticket-Daten**: Abrufen von echten Support-Tickets mit Titeln, Beschreibungen, Status, Priorität, Erstellungs- und Lösungsdatum
-
-**Setup:**
-1. Installiere das Plugin "Welcome to Awesome Support 6.3.6" in WordPress
-2. Aktiviere das Plugin
-3. Stelle sicher, dass WordPress Application Passwords aktiviert sind (oder nutze einen Admin-User mit App-Passwort)
-4. Setze folgende Umgebungsvariablen beim Backend-Start:
-   - `WORDPRESS_URL` = deine WordPress-Installation (z. B. `https://kaufe-es.eu`)
+Die Kunden-Feedback-Analyse nutzt echte Support-Tickets aus deinem WordPress-System. Setup:
+1. Plugin "Welcome to Awesome Support 6.3.6" in WordPress installieren + aktivieren
+2. WordPress Application Passwords aktivieren
+3. Umgebungsvariablen beim Backend-Start:
+   - `WORDPRESS_URL` = z. B. `https://kaufe-es.eu`
    - `WORDPRESS_USER` = WordPress-Benutzername
-   - `WORDPRESS_APP_PASSWORD` = WordPress Application Password
-5. Das System versucht automatisch, Tickets von `/wp-json/wpas-api/v1/tickets` abzurufen
+   - `WORDPRESS_APP_PASSWORD` = App-Password
 
-**Falls das Plugin nicht verfügbar ist:**
-- A.R.I. zeigt beim Ticket-Abruf eine aussagekräftige Fehlermeldung an
-- Review-Analyse funktioniert weiterhin, da diese von WooCommerce kommen
-- Das System zeigt keine Mock-Daten oder Fallback-Tickets
+Falls Plugin nicht verfügbar: A.R.I. zeigt Fehlermeldung, Review-Analyse funktioniert trotzdem.
 
-#### 🌐 **Real Web Analytics** `frontend/src/pages/AnalyseMetrics/RealWebAnalytics.tsx`
-- **ML-Features**:
-  - Multi-Source Trend Analysis (Google Trends, Reddit, News, GitHub, StackOverflow)
-  - KI-Report Generation mit GPT-basierter Analyse
-  - Automatische Kategorisierung (Performance, Products, Traffic, Conversion, Customer)
-  - Confidence Scoring & Top Trend Detection
-  - Next Steps Recommendations mit Prioritäten
-- **API**: `/api/analytics/trends/analyze`, `/api/analytics/ml/report`
-- **Status**: ✅ Vollständig mit ML/KI integriert
-- **Capabilities**: Batch Product Analysis, Time-Range Selection (today/week/month), Multi-Source Aggregation
-- **Features**: Trend Scoring, Source-Level Breakdown, KI-Insights, Average Score Tracking
-- **UI**: Time-Range Selector, Product List, Trend-Liste mit Confidence, KI-Report Display
+#### 🌐 **Real Web Analytics**
 
-#### 🗺️ **Analytic Regioning** `frontend/src/pages/AnalyseMetrics/AnalyticRegioning.tsx`
-- **ML-Features**:
-  - KI-Regionen-Analyse mit GPT-basierter Optimierung
-  - ML-Insights für regionale Performance (type, title, value, score, detail)
-  - KI-Score Anzeige (Confidence-Scoring in %)
-  - Regionen-spezifische Analyse (Global/Europa/Amerika/Asien)
-  - Automatische Identifikation von Top-Performern & Optimierungsbedarf
-  - Dynamische ML-Insights vom Backend
-- **API**: `/api/analytics/regioning/ml-analysis` (POST)
-- **Status**: ✅ Vollständig mit ML/KI integriert
-- **Capabilities**: Regional Traffic Distribution, Country Performance Ranking, Trend Detection per Region
-- **Features**: Multi-Region Selection, ML-Loading States, Error Handling, Structured Insights Rendering
-- **UI**: Region Selector (Global/Europa/Amerika/Asien), Stats Cards, Traffic Distribution Bars, Top Countries Table, KI-Insights Display
+**Übersicht:**
+- **Zweck**: Multi-Source Trend Analysis mit KI-Report Generation
+- **Use Cases**: Market Intelligence, Competitor Analysis, Trend Monitoring
+- **Kategorie**: Advanced AI
 
-#### ⭐ **Premium Audit** `frontend/src/pages/AnalyseMetrics/PremiumAudit.tsx`
-- **ML-Features**:
-  - KI-gestützte Shop-Optimierung mit GPT-basierter Analyse
-  - ML-Insights für Audit-Kategorien (type, title, value, score, detail, priority, category)
-  - Cost-Benefit-Analyse mit KI-Confidence-Scoring
-  - Automatische Prioritätsvergabe (critical/high/medium/low)
-  - Category-spezifische Optimierungsvorschläge
-  - Dynamische ML-Recommendations basierend auf Audit-Daten
-- **API**: `/api/audit/premium/ml-analysis` (POST)
-- **Status**: ✅ Vollständig mit ML/KI integriert
-- **Capabilities**: Audit Score Calculation, Category Analysis, Priority-based Recommendations, Timeline Planning
-- **Features**: ML-Button mit Loading States, Error Handling, Priority-colored Insights, Category Filtering
-- **UI**: KI-Optimierung Button, Insights mit Priority-Badges, Confidence-Score-Anzeige, Category-Tags
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/RealWebAnalytics.tsx`
+- **Backend APIs**:
+  - `POST /api/analytics/trends/analyze` - Multi-Source Trend Data
+  - `POST /api/analytics/ml/report` - KI-Report Generation
+- **Sources**: Google Trends, Reddit, News APIs, GitHub, StackOverflow
+- **Features**: 
+  - Batch Product Analysis (Trend per Product)
+  - Time-Range Selection (today/week/month)
+  - Confidence Scoring & Source Breakdown
+  - KI-Insights + Next Steps
 
-#### 🔧 **Standard Audit** `frontend/src/pages/AnalyseMetrics/StandardAudit.tsx`
-- **ML-Features**:
-  - KI-gestützte Quick-Checks mit GPT-basierter Analyse
-  - ML-Insights für Basis-Audit-Checks (type, title, value, score, detail, priority, category)
-  - Schnelle KI-Optimierungsvorschläge
-  - Automatische Prioritätsvergabe (critical/high/medium/low)
-  - Category-spezifische Quick-Checks (performance/seo/security/ux/content)
-  - Confidence-Scoring für Empfehlungen
-- **API**: `/api/audit/standard/ml-analysis` (POST)
-- **Status**: ✅ Vollständig mit ML/KI integriert
-- **Capabilities**: Quick-Fix Detection, Importance-based Checks, Progress Tracking, Next Steps Generation
-- **Features**: KI-Quick-Check Button, ML-Loading States, Error Handling, Priority-colored Insights
-- **UI**: KI-Quick-Check Button, Insights mit Priority-Badges, Confidence-Score-Anzeige, Category-Filter
+**Implementation Notes:**
+- Zeigt Trend-Liste mit Confidence-Badges
+- KI-Report wird unter Trends angezeigt
+- Loading/Error-States für alle APIs
+
+**Besonderheiten/Limitationen:**
+- API-Limits je Datenquelle beachten
+- Trends können verzögert sein (nicht Echtzeit)
+- **Status**: ✅ Vollständig ML/KI-integriert
 
 ---
 
 ### ✅ Neu vollständig integrierte Analytics-Tools (9/9)
 
-#### 📊 **Trend Analysis** `frontend/src/pages/AnalyseMetrics/TrendAnalysis.tsx`
+#### 📊 **Trend Analysis**
 
-- **ML-Features**: KI-gestützte Trend-Analyse, KI-Insights, Next Steps, Summary-Generation
-- **API**: `/api/analytics/ml/generate`
-- **Status**: ✅ Vollständig ML/KI-integriert (inkl. Loading/Error-Handling, Mock-Fallback)
+**Übersicht:**
+- **Zweck**: KI-basierte Trendanalyse mit Insights und Next Steps
+- **Use Cases**: Produkt-/Markttrends erkennen, Maßnahmen priorisieren
+- **Kategorie**: Analytics
 
-#### 🚀 **Run Trend Analysis** `frontend/src/pages/AnalyseMetrics/RunTrendAnalysis.tsx`
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/TrendAnalysis.tsx`
+- **Backend API**: `POST /api/analytics/ml/generate`
 
-- **ML-Features**: Progressives KI-Trend-Scoring, Insight-Mapping, Ergebnis-Rendering
-- **API**: `/api/ml/test/trends` (über `VITE_API_URL` oder Dev-Proxy)
-- **Status**: ✅ Vollständig ML/KI-integriert (inkl. Simulated Fallback, Fortschrittsanzeige)
+**Implementation Notes:**
+- KI-Insights + Summary + Next Steps Rendering
+- Loading/Error-State, Mock-Fallback möglich
 
-#### 🔍 **Real Analytics** `frontend/src/pages/AnalyseMetrics/RealAnalytics.tsx`
+**Besonderheiten/Limitationen:**
+- Echtzeitqualität abhängig von Datenquellen
+- Nur Empfehlungen, keine Auto-Aktionen
+- **Status**: ✅ Vollständig ML/KI-integriert
 
-- **ML-Features**: Echtzeit-ML-Analyse mit KI-Insights, Auto-Refresh (30s), Next Steps
-- **API**: `/api/analytics/ml/generate`
-- **Status**: ✅ Vollständig ML/KI-integriert (Realtime-Pipeline, Fehler-/Loading-State)
+#### 🚀 **Run Trend Analysis**
 
----
+**Übersicht:**
+- **Zweck**: Trendanalyse als Job/Snapshot starten
+- **Use Cases**: Manuelle Trendläufe, Dev/Test
+- **Kategorie**: Analytics
 
-Diese Tools haben Basic-APIs aber begrenzte ML/KI-Features:
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/RunTrendAnalysis.tsx`
+- **Backend API**: `POST /api/ml/test/trends`
 
-### AnalyseMetrics Folder (`frontend/src/pages/AnalyseMetrics/`)
+**Implementation Notes:**
+- Fortschrittsanzeige, Simulated/Mock Fallback
+- Nutzt dieselbe Engine wie Trend Analysis
 
-| Tool                  | File                   | ML-Status     | Notizen                                                    |
-| --------------------- | ---------------------- | ------------- | ---------------------------------------------------------- |
-| 📊 Shop Metrics        | ShopMetrics.tsx        | 🟢 Vollständig | ML-Analyse: `/api/analytics/metrics/ml-analysis`           |
-| 📈 Conversion Analysis | ConversionAnalysis.tsx | 🟢 Vollständig | ML-Analyse: `/api/analytics/conversion/ml-analysis`        |
-| 📋 Conversion Reported | ConversionReported.tsx | 🟢 Vollständig | ML-Analyse: `/api/analytics/conversion/ml/report-analysis` |
-| 🗺️ Analytic Regioning  | AnalyticRegioning.tsx  | 🟢 Vollständig | ML-Analyse: `/api/analytics/regioning/ml-analysis`         |
-| 🏪 Shop Health Report  | ShopHealthReport.tsx   | 🟢 Vollständig | ML-Analyse: `/api/health/ml-analysis`                      |
-| ⭐ Premium Audit       | PremiumAudit.tsx       | 🟢 Vollständig | ML-Analyse: `/api/audit/premium/ml-analysis`               |
-| 🔧 Standard Audit      | StandardAudit.tsx      | 🟢 Vollständig | ML-Analyse: `/api/audit/standard/ml-analysis`              |
-| 🔎 Mini Audit          | MiniAudit.tsx          | 🟢 Vollständig | ML-Analyse: `/api/audit/mini/ml-analysis`                  |
+**Besonderheiten/Limitationen:**
+- Dev/Testing-orientiert; Echtzeit je nach Backend
+- **Status**: ✅ ML/KI-integriert
 
-**ML-Integration Status**: Alle AnalyseMetrics-Tools rufen dedizierte ML/KI-Endpunkte auf und rendern KI-Insights.
+#### 🔍 **Real Analytics**
+
+**Übersicht:**
+- **Zweck**: Echtzeit-Analytics mit KI-Insights & Next Steps
+- **Use Cases**: Live KPI Monitoring, Realtime Alerts, KPI-Dashboards
+- **Kategorie**: Analytics
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/RealAnalytics.tsx`
+- **Backend API**: `POST /api/analytics/ml/generate`
+- **Features**: Auto-Refresh (30s), Next Steps, KPI-Score, Loading/Error-Handling
+
+**Implementation Notes:**
+- Polling-Interval 30s (configurierbar), paust bei Errors
+- Trennt UI-State für `isLoading`, `error`, `data`
+- Next Steps basieren auf KI-Summary des Responses
+
+**Besonderheiten/Limitationen:**
+- Latenz abhängig von Datenquellen (Shop/Trends/Backend)
+- Kein Auto-Writeback, nur Analyse/Empfehlungen
+- **Status**: ✅ ML/KI-integriert
+
+#### 📊 **Shop Metrics**
+
+**Übersicht:**
+- **Zweck**: ML-basierte Shop-Kennzahlen mit KPIs und Empfehlungen
+- **Use Cases**: KPI-Überblick (Umsatz, Orders, Conversion, AOV)
+- **Kategorie**: Analytics
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/ShopMetrics.tsx`
+- **Backend API**: `POST /api/analytics/metrics/ml-analysis`
+- **Output**: KPI-Cards, Trends, AI Insights
+
+**Implementation Notes:**
+- Erwartet normalisierte Metrics im Response (`metrics`, `insights`)
+- Zeigt Score-Badges + Delta vs. Vortag/Woche
+- Fallback: statische Beispielwerte, wenn API leer ist
+
+**Besonderheiten/Limitationen:**
+- Abhängig von Shop-Datenquellen (DB/REST)
+- Keine Auto-Korrekturen, nur Anzeige/Empfehlungen
+- **Status**: ✅ Vollständig ML/KI-integriert
+
+#### 📈 **Conversion Analysis**
+
+**Übersicht:**
+- **Zweck**: ML-Analyse der Conversion-Funnel-Stufen
+- **Use Cases**: Checkout-Drops erkennen, A/B-Tests priorisieren
+- **Kategorie**: Analytics
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/ConversionAnalysis.tsx`
+- **Backend API**: `POST /api/analytics/conversion/ml-analysis`
+- **Output**: Funnel-Werte, Ursachen, Next Steps
+
+**Implementation Notes:**
+- Rendert Funnel-Grid + KI-Empfehlungen
+- Highlighted Deltas mit Severity-Farben
+- Erwartet `funnel`, `insights`, `actions` Felder
+
+**Besonderheiten/Limitationen:**
+- Datenqualität abhängig vom Tracking (Events/Orders)
+- Keine Auto-Fixes; Empfehlungen manuell umsetzen
+- **Status**: ✅ Vollständig ML/KI-integriert
+
+#### 📋 **Conversion Reported**
+
+**Übersicht:**
+- **Zweck**: Report-basierte Conversion-Analyse (ML-Report-Engine)
+- **Use Cases**: Periodische Reports, Audit-Exports
+- **Kategorie**: Analytics
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/ConversionReported.tsx`
+- **Backend API**: `POST /api/analytics/conversion/ml/report-analysis`
+- **Output**: Report-Table, KI-Summary, Actions
+
+**Implementation Notes:**
+- Unterstützt Datumsfilter und Export-ähnliche Darstellung
+- Nutzt dieselben ML-Features wie Conversion Analysis, aber als Report-Flow
+- Error/Empty-States im UI vorhanden
+
+**Besonderheiten/Limitationen:**
+- Kein automatischer CSV/Export im UI (nur Darstellung)
+- Report-Inhalt abhängig von Backend-Reportgenerator
+- **Status**: ✅ Vollständig ML/KI-integriert
+
+#### 🗺️ **Analytic Regioning**
+
+**Übersicht:**
+- **Zweck**: Regionale Performance-Analyse mit KI-Scores
+- **Use Cases**: Marktpriorisierung, Regionen-Vergleich
+- **Kategorie**: Analytics
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/AnalyticRegioning.tsx`
+- **Backend API**: `POST /api/analytics/regioning/ml-analysis`
+- **Output**: Region Cards, Scores, KI-Insights
+
+**Implementation Notes:**
+- Region Selector (Global/Europa/Amerika/Asien)
+- Rendert Top-Countries, Traffic Distribution Bars, KI-Detailtexte
+- Confidence/Score wird als Badge angezeigt
+
+**Besonderheiten/Limitationen:**
+- Regionale Daten müssen im Backend verfügbar sein
+- Keine Geo-Drilldowns unter Country-Level
+- **Status**: ✅ Vollständig ML/KI-integriert
+
+#### 🏪 **Shop Health Report**
+
+**Übersicht:**
+- **Zweck**: ML-basierter Gesundheitscheck für Shop-Performance
+- **Use Cases**: Früherkennung von Problemen, Wartungsplanung
+- **Kategorie**: Analytics
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/ShopHealthReport.tsx`
+- **Backend API**: `POST /api/health/ml-analysis`
+- **Output**: Health Score, Kategorien (performance/seo/security/ux), Actions
+
+**Implementation Notes:**
+- Score + Kategorie-Badges farbcodiert
+- Zeigt KI-Empfehlungen mit Priorität
+- Loading/Error-States vorhanden
+
+**Besonderheiten/Limitationen:**
+- Erfordert vollständige Metrik-Datenquellen (Logs/SEO/Security)
+- Keine Auto-Fixes, nur Handlungsempfehlungen
+- **Status**: ✅ Vollständig ML/KI-integriert
+
+#### ⭐ **Premium Audit**
+
+**Übersicht:**
+- **Zweck**: Tiefgehendes KI-Audit mit Priorisierung und Cost-Benefit
+- **Use Cases**: Strategische Optimierung, Roadmap-Priorisierung
+- **Kategorie**: Analytics
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/PremiumAudit.tsx`
+- **Backend API**: `POST /api/audit/premium/ml-analysis`
+- **Output**: Audit Score, Priorities, KI-Insights
+
+**Implementation Notes:**
+- Priority-colored Insights (critical/high/medium/low)
+- Category Filter + Confidence Scores
+- Error/Loading-State abgedeckt
+
+**Besonderheiten/Limitationen:**
+- Kein Auto-Remediation; Ergebnisse dienen als Empfehlung
+- Laufzeit abhängig von Backend-Audit-Engine
+- **Status**: ✅ Vollständig ML/KI-integriert
+
+#### 🔧 **Standard Audit**
+
+**Übersicht:**
+- **Zweck**: Schnell-Check Audit mit KI-Empfehlungen
+- **Use Cases**: Quick-Wins vor großen Audits
+- **Kategorie**: Analytics
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/StandardAudit.tsx`
+- **Backend API**: `POST /api/audit/standard/ml-analysis`
+- **Output**: Quick Checks, Priorities, Actions
+
+**Implementation Notes:**
+- Quick-Check Button löst ML-Analyse aus
+- Priority-Badges + Category Filter
+- Graceful Error Handling
+
+**Besonderheiten/Limitationen:**
+- Fokus auf Breite statt Tiefe
+- Keine automatischen Fixes
+- **Status**: ✅ Vollständig ML/KI-integriert
+
+#### 🔎 **Mini Audit**
+
+**Übersicht:**
+- **Zweck**: Lightweight-Audit mit kompakten KI-Empfehlungen
+- **Use Cases**: Spot-Checks, schnelle Health-Checks
+- **Kategorie**: Analytics
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/AnalyseMetrics/MiniAudit.tsx`
+- **Backend API**: `POST /api/audit/mini/ml-analysis`
+- **Output**: Kurz-Insights, Prioritäten
+
+**Implementation Notes:**
+- Minimaler Input, schnelle Antwortzeit
+- Zeigt nur Top-Empfehlungen pro Kategorie
+- Fallback-Hinweis bei fehlenden Daten
+
+**Besonderheiten/Limitationen:**
+- Stärker zusammengefasste Ergebnisse als Standard/Premium
+- Kein Export/Reporting integriert
+- **Status**: ✅ Vollständig ML/KI-integriert
 
 **Note**: Feedback Analysis wurde aus dieser Kategorie entfernt - sie ist bereits vollständig ML/KI-integriert und unter "Advanced AI" dokumentiert!
 
 ---
 
-## ✅ Payment & Finances - VOLLSTÄNDIG ML/KI-INTEGRIERT (13/13 Tools)
+## ✅ Payment & Finances (13/13 Tools)
 
-**Alle Payment-Tools wurden heute mit vollständiger ML/KI-Integration und Datenschutz-Compliance ausgestattet!**
+### ⚡ **Payment Fast**
 
-### PaymentFinances Folder (`frontend/src/pages/PaymentFinances/`)
+**Übersicht:**
+- **Zweck**: Schnelle Zahlungsabwicklung mit Betrugserkennung und intelligenten Vorschlägen
+- **Use Cases**: Express-Checkout, High-Volume Payment Processing
+- **Kategorie**: Payment & Finances
 
-| Tool                      | File                      | ML-Features                                                                                  | Status |
-| ------------------------- | ------------------------- | -------------------------------------------------------------------------------------------- | ------ |
-| ⚡ Payment Fast            | PaymentFast.tsx           | Fraud Detection (Auto-Check), Smart Amount Suggestions, Risk Scoring                         | ✅      |
-| 🎯 Payment Simplified      | PaymentSimplified.tsx     | Simplified Payment Flow mit ML-Optimization                                                  | ✅      |
-| 🧪 Payment Tester          | PaymentTester.tsx         | ML-Testplan-Generator, KI-Diagnose, MLPaymentAnalyzer Integration                            | ✅      |
-| ✅ Payment Verifier        | PaymentVerifier.tsx       | ML-basierte Transaction Verification, Risk Level Detection (low/medium/high/critical)        | ✅      |
-| 🎉 Payment Success         | PaymentSuccess.tsx        | Success Metrics Analytics, Confidence Scoring, Feature-basierte Event-Tracking               | ✅      |
-| 🔐 Payment Validation      | PaymentValidation.tsx     | KI-gestützte Security Analysis, Risk Scoring, Pattern Detection                              | ✅      |
-| 📋 Payment Issued Detector | PaymentIssuedDetector.tsx | KI-Powered Issue Detection, Confidence Scoring, Auto-Categorization                          | ✅      |
-| ❤️ Payment User Favor      | PaymentUserFavor.tsx      | **GPT-4o-mini Integration**, Personalization Analytics, Datenschutz-Hinweis                  | ✅      |
-| 📦 Payment Delivery        | PaymentDelivery.tsx       | Delivery Analytics mit ML                                                                    | ✅      |
-| 🚨 Payment Emergency       | PaymentEmergency.tsx      | **GPT-4o-mini Integration**, KI-Notfall-Analyse, Datenschutz-Hinweis                         | ✅      |
-| 📈 Payment Expansion       | PaymentExpansion.tsx      | **GPT-4o-mini Integration**, KI-Expansionsplan, Confidence & Projection, Datenschutz-Hinweis | ✅      |
-| ⚡ Payment Quick Check     | PaymentQuickCheck.tsx     | KI Quick-Scan, Avg Confidence Tracking                                                       | ✅      |
-| 🤖 ML Payment Analyzer     | MLPaymentAnalyzer.tsx     | Dedicated ML Analyzer Component                                                              | ✅      |
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentFast.tsx`
+- **Backend APIs**:
+  - `POST /api/payments/fast/process` - Payment verarbeiten
+  - `POST /api/payments/ml/fraud-detection` - Betrugserkennung
+  - `POST /api/payments/ml/amount-suggestions` - Intelligente Betragvorschläge
+- **Features**: Fraud Auto-Check, Smart Amount Suggestions, Risk Scoring (low/medium/high/critical)
 
-**Datenschutz-Compliance**: PaymentUserFavor, PaymentEmergency, PaymentExpansion haben dedizierte DSGVO-Hinweise mit OpenAI-API-Transparenz (30-Tage-Retention, RAM-only Processing)
+**Implementation Notes:**
+- ML-Fraud-Detection läuft parallel zur Verarbeitung (nicht blockierend)
+- Amount Suggestions basieren auf Kundenverlauf + Transaktionsmuster
+- Risk Score wird vor Finalisierung angezeigt
 
-**Recent Updates (11.12.2025)**: Alle Payment-Tools mit ML/KI-Features und Datenschutz-Hinweisen ausgestattet
+**Besonderheiten/Limitationen:**
+- Fraud-Check ist Warnung, nicht automatische Ablehnung
+- Amount-Vorschläge optional, User kann ändern
+- **Status**: ✅ Vollständig ML/KI-integriert
+
+### 🎯 **Payment Simplified**
+
+**Übersicht:**
+- **Zweck**: Vereinfachter Payment-Flow mit ML-Optimierung
+- **Use Cases**: Mobile Checkout, Conversion-Optimierung
+- **Kategorie**: Payment & Finances
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentSimplified.tsx`
+- **Backend API**: `POST /api/payments/simplified/process`
+- **Features**: Minimale Felder, KI-Vorhersage nächster Schritt, Auto-Completion
+
+**Implementation Notes:**
+- UX-Fokus: nur essenzielle Felder sichtbar
+- ML optimiert Field-Order basierend auf User-Segment
+- Fallback zu Full-Form wenn nötig
+
+**Besonderheiten/Limitationen:**
+- Nicht für alle Produkttypen geeignet (komplexe Bundles brauchen mehr Details)
+- Conversion-Optimierung erfordert Tracking-Daten
+- **Status**: ✅ Vollständig ML/KI-integriert
+
+### 🧪 **Payment Tester**
+
+**Übersicht:**
+- **Zweck**: Payment-System Testing mit KI-Testplan-Generierung
+- **Use Cases**: QA, Integration Testing, Sandbox-Validierung
+- **Kategorie**: Payment & Finances
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentTester.tsx`
+- **Sub-Component**: `MLPaymentAnalyzer.tsx` (KI-Diagnose)
+- **Backend APIs**:
+  - `POST /api/payments/test/generate-plan` - ML-Testplan
+  - `POST /api/payments/test/run` - Testlauf
+  - `POST /api/payments/ml/diagnose` - KI-Diagnose
+- **Features**: Auto-Testplan, KI-Diagnose für Fehler, Status-Tracking
+
+**Implementation Notes:**
+- Generiert Edge-Cases basierend auf Checkout-History
+- Zeigt Testergebnisse in Table + KI-Diagnose-Panel
+- Fehlerausführlich erklärt (Root Cause + Lösungen)
+
+**Besonderheiten/Limitationen:**
+- Sandbox-only; keine echten Transaktionen
+- Testplan kann manuell angepasst werden
+- **Status**: ✅ Vollständig ML/KI-integriert
+
+### ✅ **Payment Verifier**
+
+**Übersicht:**
+- **Zweck**: ML-basierte Transaktionsverifikation mit Risk-Level-Erkennung
+- **Use Cases**: Fraud Prevention, Compliance-Checks, Post-Transaction Verification
+- **Kategorie**: Payment & Finances
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentVerifier.tsx`
+- **Backend API**: `POST /api/payments/ml/verify`
+- **Output**: Risk Level (low/medium/high/critical), Details, Actions
+
+**Implementation Notes:**
+- Prüft 20+ Indikatoren (IP, Card, Amount, Frequency, etc.)
+- Risk-Level farbencodiert und mit Badges angezeigt
+- Actions je Risk-Level (manual review, block, accept)
+
+**Besonderheiten/Limitationen:**
+- Keine automatische Blockierung; nur Empfehlung
+- Datenqualität abhängig von Historien-Daten
+- **Status**: ✅ Vollständig ML/KI-integriert
+
+### 🎉 **Payment Success**
+
+**Übersicht:**
+- **Zweck**: Success Metrics Analytics mit Confidence Scoring
+- **Use Cases**: Payment Performance Monitoring, Conversion Tracking
+- **Kategorie**: Payment & Finances
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentSuccess.tsx`
+- **Backend API**: `POST /api/payments/ml/success-metrics`
+- **Features**: Success Rate Tracking, Confidence Scores, Event-Feature Analysis
+
+**Implementation Notes:**
+- Zeigt Success % über Zeit (Chart)
+- Confidence Score pro Metrik (basierend auf Datenvolumen)
+- Top-Features: welche Faktoren beeinflussen Success am meisten
+
+**Besonderheiten/Limitationen:**
+- Benötigt ausreichend Payment-Daten (Minimum ~100 Transaktionen)
+- Correlations sind statistische Hinweise, keine Kausalität
+- **Status**: ✅ Vollständig ML/KI-integriert
+
+### 🔐 **Payment Validation**
+
+**Übersicht:**
+- **Zweck**: KI-gestützte Security-Analyse mit Risk-Pattern-Erkennung
+- **Use Cases**: Compliance, Security Audit, Anomaly Detection
+- **Kategorie**: Payment & Finances
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentValidation.tsx`
+- **Backend APIs**:
+  - `POST /api/payments/ml/validate` - Security-Analyse
+  - `POST /api/payments/ml/pattern-detect` - Anomalie-Erkennung
+- **Features**: Compliance-Checks, Risk Scoring, Pattern Detection
+
+**Implementation Notes:**
+- Prüft gegen PCI-DSS / GDPR Standards
+- Zeigt Risiken mit Severity-Farben
+- Patterns werden über Zeit erkannt (Trend-Analyse)
+
+**Besonderheiten/Limitationen:**
+- Compliance-Checks sind Richtlinien, keine Garantien
+- Pattern-Erkennung benötigt historische Daten
+- **Status**: ✅ Vollständig ML/KI-integriert
+
+### 📋 **Payment Issued Detector**
+
+**Übersicht:**
+- **Zweck**: KI-powered Issue Detection mit Auto-Kategorisierung
+- **Use Cases**: Problem-Priorisierung, Incident-Response
+- **Kategorie**: Payment & Finances
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentIssuedDetector.tsx`
+- **Backend API**: `POST /api/payments/ml/detect-issues`
+- **Output**: Issues mit Kategorie, Severity, Confidence Score
+
+**Implementation Notes:**
+- Kategorien: technical, fraud, compliance, user-error
+- Severity: critical, high, medium, low
+- Confidence 0-100 mit Fallback-Hinweisen
+
+**Besonderheiten/Limitationen:**
+- Basiert auf historischen Fehlern + Pattern-Matching
+- Neue Fehlertypen können nicht erkannt werden (Cold-Start Problem)
+- **Status**: ✅ Vollständig ML/KI-integriert
+
+### ❤️ **Payment User Favor**
+
+**Übersicht:**
+- **Zweck**: GPT-4o-mini Integration für personalisierte Payment-Favoriten
+- **Use Cases**: Personalisierung, Customer Retention, UX-Optimierung
+- **Kategorie**: Payment & Finances
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentUserFavor.tsx`
+- **Backend API**: `POST /api/payments/ml/user-preferences`
+- **LLM**: OpenAI GPT-4o-mini (mit DSGVO-Compliance)
+- **Features**: Personalization Score, Recommendation Engine, User Insights
+
+**Implementation Notes:**
+- Analysiert User Payment History → Vorschläge für bevorzugte Payment-Methoden
+- DSGVO-Hinweis: "Daten werden an OpenAI übertragen (30-Tage-Retention)"
+- Confidence Score pro Empfehlung
+
+**Besonderheiten/Limitationen:**
+- Erfordert OpenAI API Key + Datenschutz-Compliance
+- Keine Speicherung von Payment-Details lokal (nur anonyme Patterns)
+- **Status**: ✅ Vollständig ML/KI-integriert, DSGVO-konform
+
+### 📦 **Payment Delivery**
+
+**Übersicht:**
+- **Zweck**: Delivery Analytics mit ML-Vorhersagen
+- **Use Cases**: Delivery Tracking, Estimation, Performance-Monitoring
+- **Kategorie**: Payment & Finances
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentDelivery.tsx`
+- **Backend API**: `POST /api/payments/ml/delivery-predict`
+- **Features**: Delivery Time Prediction, Status Tracking, Anomaly Detection
+
+**Implementation Notes:**
+- Nutzt historische Delivery-Daten + externe APIs (Shipping Provider)
+- Zeigt ETA mit Confidence Interval (z.B. "2-4 Tage")
+- Alert bei Verzögerungsmustern
+
+**Besonderheiten/Limitationen:**
+- Abhängig von Shipping-Provider-Integration
+- Vorhersagen können unpräzise sein bei neuen Produkten
+- **Status**: ✅ Vollständig ML/KI-integriert
+
+### 🚨 **Payment Emergency**
+
+**Übersicht:**
+- **Zweck**: GPT-4o-mini Integration für KI-Notfall-Analyse
+- **Use Cases**: Critical Payment Issues, Incident Management
+- **Kategorie**: Payment & Finances
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentEmergency.tsx`
+- **Backend API**: `POST /api/payments/ml/emergency-analyze`
+- **LLM**: OpenAI GPT-4o-mini
+- **Features**: Incident Analysis, Root Cause Detection, Action Plans, Escalation
+
+**Implementation Notes:**
+- Schnelle Analyse kritischer Payment-Fehler
+- DSGVO-Hinweis: "Incident-Daten werden an OpenAI für Analyse übertragen"
+- Generiert Action Plan mit Prioritäten
+
+**Besonderheiten/Limitationen:**
+- Erfordert OpenAI API für Real-Time Analysis
+- Automatische Eskalation optional konfigurierbar
+- **Status**: ✅ Vollständig ML/KI-integriert, DSGVO-konform
+
+### 📈 **Payment Expansion**
+
+**Übersicht:**
+- **Zweck**: GPT-4o-mini Integration für Payment-Business-Expansion-Planung
+- **Use Cases**: Scaling, Market Analysis, Growth Strategy
+- **Kategorie**: Payment & Finances
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentExpansion.tsx`
+- **Backend API**: `POST /api/payments/ml/expansion-plan`
+- **LLM**: OpenAI GPT-4o-mini
+- **Features**: Revenue Projections, Market Recommendations, Confidence Scoring, Timeline
+
+**Request/Response Example:**
+```typescript
+// POST /api/payments/ml/expansion-plan
+{
+  currentMetrics: { revenue: 50000, transactions: 1000, avgValue: 50 },
+  targetGrowth: "50%",
+  markets: ["de", "at", "ch"]
+}
+// Response
+{
+  projectedRevenue: 75000,
+  timeline: "6 months",
+  recommendations: [...],
+  confidence: 0.78,
+  risks: [...]
+}
+```
+
+**Implementation Notes:**
+- Nutzt historische Performance + Market Data
+- DSGVO-Hinweis: "Geschäftsdaten werden an OpenAI für Analyse übertragen"
+- Zeigt Confidence %, Risiken und Timeline
+
+**Besonderheiten/Limitationen:**
+- Projektion basierend auf angenommenen Wachstumsfaktoren
+- Externe Marktfaktoren können Prognosen beeinflussen
+- **Status**: ✅ Vollständig ML/KI-integriert, DSGVO-konform
+
+### ⚡ **Payment Quick Check**
+
+**Übersicht:**
+- **Zweck**: Schneller KI-Scanner für Payment-System-Health
+- **Use Cases**: Spot-Checks, Daily Health Monitoring
+- **Kategorie**: Payment & Finances
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/PaymentQuickCheck.tsx`
+- **Backend API**: `POST /api/payments/ml/quick-check`
+- **Features**: System Health Score, Top Issues, Avg Confidence Tracking
+
+**Implementation Notes:**
+- Kurze Laufzeit (~5 Sekunden)
+- Zeigt Top 3 Probleme + Health Score
+- Confidence Average über alle Checks
+
+**Besonderheiten/Limitationen:**
+- Oberflächliche Checks; keine tiefgehendeAnalyse
+- Für schnelle Überblicke gedacht, nicht für detaillierte Audits
+- **Status**: ✅ Vollständig ML/KI-integriert
+
+### 🤖 **ML Payment Analyzer**
+
+**Übersicht:**
+- **Zweck**: Dedizierte KI-Analyzer-Komponente für Payment-ML-Analysen
+- **Use Cases**: Wiederverwendbare ML-Analyse-Logik
+- **Kategorie**: Payment & Finances
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/PaymentFinances/MLPaymentAnalyzer.tsx`
+- **Backend API**: Backend-abhängig (verwendet andere Payment APIs)
+- **Features**: Generische ML-Analyse, Loading States, Error Handling
+
+**Implementation Notes:**
+- Sub-Component für Payment Tester + andere Tools
+- Kapselt: Laden, Analysieren, Error-Handling, Rendering
+- Reusable für neue Payment-Features
+
+**Besonderheiten/Limitationen:**
+- Dient als Utility-Komponente, nicht als standalone Tool
+- Benutzererfahrung abhängig von aufrufenden Tools
+- **Status**: ✅ Vollständig ML/KI-integriert
+
+---
+
+**Datenschutz-Compliance**: Payment User Favor, Payment Emergency und Payment Expansion nutzen OpenAI GPT-4o-mini mit expliziten DSGVO-Hinweisen zur Datentransfer und 30-Tage Retention Policy.
 
 ---
 
