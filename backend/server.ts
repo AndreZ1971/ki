@@ -704,8 +704,11 @@ const start = async () => {
     console.log('✅ Persistence Manager bereit');
 
     // 🔄 Auto-Load für Default-User initialisieren
+    // In Production: Startet mit generischer Fallback-Spezialisierung
+    // User lädt beim Onboarding seine branchenspezifische Spezialisierung hoch
     console.log('🔄 Lade aktive Spezialisierung...');
-    await _initializeSpecializationAutoLoad('default');
+    const defaultUser = process.env.NODE_ENV === 'production' ? 'system' : 'default';
+    await _initializeSpecializationAutoLoad(defaultUser);
 
     const server = await buildServer();
 

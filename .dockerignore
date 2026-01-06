@@ -14,3 +14,12 @@ tsconfig.json
 
 # SENSITIVE: connection.json darf nie ins Image!
 backend/connection.json
+
+# TEST DATA: Lokale Test-Spezialisierungen nicht ins Image
+backend/data/specializations/default/
+data/specializations/fallback-test-user/
+backend/data/test-specializations/
+backend/data/*.json
+data/specializations/*.json
+!backend/data/specializations/fallback-generic.json
+!backend/data/specializations/active-default.json
