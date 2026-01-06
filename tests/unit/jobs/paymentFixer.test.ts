@@ -1,8 +1,11 @@
 // tests/unit/jobs/paymentFixer.test.ts
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
+// Use configurable test URL (from connection.json or env override)
+const TEST_SHOP_URL = process.env.TEST_SHOP_URL || "https://test.example.com";
+
 // Set environment variables BEFORE any imports
-process.env.WOOCOMMERCE_URL = "https://test.kaufe-es.eu";
+process.env.WOOCOMMERCE_URL = TEST_SHOP_URL;
 process.env.CONSUMER_KEY = "ck_test123";
 process.env.CONSUMER_SECRET = "cs_test456";
 
@@ -36,7 +39,7 @@ describe("PaymentFixer", () => {
 
   it("should handle initialization gracefully", () => {
     // Test that environment variables are set correctly
-    expect(process.env.WOOCOMMERCE_URL).toBe("https://test.kaufe-es.eu");
+    expect(process.env.WOOCOMMERCE_URL).toBe(TEST_SHOP_URL);
     expect(process.env.CONSUMER_KEY).toBe("ck_test123");
     expect(process.env.CONSUMER_SECRET).toBe("cs_test456");
   });

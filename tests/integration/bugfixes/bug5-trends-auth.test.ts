@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest';
 
+// Use configurable shop URL (default: test domain)
+const TEST_SHOP_URL = process.env.TEST_SHOP_URL || 'https://test.example.com';
+
 /**
  * Bug #5: Trend Analysis - WooCommerce Auth Method Wrong
  * 
@@ -51,7 +54,7 @@ describe('Bug #5: WooCommerce Basic Auth', () => {
 
   describe('URL Construction', () => {
     it('should NOT include credentials in query string', () => {
-      const baseUrl = 'https://kaufe-es.eu/wp-json/wc/v3/orders';
+      const baseUrl = `${TEST_SHOP_URL}/wp-json/wc/v3/orders`;
       
       // WRONG (old way)
       const wrongUrl = `${baseUrl}?consumer_key=ck_test&consumer_secret=cs_test`;
@@ -65,14 +68,14 @@ describe('Bug #5: WooCommerce Basic Auth', () => {
     });
 
     it('should use clean URL without auth params', () => {
-      const url = 'https://kaufe-es.eu/wp-json/wc/v3/products';
+      const url = `${TEST_SHOP_URL}/wp-json/wc/v3/products`;
       
       expect(url).not.toMatch(/[?&]consumer_key=/);
       expect(url).not.toMatch(/[?&]consumer_secret=/);
     });
 
     it('should allow other query parameters', () => {
-      const url = 'https://kaufe-es.eu/wp-json/wc/v3/orders?per_page=100&page=1';
+      const url = `${TEST_SHOP_URL}/wp-json/wc/v3/orders?per_page=100&page=1`;
       
       // Should have valid query params
       expect(url).toContain('per_page=100');
@@ -88,7 +91,7 @@ describe('Bug #5: WooCommerce Basic Auth', () => {
     it('should construct proper axios config with headers', () => {
       const consumerKey = 'ck_test';
       const consumerSecret = 'cs_test';
-      const url = 'https://kaufe-es.eu/wp-json/wc/v3/orders';
+      const url = `${TEST_SHOP_URL}/wp-json/wc/v3/orders`;
 
       // Correct implementation
       const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
@@ -122,7 +125,7 @@ describe('Bug #5: WooCommerce Basic Auth', () => {
 
   describe('Security Improvements', () => {
     it('should not expose credentials in URL logs', () => {
-      const url = 'https://kaufe-es.eu/wp-json/wc/v3/orders?per_page=50';
+      const url = `${TEST_SHOP_URL}/wp-json/wc/v3/orders?per_page=50`;
       
       // If someone logs this URL, credentials should not be visible
       const logSafe = !url.includes('consumer_key') && !url.includes('consumer_secret');
@@ -201,7 +204,7 @@ describe('Bug #5: WooCommerce Basic Auth', () => {
     });
 
     it('should work with HTTPS endpoints', () => {
-      const url = 'https://kaufe-es.eu/wp-json/wc/v3/orders';
+      const url = `${TEST_SHOP_URL}/wp-json/wc/v3/orders`;
       
       // HTTPS required for Basic Auth security
       expect(url.startsWith('https://')).toBe(true);
@@ -216,7 +219,7 @@ describe('Bug #5: WooCommerce Basic Auth', () => {
       ];
 
       endpoints.forEach(endpoint => {
-        const url = `https://kaufe-es.eu${endpoint}`;
+        const url = `${TEST_SHOP_URL}${endpoint}`;
         
         // All should work with Basic Auth header
         expect(url).not.toContain('consumer_key');
