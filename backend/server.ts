@@ -1,15 +1,19 @@
 // backend/server.ts - KOMPLETT KORRIGIERT
+import './consoleProxy';
 require('./module-alias');
 import 'module-alias/register';
 import cors from '@fastify/cors';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import fastifyMultipart from '@fastify/multipart';
+import rateLimit from '@fastify/rate-limit';
 import dotenv from 'dotenv';
-import { getConfig } from './config';
 import Fastify from 'fastify';
 import fs from 'fs';
+import Redis from 'ioredis';
 import path from 'path';
+import { logger } from './logger';
+import { getConfig } from './config';
 
 // 🔥 CHATBOT MESSAGE ROUTE
 import chatbotMessageRoute from './routes/app/api/chatbot-message';
@@ -203,6 +207,45 @@ async function buildServer() {
     // Body Limit erhöhen
     bodyLimit: 1048576 * 100, // 100MB
     requestTimeout: 300000, // 5 Minuten Timeout für lange Requests
+  });
+
+  const redisUrl = process.env.REDIS_URL?.trim();
+  const rateLimitMax = Number(process.env.RATE_LIMIT_MAX ?? 100);
+  const rateLimitWindow = process.env.RATE_LIMIT_WINDOW ?? '1 minute';
+  const rateLimitAllowList = process.env.RATE_LIMIT_ALLOWLIST
+    ?.split(',')
+    .map((v) => v.trim())
+    .filter(Boolean);
+
+  const redisClient = redisUrl
+    ? new Redis(redisUrl, { lazyConnect: true })
+    : null;
+
+  if (redisClient) {
+    redisClient.on('error', (err) =>
+      logger.warn({ err }, '[rate-limit] Redis connection issue')
+    );
+    redisClient.on('connect', () => logger.info('[rate-limit] Redis connected'));
+  } else {
+    logger.info('[rate-limit] Using in-memory store (no REDIS_URL set)');
+  }
+
+  await server.register(rateLimit, {
+    max: rateLimitMax,
+    timeWindow: rateLimitWindow,
+    allowList: rateLimitAllowList,
+    redis: redisClient ?? undefined,
+    skipOnError: true,
+  });
+
+  server.addHook('onClose', async () => {
+    if (redisClient) {
+      try {
+        await redisClient.quit();
+      } catch (err) {
+        logger.warn({ err }, '[rate-limit] Failed to close Redis');
+      }
+    }
   });
 
   // Debug-Route: Gibt alle registrierten Routen als Text zurück

@@ -1,5 +1,7 @@
 // src/agent/planner.ts
 
+import '../consoleProxy';
+
 // external (values) – nur Typ laden, keine Instanz hier erzeugen!
 
 // internal (values)

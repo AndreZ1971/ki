@@ -185,7 +185,12 @@ Header: `Authorization: Bearer <token>`
 
 #### 3. User Management
 
-**Storage:** In-Memory Map (⚠️ TODO: Database in production)
+**Storage:** In-Memory Map (⚠️ TODO: Database/Redis in production)
+
+**Roadmap (Production-Härtung):**
+- Redis-basiertes Rate Limiting (Multi-Instance fähig)
+- Token-Blacklist/Revocation in Redis (Logout, Compromise)
+- Persistente User-Verwaltung (DB/Redis statt Memory)
 
 **Current Default Users:**
 
@@ -379,9 +384,9 @@ redis.setex(`trend:${keyword}`, 21600, JSON.stringify(data));
 
 ### Specialization Signature System (RSA-2048)
 
-**Purpose:** Verify authenticity of specializations from kaufe-es.eu
+**Purpose:** Verify authenticity of specializations from Marktplatz
 
-**Generation (on kaufe-es.eu):**
+**Generation (on Marktplatz):**
 ```typescript
 const crypto = require('crypto');
 const PRIVATE_KEY = fs.readFileSync('private.pem');

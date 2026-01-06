@@ -126,9 +126,7 @@ Du hast die Basics verstanden. Jetzt kannst du:
 ## ❓ Du brauchst Hilfe?
 
 **Support-Kontakt:**
-- 📧 **E-Mail:** support@kaufe-es.eu
-- 💬 **Live-Chat:** Im Frontend (unten rechts)
-- 📱 **Telefon:** +49 XXX XXXXXXX (Business Hours)
+- 📧 **E-Mail:** support@xxx.com
 
 Wir sind für dich da! 🙌
 
@@ -150,6 +148,5 @@ Wir wissen, wie wichtig dein Shop ist. Daher wurde A.R.I. mit folgendem Prinzip 
 ---
 
 **Viel Spaß mit A.R.I.! 🚀**  
-Dein kaufe-es Team
 
 Version: 6.0.0 | Januar 2026
