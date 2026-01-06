@@ -359,6 +359,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
         return reply.status(400).send({
           success: false,
           error: i18nService.translate('error.uploadFailed'),
+          message: errorMessage,
           code: 'UPLOAD_FAILED',
         });
       }
