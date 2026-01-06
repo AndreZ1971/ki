@@ -79,6 +79,13 @@ function validateARISpecFormat(data: Record<string, unknown>): {
  * Endpoints für Upload, Verwaltung und Aktivierung von Spezialisierungen
  */
 export default async function specializationRoutes(server: FastifyInstance) {
+  // Helper zur konsistenten UserID-Ermittlung (Production nutzt 'system' als Fallback)
+  const resolveUserId = (request: FastifyRequest): string => {
+    const headerId = typeof request.headers['x-user-id'] === 'string' ? (request.headers['x-user-id'] as string) : undefined;
+    const fallback = process.env.NODE_ENV === 'production' ? 'system' : 'default';
+    const reqUser = (request as any).user?.id as string | undefined; // optional Auth Middleware
+    return reqUser || headerId || fallback;
+  };
   /**
    * GET /api/specializations/list
    * Listet alle installierten Spezialisierungen auf
@@ -119,7 +126,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const userId = request.user?.id || (typeof request.headers['x-user-id'] === 'string' ? request.headers['x-user-id'] : undefined) || 'default';
+        const userId = resolveUserId(request);
         const specializations =
           await SpecializationService.getInstalledSpecializations(userId);
 
@@ -155,7 +162,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
 
       try {
         // Extract user ID from headers or use default
-        const userId = (request.headers['x-user-id'] as string) || 'default';
+        const userId = resolveUserId(request);
         const uploadId = crypto.randomUUID();
 
         logger.debug(
@@ -394,7 +401,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
     ) => {
       try {
         const { specId } = request.body;
-        const userId = request.user?.id || (typeof request.headers['x-user-id'] === 'string' ? request.headers['x-user-id'] : undefined) || 'default';
+        const userId = resolveUserId(request);
 
         // Activate in both systems
         await SpecializationService.activateSpecialization(userId, specId);
@@ -454,7 +461,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
     ) => {
       try {
         const { specId } = request.params;
-        const userId = request.user?.id || (typeof request.headers['x-user-id'] === 'string' ? request.headers['x-user-id'] : undefined) || 'default';
+        const userId = resolveUserId(request);
 
         await SpecializationService.deleteSpecialization(userId, specId);
 
@@ -504,7 +511,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const userId = request.user?.id || (typeof request.headers['x-user-id'] === 'string' ? request.headers['x-user-id'] : undefined) || 'default';
+        const userId = resolveUserId(request);
         const active =
           await SpecializationService.getActiveSpecialization(userId);
 
