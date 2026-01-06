@@ -19,7 +19,8 @@ echo "[Entrypoint] Benutzer: $(id -un) UID: $(id -u) GID: $(id -g)"
 
 # 1. VERZEICHNISSE ERSTELLEN
 echo "[Entrypoint] 📁 Erstelle benötigte Verzeichnisse..."
-mkdir -p /app/data/dlq /app/data/backups /app/logs 2>/dev/null || true
+# Stellen sicher, dass Specializations-Verzeichnis existiert, falls der Host-Mount leer ist
+mkdir -p /app/data/dlq /app/data/backups /app/logs /app/data/specializations 2>/dev/null || true
 
 # 2. BERECHTIGUNGEN SETZEN
 echo "[Entrypoint] 🔐 Setze korrekte Berechtigungen..."
