@@ -255,25 +255,34 @@ export class SpecializationService {
   ): Promise<void> {
     const specs = await this.getInstalledSpecializations(userId);
 
+    // Check if any specializations are installed
+    if (!specs || specs.length === 0) {
+      logger.warn(`⚠️ Keine Spezialisierungen installiert für User: ${userId}`);
+      throw new Error('Keine Spezialisierungen gefunden. Bitte zuerst eine Spezialisierung hochladen.');
+    }
+
     // Deaktiviere alle anderen
     specs.forEach((s) => (s.isActive = false));
 
     // Aktiviere die gewählte
     const target = specs.find((s) => s.id === specId);
     if (!target) {
-      throw new Error(`Spezialisierung ${specId} nicht gefunden`);
+      logger.warn(`⚠️ Spezialisierung ${specId} nicht gefunden für User: ${userId}`);
+      throw new Error(`Spezialisierung "${specId}" nicht gefunden. Verfügbare IDs: ${specs.map(s => s.id).join(', ')}`);
     }
     target.isActive = true;
 
     // Speichere
-    const metadataPath = path.join(DATA_DIR, userId, 'metadata.json');
+    const userDir = path.join(DATA_DIR, userId);
+    await fs.promises.mkdir(userDir, { recursive: true });
+    const metadataPath = path.join(userDir, 'metadata.json');
     await fs.promises.writeFile(
       metadataPath,
       JSON.stringify(specs, null, 2),
       'utf-8'
     );
 
-    logger.info(`✅ Spezialisierung aktiviert: ${specId}`);
+    logger.info(`✅ Spezialisierung aktiviert: ${specId} (User: ${userId})`);
   }
 
   /**
