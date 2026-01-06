@@ -1,4 +1,3 @@
-/* eslint-env node */
 // ecosystem.config.cjs
 module.exports = {
   apps: [

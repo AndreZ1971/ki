@@ -299,8 +299,8 @@ Weitere 8 Payment-Tools mit ML-Integration
 
 ### 📧 Kommerzieller Support
 
-- **E-Mail:** info@kaufe-es.eu
-- **Website:** [kaufe-es.eu](https://kaufe-es.eu)
+- **E-Mail:** info@example.com
+- **Website:** [example.com](https://example.com)
 
 ### 🤝 Contributing
 

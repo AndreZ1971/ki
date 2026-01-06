@@ -1,5 +1,6 @@
 // agent/jobs/realAnalyticsReporting.ts
 import * as dotenv from 'dotenv';
+import { getWooConfig } from '../../woocommerce/config.js';
 
 import { GoogleTrendsService } from './googleTrendsService';
 import { RealWooCommerceAnalytics } from './realWooCommerceAnalytics';
@@ -42,9 +43,12 @@ class RealAnalyticsReporting {
 
   private static async generateBusinessReport(data: any) {
     const reportDate = new Date().toLocaleDateString('de-DE');
+    const shopUrl = getWooConfig().url || process.env.WOOCOMMERCE_URL || 'https://example.com';
+    let hostLabel = 'SHOP';
+    try { hostLabel = new URL(shopUrl).host.toUpperCase(); } catch { hostLabel = 'SHOP'; }
     
     console.log('\n' + '='.repeat(70));
-    console.log('💼 GESCHÄFTSBERICHT - KAUFE-ES.EU');
+    console.log(`💼 GESCHÄFTSBERICHT - ${hostLabel}`);
     console.log('='.repeat(70));
     console.log(`📅 Monatlicher Report - ${reportDate}`);
     

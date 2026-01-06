@@ -1,6 +1,7 @@
 // agent/jobs/paymentVerifier.ts
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
 import * as dotenv from 'dotenv';
+import { getWooConfig } from '../../woocommerce/config.js';
 
 dotenv.config();
 
@@ -75,6 +76,7 @@ class PaymentVerifier {
 
   private static async ensureTestProduct() {
     console.log('\n2. 🧪 TEST-PRODUKT SICHERSTELLEN:\n');
+    const shopUrl = getWooConfig().url || process.env.WOOCOMMERCE_URL || 'https://example.com';
     
     // Prüfen ob Test-Produkt existiert
     const productsResponse = await wooCommerce.get('products', {
@@ -100,7 +102,7 @@ class PaymentVerifier {
     }
 
     console.log('   🔗 Direkt-Link zum Testen:');
-    console.log('      https://kaufe-es.eu/');
+    console.log(`      ${shopUrl}/`);
     console.log('      ➡️ Suche nach "Payment Test Product"');
   }
 

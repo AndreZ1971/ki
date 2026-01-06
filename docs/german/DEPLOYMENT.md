@@ -619,17 +619,15 @@ spec:
 
 ## 📋 Docker-Compose Reference
 
-### Aktuelle Production docker-compose.yml
+### Aktuelle Production docker-compose.yml (neutral und parametrisierbar)
 
 ```yaml
 version: '3.8'
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: woo-app
+    image: "${IMAGE_NAME:-app-agent}:${TAG:-latest}"
+    container_name: "${CONTAINER_NAME:-app-agent}"
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -641,7 +639,7 @@ services:
       - ./backend/data:/app/data:rw
       - ./.env.production:/app/.env.production:ro
     networks:
-      - kaufe-es-network
+      - app-network
     healthcheck:                      # ← SOLLTE HINZUGEFÜGT WERDEN
       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 10s
@@ -662,7 +660,7 @@ services:
     depends_on:
       - app
     networks:
-      - kaufe-es-network
+      - app-network
     healthcheck:                      # ← SOLLTE HINZUGEFÜGT WERDEN
       test: ["CMD", "curl", "-f", "http://localhost:80/"]
       interval: 10s
@@ -678,10 +676,11 @@ services:
     command: --interval 300 --cleanup
     restart: unless-stopped
     networks:
-      - kaufe-es-network
+      - app-network
 
 networks:
-  kaufe-es-network:
+  app-network:
+    name: ${NETWORK_NAME:-app-network}
     driver: bridge
 
 volumes:
@@ -696,6 +695,14 @@ volumes:
 - ✅ Restart Policy ist sinnvoll
 - ✅ Volumes für Persistenz sind da
 - ✅ Watchtower für Monitoring
+
+**Parameter:**
+- `IMAGE_NAME` (Default: `app-agent`), `TAG` (Default: `latest`), optional `CONTAINER_NAME`
+- `NETWORK_NAME` (Default: `app-network`)
+
+**Deploy-Skripte:**
+- Bash: `IMAGE_NAME=app-agent TAG=1.0.0 ./deploy.sh`
+- PowerShell: `$env:IMAGE_NAME='app-agent'; $env:TAG='1.0.0'; ./deploy.ps1`
 
 **Für Kubernetes braucht Automattic:**
 - Neue Namespaces pro Kunde

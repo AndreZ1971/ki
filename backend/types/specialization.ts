@@ -4,13 +4,13 @@
  */
 
 /**
- * Signierte Spezialisierungs-Datei (von WooCommerce/kaufe-es.eu)
+ * Signierte Spezialisierungs-Datei (von vertrauenswürdigem Marketplace)
  */
 export interface SignedSpecialization {
   version: string; // Format-Version (z.B. "1.0")
   data: SpecializationData; // Die eigentlichen Daten
   signature: string; // Base64-kodierte Signatur
-  issuer: string; // "kaufe-es.eu"
+  issuer: string; // Marketplace domain (e.g., "marketplace.example.com")
   timestamp: number; // Unix timestamp
   orderId?: string; // WooCommerce Order ID (optional)
 }

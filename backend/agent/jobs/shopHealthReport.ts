@@ -1,5 +1,6 @@
 // agent/jobs/shopHealthReport.ts
 import * as dotenv from 'dotenv';
+import { getWooConfig } from '../../woocommerce/config.js';
 
 // Entfernt: ContentMonetizer, FreeToPaidConverter, PaymentFixer (nicht verwendet)
 import { RealWooCommerceAnalytics } from './realWooCommerceAnalytics';
@@ -23,8 +24,11 @@ class ShopHealthReport {
       // Alle Daten sammeln
       await RealWooCommerceAnalytics.getSalesData(dateRange);
       
+      const shopUrl = getWooConfig().url || process.env.WOOCOMMERCE_URL || 'https://example.com';
+      let hostLabel = 'SHOP';
+      try { hostLabel = new URL(shopUrl).host.toUpperCase(); } catch { hostLabel = 'SHOP'; }
       console.log('='.repeat(80));
-      console.log('🏪 SHOP GESUNDHEITSREPORT - KAUFE-ES.EU');
+      console.log(`🏪 SHOP GESUNDHEITSREPORT - ${hostLabel}`);
       console.log('='.repeat(80));
       console.log('📅 Reportdatum:', new Date().toLocaleDateString('de-DE'));
       

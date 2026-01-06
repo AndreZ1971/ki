@@ -1,5 +1,6 @@
 // agent/jobs/paymentLiveFixer.ts
 import * as dotenv from 'dotenv';
+import { getWooConfig } from '../../woocommerce/config.js';
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ class PaymentLiveFixer {
 
   private static async guideStripeFix() {
     console.log('🛠️ SCHRITT 1: STRIPE WEBHOOK EINRICHTEN\n');
+    const shopUrl = getWooConfig().url || process.env.WOOCOMMERCE_URL || 'https://example.com';
     
     console.log('📋 VORBEREITUNG:');
     console.log('   1. Öffne https://dashboard.stripe.com');
@@ -43,7 +45,7 @@ class PaymentLiveFixer {
     console.log('🔧 WEBHOOK HINZUFÜGEN:');
     console.log('   1. Klicke auf "+ Add endpoint"');
     console.log('   2. Endpoint URL eingeben:');
-    console.log('      🔗 https://kaufe-es.eu/wc-api/stripe_webhook');
+    console.log(`      🔗 ${shopUrl}/wc-api/stripe_webhook`);
     console.log('   3. Events auswählen:');
     console.log('      ✅ payment_intent.succeeded');
     console.log('      ✅ payment_intent.payment_failed');
@@ -104,6 +106,7 @@ class PaymentLiveFixer {
 
   private static async finalTestingGuide() {
     console.log('🧪 SCHRITT 4: FINALE TESTS DURCHFÜHREN\n');
+    const shopUrl = getWooConfig().url || process.env.WOOCOMMERCE_URL || 'https://example.com';
     
     console.log('📋 TEST-PRODUKT ERSTELLEN:');
     console.log('   1. WordPress: Produkte → Neues Produkt');
@@ -112,7 +115,7 @@ class PaymentLiveFixer {
     console.log('   4. Veröffentlicht speichern\n');
     
     console.log('🔧 TEST #1 - STRIPE:');
-    console.log('   1. Öffne: https://kaufe-es.eu/');
+    console.log(`   1. Öffne: ${shopUrl}/`);
     console.log('   2. Suche nach "Payment Test Product"');
     console.log('   3. In Warenkorb → Zur Kasse');
     console.log('   4. Stripe auswählen → Test-Karte: 4242 4242 4242 4242');

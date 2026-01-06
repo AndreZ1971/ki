@@ -1,6 +1,7 @@
 // agent/jobs/paymentFixer.ts
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
 import * as dotenv from 'dotenv';
+import { getWooConfig } from '../../woocommerce/config.js';
 
 dotenv.config();
 
@@ -75,12 +76,13 @@ class PaymentFixer {
 
   private static async generatePaymentSolutions(cancelledOrders: any[]) {
     console.log('\n🎯 SOFORTIGE PAYMENT-FIXES:\n');
+    const shopUrl = getWooConfig().url || process.env.WOOCOMMERCE_URL || 'https://example.com';
 
     console.log('1. 🔧 STRIPE KONFIGURATION ÜBERPRÜFEN:');
     console.log('   • Webhooks in Stripe Dashboard prüfen');
     console.log('   • API Keys validieren');
     console.log('   • Test-Modus vs. Live-Modus checken');
-    console.log('   • Webhook URL: https://kaufe-es.eu/wc-api/stripe_webhook\n');
+    console.log(`   • Webhook URL: ${shopUrl}/wc-api/stripe_webhook\n`);
 
     console.log('2. 🚀 ALTERNATIVE ZAHLUNGSMETHODEN AKTIVIEREN:');
     console.log('   • PayPal Express Checkout aktivieren');

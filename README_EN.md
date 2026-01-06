@@ -343,8 +343,8 @@ Your shop is on Facebook, Instagram, LinkedIn, TikTok, email. A.R.I. posts smart
 
 ### 📧 Commercial Support
 
-- **Email:** info@kaufe-es.eu
-- **Website:** [kaufe-es.eu](https://kaufe-es.eu)
+- **Email:** info@example.com
+- **Website:** [example.com](https://example.com)
 
 ### 🤝 Contributing
 

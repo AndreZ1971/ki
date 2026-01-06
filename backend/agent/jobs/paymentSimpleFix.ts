@@ -1,5 +1,6 @@
 // agent/jobs/paymentSimpleFix.ts
 import * as dotenv from 'dotenv';
+import { getWooConfig } from '../../woocommerce/config.js';
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ class PaymentSimpleFix {
 
   private static async step1() {
     console.log('\n1. 🔧 SCHRITT 1: STRIPE WEBHOOK EINRICHTEN (10 Min)\n');
+    const shopUrl = getWooConfig().url || process.env.WOOCOMMERCE_URL || 'https://example.com';
     
     console.log('   📋 WAS ZU TUN IST:');
     console.log('      Stripe muss deinem Shop Bescheid sagen wenn eine Zahlung erfolgreich war.\n');
@@ -28,7 +30,7 @@ class PaymentSimpleFix {
     console.log('      3. Links: "Developers" → "Webhooks"');
     console.log('      4. Klicke "+ Add endpoint"');
     console.log('      5. Füge diese URL ein:');
-    console.log('         🔗 https://kaufe-es.eu/wc-api/stripe_webhook');
+    console.log(`         🔗 ${shopUrl}/wc-api/stripe_webhook`);
     console.log('      6. Wähle diese Events:');
     console.log('         ✅ payment_intent.succeeded');
     console.log('         ✅ payment_intent.payment_failed');
@@ -71,12 +73,13 @@ class PaymentSimpleFix {
 
   private static async step3() {
     console.log('\n3. 🧪 SCHRITT 3: TEST-KAUF DURCHFÜHREN (5 Min)\n');
+    const shopUrl = getWooConfig().url || process.env.WOOCOMMERCE_URL || 'https://example.com';
     
     console.log('   📋 WAS ZU TUN IST:');
     console.log('      Teste ob jetzt alles funktioniert mit einem €1 Test-Kauf.\n');
     
     console.log('   👨‍💻 SO GEHT\'S:');
-    console.log('      1. Öffne https://kaufe-es.eu/ in einem neuen Browser Tab');
+    console.log(`      1. Öffne ${shopUrl}/ in einem neuen Browser Tab`);
     console.log('      2. Suche nach einem Produkt (z.B. "Wallpaper")');
     console.log('      3. Klicke "In den Warenkorb"');
     console.log('      4. Klicke "Zur Kasse"');

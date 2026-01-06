@@ -11,6 +11,11 @@ const wooCommerce = new WooCommerceRestApi({
   version: 'wc/v3'
 });
 
+// Dynamische Shop-URL aus Konfiguration
+const { getWooConfig } = require('../../woocommerce/config.js');
+const shopUrl: string = (getWooConfig()?.url) || process.env.WOOCOMMERCE_URL || 'https://example.com';
+const base: string = String(shopUrl).replace(/\/$/, '');
+
 class PaymentDebugger {
   static async debugPaymentIssues() {
     console.log('🔧 STARTE PAYMENT-DEBUGGING...\n');
@@ -102,7 +107,7 @@ class PaymentDebugger {
         enabled: true, 
         configSteps: [
           'API Keys in WooCommerce → Settings → Payments → Stripe',
-          'Webhook URL: https://kaufe-es.eu/wc-api/stripe_webhook',
+          `Webhook URL: ${base}/wc-api/stripe_webhook`,
           'Test-Modus deaktivieren für Live-Betrieb'
         ]
       },
@@ -168,7 +173,7 @@ class PaymentDebugger {
     console.log('🔴 SCHRITT 1: STRIPE WEBHOOK PRÜFEN (KRITISCH)');
     console.log('   1. Öffne https://dashboard.stripe.com');
     console.log('   2. Gehe zu "Developers" → "Webhooks"');
-    console.log('   3. Suche nach: https://kaufe-es.eu/wc-api/stripe_webhook');
+    console.log(`   3. Suche nach: ${base}/wc-api/stripe_webhook`);
     console.log('   4. Falls nicht vorhanden: Webhook manuell hinzufügen');
     console.log('   5. Events: payment_intent.succeeded, payment_intent.payment_failed');
     console.log('   6. Webhook Signing Secret in WooCommerce eintragen\n');

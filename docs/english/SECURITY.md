@@ -384,9 +384,9 @@ redis.setex(`trend:${keyword}`, 21600, JSON.stringify(data));
 
 ### Specialization Signature System (RSA-2048)
 
-**Purpose:** Verify authenticity of specializations from kaufe-es.eu
+**Purpose:** Verify authenticity of specializations from trusted marketplace
 
-**Generation (on kaufe-es.eu):**
+**Generation (on marketplace):**
 ```typescript
 const crypto = require('crypto');
 const PRIVATE_KEY = fs.readFileSync('private.pem');

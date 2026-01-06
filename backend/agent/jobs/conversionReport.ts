@@ -7,6 +7,11 @@ import { WordPressAnalyticsService } from './wordpressAnalyticsService';
 
 dotenv.config();
 
+// Dynamische Shop-Domain für Report-Header
+const { getWooConfig } = require('../../woocommerce/config.js');
+const shopUrl: string = (getWooConfig()?.url) || process.env.WOOCOMMERCE_URL || 'https://example.com';
+const hostLabel: string = (() => { try { return new URL(shopUrl).host.replace(/^www\./,''); } catch { return 'example.com'; } })();
+
 class ConversionReport {
   static async run() {
     console.log('🎯 Starte Conversion-Optimierung Report...\n');
@@ -39,7 +44,7 @@ class ConversionReport {
 
   private static async generateConversionReport(_data: any) {
     console.log('='.repeat(80));
-    console.log('🚨 CONVERSION OPTIMIERUNGS-REPORT - KAUFE-ES.EU');
+    console.log(`🚨 CONVERSION OPTIMIERUNGS-REPORT - ${hostLabel.toUpperCase()}`);
     console.log('='.repeat(80));
     console.log('📅 Analyse: ', new Date().toLocaleDateString('de-DE'));
     

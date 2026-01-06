@@ -1,12 +1,16 @@
 // backend/agent/jobs/aiImageGenerator.ts - OPTIMIERTE VERSION
 import { wooGet, wooPost } from '../../tools/woo';
+// Dynamische Shop-URL aus Konfiguration
+const { getWooConfig } = require('../../woocommerce/config.js');
+const shopUrl: string = (getWooConfig()?.url) || process.env.WOOCOMMERCE_URL || 'https://example.com';
+const base: string = String(shopUrl).replace(/\/$/, '');
 
 // EXISTIERENDE Bilder von deiner Website
 const EXISTING_IMAGES = [
-  "https://kaufe-es.eu/wp-content/uploads/2025/10/DevStarter.png",
-  "https://kaufe-es.eu/wp-content/uploads/2025/10/DevStarter-Bundles.png", 
-  "https://kaufe-es.eu/wp-content/uploads/2025/10/cover01-3.png",
-  "https://kaufe-es.eu/wp-content/uploads/2025/10/cover02.png"
+  `${base}/wp-content/uploads/2025/10/DevStarter.png`,
+  `${base}/wp-content/uploads/2025/10/DevStarter-Bundles.png`, 
+  `${base}/wp-content/uploads/2025/10/cover01-3.png`,
+  `${base}/wp-content/uploads/2025/10/cover02.png`
 ];
 
 async function generateProductImages() {

@@ -15,7 +15,7 @@ services:
       - ./backend/data:/app/data:rw
       - ./.env.production:/app/.env.production:ro
     networks:
-      - kaufe-es-network
+      - app-network
 
   nginx:
     image: nginx:latest
@@ -30,7 +30,7 @@ services:
     depends_on:
       - app
     networks:
-      - kaufe-es-network
+      - app-network
 
   watchtower:
     image: containrrr/watchtower
@@ -40,8 +40,9 @@ services:
     command: --interval 300 --cleanup
     restart: unless-stopped
     networks:
-      - kaufe-es-network
+      - app-network
 
 networks:
-  kaufe-es-network:
+  app-network:
+    name: ${NETWORK_NAME:-app-network}
     driver: bridge

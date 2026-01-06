@@ -189,7 +189,7 @@ A.R.I. uses OpenAI for all AI features:
 
 #### Step 1: Get Specialization File
 
-1. Visit [kaufe-es.eu](https://kaufe-es.eu)
+1. Visit [marketplace.example.com](https://marketplace.example.com)
 2. Choose your industry
 3. Download the `.ari-spec` file
 4. Save it on your computer
@@ -330,7 +330,7 @@ The backend is **NOT** for daily use. It shows:
 ### Specialization Not Accepted
 
 **❌ "Invalid signature"**
-- Only original files from kaufe-es.eu work
+- Only original files from authorized marketplace work
 - Download the file again
 
 **❌ "File too large"**
@@ -354,7 +354,7 @@ The backend is **NOT** for daily use. It shows:
 
 ## 📞 Support
 
-**Email:** support@kaufe-es.eu  
+**Email:** support@example.com  
 **Live Chat:** In frontend (bottom right)  
 **Phone:** +49 XXX XXXXXXX (Business Hours)
 

@@ -7,16 +7,27 @@ set -e  # Exit on error
 
 echo "🚀 Starting Hetzner Deployment..."
 
-# 1. Build Docker Image
-echo "📦 Building Docker image..."
-docker build -t kaufe-es-agent:latest .
+# Configurable image settings (override via env: IMAGE_NAME, TAG, REGISTRY)
+IMAGE_NAME=${IMAGE_NAME:-app-agent}
+TAG=${TAG:-latest}
+REGISTRY=${REGISTRY:-}
 
-# 2. Tag for Registry (optional - falls du Docker Registry verwendest)
-# docker tag kaufe-es-agent:latest your-registry.com/kaufe-es-agent:latest
+DOCKER_IMAGE="$IMAGE_NAME:$TAG"
+if [ -n "$REGISTRY" ]; then
+  DOCKER_IMAGE="$REGISTRY/$DOCKER_IMAGE"
+fi
+
+# 1. Build Docker Image
+echo "📦 Building Docker image: $DOCKER_IMAGE"
+docker build -t "$DOCKER_IMAGE" .
+
+# 2. (Optional) Additional tag for Registry if you use a separate registry host
+# Example: export REGISTRY=your-registry.com before running this script
+# docker tag "$DOCKER_IMAGE" "$REGISTRY/$IMAGE_NAME:$TAG"
 
 # 3. Push to Registry (optional)
 # echo "⬆️  Pushing to registry..."
-# docker push your-registry.com/kaufe-es-agent:latest
+# docker push "$DOCKER_IMAGE"
 
 # 4. Deploy to Hetzner via docker-compose
 echo "🚢 Deploying to Hetzner..."
