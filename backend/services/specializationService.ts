@@ -42,12 +42,12 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyVxQ9jK5pZ7N2rH8kE3v
 
 const ENCRYPTION_ALGORITHM = 'aes-256-gcm';
 
-// Lade Encryption Key aus connection.json
+// Lade Encryption Key aus connection.json (robust, mit gültigem Hex-Fallback)
 const config = loadConnectionConfig();
-const ENCRYPTION_KEY = Buffer.from(
-  config.specialization?.encryptionKey || 'default-32-byte-key-change-me!',
-  'hex'
-).subarray(0, 32);
+const defaultHexKey = '0000000000000000000000000000000000000000000000000000000000000000'; // 32 bytes
+const rawKey = config.specialization?.encryptionKey;
+const hexKey = rawKey && /^[0-9a-fA-F]{64}$/.test(rawKey) ? rawKey : defaultHexKey;
+const ENCRYPTION_KEY = Buffer.from(hexKey, 'hex');
 
 const DATA_DIR = path.join(process.cwd(), 'data', 'specializations');
 
