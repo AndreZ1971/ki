@@ -223,8 +223,9 @@ export default async function emailMarketingRoutes(server: FastifyInstance) {
 
         for (const customer of targetCustomers) {
           try {
+            const smtpFrom = (getConfig().smtp?.from) || process.env.SMTP_FROM || 'noreply@example.com';
             await transporter.sendMail({
-              from: 'info@kaufe-es.eu', // Vorkonfigurierte Absenderadresse
+              from: smtpFrom,
               to: customer.email,
               subject: emailSubject,
               html: `

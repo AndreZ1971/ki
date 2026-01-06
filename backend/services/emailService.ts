@@ -1,20 +1,19 @@
-// services/emailService.ts - VOLLSTÄNDIG KORRIGIERT
+// services/emailService.ts - Neutral & konfigurierbar
 import nodemailer from 'nodemailer';
 
-// 🔥 EXPLIZITE KONFIGURATION - KEINE Umgebungsvariablen
+// Konfiguration ausschließlich über Umgebungsvariablen/connection.json
 const emailConfig = {
-  host: 'inn.bitpalast.net',
-  port: 465,
-  secure: true,
+  host: process.env.SMTP_HOST || 'smtp.example.com',
+  port: Number(process.env.SMTP_PORT || 465),
+  secure: String(process.env.SMTP_SECURE || 'true') === 'true',
   auth: {
-    user: 'info@kaufe-es.eu',
-    pass: '010871Z71612' // 🔥 PASSWORT DIREKT EINGESETZT
+    user: process.env.SMTP_USER || 'noreply@example.com',
+    pass: process.env.SMTP_PASS || ''
   },
   tls: {
     rejectUnauthorized: false
   },
-  // 🔥 TIMEOUT EINSTELLUNGEN
-  connectionTimeout: 10000, // 10 Sekunden
+  connectionTimeout: 10000,
   greetingTimeout: 10000,
   socketTimeout: 15000
 };
@@ -23,8 +22,7 @@ console.log('🔧 Email Konfiguration geladen:', {
   host: emailConfig.host,
   port: emailConfig.port,
   secure: emailConfig.secure,
-  user: emailConfig.auth.user,
-  pass: '***' + emailConfig.auth.pass.slice(-3) // Nur letzte 3 Zeichen zeigen
+  user: emailConfig.auth.user
 });
 
 const transporter = nodemailer.createTransport(emailConfig);

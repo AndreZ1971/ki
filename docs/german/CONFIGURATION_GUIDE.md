@@ -56,7 +56,7 @@ Die Shop-URLs werden in der `connection.json` definiert:
 
 **Richtig ❌ (DO NOT DO THIS):**
 ```typescript
-const wooUrl = "https://kaufe-es.eu/wp-json/wc/v3/products";
+const wooUrl = "https://example.com/wp-json/wc/v3/products";
 ```
 
 **Richtig ✅ (SO MACHEN WIR ES):**
@@ -123,7 +123,7 @@ services:
 | URL aus `connection.json` | Hardcodiert in Code |
 | URL aus Config-Datei | URL als String-Konstante |
 | Env-Variable für Tests | Test-Fixture-URL |
-| `${config.url}/...` | `https://kaufe-es.eu/...` |
+| `${config.url}/...` | `https://example.com/...` |
 
 ### Fehlerbehandlung
 

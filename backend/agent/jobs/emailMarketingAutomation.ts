@@ -1,16 +1,21 @@
 // backend/agent/jobs/emailMarketingAutomation.ts
 import { wooGet } from '../../tools/woo';
+// Dynamische Shop-URL und Host-Label
+const { getWooConfig } = require('../../woocommerce/config.js');
+const shopUrl: string = (getWooConfig()?.url) || process.env.WOOCOMMERCE_URL || 'https://example.com';
+const base: string = String(shopUrl).replace(/\/$/, '');
+const hostLabel: string = (() => { try { return new URL(shopUrl).host.replace(/^www\./,''); } catch { return 'example.com'; } })();
 
 // Deutsche Email-Templates für DSGVO-Marketing
 const GERMAN_EMAIL_TEMPLATES = {
   welcome: {
-    subject: "🎉 Willkommen bei kaufe-es.eu - Ihre DSGVO-Compliance Lösung",
+    subject: `🎉 Willkommen bei ${hostLabel} - Ihre DSGVO-Compliance Lösung`,
     template: `
 <h1>Herzlich Willkommen!</h1>
 
 <p>Vielen Dank für Ihr Interesse an unseren DSGVO-Lösungen!</p>
 
-<p>Bei <strong>kaufe-es.eu</strong> helfen wir deutschen Unternehmen, <strong>einfach und rechtssicher DSGVO-compliant</strong> zu werden.</p>
+<p>Bei <strong>${hostLabel}</strong> helfen wir deutschen Unternehmen, <strong>einfach und rechtssicher DSGVO-compliant</strong> zu werden.</p>
 
 <h2>🏆 Unsere Top-Produkte für Sie:</h2>
 <ul>
@@ -24,12 +29,12 @@ const GERMAN_EMAIL_TEMPLATES = {
 <p>{tip}</p>
 
 <p><strong>Starten Sie jetzt durch:</strong><br>
-<a href="https://kaufe-es.eu" style="background: #3B82F6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">Zu unseren Produkten</a></p>
+<a href="${base}" style="background: #3B82F6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">Zu unseren Produkten</a></p>
 
 <p>Bei Fragen stehen wir Ihnen jederzeit zur Verfügung!</p>
 
 <p>Beste Grüße<br>
-Ihr Team von <strong>kaufe-es.eu</strong></p>
+Ihr Team von <strong>${hostLabel}</strong></p>
 
 <hr>
 <small>Sie erhalten diese Email, weil Sie sich für DSGVO-Lösungen interessieren. <a href="{unsubscribeLink}">Hier abbestellen</a>.</small>
@@ -56,7 +61,7 @@ Ihr Team von <strong>kaufe-es.eu</strong></p>
 <p>{statistic}</p>
 
 <p><strong>Alle Produkte entdecken:</strong><br>
-<a href="https://kaufe-es.eu" style="background: #10B981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">Zum Shop</a></p>
+<a href="${base}" style="background: #10B981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">Zum Shop</a></p>
 
 <hr>
 <small>Dieser Newsletter informiert Sie über DSGVO-Themen. <a href="{unsubscribeLink}">Hier abbestellen</a>.</small>
@@ -167,7 +172,7 @@ async function runWelcomeEmailCampaign() {
     for (const subscriber of newSubscribers) {
       const emailHtml = GERMAN_EMAIL_TEMPLATES.welcome.template
         .replace('{tip}', tip)
-        .replace('{unsubscribeLink}', `https://kaufe-es.eu/unsubscribe?email=${encodeURIComponent(subscriber)}`);
+        .replace('{unsubscribeLink}', `${base}/unsubscribe?email=${encodeURIComponent(subscriber)}`);
       
       try {
         const result = await EMAIL_SERVICE.send(
@@ -237,7 +242,7 @@ async function runNewsletterCampaign() {
         .replace('{monthlyTip}', monthlyTip)
         .replace('{newProducts}', newProducts ? `<ul>${newProducts}</ul>` : '<p>Keine neuen Produkte diesen Monat.</p>')
         .replace('{statistic}', statistic)
-        .replace('{unsubscribeLink}', `https://kaufe-es.eu/unsubscribe?email=${encodeURIComponent(subscriber)}`);
+        .replace('{unsubscribeLink}', `${base}/unsubscribe?email=${encodeURIComponent(subscriber)}`);
       
       const subject = GERMAN_EMAIL_TEMPLATES.newsletter.subject.replace('{month}', currentMonth);
       
@@ -304,11 +309,11 @@ async function runProductRecommendationCampaign() {
         .replace('{productName}', targetProduct.name)
         .replace('{productDescription}', targetProduct.short_description || targetProduct.description)
         .replace('{productPrice}', targetProduct.price || '49,99')
-        .replace('{productLink}', `https://kaufe-es.eu/produkt/${targetProduct.slug}`)
+        .replace('{productLink}', `${base}/produkt/${targetProduct.slug}`)
         .replace('{benefit1}', benefits[0])
         .replace('{benefit2}', benefits[1])
         .replace('{benefit3}', benefits[2])
-        .replace('{unsubscribeLink}', `https://kaufe-es.eu/unsubscribe?email=${encodeURIComponent(customer)}`);
+        .replace('{unsubscribeLink}', `${base}/unsubscribe?email=${encodeURIComponent(customer)}`);
       
       const subject = GERMAN_EMAIL_TEMPLATES.productRecommendation.subject
         .replace('{productName}', targetProduct.name);

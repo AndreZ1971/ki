@@ -232,7 +232,7 @@ describe('Bug #5: WooCommerce Basic Auth', () => {
     it('should confirm old query string method is replaced', () => {
       // This test validates that we moved away from query strings
       const oldPattern = /[?&]consumer_key=[^&]+&consumer_secret=[^&]+/;
-      const newUrl = 'https://kaufe-es.eu/wp-json/wc/v3/orders?per_page=100';
+      const newUrl = `${TEST_SHOP_URL}/wp-json/wc/v3/orders?per_page=100`;
 
       expect(oldPattern.test(newUrl)).toBe(false);
     });

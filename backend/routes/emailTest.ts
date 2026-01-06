@@ -15,9 +15,12 @@ async function emailTestRoutes(fastify: any, _options: any) {
       console.log('✅ SMTP Verbindung erfolgreich');
       
       // Test-Email senden
+      const smtp = getConfig().smtp || {};
+      const fromAddr = smtp.from || process.env.SMTP_FROM || 'noreply@example.com';
+      const toAddr = process.env.TEST_EMAIL_TO || fromAddr;
       const testResult = await transporter.sendMail({
-        from: '"Kaufe-es.eu Test" <info@kaufe-es.eu>',
-        to: 'jannro771@gmail.com',
+        from: `"App Test" <${fromAddr}>`,
+        to: toAddr,
         subject: 'Test Email - SMTP Konfiguration',
         text: 'Dies ist eine Test-Email zur Überprüfung der SMTP-Konfiguration.',
         html: '<p>Dies ist eine <b>Test-Email</b> zur Überprüfung der SMTP-Konfiguration.</p>'
@@ -25,7 +28,6 @@ async function emailTestRoutes(fastify: any, _options: any) {
 
       console.log('✅ Test-Email gesendet:', testResult.messageId);
 
-      const smtp = getConfig().smtp || {};
       return {
         success: true,
         message: 'Email-Konfiguration funktioniert!',

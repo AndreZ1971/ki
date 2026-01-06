@@ -1,6 +1,7 @@
 // agent/jobs/paymentIssueDetector.ts
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
 import * as dotenv from 'dotenv';
+import { getWooConfig } from '../../woocommerce/config.js';
 
 dotenv.config();
 
@@ -10,6 +11,9 @@ const wooCommerce = new WooCommerceRestApi({
   consumerSecret: process.env.CONSUMER_SECRET!,
   version: 'wc/v3'
 });
+
+// Dynamische Shop-URL global verfügbar machen
+const shopUrl: string = getWooConfig().url || process.env.WOOCOMMERCE_URL || 'https://example.com';
 
 class PaymentIssueDetector {
   static async detectCriticalIssues() {
@@ -76,12 +80,13 @@ class PaymentIssueDetector {
 
   private static identifyCriticalIssues(order: any): string[] {
     const issues: string[] = [];
+    const shopUrl = getWooConfig().url || process.env.WOOCOMMERCE_URL || 'https://example.com';
     
     // Stripe-spezifische Probleme
     if (order.payment_method === 'stripe') {
       issues.push('STRIPE WEBHOOK FEHLT - Zahlungen können nicht bestätigt werden');
       issues.push('Stripe API Verbindung fehlerhaft');
-      issues.push('Webhook Endpoint nicht erreichbar: https://kaufe-es.eu/wc-api/stripe_webhook');
+      issues.push(`Webhook Endpoint nicht erreichbar: ${shopUrl}/wc-api/stripe_webhook`);
     }
     
     // WooCommerce Payments-spezifische Probleme
@@ -100,9 +105,10 @@ class PaymentIssueDetector {
 
   private static async checkSystemConfiguration() {
     console.log('\n2. ⚙️ SYSTEM-KONFIGURATIONS-PRÜFUNG:\n');
+    const shopUrl = getWooConfig().url || process.env.WOOCOMMERCE_URL || 'https://example.com';
     
     console.log('   🔍 WORDPRESS/WOOCOMMERCE:');
-    console.log('      • URL: https://kaufe-es.eu');
+    console.log(`      • URL: ${shopUrl}`);
     console.log('      • SSL: ✅ Aktiv (https://)');
     console.log('      • API: ✅ Verbindung funktioniert');
     console.log('      • Produkte: 11 verfügbar\n');
@@ -124,7 +130,7 @@ class PaymentIssueDetector {
     console.log('   🔴 SOFORT-MASSNAHME #1: STRIPE WEBHOOK EINRICHTEN');
     console.log('      1. Öffne https://dashboard.stripe.com');
     console.log('      2. Gehe zu "Developers" → "Webhooks"');
-    console.log('      3. Webhook hinzufügen: https://kaufe-es.eu/wc-api/stripe_webhook');
+    console.log(`      3. Webhook hinzufügen: ${shopUrl}/wc-api/stripe_webhook`);
     console.log('      4. DIESE EVENTS AUSWÄHLEN:');
     console.log('         ✅ payment_intent.succeeded');
     console.log('         ✅ payment_intent.payment_failed');

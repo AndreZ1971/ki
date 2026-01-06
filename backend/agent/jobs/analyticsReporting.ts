@@ -1,5 +1,9 @@
 // backend/agent/jobs/analyticsReporting.ts
 import { wooGet } from '../../tools/woo';
+// Dynamische Shop-Domain für Stakeholder-Emails
+const { getWooConfig } = require('../../woocommerce/config.js');
+const shopUrl: string = (getWooConfig()?.url) || process.env.WOOCOMMERCE_URL || 'https://example.com';
+const hostLabel: string = (() => { try { return new URL(shopUrl).host.replace(/^www\./,''); } catch { return 'example.com'; } })();
 
 // Analytics Daten-Modelle
 interface SocialMediaMetrics {
@@ -355,9 +359,9 @@ async function sendAutomatedReports() {
     console.log('\n📤 Verteile Report an Stakeholder...');
     
     const stakeholders = [
-      'ceo@kaufe-es.eu',
-      'marketing@kaufe-es.eu',
-      'sales@kaufe-es.eu'
+      `ceo@${hostLabel}`,
+      `marketing@${hostLabel}`,
+      `sales@${hostLabel}`
     ];
     
     stakeholders.forEach(stakeholder => {

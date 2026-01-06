@@ -27,6 +27,7 @@ const getWooConfig = () => {
 
 const wooCommerce = new WooCommerceRestApi(getWooConfig());
 const apiBase = getConfig().apiBaseUrl || 'http://localhost:3000';
+const shopBaseUrl = String(getWooConfig().url || process.env.WOOCOMMERCE_URL || 'https://example.com').replace(/\/$/, '');
 
 if (!getWooConfig().url || !getWooConfig().consumerKey || !getWooConfig().consumerSecret) {
   console.error('❌ WooCommerce Config fehlt: Bitte URL / ConsumerKey / ConsumerSecret setzen.');
@@ -308,7 +309,7 @@ async function analyzePaymentIssues(): Promise<string> {
     // Stripe-spezifische Probleme
     if (paymentMethods['stripe'] > 0) {
       diagnosis += '**🔴 STRIPE PROBLEM ERKANNT**\n';
-      diagnosis += '1. Webhook-URL prüfen: `https://kaufe-es.eu/wc-api/stripe_webhook`\n';
+      diagnosis += `1. Webhook-URL prüfen: \`${shopBaseUrl}/wc-api/stripe_webhook\`\n`;
       diagnosis += '2. Stripe Dashboard → Developers → Webhooks\n';
       diagnosis += '3. Events aktivieren: `payment_intent.succeeded`, `payment_intent.payment_failed`\n';
       diagnosis += '4. API Keys validieren (Test vs. Live Mode)\n';

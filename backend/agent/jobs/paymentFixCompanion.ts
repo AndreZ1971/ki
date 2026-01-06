@@ -3,6 +3,11 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
+// Dynamische Shop-URL aus Konfiguration ableiten
+const { getWooConfig } = require('../../woocommerce/config.js');
+const shopUrl: string = (getWooConfig()?.url) || process.env.WOOCOMMERCE_URL || 'https://example.com';
+const base: string = String(shopUrl).replace(/\/$/, '');
+
 class PaymentFixCompanion {
   static async startCompanionSession() {
     console.log('👨‍💻 PAYMENT FIX COMPANION - LIVE BEGLEITUNG\n');
@@ -51,7 +56,7 @@ class PaymentFixCompanion {
     console.log('🔧 WEBHOOK EINRICHTEN:');
     console.log('   1. Klicke auf "+ Add endpoint"');
     console.log('   2. Endpoint URL:');
-    console.log('      🔗 https://kaufe-es.eu/wc-api/stripe_webhook');
+    console.log(`      🔗 ${base}/wc-api/stripe_webhook`);
     console.log('   3. Wähle diese Events aus:');
     console.log('      ✅ payment_intent.succeeded');
     console.log('      ✅ payment_intent.payment_failed');
@@ -111,7 +116,7 @@ class PaymentFixCompanion {
     console.log('   4. Veröffentlichen\n');
     
     console.log('🔧 TEST-KAUF DURCHFÜHREN:');
-    console.log('   1. Öffne https://kaufe-es.eu/ im Inkognito-Modus');
+    console.log(`   1. Öffne ${base}/ im Inkognito-Modus`);
     console.log('   2. Suche nach "Payment Test"');
     console.log('   3. In Warenkorb → Zur Kasse');
     console.log('   4. Stripe auswählen');

@@ -126,7 +126,7 @@ You've got the basics. Now you can:
 ## ❓ Need Help?
 
 **Support Contact:**
-- 📧 **Email:** support@kaufe-es.eu
+- 📧 **Email:** support@example.com
 - 💬 **Live Chat:** In the frontend (bottom right)
 - 📱 **Phone:** +49 XXX XXXXXXX (Business Hours)
 

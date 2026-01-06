@@ -1,5 +1,9 @@
 // backend/agent/jobs/socialMediaAutomation.ts - KORRIGIERTE VERSION
 import { wooGet } from '../../tools/woo';
+// Dynamische Shop-URL für Links
+const { getWooConfig } = require('../../woocommerce/config.js');
+const __shopUrl: string = (getWooConfig()?.url) || process.env.WOOCOMMERCE_URL || 'https://example.com';
+const base: string = String(__shopUrl).replace(/\/$/, '');
 
 // Deutsche DSGVO-spezifische Social Media Content-Templates
 const GERMAN_SOCIAL_TEMPLATES = {
@@ -147,8 +151,8 @@ function generateProductPosts(product: any): SocialMediaPosts {
     .substring(0, 100) + '...';
   
   const productUrl = product.slug 
-    ? `https://kaufe-es.eu/produkt/${product.slug}`
-    : 'https://kaufe-es.eu';
+    ? `${base}/produkt/${product.slug}`
+    : base;
   
   // Platzhalter ersetzen
   const linkedin = getRandomItem(GERMAN_SOCIAL_TEMPLATES.linkedin)
@@ -176,9 +180,9 @@ function generateGeneralPosts(): SocialMediaPosts {
   const tip = getRandomItem(GERMAN_DSGVO_CONTENT.tips);
   const fact = getRandomItem(GERMAN_DSGVO_CONTENT.facts);
   
-  const linkedin = `🔐 DSGVO-Wissen: ${fact}\n\n💡 Praxistipp: ${tip}\n\nMehr DSGVO-Tipps: https://kaufe-es.eu\n\n#DSGVO #Datenschutz #Compliance`;
+  const linkedin = `🔐 DSGVO-Wissen: ${fact}\n\n💡 Praxistipp: ${tip}\n\nMehr DSGVO-Tipps: ${base}\n\n#DSGVO #Datenschutz #Compliance`;
   
-  const twitter = `💡 DSGTO-Fakt: ${fact}\n\nTipp: ${tip}\n\nMehr: https://kaufe-es.eu #DSGVO`;
+  const twitter = `💡 DSGTO-Fakt: ${fact}\n\nTipp: ${tip}\n\nMehr: ${base} #DSGVO`;
   
   return { linkedin, twitter };
 }

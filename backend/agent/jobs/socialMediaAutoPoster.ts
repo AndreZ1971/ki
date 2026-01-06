@@ -1,5 +1,9 @@
 // backend/agent/jobs/socialMediaAutoPoster.ts
 import { generateSocialMediaPosts } from './socialMediaAutomation';
+// Dynamische Shop-URL aus Konfiguration
+const { getWooConfig } = require('../../woocommerce/config.js');
+const shopUrl: string = (getWooConfig()?.url) || process.env.WOOCOMMERCE_URL || 'https://example.com';
+const base: string = String(shopUrl).replace(/\/$/, '');
 
 // Social Media API Configuration (Placeholder - später mit echten APIs)
 const SOCIAL_MEDIA_APIS = {
@@ -147,7 +151,7 @@ async function scheduleSocialMediaPosts() {
     },
     {
       platform: 'twitter',
-      content: '💡 DSGVO-Update: Neue Bußgeldrichtlinien 2024 ➡️ https://kaufe-es.eu #DSGVO',
+      content: `💡 DSGVO-Update: Neue Bußgeldrichtlinien 2024 ➡️ ${base} #DSGVO`,
       scheduledTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // Übermorgen
       status: 'scheduled',
       product: 'News Update'

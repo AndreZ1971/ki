@@ -1,9 +1,7 @@
 services:
-  kaufe-es-agent:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: kaufe-es-agent
+  app:
+    image: "${IMAGE_NAME:-app-agent}:${TAG:-latest}"
+    container_name: "${CONTAINER_NAME:-app-agent}"
     restart: unless-stopped
 
     # Load production ENV
@@ -45,8 +43,9 @@ services:
 
     # Network
     networks:
-      - kaufe-es-network
+      - app-network
 
 networks:
-  kaufe-es-network:
+  app-network:
+    name: ${NETWORK_NAME:-app-network}
     driver: bridge

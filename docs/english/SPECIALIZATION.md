@@ -8,7 +8,7 @@
 
 ## Overview
 
-Specializations are industry-specific AI configurations that adapt A.R.I. for different business sectors. They are sold on **kaufe-es.eu**, signed digitally, and installed locally.
+Specializations are industry-specific AI configurations that adapt A.R.I. for different business sectors. They are sold on **marketplace.example.com**, signed digitally, and installed locally.
 
 **Features:**
 - ✅ RSA-2048 signature validation
@@ -21,7 +21,7 @@ Specializations are industry-specific AI configurations that adapt A.R.I. for di
 
 ## Architecture
 
-### Central (kaufe-es.eu)
+### Central (marketplace.example.com)
 - WooCommerce shop with digital products
 - After purchase: RSA-signed JSON file generated
 - Download link via email
@@ -92,7 +92,7 @@ Uploads signed specialization file.
 {
   "signedData": {
     "version": "1.0",
-    "issuer": "kaufe-es.eu",
+    "issuer": "marketplace.example.com",
     "timestamp": 1733961600000,
     "signature": "BASE64_RSA_SIGNATURE",
     "data": {
@@ -140,7 +140,7 @@ Deletes a specialization.
 
 ### Signature System (RSA-2048)
 
-**Generation (on kaufe-es.eu):**
+**Generation (on marketplace):
 ```typescript
 const signature = crypto.sign('sha256', Buffer.from(payload), {
   key: PRIVATE_KEY,
@@ -304,7 +304,7 @@ npm run test -- -t "Encryption"
 
 **Features:**
 - ✅ Upload button for `.ari-spec` or `.json`
-- ✅ Link to kaufe-es.eu marketplace
+- ✅ Link to marketplace
 - ✅ Grid with installed specializations
 - ✅ Activate/Delete buttons
 - ✅ ACTIVE badge
@@ -332,16 +332,16 @@ const handleSpecializationUpload = async (file: File) => {
 ## Deployment Checklist
 
 ### Backend
-- [ ] Set `SPEC_PUBLIC_KEY` in ENV (kaufe-es.eu public key)
+- [ ] Set `SPEC_PUBLIC_KEY` in ENV (marketplace public key)
 - [ ] Set `SPEC_ENCRYPTION_KEY` in ENV (32-byte key)
 - [ ] Create `/data/specializations/` directory
 - [ ] Enable API routes
 
 ### Frontend
 - [ ] Configure `VITE_API_URL`
-- [ ] Update link to kaufe-es.eu marketplace
+- [ ] Update link to marketplace
 
-### kaufe-es.eu
+### Marketplace Setup
 - [ ] Create WooCommerce products
 - [ ] Setup webhook for JSON generation + signature
 - [ ] Create email template with download link
@@ -390,7 +390,7 @@ A.R.I. Specializations provide:
 ✅ **Thoroughly Tested:** 148+ tests passed  
 ✅ **Production-Ready:** Auto-load, fallback, monitoring  
 
-**Distribution Channel:** kaufe-es.eu marketplace  
+**Distribution Channel:** marketplace.example.com  
 **Technical Integration:** Web-based upload system  
 **Scalability:** Unlimited specializations per user
 

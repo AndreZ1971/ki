@@ -24,7 +24,7 @@ function loadConnectionConfig(): { specialization?: { encryptionKey?: string } }
 }
 
 /**
- * Public Key von kaufe-es.eu für Signatur-Validierung
+ * Public Key des Marketplace-Issuers für Signatur-Validierung
  * Lädt aus SPEC_PUBLIC_KEY Env-Variable (Produktion) oder fallback
  */
 const KAUFE_ES_PUBLIC_KEY = (() => {
@@ -72,9 +72,10 @@ export class SpecializationService {
         return false;
       }
 
-      // Prüfe Issuer
-      if (signedSpec.issuer !== 'kaufe-es.eu') {
-        logger.warn(`❌ Ungültiger Issuer: ${signedSpec.issuer}`);
+      // Prüfe Issuer (konfigurierbar via SPEC_ISSUER Env-Variable)
+      const expectedIssuer = process.env.SPEC_ISSUER || 'marketplace.example.com';
+      if (signedSpec.issuer !== expectedIssuer) {
+        logger.warn(`❌ Ungültiger Issuer: ${signedSpec.issuer} (erwartet: ${expectedIssuer})`);
         return false;
       }
 

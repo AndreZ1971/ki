@@ -228,12 +228,12 @@ docker build -f Dockerfile -t ari:latest .
 
 **2. Tag für Registry:**
 ```bash
-docker tag ari:latest registry.kaufe-es.eu/ari:v3.2.0
+docker tag ari:latest registry.example.com/ari:v3.2.0
 ```
 
 **3. Push:**
 ```bash
-docker push registry.kaufe-es.eu/ari:v3.2.0
+docker push registry.example.com/ari:v3.2.0
 ```
 
 **Tipp:** Nutze `docker-compose.production.yml` für Prod-Deployments!
@@ -954,12 +954,12 @@ docker compose -f docker-compose.production.yml up -d
 **5. HTTPS mit Let's Encrypt:**
 ```bash
 sudo apt install certbot python3-certbot-nginx
-sudo certbot --nginx -d ari.kaufe-es.eu
+sudo certbot --nginx -d ari.example.com
 ```
 
 **6. Health Check:**
 ```bash
-curl https://ari.kaufe-es.eu/health
+curl https://ari.example.com/health
 ```
 
 ### Wie führe ich Updates durch?
@@ -985,7 +985,7 @@ docker compose -f docker-compose.production.yml up -d --no-deps --build frontend
 
 **4. Health Check:**
 ```bash
-curl https://ari.kaufe-es.eu/health
+curl https://ari.example.com/health
 ```
 
 **5. Alte Images löschen:**
@@ -1004,8 +1004,8 @@ docker compose -f docker-compose.production.yml up -d --build
 
 **Option 2 - Docker Image Tag:**
 ```bash
-docker pull registry.kaufe-es.eu/ari:v3.1.0  # Alte Version
-docker tag registry.kaufe-es.eu/ari:v3.1.0 ari:latest
+docker pull registry.example.com/ari:v3.1.0  # Alte Version
+docker tag registry.example.com/ari:v3.1.0 ari:latest
 docker compose up -d
 ```
 
@@ -1213,7 +1213,7 @@ await fastify.register(cors, {
   origin: [
     'http://localhost:5173',    // Vite Dev
     'http://localhost',          // Production
-    'https://ari.kaufe-es.eu'   // Production Domain
+    'https://ari.example.com'   // Production Domain
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
@@ -1224,7 +1224,7 @@ await fastify.register(cors, {
 ```typescript
 await fastify.register(cors, {
   origin: (origin, cb) => {
-    if (!origin || origin.endsWith('.kaufe-es.eu')) {
+    if (!origin || origin.endsWith('.example.com')) {
       cb(null, true);
     } else {
       cb(new Error('Not allowed by CORS'), false);

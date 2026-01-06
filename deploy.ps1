@@ -4,9 +4,23 @@
 
 Write-Host "🚀 Starting Hetzner Deployment..." -ForegroundColor Green
 
+# Configurable image settings (override via env: IMAGE_NAME, TAG, REGISTRY)
+$ImageName = if ([string]::IsNullOrWhiteSpace($env:IMAGE_NAME)) { 'app-agent' } else { $env:IMAGE_NAME }
+$Tag       = if ([string]::IsNullOrWhiteSpace($env:TAG)) { 'latest' } else { $env:TAG }
+$Registry  = if ([string]::IsNullOrWhiteSpace($env:REGISTRY)) { '' } else { $env:REGISTRY }
+
+$DockerImage = "$ImageName:$Tag"
+if (-not [string]::IsNullOrWhiteSpace($Registry)) {
+    $DockerImage = "$Registry/$DockerImage"
+}
+
+# Ensure docker-compose uses the same values
+$env:IMAGE_NAME = $ImageName
+$env:TAG = $Tag
+
 # 1. Build Docker Image
-Write-Host "📦 Building Docker image..." -ForegroundColor Yellow
-docker build -t kaufe-es-agent:latest .
+Write-Host "📦 Building Docker image: $DockerImage" -ForegroundColor Yellow
+docker build -t $DockerImage .
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "❌ Docker build failed!" -ForegroundColor Red

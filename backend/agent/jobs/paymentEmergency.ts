@@ -1,9 +1,11 @@
 // agent/jobs/paymentEmergency.ts
 import * as dotenv from 'dotenv';
+import { getWooConfig } from '../../woocommerce/config.js';
 
 dotenv.config();
 
 // Entfernt: wooCommerce Instanz, da nicht verwendet
+const shopUrl: string = getWooConfig().url || process.env.WOOCOMMERCE_URL || 'https://example.com';
 
 class PaymentEmergency {
   static async runEmergencyDiagnostic() {
@@ -65,6 +67,7 @@ class PaymentEmergency {
 
   private static async provideImmediateSolutions() {
     console.log('\n2. 🛠️ SOFORT-LÖSUNGEN (30 MINUTEN ARBEIT):\n');
+    const shopUrl = getWooConfig().url || process.env.WOOCOMMERCE_URL || 'https://example.com';
     
     console.log('   🔴 LÖSUNG 1: STRIPE WEBHOOK - STEP BY STEP');
     console.log('      1. 🔗 Öffne: https://dashboard.stripe.com');
@@ -72,7 +75,7 @@ class PaymentEmergency {
     console.log('      3. 🛠️ Gehe zu: Developers → Webhooks');
     console.log('      4. ➕ Klicke: "+ Add endpoint"');
     console.log('      5. 🌐 Endpoint URL eingeben:');
-    console.log('         https://kaufe-es.eu/wc-api/stripe_webhook');
+    console.log(`         ${shopUrl}/wc-api/stripe_webhook`);
     console.log('      6. ✅ Events auswählen:');
     console.log('         • payment_intent.succeeded');
     console.log('         • payment_intent.payment_failed');
@@ -116,7 +119,7 @@ class PaymentEmergency {
     console.log('      [ ] npm run payment-quick-check zeigt bezahlte Bestellungen\n');
     
     console.log('   🧪 TEST-PROTOKOLL:');
-    console.log('      1. 🔗 Öffne: https://kaufe-es.eu/');
+    console.log(`      1. 🔗 Öffne: ${shopUrl}/`);
     console.log('      2. 🎯 Suche nach einem Produkt (z.B. "Wallpaper")');
     console.log('      3. 🛒 In Warenkorb → Zur Kasse');
     console.log('      4. 💳 Stripe auswählen');

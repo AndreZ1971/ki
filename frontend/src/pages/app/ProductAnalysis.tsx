@@ -83,7 +83,8 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
   const [notes, setNotes] = useState<string>("");
   const [notesSaving, setNotesSaving] = useState(false);
   const [lastSavedTime, setLastSavedTime] = useState<string | null>(null);
-  const autoSaveTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+  // Use cross-platform timeout type compatible with browser and Node
+  const autoSaveTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortControllerRef = React.useRef<AbortController | null>(null);
 
   // 🔗 Normalisierte API-URL

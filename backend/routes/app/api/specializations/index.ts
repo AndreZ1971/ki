@@ -13,13 +13,13 @@ import { i18nService } from '../../../../services/i18nService';
  * 
  * Format-Spezifikation:
  * - Extension: .ari-spec oder .json (muss Format validieren)
- * - Inhalt: Signierte Spezialisierungs-Datei von kaufe-es.eu
+ * - Inhalt: Signierte Spezialisierungs-Datei von vertrauenswürdigem Marketplace
  * - Struktur: { format: "ari-specialization", version: "1.0", data: {...} }
  */
 export interface ARISpecializationFile {
   format: "ari-specialization";
   version: "1.0";
-  issuer: "kaufe-es.eu";
+  issuer: string; // Marketplace domain (configurable via SPEC_ISSUER)
   timestamp: number;
   signature: string;
   data: {
