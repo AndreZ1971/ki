@@ -44,8 +44,9 @@ COPY healthcheck.js ./
 # Create non-root user (ALPINE SYNTAX - nicht Debian!)
 RUN addgroup -g 1001 nodejs && \
   adduser -u 1001 -G nodejs -D nodeuser && \
-  mkdir -p /app/data /app/data/dlq /app/logs /app/backend && \
-  chown -R nodeuser:nodejs /app
+  mkdir -p /app/data /app/data/dlq /app/logs /app/backend /app/data/specializations && \
+  chown -R nodeuser:nodejs /app && \
+  chmod 755 /app/data /app/data/specializations
 
 USER nodeuser
 EXPOSE 3000
