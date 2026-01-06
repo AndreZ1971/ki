@@ -1,7 +1,7 @@
 // backend/agent/jobs/emailMarketingAutomation.ts
 import { wooGet } from '../../tools/woo';
 // Dynamische Shop-URL und Host-Label
-const { getWooConfig } = require('../../woocommerce/config.js');
+import { getWooConfig } from '../../woocommerce/config';
 const shopUrl: string = (getWooConfig()?.url) || process.env.WOOCOMMERCE_URL || 'https://example.com';
 const base: string = String(shopUrl).replace(/\/$/, '');
 const hostLabel: string = (() => { try { return new URL(shopUrl).host.replace(/^www\./,''); } catch { return 'example.com'; } })();

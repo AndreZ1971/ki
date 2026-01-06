@@ -8,10 +8,22 @@ export interface WooCommerceConfig {
   timeout: number;
 }
 
+import fs from 'fs';
+import path from 'path';
+
 export const getWooConfig = (): WooCommerceConfig => {
-  // Hole zentrale Konfiguration
-  const config = require('../config').default;
-  const woo = config.woocommerce || {};
+  // Hole zentrale Konfiguration direkt aus connection.json, um ESM/CJS-Interop-Probleme in Tests zu vermeiden
+  const configPath = path.resolve(__dirname, '../connection.json');
+  let woo: any = {};
+  if (fs.existsSync(configPath)) {
+    try {
+      const raw = fs.readFileSync(configPath, 'utf-8');
+      const parsed = JSON.parse(raw);
+      woo = parsed.woocommerce || {};
+    } catch {
+      woo = {};
+    }
+  }
   return {
     url: woo.url || '',
     consumerKey: woo.consumerKey || '',
