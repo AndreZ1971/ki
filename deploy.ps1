@@ -9,9 +9,9 @@ $ImageName = if ([string]::IsNullOrWhiteSpace($env:IMAGE_NAME)) { 'app-agent' } 
 $Tag       = if ([string]::IsNullOrWhiteSpace($env:TAG)) { 'latest' } else { $env:TAG }
 $Registry  = if ([string]::IsNullOrWhiteSpace($env:REGISTRY)) { '' } else { $env:REGISTRY }
 
-$DockerImage = "$ImageName:$Tag"
+$DockerImage = "${ImageName}:${Tag}"
 if (-not [string]::IsNullOrWhiteSpace($Registry)) {
-    $DockerImage = "$Registry/$DockerImage"
+    $DockerImage = "${Registry}/${DockerImage}"
 }
 
 # Ensure docker-compose uses the same values

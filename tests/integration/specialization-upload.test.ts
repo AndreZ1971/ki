@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { Blob } from "buffer";
 
 /**
  * Integration Tests für Spezialisierungs-Upload
@@ -50,8 +51,10 @@ describe("Specialization Upload API", () => {
       const specialization = createTestSpecialization();
       const jsonContent = JSON.stringify(specialization, null, 2);
 
+      const file = new Blob([jsonContent], { type: "application/json" });
+
       const form = new FormData();
-      form.append("file", Buffer.from(jsonContent), "specialization.json");
+      form.append("file", file, "specialization.json");
 
       try {
         const response = await fetch(uploadEndpoint, {
@@ -86,8 +89,10 @@ describe("Specialization Upload API", () => {
       const csvContent = `id,name,description,systemPrompt,category
 ${specialization.id},${specialization.name},${specialization.description},"${specialization.systemPrompt}",${specialization.category}`;
 
+      const file = new Blob([csvContent], { type: "text/csv" });
+
       const form = new FormData();
-      form.append("file", Buffer.from(csvContent), "specialization.csv");
+      form.append("file", file, "specialization.csv");
 
       try {
         const response = await fetch(uploadEndpoint, {
@@ -145,8 +150,10 @@ ${specialization.id},${specialization.name},${specialization.description},"${spe
         return;
       }
 
+      const file = new Blob(["invalid content"], { type: "text/plain" });
+
       const form = new FormData();
-      form.append("file", Buffer.from("invalid content"), "specialization.txt");
+      form.append("file", file, "specialization.txt");
 
       try {
         const response = await fetch(uploadEndpoint, {
@@ -176,8 +183,10 @@ ${specialization.id},${specialization.name},${specialization.description},"${spe
       }
 
       const largeContent = Buffer.alloc(6 * 1024 * 1024); // 6MB
+      const file = new Blob([largeContent], { type: "application/json" });
+
       const form = new FormData();
-      form.append("file", largeContent, "huge-specialization.json");
+      form.append("file", file, "huge-specialization.json");
 
       try {
         const response = await fetch(uploadEndpoint, {
@@ -207,8 +216,10 @@ ${specialization.id},${specialization.name},${specialization.description},"${spe
       }
 
       const invalidJson = '{ id: "test", name: "Missing Quotes" }'; // Missing quotes around id
+      const file = new Blob([invalidJson], { type: "application/json" });
+
       const form = new FormData();
-      form.append("file", Buffer.from(invalidJson), "broken.json");
+      form.append("file", file, "broken.json");
 
       try {
         const response = await fetch(uploadEndpoint, {
@@ -244,12 +255,12 @@ ${specialization.id},${specialization.name},${specialization.description},"${spe
         description: "Missing systemPrompt",
       };
 
+      const file = new Blob([JSON.stringify(incompleteSpec)], {
+        type: "application/json",
+      });
+
       const form = new FormData();
-      form.append(
-        "file",
-        Buffer.from(JSON.stringify(incompleteSpec)),
-        "incomplete.json"
-      );
+      form.append("file", file, "incomplete.json");
 
       try {
         const response = await fetch(uploadEndpoint, {
@@ -287,18 +298,17 @@ ${specialization.id},${specialization.name},${specialization.description},"${spe
         systemPrompt: "Normal prompt without issues",
       });
 
+      const file = new Blob([JSON.stringify(maliciousSpec)], {
+        type: "application/json",
+      });
+
       const form = new FormData();
-      form.append(
-        "file",
-        Buffer.from(JSON.stringify(maliciousSpec)),
-        "xss-attempt.json"
-      );
+      form.append("file", file, "xss-attempt.json");
 
       try {
         const response = await fetch(uploadEndpoint, {
           method: "POST",
           body: form,
-          headers: form.getHeaders(),
         });
 
         // Should sanitize and accept
@@ -345,8 +355,10 @@ ${specialization.id},${specialization.name},${specialization.description},"${spe
       const specialization = createTestSpecialization();
       const jsonContent = JSON.stringify(specialization);
 
+      const file = new Blob([jsonContent], { type: "application/json" });
+
       const form = new FormData();
-      form.append("file", Buffer.from(jsonContent), "spec.json");
+      form.append("file", file, "spec.json");
 
       try {
         const response = await fetch(uploadEndpoint, {
