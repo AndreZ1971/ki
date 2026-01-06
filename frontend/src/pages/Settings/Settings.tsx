@@ -1665,7 +1665,7 @@ const Settings = () => {
                       </label>
                       <input
                         type="text"
-                        placeholder="info@kaufe-es.eu"
+                        placeholder="admin@example.com"
                         value={credentials.smtpUser || ""}
                         onChange={(e) =>
                           handleCredentialChange("smtpUser", e.target.value)
@@ -1721,7 +1721,7 @@ const Settings = () => {
                       </label>
                       <input
                         type="text"
-                        placeholder="info@kaufe-es.eu"
+                        placeholder="noreply@example.com"
                         value={credentials.smtpFrom || ""}
                         onChange={(e) =>
                           handleCredentialChange("smtpFrom", e.target.value)

@@ -4,5 +4,5 @@
   "downloads": 0,
   "created": "2025-11-02",
   "description": "Ihr kostenloser Leitfaden für den erfolgreichen Start im E-Commerce. Lernen Sie die wichtigsten Grundlagen und Best Practices.",
-  "fileUrl": "https://kaufe-es.eu/downloads/starter-guide.pdf"
+  "fileUrl": "https://{{SHOP_URL}}/downloads/starter-guide.pdf"
 }
