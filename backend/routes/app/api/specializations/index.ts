@@ -238,6 +238,21 @@ export default async function specializationRoutes(server: FastifyInstance) {
                 "Ungültiges ARI-Spezialisierungs-Format"
             );
           }
+          // Optional Signature Validation (enabled when SPEC_PUBLIC_KEY is set)
+          const useSignatureValidation = Boolean(process.env.SPEC_PUBLIC_KEY);
+          if (useSignatureValidation) {
+            const ok = require('../../../../services/specializationService').SpecializationService.validateSignature(
+              specialization as any
+            );
+            if (!ok) {
+              return reply.status(400).send({
+                success: false,
+                error: i18nService.translate('error.invalidSignature'),
+                message: 'Signature validation failed or issuer mismatch',
+                code: 'INVALID_SIGNATURE',
+              });
+            }
+          }
         } catch (parseError) {
           const errorMsg =
             parseError instanceof Error
