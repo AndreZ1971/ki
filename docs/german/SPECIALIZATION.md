@@ -8,7 +8,7 @@
 
 ## Übersicht
 
-Spezialisierungen sind branchenspezifische KI-Konfigurationen, die A.R.I. für verschiedene Geschäftsbereiche anpassen. Sie werden auf **kaufe-es.eu** verkauft, signiert geliefert und lokal installiert.
+Spezialisierungen sind branchenspezifische KI-Konfigurationen, die A.R.I. für verschiedene Geschäftsbereiche anpassen. Sie werden auf **dein-shop.com** verkauft, signiert geliefert und lokal installiert.
 
 **Features:**
 - ✅ RSA-2048 Signatur-Validierung
@@ -21,7 +21,7 @@ Spezialisierungen sind branchenspezifische KI-Konfigurationen, die A.R.I. für v
 
 ## Architektur
 
-### Zentral (kaufe-es.eu)
+### Zentral 
 - WooCommerce-Shop mit digitalen Produkten
 - Nach Kauf: RSA-signierte JSON-Datei generiert
 - Download-Link per E-Mail
@@ -92,7 +92,7 @@ Lädt signierte Spezialisierungs-Datei hoch.
 {
   "signedData": {
     "version": "1.0",
-    "issuer": "kaufe-es.eu",
+    "issuer": "dein-shop.com",
     "timestamp": 1733961600000,
     "signature": "BASE64_RSA_SIGNATURE",
     "data": {
@@ -140,7 +140,7 @@ Löscht eine Spezialisierung.
 
 ### Signatur-System (RSA-2048)
 
-**Generierung (auf kaufe-es.eu):**
+**Generierung (Marketplace):**
 ```typescript
 const signature = crypto.sign('sha256', Buffer.from(payload), {
   key: PRIVATE_KEY,
@@ -304,7 +304,7 @@ npm run test -- -t "Encryption"
 
 **Features:**
 - ✅ Upload-Button für `.ari-spec` oder `.json`
-- ✅ Link zu kaufe-es.eu Marketplace
+- ✅ Link zum Marketplace
 - ✅ Grid mit installierten Spezialisierungen
 - ✅ Aktivieren/Löschen-Buttons
 - ✅ AKTIV Badge
@@ -326,25 +326,6 @@ const handleSpecializationUpload = async (file: File) => {
   }
 };
 ```
-
----
-
-## Deployment-Checkliste
-
-### Backend
-- [ ] `SPEC_PUBLIC_KEY` in ENV setzen (kaufe-es.eu Public Key)
-- [ ] `SPEC_ENCRYPTION_KEY` in ENV setzen (32-Byte-Key)
-- [ ] `/data/specializations/` Directory erstellen
-- [ ] API-Route freigeben
-
-### Frontend
-- [ ] `VITE_API_URL` konfiguriert
-- [ ] Link zu kaufe-es.eu Marketplace anpassen
-
-### kaufe-es.eu
-- [ ] WooCommerce-Produkte erstellen
-- [ ] Webhook für JSON-Generierung + Signatur
-- [ ] E-Mail-Template mit Download-Link
 
 ---
 
@@ -390,7 +371,7 @@ A.R.I. Spezialisierungen bieten:
 ✅ **Umfassend getestet:** 148+ Tests bestanden  
 ✅ **Production-Ready:** Auto-Load, Fallback, Monitoring  
 
-**Vertriebskanal:** kaufe-es.eu Marketplace  
+**Vertriebskanal:** Marketplace  
 **Technische Integration:** Web-basiertes Upload-System  
 **Skalierbarkeit:** Unbegrenzte Anzahl Spezialisierungen pro User
 

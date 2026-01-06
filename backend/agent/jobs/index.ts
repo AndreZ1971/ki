@@ -2,6 +2,7 @@
 
 // external
 import 'dotenv/config';
+import '../../consoleProxy';
 
 // internal
 import { logger } from '../../logger';

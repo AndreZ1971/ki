@@ -185,7 +185,12 @@ Header: `Authorization: Bearer <token>`
 
 #### 3. User Management
 
-**Storage:** In-Memory Map (⚠️ TODO: Database in production)
+**Storage:** In-Memory Map (⚠️ TODO: Database/Redis in production)
+
+**Roadmap (Production Hardening):**
+- Redis-based rate limiting (multi-instance ready)
+- Token blacklist/revocation in Redis (logout, compromise)
+- Persistent user management (DB/Redis instead of memory)
 
 **Current Default Users:**
 

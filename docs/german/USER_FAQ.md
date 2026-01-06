@@ -189,7 +189,7 @@ A.R.I. nutzt OpenAI für alle KI-Features:
 
 #### Schritt 1: Spezialisierungen-Datei kaufen
 
-1. Besuche [kaufe-es.eu](https://kaufe-es.eu)
+1. Besuche [A.R.I.-shop.com](https://A.R.I.-shop.com)
 2. Wähle deine Branche
 3. Lade die `.ari-spec` Datei herunter
 4. Speichere sie auf deinem Computer
@@ -330,7 +330,7 @@ Das Backend ist **NICHT** für die tägliche Nutzung. Es zeigt:
 ### Spezialisierung wird nicht akzeptiert
 
 **❌ "Invalid signature"**
-- Nur originale Dateien von kaufe-es.eu funktionieren
+- Nur originale Dateien funktionieren
 - Lade die Datei neu herunter
 
 **❌ "File too large"**
@@ -354,7 +354,7 @@ Das Backend ist **NICHT** für die tägliche Nutzung. Es zeigt:
 
 ## 📞 Support
 
-**E-Mail:** support@kaufe-es.eu  
+**E-Mail:** andre.zabel71@gmail.com  
 **Live-Chat:** Im Frontend (unten rechts)  
 **Telefon:** +49 XXX XXXXXXX (Business Hours)
 
@@ -589,7 +589,7 @@ Das Backend ist **NICHT** für die tägliche Nutzung. Es zeigt:
 
 **Aktivierung:**
 1. Settings → Specialization
-2. Lade `.ari-spec` Datei hoch (von kaufe-es.eu)
+2. Lade `.ari-spec` Datei hoch 
 3. Klicke "Activate"
 4. KI passt sich automatisch an deine Branche an
 
@@ -679,7 +679,7 @@ Das Backend ist **NICHT** für die tägliche Nutzung. Es zeigt:
 ### Was kostet A.R.I.?
 
 **Basis-System:**
-- Einmalige Lizenz (Preis auf kaufe-es.eu)
+- Einmalige Lizenz 
 - Keine monatlichen Gebühren
 - Unbegrenzte Nutzung
 
@@ -725,32 +725,11 @@ Für mehrere Shops:
 - Jede Installation eigenständig
 - Keine Daten-Synchronisation
 
-**Rabatte:** Ab 3+ Lizenzen verfügbar (siehe kaufe-es.eu)
-
 ---
 
 ## Support & Hilfe
 
 ### Wo finde ich weitere Dokumentation?
-
-**Verfügbare Guides:**
-- [Bedienungsanleitung](Bedienungsanleitung.md) - Vollständige User-Anleitung mit Screenshots
-- [TOOLS_DOCUMENTATION.md](TOOLS_DOCUMENTATION.md) - Alle 52 Tools im Detail
-- [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) - Server-Setup & Installation
-- [I18N.md](I18N.md) - Mehrsprachigkeit & Übersetzungen
-- [SECURITY.md](SECURITY.md) - Sicherheit & Best Practices
-
-### Wie kontaktiere ich den Support?
-
-**Support-Kanäle:**
-- 📧 E-Mail: support@kaufe-es.eu
-- 💬 Live-Chat: Im A.R.I. Frontend (unten rechts)
-- 📱 WhatsApp: +49 XXX XXXXXXX (Business Hours)
-- 🎫 Ticket-System: support.kaufe-es.eu
-
-**Antwortzeit:** 24-48h (werktags)
-
-### Was mache ich bei Fehlern?
 
 **Schritt-für-Schritt:**
 
@@ -765,14 +744,6 @@ Für mehrere Shops:
 
 **Tipp:** Die meisten Fehler lösen sich durch Browser-Reload (F5) oder Re-Login!
 
-### Gibt es ein Community-Forum?
-
-**Ja!** Besuche:
-- 💬 [community.kaufe-es.eu](https://community.kaufe-es.eu)
-- Austausch mit anderen A.R.I. Nutzern
-- Best Practices teilen
-- Feature-Requests einreichen
-
 ### Wie bekomme ich Updates?
 
 **Automatisch!**
@@ -781,12 +752,6 @@ Für mehrere Shops:
 - Keine manuelle Aktion nötig
 - Neue Features sofort verfügbar
 - Changelog im Dashboard
-
-**Version prüfen:** Settings → About → Version
-
----
-
-## Häufige Probleme (Quick-Fixes)
 
 ### Dashboard lädt nicht
 
@@ -809,7 +774,7 @@ Für mehrere Shops:
 ### Spezialisierung wird nicht geladen
 
 ✅ Datei korrekt hochgeladen?  
-✅ Signatur gültig? (nur Original-Dateien von kaufe-es.eu)  
+✅ Signatur gültig?  
 ✅ Browser-Reload (F5)  
 
 ### Sprache wechselt nicht
@@ -820,6 +785,6 @@ Für mehrere Shops:
 
 ---
 
-**Letzte Aktualisierung:** Januar 5, 2026  
+**Letzte Aktualisierung:** Januar 6, 2026  
 **Version:** 2.0.0  
 **Erstellt für:** Endnutzer & Shop-Betreiber

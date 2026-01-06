@@ -809,7 +809,7 @@ Die Kunden-Feedback-Analyse nutzt echte Support-Tickets aus deinem WordPress-Sys
 1. Plugin "Welcome to Awesome Support 6.3.6" in WordPress installieren + aktivieren
 2. WordPress Application Passwords aktivieren
 3. Umgebungsvariablen beim Backend-Start:
-   - `WORDPRESS_URL` = z. B. `https://kaufe-es.eu`
+   - `WORDPRESS_URL` = z. B. `https://dein-shop.de`
    - `WORDPRESS_USER` = WordPress-Benutzername
    - `WORDPRESS_APP_PASSWORD` = App-Password
 
