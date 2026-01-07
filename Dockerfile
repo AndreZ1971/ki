@@ -41,6 +41,9 @@ COPY --from=frontend-builder /app/frontend/dist ./public
 # Copy health check
 COPY healthcheck.js ./
 
+# Tools für Privileg-Absenkung im Entrypoint (Root -> nodeuser)
+RUN apk add --no-cache su-exec
+
 # Create non-root user (ALPINE SYNTAX - nicht Debian!)
 RUN addgroup -g 1001 nodejs && \
   adduser -u 1001 -G nodejs -D nodeuser && \
@@ -48,7 +51,7 @@ RUN addgroup -g 1001 nodejs && \
   chown -R nodeuser:nodejs /app && \
   chmod 755 /app/data /app/data/specializations
 
-USER nodeuser
+USER root
 EXPOSE 3000
 
 # Entrypoint-Skript für sichere connection.json-Erstellung
