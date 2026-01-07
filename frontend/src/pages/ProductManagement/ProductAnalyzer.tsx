@@ -80,7 +80,7 @@ const ProductAnalyzer: React.FC = () => {
       }
     };
     fetchProducts();
-  }, []);
+  }, [apiBase]);
 
   const openDetailsModal = useCallback(async () => {
     if (!selectedProductId) return;
