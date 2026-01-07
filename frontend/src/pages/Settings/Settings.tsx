@@ -260,15 +260,18 @@ const Settings = () => {
     if (!config) return "—";
 
     if (config.type === "interval") {
-      return `Alle ${config.minutes} Minuten`;
+      return t("settings.schedule.intervalLabel", { minutes: config.minutes });
     }
 
     if (config.type === "daily") {
-      return `Täglich um ${config.time} Uhr`;
+      return t("settings.schedule.dailyLabel", { time: config.time });
     }
 
     if (config.type === "weekly") {
-      return `${config.weekdays.join(", ")} um ${config.time} Uhr`;
+      return t("settings.schedule.weeklyLabel", {
+        weekdays: config.weekdays.join(", "),
+        time: config.time,
+      });
     }
 
     return "—";
@@ -344,7 +347,7 @@ const Settings = () => {
       }
     } catch (error) {
       console.error("Failed to save schedule:", error);
-      setConnectionMessage("❌ Fehler beim Speichern des Schedules");
+      setConnectionMessage(t("settings.schedule.saveError"));
       setConnectionStatus("error");
     } finally {
       setSavingSchedule(false);
@@ -444,13 +447,9 @@ const Settings = () => {
           youtubeChannelId: data.socialMedia?.youtube?.channelId || "",
         };
         setCredentials({ ...defaultCredentials, ...mapped });
-        setConnectionMessage(
-          "✅ Konfiguration geladen. Jetzt speichern, um sie zu übernehmen."
-        );
+        setConnectionMessage(t("settings.connection.importSuccess"));
       } catch (_err) {
-        setConnectionMessage(
-          "❌ Fehler beim Laden der Datei. Bitte gültige connection.json wählen."
-        );
+        setConnectionMessage(t("settings.connection.importError"));
       }
     };
     reader.readAsText(file);

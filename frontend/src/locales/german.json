@@ -161,7 +161,9 @@
       "testingConnection": "🔄 Teste Verbindung...",
       "saveConfiguration": "💾 Konfiguration speichern",
       "saving": "💾 Speichert...",
-      "importConfig": "📂 Konfiguration laden"
+      "importConfig": "📂 Konfiguration laden",
+      "importSuccess": "✅ Konfiguration geladen. Jetzt speichern, um sie zu übernehmen.",
+      "importError": "❌ Fehler beim Laden der Datei. Bitte gültige connection.json wählen."
     },
     "specialization": {
       "title": "🎯 Agent-Spezialisierung wählen",
@@ -246,6 +248,12 @@
       "loopAnalyticsName": "Analytics Insights",
       "loopAnalyticsDesc": "Automatische Business-Reports",
       "loopAnalyticsSchedule": "Täglich 20:00"
+    },
+    "schedule": {
+      "intervalLabel": "Alle {{minutes}} Minuten",
+      "dailyLabel": "Täglich um {{time}} Uhr",
+      "weeklyLabel": "{{weekdays}} um {{time}} Uhr",
+      "saveError": "❌ Fehler beim Speichern des Schedules"
     }
   },
   "dashboard": {
@@ -290,8 +298,8 @@
         "description": "Echtzeit-Analytics mit tiefgehenden Insights"
       },
       "realWebAnalytics": {
-        "title": "🌐 Real Web Analytics",
-        "description": "Web-Commerce Analytics und Tracking"
+        "title": "🌐 Real Webanalyse",
+        "description": "Analyse digitaler Produkte mit Google Trends, Reddit & KI"
       },
       "analyticRegioning": {
         "title": "🗺️ Analytic Regioning",
@@ -786,8 +794,66 @@
         "myBundles": "📊 Meine Bundles",
         "performanceHeader": "📈 Bundle-Performance"
       },
+      "trendAnalysis": {
+        "title": "📊 Trend-Analyse",
+        "subtitle": "KI-gestützte Trendanalyse mit Shop-Daten, Google Trends & Reddit",
+        "timeRangeLabel": "Zeitraum analysieren:",
+        "range7d": "7 Tage",
+        "range30d": "30 Tage",
+        "range90d": "90 Tage",
+        "range1y": "1 Jahr",
+        "errorLoadingData": "Fehler beim Laden der Trend-Daten.",
+        "metrics": {
+          "salesGrowth": "Umsatzwachstum",
+          "detailPositive": "Positiv",
+          "detailNegative": "Negativ",
+          "customerGrowth": "Kundenwachstum",
+          "detailGrowing": "Wachsend",
+          "detailDeclining": "Rückläufig",
+          "popularProducts": "Beliebte Produkte",
+          "detailTopPerformer": "Top-Performer",
+          "seasonalTrend": "Saisonaler Trend",
+          "seasonality": "Saisonalität",
+          "predictionAccuracy": "Prognosegenauigkeit",
+          "detailPredictionAccuracy": "KI-Genauigkeit",
+          "trendStrength": "Trend-Stärke",
+          "detailTrendStrength": "Trend-Stärke",
+          "marketTrend": "Markttrend",
+          "marketTrendValue": "↗️ Steigend",
+          "marketDirection": "Marktrichtung",
+          "lastUpdated": "Letzte Aktualisierung",
+          "updated": "Aktualisiert"
+        },
+        "googleTrendsTitle": "🌐 Google Trends",
+        "googleTrendsEmpty": "Keine Google-Trends-Daten verfügbar.",
+        "googleTrendsPlaceholder": "📈 Google Trends Chart",
+        "redditTrendsTitle": "👾 Reddit Trends",
+        "redditTrendsEmpty": "Keine Reddit-Trends verfügbar.",
+        "redditTrendsPlaceholder": "📈 Reddit Trends Chart",
+        "redditMentions": "Erwähnungen",
+        "aiSectionTitle": "🧠 KI-gestützte Trend-Analyse",
+        "aiSectionDescription": "Nutze KI/ML, um Trends, Prognosen und Optimierungspotenziale in Shop-, Google- und Reddit-Daten zu erkennen.",
+        "analyzeButton": "🧠 KI-Analyse starten",
+        "analyzing": "⏳ KI-Analyse läuft...",
+        "analysisFailed": "Trend-Analyse fehlgeschlagen.",
+        "analysisUnavailable": "KI-Analyse nicht verfügbar. Backend-Verbindung prüfen.",
+        "summaryTitle": "📝 KI-Zusammenfassung",
+        "insightScore": "KI-Score",
+        "nextStepsTitle": "🚀 Empfohlene Next Steps",
+        "defaultRecommendation": "Empfehlung",
+        "historyTitle": "📚 Letzte Analysen",
+        "historyRange7d": "📅 7-Tage Analyse",
+        "historyRange30d": "📅 30-Tage Analyse",
+        "historyRange90d": "📅 90-Tage Analyse",
+        "historyRange1y": "📅 1-Jahr Analyse",
+        "historyRangeFallback": "📅 Analyse",
+        "historyCurrent": "(aktuell)",
+        "historyTrends": "Trends",
+        "historyDuration": "Dauer",
+        "historyDurationFallback": "0m 0s"
+      },
       "realWebAnalytics": {
-        "title": "🌐 Real Web Analytics",
+        "title": "🌐 Real Webanalyse",
         "subtitle": "Analyse digitaler Produkte mit Google Trends, Reddit & KI",
         "productsInShop": "🛒 Produkte im Shop",
         "noProductsFound": "Keine Produkte gefunden.",
@@ -795,11 +861,21 @@
         "noTrendData": "Keine Trenddaten geladen.",
         "kiReport": "🧠 KI-Report",
         "aboutTitle": "Über diese Analytics",
-        "aboutDescription": "Real Web Analytics analysiert alle digitalen Produkte im Shop.",
+        "aboutDescription": "Real Webanalyse analysiert alle digitalen Produkte im Shop.",
         "analysisDetails": "Die Analyse erfolgt mit Google Trends, Reddit, News, GitHub, StackOverflow und KI.",
         "timeIntervalsExplanation": "Die Zeitintervalle stehen für kurzfristige, mittelfristige und langfristige Analysen.",
         "lastUpdate": "Letztes Update",
-        "analyzing": "📊 Analyse läuft..."
+        "analyzing": "📊 Analyse läuft...",
+        "loadProductsError": "Produkte konnten nicht geladen werden.",
+        "noProductsForAnalysis": "Keine Produkte für die Trend-Analyse vorhanden.",
+        "noValidProductNames": "Keine gültigen Produktnamen für die Trend-Analyse.",
+        "noTrendsFound": "Keine Trends für die aktuellen Produkte gefunden.",
+        "analyzeFailed": "Analyse fehlgeschlagen.",
+        "scoreLabel": "Score:",
+        "confidenceLabel": "Confidence:",
+        "topTrendLabel": "Top Trend",
+        "avgScoreLabel": "Durchschnittlicher Score",
+        "analyzedProductsLabel": "Analysierte Produkte"
       },
       "standardAudit": {
         "title": "🔧 Standard Audit",
