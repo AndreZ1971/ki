@@ -294,16 +294,16 @@ const LoopMonitoring: React.FC = () => {
               style={{
                 padding: "12px",
                 backgroundColor:
-                  selectedLoop === loop.id ? "#2196F3" : "#f5f5f5",
-                color: selectedLoop === loop.id ? "white" : "black",
-                border: "none",
+                  selectedLoop === loop.id ? "#2196F3" : "#1e293b",
+                color: selectedLoop === loop.id ? "white" : "#f1f5f9",
+                border: selectedLoop === loop.id ? "2px solid #2196F3" : "2px solid #334155",
                 borderRadius: "4px",
                 cursor: "pointer",
                 textAlign: "left",
               }}
             >
-              <div style={{ fontWeight: "bold" }}>{loop.name}</div>
-              <div style={{ fontSize: "12px", opacity: 0.8 }}>
+              <div style={{ fontWeight: "bold", color: selectedLoop === loop.id ? "white" : "#f1f5f9" }}>{loop.name}</div>
+              <div style={{ fontSize: "12px", opacity: 0.8, color: selectedLoop === loop.id ? "white" : "#cbd5e1" }}>
                 {loop.description}
               </div>
             </button>
