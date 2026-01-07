@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { formatCurrency, formatTime } from "../../lib/i18n-utils";
@@ -46,7 +46,7 @@ const RealWebAnalytics = () => {
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
   // Hilfsfunktion: Produkte aus WooCommerce holen
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -56,20 +56,21 @@ const RealWebAnalytics = () => {
         ? `${base}/api/products/woo/products?per_page=50`
         : `/api/products/woo/products?per_page=50`;
       const response = await fetch(apiUrl);
-      if (!response.ok) throw new Error("Fehler beim Laden der Produkte");
+      if (!response.ok)
+        throw new Error(t("pages.analytics_pages.realWebAnalytics.loadProductsError"));
       const data = await response.json();
       setProducts(data.data || []);
     } catch (_err) {
-      setError("Produkte konnten nicht geladen werden");
+      setError(t("pages.analytics_pages.realWebAnalytics.loadProductsError"));
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
 
   // Produkte beim ersten Render automatisch laden
   React.useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [fetchProducts]);
 
   // Trend-Analyse für alle Produkte im gewählten Zeitraum
   const analyzeTrends = async (_interval: "today" | "week" | "month") => {
@@ -79,13 +80,13 @@ const RealWebAnalytics = () => {
     setKIReport(null);
     try {
       if (products.length === 0) {
-        setError("Keine Produkte für Trend-Analyse vorhanden.");
+        setError(t("pages.analytics_pages.realWebAnalytics.noProductsForAnalysis"));
         setLoading(false);
         return;
       }
       const keywords = products.map((p) => p.name).filter(Boolean);
       if (keywords.length === 0) {
-        setError("Keine gültigen Produktnamen für Trend-Analyse.");
+        setError(t("pages.analytics_pages.realWebAnalytics.noValidProductNames"));
         setLoading(false);
         return;
       }
@@ -102,7 +103,7 @@ const RealWebAnalytics = () => {
       const batchData = await batchRes.json();
       setTrendResults(batchData.results || []);
       if ((batchData.results || []).length === 0) {
-        setError("Keine Trends für die aktuellen Produkte gefunden.");
+        setError(t("pages.analytics_pages.realWebAnalytics.noTrendsFound"));
       }
       // KI-Report für alle Produkte
       const aiUrl = base
@@ -117,7 +118,7 @@ const RealWebAnalytics = () => {
       setKIReport(aiData);
       setLastUpdate(new Date());
     } catch (_err) {
-      setError("Analyse fehlgeschlagen");
+      setError(t("pages.analytics_pages.realWebAnalytics.analyzeFailed"));
     } finally {
       setLoading(false);
     }
@@ -137,11 +138,11 @@ const RealWebAnalytics = () => {
           {t("common.back")}
         </button>
         <div className="analytics-header">
-          <h1>{t("analytics.realWebAnalytics.title")}</h1>
-          <p>{t("analytics.realWebAnalytics.subtitle")}</p>
+          <h1>{t("pages.analytics_pages.realWebAnalytics.title")}</h1>
+          <p>{t("pages.analytics_pages.realWebAnalytics.subtitle")}</p>
         </div>
         <div className="loading-spinner">
-          {t("analytics.realWebAnalytics.analyzing")}
+          {t("pages.analytics_pages.realWebAnalytics.analyzing")}
         </div>
       </div>
     );
@@ -153,8 +154,8 @@ const RealWebAnalytics = () => {
         {t("common.back")}
       </button>
       <div className="analytics-header">
-        <h1>{t("analytics.realWebAnalytics.title")}</h1>
-        <p>{t("analytics.realWebAnalytics.subtitle")}</p>
+        <h1>{t("pages.analytics_pages.realWebAnalytics.title")}</h1>
+        <p>{t("pages.analytics_pages.realWebAnalytics.subtitle")}</p>
         <div className="time-range-selector">
           <button
             className={timeRange === "today" ? "active" : ""}
@@ -191,9 +192,9 @@ const RealWebAnalytics = () => {
       {error && <div className="info-banner">❌ {error}</div>}
       <div className="analysis-section">
         <div className="metric-card full-width">
-          <h3>{t("analytics.realWebAnalytics.productsInShop")}</h3>
+          <h3>{t("pages.analytics_pages.realWebAnalytics.productsInShop")}</h3>
           {products.length === 0 ? (
-            <div>{t("analytics.realWebAnalytics.noProductsFound")}</div>
+            <div>{t("pages.analytics_pages.realWebAnalytics.noProductsFound")}</div>
           ) : (
             <div className="products-list">
               {products.map((p) => (
@@ -210,19 +211,19 @@ const RealWebAnalytics = () => {
       </div>
       <div className="analysis-section">
         <div className="metric-card full-width">
-          <h3>{t("analytics.realWebAnalytics.trendAnalysis")}</h3>
+          <h3>{t("pages.analytics_pages.realWebAnalytics.trendAnalysis")}</h3>
           {trendResults.length === 0 ? (
-            <div>{t("analytics.realWebAnalytics.noTrendData")}</div>
+            <div>{t("pages.analytics_pages.realWebAnalytics.noTrendData")}</div>
           ) : (
             <div className="trend-list">
               {trendResults.map((tr) => (
                 <div key={tr.keyword} className="trend-item">
                   <span className="trend-keyword">{tr.keyword}</span>
                   <span className="trend-score">
-                    Score: {tr.overallScore.toFixed(1)}
+                    {t("pages.analytics_pages.realWebAnalytics.scoreLabel")} {tr.overallScore.toFixed(1)}
                   </span>
                   <span className="trend-confidence">
-                    Confidence: {tr.confidence.toFixed(1)}%
+                    {t("pages.analytics_pages.realWebAnalytics.confidenceLabel")} {tr.confidence.toFixed(1)}%
                   </span>
                   <div className="trend-sources">
                     {tr.sources.map((src, idx) => (
@@ -240,20 +241,20 @@ const RealWebAnalytics = () => {
       {kiReport && (
         <div className="analysis-section">
           <div className="metric-card full-width">
-            <h3>{t("analytics.realWebAnalytics.kiReport")}</h3>
+            <h3>{t("pages.analytics_pages.realWebAnalytics.kiReport")}</h3>
             <div className="ki-report-text" style={{ whiteSpace: "pre-line" }}>
               {kiReport.report}
             </div>
             <div className="ki-report-summary">
-              <strong>Top Trend:</strong> {kiReport.summary?.topTrend ?? "-"}
+              <strong>{t("pages.analytics_pages.realWebAnalytics.topTrendLabel")}:</strong> {kiReport.summary?.topTrend ?? "-"}
               <br />
-              <strong>Durchschnittlicher Score:</strong>{" "}
+              <strong>{t("pages.analytics_pages.realWebAnalytics.avgScoreLabel")}:</strong>{" "}
               {typeof kiReport.summary?.avgScore === "number" &&
               !isNaN(kiReport.summary.avgScore)
                 ? kiReport.summary.avgScore.toFixed(1)
                 : "-"}
               <br />
-              <strong>Analysierte Produkte:</strong>{" "}
+              <strong>{t("pages.analytics_pages.realWebAnalytics.analyzedProductsLabel")}:</strong>{" "}
               {kiReport.summary?.total ?? "-"}
             </div>
           </div>
@@ -261,17 +262,17 @@ const RealWebAnalytics = () => {
       )}
       <div className="analysis-section">
         <div className="metric-card full-width info">
-          <h3>ℹ️ {t("analytics.realWebAnalytics.aboutTitle")}</h3>
+          <h3>ℹ️ {t("pages.analytics_pages.realWebAnalytics.aboutTitle")}</h3>
           <p>
-            <strong>{t("analytics.realWebAnalytics.aboutDescription")}</strong>
+            <strong>{t("pages.analytics_pages.realWebAnalytics.aboutDescription")}</strong>
             <br />
-            {t("analytics.realWebAnalytics.analysisDetails")}
+            {t("pages.analytics_pages.realWebAnalytics.analysisDetails")}
             <br />
-            {t("analytics.realWebAnalytics.timeIntervalsExplanation")}
+            {t("pages.analytics_pages.realWebAnalytics.timeIntervalsExplanation")}
             <br />
           </p>
           <div>
-            {t("analytics.realWebAnalytics.lastUpdate")}:{" "}
+            {t("pages.analytics_pages.realWebAnalytics.lastUpdate")}: {" "}
             {formatTime(lastUpdate)}
           </div>
         </div>

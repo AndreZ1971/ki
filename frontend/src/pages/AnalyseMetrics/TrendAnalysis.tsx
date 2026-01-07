@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { formatDate } from "../../lib/i18n-utils";
 import "./page.css";
 
@@ -24,6 +25,7 @@ interface NextStep {
 }
 
 const TrendAnalysis = () => {
+  const { t } = useTranslation();
   // const [trendData, setTrendData] = useState<TrendData | null>(null); // entfernt
   // const [loading, setLoading] = useState(true); // entfernt
   // const [error, setError] = useState<string | null>(null); // entfernt
@@ -56,64 +58,87 @@ const TrendAnalysis = () => {
           ? `${base}/api/analytics/trends/products?range=${timeRange}`
           : `/api/analytics/trends/products?range=${timeRange}`;
         const res = await fetch(apiUrl);
-        if (!res.ok) throw new Error("Fehler beim Laden der Trend-Daten");
+        if (!res.ok)
+          throw new Error(t("pages.analytics_pages.trendAnalysis.errorLoadingData"));
         const data = await res.json();
 
         if (data.success && data.trending_products) {
+          const salesGrowthValue = data.salesGrowth ?? 12.5;
+          const customerGrowthValue = data.customerGrowth ?? 8.3;
+          const seasonalTrendValue = data.seasonalTrend ?? 23.7;
+          const predictionAccuracyValue = data.predictionAccuracy ?? 87.2;
+          const trendStrengthValue = data.trendStrength ?? 76.8;
+
           const demoMetrics: Metric[] = [
             {
               icon: "📈",
-              label: "Sales Growth",
-              value: `${data.salesGrowth || 12.5}%`,
+              label: t("pages.analytics_pages.trendAnalysis.metrics.salesGrowth"),
+              value: `${salesGrowthValue}%`,
               detail:
-                data.salesGrowth && data.salesGrowth > 0
-                  ? "Positive"
-                  : "Negativ",
+                salesGrowthValue > 0
+                  ? t("pages.analytics_pages.trendAnalysis.metrics.detailPositive")
+                  : t("pages.analytics_pages.trendAnalysis.metrics.detailNegative"),
             },
             {
               icon: "👥",
-              label: "Customer Growth",
-              value: `${data.customerGrowth || 8.3}%`,
+              label: t("pages.analytics_pages.trendAnalysis.metrics.customerGrowth"),
+              value: `${customerGrowthValue}%`,
               detail:
-                data.customerGrowth && data.customerGrowth > 0
-                  ? "Wachsend"
-                  : "Rückläufig",
+                customerGrowthValue > 0
+                  ? t(
+                      "pages.analytics_pages.trendAnalysis.metrics.detailGrowing"
+                    )
+                  : t(
+                      "pages.analytics_pages.trendAnalysis.metrics.detailDeclining"
+                    ),
             },
             {
               icon: "🔥",
-              label: "Popular Products",
+              label: t("pages.analytics_pages.trendAnalysis.metrics.popularProducts"),
               value: data.trending_products.length,
-              detail: "Top-Performer",
+              detail: t(
+                "pages.analytics_pages.trendAnalysis.metrics.detailTopPerformer"
+              ),
             },
             {
               icon: "📊",
-              label: "Seasonal Trend",
-              value: `${data.seasonalTrend || 23.7}%`,
-              detail: "Saisonalität",
+              label: t("pages.analytics_pages.trendAnalysis.metrics.seasonalTrend"),
+              value: `${seasonalTrendValue}%`,
+              detail: t("pages.analytics_pages.trendAnalysis.metrics.seasonality"),
             },
             {
               icon: "🎯",
-              label: "Prediction Accuracy",
-              value: `${data.predictionAccuracy || 87.2}%`,
-              detail: "KI-Genauigkeit",
+              label: t(
+                "pages.analytics_pages.trendAnalysis.metrics.predictionAccuracy"
+              ),
+              value: `${predictionAccuracyValue}%`,
+              detail: t(
+                "pages.analytics_pages.trendAnalysis.metrics.detailPredictionAccuracy"
+              ),
             },
             {
               icon: "⚡",
-              label: "Trend Strength",
-              value: `${data.trendStrength || 76.8}%`,
-              detail: "Trend-Stärke",
+              label: t("pages.analytics_pages.trendAnalysis.metrics.trendStrength"),
+              value: `${trendStrengthValue}%`,
+              detail: t(
+                "pages.analytics_pages.trendAnalysis.metrics.detailTrendStrength"
+              ),
             },
             {
               icon: "📱",
-              label: "Market Trend",
-              value: data.marketTrend || "↗️ Steigend",
-              detail: "Marktrichtung",
+              label: t("pages.analytics_pages.trendAnalysis.metrics.marketTrend"),
+              value:
+                data.marketTrend ||
+                t("pages.analytics_pages.trendAnalysis.metrics.marketTrendValue"),
+              detail: t(
+                "pages.analytics_pages.trendAnalysis.metrics.marketDirection"
+              ),
             },
             {
               icon: "🔄",
-              label: "Last Updated",
+              label: t("pages.analytics_pages.trendAnalysis.metrics.lastUpdated"),
               value: formatDate(new Date()),
-              detail: "Aktualisiert",
+              detail: t("pages.analytics_pages.trendAnalysis.metrics.updated"),
             },
           ];
           setMetrics(demoMetrics);
@@ -130,7 +155,9 @@ const TrendAnalysis = () => {
           setRedditTrends(
             data.trending_products.slice(0, 4).map((p: any) => ({
               topic: p.name,
-              score: `${p.mentions} mentions`,
+              score: `${p.mentions} ${t(
+                "pages.analytics_pages.trendAnalysis.redditMentions"
+              )}`,
             }))
           );
 
@@ -147,7 +174,7 @@ const TrendAnalysis = () => {
       }
     };
     fetchData();
-  }, [timeRange]);
+  }, [timeRange, t]);
 
   // KI/ML-Analyse: API-Call
   const handleAnalyzeAI = useCallback(async () => {
@@ -171,7 +198,8 @@ const TrendAnalysis = () => {
           timeRange: timeRange,
         }),
       });
-      if (!res.ok) throw new Error("KI-Analyse fehlgeschlagen");
+      if (!res.ok)
+        throw new Error(t("pages.analytics_pages.trendAnalysis.analysisFailed"));
       const data = await res.json();
 
       if (data.success && data.analysis) {
@@ -210,12 +238,12 @@ const TrendAnalysis = () => {
       setSummary(null);
       setLastAnalyses([]);
       setInsightError(
-        "KI-Analyse nicht verfügbar. Überprüfe die Backend-Verbindung."
+        t("pages.analytics_pages.trendAnalysis.analysisUnavailable")
       );
     } finally {
       setInsightLoading(false);
     }
-  }, [timeRange]);
+  }, [timeRange, t]);
 
   // Automatische KI-Analyse bei Zeitraum-Änderung
   useEffect(() => {
@@ -242,18 +270,14 @@ const TrendAnalysis = () => {
         className="back-button floating-back"
         onClick={handleBackToDashboard}
       >
-        ← Zurück
+        {t("common.back")}
       </button>
 
       <div className="analytics-header">
-        <h1>📊 Trend Analysis</h1>
-        <p>
-          KI-gestützte Trendanalyse mit echten Shop-Daten, Google Trends &
-          Reddit Insights
-        </p>
-        {/* Zeitraum Auswahl */}
+        <h1>{t("pages.analytics_pages.trendAnalysis.title")}</h1>
+        <p>{t("pages.analytics_pages.trendAnalysis.subtitle")}</p>
         <div className="time-range-selector">
-          <h4>Zeitraum analysieren:</h4>
+          <h4>{t("pages.analytics_pages.trendAnalysis.timeRangeLabel")}</h4>
           <div className="range-buttons">
             {["7d", "30d", "90d", "1y"].map((range) => (
               <button
@@ -261,10 +285,10 @@ const TrendAnalysis = () => {
                 className={`range-button ${timeRange === range ? "active" : ""}`}
                 onClick={() => handleTimeRangeChange(range)}
               >
-                {range === "7d" && "7 Tage"}
-                {range === "30d" && "30 Tage"}
-                {range === "90d" && "90 Tage"}
-                {range === "1y" && "1 Jahr"}
+                {range === "7d" && t("pages.analytics_pages.trendAnalysis.range7d")}
+                {range === "30d" && t("pages.analytics_pages.trendAnalysis.range30d")}
+                {range === "90d" && t("pages.analytics_pages.trendAnalysis.range90d")}
+                {range === "1y" && t("pages.analytics_pages.trendAnalysis.range1y")}
               </button>
             ))}
           </div>
@@ -288,15 +312,17 @@ const TrendAnalysis = () => {
       {/* Google Trends Chart */}
       <div className="analysis-section">
         <div className="metric-card full-width">
-          <h3>🌐 Google Trends</h3>
+          <h3>{t("pages.analytics_pages.trendAnalysis.googleTrendsTitle")}</h3>
           {googleTrends.length === 0 ? (
             <div style={{ color: "#6c757d" }}>
-              Keine Google Trends-Daten verfügbar.
+              {t("pages.analytics_pages.trendAnalysis.googleTrendsEmpty")}
             </div>
           ) : (
             <div className="prediction-chart">
-              {/* Dummy Chart-Placeholder, kann durch echtes Chart ersetzt werden */}
-              <div className="chart-placeholder">📈 Google Trends Chart</div>
+              {/* Chart placeholder */}
+              <div className="chart-placeholder">
+                {t("pages.analytics_pages.trendAnalysis.googleTrendsPlaceholder")}
+              </div>
               <div className="prediction-stats">
                 {googleTrends.map((trend, i) => (
                   <div className="prediction-item" key={i}>
@@ -315,14 +341,16 @@ const TrendAnalysis = () => {
       {/* Reddit Trends Chart */}
       <div className="analysis-section">
         <div className="metric-card full-width">
-          <h3>👾 Reddit Trends</h3>
+          <h3>{t("pages.analytics_pages.trendAnalysis.redditTrendsTitle")}</h3>
           {redditTrends.length === 0 ? (
             <div style={{ color: "#6c757d" }}>
-              Keine Reddit-Trends verfügbar.
+              {t("pages.analytics_pages.trendAnalysis.redditTrendsEmpty")}
             </div>
           ) : (
             <div className="prediction-chart">
-              <div className="chart-placeholder">📈 Reddit Trends Chart</div>
+              <div className="chart-placeholder">
+                {t("pages.analytics_pages.trendAnalysis.redditTrendsPlaceholder")}
+              </div>
               <div className="prediction-stats">
                 {redditTrends.map((trend, i) => (
                   <div className="prediction-item" key={i}>
@@ -341,10 +369,9 @@ const TrendAnalysis = () => {
       {/* KI/ML-Analyse Sektion */}
       <div className="analysis-section">
         <div className="metric-card full-width">
-          <h3>🧠 KI-gestützte Trend-Analyse</h3>
+          <h3>{t("pages.analytics_pages.trendAnalysis.aiSectionTitle")}</h3>
           <p style={{ marginBottom: 18, color: "#2563eb", fontWeight: 500 }}>
-            Nutze KI/ML, um Trends, Prognosen und Optimierungspotenziale aus
-            Shop-, Google- und Reddit-Daten zu erkennen.
+            {t("pages.analytics_pages.trendAnalysis.aiSectionDescription")}
           </p>
           <button
             className="action-button primary"
@@ -353,15 +380,15 @@ const TrendAnalysis = () => {
             style={{ marginBottom: 18 }}
           >
             {insightLoading
-              ? "⏳ KI-Analyse läuft..."
-              : "🧠 KI-Analyse starten"}
+              ? t("pages.analytics_pages.trendAnalysis.analyzing")
+              : t("pages.analytics_pages.trendAnalysis.analyzeButton")}
           </button>
           {insightError && <div className="error-message">{insightError}</div>}
 
           {/* Zusammenfassung */}
           {summary && (
             <div className="metric-card" style={{ margin: "24px 0" }}>
-              <h4>📝 KI-Zusammenfassung</h4>
+              <h4>{t("pages.analytics_pages.trendAnalysis.summaryTitle")}</h4>
               <div
                 style={{
                   fontSize: "1.1rem",
@@ -414,7 +441,7 @@ const TrendAnalysis = () => {
                         marginTop: 8,
                       }}
                     >
-                      KI-Score: {Math.round(insight.score * 100)}%
+                        {t("pages.analytics_pages.trendAnalysis.insightScore")}: {Math.round(insight.score * 100)}%
                     </div>
                   )}
                 </div>
@@ -425,7 +452,7 @@ const TrendAnalysis = () => {
           {/* Next Steps / Empfehlungen */}
           {Array.isArray(nextSteps) && nextSteps.length > 0 && (
             <div className="next-steps" style={{ marginBottom: 32 }}>
-              <h4>🚀 Empfohlene Next Steps</h4>
+                <h4>{t("pages.analytics_pages.trendAnalysis.nextStepsTitle")}</h4>
               {nextSteps.map((step, i) => (
                 <div
                   className={`next-step ${step.criticality || "good"}`}
@@ -438,7 +465,10 @@ const TrendAnalysis = () => {
                     {!step.criticality && "➡️"}
                   </span>
                   <div className="step-content">
-                    <strong>{step.title || "Empfehlung"}</strong>
+                    <strong>
+                      {step.title ||
+                        t("pages.analytics_pages.trendAnalysis.defaultRecommendation")}
+                    </strong>
                     <p>{step.description || ""}</p>
                   </div>
                 </div>
@@ -452,7 +482,7 @@ const TrendAnalysis = () => {
       {lastAnalyses.length > 0 && (
         <div className="analysis-section">
           <div className="metric-card full-width">
-            <h3>📚 Letzte Analysen</h3>
+            <h3>{t("pages.analytics_pages.trendAnalysis.historyTitle")}</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {lastAnalyses.map((analysis, idx) => (
                 <div
@@ -498,12 +528,20 @@ const TrendAnalysis = () => {
                         }}
                       >
                         <span style={{ fontWeight: 700, color: "#f5f7ff" }}>
-                          {analysis.timeRange === "7d" && "📅 7-Tage Analyse"}
-                          {analysis.timeRange === "30d" && "📅 30-Tage Analyse"}
-                          {analysis.timeRange === "90d" && "📅 90-Tage Analyse"}
-                          {analysis.timeRange === "1y" && "📅 1-Jahr Analyse"}
-                          {!analysis.timeRange && "📅 Analyse"}
-                          {idx === 0 && " (aktuell)"}
+                          {analysis.timeRange === "7d" &&
+                            t("pages.analytics_pages.trendAnalysis.historyRange7d")}
+                          {analysis.timeRange === "30d" &&
+                            t("pages.analytics_pages.trendAnalysis.historyRange30d")}
+                          {analysis.timeRange === "90d" &&
+                            t("pages.analytics_pages.trendAnalysis.historyRange90d")}
+                          {analysis.timeRange === "1y" &&
+                            t("pages.analytics_pages.trendAnalysis.historyRange1y")}
+                          {!analysis.timeRange &&
+                            t("pages.analytics_pages.trendAnalysis.historyRangeFallback")}
+                          {idx === 0 &&
+                            ` ${t(
+                              "pages.analytics_pages.trendAnalysis.historyCurrent"
+                            )}`}
                         </span>
                         <span style={{ color: "#6c757d", fontSize: "0.85rem" }}>
                           {formatDate(new Date(analysis.timestamp))}
@@ -541,7 +579,7 @@ const TrendAnalysis = () => {
                           {analysis.trends || analysis.insightsCount}
                         </div>
                         <div style={{ color: "#6c757d", fontSize: "0.85rem" }}>
-                          Trends
+                            {t("pages.analytics_pages.trendAnalysis.historyTrends")}
                         </div>
                       </div>
 
@@ -553,10 +591,13 @@ const TrendAnalysis = () => {
                             color: "#10b981",
                           }}
                         >
-                          {analysis.duration || "0m 0s"}
+                          {analysis.duration ||
+                            t(
+                              "pages.analytics_pages.trendAnalysis.historyDurationFallback"
+                            )}
                         </div>
                         <div style={{ color: "#6c757d", fontSize: "0.85rem" }}>
-                          Dauer
+                            {t("pages.analytics_pages.trendAnalysis.historyDuration")}
                         </div>
                       </div>
 

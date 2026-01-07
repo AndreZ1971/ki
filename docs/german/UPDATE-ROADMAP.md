@@ -206,6 +206,7 @@ Neue Sprachen hinzufügen, bestehende Übersetzungen verbessern.
 - [ ] **Language-Switcher UX**: Flaggen-Icons + Auto-Detect (Browser-Locale)
 
 ### 📈 Erfolgskriterien
+
 - Min. **5 Sprachen** (DE, EN, FR, ES, IT + bonus PL, NL)
 - 100% Translation-Coverage (keine fehlenden Keys)
 - Native-Speaker-Approval für alle Sprachen
