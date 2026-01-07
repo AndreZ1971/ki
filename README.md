@@ -46,6 +46,7 @@ Shop-Betreiber verbringen den Großteil ihrer Zeit mit Aufgaben, die repetitiv s
 - 🔍 Trends erkennen, bevor die Konkurrenz es tut
 
 **A.R.I. gibt dir diese Zeit zurück.**
+
 ## ⚠️ Das Problem
 
 ### Kennst du diese Situation?
@@ -65,7 +66,7 @@ Neue Produkte? A.R.I. analysiert Trends, schreibt SEO-Texte, generiert Bilder, o
 Keine Dashboard-Paralyse mehr. A.R.I. sagt dir konkret: *"Dein Top-Produkt hat ein Imageproblem – hier sind 3 konkrete Maßnahmen."* Du triffst die Entscheidung, A.R.I. setzt um.
 
 ### 📧 Intelligente Kundenbeziehung
-Abandoned Carts? Kunden, die lange nichts gekauft haben? A.R.I. kennt sie und schreibt ihnen personalisierte Nachrichten – ohne dass du je einen Finger rührst.
+Abandoned Carts? Kunden, die lange nichts gekauft haben? A.R.I. kennt sie und erstellt personalisierte Nachrichtenentwürfe – du prüfst und gibst frei. So einfach.
 
 ## 🚀 Features
 
@@ -108,7 +109,8 @@ Abandoned Carts? Kunden, die lange nichts gekauft haben? A.R.I. kennt sie und sc
 
 ### 🔧 51+ Intelligente Tools
 
-> **Wichtig:** Alle Tools arbeiten assistierend – Entwürfe, Analysen und Hinweise werden erzeugt; Freigaben und Live-Ä
+> **Wichtig:** Alle Tools arbeiten assistierend – Entwürfe, Analysen und Hinweise werden erzeugt; Freigaben und Live-Änderungen bleiben immer bei dir.
+
 ## 🎁 Was ändert sich für dich?
 
 | Bereich | Verbesserung |
