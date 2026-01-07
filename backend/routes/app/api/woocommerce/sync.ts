@@ -1,7 +1,5 @@
 // backend/routes/app/api/woocommerce/sync.ts
 import { FastifyPluginAsync } from 'fastify';
-import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
-import https from 'https';
 import { getConfig } from '@config';
 
 interface SyncResult {
@@ -13,17 +11,47 @@ interface SyncResult {
   type: 'full' | 'products' | 'orders' | 'customers';
 }
 
-const fetchCount = async (client: WooCommerceRestApi, resource: string) => {
-  const response = await client.get(resource, { per_page: 1 });
-  const headerTotal =
-    (response as any).headers?.['x-wp-total'] ??
-    (response as any).headers?.['X-WP-Total'];
-  const total = headerTotal
-    ? Number(headerTotal)
-    : Array.isArray((response as any).data)
-      ? (response as any).data.length
-      : 0;
-  return Number.isFinite(total) ? total : 0;
+/**
+ * Fetch WooCommerce resource count using native fetch (works like /products/analyzer)
+ */
+const fetchCount = async (
+  baseUrl: string,
+  consumerKey: string,
+  consumerSecret: string,
+  resource: string,
+  useQueryAuth: boolean
+): Promise<number> => {
+  let url: string;
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'User-Agent': 'ARI-WooSync/1.0'
+  };
+
+  if (useQueryAuth) {
+    // Query String Auth
+    url = `${baseUrl}/wp-json/wc/v3/${resource}?per_page=1&consumer_key=${encodeURIComponent(consumerKey)}&consumer_secret=${encodeURIComponent(consumerSecret)}`;
+  } else {
+    // Basic Auth
+    url = `${baseUrl}/wp-json/wc/v3/${resource}?per_page=1`;
+    const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
+    headers['Authorization'] = `Basic ${auth}`;
+  }
+
+  console.log(`[WooSync] Fetching count for ${resource} from ${url.replace(/consumer_(key|secret)=[^&]+/g, 'consumer_$1=***')}`);
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers,
+    signal: AbortSignal.timeout(30000)
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`HTTP ${response.status}: ${text}`);
+  }
+
+  const total = response.headers.get('x-wp-total');
+  return total ? Number(total) : 0;
 };
 
 const syncRoutes: FastifyPluginAsync = async (fastify) => {
@@ -49,27 +77,6 @@ const syncRoutes: FastifyPluginAsync = async (fastify) => {
     return true;
   };
 
-  const createWooClient = (useQueryStringAuth: boolean) => {
-    const wooCfg = getWooCfg(); // Dynamisch laden
-    // Debug-Ausgabe für SSL und Verbindung
-    console.log('[WooSync] Erstelle WooCommerceRestApi-Client mit URL:', wooCfg.url);
-    // https.Agent mit systemweiten CAs (wie curl)
-    const agent = new https.Agent({
-      rejectUnauthorized: false, // SSL-Validierung DISABLED für Testing
-    });
-    return new WooCommerceRestApi({
-      url: wooCfg.url || '',
-      consumerKey: wooCfg.consumerKey || '',
-      consumerSecret: wooCfg.consumerSecret || '',
-      version: 'wc/v3',
-      queryStringAuth: useQueryStringAuth,
-      axiosConfig: {
-        timeout: wooCfg.timeoutMs ? Number(wooCfg.timeoutMs) : 30000,
-        httpsAgent: agent,
-      },
-    });
-  };
-
   fastify.post('/sync', async (request, reply) => {
     const body = (request.body || {}) as { type?: string };
     const type = (body.type || 'full') as SyncResult['type'];
@@ -82,11 +89,10 @@ const syncRoutes: FastifyPluginAsync = async (fastify) => {
       });
     }
 
-    // Clients DYNAMISCH bei jedem Request erstellen (nicht cachen!)
+    // Config dynamisch laden
     const wooCfg = getWooCfg();
+    const { url, consumerKey, consumerSecret } = wooCfg;
     const preferQuery = wooCfg?.authMode === 'query';
-    const wooPrimary = createWooClient(preferQuery);
-    const wooFallback = createWooClient(!preferQuery);
 
     const started = Date.now();
     try {
@@ -94,10 +100,11 @@ const syncRoutes: FastifyPluginAsync = async (fastify) => {
         resource: string
       ): Promise<number> => {
         try {
-          return await fetchCount(wooPrimary, resource);
+          return await fetchCount(url!, consumerKey!, consumerSecret!, resource, preferQuery);
         } catch (_e1) {
           // Retry with alternate auth mode
-          return await fetchCount(wooFallback, resource);
+          console.log(`[WooSync] Retry ${resource} with ${preferQuery ? 'basic' : 'query'} auth`);
+          return await fetchCount(url!, consumerKey!, consumerSecret!, resource, !preferQuery);
         }
       };
 
@@ -147,7 +154,7 @@ const syncRoutes: FastifyPluginAsync = async (fastify) => {
 
   // 🔍 DEBUG: Zeige aktuelle WooCommerce-Config
   fastify.get('/debug-config', async (request, reply) => {
-    const cfg = getConfig().woocommerce || {};
+    const cfg = getWooCfg();
     return reply.send({
       url: cfg.url,
       consumerKey: cfg.consumerKey ? `${cfg.consumerKey.substring(0, 8)}...` : 'MISSING',
@@ -157,7 +164,7 @@ const syncRoutes: FastifyPluginAsync = async (fastify) => {
     });
   });
 
-  // 🔍 DEBUG: Test WooCommerce-Verbindung direkt
+  // 🔍 DEBUG: Test WooCommerce-Verbindung direkt mit fetch
   fastify.get('/debug-test', async (request, reply) => {
     if (!isWooConfigured()) {
       return reply.status(500).send({
@@ -167,20 +174,25 @@ const syncRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     try {
-      const client = createWooClient(wooCfg?.authMode === 'query');
-      const response = await client.get('products', { per_page: 5 });
+      const wooCfg = getWooCfg();
+      const preferQuery = wooCfg?.authMode === 'query';
+      const count = await fetchCount(
+        wooCfg.url!,
+        wooCfg.consumerKey!,
+        wooCfg.consumerSecret!,
+        'products',
+        preferQuery
+      );
       return reply.send({
         success: true,
-        productCount: Array.isArray((response as any).data) ? (response as any).data.length : 0,
-        products: (response as any).data,
-        message: 'WooCommerce-Verbindung funktioniert!'
+        productCount: count,
+        message: 'WooCommerce-Verbindung funktioniert!',
+        authMode: preferQuery ? 'query' : 'basic'
       });
     } catch (error: any) {
       return reply.status(500).send({
         success: false,
-        error: error.message,
-        status: error?.response?.status,
-        data: error?.response?.data
+        error: error.message
       });
     }
   });
