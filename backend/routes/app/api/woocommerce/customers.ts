@@ -175,7 +175,7 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
     }
   });
 
-  // GET: Newsletter Abonnenten
+  // GET: Newsletter Abonnenten – dynamic fetch mit aktuellem Config
   fastify.get('/subscribers', async (request, reply) => {
     try {
       // Onboarding-Guard
@@ -190,38 +190,72 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
 
       console.log('📥 Fetching subscribers from WooCommerce...');
 
-      // ✅ ECHTE Subscriber aus WooCommerce (User mit Rolle "subscriber") – robust inkl. Auth-Fallback
-      let response: any;
+      const woo = getConfig().woocommerce || {};
+      const auth = Buffer.from(
+        `${woo.consumerKey || ''}:${woo.consumerSecret || ''}`
+      ).toString('base64');
+      const wooUrl = (woo.url || '').endsWith('/')
+        ? (woo.url || '').slice(0, -1)
+        : woo.url || '';
+
+      // ✅ Direkte REST API Call mit aktuellem Config (nicht gecacht!)
+      let subscribers: any[] = [];
+
       try {
-        response = await WooPrimary.get('customers', {
-          per_page: 100,
-          orderby: 'registered_date',
-          order: 'desc',
-          role: 'subscriber',
-        });
-      } catch (primaryErr: any) {
-        console.warn(
-          '⚠️ Woo subscribers primary query failed, retrying with fallback auth/params...',
-          primaryErr?.response?.status || primaryErr?.message
+        const response = await fetch(
+          `${wooUrl}/wp-json/wc/v3/customers?per_page=100&role=subscriber&orderby=registered_date&order=desc`,
+          {
+            headers: {
+              Authorization: `Basic ${auth}`,
+              'Content-Type': 'application/json',
+            },
+          }
         );
+
+        if (!response.ok) {
+          console.warn(
+            `⚠️ Subscribers API returned ${response.status}, trying with query string auth...`
+          );
+          // Fallback mit Query String Auth
+          const fallbackResponse = await fetch(
+            `${wooUrl}/wp-json/wc/v3/customers?per_page=100&role=subscriber&orderby=registered_date&order=desc&consumer_key=${woo.consumerKey || ''}&consumer_secret=${woo.consumerSecret || ''}`
+          );
+          if (!fallbackResponse.ok) {
+            throw new Error(`HTTP ${fallbackResponse.status}`);
+          }
+          subscribers = await fallbackResponse.json();
+        } else {
+          subscribers = await response.json();
+        }
+      } catch (primaryErr: any) {
+        console.error('❌ Primary subscribers fetch failed:', primaryErr.message);
+        // Fallback ohne role param
         try {
-          response = await WooFallback.get('customers', {
-            per_page: 100,
-            orderby: 'registered_date',
-            order: 'desc',
-            role: 'subscriber',
-          });
-        } catch (_fallbackAuthErr: any) {
-          response = await WooFallback.get('customers', {
-            per_page: 100,
-            orderby: 'id',
-            order: 'desc',
-            role: 'subscriber',
-          });
+          const fallbackResponse = await fetch(
+            `${wooUrl}/wp-json/wc/v3/customers?per_page=100&orderby=id&order=desc`,
+            {
+              headers: {
+                Authorization: `Basic ${auth}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+          if (!fallbackResponse.ok) {
+            throw new Error(`HTTP ${fallbackResponse.status}`);
+          }
+          subscribers = await fallbackResponse.json();
+        } catch (fallbackErr: any) {
+          console.error(
+            '❌ Fallback subscribers fetch failed:',
+            fallbackErr.message
+          );
+          throw primaryErr;
         }
       }
 
-      const subscribers = response.data.map((subscriber: any) => ({
+      console.log(`📊 Fetched ${subscribers.length} subscribers from WooCommerce`);
+
+      const transformedSubscribers = subscribers.map((subscriber: any) => ({
         id: subscriber.id,
         name:
           `${subscriber.first_name} ${subscriber.last_name}`.trim() ||
@@ -235,14 +269,14 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
         username: subscriber.username,
       }));
 
-      console.log(`✅ ${subscribers.length} Abonnenten erfolgreich geladen`);
+      console.log(`✅ ${transformedSubscribers.length} Abonnenten erfolgreich transformiert`);
 
       return {
         success: true,
-        data: subscribers,
-        total: subscribers.length,
+        data: transformedSubscribers,
+        total: transformedSubscribers.length,
         source: 'woocommerce-subscribers',
-        message: `${subscribers.length} Abonnenten erfolgreich geladen`,
+        message: `${transformedSubscribers.length} Abonnenten erfolgreich geladen`,
       };
     } catch (_error) {
       const err: any = _error;
