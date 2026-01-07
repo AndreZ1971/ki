@@ -50,8 +50,34 @@ const fetchCount = async (
     throw new Error(`HTTP ${response.status}: ${text}`);
   }
 
-  const total = response.headers.get('x-wp-total');
-  return total ? Number(total) : 0;
+  // Prüfe x-wp-total Header (case-insensitive)
+  let total = 0;
+  for (const [key, value] of response.headers.entries()) {
+    if (key.toLowerCase() === 'x-wp-total') {
+      total = Number(value);
+      console.log(`[WooSync] Found ${resource} count in header: ${total}`);
+      return total;
+    }
+  }
+
+  // Fallback: Zähle die Items in der Response
+  try {
+    const data = await response.json();
+    if (Array.isArray(data)) {
+      total = data.length;
+      console.log(`[WooSync] Counted ${resource} items in response: ${total}`);
+      return total;
+    } else if (data?.data && Array.isArray(data.data)) {
+      total = data.data.length;
+      console.log(`[WooSync] Counted ${resource} items in response.data: ${total}`);
+      return total;
+    }
+  } catch (_e) {
+    console.warn(`[WooSync] Could not parse response for ${resource}`);
+  }
+
+  console.warn(`[WooSync] No count found for ${resource}, returning 0`);
+  return 0;
 };
 
 const syncRoutes: FastifyPluginAsync = async (fastify) => {
