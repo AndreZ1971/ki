@@ -15,6 +15,57 @@ type GeneratedPost = {
   suggestions?: string[];
 };
 
+const brandIcons: Record<string, JSX.Element> = {
+  linkedin: (
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+      <path
+        fill="currentColor"
+        d="M20.447 20.452h-3.554v-5.569c0-1.328-.024-3.036-1.85-3.036-1.853 0-2.136 1.445-2.136 2.938v5.667H9.354V9h3.414v1.561h.049c.476-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 11.004-4.124 2.062 2.062 0 01-.004 4.124zM6.813 20.452H3.56V9h3.253v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0"
+      />
+    </svg>
+  ),
+  facebook: (
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+      <path
+        fill="currentColor"
+        d="M22.675 0H1.325C.593 0 0 .593 0 1.326v21.348C0 23.407.593 24 1.325 24h11.495V14.708h-3.13v-3.62h3.13V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.62h-3.12V24h6.116C23.407 24 24 23.407 24 22.674V1.326C24 .593 23.407 0 22.675 0z"
+      />
+    </svg>
+  ),
+  instagram: (
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+      <path
+        fill="currentColor"
+        d="M12 0C8.741 0 8.332.014 7.052.072 5.771.13 4.629.372 3.678.878c-.986.52-1.798 1.332-2.318 2.318C.854 4.147.612 5.289.554 6.57.496 7.85.482 8.259.482 12c0 3.741.014 4.15.072 5.43.058 1.281.3 2.423.806 3.374.52.986 1.332 1.798 2.318 2.318.951.506 2.093.748 3.374.806 1.28.058 1.689.072 5.43.072 3.741 0 4.15-.014 5.43-.072 1.281-.058 2.423-.3 3.374-.806.986-.52 1.798-1.332 2.318-2.318.506-.951.748-2.093.806-3.374.058-1.28.072-1.689.072-5.43 0-3.741-.014-4.15-.072-5.43-.058-1.281-.3-2.423-.806-3.374-.52-.986-1.332-1.798-2.318-2.318-.951-.506-2.093-.748-3.374-.806C16.15.014 15.741 0 12 0zm0 5.838a6.162 6.162 0 1 1 0 12.324 6.162 6.162 0 0 1 0-12.324zm7.845-1.392a1.44 1.44 0 1 1-2.88 0 1.44 1.44 0 0 1 2.88 0z"
+      />
+    </svg>
+  ),
+  twitter: (
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+      <path
+        fill="currentColor"
+        d="M23.643 4.937c-.835.371-1.732.622-2.675.733.962-.577 1.7-1.49 2.048-2.578-.9.534-1.897.923-2.958 1.135-1.804-1.924-4.83-2.032-6.754-.228-1.174 1.1-1.66 2.726-1.332 4.267-3.86-.194-7.46-2.03-9.798-5.058-1.29 2.213-.63 5.044 1.52 6.477-.78-.026-1.544-.234-2.228-.616v.061c0 2.332 1.624 4.355 3.874 4.814-.71.193-1.452.222-2.17.084.63 1.953 2.445 3.292 4.5 3.332-2.07 1.623-4.77 2.353-7.29 2.04 2.179 1.397 4.768 2.142 7.42 2.142 8.91 0 13.776-7.385 13.48-13.986.927-.67 1.73-1.5 2.368-2.448z"
+      />
+    </svg>
+  ),
+  tiktok: (
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+      <path
+        fill="currentColor"
+        d="M12.9 0h4.8c.1 1.2.5 2.3 1.2 3.3.7.9 1.7 1.7 2.8 2.1v4.8c-1.5 0-3-.4-4.3-1.1v7.8c0 2.4-1 4.7-2.7 6.3-1.7 1.7-4 2.7-6.3 2.7-5 0-9-4.1-9-9.1 0-5 4-9.1 9-9.1h.9v4.9c-.6-.2-1.3-.2-1.9 0-.6.2-1.2.6-1.6 1.1-.4.5-.7 1.1-.8 1.7-.1.6 0 1.3.3 1.9.3.6.7 1.1 1.3 1.4.6.3 1.2.5 1.9.4.6-.1 1.2-.3 1.7-.7.5-.4.9-.9 1.1-1.5.1-.4.2-.9.2-1.3V0z"
+      />
+    </svg>
+  ),
+  youtube: (
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+      <path
+        fill="currentColor"
+        d="M23.498 6.186a2.974 2.974 0 0 0-2.09-2.103C19.691 3.5 12 3.5 12 3.5s-7.691 0-9.408.583A2.974 2.974 0 0 0 .502 6.186 31.403 31.403 0 0 0 0 12a31.403 31.403 0 0 0 .502 5.814 2.974 2.974 0 0 0 2.09 2.103C4.309 20.5 12 20.5 12 20.5s7.691 0 9.408-.583a2.974 2.974 0 0 0 2.09-2.103A31.403 31.403 0 0 0 24 12a31.403 31.403 0 0 0-.502-5.814zM9.545 15.568V8.432L15.818 12z"
+      />
+    </svg>
+  )
+};
+
 const SocialMediaPoster: React.FC = () => {
   const { handleBackToDashboard } = useProductManagement();
   const { toasts, showToast } = useToast();
@@ -23,22 +74,20 @@ const SocialMediaPoster: React.FC = () => {
   const [topic, setTopic] = useState('');
   const [targetAudience, setTargetAudience] = useState('');
   const [tone, setTone] = useState<'casual' | 'professional' | 'energetic' | 'educational'>('casual');
-  const [selectedPlatforms, setSelectedPlatforms] = useState<Set<string>>(new Set(['facebook', 'instagram', 'tiktok']));
+  const [selectedPlatforms, setSelectedPlatforms] = useState<Set<string>>(new Set(['linkedin', 'facebook', 'instagram', 'twitter', 'tiktok', 'youtube']));
   const [includeHashtags, setIncludeHashtags] = useState(true);
   const [includeEmojis, setIncludeEmojis] = useState(true);
   const [ctaType, setCtaType] = useState<'none' | 'click' | 'engagement' | 'message' | 'like'>('engagement');
   const [aiLoading, setAiLoading] = useState(false);
   const [generatedPosts, setGeneratedPosts] = useState<GeneratedPost[]>([]);
-  const [editingPost, setEditingPost] = useState<string | null>(null);
-  const [editingContent, setEditingContent] = useState('');
+  const [tileContents, setTileContents] = useState<Record<string, string>>({});
+  // Removed old inline edit mode in favor of per-tile textareas
   const [error, setError] = useState<string | null>(null);
   const [postStats, setPostStats] = useState({ scheduled: 0, published: 0, engagement: 0 });
-  const [webhookConfig, setWebhookConfig] = useState<Record<string, boolean>>({ linkedin: false, facebook: false, tiktok: false });
-  const [webhookConfiguredCount, setWebhookConfiguredCount] = useState(0);
   const [aiTransformOnPublish, setAiTransformOnPublish] = useState(true);
   
-  // Integration Options (for manual posting)
-  const [_connectedAccounts, setConnectedAccounts] = useState({
+  // Integration Options - connected accounts from Settings
+  const [connectedAccounts, setConnectedAccounts] = useState({
     linkedin: false,
     facebook: false,
     instagram: false,
@@ -50,12 +99,12 @@ const SocialMediaPoster: React.FC = () => {
   const apiBase = import.meta.env.VITE_API_URL || '';
 
   const platformOptions = [
-    { value: 'linkedin', label: 'LinkedIn', icon: '💼', followers: '0' },
-    { value: 'facebook', label: 'Facebook', icon: '👍', followers: '742' },
-    { value: 'instagram', label: 'Instagram', icon: '📸', followers: '52' },
-    { value: 'twitter', label: 'Twitter', icon: '🐦', followers: '0' },
-    { value: 'tiktok', label: 'TikTok', icon: '🎵', followers: '2.1k' },
-    { value: 'youtube', label: 'YouTube', icon: '📺', followers: '0' }
+    { value: 'linkedin', label: 'LinkedIn', icon: '💼' },
+    { value: 'facebook', label: 'Facebook', icon: '👍' },
+    { value: 'instagram', label: 'Instagram', icon: '📸' },
+    { value: 'twitter', label: 'Twitter', icon: '🐦' },
+    { value: 'tiktok', label: 'TikTok', icon: '🎵' },
+    { value: 'youtube', label: 'YouTube', icon: '📺' }
   ];
 
   const toneOptions = [
@@ -91,26 +140,21 @@ const SocialMediaPoster: React.FC = () => {
       .catch(err => console.error('Status check failed:', err));
   }, [apiBase]);
 
-  // Webhook-Status (Make/Zapier/n8n) laden
+  // Sync tile contents whenever new posts are generated
   React.useEffect(() => {
-    fetch(`${apiBase}/api/social/webhook/status`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setWebhookConfig(data.webhooks || {});
-          setWebhookConfiguredCount(data.configured || 0);
-        }
-      })
-      .catch(err => console.error('Webhook status check failed:', err));
-  }, [apiBase]);
+    if (!generatedPosts || generatedPosts.length === 0) return;
+    setTileContents(prev => {
+      const next = { ...prev };
+      generatedPosts.forEach(p => {
+        next[p.platform] = p.content || '';
+      });
+      return next;
+    });
+  }, [generatedPosts]);
 
   const handleGenerateWithAI = async () => {
     if (!topic.trim()) {
       showToast('Bitte gib ein Thema ein', 'error');
-      return;
-    }
-    if (selectedPlatforms.size === 0) {
-      showToast('Bitte wähle mindestens eine Plattform', 'error');
       return;
     }
 
@@ -125,7 +169,7 @@ const SocialMediaPoster: React.FC = () => {
           topic,
           targetAudience: targetAudience || undefined,
           tone,
-          platforms: Array.from(selectedPlatforms),
+          platforms: platformOptions.map(p => p.value),
           includeHashtags,
           includeEmojis,
           ctaType
@@ -187,33 +231,13 @@ const SocialMediaPoster: React.FC = () => {
     }
   };
 
-  const handleEditPost = (platform: string, content: string) => {
-    setEditingPost(platform);
-    setEditingContent(content);
-  };
-
-  const handleSaveEdit = (platform: string) => {
-    setGeneratedPosts(prev =>
-      prev.map(post =>
-        post.platform === platform
-          ? { ...post, content: editingContent, characterCount: editingContent.length }
-          : post
-      )
-    );
-    setEditingPost(null);
-    setEditingContent('');
-    showToast('Post aktualisiert!', 'success');
-  };
+  // Deprecated inline edit removed; edits captured via tileContents
 
   const togglePlatform = (platformValue: string) => {
     setSelectedPlatforms(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(platformValue)) {
-        newSet.delete(platformValue);
-      } else {
-        newSet.add(platformValue);
-      }
-      return newSet;
+      const next = new Set(prev);
+      if (next.has(platformValue)) next.delete(platformValue); else next.add(platformValue);
+      return next;
     });
   };
 
@@ -234,7 +258,7 @@ const SocialMediaPoster: React.FC = () => {
 
       {error && <ErrorMessage message={error} />}
 
-      {/* 2-Column Layout: Left = Input, Right = Platform Selection */}
+      {/* 2-Column Layout: Left = Post-Inhalt, Right = Plattform-Auswahl; Posts unten full-width */}
       <div className="social-poster-input-grid">
         {/* Left: KI Post Generator Briefing */}
         <motion.div
@@ -243,14 +267,14 @@ const SocialMediaPoster: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <h3 style={{ color: 'white', marginBottom: '20px' }}>🤖 KI Post Generator</h3>
+          <h3 style={{ color: 'white', marginBottom: '20px' }}>📝 Post-Inhalt *</h3>
 
           <div className="form-group">
-            <label>Thema *</label>
+            <label>Post-Inhalt *</label>
             <textarea
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
-              placeholder="z.B. Neues Produkt, Tipps, Ankündigung..."
+              placeholder="Schreibe hier deinen Basis-Post-Text..."
               className="form-textarea"
               rows={3}
               style={{ fontFamily: 'inherit', resize: 'vertical' }}
@@ -270,20 +294,34 @@ const SocialMediaPoster: React.FC = () => {
 
           <div className="form-group">
             <label>Ton</label>
-            <select className="form-input" value={tone} onChange={(e) => setTone(e.target.value as any)}>
+            <div className="social-poster-select-grid">
               {toneOptions.map(t => (
-                <option key={t.value} value={t.value}>{`${t.icon} ${t.label}`}</option>
+                <div
+                  key={t.value}
+                  className={`social-poster-select-card ${tone === t.value ? 'selected' : 'unselected'}`}
+                  onClick={() => setTone(t.value as any)}
+                >
+                  <span className="social-poster-select-icon">{t.icon}</span>
+                  <span className="social-poster-select-label">{t.label}</span>
+                </div>
               ))}
-            </select>
+            </div>
           </div>
 
           <div className="form-group">
             <label>CTA Typ</label>
-            <select className="form-input" value={ctaType} onChange={(e) => setCtaType(e.target.value as any)}>
+            <div className="social-poster-select-grid">
               {ctaOptions.map(c => (
-                <option key={c.value} value={c.value}>{`${c.icon} ${c.label}`}</option>
+                <div
+                  key={c.value}
+                  className={`social-poster-select-card ${ctaType === c.value ? 'selected' : 'unselected'}`}
+                  onClick={() => setCtaType(c.value as any)}
+                >
+                  <span className="social-poster-select-icon">{c.icon}</span>
+                  <span className="social-poster-select-label">{c.label}</span>
+                </div>
               ))}
-            </select>
+            </div>
           </div>
 
           <div className="social-poster-checkbox-row">
@@ -314,14 +352,14 @@ const SocialMediaPoster: React.FC = () => {
           </LoadingButton>
         </motion.div>
 
-        {/* Right: Platform Selection */}
+        {/* Right: Plattform-Auswahl (gleiche Breite wie links) */}
         <motion.div
           className="form-container"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.15 }}
         >
-          <h3 style={{ color: 'white', marginBottom: '20px' }}>📱 Plattformen</h3>
+          <h3 style={{ color: 'white', marginBottom: '20px' }}>📱 Plattform-Auswahl</h3>
           <div className="social-poster-platforms">
             {platformOptions.map(p => (
               <motion.div
@@ -330,9 +368,8 @@ const SocialMediaPoster: React.FC = () => {
                 onClick={() => togglePlatform(p.value)}
                 className={`social-poster-platform-card ${selectedPlatforms.has(p.value) ? 'selected' : 'unselected'}`}
               >
-                <span className="social-poster-platform-icon">{p.icon}</span>
+                  <span className="social-poster-platform-icon">{brandIcons[p.value] || p.icon}</span>
                 <div className="social-poster-platform-name">{p.label}</div>
-                <div className="social-poster-platform-followers">{p.followers}</div>
                 {selectedPlatforms.has(p.value) && (
                   <div className="social-poster-platform-check">✓</div>
                 )}
@@ -347,18 +384,9 @@ const SocialMediaPoster: React.FC = () => {
           </div>
 
           <div className="social-poster-info-box" style={{ marginTop: '10px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
               <div>
-                🔌 <strong>Aktivierte Plattformen:</strong> {webhookConfiguredCount}/3
-                <span
-                  title={
-                    'Einige Plattformen sind zum Versand nicht aktiviert. ' +
-                    'Siehe Bedienungsanleitung für Details.'
-                  }
-                  style={{ marginLeft: 8, cursor: 'help', opacity: 0.9 }}
-                >
-                  ⓘ
-                </span>
+                🔌 <strong>Verbundene Plattformen:</strong> {Object.values(connectedAccounts).filter(Boolean).length}/6
               </div>
               <label className="social-poster-checkbox-label" title="AI-Optimierung beim Versand aktivieren (Backend transformiert den Text je Plattform)">
                 <input
@@ -366,164 +394,78 @@ const SocialMediaPoster: React.FC = () => {
                   checked={aiTransformOnPublish}
                   onChange={(e) => setAiTransformOnPublish(e.target.checked)}
                 />
-                <span>AI-Optimierung beim Versand</span>
+                <span>AI-Optimierung</span>
               </label>
             </div>
-            <div style={{ marginTop: 6, fontSize: 12, opacity: 0.8 }}>
-              LinkedIn: {webhookConfig.linkedin ? '✅' : '❌'} · Facebook: {webhookConfig.facebook ? '✅' : '❌'} · TikTok: {webhookConfig.tiktok ? '✅' : '❌'}
-              {!webhookConfiguredCount && (
-                <span> · Tipp: Siehe Bedienungsanleitung für Informationen</span>
-              )}
+            <div style={{ fontSize: 12, opacity: 0.8, lineHeight: '1.6' }}>
+              LinkedIn: {connectedAccounts.linkedin ? '✅' : '❌'} · 
+              Facebook: {connectedAccounts.facebook ? '✅' : '❌'} · 
+              Instagram: {connectedAccounts.instagram ? '✅' : '❌'} · 
+              Twitter: {connectedAccounts.twitter ? '✅' : '❌'} · 
+              TikTok: {connectedAccounts.tiktok ? '✅' : '❌'} · 
+              YouTube: {connectedAccounts.youtube ? '✅' : '❌'}
             </div>
           </div>
         </motion.div>
       </div>
 
-      {/* Generated Posts Grid: 3x2 */}
-      {generatedPosts.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="social-poster-generated-section"
-        >
-          <h3 style={{ color: 'white', marginBottom: '20px' }}>📋 Generierte Posts</h3>
-          <div className="social-poster-posts-grid">
-            {generatedPosts.map(post => (
+      {/* Full-width Plattform-Posts unter den beiden Karten */}
+      <motion.div
+        className="form-container social-poster-posts-wide"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.25 }}
+      >
+        <h3 style={{ color: 'white', marginBottom: '20px' }}>📱 Plattform-Posts</h3>
+        <div className="social-poster-posts-grid">
+          {platformOptions.map(p => {
+            const post = generatedPosts.find(g => g.platform === p.value);
+            const content = tileContents[p.value] ?? post?.content ?? '';
+            const characterCount = content?.length || 0;
+            const isConnected = !!connectedAccounts[p.value as keyof typeof connectedAccounts];
+            const disabled = !isConnected || !content?.trim() || !selectedPlatforms.has(p.value);
+            const title = !isConnected
+              ? 'Plattform nicht verbunden. Bitte in den Einstellungen verbinden.'
+              : (!content?.trim() ? 'Bitte erst Inhalt generieren oder eingeben' : '');
+            return (
               <motion.div
-                key={post.platform}
+                key={p.value}
                 className="social-poster-post-card form-container"
                 whileHover={{ y: -5 }}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                {/* Header */}
                 <div className="social-poster-post-header">
-                  <span className="social-poster-post-platform-icon">
-                    {platformOptions.find(p => p.value === post.platform)?.icon}
-                  </span>
+                  <span className="social-poster-post-platform-icon">{brandIcons[p.value] || p.icon}</span>
                   <div className="social-poster-post-info">
-                    <p className="social-poster-post-name">
-                      {platformOptions.find(p => p.value === post.platform)?.label}
-                    </p>
-                    <p className="social-poster-post-chars">
-                      {post.characterCount} Zeichen
-                    </p>
+                    <p className="social-poster-post-name">{p.label}</p>
+                    <p className="social-poster-post-chars">{characterCount} Zeichen</p>
                   </div>
                 </div>
-
-                {/* Content */}
-                {editingPost === post.platform ? (
-                  <textarea
-                    value={editingContent}
-                    onChange={(e) => setEditingContent(e.target.value)}
-                    className="form-textarea"
-                    rows={6}
-                    style={{ fontFamily: 'monospace', fontSize: '12px' }}
-                  />
-                ) : (
-                  <div className="social-poster-post-content">
-                    {post.content}
-                  </div>
-                )}
-
-                {/* Engagement Badge */}
-                {post.estimatedEngagement && (
-                  <div className="social-poster-engagement-badge">
-                    {post.estimatedEngagement}
-                  </div>
-                )}
-
-                {/* Hashtags */}
-                {post.hashtags && post.hashtags.length > 0 && (
-                  <div className="social-poster-hashtags">
-                    {post.hashtags.map(tag => `#${tag}`).join(' ')}
-                  </div>
-                )}
-
-                {/* Suggestions */}
-                {post.suggestions && post.suggestions.length > 0 && (
-                  <div className="social-poster-suggestions">
-                    <div className="social-poster-suggestions-title">💡 Tipps:</div>
-                    <ul className="social-poster-suggestions-list">
-                      {post.suggestions.map((suggestion, idx) => (
-                        <li key={idx}>{suggestion}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Action Buttons */}
+                <textarea
+                  value={content}
+                  onChange={(e) => setTileContents(prev => ({ ...prev, [p.value]: e.target.value }))}
+                  className="form-textarea"
+                  rows={6}
+                  style={{ fontFamily: 'monospace', fontSize: '12px' }}
+                />
                 <div className="social-poster-actions">
-                  {editingPost === post.platform ? (
-                    <>
-                      <button
-                        onClick={() => handleSaveEdit(post.platform)}
-                        className="social-poster-btn social-poster-btn-primary"
-                      >
-                        ✓ Speichern
-                      </button>
-                      <button
-                        onClick={() => setEditingPost(null)}
-                        className="social-poster-btn social-poster-btn-cancel"
-                      >
-                        ✕ Abbrechen
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => handleEditPost(post.platform, post.content)}
-                        className="social-poster-btn social-poster-btn-secondary"
-                      >
-                        ✎ Bearbeiten
-                      </button>
-                      {(() => {
-                        const supportedWebhookPlatforms = ['linkedin', 'facebook', 'tiktok'];
-                        const isSupported = supportedWebhookPlatforms.includes(post.platform);
-                        const isConfigured = isSupported && !!webhookConfig[post.platform];
-                        const disabled = !isSupported || !isConfigured;
-                        const title = !isSupported
-                          ? 'Diese Plattform wird noch nicht unterstützt'
-                          : (!isConfigured ? 'Diese Plattform ist nicht aktiviert' : '');
-                        return (
-                          <button
-                            onClick={() => handlePublishPost(post.platform, post.content)}
-                            className="social-poster-btn social-poster-btn-primary"
-                            disabled={disabled}
-                            title={title}
-                          >
-                            📤 Publish
-                          </button>
-                        );
-                      })()}
-                    </>
-                  )}
+                  <button
+                    onClick={() => handlePublishPost(p.value, content)}
+                    className="social-poster-btn social-poster-btn-primary"
+                    disabled={disabled}
+                    title={title}
+                  >
+                    📤 Senden
+                  </button>
                 </div>
               </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      )}
-
-      {/* Empty State */}
-      {generatedPosts.length === 0 && !aiLoading && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="social-poster-empty-state"
-        >
-          <div className="social-poster-empty-icon">✨</div>
-          <p className="social-poster-empty-text">
-            Gib ein Thema ein und generiere Posts!
-          </p>
-          <p className="social-poster-empty-hint">
-            Die KI optimiert automatisch für jede Plattform
-          </p>
-        </motion.div>
-      )}
+            );
+          })}
+        </div>
+      </motion.div>
+      
 
       {/* Stats */}
       <motion.div

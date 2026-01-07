@@ -205,8 +205,9 @@ export default function MLSettings() {
               borderTop: '1px solid rgba(255,255,255,0.1)'
             }}>
               <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#22c55e' }}>+15-30% Umsatz</span>
-              <label>
+              <label htmlFor="productRecommendations">
                 <input
+                  id="productRecommendations"
                   type="checkbox"
                   checked={config.features.productRecommendations}
                   onChange={e => setConfig({...config, features: {...config.features, productRecommendations: e.target.checked}})}
@@ -237,8 +238,9 @@ export default function MLSettings() {
               borderTop: '1px solid rgba(255,255,255,0.1)'
             }}>
               <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#22c55e' }}>Bessere Auswahl</span>
-              <label>
+              <label htmlFor="trendForecasting">
                 <input
+                  id="trendForecasting"
                   type="checkbox"
                   checked={config.features.trendForecasting}
                   onChange={e => setConfig({...config, features: {...config.features, trendForecasting: e.target.checked}})}
@@ -269,8 +271,9 @@ export default function MLSettings() {
               borderTop: '1px solid rgba(255,255,255,0.1)'
             }}>
               <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#22c55e' }}>+20-40% Öffnung</span>
-              <label>
+              <label htmlFor="emailOptimization">
                 <input
+                  id="emailOptimization"
                   type="checkbox"
                   checked={config.features.emailOptimization}
                   onChange={e => setConfig({...config, features: {...config.features, emailOptimization: e.target.checked}})}
@@ -332,16 +335,16 @@ export default function MLSettings() {
               </p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <input
-                type="checkbox"
-                id="fallbackRules"
-                checked={config.models.productRecommendation.fallbackToRules}
-                onChange={e => setConfig({...config, models: {...config.models, productRecommendation: {...config.models.productRecommendation, fallbackToRules: e.target.checked}}})}
-                disabled={!config.enabled}
-                style={{ width: '18px', height: '18px', cursor: config.enabled ? 'pointer' : 'not-allowed' }}
-              />
-              <label htmlFor="fallbackRules" style={{ fontSize: '14px', cursor: config.enabled ? 'pointer' : 'not-allowed' }}>
-                Automatischer Fallback zu regelbasierten Empfehlungen
+              <label htmlFor="fallbackRules" style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: config.enabled ? 'pointer' : 'not-allowed', width: '100%' }}>
+                <input
+                  type="checkbox"
+                  id="fallbackRules"
+                  checked={config.models.productRecommendation.fallbackToRules}
+                  onChange={e => setConfig({...config, models: {...config.models, productRecommendation: {...config.models.productRecommendation, fallbackToRules: e.target.checked}}})}
+                  disabled={!config.enabled}
+                  style={{ width: '18px', height: '18px', cursor: config.enabled ? 'pointer' : 'not-allowed' }}
+                />
+                <span style={{ fontSize: '14px' }}>Automatischer Fallback zu regelbasierten Empfehlungen</span>
               </label>
             </div>
           </div>

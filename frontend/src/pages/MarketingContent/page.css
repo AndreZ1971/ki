@@ -5,3 +5,219 @@
 @import '../shared-analytics.css';
 
 /* Seiten-spezifische Overrides hier hinzufügen falls nötig */
+
+/* Social Media Poster Layout */
+.social-poster-select-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+	gap: var(--spacing-sm);
+	width: 100%;
+}
+
+.social-poster-select-card {
+	background: var(--glass-bg-secondary);
+	border: 1px solid var(--glass-border);
+	border-radius: var(--radius-md);
+	padding: var(--spacing-sm);
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-sm);
+	cursor: pointer;
+	transition: all var(--transition-fast);
+}
+
+.social-poster-select-card.unselected {
+	opacity: 0.8;
+}
+
+.social-poster-select-card.selected {
+	background: var(--glass-bg-primary);
+	border-color: var(--color-info);
+}
+
+.social-poster-select-card:hover {
+	transform: translateY(-1px);
+}
+
+.social-poster-select-icon {
+	font-size: 18px;
+}
+
+.social-poster-select-label {
+	font-size: var(--text-sm);
+	color: var(--heading-secondary);
+	font-weight: var(--font-semibold);
+}
+
+@media (max-width: 900px) {
+	.social-poster-select-grid {
+		grid-template-columns: repeat(2, minmax(120px, 1fr));
+	}
+}
+.page-container {
+	max-width: 1400px;
+	margin: 0 auto;
+	padding: var(--spacing-lg);
+}
+
+.page-header {
+	background: var(--glass-bg-primary);
+	border: 1px solid var(--glass-border);
+	backdrop-filter: var(--blur-md);
+	-webkit-backdrop-filter: var(--blur-md);
+	padding: var(--spacing-xl);
+	border-radius: var(--radius-xl);
+	box-shadow: var(--shadow-md);
+	margin-bottom: var(--spacing-xl);
+}
+
+.social-poster-input-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(420px, 1fr));
+	gap: var(--spacing-lg);
+	align-items: start;
+}
+
+
+.social-poster-posts-wide {
+	margin-top: var(--spacing-lg);
+}
+
+/* Right column should scroll internally, not the whole page */
+/* Entfernt interne Scrollbar in der rechten Spalte */
+
+.form-container {
+	background: var(--glass-bg-primary);
+	border: 1px solid var(--glass-border);
+	backdrop-filter: var(--blur-md);
+	-webkit-backdrop-filter: var(--blur-md);
+	padding: var(--spacing-lg);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-sm);
+	box-sizing: border-box;
+}
+
+.social-poster-posts-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: var(--spacing-md);
+}
+
+.social-poster-post-card {
+	background: var(--glass-bg-secondary);
+	border: 1px solid var(--glass-border);
+	border-radius: var(--radius-md);
+	padding: var(--spacing-md);
+}
+
+.social-poster-post-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: var(--spacing-sm);
+}
+
+.social-poster-post-platform-icon {
+	font-size: 24px;
+}
+
+.social-poster-post-info {
+	display: flex;
+	gap: var(--spacing-sm);
+	align-items: baseline;
+}
+
+.social-poster-post-name {
+	color: var(--heading-secondary);
+	font-weight: var(--font-semibold);
+}
+
+.social-poster-post-chars {
+	color: var(--text-tertiary);
+	font-size: var(--text-sm);
+}
+
+.social-poster-actions {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: var(--spacing-sm);
+}
+
+/* Responsive adjustments */
+/* Plattform-Auswahl Grid */
+.social-poster-platforms {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(190px, 1fr));
+	gap: var(--spacing-md);
+	margin-bottom: var(--spacing-md);
+}
+
+.social-poster-platform-card {
+	background: var(--glass-bg-secondary);
+	border: 1px solid var(--glass-border);
+	border-radius: var(--radius-md);
+	padding: var(--spacing-md);
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-sm);
+	cursor: pointer;
+	transition: all var(--transition-fast);
+}
+
+.social-poster-platform-card.unselected {
+	opacity: 0.7;
+}
+
+.social-poster-platform-card:hover {
+	background: var(--glass-bg-primary);
+	transform: translateY(-2px);
+}
+
+.social-poster-platform-icon {
+	font-size: 22px;
+}
+
+.social-poster-platform-name {
+	color: var(--heading-secondary);
+	font-weight: var(--font-semibold);
+	font-size: var(--text-base);
+}
+
+.social-poster-platform-followers {
+	margin-left: auto;
+	color: var(--text-tertiary);
+	font-size: var(--text-xs);
+}
+
+.social-poster-platform-check {
+	margin-left: var(--spacing-sm);
+	color: var(--color-success);
+}
+
+@media (max-width: 1200px) {
+	.social-poster-input-grid {
+		grid-template-columns: 1fr 1fr;
+	}
+	.social-poster-posts-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+	.social-poster-platforms {
+		grid-template-columns: repeat(2, minmax(180px, 1fr));
+	}
+}
+
+@media (max-width: 900px) {
+	.social-poster-input-grid {
+		grid-template-columns: 1fr;
+	}
+	.social-poster-input-grid > .form-container:last-child {
+		max-height: none;
+		overflow: visible;
+	}
+	.social-poster-posts-grid {
+		grid-template-columns: 1fr;
+	}
+	.social-poster-platforms {
+		grid-template-columns: 1fr;
+	}
+}
