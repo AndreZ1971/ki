@@ -33,7 +33,7 @@ const ProductAnalyzer: React.FC = () => {
   const [saveLoading, setSaveLoading] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  const apiBase = 'http://localhost:3000';
+  const apiBase = import.meta.env.VITE_API_URL || '';
 
   // Lade Produktliste beim Mounten
   useEffect(() => {
