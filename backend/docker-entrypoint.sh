@@ -22,7 +22,7 @@ echo "[Entrypoint] 📁 Erstelle benötigte Verzeichnisse..."
 # Stellen sicher, dass Specializations-Verzeichnis existiert, falls der Host-Mount leer ist
 mkdir -p /app/data/dlq /app/data/backups /app/logs /app/data/specializations 2>/dev/null || true
 
-# 2. BERECHTIGUNGEN SETZEN
+# 2. BERECHTIGUNGEN SETZEN (läuft als root, daher kann chown auf Mounts greifen)
 echo "[Entrypoint] 🔐 Setze korrekte Berechtigungen..."
 chown -R nodeuser:nodejs /app/data /app/logs 2>/dev/null || echo "[Entrypoint] ℹ️  Berechtigungen bereits korrekt"
 chmod -R 755 /app/data 2>/dev/null || true
@@ -211,4 +211,5 @@ echo "[Entrypoint] ✅ A.R.I. Backend Container startet jetzt..."
 echo "[Entrypoint] 🚀 API verfügbar unter: http://localhost:3000"
 echo "[Entrypoint] 📝 Bitte öffne Settings und fülle connection.json aus!"
 
-exec "$@"
+# Privilegien absenken und Backend starten
+exec su-exec nodeuser "$@"
