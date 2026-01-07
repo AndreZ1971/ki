@@ -27,9 +27,11 @@ const fetchCount = async (client: WooCommerceRestApi, resource: string) => {
 };
 
 const syncRoutes: FastifyPluginAsync = async (fastify) => {
-  const wooCfg: any = getConfig().woocommerce || {};
+  // Helper: Lade Config DYNAMISCH bei jedem Aufruf (nicht cachen!)
+  const getWooCfg = () => getConfig().woocommerce || {};
 
   const isWooConfigured = (): boolean => {
+    const wooCfg = getWooCfg(); // Dynamisch laden
     const missing =
       !wooCfg.url || !wooCfg.consumerKey || !wooCfg.consumerSecret;
     const looksPlaceholder = (v?: string) =>
@@ -48,6 +50,7 @@ const syncRoutes: FastifyPluginAsync = async (fastify) => {
   };
 
   const createWooClient = (useQueryStringAuth: boolean) => {
+    const wooCfg = getWooCfg(); // Dynamisch laden
     // Debug-Ausgabe für SSL und Verbindung
     console.log('[WooSync] Erstelle WooCommerceRestApi-Client mit URL:', wooCfg.url);
     // https.Agent mit systemweiten CAs (wie curl)
@@ -67,10 +70,6 @@ const syncRoutes: FastifyPluginAsync = async (fastify) => {
     });
   };
 
-  const preferQuery = wooCfg?.authMode === 'query';
-  const wooPrimary = createWooClient(preferQuery);
-  const wooFallback = createWooClient(!preferQuery);
-
   fastify.post('/sync', async (request, reply) => {
     const body = (request.body || {}) as { type?: string };
     const type = (body.type || 'full') as SyncResult['type'];
@@ -82,6 +81,12 @@ const syncRoutes: FastifyPluginAsync = async (fastify) => {
           'WooCommerce API nicht konfiguriert. Bitte URL, consumerKey, consumerSecret setzen.',
       });
     }
+
+    // Clients DYNAMISCH bei jedem Request erstellen (nicht cachen!)
+    const wooCfg = getWooCfg();
+    const preferQuery = wooCfg?.authMode === 'query';
+    const wooPrimary = createWooClient(preferQuery);
+    const wooFallback = createWooClient(!preferQuery);
 
     const started = Date.now();
     try {
