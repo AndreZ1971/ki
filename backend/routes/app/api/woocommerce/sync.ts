@@ -139,6 +139,46 @@ const syncRoutes: FastifyPluginAsync = async (fastify) => {
       });
     }
   });
+
+  // 🔍 DEBUG: Zeige aktuelle WooCommerce-Config
+  fastify.get('/debug-config', async (request, reply) => {
+    const cfg = getConfig().woocommerce || {};
+    return reply.send({
+      url: cfg.url,
+      consumerKey: cfg.consumerKey ? `${cfg.consumerKey.substring(0, 8)}...` : 'MISSING',
+      consumerSecret: cfg.consumerSecret ? 'SET' : 'MISSING',
+      authMode: cfg.authMode || 'basic (default)',
+      isConfigured: isWooConfigured()
+    });
+  });
+
+  // 🔍 DEBUG: Test WooCommerce-Verbindung direkt
+  fastify.get('/debug-test', async (request, reply) => {
+    if (!isWooConfigured()) {
+      return reply.status(500).send({
+        success: false,
+        error: 'WooCommerce nicht konfiguriert'
+      });
+    }
+
+    try {
+      const client = createWooClient(wooCfg?.authMode === 'query');
+      const response = await client.get('products', { per_page: 5 });
+      return reply.send({
+        success: true,
+        productCount: Array.isArray((response as any).data) ? (response as any).data.length : 0,
+        products: (response as any).data,
+        message: 'WooCommerce-Verbindung funktioniert!'
+      });
+    } catch (error: any) {
+      return reply.status(500).send({
+        success: false,
+        error: error.message,
+        status: error?.response?.status,
+        data: error?.response?.data
+      });
+    }
+  });
 };
 
 export default syncRoutes;
