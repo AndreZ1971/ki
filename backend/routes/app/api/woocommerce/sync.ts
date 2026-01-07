@@ -52,7 +52,7 @@ const syncRoutes: FastifyPluginAsync = async (fastify) => {
     console.log('[WooSync] Erstelle WooCommerceRestApi-Client mit URL:', wooCfg.url);
     // https.Agent mit systemweiten CAs (wie curl)
     const agent = new https.Agent({
-      rejectUnauthorized: true, // SSL-Validierung aktiv
+      rejectUnauthorized: false, // SSL-Validierung DISABLED für Testing
     });
     return new WooCommerceRestApi({
       url: wooCfg.url || '',
