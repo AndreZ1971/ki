@@ -67,7 +67,7 @@ type ScheduleConfig =
 interface LoopSchedules {
   "anomaly-detection": DailyScheduleConfig;
   "payment-recovery": IntervalScheduleConfig;
-  "product-optimization": WeeklyScheduleConfig;
+  "product-performance": WeeklyScheduleConfig;
   "analytics-insights": DailyScheduleConfig;
 }
 
@@ -256,7 +256,7 @@ const defaultCredentials: ShopCredentials = {
 const defaultLoopSchedules: LoopSchedules = {
   "anomaly-detection": { enabled: true, type: "daily", time: "08:00" },
   "payment-recovery": { enabled: true, type: "interval", minutes: 30 },
-  "product-optimization": {
+  "product-performance": {
     enabled: true,
     type: "weekly",
     time: "10:00",
@@ -3626,7 +3626,7 @@ const Settings = () => {
                     icon: "📈",
                     name: t("settings.agentic.loopProductName"),
                     desc: t("settings.agentic.loopProductDesc"),
-                    loopType: "product-optimization" as const,
+                    loopType: "product-performance" as const,
                   },
                   {
                     icon: "💳",

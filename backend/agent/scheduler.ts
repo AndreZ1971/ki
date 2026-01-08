@@ -17,14 +17,14 @@ import type { ScheduleConfig as LoopScheduleConfig } from '../types/loopSchedule
 
 export interface ScheduleConfig {
   anomalyDetection: string; // Cron pattern
-  productOptimization: string;
+  productPerformance: string;
   paymentRecovery: string;
   analyticsInsights: string;
 }
 
 export interface ScheduleStatus {
   anomalyDetection: { scheduled: boolean; lastRun?: Date; nextRun?: string };
-  productOptimization: { scheduled: boolean; lastRun?: Date; nextRun?: string };
+  productPerformance: { scheduled: boolean; lastRun?: Date; nextRun?: string };
   paymentRecovery: { scheduled: boolean; lastRun?: Date; nextRun?: string };
   analyticsInsights: { scheduled: boolean; lastRun?: Date; nextRun?: string };
   isRunning: boolean;
@@ -40,7 +40,7 @@ export class LoopScheduler {
     // Daily at 09:00
     anomalyDetection: '0 9 * * *',
     // Twice a week: Monday and Thursday at 10:00
-    productOptimization: '0 10 * * 1,4',
+    productPerformance: '0 10 * * 1,4',
     // Every 30 minutes
     paymentRecovery: '*/30 * * * *',
     // Daily at 20:00
@@ -67,14 +67,10 @@ export class LoopScheduler {
       return new AnomalyDetectionLoop().execute();
     });
 
-    // Product Optimization: Mo/Do 10:00
-    this.scheduleLoop(
-      'product-optimization',
-      schedule.productOptimization,
-      () => {
-        return new ProductOptimizationLoop().execute();
-      }
-    );
+    // Product Performance: Montag/Donnerstag 10:00 (umbenannt von Product Optimization)
+    this.scheduleLoop('product-performance', schedule.productPerformance, () => {
+      return new ProductOptimizationLoop().execute();
+    });
 
     // Payment Recovery: alle 30 Minuten
     this.scheduleLoop('payment-recovery', schedule.paymentRecovery, () => {
@@ -244,10 +240,10 @@ export class LoopScheduler {
         lastRun: this.lastRuns.get('anomaly-detection'),
         nextRun: this.jobs.has('anomaly-detection') ? 'scheduled' : undefined,
       },
-      productOptimization: {
-        scheduled: this.jobs.has('product-optimization'),
-        lastRun: this.lastRuns.get('product-optimization'),
-        nextRun: this.jobs.has('product-optimization')
+      productPerformance: {
+        scheduled: this.jobs.has('product-performance'),
+        lastRun: this.lastRuns.get('product-performance'),
+        nextRun: this.jobs.has('product-performance')
           ? 'scheduled'
           : undefined,
       },
@@ -340,7 +336,7 @@ export class LoopScheduler {
       case 'anomaly-detection':
         executeFunc = () => new AnomalyDetectionLoop().execute();
         break;
-      case 'product-optimization':
+      case 'product-performance':
         executeFunc = () => new ProductOptimizationLoop().execute();
         break;
       case 'payment-recovery':

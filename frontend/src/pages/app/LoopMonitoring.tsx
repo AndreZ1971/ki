@@ -43,8 +43,8 @@ const LoopMonitoring: React.FC = () => {
       description: "Payment Anomalien erkennen",
     },
     {
-      id: "product-optimization",
-      name: "📈 Product Optimization",
+      id: "product-performance",
+      name: "📈 Product Performance",
       description: "A/B Testing für Produkte",
     },
     {

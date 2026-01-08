@@ -61,10 +61,9 @@ span[style*="color"] {
   color: var(--color-text-primary) !important;
 }
 
-/* Fix: weiße Hintergründe */
+/* Fix: weiße Hintergründe - ONLY target specific transparent backgrounds, not ALL backgrounds */
 div[style*="rgba(255, 255, 255, 0.03)"],
-div[style*="rgba(255,255,255,0.03)"],
-div[style*="background"] {
+div[style*="rgba(255,255,255,0.03)"] {
   background: var(--glass-bg-secondary) !important;
   color: var(--color-text-primary) !important;
 }

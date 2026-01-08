@@ -1,20 +1,16 @@
 # 🤖 A.R.I. - Artificial Retail Intelligence
 
-<div align="center">
-
 ![Version](https://img.shields.io/badge/version-6.2.0-blue.svg)
 ![Tests](https://img.shields.io/badge/tests-350%2F350-success.svg)
 ![ML Integration](https://img.shields.io/badge/ML%20Integration-100%25-green.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-**Der digitale Mitarbeiter für deinen Online-Shop**
+## Der digitale Mitarbeiter für deinen Online-Shop
 
 Ein System, das deinen WooCommerce-Shop analysiert, optimiert und wächst –  
 ohne dass du dich mit Technik, Servern oder Konfiguration auseinandersetzen musst.
 
 [🚀 Installation](#installation) • [📚 Dokumentation](#dokumentation) • [💬 Support](#support) • [🔧 Features](#features)
-
-</div>
 
 ---
 
@@ -79,9 +75,9 @@ Abandoned Carts? Kunden, die lange nichts gekauft haben? A.R.I. kennt sie und er
 - **Typen:** `failed_payment`, `unusual_amount`, `repeated_attempts`, `high_risk`
 - Real-time Monitoring & Alerting
 
-#### 2. Product Optimization Loop 📈
+#### 2. Product Performance Loop 📈
 - A/B testet Produktattribute automatisch
-- **Optimiert:** Preis (-10%), Titel (+Bestseller), Beschreibung (+Benefits)
+- **Verbessert:** Preis (-10%), Titel (+Bestseller), Beschreibung (+Benefits)
 - Kontinuierliche Conversion-Verbesserung
 
 #### 3. Payment Recovery Loop 💳
@@ -90,6 +86,7 @@ Abandoned Carts? Kunden, die lange nichts gekauft haben? A.R.I. kennt sie und er
 - **Success Rate:** bis zu 60% bei Contact-Strategie
 
 #### 4. Analytics Insights Loop 📊
+
 - Generiert automatisch Dashboard-Insights
 - Erkennt Anomalien und Trends
 - Liefert Empfehlungen für Maßnahmen
@@ -120,17 +117,17 @@ Abandoned Carts? Kunden, die lange nichts gekauft haben? A.R.I. kennt sie und er
 | 📊 **Insights** | Du verstehst dein Business besser – klare, verwertbare Insights statt Datenmüll |
 | 🚀 **Skalierung** | Du kannst skalieren – ohne mehr Leute einzustellen |
 
-### Konkret umgesetzt durch:
+### Konkret umgesetzt durch
 
 - ✅ Optimierte Produkttexte (SEO-optimiert, verkaufsfördernd)
 - ✅ KI-generierte Produktbilder (DALL-E Integration)
 - ✅ Echtzeit-Analytics mit echten Empfehlungen
 - ✅ Email-Automation (Carts, Willkommensserie, Reaktivierung)
 - ✅ Social-Media-Posts (6 Plattformen)
-- ✅ â° Du bekommst deine Zeit zurÃ¼ck – 5â€"10 Stunden pro Woche weniger Admin-Arbeit
-ðŸ'° Bessere Zahlen – Conversion steigt, Kunden werden besser betreut, Repeat-Purchases nehmen zu
-ðŸ"Š Du verstehst dein Business besser – klare, verwertbare Insights statt DatenmÃ¼ll
-ðŸš€ Du kannst skalieren – ohne mehr Leute einzustellen
+- ✅ Du bekommst deine Zeit zurück  10 Stunden pro Woche weniger Admin-Arbeit
+- ✅ Bessere Zahlen – Conversion steigt, Kunden werden besser betreut, Repeat-Purchases nehmen zu
+- ✅ Du verstehst dein Business besser – klare, verwertbare Insights statt DatenmÃ¼ll
+- ✅ Du kannst skalieren – ohne mehr Leute einzustellen
 
 Konkret umgesetzt durch:
 
@@ -163,6 +160,7 @@ Konkret umgesetzt durch:
 - **DALL-E:** Automatische Bild-Generierung
 - **Embeddings:** Semantic Search & Matching
 - **Custom ML:** Trend-Analyse, Sentiment Detection, Pattern Recognition
+
 ## 🔧 Tool-Übersicht
 
 ### 📊 Analytics (13 Tools)
@@ -242,33 +240,6 @@ Weitere 8 Payment-Tools mit ML-Integration
 | Advanced | 9 | 🟢 9/9 | **100%** |
 | **GESAMT** | **53** | **🟢 53/53** | **100%** |
 
-### 🆕 Recent Updates (16. Dezember 2025)
-
-### 🗺️ Roadmap
-
-<details>
-<summary><strong>Q1 2026</strong></summary>
-
-- [ ] Kubernetes Deployment Support
-- [ ] Prometheus Metrics Export
-- [ ] GraphQL API Alternative
-- [ ] WebSocket Real-Time Updates
-
-</details>
-
-<details>
-<summary><strong>Q2 2026</strong></summary>
-
-- [ ] Multi-Tenancy (mehrere Shops)
-- [ ] Redis Caching Layer
-- [ ] PostgreSQL Integration
-- [ ] Advanced ML Models (Custom Training)
-
-</details>
-
-<details>
-<summary><strong>Q3 2026</strong></summary>
-
 ---
 
 ## 🛡️ Sicherheit & Compliance
@@ -299,26 +270,12 @@ Weitere 8 Payment-Tools mit ML-Integration
 
 ## 💬 Support
 
-### 📧 Kommerzieller Support
-
 - **E-Mail:** info@example.com
 - **Website:** [example.com](https://example.com)
-
-### 🤝 Contributing
-
-Contributions sind willkommen! Bitte lese [CONTRIBUTING.md](CONTRIBUTING.md) vor dem ersten PR.
-
----
-
-## 📄 License
-
-MIT License - siehe [LICENSE](LICENSE) für Details.
 
 ---
 
 ## 🙏 Credits
-
-<div align="center">
 
 **Entwickelt mit ❤️ von André Zabel ([@AndreZ1971](https://github.com/AndreZ1971))**
 
@@ -332,8 +289,6 @@ MIT License - siehe [LICENSE](LICENSE) für Details.
 ![Fastify](https://img.shields.io/badge/Fastify-000000?style=for-the-badge&logo=fastify&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
-</div>
-
 ---
 
 <div align="center">
@@ -342,4 +297,3 @@ MIT License - siehe [LICENSE](LICENSE) für Details.
 
 [🚀 Installation](docs/german/DEPLOYMENT_GUIDE.md) • [📚 Dokumentation](docs/german/Bedienungsanleitung.md) • [💬 Support](#support)
 
-**⭐ Wenn dir A.R.I. gefällt, gib diesem Projekt einen Stern!**

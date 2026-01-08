@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-6.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-6.4.0-blue.svg)
 ![Tests](https://img.shields.io/badge/tests-350%2F350-success.svg)
 ![ML Integration](https://img.shields.io/badge/ML%20Integration-100%25-green.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
@@ -69,7 +69,7 @@ New products? A.R.I. analyzes trends, writes SEO texts, generates images, organi
 No more dashboard paralysis. A.R.I. tells you concretely: *"Your top product has an image problem – here are 3 concrete measures."* You make the decision, A.R.I. implements it.
 
 ### 📧 Intelligent Customer Relationships
-Abandoned carts? Customers who haven't bought anything in a long time? A.R.I. knows them and writes them personalized messages – without you ever lifting a finger.
+Abandoned carts? Customers who haven't bought anything in a long time? A.R.I. knows them and creates personalized message drafts – you review and approve. That simple.
 
 ### 📱 Visible Everywhere
 Your shop is on Facebook, Instagram, LinkedIn, TikTok, email. A.R.I. posts smartly, at the right time, with images and texts that work.
@@ -88,9 +88,9 @@ Your shop is on Facebook, Instagram, LinkedIn, TikTok, email. A.R.I. posts smart
 - **Types:** `failed_payment`, `unusual_amount`, `repeated_attempts`, `high_risk`
 - Real-time monitoring & alerting
 
-#### 2. Product Optimization Loop 📈
+#### 2. Product Performance Loop 📈
 - Automatically A/B tests product attributes
-- **Optimizes:** Price (-10%), title (+Bestseller), description (+Benefits)
+- **Enhances:** Price (-10%), title (+Bestseller), description (+Benefits)
 - Continuous conversion improvement
 
 #### 3. Payment Recovery Loop 💳
@@ -118,7 +118,7 @@ Your shop is on Facebook, Instagram, LinkedIn, TikTok, email. A.R.I. posts smart
 
 ### 🔧 51+ Intelligent Tools
 
-> **Important:** All tools work assistively – drafts, analyses, and hints are generated; approvals and live changes require your click.
+> **Important:** All tools work assistively – drafts, analyses, and hints are generated; approvals and live changes remain always with you.
 
 ## 🎁 What Changes for You?
 
@@ -272,38 +272,6 @@ Your shop is on Facebook, Instagram, LinkedIn, TikTok, email. A.R.I. posts smart
 - Quick templates for fast notes
 - Last-saved timestamp display
 
-### 🗺️ Roadmap
-
-<details>
-<summary><strong>Q1 2026</strong></summary>
-
-- [ ] Kubernetes deployment support
-- [ ] Prometheus metrics export
-- [ ] GraphQL API alternative
-- [ ] WebSocket real-time updates
-
-</details>
-
-<details>
-<summary><strong>Q2 2026</strong></summary>
-
-- [ ] Multi-tenancy (multiple shops)
-- [ ] Redis caching layer
-- [ ] PostgreSQL integration
-- [ ] Advanced ML models (custom training)
-
-</details>
-
-<details>
-<summary><strong>Q3 2026</strong></summary>
-
-- [ ] Mobile app (iOS/Android)
-- [ ] Voice control integration
-- [ ] Predictive analytics dashboard
-- [ ] A/B testing framework
-
-</details>
-
 ---
 
 ## 🛡️ Security & Compliance
@@ -341,14 +309,8 @@ Your shop is on Facebook, Instagram, LinkedIn, TikTok, email. A.R.I. posts smart
 
 ## 💬 Support
 
-### 📧 Commercial Support
-
 - **Email:** info@example.com
 - **Website:** [example.com](https://example.com)
-
-### 🤝 Contributing
-
-Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) before your first PR.
 
 ---
 
@@ -384,6 +346,5 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 [🚀 Installation](docs/english/DEPLOYMENT_GUIDE.md) • [📚 Documentation](docs/english/USER_MANUAL.md) • [💬 Support](#support)
 
-**⭐ If you like A.R.I., give this project a star!**
 
 </div>

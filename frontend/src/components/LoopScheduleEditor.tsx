@@ -34,7 +34,7 @@ interface Props {
   loopType:
     | "anomaly-detection"
     | "payment-recovery"
-    | "product-optimization"
+    | "product-performance"
     | "analytics-insights";
   config: ScheduleConfig;
   onChange: (config: ScheduleConfig) => void;

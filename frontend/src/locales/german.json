@@ -239,7 +239,7 @@
       "loopAnomalyName": "Anomaly Detection",
       "loopAnomalyDesc": "Payment-Anomalien automatisch erkennen",
       "loopAnomalySchedule": "Täglich 09:00",
-      "loopProductName": "Product Optimization",
+      "loopProductName": "Product Performance",
       "loopProductDesc": "A/B Testing für Produkte",
       "loopProductSchedule": "Mo/Do 10:00",
       "loopPaymentName": "Payment Recovery",

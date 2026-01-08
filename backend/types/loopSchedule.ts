@@ -6,7 +6,7 @@
 export type LoopType =
   | 'anomaly-detection'
   | 'payment-recovery'
-  | 'product-optimization'
+  | 'product-performance'
   | 'analytics-insights';
 
 export type ScheduleType = 'daily' | 'weekly' | 'interval';
@@ -49,7 +49,7 @@ export type ScheduleConfig =
 export interface LoopSchedules {
   'anomaly-detection': DailyScheduleConfig;
   'payment-recovery': IntervalScheduleConfig;
-  'product-optimization': WeeklyScheduleConfig;
+  'product-performance': WeeklyScheduleConfig;
   'analytics-insights': DailyScheduleConfig;
 }
 

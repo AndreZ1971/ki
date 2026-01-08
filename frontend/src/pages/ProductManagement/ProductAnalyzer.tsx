@@ -25,7 +25,6 @@ const ProductAnalyzer: React.FC = () => {
   const [analysis, setAnalysis] = useState<any | null>(null);
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
-  const [showRaw, setShowRaw] = useState(false);
   const [productError, setProductError] = useState<string | null>(null);
   const [productDebug, setProductDebug] = useState<any | null>(null);
   const [editMode, setEditMode] = useState(false);
@@ -198,13 +197,16 @@ const ProductAnalyzer: React.FC = () => {
       </div>
 
       {/* Product Selection */}
-      <div style={{
-        background: '#ffffff',
-        border: '1px solid #E2E8F0',
-        borderRadius: '12px',
-        padding: '24px',
-        marginBottom: '32px'
-      }}>
+      <div 
+        className="product-analyzer-selection"
+        style={{
+          background: '#ffffff',
+          border: '1px solid #E2E8F0',
+          borderRadius: '12px',
+          padding: '24px',
+          marginBottom: '32px'
+        }}
+      >
         <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '16px', textTransform: 'uppercase', color: '#0b1220' }}>
           🎯 Produkt auswählen
         </div>
@@ -286,17 +288,23 @@ const ProductAnalyzer: React.FC = () => {
 
       {/* Modal: Produktdetails & Analyse */}
       {showModal && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.35)', backdropFilter: 'blur(2px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50
-        }}>
-          <div style={{ width: '900px', maxWidth: '90vw', maxHeight: '90vh', background: '#ffffff', border: '1px solid #E2E8F0', borderRadius: '12px', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+        <div 
+          className="product-analyzer-modal-backdrop"
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(6, 8, 17, 0.55)', backdropFilter: 'blur(4px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50
+          }}
+        >
+          <div 
+            className="product-analyzer-modal"
+            style={{ width: '900px', maxWidth: '90vw', maxHeight: '90vh', background: 'rgb(45, 50, 75)', border: '1px solid rgba(255, 255, 255, 0.2)', borderRadius: '18px', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 70px rgba(0, 0, 0, 0.4)' }}
+          >
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255, 255, 255, 0.12)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
               <div>
-                <div style={{ fontSize: '16px', fontWeight: 700, color: '#0b1220' }}>
+                <div style={{ fontSize: '16px', fontWeight: 700, color: '#f5f7ff' }}>
                   {editMode ? '✏️ Produkt bearbeiten' : 'Produktdetails'}
                 </div>
-                <div style={{ fontSize: '12px', color: '#64748b' }}>ID: {selectedProductId}</div>
+                <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)' }}>ID: {selectedProductId}</div>
               </div>
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                 {editMode && (
@@ -305,9 +313,9 @@ const ProductAnalyzer: React.FC = () => {
                       onClick={saveProduct}
                       disabled={saveLoading}
                       style={{ 
-                        border: '1px solid #22c55e', 
-                        background: saveLoading ? '#f0fdf4' : '#22c55e', 
-                        color: saveLoading ? '#16a34a' : '#fff', 
+                        border: '1px solid rgba(52, 199, 89, 0.5)', 
+                        background: saveLoading ? 'rgba(52, 199, 89, 0.2)' : 'rgba(52, 199, 89, 0.3)', 
+                        color: saveLoading ? 'rgba(255, 255, 255, 0.7)' : '#fff', 
                         borderRadius: 8, 
                         padding: '6px 14px', 
                         cursor: saveLoading ? 'not-allowed' : 'pointer',
@@ -319,9 +327,9 @@ const ProductAnalyzer: React.FC = () => {
                     <button 
                       onClick={toggleEditMode} 
                       style={{ 
-                        border: '1px solid #CBD5E1', 
-                        background: '#fff', 
-                        color: '#0b1220', 
+                        border: '1px solid rgba(255, 255, 255, 0.2)', 
+                        background: 'rgba(255, 255, 255, 0.05)', 
+                        color: '#f5f7ff', 
                         borderRadius: 8, 
                         padding: '6px 12px', 
                         cursor: 'pointer' 
@@ -335,9 +343,9 @@ const ProductAnalyzer: React.FC = () => {
                   <button 
                     onClick={toggleEditMode} 
                     style={{ 
-                      border: '1px solid #2563eb', 
-                      background: '#fff', 
-                      color: '#2563eb', 
+                      border: '1px solid rgba(59, 130, 246, 0.5)', 
+                      background: 'rgba(59, 130, 246, 0.2)', 
+                      color: '#60a5fa', 
                       borderRadius: 8, 
                       padding: '6px 14px', 
                       cursor: 'pointer',
@@ -350,9 +358,9 @@ const ProductAnalyzer: React.FC = () => {
                 <button 
                   onClick={() => setShowModal(false)} 
                   style={{ 
-                    border: '1px solid #CBD5E1', 
-                    background: '#fff', 
-                    color: '#0b1220', 
+                    border: '1px solid rgba(255, 255, 255, 0.2)', 
+                    background: 'rgba(255, 255, 255, 0.05)', 
+                    color: '#f5f7ff', 
                     borderRadius: 8, 
                     padding: '6px 10px', 
                     cursor: 'pointer' 
@@ -365,161 +373,150 @@ const ProductAnalyzer: React.FC = () => {
 
             <div style={{ padding: '20px', display: 'grid', gap: '16px', overflowY: 'auto' }}>
               {saveError && (
-                <div style={{ background: '#fee2e2', border: '1px solid #fca5a5', borderRadius: 8, padding: 12, color: '#b91c1c', fontSize: 12 }}>
+                <div style={{ background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.4)', borderRadius: 8, padding: 12, color: '#fca5a5', fontSize: 12 }}>
                   ⚠️ {saveError}
                 </div>
               )}
               {modalLoading ? (
-                <div style={{ color: '#475569' }}>⏳ Produktdetails werden geladen…</div>
+                <div style={{ color: 'rgba(255, 255, 255, 0.7)' }}>⏳ Produktdetails werden geladen…</div>
               ) : productDetails ? (
                 <div style={{ display: 'grid', gridTemplateColumns: editMode ? '1fr' : '2fr 1fr', gap: '16px' }}>
-                  <div style={{ background: '#fff', border: '1px solid #E2E8F0', borderRadius: 12, padding: 16, maxHeight: editMode ? 'none' : '420px', overflowY: 'auto' }}>
+                  <div style={{ background: 'rgb(55, 60, 85)', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: 12, padding: 16, maxHeight: editMode ? 'none' : '420px', overflowY: 'auto' }}>
                     {editMode ? (
                       <div style={{ display: 'grid', gap: '16px' }}>
                         <div>
-                          <label style={{ fontSize: 12, color: '#64748b', display: 'block', marginBottom: 6 }}>Produktname</label>
+                          <label style={{ fontSize: 12, color: 'rgba(255, 255, 255, 0.7)', display: 'block', marginBottom: 6 }}>Produktname</label>
                           <input
                             type="text"
                             value={editedProduct?.name || ''}
                             onChange={(e) => updateField('name', e.target.value)}
-                            style={{ width: '100%', padding: '10px 12px', border: '1px solid #CBD5E1', borderRadius: 8, fontSize: 14, color: '#0b1220' }}
+                            style={{ width: '100%', padding: '10px 12px', border: '1px solid rgba(255, 255, 255, 0.2)', background: 'rgb(35, 40, 60)', borderRadius: 8, fontSize: 14, color: '#f5f7ff' }}
                           />
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
                           <div>
-                            <label style={{ fontSize: 12, color: '#64748b', display: 'block', marginBottom: 6 }}>Normalpreis (€)</label>
+                            <label style={{ fontSize: 12, color: 'rgba(255, 255, 255, 0.7)', display: 'block', marginBottom: 6 }}>Normalpreis (€)</label>
                             <input
                               type="number"
                               step="0.01"
                               value={editedProduct?.regular_price || ''}
                               onChange={(e) => updateField('regular_price', e.target.value)}
-                              style={{ width: '100%', padding: '10px 12px', border: '1px solid #CBD5E1', borderRadius: 8, fontSize: 14, color: '#0b1220' }}
+                              style={{ width: '100%', padding: '10px 12px', border: '1px solid rgba(255, 255, 255, 0.2)', background: 'rgb(35, 40, 60)', borderRadius: 8, fontSize: 14, color: '#f5f7ff' }}
                             />
                           </div>
                           <div>
-                            <label style={{ fontSize: 12, color: '#64748b', display: 'block', marginBottom: 6 }}>Sale-Preis (€)</label>
+                            <label style={{ fontSize: 12, color: 'rgba(255, 255, 255, 0.7)', display: 'block', marginBottom: 6 }}>Sale-Preis (€)</label>
                             <input
                               type="number"
                               step="0.01"
                               value={editedProduct?.sale_price || ''}
                               onChange={(e) => updateField('sale_price', e.target.value)}
-                              style={{ width: '100%', padding: '10px 12px', border: '1px solid #CBD5E1', borderRadius: 8, fontSize: 14, color: '#0b1220' }}
+                              style={{ width: '100%', padding: '10px 12px', border: '1px solid rgba(255, 255, 255, 0.2)', background: 'rgb(35, 40, 60)', borderRadius: 8, fontSize: 14, color: '#f5f7ff' }}
                             />
                           </div>
                           <div>
-                            <label style={{ fontSize: 12, color: '#64748b', display: 'block', marginBottom: 6 }}>Lagerbestand</label>
+                            <label style={{ fontSize: 12, color: 'rgba(255, 255, 255, 0.7)', display: 'block', marginBottom: 6 }}>Lagerbestand</label>
                             <input
                               type="number"
                               value={editedProduct?.stock_quantity ?? ''}
                               onChange={(e) => updateField('stock_quantity', e.target.value === '' ? null : parseInt(e.target.value))}
-                              style={{ width: '100%', padding: '10px 12px', border: '1px solid #CBD5E1', borderRadius: 8, fontSize: 14, color: '#0b1220' }}
+                              style={{ width: '100%', padding: '10px 12px', border: '1px solid rgba(255, 255, 255, 0.2)', background: 'rgb(35, 40, 60)', borderRadius: 8, fontSize: 14, color: '#f5f7ff' }}
                             />
                           </div>
                         </div>
                         <div>
-                          <label style={{ fontSize: 12, color: '#64748b', display: 'block', marginBottom: 6 }}>Kurzbeschreibung</label>
+                          <label style={{ fontSize: 12, color: 'rgba(255, 255, 255, 0.7)', display: 'block', marginBottom: 6 }}>Kurzbeschreibung</label>
                           <textarea
                             value={editedProduct?.short_description?.replace(/<[^>]*>/g, '') || ''}
                             onChange={(e) => updateField('short_description', e.target.value)}
                             rows={3}
-                            style={{ width: '100%', padding: '10px 12px', border: '1px solid #CBD5E1', borderRadius: 8, fontSize: 13, color: '#0b1220', fontFamily: 'inherit', resize: 'vertical' }}
+                            style={{ width: '100%', padding: '10px 12px', border: '1px solid rgba(255, 255, 255, 0.2)', background: 'rgb(35, 40, 60)', borderRadius: 8, fontSize: 13, color: '#f5f7ff', fontFamily: 'inherit', resize: 'vertical' }}
                           />
                         </div>
                         <div>
-                          <label style={{ fontSize: 12, color: '#64748b', display: 'block', marginBottom: 6 }}>Beschreibung</label>
+                          <label style={{ fontSize: 12, color: 'rgba(255, 255, 255, 0.7)', display: 'block', marginBottom: 6 }}>Beschreibung</label>
                           <textarea
                             value={editedProduct?.description?.replace(/<[^>]*>/g, '') || ''}
                             onChange={(e) => updateField('description', e.target.value)}
                             rows={6}
-                            style={{ width: '100%', padding: '10px 12px', border: '1px solid #CBD5E1', borderRadius: 8, fontSize: 13, color: '#0b1220', fontFamily: 'inherit', resize: 'vertical' }}
+                            style={{ width: '100%', padding: '10px 12px', border: '1px solid rgba(255, 255, 255, 0.2)', background: 'rgb(35, 40, 60)', borderRadius: 8, fontSize: 13, color: '#f5f7ff', fontFamily: 'inherit', resize: 'vertical' }}
                           />
                         </div>
                       </div>
                     ) : (
                       <>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: '#0b1220', marginBottom: 8 }}>{productDetails.name || '—'}</div>
-                        <div style={{ fontSize: 12, color: '#64748b', marginBottom: 12 }}>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: '#f5f7ff', marginBottom: 8 }}>{productDetails.name || '—'}</div>
+                        <div style={{ fontSize: 12, color: 'rgba(255, 255, 255, 0.7)', marginBottom: 12 }}>
                           Preis: {(productDetails.price ?? productDetails.regular_price) ? `${productDetails.price ?? productDetails.regular_price}€` : '—'} {productDetails.sale_price ? `(Sale: ${productDetails.sale_price}€)` : ''}
                         </div>
-                        <div style={{ fontSize: 12, color: '#0b1220', whiteSpace: 'pre-wrap' }}
+                        <div style={{ fontSize: 12, color: 'rgba(255, 255, 255, 0.8)', whiteSpace: 'pre-wrap' }}
                           dangerouslySetInnerHTML={{ __html: (productDetails.description || productDetails.short_description || '—') }}
                         />
                         {productDetails.images && productDetails.images.length > 0 && (
                           <div style={{ marginTop: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                             {productDetails.images.slice(0,4).map((img: any, i: number) => (
-                              <img key={i} src={img.src} alt={img.alt || 'image'} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8, border: '1px solid #E2E8F0' }} />
+                              <img key={i} src={img.src} alt={img.alt || 'image'} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8, border: '1px solid rgba(255, 255, 255, 0.2)' }} />
                             ))}
                           </div>
                         )}
                         {productDetails.price_html && (
-                          <div style={{ marginTop: 10, fontSize: 12, color: '#0b1220' }} dangerouslySetInnerHTML={{ __html: productDetails.price_html }} />
+                          <div style={{ marginTop: 10, fontSize: 12, color: 'rgba(255, 255, 255, 0.8)' }} dangerouslySetInnerHTML={{ __html: productDetails.price_html }} />
                         )}
                       </>
                     )}
                   </div>
                   {!editMode && (
                     <div style={{ display: 'grid', gap: 12 }}>
-                      <div style={{ background: '#fff', border: '1px solid #E2E8F0', borderRadius: 12, padding: 12 }}>
-                        <div style={{ fontSize: 12, color: '#64748b', marginBottom: 6 }}>📈 Kennzahlen</div>
-                        <div style={{ fontSize: 13, color: '#0b1220' }}>Gesamtverkäufe: {productDetails.total_sales ?? '—'}</div>
-                        <div style={{ fontSize: 13, color: '#0b1220' }}>Lagerbestand: {productDetails.stock_quantity ?? '—'}</div>
-                        <div style={{ fontSize: 13, color: '#0b1220' }}>Status: {productDetails.stock_status ?? '—'}</div>
-                        <div style={{ fontSize: 13, color: '#0b1220' }}>Kategorien: {(productDetails.categories || []).map((c: any) => c.name).join(', ') || '—'}</div>
+                      <div style={{ background: 'rgb(55, 60, 85)', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: 12, padding: 12 }}>
+                        <div style={{ fontSize: 12, color: 'rgba(255, 255, 255, 0.7)', marginBottom: 6 }}>📈 Kennzahlen</div>
+                        <div style={{ fontSize: 13, color: '#f5f7ff' }}>Gesamtverkäufe: {productDetails.total_sales ?? '—'}</div>
+                        <div style={{ fontSize: 13, color: '#f5f7ff' }}>Lagerbestand: {productDetails.stock_quantity ?? '—'}</div>
+                        <div style={{ fontSize: 13, color: '#f5f7ff' }}>Status: {productDetails.stock_status ?? '—'}</div>
+                        <div style={{ fontSize: 13, color: '#f5f7ff' }}>Kategorien: {(productDetails.categories || []).map((c: any) => c.name).join(', ') || '—'}</div>
                       </div>
-                      <button onClick={runAnalysis} disabled={analysisLoading} style={{ padding: '10px 14px', borderRadius: 8, border: '1px solid rgba(37,99,235,0.35)', background: analysisLoading ? 'rgba(37,99,235,0.10)' : 'linear-gradient(135deg, rgba(37,99,235,0.12), rgba(34,197,94,0.1))', color: '#1d4ed8', cursor: analysisLoading ? 'not-allowed' : 'pointer' }}>
+                      <button onClick={runAnalysis} disabled={analysisLoading} style={{ padding: '10px 14px', borderRadius: 8, border: '1px solid rgba(59, 130, 246, 0.5)', background: analysisLoading ? 'rgba(59, 130, 246, 0.2)' : 'linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(52, 199, 89, 0.2))', color: '#60a5fa', cursor: analysisLoading ? 'not-allowed' : 'pointer', fontWeight: 600 }}>
                         {analysisLoading ? '⏳ KI analysiert…' : '🤖 Mit KI analysieren'}
                       </button>
                       {analysisError && (
-                        <div style={{ fontSize: 12, color: '#b91c1c' }}>⚠️ {analysisError}</div>
+                        <div style={{ fontSize: 12, color: '#fca5a5' }}>⚠️ {analysisError}</div>
                       )}
-                      <button onClick={() => setShowRaw(!showRaw)} style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #CBD5E1', background: '#fff', color: '#0b1220', cursor: 'pointer' }}>
-                        {showRaw ? '🔎 Rohdaten ausblenden' : '🔎 Rohdaten anzeigen'}
-                      </button>
                     </div>
                   )}
                 </div>
               ) : (
-                <div style={{ color: '#b91c1c', display: 'grid', gap: 12 }}>
+                <div style={{ color: '#fca5a5', display: 'grid', gap: 12 }}>
                   <div>⚠️ Keine Produktdetails gefunden.</div>
-                  {productError && <div style={{ fontSize: 12, color: '#b91c1c' }}>Fehler: {productError}</div>}
+                  {productError && <div style={{ fontSize: 12, color: '#fca5a5' }}>Fehler: {productError}</div>}
                   {productDebug && (
-                    <pre style={{ margin: 0, fontSize: 11, color: '#0b1220', background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 8, padding: 10, overflowX: 'auto' }}>
+                    <pre style={{ margin: 0, fontSize: 11, color: '#f5f7ff', background: 'rgba(0, 0, 0, 0.3)', border: '1px solid rgba(255, 255, 255, 0.15)', borderRadius: 8, padding: 10, overflowX: 'auto' }}>
                       {JSON.stringify(productDebug, null, 2)}
                     </pre>
                   )}
                 </div>
               )}
 
-              {productDetails && showRaw && (
-                <div style={{ background: '#fff', border: '1px solid #E2E8F0', borderRadius: 12, padding: 12 }}>
-                  <div style={{ fontSize: 12, color: '#64748b', marginBottom: 6 }}>Rohdaten (WooCommerce JSON)</div>
-                  <pre style={{ margin: 0, fontSize: 11, color: '#0b1220', background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 8, padding: 10, overflowX: 'auto' }}>
-                    {JSON.stringify(productDetails, null, 2)}
-                  </pre>
-                </div>
-              )}
               {analysis && (
-                <div style={{ background: '#fff', border: '1px solid #E2E8F0', borderRadius: 12, padding: 16, maxHeight: '320px', overflowY: 'auto' }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: '#0b1220', marginBottom: 8 }}>Analyse-Ergebnis</div>
+                <div style={{ background: 'rgb(55, 60, 85)', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: 12, padding: 16, maxHeight: '320px', overflowY: 'auto' }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#f5f7ff', marginBottom: 8 }}>Analyse-Ergebnis</div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
-                    <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 8, padding: 10 }}>
-                      <div style={{ fontSize: 12, color: '#14532d' }}>Gesamt-Score</div>
-                      <div style={{ fontSize: 20, fontWeight: 700, color: '#166534' }}>{analysis.score}</div>
+                    <div style={{ background: 'rgba(52, 199, 89, 0.15)', border: '1px solid rgba(52, 199, 89, 0.3)', borderRadius: 8, padding: 10 }}>
+                      <div style={{ fontSize: 12, color: 'rgba(52, 199, 89, 0.9)' }}>Gesamt-Score</div>
+                      <div style={{ fontSize: 20, fontWeight: 700, color: '#4ade80' }}>{analysis.score}</div>
                     </div>
                     {analysis.metrics && (
-                      <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 8, padding: 10 }}>
-                        <div style={{ fontSize: 12, color: '#1e3a8a' }}>Metriken</div>
-                        <div style={{ fontSize: 12, color: '#0b1220' }}>Bilder: {analysis.metrics.imageCount}</div>
-                        <div style={{ fontSize: 12, color: '#0b1220' }}>Kategorien: {analysis.metrics.categoryCount}</div>
+                      <div style={{ background: 'rgba(59, 130, 246, 0.15)', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: 8, padding: 10 }}>
+                        <div style={{ fontSize: 12, color: 'rgba(96, 165, 250, 0.9)' }}>Metriken</div>
+                        <div style={{ fontSize: 12, color: '#f5f7ff' }}>Bilder: {analysis.metrics.imageCount}</div>
+                        <div style={{ fontSize: 12, color: '#f5f7ff' }}>Kategorien: {analysis.metrics.categoryCount}</div>
                       </div>
                     )}
                   </div>
                   {Array.isArray(analysis.recommendations) && analysis.recommendations.length > 0 && (
                     <div style={{ marginTop: 12 }}>
-                      <div style={{ fontSize: 12, color: '#0b1220', marginBottom: 6 }}>Empfehlungen</div>
+                      <div style={{ fontSize: 12, color: '#f5f7ff', marginBottom: 6 }}>Empfehlungen</div>
                       <ul style={{ margin: 0, paddingLeft: 18 }}>
                         {analysis.recommendations.map((r: string, i: number) => (
-                          <li key={i} style={{ fontSize: 12, color: '#0b1220' }}>{r}</li>
+                          <li key={i} style={{ fontSize: 12, color: 'rgba(255, 255, 255, 0.8)' }}>{r}</li>
                         ))}
                       </ul>
                     </div>
@@ -553,6 +550,45 @@ const ProductAnalyzer: React.FC = () => {
         @keyframes pulse {
           0%, 100% { opacity: 0.8; }
           50% { opacity: 0.4; }
+        }
+        
+        /* Override global CSS - higher specificity than div[style*="background"] */
+        div.product-analyzer-modal-backdrop,
+        div.product-analyzer-modal,
+        .product-analyzer-modal div[style*="background"],
+        .product-analyzer-modal div[style*="rgba"] {
+          background: revert !important;
+        }
+        
+        div.product-analyzer-modal {
+          background: rgb(45, 50, 75) !important;
+        }
+        
+        /* Protect Product Selection from global CSS overrides */
+        .product-analyzer-selection,
+        .product-analyzer-selection * {
+          background: revert !important;
+          color: revert !important;
+        }
+        
+        .product-analyzer-selection {
+          background: #ffffff !important;
+        }
+        
+        .product-analyzer-selection label,
+        .product-analyzer-selection div {
+          color: #0b1220 !important;
+        }
+        
+        .product-analyzer-selection select {
+          background: #ffffff !important;
+          color: #0b1220 !important;
+          border: 1px solid #CBD5E1 !important;
+        }
+        
+        .product-analyzer-selection option {
+          background: #ffffff !important;
+          color: #0b1220 !important;
         }
       `}</style>
     </div>
