@@ -21,9 +21,10 @@ interface User {
 const users: Map<string, User> = new Map();
 
 // Initialize default admin user
+// WICHTIG: Passwort nach erstem Login ändern!
 const defaultPasswordHash = crypto
   .createHash('sha256')
-  .update('admin123')
+  .update('ARI#2026!Secure')
   .digest('hex');
 
 users.set('admin', {

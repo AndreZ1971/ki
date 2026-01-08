@@ -167,12 +167,6 @@ const Login: React.FC = () => {
             </Box>
           </Box>
         </Paper>
-
-        <Box sx={{ mt: 3, textAlign: 'center' }}>
-          <Typography variant="body2" color="text.secondary">
-            {t('auth.defaultCredentials')}: admin / admin123
-          </Typography>
-        </Box>
       </Box>
     </Container>
   );
