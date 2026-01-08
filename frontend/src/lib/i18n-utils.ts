@@ -31,22 +31,38 @@ export const formatTime = (
 };
 
 export const formatDateTime = (
-  value: Date | string | number,
+  value: Date | string | number | undefined,
   options?: Intl.DateTimeFormatOptions
 ) => {
-  const date =
-    typeof value === "string" || typeof value === "number"
-      ? new Date(value)
-      : value;
-  const fmtOptions: Intl.DateTimeFormatOptions = {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    ...(options || {}),
-  };
-  return new Intl.DateTimeFormat(getLocale(), fmtOptions).format(date);
+  // Handle undefined/null/invalid values
+  if (!value) {
+    return 'Unbekannt';
+  }
+
+  try {
+    const date =
+      typeof value === "string" || typeof value === "number"
+        ? new Date(value)
+        : value;
+    
+    // Validate date
+    if (isNaN(date.getTime())) {
+      return 'Unbekannt';
+    }
+
+    const fmtOptions: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      ...(options || {}),
+    };
+    return new Intl.DateTimeFormat(getLocale(), fmtOptions).format(date);
+  } catch (error) {
+    console.warn('[formatDateTime] Error:', error);
+    return 'Unbekannt';
+  }
 };
 
 export const formatNumber = (

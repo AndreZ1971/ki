@@ -1495,7 +1495,7 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
               paddingTop: "16px",
             }}
           >
-            ⏱️ Analysiert am {formatDateTime(new Date(result.analyzedAt))}
+            ⏱️ Analysiert am {formatDateTime(result.analyzedAt)}
           </div>
         </div>
       )}
