@@ -2,7 +2,7 @@
 /**
  * Fastify Routes für Agentic Loops
  * POST /api/agent/loops/:type/run
- * Unterstützte Types: anomaly-detection, product-optimization, payment-recovery, analytics-insights
+ * Unterstützte Types: anomaly-detection, product-performance, payment-recovery, analytics-insights
  */
 
 import { FastifyInstance, FastifyPluginAsync } from 'fastify';
@@ -18,7 +18,7 @@ import { AnalyticsInsightsLoop } from '../agent/loops/analyticsInsightsLoop';
 // Type-safe loop factory
 type LoopType =
   | 'anomaly-detection'
-  | 'product-optimization'
+  | 'product-performance'
   | 'payment-recovery'
   | 'analytics-insights';
 
@@ -41,7 +41,7 @@ function createLoop(type: LoopType): AgenticLoop | null {
   switch (type) {
     case 'anomaly-detection':
       return new AnomalyDetectionLoop();
-    case 'product-optimization':
+    case 'product-performance':
       return new ProductOptimizationLoop();
     case 'payment-recovery':
       return new PaymentRecoveryLoop();
@@ -65,7 +65,7 @@ const agentLoopsRoutes: FastifyPluginAsync = async (
     try {
       const validTypes: LoopType[] = [
         'anomaly-detection',
-        'product-optimization',
+        'product-performance',
         'payment-recovery',
         'analytics-insights',
       ];
@@ -127,8 +127,8 @@ const agentLoopsRoutes: FastifyPluginAsync = async (
         description: 'Detect payment anomalies in orders',
         status: 'active',
       },
-      'product-optimization': {
-        description: 'A/B test products to improve conversion',
+      'product-performance': {
+        description: 'Enhance product performance via A/B tests',
         status: 'active',
       },
       'payment-recovery': {
@@ -169,9 +169,9 @@ const agentLoopsRoutes: FastifyPluginAsync = async (
           bySeverity: { high: 30, medium: 15 },
         },
       },
-      'product-optimization': {
-        name: 'Product Optimization Loop',
-        description: 'A/B test product attributes (price, title, description)',
+      'product-performance': {
+        name: 'Product Performance Loop',
+        description: 'Enhance product performance via A/B tests on attributes (price, title, description)',
         phases: ['sense', 'think', 'act', 'learn'],
         output: {
           totalTests: 'number',

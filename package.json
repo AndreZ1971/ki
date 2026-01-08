@@ -5,7 +5,9 @@
   "main": "dist/server.js",
   "type": "commonjs",
   "scripts": {
-    "build": "tsc",
+    "build": "npm --prefix backend run build && npm --prefix frontend run build",
+    "build:backend": "npm --prefix backend run build",
+    "build:frontend": "npm --prefix frontend run build",
     "dev": "tsx watch src/server.ts",
     "dev:agent": "tsx watch src/agent/planner.ts",
     "start": "node backend/dist/server.js",

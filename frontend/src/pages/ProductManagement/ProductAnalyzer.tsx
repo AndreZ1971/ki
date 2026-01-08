@@ -189,9 +189,9 @@ const ProductAnalyzer: React.FC = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
         <div>
           <button className="back-button floating-back" onClick={handleBackToDashboard}>← Zurück</button>
-          <h1 style={{ marginTop: '16px', color: '#0b1220' }}>🔍 Product Analyzer & Optimizer</h1>
+          <h1 style={{ marginTop: '16px', color: '#0b1220' }}>🔍 Product Analyzer</h1>
           <p style={{ color: '#475569', fontSize: '14px', marginTop: '8px' }}>
-            Analysiere deine Produkte mit KI und erhalte detaillierte Optimierungsvorschläge
+            Analysiere deine Produkte mit KI und erhalte detaillierte Verbesserungsvorschläge
           </p>
         </div>
       </div>

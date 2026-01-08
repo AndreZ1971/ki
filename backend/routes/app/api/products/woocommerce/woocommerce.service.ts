@@ -45,7 +45,7 @@ export class WooCommerceService {
         headers: {
           'Authorization': `Basic ${this.auth}`,
           'Content-Type': 'application/json',
-          'User-Agent': 'Product-Optimizer/1.0'
+          'User-Agent': 'Product-Performance/1.0'
         },
         body: JSON.stringify(updateData)
       });
@@ -78,7 +78,7 @@ export class WooCommerceService {
       const response = await fetch(url, {
         headers: {
           'Authorization': `Basic ${this.auth}`,
-          'User-Agent': 'Product-Optimizer/1.0'
+          'User-Agent': 'Product-Performance/1.0'
         }
       });
 
@@ -109,7 +109,7 @@ export class WooCommerceService {
         headers: {
           'Authorization': `Basic ${this.auth}`,
           'Content-Type': 'application/json',
-          'User-Agent': 'Product-Optimizer/1.0'
+          'User-Agent': 'Product-Performance/1.0'
         },
         body: JSON.stringify(productData)
       });
@@ -143,7 +143,7 @@ export class WooCommerceService {
       const response = await fetch(url, {
         headers: {
           'Authorization': `Basic ${this.auth}`,
-          'User-Agent': 'Product-Optimizer/1.0'
+          'User-Agent': 'Product-Performance/1.0'
         }
       });
 
