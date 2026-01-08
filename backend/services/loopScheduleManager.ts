@@ -31,7 +31,7 @@ const DEFAULT_SCHEDULES: LoopSchedules = {
     type: 'interval',
     minutes: 30,
   },
-  'product-optimization': {
+  'product-performance': {
     enabled: true,
     type: 'weekly',
     time: '10:00',
