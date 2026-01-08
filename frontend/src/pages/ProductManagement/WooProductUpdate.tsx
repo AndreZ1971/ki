@@ -59,6 +59,8 @@ const WooProductUpdate = () => {
   const [selectedProductForAnalysis, setSelectedProductForAnalysis] = useState<ProductItem | null>(null);
   const [aiAutoApply, setAiAutoApply] = useState(false);
   const [optimizedDescriptions, setOptimizedDescriptions] = useState<Record<number, string>>({});
+  const [maxPriceIncrease, setMaxPriceIncrease] = useState<number>(20);
+  const [maxPriceDecrease, setMaxPriceDecrease] = useState<number>(15);
 
   // Lade echte Produkte aus WooCommerce
     const loadProducts = React.useCallback(async () => {
@@ -103,7 +105,9 @@ const WooProductUpdate = () => {
         productId: product.id,
         productName: product.name,
         currentPrice: product.price,
-        category: 'general'
+        category: 'general',
+        maxPriceIncreasePercent: maxPriceIncrease,
+        maxPriceDecreasePercent: maxPriceDecrease
       });
       
       if (result.success) {
@@ -371,6 +375,68 @@ const WooProductUpdate = () => {
               Nutze Echtzeit-Daten von <strong>Google Trends</strong> und <strong>Reddit</strong> für intelligente Produkt-Updates.
             </p>
 
+            {/* Price Limits - Percentage Based */}
+            <div style={{ 
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '15px',
+              marginBottom: '15px',
+              padding: '15px',
+              background: 'rgba(255,255,255,0.15)',
+              borderRadius: '10px'
+            }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                  📈 Max. Preiserhöhung (%)
+                </label>
+                <input 
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="5"
+                  value={maxPriceIncrease}
+                  onChange={(e) => setMaxPriceIncrease(Number(e.target.value))}
+                  style={{ 
+                    width: '100%',
+                    padding: '10px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    background: 'rgba(255,255,255,0.9)',
+                    fontSize: '16px',
+                    fontWeight: 'bold'
+                  }}
+                />
+                <div style={{ fontSize: '12px', opacity: 0.85, marginTop: '6px' }}>
+                  Preis darf max. +{maxPriceIncrease}% steigen
+                </div>
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                  📉 Max. Preissenkung (%)
+                </label>
+                <input 
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="5"
+                  value={maxPriceDecrease}
+                  onChange={(e) => setMaxPriceDecrease(Number(e.target.value))}
+                  style={{ 
+                    width: '100%',
+                    padding: '10px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    background: 'rgba(255,255,255,0.9)',
+                    fontSize: '16px',
+                    fontWeight: 'bold'
+                  }}
+                />
+                <div style={{ fontSize: '12px', opacity: 0.85, marginTop: '6px' }}>
+                  Preis darf max. -{maxPriceDecrease}% sinken
+                </div>
+              </div>
+            </div>
+
             {/* AI-Auto-Apply Toggle */}
             <div style={{ 
               display: 'flex', 
@@ -432,7 +498,7 @@ const WooProductUpdate = () => {
                   whiteSpace: 'nowrap'
                 }}
               >
-                {aiLoading ? '⏳ Analysiere...' : `🎯 Alle analysieren (${Math.min(selectedProducts.length, 5)})`}
+                {aiLoading ? '⏳ Analysiere...' : `🎯 Alle analysieren (${selectedProducts.length})`}
               </button>
             </div>
             
@@ -603,13 +669,43 @@ const WooProductUpdate = () => {
                           🔥 {trend.trendScore?.toFixed(0)}/100
                         </span>
                         {trend.suggestedPrice && (
-                          <span style={{ 
-                            color: '#10b981',
-                            fontWeight: 'bold',
-                            fontSize: '14px'
-                          }}>
-                            → €{trend.suggestedPrice} ({trend.priceChange})
-                          </span>
+                          <>
+                            <span style={{ 
+                              color: '#10b981',
+                              fontWeight: 'bold',
+                              fontSize: '14px'
+                            }}>
+                              → €{trend.suggestedPrice} ({trend.priceChange})
+                            </span>
+                            {!aiAutoApply && (
+                              <button
+                                onClick={async () => {
+                                  try {
+                                    await apiClient.put(`/api/products/woo/update-single/${product.id}`, {
+                                      regular_price: trend.suggestedPrice?.toString()
+                                    });
+                                    toast.success(`✅ Preis für "${product.name}" auf €${trend.suggestedPrice} aktualisiert!`);
+                                    await loadProducts();
+                                  } catch (_error) {
+                                    toast.error('Fehler beim Aktualisieren');
+                                  }
+                                }}
+                                style={{
+                                  background: '#10b981',
+                                  color: 'white',
+                                  border: 'none',
+                                  padding: '4px 10px',
+                                  borderRadius: '6px',
+                                  cursor: 'pointer',
+                                  fontSize: '12px',
+                                  fontWeight: 'bold'
+                                }}
+                                title="Vorgeschlagenen Preis übernehmen"
+                              >
+                                ✓ Übernehmen
+                              </button>
+                            )}
+                          </>
                         )}
                       </>
                     )}

@@ -14,9 +14,12 @@
   align-items: center;
   gap: 12px;
   padding: 14px 18px;
-  background: white;
+  background: linear-gradient(145deg, rgba(30, 38, 58, 0.95), rgba(20, 26, 42, 0.98));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   min-width: 300px;
   max-width: 500px;
   pointer-events: all;
@@ -54,15 +57,16 @@
 .toast-message {
   flex: 1;
   font-size: 14px;
-  color: #1f2937;
+  color: #f4f7ff;
   line-height: 1.5;
+  font-weight: 500;
 }
 
 .toast-close {
   background: none;
   border: none;
   font-size: 18px;
-  color: #6b7280;
+  color: #c7d1e4;
   cursor: pointer;
   padding: 0;
   width: 24px;
@@ -76,8 +80,8 @@
 }
 
 .toast-close:hover {
-  background: #f3f4f6;
-  color: #1f2937;
+  background: rgba(255, 255, 255, 0.1);
+  color: #f4f7ff;
 }
 
 @keyframes slideIn {

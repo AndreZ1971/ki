@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-6.4.0-blue.svg)
+![Version](https://img.shields.io/badge/version-6.3.0-blue.svg)
 ![Tests](https://img.shields.io/badge/tests-350%2F350-success.svg)
 ![ML Integration](https://img.shields.io/badge/ML%20Integration-100%25-green.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
@@ -54,10 +54,6 @@ Your shop is thriving, but you're stuck. Conversion could be better. Customer co
 
 **All the work is on you. You are the bottleneck.**
 
-This isn't scalable. This isn't sustainable. And it's not necessary, because:
-
-> **80% of these tasks can be done better, faster, and more consistently with the help of AI.**
-
 ## ✅ The Solution
 
 **A.R.I. helps you with the operational work of your shop. Simple. Intelligent. Around the clock.**
@@ -76,6 +72,27 @@ Your shop is on Facebook, Instagram, LinkedIn, TikTok, email. A.R.I. posts smart
 
 ### 🔄 Constantly Getting Better
 **44 specialized processes** run in the background. Your shop gets better every day – without your intervention.
+
+## 🎁 What Changes for You?
+
+| Area | Improvement |
+|------|-------------|
+| ⏰ **Time** | You get your time back – **5–10 hours per week** less admin work |
+| 💰 **Numbers** | Conversion increases, customers are better served, repeat purchases rise |
+| 📊 **Insights** | You understand your business better – clear, actionable insights instead of data garbage |
+| 🚀 **Scaling** | You can scale – without hiring more people |
+
+### Concretely Implemented Through
+
+- ✅ Optimized product texts (SEO-optimized, sales-promoting)
+- ✅ AI-generated product images (DALL-E integration)
+- ✅ Real-time analytics with real recommendations
+- ✅ Email automation (carts, welcome series, reactivation)
+- ✅ Social media posts (6 platforms)
+- ✅ **NEW:** Multi-source trend analysis (Google Trends + Reddit OAuth)
+- ✅ **NEW:** Percentage-based price suggestions with intelligent fallback logic
+- ✅ **NEW:** Dark glass theme with improved contrast
+- ✅ **NEW:** Manual validation of AI suggestions before adoption
 
 ## 🚀 Features
 
@@ -236,15 +253,15 @@ Your shop is on Facebook, Instagram, LinkedIn, TikTok, email. A.R.I. posts smart
 
 ## 📊 Status & Roadmap
 
-### ✅ Current Status
+### ✅ Current Status (January 8, 2026)
 
 | Metric | Status |
 |--------|--------|
-| **Version** | 6.0.0 – Production-Ready |
+| **Version** | 6.3.0 – Production-Ready |
 | **Tests** | 350/350 ✅ |
 | **Workflows** | 44 automated jobs |
 | **Languages** | German & English |
-| **Stable since** | December 2025 |
+| **Stable since** | January 2026 |
 
 ### 🤖 ML/AI Integration Status
 
@@ -257,20 +274,31 @@ Your shop is on Facebook, Instagram, LinkedIn, TikTok, email. A.R.I. posts smart
 | Advanced | 9 | 🟢 9/9 | **100%** |
 | **TOTAL** | **53** | **🟢 53/53** | **100%** |
 
-### 🆕 Recent Updates (December 16, 2025)
+### 🆕 Recent Updates (January 8, 2026)
 
-#### ✅ Critical Fixes:
-- Rate-limiting protection (useEffect dependency hell solved)
-- OpenAI description overflow fix (max 500 chars, HTML sanitization)
-- IP-block prevention (404 monitoring implemented)
-- TypeScript compilation fixes
-- Duplicate handler fix
+#### ✅ Configuration System:
+- Multi-path fallback loader for `connection.json`
+- Centralized credentials management (no .env API keys)
+- Support for dev, production, and CI/CD environments
+- Detailed fallback logging for debugging
 
-#### ✅ New Features:
-- Product notes with autosave
-- Character counter (0/1000 with warnings)
-- Quick templates for fast notes
-- Last-saved timestamp display
+#### ✅ Reddit Integration:
+- Genuine OAuth 2.0 with Client Credentials Flow
+- Real customer discussions and sentiment
+- Async with caching to prevent rate limits
+- Fallback support in trend aggregation
+
+#### ✅ Price Intelligence:
+- Percentage-based limits (+20% / -15% default)
+- Dynamic fallback scaling (30-70% range)
+- Double validation (frontend + backend)
+- Real-time price preview in UI
+
+#### ✅ UI/UX Improvements:
+- Dark glass theme with high contrast
+- Improved error messages and logging
+- Manual validation of AI suggestions
+- Better accessibility (WCAG 2.1 AA)
 
 ---
 

@@ -9,6 +9,7 @@ import googleTrends from 'google-trends-api';
 import { logger } from '../logger';
 // ...existing code...
 import Parser from 'rss-parser';
+import { getConfig } from '@config';
 
 // ============================================================================
 // Types
@@ -57,7 +58,7 @@ const SOURCES: Record<string, TrendSource> = {
   reddit: {
     name: 'Reddit',
     type: 'social',
-    available: !!process.env.REDDIT_CLIENT_ID,
+    available: true, // Check credentials at runtime via getConfig()
     requiresAuth: true
   },
   wikipedia: {
@@ -162,6 +163,8 @@ export class TrendAggregatorService {
         return this.fetchGitHubTrending(keyword);
       case 'stackoverflow':
         return this.fetchStackOverflow(keyword);
+      case 'reddit':
+        return this.fetchReddit(keyword);
       default:
         logger.warn({ source }, 'Unknown source');
         return null;
@@ -245,6 +248,90 @@ export class TrendAggregatorService {
       };
     } catch (error) {
       logger.error({ keyword, error }, 'YouTube fetch failed');
+      return null;
+    }
+  }
+
+  /**
+   * Reddit (OAuth API via connection.json)
+   */
+  private async fetchReddit(keyword: string): Promise<TrendDataPoint | null> {
+    const config = getConfig();
+    const clientId = config.reddit?.clientId;
+    const clientSecret = config.reddit?.clientSecret;
+
+    if (!clientId || !clientSecret) {
+      logger.warn('Reddit OAuth credentials missing in connection.json, skipping');
+      return null;
+    }
+
+    try {
+      // Step 1: Get OAuth token (application-only, no user context)
+      const authResponse = await axios.post(
+        'https://www.reddit.com/api/v1/access_token',
+        'grant_type=client_credentials',
+        {
+          auth: {
+            username: clientId,
+            password: clientSecret
+          },
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'User-Agent': 'ari-trend-aggregator/1.0'
+          },
+          timeout: 8000
+        }
+      );
+
+      const accessToken = authResponse.data.access_token;
+      if (!accessToken) {
+        logger.warn('Reddit OAuth token not received');
+        return null;
+      }
+
+      // Step 2: Search with OAuth token
+      const searchResponse = await axios.get('https://oauth.reddit.com/search', {
+        params: {
+          q: keyword,
+          sort: 'relevance',
+          limit: 25,
+          restrict_sr: false,
+          t: 'week'
+        },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'User-Agent': 'ari-trend-aggregator/1.0'
+        },
+        timeout: 8000
+      });
+
+      const posts = searchResponse.data?.data?.children || [];
+      if (!posts.length) return null;
+
+      const upvotes = posts.map((p: any) => p.data?.score || 0);
+      const comments = posts.map((p: any) => p.data?.num_comments || 0);
+      const avgScore = upvotes.reduce((a: number, b: number) => a + b, 0) / posts.length;
+      const avgComments = comments.reduce((a: number, b: number) => a + b, 0) / posts.length;
+
+      // Score heuristic: blend volume and engagement
+      const volumeScore = Math.min((posts.length / 25) * 100, 100);
+      const engagementScore = Math.min((avgScore + avgComments) * 2, 100);
+      const score = Math.min((volumeScore * 0.6 + engagementScore * 0.4), 100);
+
+      return {
+        source: 'reddit',
+        keyword,
+        score,
+        timestamp: new Date().toISOString(),
+        metadata: {
+          posts: posts.length,
+          avgUpvotes: avgScore,
+          avgComments,
+          authenticated: true
+        }
+      };
+    } catch (error) {
+      logger.warn({ keyword, error }, 'Reddit OAuth fetch failed');
       return null;
     }
   }

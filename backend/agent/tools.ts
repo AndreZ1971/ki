@@ -19,6 +19,7 @@ import { createKitsSeed } from './jobs/kitsTemplates.js';
 import { createMiniAudit } from './jobs/miniAudit.js';
 import { createPremiumAudit } from './jobs/premiumAudit.js';
 import { createStandardAudit } from './jobs/standardAudit.js';
+import { runWooRealtimeUpdate } from './jobs/wooRealtimeUpdate.js';
 
 import type { Tool } from '../types.js';
 
@@ -279,6 +280,44 @@ export const wooCreateBundlesSeedTool: Tool = {
   },
 };
 
+export const wooRealtimeUpdateTool: Tool = {
+  name: 'woo_realtime_update',
+  description:
+    'Live-Trend-Update für bestehende Produkte (Preis/Lager/Text). Input: { productId: number, keyword?: string, geo?: string, includeReddit?: boolean, applyPrice?: boolean, applyStock?: boolean, applyDescription?: boolean, dryRun?: boolean }',
+  async run(input) {
+    const {
+      productId,
+      keyword,
+      geo,
+      includeReddit,
+      applyPrice,
+      applyStock,
+      applyDescription,
+      dryRun,
+    } = input as {
+      productId: number;
+      keyword?: string;
+      geo?: string;
+      includeReddit?: boolean;
+      applyPrice?: boolean;
+      applyStock?: boolean;
+      applyDescription?: boolean;
+      dryRun?: boolean;
+    };
+
+    return await runWooRealtimeUpdate({
+      productId,
+      keyword,
+      geo,
+      includeReddit,
+      applyPrice,
+      applyStock,
+      applyDescription,
+      dryRun,
+    });
+  },
+};
+
 // --------------------------------------------------------------
 // Tool-Registry & Katalog
 // --------------------------------------------------------------
@@ -298,6 +337,7 @@ export const tools: Tool[] = [
   wooCreatePremiumAuditTool,
   wooCreateKitsSeedTool,
   wooCreateBundlesSeedTool,
+  wooRealtimeUpdateTool,
 
   // WP: Upload / weitere Helfer
   ...wpTools,

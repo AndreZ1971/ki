@@ -1,6 +1,6 @@
 # 🤖 A.R.I. - Artificial Retail Intelligence
 
-![Version](https://img.shields.io/badge/version-6.2.0-blue.svg)
+![Version](https://img.shields.io/badge/version-6.3.0-blue.svg)
 ![Tests](https://img.shields.io/badge/tests-350%2F350-success.svg)
 ![ML Integration](https://img.shields.io/badge/ML%20Integration-100%25-green.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
@@ -124,12 +124,10 @@ Abandoned Carts? Kunden, die lange nichts gekauft haben? A.R.I. kennt sie und er
 - ✅ Echtzeit-Analytics mit echten Empfehlungen
 - ✅ Email-Automation (Carts, Willkommensserie, Reaktivierung)
 - ✅ Social-Media-Posts (6 Plattformen)
-- ✅ Du bekommst deine Zeit zurück  10 Stunden pro Woche weniger Admin-Arbeit
-- ✅ Bessere Zahlen – Conversion steigt, Kunden werden besser betreut, Repeat-Purchases nehmen zu
-- ✅ Du verstehst dein Business besser – klare, verwertbare Insights statt DatenmÃ¼ll
-- ✅ Du kannst skalieren – ohne mehr Leute einzustellen
-
-Konkret umgesetzt durch:
+- ✅ **NEU:** Multi-Source Trend-Analyse (Google Trends + Reddit OAuth)
+- ✅ **NEU:** Prozentuale Preissuggestionen mit intelligenter Fallback-Logik
+- ✅ **NEU:** Dunkles Glass-Theme mit verbesserten Kontrasten
+- ✅ **NEU:** Manuelle Validierung von AI-Vorschlägen vor Übernahme
 
 ## ⚙️ Technologie
 

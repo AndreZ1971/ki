@@ -3,30 +3,68 @@
 import fs from 'fs';
 import path from 'path';
 
-// connection.json IMMER aus dem Backend-Quellverzeichnis laden (unabhängig von dist oder src)
-const configPath = path.resolve(__dirname, '../connection.json');
+// connection.json laden - Mehrere Pfade versuchen
+let configPath = '';
 let configData: any = {};
-if (fs.existsSync(configPath)) {
-  configData = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-  console.log(`✅ [config.ts] connection.json geladen von: ${configPath}`);
-  console.log(
-    '[config.ts] Geladene WooCommerce-Daten:',
-    configData.woocommerce
-  );
-  console.log('[config.ts] Geladene WordPress-Daten:', configData.wordpress);
-  console.log('[config.ts] Geladene OpenAI-Daten:', configData.openAI);
-  // Debug: Zeige OpenAI API-Key
-  if (configData.openAI && configData.openAI.apiKey) {
-    console.log(
-      `[config.ts] OpenAI API-Key gefunden: ${configData.openAI.apiKey.substring(0, 8)}...`
-    );
-  } else {
-    console.warn('[config.ts] OpenAI API-Key NICHT gefunden!');
+
+// Debug: Zeige wo wir sind
+console.log('[config.ts] __dirname:', __dirname);
+console.log('[config.ts] process.cwd():', process.cwd());
+
+// 1. Versuche: backend/connection.json (Entwicklung - im Backend Dir selbst)
+const localPath = path.resolve(__dirname, './connection.json');
+// 2. Versuche: ../connection.json (aus dist/)
+const parentPath = path.resolve(__dirname, '../connection.json');
+// 3. Versuche: CWD/connection.json
+const cwdPath = path.resolve(process.cwd(), 'connection.json');
+// 4. Versuche: CWD/backend/connection.json
+const cwdBackendPath = path.resolve(process.cwd(), 'backend', 'connection.json');
+
+const pathsToTry = [localPath, parentPath, cwdPath, cwdBackendPath];
+
+console.log('[config.ts] Versuche folgende Pfade:');
+pathsToTry.forEach(p => console.log(`  - ${p}`));
+
+for (const tryPath of pathsToTry) {
+  if (fs.existsSync(tryPath)) {
+    configPath = tryPath;
+    try {
+      configData = JSON.parse(fs.readFileSync(tryPath, 'utf-8'));
+      console.log(`✅ [config.ts] connection.json geladen von: ${configPath}`);
+      console.log(
+        '[config.ts] Geladene WooCommerce-Daten:',
+        configData.woocommerce
+      );
+      console.log('[config.ts] Geladene WordPress-Daten:', configData.wordpress);
+      console.log('[config.ts] Geladene OpenAI-Daten:', configData.openAI);
+      // Debug: Zeige OpenAI API-Key
+      if (configData.openAI && configData.openAI.apiKey) {
+        console.log(
+          `[config.ts] OpenAI API-Key gefunden: ${configData.openAI.apiKey.substring(0, 8)}...`
+        );
+      } else {
+        console.warn('[config.ts] OpenAI API-Key NICHT gefunden!');
+      }
+      if (configData.reddit?.clientId) {
+        console.log(
+          `[config.ts] Reddit ClientID gefunden: ${configData.reddit.clientId.substring(0, 8)}...`
+        );
+      } else {
+        console.warn('[config.ts] Reddit ClientID NICHT gefunden!');
+      }
+      break;
+    } catch (error) {
+      console.error(`❌ [config.ts] Fehler beim Parsing von ${tryPath}:`, error);
+    }
   }
-} else {
+}
+
+if (!configPath || Object.keys(configData).length === 0) {
   console.warn(
-    '⚠️ [config.ts] connection.json nicht gefunden! Bitte im aktuellen Arbeitsverzeichnis ablegen.'
+    '⚠️ [config.ts] connection.json nicht gefunden! Folgende Pfade wurden versucht:'
   );
+  pathsToTry.forEach(p => console.warn(`   - ${p}`));
+  console.warn('[config.ts] Fallback wird verwendet - viele Features funktionieren nicht!');
 }
 
 export interface Config {

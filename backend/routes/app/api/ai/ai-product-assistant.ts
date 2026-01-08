@@ -46,6 +46,8 @@ interface TrendPricingRequest {
   productName: string;
   currentPrice: number;
   category: string;
+  maxPriceIncreasePercent?: number;
+  maxPriceDecreasePercent?: number;
 }
 
 interface TrendDescriptionRequest {
@@ -563,7 +565,7 @@ Antworte NUR mit JSON.`;
     '/ai/trend-pricing',
     async (request: FastifyRequest<{ Body: TrendPricingRequest }>, reply: FastifyReply) => {
       try {
-        const { productName, currentPrice, category } = request.body;
+        const { productName, currentPrice, category, maxPriceIncreasePercent = 20, maxPriceDecreasePercent = 15 } = request.body;
 
         if (!productName?.trim() || !currentPrice) {
           return reply.code(400).send({ 
@@ -571,6 +573,10 @@ Antworte NUR mit JSON.`;
             error: 'Produktname und aktueller Preis erforderlich' 
           });
         }
+
+        // Calculate absolute min/max prices based on percentages
+        const maxPrice = currentPrice * (1 + maxPriceIncreasePercent / 100);
+        const minPrice = currentPrice * (1 - maxPriceDecreasePercent / 100);
 
         // Import TrendAggregator dynamisch
         const { trendAggregator } = await import('../../../../services/trendAggregatorService.js');
@@ -585,6 +591,11 @@ Antworte NUR mit JSON.`;
 **Kategorie:** ${category}
 **Aktueller Preis:** €${currentPrice}
 
+**🚨 PREISGRENZEN (MUSS EINGEHALTEN WERDEN):**
+- Maximale Erhöhung: +${maxPriceIncreasePercent}% (€${maxPrice.toFixed(2)} max)
+- Maximale Senkung: -${maxPriceDecreasePercent}% (€${minPrice.toFixed(2)} min)
+- Der vorgeschlagene Preis MUSS zwischen €${minPrice.toFixed(2)} und €${maxPrice.toFixed(2)} liegen!
+
 **🔥 TREND-DATEN (Live):**
 - Google Trends Score: ${trendData.overallScore.toFixed(1)}/100
 - Datenquellen: ${trendData.sources.length} aktiv
@@ -595,11 +606,11 @@ ${trendData.sources.map((s: any) => `- ${s.source}: Score ${s.score.toFixed(1)},
 
 **AUFGABE:**
 Basierend auf den Trend-Daten, schlage einen optimalen Preis vor.
-- Hoher Trend (>70): Preis erhöhen (Demand steigt)
+- Hoher Trend (>70): Preis erhöhen (Demand steigt) - aber maximal +${maxPriceIncreasePercent}%
 - Mittlerer Trend (30-70): Preis beibehalten oder leicht anpassen
-- Niedriger Trend (<30): Preis senken (Demand sinkt)
+- Niedriger Trend (<30): Preis senken (Demand sinkt) - aber maximal -${maxPriceDecreasePercent}%
 
-Erstelle JSON-Antwort:
+ERSTELLE JSON-ANTWORT:
 {
   "suggestedPrice": 29.99,
   "priceChange": "+15%",
@@ -611,6 +622,7 @@ Erstelle JSON-Antwort:
   "nextReviewDate": "2025-12-18"
 }
 
+WICHTIG: Der suggestedPrice MUSS zwischen ${minPrice.toFixed(2)} und ${maxPrice.toFixed(2)} liegen!
 Antworte NUR mit JSON.`;
 
         const openai = getOpenAIClient();
@@ -632,12 +644,43 @@ Antworte NUR mit JSON.`;
 
         const parsed = JSON.parse(result);
 
+        // Enforce percentage limits on suggested price
+        let suggestedPrice = parsed.suggestedPrice || currentPrice;
+        if (suggestedPrice > maxPrice) suggestedPrice = maxPrice;
+        if (suggestedPrice < minPrice) suggestedPrice = minPrice;
+
+        // If GPT hits the hard bound, compute a softer dynamic suggestion based on trend score
+        if (suggestedPrice === minPrice || suggestedPrice === maxPrice) {
+          const score = Number.isFinite(trendData.overallScore) ? trendData.overallScore : 50;
+          let dynamicPrice = currentPrice;
+
+          if (score < 50) {
+            // Softer Reduktion: 30% bis 70% des maximalen Drops, skaliert mit Score
+            const dropScale = Math.min(1, Math.max(0, (60 - score) / 60));
+            const dropPct = maxPriceDecreasePercent * (0.3 + 0.4 * dropScale); // 30-70% des Max-Drops
+            dynamicPrice = currentPrice * (1 - dropPct / 100);
+          } else {
+            // Erhöhung skaliert zwischen 30% und 100% des Max-Increase für Score 50-100
+            const liftScale = Math.min(1, Math.max(0, (score - 50) / 50));
+            const liftPct = maxPriceIncreasePercent * (0.3 + 0.7 * liftScale);
+            dynamicPrice = currentPrice * (1 + liftPct / 100);
+          }
+
+          // Clamp the dynamic suggestion as well
+          dynamicPrice = Math.min(Math.max(dynamicPrice, minPrice), maxPrice);
+          suggestedPrice = Number(dynamicPrice.toFixed(2));
+        }
+
+        // Recalculate priceChange based on final price
+        const actualChange = ((suggestedPrice - currentPrice) / currentPrice * 100);
+        const priceChangeStr = actualChange >= 0 ? `+${actualChange.toFixed(2)}%` : `${actualChange.toFixed(2)}%`;
+
         return reply.send({
           success: true,
           data: {
             currentPrice,
-            suggestedPrice: parsed.suggestedPrice || currentPrice,
-            priceChange: parsed.priceChange || '0%',
+            suggestedPrice: suggestedPrice,
+            priceChange: priceChangeStr,
             trendScore: trendData.overallScore,
             trendSources: trendData.sources.map((s: any) => ({
               name: s.source,

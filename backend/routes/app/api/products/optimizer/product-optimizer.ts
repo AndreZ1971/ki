@@ -100,18 +100,37 @@ async function analyzeProduct(productId: number, _server: FastifyInstance) {
 
   // 1. Produkt von WooCommerce abrufen
   console.log(`📡 Lade Produkt ${productId} von WooCommerce...`);
-  const product = await wooCommerceService.getProduct(productId, _server);
+  let product;
+  try {
+    product = await wooCommerceService.getProduct(productId, _server);
+    console.log(`✅ Produkt ${productId} erfolgreich geladen:`, {
+      name: product.name,
+      price: product.price,
+      hasDescription: !!product.description
+    });
+  } catch (error: any) {
+    console.error(`❌ WooCommerce Fehler beim Laden von Produkt ${productId}:`, {
+      message: error.message,
+      stack: error.stack?.split('\n').slice(0, 3).join('\n')
+    });
+    throw new Error(`Produkt ${productId} konnte nicht von WooCommerce geladen werden: ${error.message}`);
+  }
 
   // 2. OpenAI für Analyse nutzen (falls verfügbar)
   let aiAnalysis = null;
   const openAIClient = initializeOpenAI();
   if (openAIClient) {
     try {
+      console.log(`🤖 Starte OpenAI-Analyse für Produkt ${productId}...`);
       aiAnalysis = await openAIAnalyzeProduct(product, _server);
+      console.log(`✅ OpenAI-Analyse erfolgreich für Produkt ${productId}`);
     } catch (error: any) {
+      console.error(`❌ OpenAI Fehler bei Produkt ${productId}:`, error.message);
       _server.log.error('OpenAI Analyse fehlgeschlagen:', error.message);
       // Fallback: Metriken ohne AI
     }
+  } else {
+    console.log(`⚠️ OpenAI nicht verfügbar - Analyse ohne AI für Produkt ${productId}`);
   }
 
   // 3. Metriken berechnen
@@ -367,8 +386,10 @@ export default async function productOptimizerRoutes(_server: FastifyInstance) {
         const { id } = _request.params;
         const productId = parseInt(id);
 
+        console.log(`[Product Performance] 📥 Neue Analyse-Anfrage für ID: ${id}`);
+
         if (!id || isNaN(productId)) {
-          console.error('[Product Performance] Invalid productId:', {
+          console.error('[Product Performance] ❌ Invalid productId:', {
             id,
             productId,
           });
@@ -389,7 +410,7 @@ export default async function productOptimizerRoutes(_server: FastifyInstance) {
 
         // Prüfe ob WooCommerce verfügbar ist
         if (!wooCommerceService.isReady()) {
-          console.warn('[Product Performance] WooCommerce nicht bereit');
+          console.warn('[Product Performance] ❌ WooCommerce nicht bereit');
           return _reply.status(503).send({
             success: false,
             error: 'WooCommerce Service nicht verfügbar',
@@ -397,18 +418,26 @@ export default async function productOptimizerRoutes(_server: FastifyInstance) {
           });
         }
 
+        console.log(`[Product Performance] ✅ WooCommerce Service bereit`);
+
         _server.log.info(`Starte Produkt-Analyse für ID: ${productId}`);
         const analysis = await analyzeProduct(productId, _server);
+        
+        console.log(`[Product Performance] ✅ Analyse erfolgreich abgeschlossen für ID: ${productId}`);
         _server.log.info(
           `✅ Produkt-Analyse abgeschlossen für ID: ${productId}`
         );
+        
         return {
           success: true,
           analysis,
           suggestions: analysis.recommendations,
         };
       } catch (error: any) {
-        console.error('[Product Performance] Fehler:', error);
+        console.error('[Product Performance] ❌ FEHLER:', {
+          message: error.message,
+          stack: error.stack?.split('\n').slice(0, 5).join('\n')
+        });
         _server.log.error('Analyse fehlgeschlagen:', error.message);
         return _reply.status(500).send({
           success: false,

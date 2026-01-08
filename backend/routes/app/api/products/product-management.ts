@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import OpenAI from 'openai';
 import { getConfig } from '../../../../config';
+import { runWooRealtimeUpdate } from '../../../../agent/jobs/wooRealtimeUpdate.js';
 
 interface CreateProductBody {
   count: number;
@@ -663,101 +664,35 @@ export default async function productRoutes(server: FastifyInstance) {
           throw new Error('Keine Produkt-IDs angegeben');
         }
 
-        const wooConfig = getConfig().woocommerce || {};
-        if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
-          throw new Error('WooCommerce-Konfiguration fehlt');
-        }
-        const auth = Buffer.from(`${wooConfig.consumerKey}:${wooConfig.consumerSecret}`).toString('base64');
+        const results = [] as any[];
+        const errors: string[] = [];
 
-        // Batch Update mit WooCommerce API
-        const updateData: any = {};
-        
-        switch (type) {
-          case 'prices':
-            // Preise um 5% erhöhen (Beispiel)
-            updateData.increase_price = true;
-            break;
-          case 'inventory':
-            // Lagerbestand synchronisieren (Beispiel)
-            updateData.manage_stock = true;
-            break;
-          case 'descriptions':
-            // Beschreibungen optimieren (würde AI verwenden)
-            updateData.update_descriptions = true;
-            break;
-          case 'all':
-            updateData.full_update = true;
-            break;
-        }
-
-        const updatedProducts = [];
-        const errors = [];
-
-        // Update jedes Produkt einzeln
         for (const productId of productIds) {
           try {
-            // Lade aktuelles Produkt
-            const getResponse = await fetch(`${wooConfig.url}/wp-json/wc/v3/products/${productId}`, {
-              headers: {
-                'Authorization': `Basic ${auth}`,
-                'Content-Type': 'application/json',
-              }
+            const res = await runWooRealtimeUpdate({
+              productId: Number(productId),
+              geo: 'DE',
+              includeReddit: false,
+              applyPrice: type === 'prices' || type === 'all',
+              applyStock: type === 'inventory' || type === 'all',
+              applyDescription: type === 'descriptions' || type === 'all',
+              dryRun: false,
             });
-
-            if (!getResponse.ok) continue;
-
-            const product = await getResponse.json();
-            const updatePayload: any = {};
-
-            // Erstelle Update basierend auf Typ
-            if (type === 'prices' || type === 'all') {
-              const currentPrice = parseFloat(product.regular_price || product.price || '0');
-              if (currentPrice > 0) {
-                updatePayload.regular_price = (currentPrice * 1.05).toFixed(2); // 5% Erhöhung
-              }
-            }
-
-            if (type === 'inventory' || type === 'all') {
-              updatePayload.manage_stock = true;
-              if (!product.stock_quantity) {
-                updatePayload.stock_quantity = 10; // Standard-Lagerbestand
-              }
-            }
-
-            if (type === 'descriptions' || type === 'all') {
-              // Füge Hinweis zur Beschreibung hinzu
-              updatePayload.description = (product.description || '') + '\n\n✨ Aktualisiert am ' + new Date().toLocaleDateString('de-DE');
-            }
-
-            // Sende Update
-            const updateResponse = await fetch(`${wooConfig.url}/wp-json/wc/v3/products/${productId}`, {
-              method: 'PUT',
-              headers: {
-                'Authorization': `Basic ${auth}`,
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(updatePayload)
-            });
-
-            if (updateResponse.ok) {
-              const updated = await updateResponse.json();
-              updatedProducts.push(updated);
-              console.log(`✅ Updated product ${productId}`);
-            } else {
-              const errorText = await updateResponse.text();
-              errors.push(`Product ${productId}: ${errorText}`);
-            }
+            results.push(res);
+            console.log(`✅ Woo realtime update success for product ${productId}`);
           } catch (err) {
-            errors.push(`Product ${productId}: ${err instanceof Error ? err.message : 'Unknown error'}`);
+            const msg = err instanceof Error ? err.message : 'Unknown error';
+            errors.push(`Product ${productId}: ${msg}`);
+            console.error(`❌ Woo realtime update failed for product ${productId}:`, err);
           }
         }
 
         return reply.send({
-          success: true,
-          message: `${updatedProducts.length} von ${productIds.length} Produkten aktualisiert (${type})`,
-          updatedCount: updatedProducts.length,
-          errors: errors.length > 0 ? errors : undefined,
-          products: updatedProducts
+          success: errors.length === 0,
+          message: `${results.length} von ${productIds.length} Produkten aktualisiert (${type})`,
+          updatedCount: results.length,
+          errors: errors.length ? errors : undefined,
+          products: results,
         });
       } catch (_error) {
         console.error('❌ Error updating products:', _error);
