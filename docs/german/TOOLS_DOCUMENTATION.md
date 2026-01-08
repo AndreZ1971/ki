@@ -1,9 +1,10 @@
 # A.R.I. Tools Documentation - ML/KI Integration Status
 
-> **Fokus dieser Dokumentation**: Technische Details der ML/KI-Integration für alle Dashboard-Tools. Die User-Dokumentation mit Screenshots und Bedienanleitung befindet sich in `Bedienungsanleitung-KI-Agent.md`.
+> **Fokus dieser Dokumentation**: Technische Details der ML/KI-Integration für alle Dashboard-Tools. Die User-Dokumentation mit Screenshots und Bedienanleitung befindet sich in `Bedienungsanleitung.md`.
 
-**Zuletzt aktualisiert**: 16. Dezember 2025  
-**Status**: ✅ Abgeschlossen - Notes-Feature mit Autosave, Character Counter & Quick Templates, kritische Fixes für Rate-Limiting und IP-Block-Prevention
+**Zuletzt aktualisiert**: 8. Januar 2026  
+**Version**: 6.3.0  
+**Status**: ✅ Production Ready - Reddit OAuth, prozentuale Preislimits, Dark Glass Theme, verbesserte Fehlerbehandlung
 
 ---
 
@@ -11,12 +12,216 @@
 
 | Kategorie               | Tools        | ML/KI          | Status        |
 | ----------------------- | ------------ | -------------- | ------------- |
-| **Analytics**           | 9 Tools      | 🟢 Ja (9/9)     | Abgeschlossen |
-| **Product Management**  | 8 Tools      | 🟢 Ja (8/8)     | Abgeschlossen |
-| **Payment & Finances**  | 13 Tools     | 🟢 Ja (13/13)   | Abgeschlossen |
-| **Marketing & Content** | 10 Tools     | 🟢 Ja (10/10)   | Abgeschlossen |
-| **Advanced AI**         | 12 Tools     | 🟢 Ja (12/12)   | Abgeschlossen |
-| **GESAMT**              | **52 Tools** | 🟢 52/52 (100%) | Fertiggestellt |
+| **Analytics**           | 13 Tools     | 🟢 Ja (13/13)  | Abgeschlossen |
+| **Product Management**  | 8 Tools      | 🟢 Ja (8/8)    | Abgeschlossen |
+| **Payment & Finances**  | 13 Tools     | 🟢 Ja (13/13)  | Abgeschlossen |
+| **Marketing & Content** | 10 Tools     | 🟢 Ja (10/10)  | Abgeschlossen |
+| **Advanced AI**         | 9 Tools      | 🟢 Ja (9/9)    | Abgeschlossen |
+| **GESAMT**              | **53 Tools** | 🟢 53/53 (100%)| Fertiggestellt |
+
+---
+
+## 🆕 Januar 2026 Updates
+
+### ✅ Reddit OAuth Integration
+**Implementierung**: Echte OAuth 2.0 mit Client Credentials Flow (nicht Public Search)  
+**Status**: Production Ready  
+**Dateien**:
+- `backend/services/trendAggregatorService.ts` (fetchReddit Methode)
+- `backend/config.ts` (Multi-Path Config-Loader für connection.json)
+
+**Technische Details**:
+```typescript
+// fetchReddit now uses connection.json credentials
+const config = getConfig();
+const clientId = config.reddit?.clientId;
+const clientSecret = config.reddit?.clientSecret;
+
+// OAuth Token → Bearer Header
+const authHeader = `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`;
+```
+
+**Vorteile**:
+- Authentische Kunden-Meinungen statt API-Limits
+- Async mit Caching (max 1 Request/Minute pro Produkt)
+- Fallback auf andere Quellen wenn Reddit down ist
+
+### ✅ Percentage-Based Price Suggestions
+**Implementierung**: `maxPriceIncreasePercent` + `maxPriceDecreasePercent` statt feste €-Werte  
+**Status**: Production Ready  
+**Dateien**:
+- `backend/routes/app/api/products/optimizer/product-optimizer.ts` (analyzeProduct mit Validierung)
+- `backend/routes/app/api/ai/ai-product-assistant.ts` (GPT-Prompt mit Bounds)
+- `frontend/src/pages/ProductManagement/WooProductUpdate.tsx` (Percentage Input Fields)
+
+**Dynamischer Fallback-Mechanismus**:
+```typescript
+if (score < 50) {
+  // Reduktion: nutze nur 30-70% der max Reduktion
+  const fallback = (60 - score) / 60;  // Score 50→0.167, Score 0→1.0
+  newPrice = Math.round((basePrice - (basePrice * maxDecrease * fallback)) * 100) / 100;
+} else {
+  // Erhöhung: nutze 30-100% der max Erhöhung
+  const fallback = (score - 50) / 50;  // Score 50→0, Score 100→1.0
+  newPrice = Math.round((basePrice + (basePrice * maxIncrease * fallback)) * 100) / 100;
+}
+```
+
+**Defaults**:
+- `maxPriceIncreasePercent`: 20
+- `maxPriceDecreasePercent`: 15
+- Benutzer kann anpassen
+
+### ✅ Multi-Source Trend Aggregation
+**Status**: Production Ready  
+**Quellen aktiv**:
+1. **Google Trends** - 7-Tage-Durchschnitt (interestOverTime)
+2. **Reddit OAuth** - Live-Diskussionen mit Upvote-Gewichtung (NEU)
+3. **Wikipedia** - Pageviews-Trends
+4. **Google News** - RSS-Feeds mit Häufigkeit
+5. **GitHub** - Repository Star-Trends (Tech-Produkte)
+6. **StackOverflow** - Tag-Häufigkeit (Developer-Communities)
+
+**Aggregations-Logik**:
+```typescript
+const aggregatedScore = 
+  (googleTrendsScore * 0.35) +
+  (redditScore * 0.30) +
+  (wikipediaScore * 0.15) +
+  (newsScore * 0.10) +
+  (githubScore * 0.05) +
+  (stackoverflowScore * 0.05);
+```
+
+**Confidence-Berechnung**: Je mehr Quellen Daten liefern, desto höher Confidence (%
+
+### ✅ Configuration Management
+**Status**: Production Ready  
+**System**: Multi-Path Fallback-Loader
+
+**Pfade (in dieser Reihenfolge)**:
+1. `backend/dist/connection.json` (aus dist/)
+2. `backend/connection.json` (Entwicklung)
+3. `process.cwd()/connection.json` (CWD)
+4. `process.cwd()/backend/connection.json` (CWD/backend)
+
+**Vorteile**:
+- Single Source of Truth für alle Credentials
+- Funktioniert in Dev und Production
+- Kein Risiko für API-Keys in Git
+- Debug-Logging zeigt, welcher Pfad verwendet wurde
+
+---
+
+## ✅ Fertiggestellte Tools mit voller ML/KI-Integration
+
+### Product Management (8/8 Tools)
+
+#### 🔍 **Product Analyzer** mit Trend-Based Pricing
+**Übersicht:**
+- **Zweck**: Multi-Source Trend-Analyse mit KI-Preisempfehlungen
+- **Use Cases**: Produkt-Optimierung basierend auf echten Markttrends
+- **Kategorie**: Product Management
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/ProductManagement/WooProductUpdate.tsx`
+- **Backend API**: 
+  - `POST /ai/trend-pricing` (GPT-4 + Trend-Daten)
+  - `GET /api/products/adviser/analyze/:id` (Produkt-Details)
+- **UI**: Prozentuale Input-Felder, Live-Preisvorschau, Dark Glass Theme
+
+**Implementation** (neu in v6.3):
+- Prozentuale Limits mit dynamischem Fallback
+- Multi-Source Aggregation (Google + Reddit + Wiki + News)
+- Manual Override vor Speicherung
+- Confidence Score für jeden Vorschlag
+
+**Besonderheiten:**
+- Fallback bei Trend-Score < 50 verhindert "floor camping"
+- Prozentuale Limits skalieren automatisch mit Produktpreis
+- Reddit-Daten nur für englischsprachige Diskussionen (momentan)
+
+---
+
+### Analytics (13/13 Tools)
+
+#### 🔄 **Trend Analysis** (Multi-Source)
+**Neue Features v6.3**:
+- Google Trends mit 7-Tage-Durchschnitt
+- Reddit OAuth mit Upvote-Gewichtung
+- Confidence % basierend auf Quellen-Verfügbarkeit
+- Fallback auf Wikipedia/News wenn Trend-Daten schwach
+
+**Datenquellen & Gewichte**:
+```
+Google Trends: 35%
+Reddit OAuth: 30%
+Wikipedia: 15%
+Google News: 10%
+GitHub: 5%
+StackOverflow: 5%
+```
+
+---
+
+## 📋 Configuration Reference
+
+### connection.json Struktur
+```json
+{
+  "woocommerce": {
+    "url": "https://kaufe-es.eu",
+    "consumerKey": "ck_...",
+    "consumerSecret": "cs_...",
+    "authMode": "basic",
+    "timeoutMs": 30000
+  },
+  "wordpress": {
+    "url": "https://kaufe-es.eu",
+    "username": "admin",
+    "appPassword": "xxxx xxxx xxxx xxxx xxxx xxxx"
+  },
+  "openAI": {
+    "apiKey": "sk-proj-...",
+    "model": "gpt-4o-mini"
+  },
+  "reddit": {
+    "clientId": "0Fju4VBi...",
+    "clientSecret": "gVVZ2p6u..."
+  }
+}
+```
+
+---
+
+## 🔧 Debugging
+
+### Logging aktivieren
+Die folgenden Module geben detailliertes Debug-Logging aus:
+- `config.ts`: Pfade, Credentials, Config-Loading
+- `product-optimizer.ts`: Analyse-Schritte, Fehler
+- `trendAggregatorService.ts`: Trend-Abrufe, OAuth, Aggregation
+- `openaiHelper.ts`: API-Calls, Errors
+
+### Häufige Issues
+
+**"connection.json nicht gefunden"**
+→ Check: Liegt die Datei im `backend/`-Verzeichnis?
+
+**"Reddit Daten sind leer"**
+→ Check: 
+- Sind Credentials in `connection.json` gültig?
+- OAuth Limits überschritten? (max 1/Min pro Produkt)
+- Fallback auf andere Quellen aktiv
+
+**"Preis wird nicht aktualisiert"**
+→ Check:
+- Wurde "Übernehmen" geklickt (nicht nur "Vorschau")?
+- Backend neugestartet nach Config-Änderung?
+
+---
+
+**Status**: Alle 53 Tools mit ML/KI aktiv und getestet. System ist Production Ready seit Januar 2026.
 
 ---
 

@@ -1,10 +1,335 @@
-# A.R.I. Tool-Referenz (51 Tools, assistiert, nicht autonom)
+# A.R.I. Bedienungsanleitung v6.3.0 (Januar 2026)
 
-**Grundprinzip:** Alle Tools arbeiten assistierend. Entwürfe, Analysen und Hinweise werden erzeugt; Freigaben und Live-Änderungen erfordern deinen Klick.
+**Status:** Production Ready mit erweiterten Trend-Analysen und Preisoptimierungen
 
 ---
 
-## Analytics (13)
+## 🎯 Schnelleinstieg
+
+### Was brauche ich?
+- WooCommerce Shop mit aktiver API
+- WordPress Benutzerkonto
+- OpenAI API Key (in `connection.json` eintragen)
+- Optional: Reddit OAuth Credentials (für echte Kundenmeinungen)
+
+### Was passiert automatisch?
+A.R.I. liest deine Daten (Produkte, Bestellungen, Trends) und erstellt **Hinweise, Entwürfe und Vorschläge**. Du prüfst und entscheidest – keine autonomen Änderungen am Shop ohne dein OK.
+
+---
+
+## 📦 Produktverwaltung
+
+### 🆕 Woo Product Update (mit Trend-Analyse)
+**Was es tut:** Aktualisiert WooCommerce-Preise basierend auf Google Trends + Reddit Kundenmeinungen.  
+**Neu in v6.3:**
+- **Prozentuale Preislimits**: Max +20% Erhöhung / -15% Reduktion (anpassbar)
+- **Multi-Source Trends**: Google Trends (Suchinteresse) + Reddit (Kundenmeinungen)
+- **Intelligente Fallbacks**: Wenn Trend-Daten schwach sind, nutzt AI automatisch skalierte Prozentbereich
+- **Manual Override**: Du kannst jeden Vorschlag vor Speicherung prüfen/ändern
+
+**Verwendung:**
+1. Produkt in "Woo Product Updater" wählen
+2. `maxPriceIncreasePercent` und `maxPriceDecreasePercent` eingeben (z.B. +20 / -15)
+3. **"Trend-Analyse starten"** klicken
+4. AI schlägt neuen Preis vor (mit Begründung: Google Trends Score, Reddit Sentiment, Confidence %)
+5. **Entweder:** "✓ Übernehmen" (speichert sofort) **oder** "Manuell anpassen" (editieren + speichern)
+
+**Beispiel:**
+- Aktueller Preis: €50
+- Max Increase: +20% → €60
+- Max Decrease: -15% → €42.50
+- Google Trends Score: 65/100 (interesse fallend)
+- Reddit: Kunden wünschen sich niedrigeren Preis
+- **AI Vorschlag:** €47 (-6%) mit 78% Confidence
+- ✓ Du klickst "Übernehmen" → Preis wird auf €47 gesetzt
+
+**Grenzen:** Prozentuale Limits sind Richtlinien, nicht absolute Grenzen – AI kann davon abweichen, wenn Trend-Daten sehr stark sind. Bei Speicherung nochmal prüfen!
+
+### Product Analyzer  
+**Was es tut:** 360°-Check deines Produkts (SEO-Score, Beschreibungsqualität, Preispositionierung).  
+**Input:** Produkt-ID.  
+**Output:** Score-Karte mit Insights & Verbesserungsvorschlägen.  
+**Grenzen:** Analyse-Hinweise; keine Auto-Änderungen.
+
+### Auto Product Creator
+**Was es tut:** Generiert Produkttexte, Bild-Prompts, Keywords mit KI.  
+**Input:** Produkttitel, Kategorie, Keywords.  
+**Output:** Beschreibungsentwurf + DALL-E Bild-Prompt.  
+**Grenzen:** Du speicherst manuell in WooCommerce.
+
+### Categories Manager
+**Was es tut:** Erstellt/bearbeitet WooCommerce-Kategorien.  
+**Input:** Kategoriedaten.  
+**Output:** Kategorien in WooCommerce (nur nach deinem Klick).  
+**Grenzen:** Manuelles Speichern erforderlich.
+
+### Create Freebies  
+**Was es tut:** Erstellt digitale Freebie-Produkte (0 €, Download).  
+**Input:** Deine ZIP/PDF-Datei, Produktinfos.  
+**Output:** Freebie-Eintrag in WooCommerce (mit deiner Datei).  
+**Grenzen:** Du bereitest Datei; A.R.I. erstellt keinen Content.
+
+### Product Bundles
+**Was es tut:** Kombiniert mehrere Produkte zu Bundles.  
+**Input:** Produkt-IDs, Bundle-Name.  
+**Output:** Bundle-Entwurf.  
+**Grenzen:** Du speicherst in WooCommerce.
+
+---
+
+## 📊 Analytics & Insights
+
+### 🆕 Trend Analysis (Multi-Source)
+**Was es tut:** Erkennt Trends via **Google Trends**, **Reddit Diskussionen**, **Wikipedia Pageviews**, **Google News** und mehr.  
+**Neu in v6.3:**
+- **Google Trends**: 7-Tage-Durchschnitt der Suchanfragen
+- **Reddit OAuth**: Echte Kundenmeinungen aus r/ecommerce, r/shopping, etc. (nicht bloß Public API)
+- **Wikipedia**: International Trend-Indikatoren
+- **Google News**: Nachrichtentrends im Bereich
+- **Geplant (Phase 1):** YouTube Trending Videos
+
+**Verwendung:**
+1. Produktname eingeben (z.B. "Laptop-Rucksack")
+2. "Trends analysieren" klicken
+3. Sehe: Google Trend Score (0-100), Reddit Sentiment (Pos/Neg/Neutral), Confidence %
+4. AI kombiniert Daten → Preisvorschlag
+
+**Beispiel:**
+- Google Trends: 72/100 (hohes Suchinteresse)
+- Reddit: +65 Upvotes für "gute Qualität für den Preis", -30 für "zu teuer"
+- Confidence: 82%
+- **Vorschlag:** Mittlerer Preis mit guter Qualitäts-Botschaft
+
+**Grenzen:** Trends sind verzögert (Google Trends max 7 Tage alt). Reddit-Daten nur für englische Diskussionen (momentan).
+
+### Shop Metrics
+**Was es tut:** Live-KPIs aus WooCommerce (Umsatz, Bestellungen, Conversion).  
+**Input:** WooCommerce-API.  
+**Output:** Dashboard mit Echtzeitdaten.  
+**Grenzen:** Nur Lesezugriff.
+
+### Conversion Analysis
+**Was es tut:** Analysiert, wo Nutzer aus dem Funnel abspringen.  
+**Input:** Analytics-Daten, Zeitraum.  
+**Output:** Funnel mit Drop-Off-Punkten.  
+**Grenzen:** Hinweise; keine Auto-Fixes.
+
+### Feedback Analysis
+**Was es tut:** Sentiment-Analyse von Reviews + Support-Tickets.  
+**Input:** WooCommerce-Reviews, Awesome Support Tickets.  
+**Output:** Sentiment-Bericht, Top-Issues, Prioritäten.  
+**Grenzen:** Analyse-Hinweise; keine Auto-Antworten.
+
+### Real Analytics
+**Was es tut:** Live-Dashboard mit Besuchern, Klicks, Sessions.  
+**Input:** Tracking-Code installiert.  
+**Output:** Echtzeit-Metriken.  
+**Grenzen:** Nur Anzeige.
+
+### Shop Health Report
+**Was es tut:** 360°-Shop-Audit (Performance, SEO, Security, Conversion).  
+**Input:** Shop-URL.  
+**Output:** Score + Problemliste mit Prioritäten.  
+**Grenzen:** Keine Auto-Reparatur.
+
+### Premium/Standard/Mini Audit
+**Was es tut:** Verschiedene Audit-Tiefen (Premium = detailliert; Mini = schnell).  
+**Input:** Shop-URL, Audit-Typ.  
+**Output:** Audit-Bericht.  
+**Grenzen:** Hinweise; du setzt um.
+
+---
+
+## 💳 Zahlungsverarbeitung
+
+### Payment Verifier
+**Was es tut:** Prüft Zahlungen auf Betrug/Fehler.  
+**Input:** Transaktionen.  
+**Output:** Verifikations-Status (OK/Verdächtig/Fehler).  
+**Grenzen:** Hinweise; keine Auto-Blocks.
+
+### Payment Tester
+**Was es tut:** Testet Payment-Flows automatisch (Erfolgsrate, Geschwindigkeit).  
+**Input:** Test-Szenarien.  
+**Output:** Test-Report.  
+**Grenzen:** Nur Tests.
+
+### Payment Emergency
+**Was es tut:** Notfall-Analyse bei Payment-Problemen (Systemausfall).  
+**Input:** Incident-Trigger.  
+**Output:** Response-Plan.  
+**Grenzen:** Du aktivierst Notfallmaßnahmen.
+
+### Payment Expansion
+**Was es tut:** Plant Erweiterung von Zahlungsoptionen (neue Länder, Währungen).  
+**Input:** Neue Payment-Provider.  
+**Output:** Integrations-Plan.  
+**Grenzen:** Du setzt um.
+
+---
+
+## 📧 Marketing
+
+### 🆕 Social Media Poster (6 Plattformen)
+**Was es tut:** Erstellt Post-Entwürfe für LinkedIn, Facebook, Instagram, TikTok, X (Twitter), YouTube.  
+**Input:** Thema, Zielgruppe, Tonalität.  
+**Output:** Plattformspezifische Post-Entwürfe (mit Hashtags, Emojis, Timing-Vorschlägen).  
+**Neu in v6.3:**
+- Dark Glass UI für bessere Lesbarkeit
+- Prozentuale Engagement-Prognosen
+- Copy/Paste-Option (ohne API-Token)
+
+**Verwendung:**
+1. Thema eingeben (z.B. "Neuer Winter-Sale")
+2. Plattformen wählen (einzeln oder alle)
+3. Tonalität: Professionell / Spielerisch / Viral
+4. "Posts generieren" klicken
+5. **Entweder:** Posts (manuell) kopieren und posten **oder** API-Tokens in Settings eintragen für automatisches Posten
+
+**Grenzen:** API-Tokens erforderlich für Auto-Post (siehe `social_media_onboarding.md` für Setup).
+
+### AI Email Generator
+**Was es tut:** Erstellt E-Mail-Entwürfe (Newsletter, Welcome, Winback).  
+**Input:** Thema, Zielgruppe, Tonalität.  
+**Output:** E-Mail-Draft mit Subject-Line und Body.  
+**Grenzen:** Du versendest manuell (Mailchimp, Brevo, etc.).
+
+### Blogpost Generator
+**Was es tut:** Generiert Blog-Artikel-Entwürfe (SEO-optimiert).  
+**Input:** Thema, Keywords, Länge (kurz/mittel/lang).  
+**Output:** Artikel-Entwurf (Markdown).  
+**Grenzen:** Du prüfst und publishst in WordPress.
+
+### Kite Templates
+**Was es tut:** Vorlagen-Bibliothek (E-Mails, Landing Pages, Posts).  
+**Input:** Template-Typ.  
+**Output:** Anpassbare Vorlage.  
+**Grenzen:** Du editierst und publishst.
+
+### Image Analyzer
+**Was es tut:** Prüft Bilder (SEO Alt-Text, Qualität, Größe).  
+**Input:** Bild-URL.  
+**Output:** Analyse-Report mit Verbesserungsvorschlägen.  
+**Grenzen:** Hinweise; keine Auto-Optimierung.
+
+---
+
+## 🧠 Erweiterte Funktionen
+
+### Context Generator
+**Was es tut:** Optimiert AI-Prompts für bessere Ergebnisse.  
+**Input:** Use-Case / Anfrage.  
+**Output:** Optimierter Kontext/Prompt.  
+**Grenzen:** Du nutzt Output in anderen Tools.
+
+### Memory System
+**Was es tut:** KI lernt deine Vorlieben (Tonalität, Länge, Stil).  
+**Input:** Deine Interaktionen.  
+**Output:** Personalisierte Ergebnisse (z.B. "Wir wissen, dass du kurze prägnante Texte magst").  
+**Grenzen:** RAM-basiert, wird beim Neustart zurückgesetzt.
+
+### User Management
+**Was es tut:** Analysiert Kunden-Verhalten (Top-Kunden, Churn-Risiko, personalisierte Angebote).  
+**Input:** Kunden-Daten aus WooCommerce.  
+**Output:** Kunden-Dashboard + personalisierte Vorschläge.  
+**Grenzen:** Vorschläge; du entscheidest über Angebote.
+
+### System Health
+**Was es tut:** Prüft Gesundheitszustand (API-Status, CPU, Memory, Fehlerrate).  
+**Input:** Monitoring.  
+**Output:** Health-Dashboard mit Alerts.  
+**Grenzen:** Nur Monitoring; keine Auto-Reparatur.
+
+---
+
+## ⚙️ Konfiguration
+
+### Credentials einrichten
+**Alle Credentials in:** `backend/connection.json` (Git-ignoriert)
+
+```json
+{
+  "woocommerce": {
+    "url": "https://dein-shop.de",
+    "consumerKey": "ck_...",
+    "consumerSecret": "cs_..."
+  },
+  "openAI": {
+    "apiKey": "sk-proj-...",
+    "model": "gpt-4o-mini"
+  },
+  "reddit": {
+    "clientId": "0Fju4VBi...",
+    "clientSecret": "gVVZ2p6u..."
+  }
+}
+```
+
+### Dark Glass Theme
+Das System nutzt automatisch ein dunkles Glass-Morphism-Design mit:
+- Rgba-Backgrounds (rgba(36,44,68,0.75))
+- Blur-Effekte (backdrop-filter: blur(10px))
+- Helle Schrift (#f7f9ff) auf dunklem Hintergrund
+- Hohe Kontraste (WCAG 2.1 AA)
+
+Keine zusätzliche Konfiguration erforderlich.
+
+---
+
+## 🆕 Prozentuale Preislimits erklärt
+
+### Warum Prozente statt feste €-Werte?
+- **Problem:** Ein Limit wie "max €10 Reduktion" funktioniert für €20-Produkte, aber nicht für €200-Produkte
+- **Lösung:** Prozentuale Limits skalieren automatisch
+
+### Wie funktioniert es?
+```
+Aktueller Preis: €100
+maxPriceIncreasePercent: 20% → Maximum: €120
+maxPriceDecreasePercent: 15% → Minimum: €85
+
+AI Trend-Score: 65/100 (mittel)
+Dynamischer Fallback: (65-50)/50 = 0.30 → 30% der max Reduktion nutzen
+Berechnung: €100 - (€15 × 0.30) = €100 - €4.50 = €95.50
+
+**Vorschlag: €95.50 statt hart auf €85**
+```
+
+### Was ist die "dynamische Fallback-Logik"?
+Wenn Trend-Daten schwach sind (Score < 50), skaliert AI den Preisabschlag, um nicht immer das Maximum zu nehmen. Das verhindert, dass alle Preise auf der gleichen Untergrenze landen.
+
+---
+
+## 🔧 Häufige Probleme
+
+### "Trend-Analyse funktioniert nicht"
+1. **Check:** Sind Reddit-Credentials in `connection.json` eingetragen?
+   - Falls Nein → Eintragen + Backend neustarten
+   - Falls Ja → Nächster Schritt
+
+2. **Check:** Ist OpenAI API-Key vorhanden?
+   - Falls Nein → Eintragen + Backend neustarten
+
+3. **Check:** Browser-Console (F12) öffnen → Errors prüfen
+
+### "Preis wird nicht aktualisiert"
+1. **Check:** Klickst du "Übernehmen" oder "Manuell anpassen"?
+   - "Manuell anpassen" speichert NICHT automatisch
+   - Du musst nochmal "Speichern" klicken
+
+2. **Check:** Fehler in Browser-Console?
+
+### "Posts werden nicht auf Social Media gepostet"
+1. **Check:** Hast du API-Tokens in Settings → Social Media eingegeben?
+   - Siehe `social_media_onboarding.md` für Anleitung
+
+2. **Check:** Tokens sind gültig und nicht abgelaufen?
+   - Reddit OAuth-Tokens: 1 Stunde gültig
+   - Facebook/LinkedIn/TikTok: Verschiedene Refresh-Intervale
+
+---
+
+**Alle Tools arbeiten assistierend – deine Kontrolle bleibt immer erhalten. Viel Erfolg! 🚀**
 
 ### Shop Metrics
 **Was es tut:** Liest Basis-KPIs aus WooCommerce (Umsatz, Bestellungen, Conversion, Kunden).  
