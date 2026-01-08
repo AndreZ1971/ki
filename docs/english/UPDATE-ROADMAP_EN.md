@@ -1,333 +1,159 @@
-# 🗺️ A.R.I. Update Roadmap
+# ARI Update Roadmap
 
-**Version**: 6.3.0+  
-**Status**: Living Document  
-**Last Update**: January 7, 2026
+## Status: January 2026
 
----
-
-## 📋 Overview
-
-This roadmap defines strategic updates for A.R.I. following the successful v6.3.0 release. The focus is on **refining existing features**, **expanding AI capabilities**, and **internationalization**.
+This document outlines the current and planned improvements to the Trend Aggregator and Product Analysis features.
 
 ---
 
-## 🎯 Update Strategy
+## 🎯 Recently Completed Updates
 
-### Parallel Development (continuous)
-- **Track 1**: Tool Prompt Optimization
-- **Track 4**: i18n Expansion & Improvement
-- **Track 5**: New Specializations
+### ✅ Reddit OAuth Integration (January 2026)
+- **Status**: Production Ready
+- **Implementation**: Genuine Reddit OAuth with Client Credentials Flow
+- **Data Source**: `connection.json` (centralized configuration)
+- **Benefits**: Authentic customer opinions from Reddit discussions
+- **Performance**: Async with caching, max requests per minute controlled
 
-### Sequential Development (by priority)
-- **Track 2**: Voice/TTS Integration (after Track 1)
-- **Track 3**: ML Feature Expansion (after Track 2)
+### ✅ Percentage-Based Price Suggestions (January 2026)
+- **Status**: Production Ready
+- **Logic**: `maxPriceIncreasePercent` (default +20%), `maxPriceDecreasePercent` (default -15%)
+- **Intelligent Fallbacks**: Dynamic scaling (30-70% range) when trend score not optimal
+- **Frontend**: Percentage input fields with live price preview
+- **Security**: Double validation (Frontend + Backend)
 
----
+### ✅ Dark Glass UI Theme (January 2026)
+- **Status**: Production Ready
+- **Implementation**: Rgba-Backgrounds + Blur-Filters with !important Overrides
+- **Components**: Header, Cards, Product List, Toasts
+- **Accessibility**: High contrast, WCAG 2.1 AA compatible
 
-## 🔧 Track 1: Tool Prompt Optimization
+### ✅ Improved Error Handling (January 2026)
+- **Status**: Production Ready
+- **Features**: Detailed logging, WooCommerce availability check, OpenAI API Key validation
+- **Stack Traces**: Truncated to first 5 lines for readability
+- **DX Improvements**: Clear error messages for Admin & User
 
-### 🎯 Goal
-All 52 tools should use **specialization-based prompts** to deliver more precise, contextual responses.
-
-### 📊 Current State
-- Currently: Generic prompts for all shops
-- Problem: Recommendations are too generic, ignore shop specialization
-- Example: Fashion shop receives tech product suggestions
-
-### ✅ Actions
-
-#### Phase 1: Analysis & Template Creation (2 weeks)
-- [ ] Audit all 52 tool prompts (`backend/tools/`)
-- [ ] Create specialization template (`{SPEC_CONTEXT}`, `{SPEC_TONE}`, `{SPEC_FOCUS}`)
-- [ ] Document best practices
-
-#### Phase 2: Category-based Optimization (6 weeks)
-- [ ] **Analytics (13 Tools)**: Shop health reports with spec metrics
-  - Example: Fashion → seasonality, Tech → product cycles
-- [ ] **Product Management (8 Tools)**: Content generation with spec vocabulary
-  - Example: Fashion → style/material/size, Tech → specs/compatibility
-- [ ] **Payment (13 Tools)**: Fraud detection with spec thresholds
-  - Example: Digital products → lower threshold
-- [ ] **Marketing (10 Tools)**: Tone-of-voice from specialization
-  - Example: Luxury → formal, Youth → casual
-- [ ] **Advanced (9 Tools)**: Memory context with spec preferences
-
-#### Phase 3: Testing & Rollout (2 weeks)
-- [ ] A/B tests: Generic vs. Spec prompts
-- [ ] Metrics: Conversion lift, user satisfaction, tool usage
-- [ ] Rollout: Feature flag `USE_SPEC_PROMPTS=true`
-
-### 📈 Success Criteria
-- Min. **20% improvement** in tool recommendation quality (user feedback)
-- Max. **10% token overhead** per request
-- 100% of tools support spec context
+### ✅ Configuration Management (January 2026)
+- **Status**: Production Ready
+- **System**: `connection.json` with multi-path fallback system
+- **Benefits**: Single source of truth for all credentials
+- **Security**: No API keys in .env, all in git-ignored JSON
 
 ---
 
-## 🎤 Track 2: Voice/TTS Integration
+## 📋 Planned Improvements (Trend Aggregator)
 
-### 🎯 Goal
-Chat-bot can **speak** – insights, recommendations, and notifications are read aloud.
+### Phase 1: YouTube Trends Integration
+- **Status**: Planned
+- **Description**: Enable YouTube trending data as additional source
+- **Prerequisite**: YouTube API Key (in `connection.json`)
+- **Benefits**: Better trend assessment through video popularity
+- **Effort**: Medium (2-3 days)
+- **Priority**: High
 
-### 📊 Current State
-- Currently: Text-based chat only
-- Use case: Merchants in warehouse, while packing, on the go – hear updates
+### Phase 2: Enhanced Wikipedia Analysis
+- **Status**: Active (Basic)
+- **Planned Enhancement**: Multi-language support, pageviews trends over longer periods
+- **Benefits**: International trend recognition
+- **Effort**: Low (1 day)
+- **Priority**: Medium
 
-### ✅ Actions
+### Phase 3: Google News RSS Optimization
+- **Status**: Active (Basic)
+- **Planned Enhancement**: Sentiment analysis of news headlines, category-specific feeds
+- **Benefits**: Better assessment of news landscape
+- **Effort**: Medium (2 days)
+- **Priority**: Medium
 
-#### Phase 1: Browser-based TTS (4 weeks)
-- [ ] **Frontend**: Web Speech API integration
-  - `SpeechSynthesis` for browser TTS
-  - Voice selection (male/female, language)
-  - Speed/pitch controls
-- [ ] **UI**: Speaker icon in chat interface
-  - Play/Pause/Stop controls
-  - Auto-read for new messages (optional)
-- [ ] **Accessibility**: Screen reader compatibility
+### Phase 4: GitHub Trending Enhancement
+- **Status**: Active (Basic)
+- **Planned Enhancement**: Tech-product-specific trend scores, star growth rate
+- **Benefits**: Better assessment for tech/software products
+- **Effort**: Medium (2 days)
+- **Priority**: Low
 
-#### Phase 2: OpenAI TTS Integration (Optional, 2 weeks)
-- [ ] **Backend**: `/api/tts/generate` endpoint
-  - OpenAI TTS-1/TTS-1-HD models
-  - Audio caching for frequent phrases
-- [ ] **Frontend**: Audio player for TTS files
-  - Download option for insights
-- [ ] **Cost Control**: TTS only for important notifications
+### Phase 5: StackOverflow Trends
+- **Status**: Active (Basic)
+- **Planned Enhancement**: Tag-based trend analysis, question frequency tracking
+- **Benefits**: Recognize developer community trends
+- **Effort**: Medium (2 days)
+- **Priority**: Low
 
-#### Phase 3: Voice Commands (Future)
-- [ ] Speech-to-text for chat input
-- [ ] Voice activation ("Hey A.R.I.")
-
-### 📈 Success Criteria
-- Min. **15% of users** activate voice feature
-- Latency < 2 seconds (browser TTS) / < 5 seconds (OpenAI TTS)
-- Positive accessibility feedback
-
----
-
-## 🤖 Track 3: ML Feature Expansion
-
-### 🎯 Goal
-Activate the **3 prepared ML features**: Dynamic pricing, churn prediction, fraud detection.
-
-### 📊 Current State
-- Already prepared in `backend/ml/` and `ml.config.ts`
-- Features are disabled: `dynamicPricing: false`, `churnPrediction: false`, `fraudDetection: false`
-- Reason: Models require training data & testing
-
-### ✅ Actions
-
-#### Feature 1: Dynamic Pricing (8 weeks)
-- [ ] **Model Training**:
-  - Collect historical pricing data (min. 3 months)
-  - Features: Day of week, season, competition, inventory, demand
-  - Algorithm: Gradient Boosting (XGBoost/LightGBM)
-- [ ] **Backend**: `/api/ml/pricing/suggest` endpoint
-  - Input: Product ID
-  - Output: `{ suggestedPrice, confidence, reasoning }`
-- [ ] **Frontend**: Pricing dashboard
-  - Price suggestion cards with confidence meter
-  - Accept/Reject buttons (shop owner decides)
-- [ ] **Safety**: Min/max price limits, human-in-the-loop
-
-#### Feature 2: Churn Prediction (6 weeks)
-- [ ] **Model Training**:
-  - Features: Purchase frequency, recency, AOV, support tickets, email open rate
-  - Binary classification: Churn risk (High/Medium/Low)
-- [ ] **Backend**: `/api/ml/churn/predict` endpoint
-  - Batch processing for all customers (nightly)
-  - Store churn score in `customer_meta`
-- [ ] **Frontend**: Churn dashboard
-  - List of high-risk customers
-  - Automatic winback email trigger
-- [ ] **Agentic Loop**: Customer Winback Loop (new)
-  - Detects churn risk → suggests winback campaign
-
-#### Feature 3: Fraud Detection (6 weeks)
-- [ ] **Model Training**:
-  - Features: Payment velocity, geo mismatch, device fingerprint, order value anomaly
-  - Multi-class: `safe`, `suspicious`, `fraudulent`
-- [ ] **Backend**: `/api/ml/fraud/detect` endpoint
-  - Real-time scoring at checkout
-  - Threshold-based auto-blocking (configurable)
-- [ ] **Frontend**: Fraud dashboard
-  - Flagged orders with review queue
-  - False positive feedback loop
-- [ ] **Integration**: Extend Payment Verifier tool
-
-### 📈 Success Criteria
-- **Dynamic Pricing**: Min. **5% revenue lift** in A/B test
-- **Churn Prediction**: Min. **70% accuracy**, **30% winback success rate**
-- **Fraud Detection**: Max. **2% false positive rate**, **90% fraud detection rate**
+### Phase 6: UI Transparency Layer
+- **Status**: Planned
+- **Description**: Badge system in UI to display active/inactive sources
+- **Features**:
+  - Live status per source (✅ active, ⏸ disabled, ❌ failed)
+  - Fallback handling with user feedback
+  - Logging/telemetry for admins
+  - Source attribution in analysis results
+- **Benefits**: Transparency for end customers, better debugging
+- **Effort**: Low-Medium (1-2 days)
+- **Priority**: Medium
 
 ---
 
-## 🌍 Track 4: i18n Expansion & Improvement
+## 🔧 Technical Details
 
-### 🎯 Goal
-Add new languages, improve existing translations.
-
-### 📊 Current State
-- Currently: German (DE), English (EN)
-- Problem: Some translations are machine-generated/unnatural
-- Missing markets: FR, ES, IT, PL, NL
-
-### ✅ Actions
-
-#### Phase 1: Improve Existing Languages (3 weeks)
-- [ ] **Audit**: Review all `frontend/src/locales/` files
-  - Mark inconsistencies (e.g., "Dashboard" vs. "Overview")
-  - Document missing keys
-- [ ] **Native Speaker Review**:
-  - DE: Professional correction (especially tech terms)
-  - EN: British vs. American English (standard: American)
-- [ ] **Context-based Translations**:
-  - Example: "order" (verb: to order, noun: order)
-  - Correct pluralization (ICU MessageFormat)
-
-#### Phase 2: Add New Languages (8 weeks)
-- [ ] **French (FR)** – 2 weeks
-  - Target market: France, Belgium, Switzerland, Canada
-  - Special: Formal/informal ("tu" vs. "vous")
-- [ ] **Spanish (ES)** – 2 weeks
-  - Target market: Spain, Latin America
-  - Special: EU Spanish vs. LATAM Spanish
-- [ ] **Italian (IT)** – 2 weeks
-  - Target market: Italy, Switzerland
-- [ ] **Polish (PL)** – 1 week
-  - Target market: Poland (growing e-commerce market)
-- [ ] **Dutch (NL)** – 1 week
-  - Target market: Netherlands, Belgium
-
-#### Phase 3: Improve i18n Tooling (2 weeks)
-- [ ] **Automatic Key Detection**: Delete unused keys
-- [ ] **Translation Memory**: Reusable phrases
-- [ ] **Crowdin/Lokalise Integration**: For community translations
-- [ ] **Language Switcher UX**: Flag icons + auto-detect (browser locale)
-
-### 📈 Success Criteria
-- Min. **5 languages** (DE, EN, FR, ES, IT + bonus PL, NL)
-- 100% translation coverage (no missing keys)
-- Native speaker approval for all languages
-
----
-
-## 🏪 Track 5: New Shop Specializations
-
-### 🎯 Goal
-Provide specializations for **top e-commerce industries**.
-
-### 📊 Current State
-- Currently: Generic fallback, Fashion-Mode, Tech-Electronics
-- Missing: Food, Beauty, Sports, Home & Garden, Digital Products, etc.
-
-### ✅ Actions
-
-#### Phase 1: Market Analysis & Prioritization (1 week)
-- [ ] Identify top 10 e-commerce industries (revenue volume)
-- [ ] Create specialization templates (system prompt, features, context)
-
-#### Phase 2: Develop Specializations (12 weeks, parallel)
-
-##### Priority 1 (6 weeks)
-- [ ] **Food & Beverage** (Food, drinks, gourmet)
-  - Features: Expiration tracking, recipe generation, allergen filter
-  - Tone: Appetizing, inviting, health-conscious
-- [ ] **Beauty & Cosmetics** (Cosmetics, care, perfume)
-  - Features: Skin type analysis, ingredient scanner, before/after trends
-  - Tone: Luxurious, confident, inclusive
-- [ ] **Sports & Fitness** (Sports equipment, fitness gear, outdoor)
-  - Features: Activity matching, size guide, performance metrics
-  - Tone: Motivating, dynamic, performance-oriented
-
-##### Priority 2 (6 weeks)
-- [ ] **Home & Garden** (Furniture, decor, garden, DIY)
-  - Features: Room planner, style matching, seasonal trends
-  - Tone: Cozy, inspiring, sustainable
-- [ ] **Digital Products** (Software, e-books, courses, downloads)
-  - Features: License management, auto-delivery, anti-piracy
-  - Tone: Professional, education-focused, innovative
-- [ ] **Jewelry & Accessories** (Jewelry, watches, bags)
-  - Features: Occasion matching, material guide, gift finder
-  - Tone: Elegant, emotional, exclusive
-
-#### Phase 3: Testing & Rollout (2 weeks)
-- [ ] Beta testing with real shop owners (1 per industry)
-- [ ] Feedback loop: Adjust prompts & features
-- [ ] Documentation: Setup guides for each specialization
-
-### 📈 Success Criteria
-- Min. **6 new specializations** (+ 3 existing = 9 total)
-- Each specialization tested with min. **1 live shop**
-- User satisfaction score > 4.5/5
-
----
-
-## 📅 Timeline
+### Current Architecture
 
 ```
-Q1 2026 (Jan-Mar)
-├─ Track 1: Tool Prompt Optimization ████████████ (ongoing)
-├─ Track 4: i18n DE/EN Improvement  ████░░░░░░░░
-├─ Track 5: Food & Beauty Specs     ████████░░░░
-└─ Track 2: Browser TTS (Start)     ░░░░░░░░████
+Frontend
+  ├─ WooProductUpdate.tsx (Percentage Limits UI)
+  ├─ ProductAnalyzer.tsx (Analysis Page)
+  └─ page.css (Dark Glass Theme)
 
-Q2 2026 (Apr-Jun)
-├─ Track 1: Tool Prompt Optimization ████████████ (ongoing)
-├─ Track 4: FR/ES/IT Integration     ████████████
-├─ Track 5: Sport/Home/Digital       ████████████
-├─ Track 2: OpenAI TTS               ████████░░░░
-└─ Track 3: Dynamic Pricing          ░░░░░░░░████
+Backend API
+  ├─ /api/products/adviser/analyze/:id (Product Analysis)
+  ├─ /api/products/woo/update-single (Price Update)
+  └─ /ai/trend-pricing (GPT + Trend Aggregation)
 
-Q3 2026 (Jul-Sep)
-├─ Track 1: Final Refinements        ████░░░░░░░░
-├─ Track 4: PL/NL (Bonus)            ████░░░░░░░░
-├─ Track 3: Churn & Fraud            ████████████
-└─ Track 2: Voice Commands (R&D)     ░░░░░░░░░░░░
+Services
+  ├─ trendAggregatorService.ts
+  │  ├─ Google Trends (7-day moving average)
+  │  ├─ Reddit OAuth (live discussions)
+  │  ├─ Wikipedia (pageviews)
+  │  ├─ Google News (RSS feed)
+  │  ├─ GitHub (trending repos)
+  │  └─ StackOverflow (top tags)
+  │
+  ├─ wooCommerceService.ts (Product CRUD)
+  └─ openaiHelper.ts (GPT-4 + Config)
+
+Config
+  └─ connection.json (centralized credentials)
 ```
 
----
+### Key Files
 
-## 🎯 Success Measurement
-
-### Key Performance Indicators (KPIs)
-
-| Metric | Baseline (v6.3.0) | Target (v7.0.0) |
-|--------|-------------------|-----------------|
-| **Tool Recommendation Quality** | 3.5/5 | 4.2/5 |
-| **Supported Languages** | 2 (DE, EN) | 5+ (DE, EN, FR, ES, IT) |
-| **Available Specializations** | 3 | 9+ |
-| **ML Features Active** | 0/3 | 3/3 (Pricing, Churn, Fraud) |
-| **Voice Feature Adoption** | 0% | 15%+ |
-| **Translation Coverage** | 92% | 100% |
+| File | Description | Status |
+|------|-------------|--------|
+| `backend/routes/app/api/products/optimizer/product-optimizer.ts` | Main analysis route with improved logging | ✅ Updated |
+| `backend/services/trendAggregatorService.ts` | Multi-source trend aggregation with Reddit OAuth | ✅ Updated |
+| `backend/config.ts` | Multi-path config loader for connection.json | ✅ Updated |
+| `frontend/src/pages/ProductManagement/WooProductUpdate.tsx` | Percentage limits UI with dark glass theme | ✅ Updated |
+| `frontend/src/pages/ProductManagement/page.css` | Dark glass styling with !important overrides | ✅ Updated |
 
 ---
 
-## 🚀 Release Strategy
+## 📊 Next Steps (Priority Order)
 
-### Version Schema
-- **v6.4.0**: Track 1 Phase 1-2 + Track 4 Phase 1
-- **v6.5.0**: Track 5 Priority 1 (Food, Beauty, Sports)
-- **v6.6.0**: Track 2 Phase 1 (Browser TTS)
-- **v7.0.0**: Track 3 complete + Track 5 Priority 2 + Track 4 Phase 2
-
-### Rollout Principles
-- **Feature Flags**: All new features behind toggles
-- **Beta Phase**: Min. 2 weeks for critical features
-- **Backward Compatibility**: No breaking changes for existing specs
-- **A/B Testing**: Track 1 & 3 with metrics comparison
+1. **YouTube Integration** (Phase 1) - Customers request YouTube data
+2. **UI Badges** (Phase 6) - Improved transparency for API status
+3. **Advanced Wikipedia** (Phase 2) - Multi-language support
+4. **Sentiment News** (Phase 3) - Better news assessment
 
 ---
 
-## 📝 Notes
+## 💡 Recognized Learnings
 
-- **Dependencies**: Track 2 & 3 require stable tool prompts (Track 1)
-- **Resources**: Track 4 & 5 are parallelizable (independent)
-- **Risks**: ML features (Track 3) require sufficient training data
-- **Community**: i18n crowdsourcing can accelerate Track 4
+- **Percentage limits are better than absolute € thresholds** - Flexible to different price ranges
+- **Fallback logic prevents "floor camping"** - AI suggestions distribute across allowed range
+- **connection.json as single source of truth** - Simpler management than .env files
+- **Dark glass theme with !important overrides necessary** - UI framework conflicts force overrides
+- **Real OAuth better than API keys** - Reddit data more authentic and up-to-date
 
 ---
 
-**Author**: André Zabel  
-**Repository**: A.R.I. - Artificial Retail Intelligence System  
-**Status**: ✅ Approved for Execution
+**Note**: Updates are rolled out gradually to provide continuous improvements and keep customers engaged. Each phase includes testing + documentation + release notes.
