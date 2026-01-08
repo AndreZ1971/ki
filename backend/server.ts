@@ -302,7 +302,7 @@ async function buildServer() {
           { name: 'woocommerce', description: 'WooCommerce Operations' },
           { name: 'memory', description: 'Agent Memory Management' },
           { name: 'system', description: 'System Operations' },
-          { name: 'product-optimizer', description: 'AI Product Optimization' },
+          { name: 'product-performance', description: 'AI Product Performance' },
           { name: 'reviews', description: 'Review Analysis & Sentiment' },
           { name: 'ai', description: 'AI Content Generation' },
           { name: 'shop-metrics', description: 'Shop Analytics & Dashboard' },

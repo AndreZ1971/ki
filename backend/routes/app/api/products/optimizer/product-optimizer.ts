@@ -368,7 +368,7 @@ export default async function productOptimizerRoutes(_server: FastifyInstance) {
         const productId = parseInt(id);
 
         if (!id || isNaN(productId)) {
-          console.error('[Product Optimizer] Invalid productId:', {
+          console.error('[Product Performance] Invalid productId:', {
             id,
             productId,
           });
@@ -383,13 +383,13 @@ export default async function productOptimizerRoutes(_server: FastifyInstance) {
         // ✅ Erst HIER wird initialisiert
         const openAIClient = initializeOpenAI();
         console.log(
-          `[Product Optimizer] Starte Produkt-Analyse für ID: ${productId}`
+          `[Product Performance] Starte Produkt-Analyse für ID: ${productId}`
         );
-        console.log(`[Product Optimizer] OpenAI verfügbar: ${!!openAIClient}`);
+        console.log(`[Product Performance] OpenAI verfügbar: ${!!openAIClient}`);
 
         // Prüfe ob WooCommerce verfügbar ist
         if (!wooCommerceService.isReady()) {
-          console.warn('[Product Optimizer] WooCommerce nicht bereit');
+          console.warn('[Product Performance] WooCommerce nicht bereit');
           return _reply.status(503).send({
             success: false,
             error: 'WooCommerce Service nicht verfügbar',
@@ -408,7 +408,7 @@ export default async function productOptimizerRoutes(_server: FastifyInstance) {
           suggestions: analysis.recommendations,
         };
       } catch (error: any) {
-        console.error('[Product Optimizer] Fehler:', error);
+        console.error('[Product Performance] Fehler:', error);
         _server.log.error('Analyse fehlgeschlagen:', error.message);
         return _reply.status(500).send({
           success: false,
@@ -425,7 +425,7 @@ export default async function productOptimizerRoutes(_server: FastifyInstance) {
     {
       schema: {
         tags: ['product-adviser'],
-        summary: 'Get optimizer status',
+        summary: 'Get performance status',
         description: 'Check if product optimizer is available',
       },
     },
@@ -433,7 +433,7 @@ export default async function productOptimizerRoutes(_server: FastifyInstance) {
       const openAIClient = initializeOpenAI();
       return {
         available: !!openAIClient,
-        service: 'product-optimizer',
+        service: 'product-performance',
         openaiConfigured: !!openAIClient,
         timestamp: new Date().toISOString(),
       };
@@ -445,7 +445,7 @@ export default async function productOptimizerRoutes(_server: FastifyInstance) {
     '/woo/products/:id/seo-optimize',
     {
       schema: {
-        tags: ['product-optimizer'],
+        tags: ['product-performance'],
         summary: 'AI SEO Optimization for products',
         description:
           'Automatically optimize product titles, descriptions and metadata for better SEO',
@@ -624,7 +624,7 @@ RESPONSE IN JSON FORMAT:
     '/actions/restock/:id',
     {
       schema: {
-        tags: ['product-optimizer'],
+        tags: ['product-performance'],
         summary: 'Restock / Lager auffüllen',
         description:
           'Berechnet einen Bestellvorschlag und aktualisiert WooCommerce Lagerbestand',
@@ -717,7 +717,7 @@ RESPONSE IN JSON FORMAT:
     '/actions/price/:id',
     {
       schema: {
-        tags: ['product-optimizer'],
+        tags: ['product-performance'],
         summary: 'Preis aktualisieren',
         description: 'Setzt neuen Preis/Sale-Preis in WooCommerce',
         params: {
@@ -784,7 +784,7 @@ RESPONSE IN JSON FORMAT:
     '/actions/steering/:id',
     {
       schema: {
-        tags: ['product-optimizer'],
+        tags: ['product-performance'],
         summary: 'Produkt-Steuerung',
         description: 'Promote, de-priorisieren oder Aktionen markieren',
         params: {
@@ -830,8 +830,8 @@ RESPONSE IN JSON FORMAT:
           })),
           meta_data: [
             ...(product.meta_data || []),
-            { key: 'optimizer_action', value: action },
-            { key: 'optimizer_note', value: note || '' },
+            { key: 'performance_action', value: action },
+            { key: 'performance_note', value: note || '' },
           ],
         };
 
@@ -864,7 +864,7 @@ RESPONSE IN JSON FORMAT:
     '/notes/:id',
     {
       schema: {
-        tags: ['product-optimizer'],
+        tags: ['product-performance'],
         summary: 'Produkt-Notizen speichern',
         description:
           'Speichere Notizen (Lagerort, Meta-Daten) für ein Produkt in WooCommerce',
@@ -938,7 +938,7 @@ RESPONSE IN JSON FORMAT:
     '/woo/products/:id/seo-apply',
     {
       schema: {
-        tags: ['product-optimizer'],
+        tags: ['product-performance'],
         summary: 'Apply SEO optimizations directly to WooCommerce',
         description:
           'Automatically update product title, description and SEO metadata in WooCommerce',
@@ -995,7 +995,7 @@ RESPONSE IN JSON FORMAT:
         // 1. Erst SEO Optimierung durchführen
         const seoResponse = await _server.inject({
           method: 'POST',
-          url: `/product-optimizer/woo/products/${id}/seo-optimize`,
+          url: `/product-performance/woo/products/${id}/seo-optimize`,
           payload: {
             currentTitle,
             currentDescription,
@@ -1090,7 +1090,7 @@ RESPONSE IN JSON FORMAT:
     '/woo/products/:id/price-analysis',
     {
       schema: {
-        tags: ['product-optimizer'],
+        tags: ['product-performance'],
         summary: 'AI-powered price analysis and recommendations',
         description:
           'Analyze market prices and recommend optimal pricing strategy with competitive intelligence',
@@ -1351,7 +1351,7 @@ RESPONSE IN JSON FORMAT:
     '/woo/products/:id/bundle-suggestions',
     {
       schema: {
-        tags: ['product-optimizer'],
+        tags: ['product-performance'],
         summary: 'AI-generated product bundle recommendations',
         description:
           'Suggest smart product bundles for increased average order value',
