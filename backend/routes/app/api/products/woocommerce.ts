@@ -70,10 +70,10 @@ class WooCommerceClient {
 
   private async makeRequest(endpoint: string, options: any = {}) {
     if (!this.baseUrl || !this.consumerKey || !this.consumerSecret) {
-      console.error('[WooCommerceClient] Fehlende Konfiguration:', {
-        baseUrl: this.baseUrl,
-        consumerKey: this.consumerKey,
-        consumerSecret: this.consumerSecret
+      console.error('[WooCommerceClient] ❌ Fehlende Konfiguration:', {
+        baseUrl: this.baseUrl ? '✓' : '✗',
+        consumerKey: this.consumerKey ? '✓' : '✗',
+        consumerSecret: this.consumerSecret ? '✓' : '✗'
       });
       throw new Error('WooCommerce API nicht konfiguriert. Bitte Werte in connection.json setzen');
     }
@@ -91,44 +91,57 @@ class WooCommerceClient {
       // Erhöhe Undici Connect Timeout explizit
       dispatcher: new Agent({ connect: { timeout: 30000 } })
     };
-    console.log(`[WooCommerce] Request:`, url, defaultOptions, options);
+    
+    console.log(`[WooCommerce] 📡 Request to: ${url}`);
      
      // Versuche Cache zuerst
      const cacheKey = `woo_${endpoint}`;
      const cached = wooCache.get(cacheKey);
      if (cached) {
-       console.log(`[WooCommerce] Cache HIT für ${endpoint}`);
+       console.log(`[WooCommerce] ✓ Cache HIT für ${endpoint}`);
        return cached;
      }
      
      try {
        const response = await fetch(url, { ...defaultOptions, ...options });
-       console.log(`[WooCommerce] Response Status:`, response.status);
+       console.log(`[WooCommerce] Response Status: ${response.status}`);
+       
        if (!response.ok) {
          const text = await response.text();
-         console.error(`[WooCommerce] Fehlerhafte Antwort:`, text);
-         throw new Error(`HTTP error! status: ${response.status}`);
+         console.error(`[WooCommerce] ❌ HTTP ${response.status}: ${text.substring(0, 200)}`);
+         
+         // Bessere Fehlermeldungen basierend auf Status
+         if (response.status === 401 || response.status === 403) {
+           throw new Error(`WooCommerce API Authentication failed (${response.status}): Überprüfen Sie Consumer Key und Secret`);
+         } else if (response.status === 404) {
+           throw new Error(`WooCommerce API endpoint not found (${response.status}): ${url}`);
+         } else if (response.status === 500) {
+           throw new Error(`WooCommerce server error (${response.status}): ${text.substring(0, 100)}`);
+         } else {
+           throw new Error(`HTTP error ${response.status}: ${text.substring(0, 200)}`);
+         }
        }
+       
        const json = await response.json();
-       console.log(`[WooCommerce] Response JSON:`, json);
+       console.log(`[WooCommerce] ✅ Response loaded successfully`);
        
        // Cache erfolgreiche Antwort (60s)
        wooCache.set(cacheKey, json, 60);
        
        return json;
      } catch (_error) {
-       console.error(`Fehler bei WooCommerce Request ${endpoint}:`, _error);
+       const errorMsg = _error instanceof Error ? _error.message : 'Unknown error';
+       console.error(`[WooCommerce] ❌ Request failed for ${endpoint}:`, errorMsg);
        
        // Fallback zu Cache auch bei Fehler
        const cachedFallback = wooCache.get(cacheKey);
        if (cachedFallback) {
-         console.log(`[WooCommerce] Cache FALLBACK für ${endpoint} (wegen Fehler)`);
+         console.log(`[WooCommerce] ⚠️  Using cache fallback für ${endpoint}`);
          return cachedFallback;
        }
        
       // Liefere einen klaren Fehlertext für Upstream-Handler
-      const message = _error instanceof Error ? _error.message : 'Unbekannter Fehler';
-      throw new Error(message);
+      throw _error;
     }
   }
 
@@ -139,7 +152,22 @@ class WooCommerceClient {
     if (params.search) queryParams.append('search', params.search);
     if (params.category) queryParams.append('category', params.category);
     const endpoint = `/wp-json/wc/v3/products${queryParams.toString() ? `?${queryParams}` : ''}`;
-    return this.makeRequest(endpoint);
+    
+    try {
+      console.log('[getProducts] Loading with params:', params);
+      console.log('[getProducts] Endpoint:', endpoint);
+      const result = await this.makeRequest(endpoint);
+      console.log('[getProducts] Successfully loaded', Array.isArray(result) ? result.length : '?', 'products');
+      return result;
+    } catch (error: any) {
+      console.error('[getProducts] Error:', {
+        message: error?.message,
+        url: `${this.baseUrl}${endpoint}`,
+        hasConfig: !!(this.baseUrl && this.consumerKey && this.consumerSecret),
+        params
+      });
+      throw error;
+    }
   }
 
 
@@ -271,29 +299,63 @@ export default async function wooCommerceRoutes(server: FastifyInstance) {
     }
   }, async (request: any, reply) => {
     try {
-      const { page, per_page, search, category } = request.query;
-      server.log.info('[Route] /woo/products called');
+      const { page = 1, per_page = 100, search, category } = request.query;
+      console.log('[Route /woo/products] 📥 Request received with params:', { page, per_page, search, category });
+      
+      // Validiere Query-Parameter
+      if (per_page > 100) {
+        throw new Error('per_page cannot exceed 100');
+      }
+      
       const products = await wooCommerce.getProducts({ 
         page, 
         per_page, 
         search,
         category 
       });
-      server.log.info(`[Route] /woo/products loaded ${products?.length} products`);
-      return { success: true, data: products };
+      
+      if (!products) {
+        throw new Error('No products returned from WooCommerce API');
+      }
+      
+      console.log(`[Route /woo/products] ✅ Successfully loaded ${Array.isArray(products) ? products.length : 'unknown'} products`);
+      
+      return { 
+        success: true, 
+        data: products,
+        count: Array.isArray(products) ? products.length : 0
+      };
     } catch (error: any) {
-      const errorMsg = error?.message || 'unknown error';
-      server.log.error('[Route] /woo/products error: ' + errorMsg);
-      const status = error?.message?.includes('timeout') ? 504 : 500;
-      const message = errorMsg.includes('nicht konfiguriert') 
+      const errorMsg = error?.message || 'Unknown error';
+      const errorStack = error?.stack || '';
+      
+      console.error('[Route /woo/products] ❌ Error:', {
+        message: errorMsg,
+        stack: errorStack.split('\n').slice(0, 5).join('\n'),
+        queryParams: request.query,
+        timestamp: new Date().toISOString()
+      });
+      
+      const status = errorMsg.includes('timeout') ? 504 : 500;
+      const isConfigError = errorMsg.includes('nicht konfiguriert') || errorMsg.includes('WooCommerce API');
+      const message = isConfigError 
         ? 'WooCommerce ist nicht konfiguriert. Bitte WooCommerce-Daten in connection.json setzen.'
-        : `Failed to fetch products: ${errorMsg}`;
+        : errorMsg.includes('404') 
+          ? 'WooCommerce API endpoint nicht gefunden. Überprüfen Sie die Shop-URL.'
+          : errorMsg.includes('401') || errorMsg.includes('403')
+            ? 'WooCommerce API Authentifizierung fehlgeschlagen. Überprüfen Sie Consumer Key und Secret.'
+            : `Fehler beim Laden der Produkte: ${errorMsg}`;
+      
       reply.code(status);
       return { 
         success: false, 
         error: message,
         statusCode: status,
-        debug: process.env.NODE_ENV === 'development' ? errorMsg : undefined
+        details: process.env.NODE_ENV === 'development' ? {
+          message: errorMsg,
+          type: error?.constructor?.name
+        } : undefined,
+        timestamp: new Date().toISOString()
       };
     }
   });
