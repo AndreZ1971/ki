@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import type { JSX } from 'react';
 import { motion } from 'framer-motion';
 import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
@@ -191,6 +192,8 @@ const SocialMediaPoster: React.FC = () => {
       setAiLoading(false);
     }
   };
+
+  const webhookConfig: Record<string, boolean> = {}; // Stub für Build-Kompatibilität
 
   const handlePublishPost = async (platform: string, content: string) => {
     try {

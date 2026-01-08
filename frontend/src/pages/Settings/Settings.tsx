@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import type { JSX } from 'react';
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import "./Settings.css";
