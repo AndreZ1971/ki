@@ -426,7 +426,7 @@ export default async function productOptimizerRoutes(_server: FastifyInstance) {
       schema: {
         tags: ['product-adviser'],
         summary: 'Get performance status',
-        description: 'Check if product optimizer is available',
+        description: 'Check if product performance service is available',
       },
     },
     async () => {
