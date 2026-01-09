@@ -18,34 +18,76 @@ const buildEmailConfig = () => {
     tls: { rejectUnauthorized: false },
     connectionTimeout: 10000,
     greetingTimeout: 10000,
-    socketTimeout: 15000
+    socketTimeout: 15000,
+    pool: true,
+    maxConnections: 5,
+    maxMessages: 100
   };
 };
 
-const emailConfig = buildEmailConfig();
+// Erstelle Transporter-Factory für dynamisches Neuladen
+let transporterInstance: nodemailer.Transporter | null = null;
 
-console.log('🔧 Email Konfiguration geladen:', {
-  host: emailConfig.host,
-  port: emailConfig.port,
-  secure: emailConfig.secure,
-  user: emailConfig.auth.user
-});
-
-const transporter = nodemailer.createTransport(emailConfig);
-
-// Verbindung testen mit besserem Error Handling
-transporter.verify(function(error, _success) {
-  if (error) {
-    console.log('❌ SMTP Verbindung fehlgeschlagen:', error.message);
-    console.log('🔍 Details:', {
+export const getTransporter = () => {
+  if (!transporterInstance) {
+    const emailConfig = buildEmailConfig();
+    
+    console.log('🔧 Email Konfiguration geladen:', {
       host: emailConfig.host,
       port: emailConfig.port,
-      secure: emailConfig.secure
+      secure: emailConfig.secure,
+      user: emailConfig.auth.user
     });
-  } else {
-    console.log('✅ SMTP Server ist bereit');
-    console.log('🔍 Verbunden zu:', emailConfig.host + ':' + emailConfig.port);
-  }
-});
 
+    transporterInstance = nodemailer.createTransport(emailConfig);
+
+    // Verbindung testen mit besserem Error Handling
+    transporterInstance.verify(function(error, _success) {
+      if (error) {
+        console.log('❌ SMTP Verbindung fehlgeschlagen:', error.message);
+        console.log('🔍 Details:', {
+          host: emailConfig.host,
+          port: emailConfig.port,
+          secure: emailConfig.secure
+        });
+      } else {
+        console.log('✅ SMTP Server ist bereit');
+        console.log('🔍 Verbunden zu:', emailConfig.host + ':' + emailConfig.port);
+      }
+    });
+  }
+  return transporterInstance;
+};
+
+// Reload-Funktion für config-updates
+export const reloadTransporter = () => {
+  if (transporterInstance) {
+    transporterInstance.close();
+  }
+  transporterInstance = null;
+  return getTransporter();
+};
+
+// Verify-Funktion mit Timeout
+export const verify = async (timeoutMs = 10000): Promise<boolean> => {
+  const transporter = getTransporter();
+  
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error('Connection timeout'));
+    }, timeoutMs);
+
+    transporter.verify((error, _success) => {
+      clearTimeout(timer);
+      if (error) {
+        reject(error);
+      } else {
+        resolve(true);
+      }
+    });
+  });
+};
+
+// Default export für Rückwärtskompatibilität
+const transporter = getTransporter();
 export default transporter;
