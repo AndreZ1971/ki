@@ -27,14 +27,15 @@ echo "[Entrypoint] 🔐 Setze korrekte Berechtigungen..."
 chown -R nodeuser:nodejs /app/data /app/logs 2>/dev/null || echo "[Entrypoint] ℹ️  Berechtigungen bereits korrekt"
 chmod -R 755 /app/data 2>/dev/null || true
 
-# 3. CONNECTION.JSON INITIALISIEREN (ALLE FELDER - VOLLSTÄNDIG)
-echo "[Entrypoint] 📝 Erstelle connection.json mit ALLEN erforderlichen Feldern..."
+# 3. CONNECTION.JSON INITIALISIEREN (NUR WENN NICHT VORHANDEN)
+if [ ! -f /app/connection.json ]; then
+  echo "[Entrypoint] 📝 Erstelle connection.json mit ALLEN erforderlichen Feldern..."
 
-# 🔐 Generiere sicheren Encryption Key für Spezialisierungen (32 Bytes = 64 Hex Chars)
-SPEC_ENCRYPTION_KEY=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
-echo "[Entrypoint] 🔐 Generiere Verschlüsselungs-Key für Spezialisierungen..."
+  # 🔐 Generiere sicheren Encryption Key für Spezialisierungen (32 Bytes = 64 Hex Chars)
+  SPEC_ENCRYPTION_KEY=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+  echo "[Entrypoint] 🔐 Generiere Verschlüsselungs-Key für Spezialisierungen..."
 
-cat <<'CONNECTION_JSON' > /app/connection.json
+  cat <<'CONNECTION_JSON' > /app/connection.json
 {
   "_description": "A.R.I. Configuration File - ALLE Felder müssen in UI gefüllt werden",
   
@@ -187,12 +188,14 @@ cat <<'CONNECTION_JSON' > /app/connection.json
   }
 }
 CONNECTION_JSON
+  # 🔐 Ersetze Placeholder mit echtem Key
+  sed -i "s/SPEC_KEY_PLACEHOLDER/$SPEC_ENCRYPTION_KEY/g" /app/connection.json
 
-# 🔐 Ersetze Placeholder mit echtem Key
-sed -i "s/SPEC_KEY_PLACEHOLDER/$SPEC_ENCRYPTION_KEY/g" /app/connection.json
-
-echo "[Entrypoint] ✅ connection.json erfolgreich erstellt"
-echo "[Entrypoint] 🔐 Verschlüsselungs-Key für Spezialisierungen generiert"
+  echo "[Entrypoint] ✅ connection.json erfolgreich erstellt"
+  echo "[Entrypoint] 🔐 Verschlüsselungs-Key für Spezialisierungen generiert"
+else
+  echo "[Entrypoint] 📄 Bestehende connection.json gefunden – Überschreiben wird übersprungen"
+fi
 
 # 4. BERECHTIGUNGEN FÜR CONNECTION.JSON
 echo "[Entrypoint] 🔒 Setze Berechtigungen für connection.json..."
@@ -209,7 +212,11 @@ echo "[Entrypoint]    ✓ Port: ${PORT:-3000}"
 # 6. STARTUP
 echo "[Entrypoint] ✅ A.R.I. Backend Container startet jetzt..."
 echo "[Entrypoint] 🚀 API verfügbar unter: http://localhost:3000"
-echo "[Entrypoint] 📝 Bitte öffne Settings und fülle connection.json aus!"
+if [ -f /app/connection.json ]; then
+  echo "[Entrypoint] 📝 connection.json geladen. Änderungen über Settings möglich."
+else
+  echo "[Entrypoint] 📝 Bitte öffne Settings und fülle connection.json aus!"
+fi
 
 # Privilegien absenken und Backend starten
 exec su-exec nodeuser "$@"

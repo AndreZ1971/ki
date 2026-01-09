@@ -20,19 +20,20 @@ interface User {
 // In-memory user store (TODO: Replace with database in production)
 const users: Map<string, User> = new Map();
 
-// Initialize default admin user
-// WICHTIG: Passwort nach erstem Login ändern!
-const defaultPasswordHash = crypto
-  .createHash('sha256')
-  .update('ARI#2026!Secure')
-  .digest('hex');
+// Initialize default admin user from ENV (fallback to safe default)
+// Configure via .env.production or environment variables:
+// ADMIN_USER, ADMIN_PASS (plaintext) or ADMIN_PASS_HASH (sha256)
+const ADMIN_USER = process.env.ADMIN_USER || 'admin';
+const ADMIN_PASS_HASH =
+  process.env.ADMIN_PASS_HASH ||
+  crypto.createHash('sha256').update(process.env.ADMIN_PASS || 'ARI#2026!Secure').digest('hex');
 
-users.set('admin', {
+users.set(ADMIN_USER, {
   id: '1',
-  username: 'admin',
+  username: ADMIN_USER,
   email: 'admin@ari.local',
   role: 'admin',
-  passwordHash: defaultPasswordHash,
+  passwordHash: ADMIN_PASS_HASH,
 });
 
 export default async function authRoutes(fastify: FastifyInstance) {
