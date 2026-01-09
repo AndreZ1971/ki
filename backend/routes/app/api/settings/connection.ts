@@ -770,16 +770,102 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       // Test SMTP (optional - nur wenn in config vorhanden)
-      // Note: SMTP Test wird in Zukunft implementiert wenn connection.json SMTP-Felder hat
-      results.smtp.message = '⏳ SMTP Test kommt in v5.1.1';
-
-      // Test Reddit (optional - nur wenn konfiguriert)
-      // Note: Reddit Test wird in Zukunft implementiert wenn OAuth-Details vorhanden
-      results.reddit.message = '⏳ Reddit Test kommt in v5.1.1';
+      if (config.smtp?.host && config.smtp?.user && config.smtp?.password) {
+        const smtpStart = Date.now();
+        try {
+          const nodemailer = await import('nodemailer');
+          const testTransporter = nodemailer.default.createTransport({
+            host: config.smtp.host,
+            port: config.smtp.port || 465,
+            secure: config.smtp.secure !== false,
+            auth: {
+              user: config.smtp.user,
+              pass: config.smtp.password
+            },
+            tls: { rejectUnauthorized: false }
+          });
+          
+          await testTransporter.verify();
+          results.smtp.success = true;
+          results.smtp.time = Date.now() - smtpStart;
+          results.smtp.message = `✅ SMTP-Server erreichbar (${config.smtp.host}:${config.smtp.port})`;
+          logger.info('✅ SMTP connection successful');
+        } catch (smtpError: any) {
+          results.smtp.time = Date.now() - smtpStart;
+          results.smtp.message = `❌ SMTP-Fehler: ${smtpError.message}`;
+          results.smtp.error = {
+            category: 'auth',
+            hint: 'SMTP-Zugangsdaten oder Server-Einstellungen prüfen'
+          };
+          logger.warn(`❌ SMTP connection failed: ${smtpError.message}`);
+        }
+      } else {
+        results.smtp.message = '⚠️ SMTP nicht konfiguriert';
+      }
 
       // Test Support-System (optional)
-      // Note: Support Test wird in Zukunft implementiert
-      results.support.message = '⏳ Support-System Test kommt in v5.2.0';
+      if (config.wordpress?.url && config.support?.ticketsEndpoint) {
+        const supportStart = Date.now();
+        try {
+          const { getTickets } = await import('../../../../services/supportTickets.js');
+          const tickets = await getTickets();
+          results.support.success = true;
+          results.support.time = Date.now() - supportStart;
+          results.support.message = `✅ Support-System erreichbar (${tickets.length} Tickets gefunden)`;
+          logger.info(`✅ Support system connection successful - ${tickets.length} tickets`);
+        } catch (supportError: any) {
+          results.support.time = Date.now() - supportStart;
+          results.support.message = `❌ Support-Fehler: ${supportError.message}`;
+          results.support.error = {
+            category: 'network',
+            hint: 'Support-Endpoint oder WordPress-Zugangsdaten prüfen'
+          };
+          logger.warn(`❌ Support connection failed: ${supportError.message}`);
+        }
+      } else {
+        results.support.message = '⚠️ Support-System nicht konfiguriert';
+      }
+
+      // Test Reddit (optional - nur wenn konfiguriert)
+      if (config.reddit?.clientId && config.reddit?.clientSecret) {
+        const redditStart = Date.now();
+        try {
+          const redditAuth = Buffer.from(`${config.reddit.clientId}:${config.reddit.clientSecret}`).toString('base64');
+          const redditResponse = await fetch('https://www.reddit.com/api/v1/access_token', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Basic ${redditAuth}`,
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'User-Agent': 'ARI-Agent/1.0'
+            },
+            body: 'grant_type=client_credentials'
+          });
+          
+          if (redditResponse.ok) {
+            const redditData = await redditResponse.json();
+            if (redditData.access_token) {
+              results.reddit.success = true;
+              results.reddit.time = Date.now() - redditStart;
+              results.reddit.message = '✅ Reddit OAuth erfolgreich';
+              logger.info('✅ Reddit OAuth successful');
+            } else {
+              throw new Error('Kein Access Token erhalten');
+            }
+          } else {
+            throw new Error(`HTTP ${redditResponse.status}`);
+          }
+        } catch (redditError: any) {
+          results.reddit.time = Date.now() - redditStart;
+          results.reddit.message = `❌ Reddit-Fehler: ${redditError.message}`;
+          results.reddit.error = {
+            category: 'auth',
+            hint: 'Reddit Client-ID oder Secret prüfen'
+          };
+          logger.warn(`❌ Reddit connection failed: ${redditError.message}`);
+        }
+      } else {
+        results.reddit.message = '⚠️ Reddit nicht konfiguriert';
+      }
 
       const overallSuccess =
         results.wordpress.success ||
