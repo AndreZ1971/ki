@@ -59,6 +59,18 @@ interface ShopCredentials {
   youtubeAccessToken: string;
   youtubeRefreshToken: string;
   youtubeChannelId: string;
+
+  // SMTP (optional, flattened for frontend)
+  smtpHost?: string;
+  smtpPort?: number;
+  smtpSecure?: boolean;
+  smtpUser?: string;
+  smtpPassword?: string;
+  smtpFrom?: string;
+
+  // Reddit (optional, flattened for frontend)
+  redditClientId?: string;
+  redditClientSecret?: string;
 }
 
 // Error categorization for connection tests
@@ -213,6 +225,18 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
             ? '****'
             : '',
           youtubeChannelId: fileData.socialMedia?.youtube?.channelId || '',
+
+          // SMTP (flattened)
+          smtpHost: fileData.smtp?.host || '',
+          smtpPort: fileData.smtp?.port ?? 465,
+          smtpSecure: fileData.smtp?.secure ?? true,
+          smtpUser: fileData.smtp?.user || '',
+          smtpPassword: fileData.smtp?.password ? '****' : '',
+          smtpFrom: fileData.smtp?.from || '',
+
+          // Reddit (flattened)
+          redditClientId: fileData.reddit?.clientId || '',
+          redditClientSecret: fileData.reddit?.clientSecret ? '****' : '',
         };
       } catch {
         // Datei existiert nicht oder ist leer
@@ -232,6 +256,16 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
           enableAnalytics: true,
           enableAutoProducts: true,
           enableEmailMarketing: true,
+          // SMTP defaults
+          smtpHost: '',
+          smtpPort: 465,
+          smtpSecure: true,
+          smtpUser: '',
+          smtpPassword: '',
+          smtpFrom: '',
+          // Reddit defaults
+          redditClientId: '',
+          redditClientSecret: '',
           // Social Media Defaults
           linkedinEnabled: false,
           linkedinAccessToken: '',
