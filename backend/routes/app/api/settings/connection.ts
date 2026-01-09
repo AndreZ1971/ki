@@ -550,11 +550,16 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         },
         // Social Media - NEW STRUCTURED FORMAT
         socialMedia: socialMediaStructured,
-        // Preserve other existing data from old file
-        ...(oldFileData.reddit && { reddit: oldFileData.reddit }),
-        ...(oldFileData.smtp && { smtp: oldFileData.smtp }),
-        ...(oldFileData.support && { support: oldFileData.support }),
-        ...(oldFileData.ml && { ml: oldFileData.ml }),
+        // Optional sections: prefer new payload values, otherwise preserve existing
+        ...(payload.reddit && { reddit: payload.reddit }),
+        ...(payload.smtp && { smtp: payload.smtp }),
+        ...(payload.support && { support: payload.support }),
+        ...(payload.ml && { ml: payload.ml }),
+        // Preserve existing if payload did not provide them
+        ...(!payload.reddit && oldFileData.reddit ? { reddit: oldFileData.reddit } : {}),
+        ...(!payload.smtp && oldFileData.smtp ? { smtp: oldFileData.smtp } : {}),
+        ...(!payload.support && oldFileData.support ? { support: oldFileData.support } : {}),
+        ...(!payload.ml && oldFileData.ml ? { ml: oldFileData.ml } : {}),
         ...(oldFileData.onboarding && { onboarding: oldFileData.onboarding }),
         ...(oldFileData.metadata && { metadata: oldFileData.metadata }),
       };
