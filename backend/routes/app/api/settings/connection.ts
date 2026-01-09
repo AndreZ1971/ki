@@ -4,6 +4,7 @@ import { logger } from '../../../../logger.js';
 import fs from 'fs/promises';
 import path from 'path';
 import { configValidator } from '../../../../services/configValidator.js';
+import { getConfig } from '@config';
 
 interface ShopCredentials {
   // WordPress
@@ -775,17 +776,18 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       // Test SMTP (optional - nur wenn in config vorhanden)
-      if (config.smtp?.host && config.smtp?.user && config.smtp?.password) {
+      const currentConfig = getConfig();
+      if (currentConfig.smtp?.host && currentConfig.smtp?.user && currentConfig.smtp?.password) {
         const smtpStart = Date.now();
         try {
           const nodemailer = await import('nodemailer');
           const testTransporter = nodemailer.default.createTransport({
-            host: config.smtp.host,
-            port: config.smtp.port || 465,
-            secure: config.smtp.secure !== false,
+            host: currentConfig.smtp.host,
+            port: currentConfig.smtp.port || 465,
+            secure: currentConfig.smtp.secure !== false,
             auth: {
-              user: config.smtp.user,
-              pass: config.smtp.password
+              user: currentConfig.smtp.user,
+              pass: currentConfig.smtp.password
             },
             tls: { rejectUnauthorized: false }
           });
@@ -793,7 +795,7 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
           await testTransporter.verify();
           results.smtp.success = true;
           results.smtp.time = Date.now() - smtpStart;
-          results.smtp.message = `✅ SMTP-Server erreichbar (${config.smtp.host}:${config.smtp.port})`;
+          results.smtp.message = `✅ SMTP-Server erreichbar (${currentConfig.smtp.host}:${currentConfig.smtp.port})`;
           logger.info('✅ SMTP connection successful');
         } catch (smtpError: any) {
           results.smtp.time = Date.now() - smtpStart;
@@ -809,7 +811,7 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       // Test Support-System (optional)
-      if (config.wordpress?.url && config.support?.ticketsEndpoint) {
+      if (currentConfig.wordpress?.url && currentConfig.support?.ticketsEndpoint) {
         const supportStart = Date.now();
         try {
           const { getTickets } = await import('../../../../services/supportTickets.js');
@@ -832,10 +834,10 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       // Test Reddit (optional - nur wenn konfiguriert)
-      if (config.reddit?.clientId && config.reddit?.clientSecret) {
+      if (currentConfig.reddit?.clientId && currentConfig.reddit?.clientSecret) {
         const redditStart = Date.now();
         try {
-          const redditAuth = Buffer.from(`${config.reddit.clientId}:${config.reddit.clientSecret}`).toString('base64');
+          const redditAuth = Buffer.from(`${currentConfig.reddit.clientId}:${currentConfig.reddit.clientSecret}`).toString('base64');
           const redditResponse = await fetch('https://www.reddit.com/api/v1/access_token', {
             method: 'POST',
             headers: {

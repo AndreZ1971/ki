@@ -179,10 +179,11 @@ export class WooCommerceService {
 
 
   getConfigurationStatus() {
+    const creds = this.getCredentials();
     return {
-      isConfigured: this.isConfigured,
-      baseUrl: this.baseUrl ? '✅ Gesetzt' : '❌ Fehlt',
-      hasAuth: this.auth ? '✅ Gesetzt' : '❌ Fehlt'
+      isConfigured: this.isReady(),
+      baseUrl: creds?.baseUrl ? '✅ Gesetzt' : '❌ Fehlt',
+      hasAuth: creds?.auth ? '✅ Gesetzt' : '❌ Fehlt'
     };
   }
 }

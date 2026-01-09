@@ -5,6 +5,7 @@ import { useToast } from '../../hooks/useToast';
 import { BackButton } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
 import { EmailPreviewModal } from '../../components/EmailPreviewModal';
+import { emailApi } from '../../lib/api';
 import './page.css';
 
 interface EmailTemplate {
@@ -217,32 +218,40 @@ const AIEmailGenerator: React.FC = () => {
     setSending(true);
     try {
       const selectedCustomerData = customers.filter(c => selectedCustomers.includes(c.id));
-      
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/email/send`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          customers: selectedCustomerData,
-          subject: emailData.subject,
-          body: emailData.body,
-          emailType: formData.emailType
-        })
+      const result = await emailApi.sendEmail({
+        customers: selectedCustomerData,
+        subject: emailData.subject,
+        body: emailData.body,
+        emailType: formData.emailType
       });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `API Error: ${response.status}`);
-      }
-
-      const result = await response.json();
+      
+      console.log('📧 Email Send Result:', result);
       
       if (result.success) {
-        showToast(result.message || 'Emails erfolgreich versendet!', 'success');
-        setEmailData(null);
-        setSelectedCustomers([]);
-        setIsPreviewModalOpen(false); // 🔥 MODAL SCHLIESSEN
+        const { sent, failed, failed_emails } = result.data || {};
+        
+        // Prüfe ob ALLE Mails fehlgeschlagen sind
+        if (failed > 0 && sent === 0) {
+          console.error('❌ Alle Emails fehlgeschlagen:');
+          console.table(failed_emails); // Zeige Details in Tabelle
+          failed_emails?.forEach((fail: any) => {
+            console.error(`  ❌ ${fail.email}: ${fail.error}`);
+          });
+          const firstError = failed_emails?.[0]?.error || 'Unbekannter SMTP-Fehler';
+          showToast(`Alle ${failed} Emails fehlgeschlagen: ${firstError}`, 'error');
+        } 
+        // Teilerfolg
+        else if (failed > 0) {
+          console.warn(`⚠️ ${sent} erfolgreich, ${failed} fehlgeschlagen:`, failed_emails);
+          showToast(`⚠️ ${sent} erfolgreich, ${failed} fehlgeschlagen. Details in der Console.`, 'warning');
+        } 
+        // Voller Erfolg
+        else {
+          showToast(result.message || `✅ ${sent} Emails erfolgreich versendet!`, 'success');
+          setEmailData(null);
+          setSelectedCustomers([]);
+          setIsPreviewModalOpen(false);
+        }
       } else {
         throw new Error(result.error || 'Unbekannter Fehler beim Senden');
       }
@@ -261,6 +270,20 @@ const AIEmailGenerator: React.FC = () => {
       }
     } finally {
       setSending(false);
+    }
+  };
+
+  // 🔎 SMTP Konfiguration testen
+  const testSmtp = async () => {
+    try {
+      const result = await emailApi.testSmtp();
+      if (result.success) {
+        showToast('SMTP Test erfolgreich! Testmail gesendet.', 'success');
+      } else {
+        showToast(result.error || 'SMTP-Test fehlgeschlagen', 'error');
+      }
+    } catch (error: any) {
+      showToast('SMTP-Test Fehler: ' + (error.message || 'Unbekannt'), 'error');
     }
   };
 
@@ -490,11 +513,10 @@ const AIEmailGenerator: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', textAlign: 'center' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '8px', justifyContent: 'center' }}>
               <h1>📧 AI Email Generator</h1>
-              {getApiStatusBadge()}
             </div>
             <p style={{ margin: 0 }}>Erstelle und versende personalisierte Emails mit KI</p>
             {apiStatus === 'connected' && (
@@ -505,7 +527,7 @@ const AIEmailGenerator: React.FC = () => {
           </div>
           
           {/* VIEW TABS */}
-          <div style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.05)', padding: '4px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.05)', padding: '4px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', flexWrap: 'wrap', marginTop: '16px', justifyContent: 'center' }}>
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}

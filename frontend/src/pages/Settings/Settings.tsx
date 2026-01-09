@@ -2511,8 +2511,10 @@ const Settings = () => {
                           {spec.price}€
                         </span>
                         {!spec.isActive && (
-                          <button
-                            onClick={() => purchaseSpecialization(spec)}
+                          <a
+                            href="https://kaufe-es.eu/index.php/shop/"
+                            target="_blank"
+                            rel="noopener noreferrer"
                             style={{
                               padding: "10px 16px",
                               background:
@@ -2523,10 +2525,12 @@ const Settings = () => {
                               cursor: "pointer",
                               fontSize: "13px",
                               fontWeight: 700,
+                              textDecoration: "none",
+                              display: "inline-block",
                             }}
                           >
-                            {t("settings.specialization.activate")}
-                          </button>
+                            zum Shop
+                          </a>
                         )}
                       </div>
                     </div>
