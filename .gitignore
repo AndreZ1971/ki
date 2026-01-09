@@ -16,6 +16,8 @@ screenshots/
 !frontend/.env.production
 .env.production
 backend/connection.json  # Niemals ins Repo!
+# Backup snapshots of connection settings (contain secrets)
+backend/data/backups/connection*.json
 
 # BUILD & DIST
 frontend/dist/
