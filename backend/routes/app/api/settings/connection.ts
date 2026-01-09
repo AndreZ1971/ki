@@ -415,6 +415,8 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
       const oldWcConsumerSecret = oldFileData?.woocommerce?.consumerSecret;
       const oldOpenaiApiKey = oldFileData?.openAI?.apiKey;
       const oldWcConsumerKey = oldFileData?.woocommerce?.consumerKey;
+      const oldSmtp = oldFileData?.smtp || {};
+      const oldReddit = oldFileData?.reddit || {};
 
       // Build cleaned credentials (unmasking if needed)
       const cleanedCredentials: ShopCredentials = {
@@ -478,6 +480,26 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         youtubeRefreshToken: unmaskValue(
           newCredentials.youtubeRefreshToken,
           getOldSocialMediaValue('youtube', 'refreshToken')
+        ),
+      };
+
+      // Unmask SMTP + Reddit (masking not handled before)
+      const cleanedSmtp = {
+        host: unmaskValue(payload.smtp?.host || '', oldSmtp.host),
+        port: payload.smtp?.port ?? oldSmtp.port ?? 465,
+        secure:
+          payload.smtp?.secure ??
+          (typeof oldSmtp.secure === 'boolean' ? oldSmtp.secure : true),
+        user: unmaskValue(payload.smtp?.user || '', oldSmtp.user),
+        password: unmaskValue(payload.smtp?.password || '', oldSmtp.password),
+        from: unmaskValue(payload.smtp?.from || '', oldSmtp.from),
+      };
+
+      const cleanedReddit = {
+        clientId: unmaskValue(payload.reddit?.clientId || '', oldReddit.clientId),
+        clientSecret: unmaskValue(
+          payload.reddit?.clientSecret || '',
+          oldReddit.clientSecret
         ),
       };
 
@@ -586,13 +608,11 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         // Social Media - NEW STRUCTURED FORMAT
         socialMedia: socialMediaStructured,
         // Optional sections: prefer new payload values, otherwise preserve existing
-        ...(payload.reddit && { reddit: payload.reddit }),
-        ...(payload.smtp && { smtp: payload.smtp }),
+        reddit: cleanedReddit,
+        smtp: cleanedSmtp,
         ...(payload.support && { support: payload.support }),
         ...(payload.ml && { ml: payload.ml }),
         // Preserve existing if payload did not provide them
-        ...(!payload.reddit && oldFileData.reddit ? { reddit: oldFileData.reddit } : {}),
-        ...(!payload.smtp && oldFileData.smtp ? { smtp: oldFileData.smtp } : {}),
         ...(!payload.support && oldFileData.support ? { support: oldFileData.support } : {}),
         ...(!payload.ml && oldFileData.ml ? { ml: oldFileData.ml } : {}),
         ...(oldFileData.onboarding && { onboarding: oldFileData.onboarding }),
