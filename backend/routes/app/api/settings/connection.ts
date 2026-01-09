@@ -628,6 +628,18 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
       logger.info(
         `✅ Social Media section saved: ${Object.keys(socialMediaStructured).filter((k) => socialMediaStructured[k].enabled).length} channels enabled`
       );
+      
+      // Reload email transporter if SMTP config changed
+      if (cleanedSmtp.host || cleanedSmtp.user) {
+        try {
+          const { reloadTransporter } = await import('../../../../services/emailService.js');
+          reloadTransporter();
+          logger.info('🔄 Email transporter reloaded with new SMTP config');
+        } catch (reloadError) {
+          logger.warn(`⚠️ Could not reload email transporter: ${reloadError}`);
+        }
+      }
+      
       return {
         success: true,
         message: 'Konfiguration erfolgreich gespeichert!',
@@ -664,61 +676,66 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         ]);
       };
 
+      const timeoutMs = 7000;
+      const tasks: Promise<void>[] = [];
+
       // Test WordPress
       if (
         credentials.wpUrl &&
         credentials.wpUsername &&
         credentials.wpAppPassword
       ) {
-        const wpStart = Date.now();
-        try {
-          const wpResponse = await withTimeout(
-            fetch(
-              `${credentials.wpUrl}/wp-json/wp/v2/users/me`,
-              {
-                method: 'GET',
-                headers: {
-                  Authorization:
-                    'Basic ' +
-                    Buffer.from(
-                      `${credentials.wpUsername}:${credentials.wpAppPassword}`
-                    ).toString('base64'),
-                },
-              }
-            ),
-            10000
-          );
-
-          results.wordpress.time = Date.now() - wpStart;
-
-          if (wpResponse.ok) {
-            const userData = (await wpResponse.json()) as { name?: string };
-            results.wordpress.success = true;
-            results.wordpress.message = `✅ Verbunden als ${userData.name || 'User'}`;
-            logger.info(
-              `✅ WordPress connection successful (${results.wordpress.time}ms)`
+        tasks.push((async () => {
+          const wpStart = Date.now();
+          try {
+            const wpResponse = await withTimeout(
+              fetch(
+                `${credentials.wpUrl}/wp-json/wp/v2/users/me`,
+                {
+                  method: 'GET',
+                  headers: {
+                    Authorization:
+                      'Basic ' +
+                      Buffer.from(
+                        `${credentials.wpUsername}:${credentials.wpAppPassword}`
+                      ).toString('base64'),
+                  },
+                }
+              ),
+              timeoutMs
             );
-          } else {
-            const errorCategory =
-              wpResponse.status === 401 ? 'auth' : 'unknown';
-            const hint =
-              wpResponse.status === 401
-                ? '🔐 Authentifizierungsfehler - Username oder App Password ungültig'
-                : `❌ WordPress-Fehler ${wpResponse.status}: ${wpResponse.statusText}`;
+
+            results.wordpress.time = Date.now() - wpStart;
+
+            if (wpResponse.ok) {
+              const userData = (await wpResponse.json()) as { name?: string };
+              results.wordpress.success = true;
+              results.wordpress.message = `✅ Verbunden als ${userData.name || 'User'}`;
+              logger.info(
+                `✅ WordPress connection successful (${results.wordpress.time}ms)`
+              );
+            } else {
+              const errorCategory =
+                wpResponse.status === 401 ? 'auth' : 'unknown';
+              const hint =
+                wpResponse.status === 401
+                  ? '🔐 Authentifizierungsfehler - Username oder App Password ungültig'
+                  : `❌ WordPress-Fehler ${wpResponse.status}: ${wpResponse.statusText}`;
+              results.wordpress.message = hint;
+              results.wordpress.error = {
+                category: errorCategory,
+                hint,
+              };
+              logger.warn(`❌ WordPress connection failed: ${wpResponse.status}`);
+            }
+          } catch (wpError) {
+            results.wordpress.time = Date.now() - wpStart;
+            const { category, hint } = categorizeError(wpError);
             results.wordpress.message = hint;
-            results.wordpress.error = {
-              category: errorCategory,
-              hint,
-            };
-            logger.warn(`❌ WordPress connection failed: ${wpResponse.status}`);
+            results.wordpress.error = { category, hint };
+            logger.error(`❌ WordPress connection error: ${wpError}`);
           }
-        } catch (wpError) {
-          results.wordpress.time = Date.now() - wpStart;
-          const { category, hint } = categorizeError(wpError);
-          results.wordpress.message = hint;
-          results.wordpress.error = { category, hint };
-          logger.error(`❌ WordPress connection error: ${wpError}`);
-        }
+        })());
       } else {
         results.wordpress.message = '⚠️ WordPress-Zugangsdaten unvollständig';
       }
@@ -729,121 +746,125 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         credentials.wcConsumerKey &&
         credentials.wcConsumerSecret
       ) {
-        const wcStart = Date.now();
-        try {
-          const wcUrl = new URL(
-            '/wp-json/wc/v3/system_status',
-            credentials.wcApiUrl
-          );
-          wcUrl.searchParams.append('consumer_key', credentials.wcConsumerKey);
-          wcUrl.searchParams.append(
-            'consumer_secret',
-            credentials.wcConsumerSecret
-          );
-
-          const wcResponse = await withTimeout(
-            fetch(wcUrl.toString(), {
-              method: 'GET',
-              headers: {
-                Accept: 'application/json',
-              },
-            }),
-            10000
-          );
-
-          results.woocommerce.time = Date.now() - wcStart;
-
-          if (wcResponse.ok) {
-            const systemStatus = (await wcResponse.json()) as {
-              environment?: { version?: string };
-            };
-            const version = systemStatus?.environment?.version || 'Unknown';
-            results.woocommerce.success = true;
-            results.woocommerce.message = `✅ WooCommerce ${version} verbunden`;
-            logger.info(
-              `✅ WooCommerce connection successful (${results.woocommerce.time}ms)`
+        tasks.push((async () => {
+          const wcStart = Date.now();
+          try {
+            const wcUrl = new URL(
+              '/wp-json/wc/v3/system_status',
+              credentials.wcApiUrl
             );
-          } else {
-            const errorCategory =
-              wcResponse.status === 401 ? 'auth' : 'unknown';
-            const hint =
-              wcResponse.status === 401
-                ? '🔐 Authentifizierungsfehler - Consumer Key/Secret ungültig'
-                : `❌ WooCommerce-Fehler ${wcResponse.status}: ${wcResponse.statusText}`;
+            wcUrl.searchParams.append('consumer_key', credentials.wcConsumerKey);
+            wcUrl.searchParams.append(
+              'consumer_secret',
+              credentials.wcConsumerSecret
+            );
+
+            const wcResponse = await withTimeout(
+              fetch(wcUrl.toString(), {
+                method: 'GET',
+                headers: {
+                  Accept: 'application/json',
+                },
+              }),
+              timeoutMs
+            );
+
+            results.woocommerce.time = Date.now() - wcStart;
+
+            if (wcResponse.ok) {
+              const systemStatus = (await wcResponse.json()) as {
+                environment?: { version?: string };
+              };
+              const version = systemStatus?.environment?.version || 'Unknown';
+              results.woocommerce.success = true;
+              results.woocommerce.message = `✅ WooCommerce ${version} verbunden`;
+              logger.info(
+                `✅ WooCommerce connection successful (${results.woocommerce.time}ms)`
+              );
+            } else {
+              const errorCategory =
+                wcResponse.status === 401 ? 'auth' : 'unknown';
+              const hint =
+                wcResponse.status === 401
+                  ? '🔐 Authentifizierungsfehler - Consumer Key/Secret ungültig'
+                  : `❌ WooCommerce-Fehler ${wcResponse.status}: ${wcResponse.statusText}`;
+              results.woocommerce.message = hint;
+              results.woocommerce.error = {
+                category: errorCategory,
+                hint,
+              };
+              logger.warn(
+                `❌ WooCommerce connection failed: ${wcResponse.status}`
+              );
+            }
+          } catch (wcError) {
+            results.woocommerce.time = Date.now() - wcStart;
+            const { category, hint } = categorizeError(wcError);
             results.woocommerce.message = hint;
-            results.woocommerce.error = {
-              category: errorCategory,
-              hint,
-            };
-            logger.warn(
-              `❌ WooCommerce connection failed: ${wcResponse.status}`
-            );
+            results.woocommerce.error = { category, hint };
+            logger.error(`❌ WooCommerce connection error: ${wcError}`);
           }
-        } catch (wcError) {
-          results.woocommerce.time = Date.now() - wcStart;
-          const { category, hint } = categorizeError(wcError);
-          results.woocommerce.message = hint;
-          results.woocommerce.error = { category, hint };
-          logger.error(`❌ WooCommerce connection error: ${wcError}`);
-        }
+        })());
       } else {
         results.woocommerce.message = '⚠️ WooCommerce-API-Keys unvollständig';
       }
 
       // Test OpenAI
       if (credentials.openaiApiKey) {
-        const openaiStart = Date.now();
-        try {
-          const openaiResponse = await withTimeout(
-            fetch(
-              'https://api.openai.com/v1/models',
-              {
-                method: 'GET',
-                headers: {
-                  Authorization: `Bearer ${credentials.openaiApiKey}`,
-                },
-              }
-            ),
-            10000
-          );
-
-          results.openai.time = Date.now() - openaiStart;
-
-          if (openaiResponse.ok) {
-            const data = (await openaiResponse.json()) as {
-              data?: { id?: string }[];
-            };
-            const modelCount = data?.data?.length || 0;
-            results.openai.success = true;
-            results.openai.message = `✅ OpenAI API aktiv (${modelCount} Modelle verfügbar)`;
-            logger.info(
-              `✅ OpenAI connection successful (${results.openai.time}ms)`
+        tasks.push((async () => {
+          const openaiStart = Date.now();
+          try {
+            const openaiResponse = await withTimeout(
+              fetch(
+                'https://api.openai.com/v1/models',
+                {
+                  method: 'GET',
+                  headers: {
+                    Authorization: `Bearer ${credentials.openaiApiKey}`,
+                  },
+                }
+              ),
+              timeoutMs
             );
-          } else if (openaiResponse.status === 401) {
-            results.openai.message =
-              '🔐 OpenAI API-Key ungültig oder abgelaufen';
-            results.openai.error = {
-              category: 'auth',
-              hint: '🔐 Authentifizierungsfehler - API-Key ist ungültig. Überprüfen Sie den Key auf https://platform.openai.com',
-            };
-            logger.warn('❌ OpenAI authentication failed');
-          } else {
-            results.openai.message = `❌ OpenAI-Fehler: ${openaiResponse.status}`;
-            results.openai.error = {
-              category: 'unknown',
-              hint: `❌ OpenAI API Fehler ${openaiResponse.status}. Probieren Sie später erneut.`,
-            };
-            logger.warn(
-              `❌ OpenAI connection failed: ${openaiResponse.status}`
-            );
+
+            results.openai.time = Date.now() - openaiStart;
+
+            if (openaiResponse.ok) {
+              const data = (await openaiResponse.json()) as {
+                data?: { id?: string }[];
+              };
+              const modelCount = data?.data?.length || 0;
+              results.openai.success = true;
+              results.openai.message = `✅ OpenAI API aktiv (${modelCount} Modelle verfügbar)`;
+              logger.info(
+                `✅ OpenAI connection successful (${results.openai.time}ms)`
+              );
+            } else if (openaiResponse.status === 401) {
+              results.openai.message =
+                '🔐 OpenAI API-Key ungültig oder abgelaufen';
+              results.openai.error = {
+                category: 'auth',
+                hint: '🔐 Authentifizierungsfehler - API-Key ist ungültig. Überprüfen Sie den Key auf https://platform.openai.com',
+              };
+              logger.warn('❌ OpenAI authentication failed');
+            } else {
+              results.openai.message = `❌ OpenAI-Fehler: ${openaiResponse.status}`;
+              results.openai.error = {
+                category: 'unknown',
+                hint: `❌ OpenAI API Fehler ${openaiResponse.status}. Probieren Sie später erneut.`,
+              };
+              logger.warn(
+                `❌ OpenAI connection failed: ${openaiResponse.status}`
+              );
+            }
+          } catch (openaiError) {
+            results.openai.time = Date.now() - openaiStart;
+            const { category, hint } = categorizeError(openaiError);
+            results.openai.message = hint;
+            results.openai.error = { category, hint };
+            logger.error(`❌ OpenAI connection error: ${openaiError}`);
           }
-        } catch (openaiError) {
-          results.openai.time = Date.now() - openaiStart;
-          const { category, hint } = categorizeError(openaiError);
-          results.openai.message = hint;
-          results.openai.error = { category, hint };
-          logger.error(`❌ OpenAI connection error: ${openaiError}`);
-        }
+        })());
       } else {
         results.openai.message = '⚠️ OpenAI API-Key nicht konfiguriert';
       }
@@ -851,107 +872,118 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
       // Test SMTP (optional - nur wenn in config vorhanden)
       const currentConfig = getConfig();
       if (currentConfig.smtp?.host && currentConfig.smtp?.user && currentConfig.smtp?.password) {
-        const smtpStart = Date.now();
-        try {
-          const nodemailer = await import('nodemailer');
-          const testTransporter = nodemailer.default.createTransport({
-            host: currentConfig.smtp.host,
-            port: currentConfig.smtp.port || 465,
-            secure: currentConfig.smtp.secure !== false,
-            auth: {
-              user: currentConfig.smtp.user,
-              pass: currentConfig.smtp.password
-            },
-            connectionTimeout: 10000,
-            greetingTimeout: 10000,
-            socketTimeout: 10000,
-            tls: { rejectUnauthorized: false }
-          });
-          
-          await testTransporter.verify();
-          results.smtp.success = true;
-          results.smtp.time = Date.now() - smtpStart;
-          results.smtp.message = `✅ SMTP-Server erreichbar (${currentConfig.smtp.host}:${currentConfig.smtp.port})`;
-          logger.info('✅ SMTP connection successful');
-        } catch (smtpError: any) {
-          results.smtp.time = Date.now() - smtpStart;
-          results.smtp.message = `❌ SMTP-Fehler: ${smtpError.message}`;
-          results.smtp.error = {
-            category: 'auth',
-            hint: 'SMTP-Zugangsdaten oder Server-Einstellungen prüfen'
-          };
-          logger.warn(`❌ SMTP connection failed: ${smtpError.message}`);
-        }
+        tasks.push((async () => {
+          const smtp = currentConfig.smtp!;
+          const smtpStart = Date.now();
+          try {
+            const nodemailer = await import('nodemailer');
+            const testTransporter = nodemailer.default.createTransport({
+              host: smtp.host,
+              port: smtp.port || 465,
+              secure: smtp.secure !== false,
+              auth: {
+                user: smtp.user,
+                pass: smtp.password
+              },
+              connectionTimeout: timeoutMs,
+              greetingTimeout: timeoutMs,
+              socketTimeout: timeoutMs,
+              tls: { rejectUnauthorized: false }
+            });
+            
+            await testTransporter.verify();
+            results.smtp.success = true;
+            results.smtp.time = Date.now() - smtpStart;
+            results.smtp.message = `✅ SMTP-Server erreichbar (${smtp.host}:${smtp.port})`;
+            logger.info('✅ SMTP connection successful');
+          } catch (smtpError: any) {
+            results.smtp.time = Date.now() - smtpStart;
+            results.smtp.message = `❌ SMTP-Fehler: ${smtpError.message}`;
+            results.smtp.error = {
+              category: 'auth',
+              hint: 'SMTP-Zugangsdaten oder Server-Einstellungen prüfen'
+            };
+            logger.warn(`❌ SMTP connection failed: ${smtpError.message}`);
+          }
+        })());
       } else {
         results.smtp.message = '⚠️ SMTP nicht konfiguriert';
       }
 
       // Test Support-System (optional)
       if (currentConfig.wordpress?.url && currentConfig.support?.ticketsEndpoint) {
-        const supportStart = Date.now();
-        try {
-          const { getTickets } = await import('../../../../services/supportTickets.js');
-          const tickets = await withTimeout(getTickets(), 10000);
-          results.support.success = true;
-          results.support.time = Date.now() - supportStart;
-          results.support.message = `✅ Support-System erreichbar (${tickets.length} Tickets gefunden)`;
-          logger.info(`✅ Support system connection successful - ${tickets.length} tickets`);
-        } catch (supportError: any) {
-          results.support.time = Date.now() - supportStart;
-          results.support.message = `❌ Support-Fehler: ${supportError.message}`;
-          results.support.error = {
-            category: 'network',
-            hint: 'Support-Endpoint oder WordPress-Zugangsdaten prüfen'
-          };
-          logger.warn(`❌ Support connection failed: ${supportError.message}`);
-        }
+        tasks.push((async () => {
+          const supportStart = Date.now();
+          try {
+            const { getTickets } = await import('../../../../services/supportTickets.js');
+            const tickets = await withTimeout(getTickets(), timeoutMs);
+            results.support.success = true;
+            results.support.time = Date.now() - supportStart;
+            results.support.message = `✅ Support-System erreichbar (${tickets.length} Tickets gefunden)`;
+            logger.info(`✅ Support system connection successful - ${tickets.length} tickets`);
+          } catch (supportError: any) {
+            results.support.time = Date.now() - supportStart;
+            results.support.message = `❌ Support-Fehler: ${supportError.message}`;
+            results.support.error = {
+              category: 'network',
+              hint: 'Support-Endpoint oder WordPress-Zugangsdaten prüfen'
+            };
+            logger.warn(`❌ Support connection failed: ${supportError.message}`);
+          }
+        })());
       } else {
         results.support.message = '⚠️ Support-System nicht konfiguriert';
       }
 
       // Test Reddit (optional - nur wenn konfiguriert)
       if (currentConfig.reddit?.clientId && currentConfig.reddit?.clientSecret) {
-        const redditStart = Date.now();
-        try {
-          const redditAuth = Buffer.from(`${currentConfig.reddit.clientId}:${currentConfig.reddit.clientSecret}`).toString('base64');
-          const redditResponse = await withTimeout(
-            fetch('https://www.reddit.com/api/v1/access_token', {
-              method: 'POST',
-              headers: {
-                'Authorization': `Basic ${redditAuth}`,
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'User-Agent': 'ARI-Agent/1.0'
-              },
-              body: 'grant_type=client_credentials'
-            }),
-            10000
-          );
-          
-          if (redditResponse.ok) {
-            const redditData = await redditResponse.json();
-            if (redditData.access_token) {
-              results.reddit.success = true;
-              results.reddit.time = Date.now() - redditStart;
-              results.reddit.message = '✅ Reddit OAuth erfolgreich';
-              logger.info('✅ Reddit OAuth successful');
+        tasks.push((async () => {
+          const reddit = currentConfig.reddit!;
+          const redditStart = Date.now();
+          try {
+            const redditAuth = Buffer.from(`${reddit.clientId}:${reddit.clientSecret}`).toString('base64');
+            const redditResponse = await withTimeout(
+              fetch('https://www.reddit.com/api/v1/access_token', {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Basic ${redditAuth}`,
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'User-Agent': 'ARI-Agent/1.0'
+                },
+                body: 'grant_type=client_credentials'
+              }),
+              timeoutMs
+            );
+            
+            if (redditResponse.ok) {
+              const redditData = await redditResponse.json();
+              if (redditData.access_token) {
+                results.reddit.success = true;
+                results.reddit.time = Date.now() - redditStart;
+                results.reddit.message = '✅ Reddit OAuth erfolgreich';
+                logger.info('✅ Reddit OAuth successful');
+              } else {
+                throw new Error('Kein Access Token erhalten');
+              }
             } else {
-              throw new Error('Kein Access Token erhalten');
+              throw new Error(`HTTP ${redditResponse.status}`);
             }
-          } else {
-            throw new Error(`HTTP ${redditResponse.status}`);
+          } catch (redditError: any) {
+            results.reddit.time = Date.now() - redditStart;
+            results.reddit.message = `❌ Reddit-Fehler: ${redditError.message}`;
+            results.reddit.error = {
+              category: 'auth',
+              hint: 'Reddit Client-ID oder Secret prüfen'
+            };
+            logger.warn(`❌ Reddit connection failed: ${redditError.message}`);
           }
-        } catch (redditError: any) {
-          results.reddit.time = Date.now() - redditStart;
-          results.reddit.message = `❌ Reddit-Fehler: ${redditError.message}`;
-          results.reddit.error = {
-            category: 'auth',
-            hint: 'Reddit Client-ID oder Secret prüfen'
-          };
-          logger.warn(`❌ Reddit connection failed: ${redditError.message}`);
-        }
+        })());
       } else {
         results.reddit.message = '⚠️ Reddit nicht konfiguriert';
       }
+
+      // Alle Tests parallel warten
+      await Promise.allSettled(tasks);
 
       const overallSuccess =
         results.wordpress.success ||
