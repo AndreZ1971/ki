@@ -654,6 +654,16 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         support: { success: false, message: '', time: 0 },
       };
 
+      // Timeout helper
+      const withTimeout = <T>(promise: Promise<T>, ms: number): Promise<T> => {
+        return Promise.race([
+          promise,
+          new Promise<T>((_, reject) =>
+            setTimeout(() => reject(new Error(`Timeout after ${ms}ms`)), ms)
+          ),
+        ]);
+      };
+
       // Test WordPress
       if (
         credentials.wpUrl &&
@@ -662,18 +672,21 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
       ) {
         const wpStart = Date.now();
         try {
-          const wpResponse = await fetch(
-            `${credentials.wpUrl}/wp-json/wp/v2/users/me`,
-            {
-              method: 'GET',
-              headers: {
-                Authorization:
-                  'Basic ' +
-                  Buffer.from(
-                    `${credentials.wpUsername}:${credentials.wpAppPassword}`
-                  ).toString('base64'),
-              },
-            }
+          const wpResponse = await withTimeout(
+            fetch(
+              `${credentials.wpUrl}/wp-json/wp/v2/users/me`,
+              {
+                method: 'GET',
+                headers: {
+                  Authorization:
+                    'Basic ' +
+                    Buffer.from(
+                      `${credentials.wpUsername}:${credentials.wpAppPassword}`
+                    ).toString('base64'),
+                },
+              }
+            ),
+            10000
           );
 
           results.wordpress.time = Date.now() - wpStart;
@@ -728,12 +741,15 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
             credentials.wcConsumerSecret
           );
 
-          const wcResponse = await fetch(wcUrl.toString(), {
-            method: 'GET',
-            headers: {
-              Accept: 'application/json',
-            },
-          });
+          const wcResponse = await withTimeout(
+            fetch(wcUrl.toString(), {
+              method: 'GET',
+              headers: {
+                Accept: 'application/json',
+              },
+            }),
+            10000
+          );
 
           results.woocommerce.time = Date.now() - wcStart;
 
@@ -778,14 +794,17 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
       if (credentials.openaiApiKey) {
         const openaiStart = Date.now();
         try {
-          const openaiResponse = await fetch(
-            'https://api.openai.com/v1/models',
-            {
-              method: 'GET',
-              headers: {
-                Authorization: `Bearer ${credentials.openaiApiKey}`,
-              },
-            }
+          const openaiResponse = await withTimeout(
+            fetch(
+              'https://api.openai.com/v1/models',
+              {
+                method: 'GET',
+                headers: {
+                  Authorization: `Bearer ${credentials.openaiApiKey}`,
+                },
+              }
+            ),
+            10000
           );
 
           results.openai.time = Date.now() - openaiStart;
@@ -843,6 +862,9 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
               user: currentConfig.smtp.user,
               pass: currentConfig.smtp.password
             },
+            connectionTimeout: 10000,
+            greetingTimeout: 10000,
+            socketTimeout: 10000,
             tls: { rejectUnauthorized: false }
           });
           
@@ -869,7 +891,7 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         const supportStart = Date.now();
         try {
           const { getTickets } = await import('../../../../services/supportTickets.js');
-          const tickets = await getTickets();
+          const tickets = await withTimeout(getTickets(), 10000);
           results.support.success = true;
           results.support.time = Date.now() - supportStart;
           results.support.message = `✅ Support-System erreichbar (${tickets.length} Tickets gefunden)`;
@@ -892,15 +914,18 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         const redditStart = Date.now();
         try {
           const redditAuth = Buffer.from(`${currentConfig.reddit.clientId}:${currentConfig.reddit.clientSecret}`).toString('base64');
-          const redditResponse = await fetch('https://www.reddit.com/api/v1/access_token', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Basic ${redditAuth}`,
-              'Content-Type': 'application/x-www-form-urlencoded',
-              'User-Agent': 'ARI-Agent/1.0'
-            },
-            body: 'grant_type=client_credentials'
-          });
+          const redditResponse = await withTimeout(
+            fetch('https://www.reddit.com/api/v1/access_token', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Basic ${redditAuth}`,
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'User-Agent': 'ARI-Agent/1.0'
+              },
+              body: 'grant_type=client_credentials'
+            }),
+            10000
+          );
           
           if (redditResponse.ok) {
             const redditData = await redditResponse.json();
