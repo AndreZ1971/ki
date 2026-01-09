@@ -274,7 +274,7 @@ const AIEmailGenerator: React.FC = () => {
   };
 
   // 🔎 SMTP Konfiguration testen
-  const testSmtp = async () => {
+  const _testSmtp = async () => {
     try {
       const result = await emailApi.testSmtp();
       if (result.success) {
@@ -490,7 +490,7 @@ const AIEmailGenerator: React.FC = () => {
   );
 
   // 🔥 NEU: API Status Badge
-  const getApiStatusBadge = () => {
+  const _getApiStatusBadge = () => {
     switch (apiStatus) {
       case 'connected':
         return <span style={{ background: '#10b981', color: 'white', padding: '4px 8px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold' }}>✅ API Verbunden</span>;

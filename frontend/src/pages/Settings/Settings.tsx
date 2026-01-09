@@ -1008,7 +1008,7 @@ const Settings = () => {
     }
   };
 
-  const purchaseSpecialization = (spec: Specialization) => {
+  const _purchaseSpecialization = (spec: Specialization) => {
     console.log("🛒 Kaufe Spezialisierung:", spec.name);
     alert(`🛒 Weiterleitung zum Kauf: ${spec.name} (${spec.price}€)`);
   };
