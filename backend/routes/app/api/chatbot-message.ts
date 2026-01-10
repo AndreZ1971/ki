@@ -106,6 +106,24 @@ export default async function chatbotMessageRoute(server: FastifyInstance) {
         } catch (_e) {
           // Fallback unten
         }
+        // Zusätzlicher Fallback: direkte Shop-Stats
+        try {
+          const stats = await getShopStats();
+          if (typeof stats.products === 'number' && stats.products > 0) {
+            // Kategorien via Function Caller versuchen
+            const categoryRes = await callChatbotFunction('wieviele kategorien gibt es?');
+            const catCount = categoryRes && categoryRes.result && !categoryRes.result.error
+              ? Number(categoryRes.result.count || 0)
+              : undefined;
+            const reply = typeof catCount === 'number'
+              ? `${stats.products} Produkte in ${catCount} Kategorien`
+              : `${stats.products} Produkte im Shop`;
+            recordQuery(message, true);
+            return { success: true, reply };
+          }
+        } catch (_e2) {
+          // Ignorieren
+        }
         recordQuery(message, false);
         return { success: true, reply: 'Produktverwaltung, Bestseller-Analysen und Sortimentsoptimierung findest du im Modul "Produkte". Dort kannst du neue Artikel anlegen, bearbeiten und auswerten.' };
       }
