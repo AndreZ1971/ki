@@ -238,6 +238,14 @@ Weitere 8 Payment-Tools mit ML-Integration
 | Advanced | 9 | 🟢 9/9 | **100%** |
 | **GESAMT** | **53** | **🟢 53/53** | **100%** |
 
+### 🔭 Roadmap (ohne Datenbankpflicht)
+
+- Leichtgewichtiger Wissensspeicher: FAQs/Antwort-Snippets als JSON/YAML im Repo (git-versioniert); Vektor-Store nur als optionale, spätere Erweiterung.
+- Feedback-Loop light: Thumbs-Up/Down im Frontend, Speicherung in kleinen JSON-/CSV-Logs mit Rotation; Auswertung bei Bedarf offline.
+- Mehr Live-Daten-Intents: Umsatz heute, Top-Seller, Low-Stock direkt über bestehende WooCommerce-APIs, keine Persistenz.
+- Tests & Observability: Golden-Chat-Tests (Vitest/Playwright), einfache Request-/Fallback-Logs mit Rotation; Kennzahlen aus Logs parsbar.
+- Feature Flags ohne DB: Env-Variablen oder kleine Config-Dateien für neue Intents/Prompts; Umschalten per Deploy.
+
 ---
 
 ## 🛡️ Sicherheit & Compliance

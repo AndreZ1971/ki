@@ -274,6 +274,14 @@ Your shop is on Facebook, Instagram, LinkedIn, TikTok, email. A.R.I. posts smart
 | Advanced | 9 | 🟢 9/9 | **100%** |
 | **TOTAL** | **53** | **🟢 53/53** | **100%** |
 
+### 🔭 Roadmap (no database required)
+
+- Lightweight knowledge base: FAQs/answer snippets as JSON/YAML in-repo (git versioned); vector store only as an optional, later extension.
+- Light feedback loop: thumbs up/down in the frontend, stored as small JSON/CSV logs with rotation; analyze offline when needed.
+- More live-data intents: revenue today, top sellers, low stock via existing WooCommerce APIs, no persistence.
+- Tests & observability: golden chat tests (Vitest/Playwright), simple request/fallback logs with rotation; metrics derivable from logs.
+- Feature flags without DB: env vars or small config files for new intents/prompts; toggled per deploy.
+
 ### 🆕 Recent Updates (January 8, 2026)
 
 #### ✅ Configuration System:
