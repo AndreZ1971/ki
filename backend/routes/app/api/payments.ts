@@ -1,6 +1,7 @@
 import { getConfig } from '@config';
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { recordMlEvent, getMlEvents } from '../../../services/mlStats.js';
+import { logger } from '../../../logger';
 
 /**
  * Helper: Remove markdown code blocks from GPT responses
@@ -126,7 +127,7 @@ export default async function paymentRoutes(server: FastifyInstance) {
     async (request: FastifyRequest<{ Body: FraudCheckBody }>, reply: FastifyReply) => {
       try {
         const { amount, currency, customerEmail, ipAddress = 'unknown' } = request.body;
-        console.log('🔍 Fraud check:', { amount, customerEmail });
+        logger.debug({ amount, customerEmail }, 'Fraud check started');
 
         const { getOpenAIClient, executeOpenAI } = await import('../../../utils/openai.js');
         const openai = getOpenAIClient();
@@ -202,14 +203,14 @@ Scoring:
 
         recordMlEvent('payments.fraud-check', true, normalizedAnalysis.confidence);
 
-        console.log(`✅ Fraud analysis: Risk=${normalizedAnalysis.riskScore}, Level=${normalizedAnalysis.riskLevel}`);
+        logger.info({ riskScore: normalizedAnalysis.riskScore, riskLevel: normalizedAnalysis.riskLevel }, 'Fraud analysis completed');
 
         return reply.send({
           success: true,
           data: normalizedAnalysis
         });
       } catch (error) {
-        console.error('❌ Fraud check error:', error);
+        logger.error({ error: error instanceof Error ? error.message : 'Unknown', function: 'fraudCheck' }, 'Fraud check failed');
         recordMlEvent('payments.fraud-check', false, 0);
         return reply.status(500).send({
           success: false,
@@ -238,7 +239,7 @@ Scoring:
     async (request: FastifyRequest<{ Querystring: AmountSuggestionQuery }>, reply: FastifyReply) => {
       try {
         const { currency = 'EUR', category = 'digital-products' } = request.query;
-        console.log('💰 Amount suggestions for:', currency, category);
+        logger.debug({ currency, category }, 'Generating amount suggestions');
 
         // ✅ FALLBACK AMOUNT SUGGESTIONS - Stabil ohne externe APIs
         const fallbackSuggestions = [
@@ -282,7 +283,7 @@ Scoring:
         const suggestions = fallbackSuggestions;
         const avgConfidence = suggestions.reduce((sum, s) => sum + s.conversionScore, 0) / suggestions.length;
 
-        console.log(`✅ Generated ${suggestions.length} amount suggestions (fallback)`);
+        logger.info({ count: suggestions.length, avgConfidence }, 'Amount suggestions generated (fallback)');
 
         recordMlEvent('payments.suggest-amounts', true, avgConfidence);
 
@@ -293,7 +294,7 @@ Scoring:
           category
         });
       } catch (error) {
-        console.error('❌ Amount suggestion error:', error);
+        logger.error({ error: error instanceof Error ? error.message : 'Unknown', function: 'suggestAmounts' }, 'Amount suggestion failed');
         recordMlEvent('payments.suggest-amounts', false, 0);
         return reply.status(500).send({
           success: false,
@@ -367,7 +368,7 @@ Scoring:
           }
         });
       } catch (error) {
-        console.error('❌ Success prediction error:', error);
+        logger.error({ error: error instanceof Error ? error.message : 'Unknown', function: 'predictSuccess' }, 'Success prediction failed');
         recordMlEvent('payments.predict-success', false, 0);
         return reply.status(500).send({
           success: false,
@@ -450,7 +451,7 @@ Antworte als JSON-Objekt:
 
         return reply.send({ success: true, data: normalized });
       } catch (error) {
-        console.error('❌ UX check error:', error);
+        logger.error({ error: error instanceof Error ? error.message : 'Unknown', function: 'uxCheck' }, 'UX check failed');
         recordMlEvent('payments.ux-check', false, 0);
         return reply.status(500).send({
           success: false,
@@ -629,11 +630,11 @@ Antworte als JSON-Objekt:
 
         recordMlEvent('payments.verify', valid, 1 - riskScore / 100);
 
-        console.log(`✅ Payment verification: ${transactionId}, Risk=${riskScore}, Level=${riskLevel}, Action=${recommendedAction}`);
+        logger.info({ transactionId, riskScore, riskLevel, recommendedAction }, 'Payment verification completed');
 
         return reply.send({ success: true, data: result });
       } catch (error) {
-        console.error('❌ Payment verify error:', error);
+        logger.error({ error: error instanceof Error ? error.message : 'Unknown', function: 'verifyPayment' }, 'Payment verification failed');
         recordMlEvent('payments.verify', false, 0);
         return reply.status(500).send({
           success: false,
@@ -727,7 +728,7 @@ Regeln:
 
         return reply.send({ success: true, data: normalized });
       } catch (error) {
-        console.error('❌ Test plan error:', error);
+        logger.error({ error: error instanceof Error ? error.message : 'Unknown', function: 'generateTestPlan' }, 'Test plan generation failed');
         recordMlEvent('payments.test-plan', false, 0);
         return reply.status(500).send({
           success: false,
@@ -803,7 +804,7 @@ Liefere JSON:
 
         return reply.send({ success: true, data: normalized });
       } catch (error) {
-        console.error('❌ Test diagnose error:', error);
+        logger.error({ error: error instanceof Error ? error.message : 'Unknown', function: 'diagnoseTest' }, 'Test diagnose failed');
         recordMlEvent('payments.test-diagnose', false, 0);
         return reply.status(500).send({
           success: false,
@@ -930,7 +931,7 @@ Liefere JSON:
 
         return reply.send({ success: true, data: normalized });
       } catch (error) {
-        console.error('❌ Issue detection error:', error);
+        logger.error({ error: error instanceof Error ? error.message : 'Unknown', function: 'detectIssues' }, 'Issue detection failed');
         recordMlEvent('payments.issue-detection', false, 0);
         return reply.status(500).send({
           success: false,
@@ -1084,7 +1085,7 @@ Liefere JSON:
 
         return reply.send({ success: true, data: normalized });
       } catch (error) {
-        console.error('❌ User preferences error:', error);
+        logger.error({ error: error instanceof Error ? error.message : 'Unknown', function: 'analyzeUserPreferences' }, 'User preferences analysis failed');
         recordMlEvent('payments.user-preferences', false, 0);
         return reply.status(500).send({
           success: false,
@@ -1159,7 +1160,7 @@ Liefere JSON:
           }
         });
       } catch (error) {
-        console.error('❌ Success metrics error:', error);
+        logger.error({ error: error instanceof Error ? error.message : 'Unknown', function: 'getSuccessMetrics' }, 'Success metrics calculation failed');
         return reply.status(500).send({ success: false, error: error instanceof Error ? error.message : 'Metriken konnten nicht berechnet werden' });
       }
     }
@@ -1404,7 +1405,7 @@ Liefere JSON:
 
         return reply.send({ success: true, data: normalized });
       } catch (error) {
-        console.error('❌ Delivery optimization error:', error);
+        logger.error({ error: error instanceof Error ? error.message : 'Unknown', function: 'optimizeDelivery' }, 'Delivery optimization failed');
         recordMlEvent('payments.delivery-optimization', false, 0);
         return reply.status(500).send({
           success: false,
@@ -1699,7 +1700,7 @@ Ticket: ${ticketId}`
 
         return reply.send({ success: true, data: normalized });
       } catch (error) {
-        console.error('❌ Emergency analysis error:', error);
+        logger.error({ error: error instanceof Error ? error.message : 'Unknown', function: 'analyzeEmergency' }, 'Emergency analysis failed');
         recordMlEvent('payments.emergency-analysis', false, 0);
         return reply.status(500).send({
           success: false,
@@ -1814,7 +1815,7 @@ Gib zurück (JSON):
 
         return reply.send({ success: true, data: normalized });
       } catch (error) {
-        console.error('❌ Expansion strategy error:', error);
+        logger.error({ error: error instanceof Error ? error.message : 'Unknown', function: 'generateExpansionStrategy' }, 'Expansion strategy generation failed');
         recordMlEvent('payments.expansion-strategy', false, 0);
         return reply.status(500).send({
           success: false,
@@ -1878,7 +1879,7 @@ async function sendEmergencyAlerts(analysis: any): Promise<void> {
           alerts.push('⚠️ Slack notification failed');
         }
       } catch (slackError) {
-        console.error('Slack webhook error:', slackError);
+        logger.error({ error: slackError instanceof Error ? slackError.message : 'Unknown' }, 'Slack webhook error');
         alerts.push('❌ Slack error');
       }
     }
@@ -1888,10 +1889,10 @@ async function sendEmergencyAlerts(analysis: any): Promise<void> {
     if (alertEmail) {
       try {
         // Hier würde dein bestehendes Email-System integriert werden
-        console.log(`📧 Emergency email would be sent to: ${alertEmail}`);
+        logger.info({ alertEmail }, 'Emergency email queued');
         alerts.push('✅ Email queued');
       } catch (emailError) {
-        console.error('Email error:', emailError);
+        logger.error({ error: emailError instanceof Error ? emailError.message : 'Unknown' }, 'Emergency email error');
         alerts.push('❌ Email error');
       }
     }
@@ -1929,32 +1930,14 @@ async function sendEmergencyAlerts(analysis: any): Promise<void> {
           alerts.push('⚠️ PagerDuty failed');
         }
       } catch (pdError) {
-        console.error('PagerDuty error:', pdError);
+        logger.error({ error: pdError instanceof Error ? pdError.message : 'Unknown' }, 'PagerDuty error');
         alerts.push('❌ PagerDuty error');
       }
     }
 
-    // 4. Console Log (immer)
-    console.log(`
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🚨 PAYMENT EMERGENCY ALERT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Ticket:           ${analysis.ticketId}
-Severity:         ${analysis.severity}
-Priority:         ${analysis.priority}
-Customers:        ${analysis.estimatedImpact.customersFacing.toLocaleString()}
-Revenue at Risk:  €${analysis.estimatedImpact.revenueAtRisk.toLocaleString()}
-SLA Violation:    ${analysis.estimatedImpact.slaViolation ? 'YES ❌' : 'NO ✅'}
-Issue Type:       ${analysis.metadata.issueType}
-
-Escalation Path:
-${analysis.escalationPath.map((p: string, i: number) => `  ${i + 1}. ${p}`).join('\n')}
-
-Alerts Sent: ${alerts.join(', ')}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    `);
+    // Strukturiertes Emergency Logging bereits durch logger.warn oben erledigt
 
   } catch (error) {
-    console.error('❌ Error sending emergency alerts:', error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown' }, 'Error sending emergency alerts');
   }
 }

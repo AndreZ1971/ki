@@ -1,5 +1,6 @@
 // services/api.ts
 import axios from 'axios';
+import { logger } from '../logger.js';
 
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL || 'http://localhost:3001', // Backend URL anpassen
@@ -26,7 +27,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 500) {
-      console.error('Server Error:', error.response.data);
+      logger.error({ error: error.response.data, status: 500 }, 'Server error in API call');
       throw new Error('Server error - please check backend services');
     }
     return Promise.reject(error);

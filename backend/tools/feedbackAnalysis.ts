@@ -1,6 +1,8 @@
 // Kunden-Feedback-Analyse Tool
 // Analysiert Bewertungen und Support-Tickets aus dem Shop
 
+import { logger } from '../logger';
+
 // Dynamischer Import für node-fetch (ESM/TS kompatibel)
 // @ts-expect-error: TypeScript cannot resolve .js import in mixed ESM/CJS build
 import type { RequestInfo, RequestInit } from 'node-fetch';
@@ -38,7 +40,7 @@ export async function fetchReviews({ shopUrl, consumerKey, consumerSecret }: { s
     const data = await response.json();
     return data as Review[];
   } catch (error) {
-    console.error('fetchReviews error:', error);
+    logger.error({ error }, 'Failed to fetch reviews');
     return [];
   }
 }
@@ -58,7 +60,7 @@ export async function fetchSupportTickets({ shopUrl, apiToken }: { shopUrl: stri
     const data = await response.json();
     return data as Ticket[];
   } catch (error) {
-    console.error('fetchSupportTickets error:', error);
+    logger.error({ error }, 'Failed to fetch support tickets');
     return [];
   }
 }

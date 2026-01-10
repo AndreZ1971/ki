@@ -8,6 +8,8 @@
 //   WOO_AUTH_MODE   = basic | query   (optional, default: basic)
 //   WOO_TIMEOUT_MS  = 30000           (optional)
 
+import { logger } from '../logger';
+
 // FÜGE DIESE ZEILE HINZU: Environment Variablen laden
 
 import { getConfig } from '../config';
@@ -20,6 +22,66 @@ import type { Tool } from '../types.js';
 
 const AUTH_MODE = (process.env.WOO_AUTH_MODE ?? 'basic').toLowerCase();
 const TIMEOUT_MS = Number(process.env.WOO_TIMEOUT_MS ?? 30000);
+const MAX_RETRIES = 3;
+const BASE_RETRY_DELAY = 1000; // 1 second
+
+/**
+ * Retry-Helper mit exponentiellem Backoff
+ */
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  maxAttempts: number = MAX_RETRIES
+): Promise<T> {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      const isLastAttempt = attempt === maxAttempts - 1;
+      const isDev = process.env.NODE_ENV === 'development';
+      
+      if (isLastAttempt) {
+        throw error;
+      }
+      
+      const delay = BASE_RETRY_DELAY * Math.pow(2, attempt);
+      if (isDev) {
+        logger.debug({ attempt: attempt + 1, maxAttempts: maxAttempts - 1, delay }, 'Retrying operation');
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  throw new Error('Max retries exceeded');
+}
+
+/**
+ * Timeout-Helper mit Promise.race
+ */
+async function withTimeout<T>(
+  fn: () => Promise<T>,
+  timeoutMs: number = 5000
+): Promise<T> {
+  const isDev = process.env.NODE_ENV === 'development';
+  let timer: NodeJS.Timeout | null = null;
+  
+  try {
+    return await Promise.race([
+      fn(),
+      new Promise<T>((_, reject) => {
+        timer = setTimeout(() => {
+          if (isDev) {
+            logger.warn({ timeoutMs }, 'Operation timed out');
+          }
+          reject(new Error(`Operation timed out after ${timeoutMs}ms`));
+        }, timeoutMs);
+      })
+    ]);
+  } finally {
+    if (timer) {
+      clearTimeout(timer);
+    }
+  }
+}
 
 function getWooConfig() {
   // Hole WooCommerce-Konfiguration aus connection.json (config.woocommerce)
@@ -112,8 +174,13 @@ export async function wooGet(
       : params;
 
   try {
-    const res = await client.get(url, { params: qp });
-    return res.data;
+    return await withTimeout(
+      () => withRetry(async () => {
+        const res = await client.get(url, { params: qp });
+        return res.data;
+      }),
+      5000 // 5 second timeout
+    );
   } catch (_err) {
     throw new Error(`woo_get failed: ${axiosErrorToMessage(_err)}`);
   }
@@ -152,16 +219,21 @@ export async function wooPost(
       : restParams;
 
   try {
-    if (method === 'put') {
-      const res = await client.put(url, data ?? {}, { params: qp });
-      return res.data;
-    } else if (method === 'patch') {
-      const res = await client.patch(url, data ?? {}, { params: qp });
-      return res.data;
-    } else {
-      const res = await client.post(url, data ?? {}, { params: qp });
-      return res.data;
-    }
+    return await withTimeout(
+      () => withRetry(async () => {
+        if (method === 'put') {
+          const res = await client.put(url, data ?? {}, { params: qp });
+          return res.data;
+        } else if (method === 'patch') {
+          const res = await client.patch(url, data ?? {}, { params: qp });
+          return res.data;
+        } else {
+          const res = await client.post(url, data ?? {}, { params: qp });
+          return res.data;
+        }
+      }),
+      5000 // 5 second timeout
+    );
   } catch (_err) {
     throw new Error(`woo_post failed: ${axiosErrorToMessage(_err)}`);
   }

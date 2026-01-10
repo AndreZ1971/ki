@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { getConfig } from '../../../../config';
+import { logger } from '../../../../logger';
 
 interface Freebie {
   id: number;
@@ -121,7 +122,7 @@ export default async function freebieRoutes(server: FastifyInstance) {
           totalProducts: products.length
         });
       } catch (_error) {
-        console.error('Freebies API Error:', _error);
+        logger.error({ error: _error, function: 'getFreebies' }, 'Freebies API Error');
         return reply.status(500).send({
           success: false,
           error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
@@ -154,18 +155,13 @@ export default async function freebieRoutes(server: FastifyInstance) {
     async (request: FastifyRequest<{ Body: CreateFreebieBody }>, reply: FastifyReply) => {
       try {
         const freebieData = request.body;
-        console.log('🎁 Creating freebie:', freebieData);
+        logger.debug({ freebieData }, 'Creating freebie');
 
         // ✅ ECHTE WooCommerce Freebie-Erstellung - Nutze bereits geladene Config
         const wooConfig = getConfig().woocommerce || {};
         
         if (!wooConfig?.url || !wooConfig?.consumerKey || !wooConfig?.consumerSecret) {
-          console.error('❌ WooCommerce Config ungültig:', {
-            url: !!wooConfig?.url,
-            consumerKey: !!wooConfig?.consumerKey,
-            consumerSecret: !!wooConfig?.consumerSecret,
-            fullConfig: wooConfig
-          });
+          logger.error({ hasUrl: !!wooConfig?.url, hasKey: !!wooConfig?.consumerKey, hasSecret: !!wooConfig?.consumerSecret, fullConfig: wooConfig }, 'WooCommerce Config ungültig');
           throw new Error(`WooCommerce-Konfiguration fehlt: ${JSON.stringify({ url: !!wooConfig?.url, key: !!wooConfig?.consumerKey, secret: !!wooConfig?.consumerSecret })}`);
         }
 
@@ -202,7 +198,7 @@ export default async function freebieRoutes(server: FastifyInstance) {
           ];
         }
 
-        console.log('📤 Sending to WooCommerce:', JSON.stringify(wooPayload, null, 2));
+        logger.debug({ payload: wooPayload }, 'Sending to WooCommerce');
 
         const response = await fetch(`${wooConfig.url}/wp-json/wc/v3/products`, {
           method: 'POST',
@@ -215,12 +211,12 @@ export default async function freebieRoutes(server: FastifyInstance) {
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('❌ WooCommerce Error:', errorText);
+          logger.error({ status: response.status, error: errorText }, 'WooCommerce Error');
           throw new Error(`WooCommerce API Error: ${response.status} - ${errorText}`);
         }
 
         const wooFreebie = await response.json();
-        console.log('✅ Freebie created in WooCommerce:', wooFreebie.id);
+        logger.info({ freebieId: wooFreebie.id }, 'Freebie created in WooCommerce');
 
         const newFreebie: Freebie = {
           id: wooFreebie.id,
@@ -240,7 +236,7 @@ export default async function freebieRoutes(server: FastifyInstance) {
           permalink: wooFreebie.permalink
         });
       } catch (_error) {
-        console.error('❌ Freebie creation error:', _error);
+        logger.error({ error: _error, function: 'createFreebie' }, 'Freebie creation error');
         return reply.status(500).send({
           success: false,
           error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
@@ -261,7 +257,7 @@ export default async function freebieRoutes(server: FastifyInstance) {
     async (request: FastifyRequest<{ Querystring: MLGenerateQuery }>, reply: FastifyReply) => {
       try {
         const { type } = request.query;
-        console.log('🎁 Generating freebie ideas for type:', type);
+        logger.debug({ type }, 'Generating freebie ideas for type');
 
         // Fallback-Ideen pro Typ (verwende diese sofort ohne OpenAI-Call für Stabilität)
         const fallbackIdeasByType: Record<string, FreebieIdea[]> = {
@@ -302,12 +298,12 @@ export default async function freebieRoutes(server: FastifyInstance) {
           reason: idea.reason || 'Bewährte Freebie-Strategie'
         })).slice(0, 5);
 
-        console.log(`✅ Returning ${normalized.length} freebie ideas`);
+        logger.info({ count: normalized.length }, 'Returning freebie ideas');
 
         // Antworte im konsistenten ApiResponse-Format mit "data"
         return reply.send({ success: true, data: normalized });
       } catch (_error) {
-        console.error('Freebie ML Generate Error:', _error);
+        logger.error({ error: _error, function: 'mlGenerateFreebieIdeas' }, 'Freebie ML Generate Error');
         return reply.status(500).send({
           success: false,
           error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
@@ -335,7 +331,7 @@ export default async function freebieRoutes(server: FastifyInstance) {
     async (request: FastifyRequest<{ Body: AutoCreateBody }>, reply: FastifyReply) => {
       try {
         const { type } = request.body;
-        console.log('🤖 Auto-creating freebie:', type);
+        logger.debug({ type }, 'Auto-creating freebie');
 
         // ✅ AI-basierte Freebie-Generierung mit OpenAI
         const OpenAI = (await import('openai')).default;
@@ -373,13 +369,13 @@ Antworte mit einem JSON Objekt im Format:
         });
 
         const responseContent = completion.choices[0].message.content || '{"name": "Freebie", "description": ""}';
-        console.log('🤖 OpenAI Response:', responseContent);
+        logger.debug({ responsePreview: responseContent.substring(0, 200) }, 'OpenAI Response');
         
         let freebieIdea: any;
         try {
           freebieIdea = JSON.parse(responseContent);
         } catch (parseError) {
-          console.error('❌ JSON Parse Error:', parseError);
+          logger.error({ error: parseError }, 'JSON Parse Error');
           throw new Error('Fehler beim Parsen der AI Antwort');
         }
 
@@ -416,7 +412,7 @@ Antworte mit einem JSON Objekt im Format:
           ]
         };
 
-        console.log('📤 Sending to WooCommerce:', JSON.stringify(wooPayload, null, 2));
+        logger.debug({ payload: wooPayload }, 'Sending to WooCommerce');
 
         const response = await fetch(`${wooConfig.url}/wp-json/wc/v3/products`, {
           method: 'POST',
@@ -429,12 +425,12 @@ Antworte mit einem JSON Objekt im Format:
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('❌ WooCommerce Error:', errorText);
+          logger.error({ status: response.status, error: errorText }, 'WooCommerce Error');
           throw new Error(`WooCommerce API Error: ${response.status} - ${errorText}`);
         }
 
         const wooFreebie = await response.json();
-        console.log('✅ Freebie created in WooCommerce:', wooFreebie.id);
+        logger.info({ freebieId: wooFreebie.id }, 'Freebie created in WooCommerce');
 
         const newFreebie: Freebie = {
           id: wooFreebie.id,
@@ -455,7 +451,7 @@ Antworte mit einem JSON Objekt im Format:
           timestamp: new Date().toISOString()
         });
       } catch (_error) {
-        console.error('❌ Auto-create freebie error:', _error);
+        logger.error({ error: _error, function: 'autoCreateFreebie' }, 'Auto-create freebie error');
         return reply.status(500).send({
           success: false,
           error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'

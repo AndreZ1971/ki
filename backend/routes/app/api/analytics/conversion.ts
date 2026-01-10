@@ -3,6 +3,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { registerConversionMLAnalysis } from './conversion/ml-analysis';
 import { registerConversionReportMLAnalysis } from './conversion/ml-report-analysis';
 import { getConfig } from '../../../../config';
+import { logger } from '../../../../logger.js';
 
 export default async function conversionRoutes(fastify: FastifyInstance) {
   // Registriere ML-Analysis Sub-Routes
@@ -81,13 +82,7 @@ export default async function conversionRoutes(fastify: FastifyInstance) {
         const conversionRate =
           totalCustomers > 0 ? (totalOrders / totalCustomers) * 100 : 0;
           
-        console.log('✅ [ConversionAnalysis]:', {
-          totalOrders,
-          totalCustomers,
-          totalSales,
-          avgOrderValue,
-          conversionRate
-        });
+        logger.info({ totalOrders, totalCustomers, totalSales, avgOrderValue, conversionRate }, 'ConversionAnalysis complete');
         
         return reply.send({
           success: true,
@@ -102,7 +97,7 @@ export default async function conversionRoutes(fastify: FastifyInstance) {
           },
         });
       } catch (error) {
-        console.error('❌ Conversion Analysis Error:', error);
+        logger.error({ error, function: 'conversionAnalysis' }, 'Conversion Analysis Error');
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Unbekannter Fehler',

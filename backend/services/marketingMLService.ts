@@ -1,6 +1,7 @@
 // backend/services/marketingMLService.ts
 import { getOpenAIClient, executeOpenAI } from '../utils/openaiHelper';
 import { getConfig } from '../config';
+import { logger } from '../logger';
 
 const OPENAI_MODEL = getConfig().openAI?.model?.trim() || 'gpt-4-turbo';
 
@@ -41,11 +42,11 @@ export class MarketingMLService {
   }): Promise<{ ideas: MarketingIdea[]; campaign_name: string; confidence_score: number }> {
     const openai = getOpenAIClient();
 
-    console.log('🎯 [MarketingMLService] generateMarketingIdeas aufgerufen:', {
+    logger.info({
       goal: data.goal,
       audience: data.audience,
       hasProductInfo: !!data.productInfo
-    });
+    }, 'Marketing generateMarketingIdeas called');
 
     const prompt = `Du bist ein Expert Digital Marketing Strategist. Generiere innovative Marketing-Ideen für die folgende Kampagne:
 
@@ -73,7 +74,7 @@ Erstelle 5 konkrete, umsetzbare Marketing-Ideen im folgenden JSON-Format:
 Fokus: Kreativ, datengestützt, sofort umsetzbar für E-Commerce.`;
 
     try {
-      console.log('🔄 [MarketingMLService] Sende Anfrage an OpenAI...');
+      logger.info('Sending request to OpenAI for marketing ideas');
       const completion = await executeOpenAI(async () => {
         return openai.chat.completions.create({
           model: OPENAI_MODEL,
@@ -84,14 +85,14 @@ Fokus: Kreativ, datengestützt, sofort umsetzbar für E-Commerce.`;
       }, 'marketing_ideas');
 
       const content = (completion as any).choices[0]?.message?.content || '{}';
-      console.log('✅ [MarketingMLService] OpenAI-Response erhalten');
+      logger.info('OpenAI response received for marketing ideas');
 
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       const result = jsonMatch ? JSON.parse(jsonMatch[0]) : { ideas: [], campaign_name: 'Kampagne', confidence_score: 0 };
 
       return result;
     } catch (error: any) {
-      console.error('❌ [MarketingMLService] Fehler bei generateMarketingIdeas:', error.message);
+      logger.error({ error, function: 'generateMarketingIdeas' }, 'Marketing ideas generation failed');
       throw error;
     }
   }
@@ -107,7 +108,7 @@ Fokus: Kreativ, datengestützt, sofort umsetzbar für E-Commerce.`;
   }): Promise<EmailCampaignIdea> {
     const openai = getOpenAIClient();
 
-    console.log('📧 [MarketingMLService] generateEmailCampaign für:', data.campaignType);
+    logger.info({ campaignType: data.campaignType }, 'Marketing generateEmailCampaign called');
 
     const prompt = `Du bist ein E-Mail Marketing Expert. Erstelle eine hochkonvertierend Kampagne:
 
@@ -152,7 +153,7 @@ Alle Texte auf DEUTSCH, hochkonvertierend, DSGVO-konform.`;
 
       return result;
     } catch (error: any) {
-      console.error('❌ Fehler bei generateEmailCampaign:', error.message);
+      logger.error({ error, function: 'generateEmailCampaign' }, 'Email campaign generation failed');
       throw error;
     }
   }
@@ -167,7 +168,7 @@ Alle Texte auf DEUTSCH, hochkonvertierend, DSGVO-konform.`;
   }): Promise<SocialMediaContent[]> {
     const openai = getOpenAIClient();
 
-    console.log('📱 [MarketingMLService] generateSocialMediaContent für:', data.platforms);
+    logger.info({ platforms: data.platforms }, 'Marketing generateSocialMediaContent called');
 
     const prompt = `Du bist ein Social Media Content Strategist. Erstelle 5 Posts für jede Plattform:
 
@@ -218,7 +219,7 @@ WICHTIG: Posts sind auf DEUTSCH, plattformoptimiert, viral-potenzial.`;
         engagement_prediction: 0
       }));
     } catch (error: any) {
-      console.error('❌ Fehler bei generateSocialMediaContent:', error.message);
+      logger.error({ error, function: 'generateSocialMediaContent' }, 'Social media content generation failed');
       throw error;
     }
   }
@@ -233,7 +234,7 @@ WICHTIG: Posts sind auf DEUTSCH, plattformoptimiert, viral-potenzial.`;
   }): Promise<{ optimized_versions: string[]; improvements: string[]; confidence: number }> {
     const openai = getOpenAIClient();
 
-    console.log('✏️ [MarketingMLService] optimizeMarketingCopy');
+    logger.info('Marketing optimizeMarketingCopy called');
 
     const prompt = `Du bist ein hochperformanter Copywriter. Optimiere den folgenden Marketing-Text für Konvertierung:
 
@@ -273,7 +274,7 @@ Fokus: Konvertierung, Klarheit, emotionale Resonanz.`;
 
       return result;
     } catch (error: any) {
-      console.error('❌ Fehler bei optimizeMarketingCopy:', error.message);
+      logger.error({ error, function: 'optimizeMarketingCopy' }, 'Marketing copy optimization failed');
       throw error;
     }
   }
@@ -290,7 +291,7 @@ Fokus: Konvertierung, Klarheit, emotionale Resonanz.`;
   }): Promise<{ forecast: any; recommendations: string[] }> {
     const openai = getOpenAIClient();
 
-    console.log('📊 [MarketingMLService] forecastCampaignPerformance');
+    logger.info('Marketing forecastCampaignPerformance called');
 
     const prompt = `Du bist ein Marketing Analytics Expert. Prognostiziere die Performance der Kampagne:
 
@@ -335,7 +336,7 @@ Generiere Prognose + Handlungsempfehlungen im JSON-Format:
 
       return result;
     } catch (error: any) {
-      console.error('❌ Fehler bei forecastCampaignPerformance:', error.message);
+      logger.error({ error, function: 'forecastCampaignPerformance' }, 'Campaign performance forecast failed');
       throw error;
     }
   }

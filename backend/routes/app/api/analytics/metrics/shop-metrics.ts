@@ -3,6 +3,7 @@
 import { FastifyInstance } from 'fastify';
 import { getConfig } from '../../../../../config';
 import { wooCache } from '../../../../../utils/woo-cache';
+import { logger } from '../../../../../logger';
 
 interface WooCommerceOrder {
   id: number;
@@ -64,7 +65,7 @@ export default async function shopMetricsRoutes(server: FastifyInstance) {
         const cacheKey = `woo_dashboard_${endpoint}`;
         const cached = wooCache.get(cacheKey);
         if (cached) {
-          console.log(`[Shop Metrics] Cache HIT für ${endpoint}`);
+          logger.debug({ endpoint }, 'Shop metrics cache hit');
           return cached;
         }
 
@@ -111,15 +112,9 @@ export default async function shopMetricsRoutes(server: FastifyInstance) {
       const productsTyped: WooCommerceProduct[] =
         products as WooCommerceProduct[];
 
-      console.log(
-        `📊 Shop Metrics - Customers found: ${customersTyped.length}`
-      );
-      console.log(`📊 Shop Metrics - Orders found: ${ordersTyped.length}`);
-      console.log(`📊 Shop Metrics - Products found: ${productsTyped.length}`);
+      logger.debug({ customersCount: customersTyped.length, ordersCount: ordersTyped.length, productsCount: productsTyped.length }, 'Shop metrics data loaded');
 
-      console.log(`📊 Shop Metrics - Customers found: ${customers.length}`);
-      console.log(`📊 Shop Metrics - Orders found: ${orders.length}`);
-      console.log(`📊 Shop Metrics - Products found: ${products.length}`);
+      logger.debug({ customersCount: customers.length, ordersCount: orders.length, productsCount: products.length }, 'Shop metrics raw data');
 
       // Heutige Daten berechnen
       const today = new Date().toISOString().split('T')[0];
@@ -164,7 +159,7 @@ export default async function shopMetricsRoutes(server: FastifyInstance) {
         data: metrics,
       };
     } catch (error) {
-      console.error('Shop Metrics Error:', error);
+      logger.error({ error: error instanceof Error ? error.message : 'Unknown', function: 'getShopMetrics' }, 'Shop metrics error');
       const message = error instanceof Error ? error.message : 'Unknown error';
 
       // Fallback: Versuche gecachte Daten zu nutzen
@@ -180,7 +175,7 @@ export default async function shopMetricsRoutes(server: FastifyInstance) {
         );
 
         if (cachedOrders && cachedCustomers && cachedProducts) {
-          console.log('Using cached shop metrics due to error');
+          logger.info('Using cached shop metrics due to error');
           const ordersTyped = cachedOrders as WooCommerceOrder[];
           const customersTyped = cachedCustomers as WooCommerceCustomer[];
           const productsTyped = cachedProducts as WooCommerceProduct[];
@@ -407,7 +402,7 @@ export default async function shopMetricsRoutes(server: FastifyInstance) {
           },
         });
       } catch (error: any) {
-        console.error('Shop Metrics ML-Analysis Error:', error);
+        logger.error({ error: error.message || 'Unknown', function: 'shopMetricsMLAnalysis' }, 'Shop metrics ML analysis error');
         return reply.status(500).send({
           success: false,
           error: error.message || 'KI-Analyse fehlgeschlagen',

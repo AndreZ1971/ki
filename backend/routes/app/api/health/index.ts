@@ -1,5 +1,6 @@
 // backend/routes/app/api/health/index.ts
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { logger } from '../../../../logger';
 
 export default async function healthRoutes(fastify: FastifyInstance) {
   
@@ -24,7 +25,7 @@ export default async function healthRoutes(fastify: FastifyInstance) {
         timestamp: new Date().toISOString()
       });
     } catch (error: any) {
-      console.error('Cache clear error:', error);
+      logger.error({ error: error.message, function: 'clearCache' }, 'Cache clear error');
       return reply.status(500).send({
         success: false,
         message: 'Fehler beim Leeren des Cache',
@@ -54,7 +55,7 @@ export default async function healthRoutes(fastify: FastifyInstance) {
         timestamp: new Date().toISOString()
       });
     } catch (error: any) {
-      console.error('Performance report error:', error);
+      logger.error({ error: error.message, function: 'performanceReport' }, 'Performance report error');
       return reply.status(500).send({
         success: false,
         message: 'Fehler beim Erstellen des Performance Reports',
@@ -91,7 +92,7 @@ export default async function healthRoutes(fastify: FastifyInstance) {
         ]
       });
     } catch (error: any) {
-      console.error('Security scan error:', error);
+      logger.error({ error: error.message, function: 'securityScan' }, 'Security scan error');
       return reply.status(500).send({
         success: false,
         message: 'Fehler beim Sicherheits-Scan',
@@ -131,7 +132,7 @@ export default async function healthRoutes(fastify: FastifyInstance) {
         analyzedAt: new Date().toISOString()
       });
     } catch (error: any) {
-      console.error('SEO analysis error:', error);
+      logger.error({ error: error.message, function: 'seoAnalysis' }, 'SEO analysis error');
       return reply.status(500).send({
         success: false,
         message: 'Fehler bei der SEO-Analyse',

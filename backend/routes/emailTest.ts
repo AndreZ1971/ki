@@ -2,17 +2,18 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import transporter from '../services/emailService';
 import { getConfig } from '@config';
+import { logger } from '../logger';
 
 async function emailTestRoutes(fastify: any, _options: any) {
   
   // Test-Endpoint für Email-Konfiguration
   fastify.get('/test-email-config', async (_request: FastifyRequest, _reply: FastifyReply) => {
     try {
-      console.log('🧪 Teste Email-Konfiguration...');
+      logger.info('Testing email configuration');
       
       // Teste die Verbindung
       await transporter.verify();
-      console.log('✅ SMTP Verbindung erfolgreich');
+      logger.info('SMTP connection successful');
       
       // Test-Email senden
       const smtp = getConfig().smtp || {};
@@ -26,7 +27,7 @@ async function emailTestRoutes(fastify: any, _options: any) {
         html: '<p>Dies ist eine <b>Test-Email</b> zur Überprüfung der SMTP-Konfiguration.</p>'
       });
 
-      console.log('✅ Test-Email gesendet:', testResult.messageId);
+      logger.info({ messageId: testResult.messageId }, 'Test email sent successfully');
 
       return {
         success: true,
@@ -41,7 +42,7 @@ async function emailTestRoutes(fastify: any, _options: any) {
         }
       };
     } catch (error: any) {
-      console.error('❌ Email Test fehlgeschlagen:', error.message);
+      logger.error({ error, message: error.message }, 'Email test failed');
       const smtp = getConfig().smtp || {};
       return _reply.status(500).send({
         success: false,

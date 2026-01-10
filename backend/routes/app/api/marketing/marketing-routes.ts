@@ -2,6 +2,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { analyzeSegmentsAI, generateCampaignAI } from './conversion-ai.js';
 import { getConfig } from '@config';
+import { logger } from '../../../../logger';
 
 interface GermanContentRequest {
   contentType: string;
@@ -484,7 +485,7 @@ Deutsch, natürlich, konversionsstark, plattformoptimiert.`;
           generatedAt: new Date().toISOString()
         });
       } catch (_error) {
-        console.error('❌ Error generating audio script:', _error);
+        logger.error({ error: _error instanceof Error ? _error.message : 'Unknown', function: 'generateAudioScript' }, 'Error generating audio script');
         return reply.send(fallback());
       }
     }
@@ -835,7 +836,7 @@ Return VALID JSON:
               suggestions: generatedContent.suggestions || []
             });
           } catch (parseError) {
-            console.error(`Failed to parse response for ${platform}:`, parseError);
+            logger.error({ platform, error: parseError instanceof Error ? parseError.message : 'Unknown' }, 'Failed to parse social post response');
             // Fallback for this platform
             const fallback = generateFallbackPost(topic, platform, tone, targetAudience, includeHashtags, includeEmojis);
             posts.push(fallback);
@@ -853,7 +854,7 @@ Return VALID JSON:
         } as GeneratedPostsResponse);
 
       } catch (error) {
-        console.error('❌ Social Post Generation Error:', error);
+        logger.error({ error: error instanceof Error ? error.message : 'Unknown', function: 'generateSocialPosts' }, 'Social post generation failed');
         // Return fallback posts on error
         return reply.send({
           success: true,

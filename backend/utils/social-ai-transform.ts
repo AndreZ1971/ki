@@ -1,5 +1,6 @@
 // backend/utils/social-ai-transform.ts
 import { getOpenAIClient, executeOpenAI } from './openai';
+import { logger } from '../logger';
 
 interface TransformOptions {
   platform: 'linkedin' | 'facebook' | 'tiktok' | 'twitter' | 'instagram';
@@ -130,10 +131,11 @@ Antworte NUR mit dem fertigen Post, keine Erklärungen oder Meta-Kommentare!`
       { platform, originalContent: content }
     );
 
-    console.log(`✨ AI-Transformation für ${platform}:`, {
-      original: content.substring(0, 50) + '...',
-      transformed: transformedContent.substring(0, 50) + '...'
-    });
+    logger.info({
+      platform,
+      originalPreview: content.substring(0, 50) + '...',
+      transformedPreview: transformedContent.substring(0, 50) + '...'
+    }, 'AI transformation completed for platform');
 
     return {
       content: transformedContent,
@@ -142,9 +144,9 @@ Antworte NUR mit dem fertigen Post, keine Erklärungen oder Meta-Kommentare!`
     };
 
   } catch (error) {
-    console.error(`❌ AI-Transformation Error für ${platform}:`, error);
+    logger.error({ error, platform }, 'AI transformation failed');
     // Fallback: Original Content nutzen
-    console.log(`⚠️ Fallback: Nutze Original-Content für ${platform}`);
+    logger.warn({ platform }, 'Using original content as fallback');
     return {
       content,
       platform,
@@ -173,7 +175,7 @@ export async function transformContentForMultiplePlatforms(
     if (result.status === 'fulfilled') {
       transformed[platform] = result.value;
     } else {
-      console.error(`❌ Transformation für ${platform} fehlgeschlagen:`, result.reason);
+      logger.error({ platform, reason: result.reason }, 'Batch transformation failed for platform');
       // Fallback
       transformed[platform] = {
         content,

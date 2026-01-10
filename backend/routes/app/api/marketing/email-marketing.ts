@@ -4,6 +4,7 @@ import transporter from '../../../../services/emailService.js';
 import { getConfig } from '@config';
 import https from 'https';
 import axios from 'axios';
+import { logger } from '../../../../logger';
 
 interface SendCampaignBody {
   campaignName: string;
@@ -124,7 +125,7 @@ export default async function emailMarketingRoutes(server: FastifyInstance) {
         data: segments
       });
     } catch (_error) {
-      console.error('❌ Error loading customer segments:', _error);
+      logger.error({ error: _error instanceof Error ? _error.message : 'Unknown', function: 'loadCustomerSegments' }, 'Error loading customer segments');
       // Liefere einen sanften Fallback statt 500, damit das UI weiter funktioniert
       return reply.send({
         success: true,
@@ -248,7 +249,7 @@ export default async function emailMarketingRoutes(server: FastifyInstance) {
           }
         }
 
-        console.log(`✅ E-Mail-Kampagne "${campaignName}" gesendet: ${sentCount}/${targetCustomers.length}`);
+        logger.info({ campaignName, sentCount, total: targetCustomers.length }, 'Email campaign sent');
 
         return reply.send({
           success: true,
@@ -261,7 +262,7 @@ export default async function emailMarketingRoutes(server: FastifyInstance) {
           errors: errors.length > 0 ? errors.slice(0, 5) : undefined
         });
       } catch (_error) {
-        console.error('❌ Error sending campaign:', _error);
+        logger.error({ error: _error instanceof Error ? _error.message : 'Unknown', function: 'sendCampaign' }, 'Error sending campaign');
         return reply.status(500).send({
           success: false,
           error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
@@ -424,7 +425,7 @@ Texte auf Deutsch, konversionsstark, klar, DSGVO-freundlich.`;
           generatedAt: new Date().toISOString()
         });
       } catch (_error) {
-        console.error('❌ Error generating email campaign:', _error);
+        logger.error({ error: _error instanceof Error ? _error.message : 'Unknown', function: 'generateEmailCampaign' }, 'Error generating email campaign');
         return reply.send(fallback());
       }
     }

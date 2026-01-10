@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { AnalyticsMLService } from '../../../../services/analyticsMLService';
 import { wooGet } from '../../../../tools/woo';
+import { logger } from '../../../../logger';
 
 export default async function mlInsightsRoutes(fastify: FastifyInstance) {
   // GET /api/analytics/ml-insights/report
@@ -21,7 +22,7 @@ export default async function mlInsightsRoutes(fastify: FastifyInstance) {
         timestamp: new Date().toISOString()
       });
     } catch (error) {
-      console.error('ML Report Generation failed:', error);
+      logger.error({ error, function: 'mlReportGet' }, 'ML Report Generation failed');
       // Fallback zu statischen Daten bei Fehler
       return reply.send({
         success: true,
@@ -48,11 +49,7 @@ export default async function mlInsightsRoutes(fastify: FastifyInstance) {
       trendData?: any;
     };
 
-    console.log('📊 [ML Report] Anfrage erhalten:', {
-      keywords: keywords.length,
-      hasTrendData: !!trendData,
-      trendDataLength: trendData?.length || 0
-    });
+    logger.debug({ keywords: keywords.length, hasTrendData: !!trendData, trendDataLength: trendData?.length || 0 }, 'ML Report request received');
 
     try {
       // Berechne durchschnittlichen Score aus Trend-Daten
@@ -65,13 +62,9 @@ export default async function mlInsightsRoutes(fastify: FastifyInstance) {
         ? trendData.reduce((max: any, t: any) => (t.overallScore || 0) > (max.overallScore || 0) ? t : max, trendData[0])
         : null;
 
-      console.log('📈 [ML Report] Trend-Statistiken:', {
-        avgScore,
-        topTrend: topTrend?.keyword,
-        topTrendScore: topTrend?.overallScore
-      });
+      logger.debug({ avgScore, topTrend: topTrend?.keyword, topTrendScore: topTrend?.overallScore }, 'ML Report trend statistics');
 
-      console.log('🤖 [ML Report] Starte OpenAI-Analyse...');
+      logger.debug({ function: 'mlReportPost' }, 'Starting OpenAI analysis');
 
       // ✅ Echte OpenAI-Integration für ausführlichen Trend-Report
       const mlReport = await AnalyticsMLService.generateInsights({
@@ -85,11 +78,7 @@ export default async function mlInsightsRoutes(fastify: FastifyInstance) {
         timeframe: '30days'
       });
 
-      console.log('✅ [ML Report] OpenAI-Analyse erfolgreich:', {
-        insightsCount: mlReport.insights?.length || 0,
-        confidenceScore: mlReport.confidence_score,
-        nextStepsCount: mlReport.next_steps?.length || 0
-      });
+      logger.info({ insightsCount: mlReport.insights?.length || 0, confidenceScore: mlReport.confidence_score, nextStepsCount: mlReport.next_steps?.length || 0 }, 'ML Report OpenAI analysis successful');
 
       // Generiere ausführlichen, formatierten Report
       const reportSections = [
@@ -123,7 +112,7 @@ export default async function mlInsightsRoutes(fastify: FastifyInstance) {
         raw: trendData || []
       });
     } catch (error) {
-      console.error('ML Trend Report Generation failed:', error);
+      logger.error({ error, function: 'mlReportPost' }, 'ML Trend Report Generation failed');
       // Fallback zu statischen Daten bei Fehler
       return reply.send({
         report: `📊 **PRODUKT-TREND-ANALYSE**\n\nAnalysierte Produkte: ${keywords.length}\n\n⚠️ ML-Analyse temporär nicht verfügbar.\nBitte versuchen Sie es später erneut oder kontaktieren Sie den Support.`,
@@ -190,7 +179,7 @@ export default async function mlInsightsRoutes(fastify: FastifyInstance) {
         }
       });
     } catch (error) {
-      console.error('ML Insights Generation failed:', error);
+      logger.error({ error, function: 'mlInsightsGenerate' }, 'ML Insights Generation failed');
       // Fallback bei Fehler
       const fallbackInsights = [
         {
@@ -220,7 +209,7 @@ export default async function mlInsightsRoutes(fastify: FastifyInstance) {
   // POST /api/analytics/ml-insights/report-insights
   fastify.post('/report-insights', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      console.log('📊 Report-Insights: Hole echte WooCommerce-Daten...');
+      logger.debug({ function: 'reportInsights' }, 'Report-Insights: fetching real WooCommerce data');
       
       // 1. WooCommerce-Daten abrufen mit wooGet
       const thirtyDaysAgo = new Date();
@@ -234,12 +223,12 @@ export default async function mlInsightsRoutes(fastify: FastifyInstance) {
           status: 'any'
         });
       } catch (wooError: any) {
-        console.error('❌ WooCommerce API Fehler:', wooError.message);
+        logger.error({ error: wooError.message }, 'WooCommerce API Error');
         throw new Error(`WooCommerce API: ${wooError.message}`);
       }
 
       const orders = Array.isArray(ordersData) ? ordersData : (ordersData?.data || []);
-      console.log(`📦 ${orders.length} Orders gefunden`);
+      logger.debug({ count: orders.length }, 'Orders found');
 
       // 2. Conversion-Metriken berechnen
       const completedOrders = orders.filter((o: any) => o.status === 'completed');
@@ -260,7 +249,7 @@ export default async function mlInsightsRoutes(fastify: FastifyInstance) {
         avgOrderValue,
         conversionRate
       });
-      console.log('🤖 OpenAI-Analyse abgeschlossen');
+      logger.debug({ function: 'reportInsights' }, 'OpenAI analysis complete');
 
       // 4. Response formatieren
       return reply.send({
@@ -285,7 +274,7 @@ export default async function mlInsightsRoutes(fastify: FastifyInstance) {
       });
 
     } catch (error: any) {
-      console.error('❌ Report-Insights Fehler:', error.message);
+      logger.error({ error: error.message, function: 'reportInsights' }, 'Report-Insights Error');
       
       // Fallback: Ehrliche Fehlermeldung mit Mock-Struktur
       return reply.send({

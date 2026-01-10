@@ -1,6 +1,7 @@
 // backend/routes/app/api/social/post-routes.ts
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { getConfig } from '@config';
+import { logger } from '../../../../logger';
 
 interface PostRequest {
   platform: 'facebook' | 'instagram' | 'tiktok' | 'all';
@@ -54,7 +55,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
         });
 
       } catch (error) {
-        console.error('❌ Post Error:', error);
+        logger.error({ error }, 'Social media post error');
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Post failed'
@@ -97,7 +98,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
       throw new Error(`Facebook API Error: ${data.error.message}`);
     }
 
-    console.log('✅ Facebook Post ID:', data.id);
+    logger.info({ postId: data.id }, 'Facebook post created successfully');
 
     return {
       success: true,
@@ -169,7 +170,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
       throw new Error(`Instagram Publish Error: ${publishData.error.message}`);
     }
 
-    console.log('✅ Instagram Post ID:', publishData.id);
+    logger.info({ postId: publishData.id }, 'Instagram post created successfully');
 
     return {
       success: true,
@@ -225,7 +226,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
       throw new Error(`TikTok API Error: ${data.error.message}`);
     }
 
-    console.log('✅ TikTok Publish ID:', data.data?.publish_id);
+    logger.info({ publishId: data.data?.publish_id }, 'TikTok post created successfully');
 
     return {
       success: true,
@@ -251,7 +252,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
       });
 
     } catch (error) {
-      console.error('❌ Stats Error:', error);
+      logger.error({ error }, 'Failed to fetch social media stats');
       return reply.status(500).send({
         success: false,
         error: error instanceof Error ? error.message : 'Failed to fetch stats'

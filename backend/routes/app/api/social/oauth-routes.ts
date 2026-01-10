@@ -1,6 +1,7 @@
 // backend/routes/app/api/social/oauth-routes.ts
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { getConfig } from '@config';
+import { logger } from '../../../../logger.js';
 
 interface OAuthCallbackQuery {
   code: string;
@@ -61,14 +62,14 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
         const longLivedData = await longLivedResponse.json();
 
         // Store tokens (in real app, save to database)
-        console.log('✅ Facebook Access Token:', longLivedData.access_token);
+        logger.info({ hasAccessToken: !!longLivedData.access_token }, 'Facebook access token received');
 
         // Get user's pages
         const pagesUrl = `https://graph.facebook.com/v18.0/me/accounts?access_token=${longLivedData.access_token}`;
         const pagesResponse = await fetch(pagesUrl);
         const pagesData = await pagesResponse.json();
 
-        console.log('📄 Facebook Pages:', pagesData.data);
+        logger.info({ pageCount: pagesData.data?.length || 0 }, 'Facebook pages retrieved');
 
         // Get Instagram Business Account ID
         if (pagesData.data && pagesData.data.length > 0) {
@@ -79,7 +80,7 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
           const igResponse = await fetch(igUrl);
           const igData = await igResponse.json();
 
-          console.log('📸 Instagram Business Account:', igData.instagram_business_account);
+          logger.info({ hasIgAccount: !!igData.instagram_business_account }, 'Instagram business account retrieved');
         }
 
         return reply.send({
@@ -92,7 +93,7 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
         });
 
       } catch (error) {
-        console.error('❌ Facebook OAuth Error:', error);
+        logger.error({ error }, 'Facebook OAuth failed');
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'OAuth failed'
@@ -156,8 +157,7 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
           throw new Error('Failed to get TikTok access token');
         }
 
-        console.log('✅ TikTok Access Token:', tokenData.access_token);
-        console.log('🔄 TikTok Refresh Token:', tokenData.refresh_token);
+        logger.info({ hasAccessToken: !!tokenData.access_token, hasRefreshToken: !!tokenData.refresh_token }, 'TikTok tokens received');
 
         // Get user info
         const userUrl = 'https://open.tiktokapis.com/v2/user/info/?fields=open_id,union_id,avatar_url,display_name';
@@ -168,7 +168,7 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
         });
 
         const userData = await userResponse.json();
-        console.log('👤 TikTok User:', userData);
+        logger.info({ hasUserData: !!userData.data }, 'TikTok user info retrieved');
 
         return reply.send({
           success: true,
@@ -181,7 +181,7 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
         });
 
       } catch (error) {
-        console.error('❌ TikTok OAuth Error:', error);
+        logger.error({ error }, 'TikTok OAuth failed');
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'TikTok OAuth failed'
@@ -221,7 +221,7 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
       const { platform } = request.body;
 
       // In production, remove tokens from database
-      console.log(`🔌 Disconnecting ${platform}`);
+      logger.info({ platform }, 'Disconnecting social media platform');
 
       return reply.send({
         success: true,

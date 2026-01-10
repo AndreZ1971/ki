@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import OpenAI from 'openai';
 import { getConfig } from '@config';
+import { logger } from '../../../../logger';
 
 // ✅ NEU (richtig - lazy Initialisierung)
 let openai: OpenAI | null = null;
@@ -12,7 +13,7 @@ function initializeOpenAI() {
   const apiKey = config.openAI?.apiKey;
   const model = config.openAI?.model;
   if (!apiKey || apiKey.trim() === '' || !apiKey.startsWith('sk-')) {
-    console.warn('⚠️ OpenAI API Key nicht konfiguriert (getConfig)');
+    logger.warn('OpenAI API Key not configured');
     openai = null;
     lastApiKey = undefined;
     lastModel = undefined;
@@ -23,7 +24,7 @@ function initializeOpenAI() {
     openai = new OpenAI({ apiKey });
     lastApiKey = apiKey;
     lastModel = model;
-    console.log('✅ Reviews OpenAI Client (getConfig) erfolgreich initialisiert');
+    logger.debug('Reviews OpenAI client successfully initialized');
   }
   return openai;
 }

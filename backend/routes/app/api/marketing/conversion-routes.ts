@@ -1,6 +1,7 @@
 // backend/routes/app/api/marketing/conversion-routes.ts
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { getConfig } from '@config';
+import { logger } from '../../../../logger';
 
 interface CreateCampaignBody {
   userSegment: 'inactive' | 'one-time' | 'abandoned-cart' | 'low-value';
@@ -122,7 +123,7 @@ export default async function conversionRoutes(server: FastifyInstance) {
         }
       });
     } catch (_error) {
-      console.error('❌ Error loading conversion segments:', _error);
+      logger.error({ error: _error instanceof Error ? _error.message : 'Unknown', function: 'loadConversionSegments' }, 'Error loading conversion segments');
       return reply.status(500).send({
         success: false,
         error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
@@ -229,7 +230,7 @@ export default async function conversionRoutes(server: FastifyInstance) {
           }
         }
 
-        console.log(`✅ Conversion-Kampagne erstellt: ${targetCustomers.length} Kunden, Segment: ${userSegment}, Incentive: ${incentiveType}`);
+        logger.info({ targetCount: targetCustomers.length, segment: userSegment, incentive: incentiveType }, 'Conversion campaign created');
 
         return reply.send({
           success: true,
@@ -243,7 +244,7 @@ export default async function conversionRoutes(server: FastifyInstance) {
           }
         });
       } catch (_error) {
-        console.error('❌ Error creating conversion campaign:', _error);
+        logger.error({ error: _error instanceof Error ? _error.message : 'Unknown', function: 'createConversionCampaign' }, 'Error creating conversion campaign');
         return reply.status(500).send({
           success: false,
           error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'

@@ -1,6 +1,7 @@
 // src/agent/planner.ts
 
 import '../consoleProxy';
+import { logger } from '../logger.js';
 
 // external (values) – nur Typ laden, keine Instanz hier erzeugen!
 
@@ -183,7 +184,7 @@ export async function planAndAct(
       ? goal
       : String(goal);
 
-  console.log('DEBUG: Processing goal:', goalText.slice(0, 200) + '...');
+  logger.debug({ goal: goalText.slice(0, 200) }, 'Processing planner goal');
 
   // FIX: Sicherstellen, dass history definiert ist
   const safeHistory = history || [];

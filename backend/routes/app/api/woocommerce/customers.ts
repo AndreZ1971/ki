@@ -3,6 +3,7 @@ import { FastifyPluginAsync } from 'fastify';
 
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
 import { getConfig } from '@config';
+import { logger } from '../../../../logger';
 
 const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
   // Helper: Prüfe, ob WooCommerce konfiguriert ist (Onboarding kann Placeholder setzen)
@@ -58,7 +59,7 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
         });
       }
 
-      console.log('📥 Fetching customers from WooCommerce...');
+      logger.info('Fetching customers from WooCommerce');
 
       const woo = getConfig().woocommerce || {};
       const auth = Buffer.from(
@@ -84,9 +85,7 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
         );
 
         if (!response.ok) {
-          console.warn(
-            `⚠️ Customers API returned ${response.status}, trying with query string auth...`
-          );
+          logger.warn({ status: response.status }, 'Customers API error, trying query string auth');
           // Fallback mit Query String Auth
           const fallbackResponse = await fetch(
             `${wooUrl}/wp-json/wc/v3/customers?per_page=100&role=all&consumer_key=${woo.consumerKey || ''}&consumer_secret=${woo.consumerSecret || ''}`
@@ -99,7 +98,7 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
           customers = await response.json();
         }
       } catch (primaryErr: any) {
-        console.error('❌ Primary customers fetch failed:', primaryErr.message);
+        logger.error({ error: primaryErr.message }, 'Primary customers fetch failed');
         // Letzter Fallback: ohne role Parameter
         try {
           const fallbackResponse = await fetch(
@@ -116,15 +115,12 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
           }
           customers = await fallbackResponse.json();
         } catch (fallbackErr: any) {
-          console.error(
-            '❌ Fallback customers fetch failed:',
-            fallbackErr.message
-          );
+          logger.error({ error: fallbackErr.message }, 'Fallback customers fetch failed');
           throw primaryErr;
         }
       }
 
-      console.log(`📊 Fetched ${customers.length} customers from WooCommerce`);
+      logger.info({ count: customers.length }, 'Fetched customers from WooCommerce');
 
       // ✅ Transformiere die Kundendaten
       const transformedCustomers = customers.map((customer: any) => ({
@@ -148,9 +144,7 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
         role: customer.role,
       }));
 
-      console.log(
-        `✅ ${transformedCustomers.length} Kunden erfolgreich transformiert`
-      );
+      logger.info({ count: transformedCustomers.length }, 'Customers transformed successfully');
 
       return {
         success: true,
@@ -163,7 +157,7 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
       const status = err?.response?.status || 500;
       const data = err?.response?.data;
       const message = err instanceof Error ? err.message : String(err);
-      console.error('WooCommerce API Error:', { status, message, data });
+      logger.error({ status, message, data }, 'WooCommerce API error loading customers');
       reply.status(status).send({
         success: false,
         code: 'WOO_API_ERROR',
@@ -188,7 +182,7 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
         });
       }
 
-      console.log('📥 Fetching subscribers from WooCommerce...');
+      logger.info('Fetching subscribers from WooCommerce');
 
       const woo = getConfig().woocommerce || {};
       const auth = Buffer.from(
@@ -213,9 +207,7 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
         );
 
         if (!response.ok) {
-          console.warn(
-            `⚠️ Subscribers API returned ${response.status}, trying with query string auth...`
-          );
+          logger.warn({ status: response.status }, 'Subscribers API error, trying query string auth');
           // Fallback mit Query String Auth
           const fallbackResponse = await fetch(
             `${wooUrl}/wp-json/wc/v3/customers?per_page=100&role=subscriber&orderby=registered_date&order=desc&consumer_key=${woo.consumerKey || ''}&consumer_secret=${woo.consumerSecret || ''}`
@@ -228,7 +220,7 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
           subscribers = await response.json();
         }
       } catch (primaryErr: any) {
-        console.error('❌ Primary subscribers fetch failed:', primaryErr.message);
+        logger.error({ error: primaryErr.message }, 'Primary subscribers fetch failed');
         // Fallback ohne role param
         try {
           const fallbackResponse = await fetch(
@@ -245,15 +237,12 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
           }
           subscribers = await fallbackResponse.json();
         } catch (fallbackErr: any) {
-          console.error(
-            '❌ Fallback subscribers fetch failed:',
-            fallbackErr.message
-          );
+          logger.error({ error: fallbackErr.message }, 'Fallback subscribers fetch failed');
           throw primaryErr;
         }
       }
 
-      console.log(`📊 Fetched ${subscribers.length} subscribers from WooCommerce`);
+      logger.info({ count: subscribers.length }, 'Fetched subscribers from WooCommerce');
 
       const transformedSubscribers = subscribers.map((subscriber: any) => ({
         id: subscriber.id,
@@ -269,7 +258,7 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
         username: subscriber.username,
       }));
 
-      console.log(`✅ ${transformedSubscribers.length} Abonnenten erfolgreich transformiert`);
+      logger.info({ count: transformedSubscribers.length }, 'Subscribers transformed successfully');
 
       return {
         success: true,
@@ -283,7 +272,7 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
       const status = err?.response?.status || 500;
       const data = err?.response?.data;
       const message = err instanceof Error ? err.message : String(err);
-      console.error('Subscribers API Error:', { status, message, data });
+      logger.error({ status, message, data }, 'Subscribers API error');
       reply.status(status).send({
         success: false,
         code: 'WOO_API_ERROR',
@@ -378,7 +367,7 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
         }
       });
     } catch (_error) {
-      console.error('❌ Fehler beim Laden der Kundensegmente:', _error);
+      logger.error({ error: _error }, 'Failed to load customer segments');
       return reply.status(500).send({
         success: false,
         error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'

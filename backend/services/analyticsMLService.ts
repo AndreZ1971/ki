@@ -1,6 +1,7 @@
 // services/analyticsMLService.ts
 import { getOpenAIClient, executeOpenAI } from '../utils/openaiHelper';
 import { getConfig } from '../config';
+import { logger } from '../logger';
 
 const OPENAI_MODEL = getConfig().openAI?.model?.trim() || 'gpt-4-turbo';
 
@@ -46,11 +47,11 @@ export class AnalyticsMLService {
   }): Promise<{ insights: MLInsight[]; confidence_score: number; next_steps: string[] }> {
     const openai = getOpenAIClient();
 
-    console.log('🤖 [AnalyticsMLService] generateInsights aufgerufen:', {
+    logger.info({
       metricsCount: data.metrics?.length || 0,
       hasShopData: !!data.shopData,
       timeframe: data.timeframe
-    });
+    }, 'Analytics generateInsights called');
 
     const prompt = `Du bist ein E-Commerce Analytics-Experte. Analysiere die folgenden Shop-Daten und gebe actionable Insights.
 
@@ -76,7 +77,7 @@ Erstelle 5 konkrete Insights im folgenden JSON-Format:
 Fokus: Actionable, datenbasierte Empfehlungen für E-Commerce-Optimierung.`;
 
     try {
-      console.log('🔄 [AnalyticsMLService] Sende Anfrage an OpenAI...');
+      logger.info('Sending request to OpenAI for analytics insights');
       const completion = await executeOpenAI(
         () => openai.chat.completions.create({
           model: OPENAI_MODEL,
@@ -98,23 +99,23 @@ Fokus: Actionable, datenbasierte Empfehlungen für E-Commerce-Optimierung.`;
       );
 
       const result = JSON.parse(completion.choices[0].message.content || '{}');
-      console.log('✅ [AnalyticsMLService] OpenAI-Response erhalten:', {
+      logger.info({
         insightsCount: result.insights?.length || 0,
         confidenceScore: result.confidence_score,
         hasNextSteps: !!result.next_steps
-      });
+      }, 'OpenAI response received for analytics');
       return {
         insights: result.insights || [],
         confidence_score: result.confidence_score || 85,
         next_steps: result.next_steps || []
       };
     } catch (error) {
-      console.error('❌ [AnalyticsMLService] Error:', error);
-      console.error('❌ Error Details:', {
+      logger.error({
+        error,
+        function: 'generateInsights',
         name: error instanceof Error ? error.name : 'Unknown',
-        message: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined
-      });
+        message: error instanceof Error ? error.message : String(error)
+      }, 'Analytics insights generation failed');
       // Fallback zu strukturierten Dummy-Daten bei Fehler
       return {
         insights: [
@@ -192,7 +193,7 @@ Fokus: Quick Wins und High-Impact-Optimierungen für E-Commerce.`;
       const result = JSON.parse(completion.choices[0].message.content || '{}');
       return result.insights || [];
     } catch (error) {
-      console.error('Conversion Analysis Error:', error);
+      logger.error({ error, function: 'analyzeConversionData' }, 'Conversion analysis failed');
       return [
         {
           title: 'Analyse temporär nicht verfügbar',
@@ -262,7 +263,7 @@ Fokus: Regionale Besonderheiten, Wachstumspotenziale, lokale Optimierungen.`;
       const result = JSON.parse(completion.choices[0].message.content || '{}');
       return result.insights || [];
     } catch (error) {
-      console.error('Regional Analysis Error:', error);
+      logger.error({ error, function: 'analyzeRegionalData' }, 'Regional analysis failed');
       return [
         {
           title: 'Analyse temporär nicht verfügbar',
@@ -337,7 +338,7 @@ Fokus: Business-Relevanz, Marktchancen, Timing-Empfehlungen.`;
         recommendation: result.recommendation || 'N/A'
       };
     } catch (error) {
-      console.error('Trend Interpretation Error:', error);
+      logger.error({ error, function: 'interpretTrendData' }, 'Trend interpretation failed');
       return {
         keyword: trendData.keyword,
         interpretation: 'Analyse temporär nicht verfügbar',
@@ -401,7 +402,7 @@ Fokus: Positive Entwicklungen, Quick Wins, High-Impact Bereiche.`;
       const result = JSON.parse(completion.choices[0].message.content || '{}');
       return { insights: result.insights || [] };
     } catch (error) {
-      console.error('ML Report Generation Error:', error);
+      logger.error({ error, function: 'generateMLReport' }, 'ML report generation failed');
       return {
         insights: [
           {
@@ -436,7 +437,7 @@ Fokus: Positive Entwicklungen, Quick Wins, High-Impact Bereiche.`;
   }> {
     const openai = getOpenAIClient();
 
-    console.log('🤖 [AnalyticsMLService] analyzeReportData aufgerufen:', reportContext);
+    logger.info({ reportContext }, 'Analytics analyzeReportData called');
 
     const prompt = `Analysiere diese echten WooCommerce-Conversion-Daten und gebe professionelle Business-Insights:
 
@@ -488,7 +489,7 @@ Erstelle eine ehrliche, datenbasierte Analyse. Antworte IMMER in validem JSON-Fo
       );
 
       const result = JSON.parse(completion.choices[0].message.content || '{}');
-      console.log('✅ OpenAI Report-Analyse erfolgreich');
+      logger.info('OpenAI report analysis successful');
       
       return {
         insights: result.insights || [],
@@ -499,7 +500,7 @@ Erstelle eine ehrliche, datenbasierte Analyse. Antworte IMMER in validem JSON-Fo
         recommendation: result.recommendation || 'Weitere Analyse erforderlich'
       };
     } catch (error) {
-      console.error('❌ Report Data Analysis Error:', error);
+      logger.error({ error, function: 'analyzeReportData' }, 'Report data analysis failed');
       throw error;
     }
   }

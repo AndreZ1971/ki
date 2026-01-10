@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { getConfig } from '../../../../config';
+import { logger } from '../../../../logger';
 
 interface Bundle {
   id: number;
@@ -123,7 +124,7 @@ export default async function bundleRoutes(server: FastifyInstance) {
           ordersAnalyzed: orders.length
         });
       } catch (_error) {
-        console.error('Bundles API Error:', _error);
+        logger.error({ error: _error instanceof Error ? _error.message : 'Unknown', function: 'getBundles' }, 'Bundles API error');
         return reply.status(500).send({
           success: false,
           error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
@@ -156,18 +157,13 @@ export default async function bundleRoutes(server: FastifyInstance) {
     async (request: FastifyRequest<{ Body: CreateBundleBody }>, reply: FastifyReply) => {
       try {
         const bundleData = request.body;
-        console.log('📦 Creating bundle:', bundleData);
+        logger.debug({ bundleData }, 'Creating bundle');
 
         // ✅ ECHTE WooCommerce Bundle-Erstellung - Nutze bereits geladene Config
         const wooConfig = getConfig().woocommerce;
 
         if (!wooConfig?.url || !wooConfig?.consumerKey || !wooConfig?.consumerSecret) {
-          console.error('❌ WooCommerce Config ungültig:', {
-            url: !!wooConfig?.url,
-            consumerKey: !!wooConfig?.consumerKey,
-            consumerSecret: !!wooConfig?.consumerSecret,
-            fullConfig: wooConfig
-          });
+          logger.error({ hasUrl: !!wooConfig?.url, hasKey: !!wooConfig?.consumerKey, hasSecret: !!wooConfig?.consumerSecret, fullConfig: wooConfig }, 'WooCommerce Config ungültig');
           throw new Error(`WooCommerce-Konfiguration fehlt: ${JSON.stringify({ url: !!wooConfig?.url, key: !!wooConfig?.consumerKey, secret: !!wooConfig?.consumerSecret })}`);
         }
 
@@ -198,7 +194,7 @@ export default async function bundleRoutes(server: FastifyInstance) {
           ]
         };
 
-        console.log('📤 Sending to WooCommerce:', JSON.stringify(wooPayload, null, 2));
+        logger.debug({ payload: wooPayload }, 'Sending to WooCommerce');
 
         const response = await fetch(`${wooConfig.url}/wp-json/wc/v3/products`, {
           method: 'POST',
@@ -211,12 +207,12 @@ export default async function bundleRoutes(server: FastifyInstance) {
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('❌ WooCommerce Error:', errorText);
+          logger.error({ status: response.status, error: errorText }, 'WooCommerce Error');
           throw new Error(`WooCommerce API Error: ${response.status} - ${errorText}`);
         }
 
         const wooBundle = await response.json();
-        console.log('✅ Bundle created in WooCommerce:', wooBundle.id);
+        logger.info({ bundleId: wooBundle.id }, 'Bundle created in WooCommerce');
 
         const newBundle: Bundle = {
           id: wooBundle.id,
@@ -237,7 +233,7 @@ export default async function bundleRoutes(server: FastifyInstance) {
           permalink: wooBundle.permalink
         });
       } catch (_error) {
-        console.error('❌ Bundle creation error:', _error);
+        logger.error({ error: _error, function: 'createBundle' }, 'Bundle creation error');
         return reply.status(500).send({
           success: false,
           error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
@@ -266,7 +262,7 @@ export default async function bundleRoutes(server: FastifyInstance) {
     async (request: FastifyRequest<{ Querystring: { category?: string; priceRange?: string; targetAudience?: string } }>, reply: FastifyReply) => {
       try {
         const { category = 'all', priceRange = '50-200', targetAudience = 'B2B & Selbstständige' } = request.query;
-        console.log('🤖 Generating bundle ideas:', { category, priceRange, targetAudience });
+        logger.debug({ category, priceRange, targetAudience }, 'Generating bundle ideas');
 
         // ✅ FALLBACK BUNDLE IDEAS - Stabil und zuverlässig ohne externe APIs
         const fallbackBundleIdeas: any[] = [
@@ -342,7 +338,7 @@ export default async function bundleRoutes(server: FastifyInstance) {
           ideas = fallbackBundleIdeas;
         }
 
-        console.log(`✅ Generated ${ideas.length} bundle ideas (fallback)`);
+        logger.debug({ count: ideas.length }, 'Generated bundle ideas (fallback)');
         ideas = ideas.map((idea: any) => ({
           ...idea,
           conversionScore: Math.max(0, Math.min(1, idea.conversionScore || 0.5)),
@@ -352,7 +348,7 @@ export default async function bundleRoutes(server: FastifyInstance) {
           expectedRevenue: parseFloat(idea.expectedRevenue || 1000)
         }));
 
-        console.log(`✅ Generated ${ideas.length} bundle ideas`);
+        logger.info({ count: ideas.length }, 'Generated bundle ideas');
 
         return reply.send({
           success: true,
@@ -361,7 +357,7 @@ export default async function bundleRoutes(server: FastifyInstance) {
           filters: { category, priceRange, targetAudience }
         });
       } catch (error) {
-        console.error('❌ ML Bundle generation error:', error);
+        logger.error({ error, function: 'generateBundleIdeas' }, 'ML Bundle generation error');
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Bundle-Ideen konnten nicht generiert werden'

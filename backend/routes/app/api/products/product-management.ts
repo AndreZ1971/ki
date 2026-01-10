@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import OpenAI from 'openai';
 import { getConfig } from '../../../../config';
 import { runWooRealtimeUpdate } from '../../../../agent/jobs/wooRealtimeUpdate.js';
+import { logger } from '../../../../logger';
 
 interface CreateProductBody {
   count: number;
@@ -64,13 +65,12 @@ export default async function productRoutes(server: FastifyInstance) {
           specializationPrompt = '',
           generateImages = false
         } = request.body;
-        console.log('🤖 Auto-creating products:', { count, category, productType, optimization, keywords, seoOptimized, mlMarketAnalysis, generateImages });
+        logger.debug({ count, category, productType, optimization, keywords, seoOptimized, mlMarketAnalysis, generateImages }, 'Auto-creating products');
 
         // Debug: Logge OpenAI-Key und Model
         const openAIKey = getConfig().openAI?.apiKey;
         const openAIModel = getConfig().openAI?.model;
-        console.log('[auto-create] OpenAI-Key:', openAIKey ? openAIKey.substring(0, 8) + '...' : 'NICHT VORHANDEN');
-        console.log('[auto-create] OpenAI-Model:', openAIModel);
+        logger.debug({ hasKey: !!openAIKey, model: openAIModel }, 'OpenAI configuration');
 
         // WooCommerce Config aus zentraler config.json
         const wooConfig = getConfig().woocommerce || {};
@@ -129,18 +129,18 @@ export default async function productRoutes(server: FastifyInstance) {
         });
 
         const responseContent = completion.choices[0].message.content || '{"products": []}';
-        console.log('🤖 OpenAI Response:', responseContent);
+        logger.debug({ responseLength: responseContent.length }, 'OpenAI response received');
         
         let productsData: any[];
         try {
           const parsed = JSON.parse(responseContent);
           productsData = Array.isArray(parsed) ? parsed : (parsed.products || []);
         } catch (parseError) {
-          console.error('❌ JSON Parse Error:', parseError);
+          logger.error({ error: parseError instanceof Error ? parseError.message : 'Unknown' }, 'JSON parse error');
           throw new Error('Fehler beim Parsen der AI Antwort');
         }
         
-        console.log(`✅ Generated ${productsData.length} product ideas`);
+        logger.info({ count: productsData.length }, 'Generated product ideas');
 
         // Hilfsfunktion: Berechne Qualitätsscore für ein Produkt
         const calculateQualityScore = (product: any, _idea: any): number => {
@@ -224,7 +224,7 @@ export default async function productRoutes(server: FastifyInstance) {
             if (generateImages) {
               try {
                 // Nutze OpenAI DALL-E für hochwertige Produktbilder
-                console.log(`🎨 Generating product image for: ${productIdea.name}`);
+                logger.debug({ productName: productIdea.name }, 'Generating product image');
                 
                 const imagePrompt = `Professional product photography of ${productIdea.name}, high quality, studio lighting, white background, e-commerce style, detailed, 4k`;
                 
@@ -238,13 +238,13 @@ export default async function productRoutes(server: FastifyInstance) {
                 
                 imageUrl = imageResponse.data?.[0]?.url || null;
                 if (imageUrl) {
-                  console.log(`✅ Generated image for ${productIdea.name}: ${imageUrl}`);
+                  logger.info({ productName: productIdea.name, imageUrl }, 'Generated product image');
                 }
               } catch (imgError) {
-                console.error('Fehler beim Generieren des Bildes mit DALL-E:', imgError);
+                logger.error({ error: imgError instanceof Error ? imgError.message : 'Unknown' }, 'Error generating image with DALL-E');
                 // Fallback zu Picsum (zuverlässiger als Unsplash)
                 imageUrl = `https://picsum.photos/seed/${encodeURIComponent(productIdea.name)}/800/600`;
-                console.log(`⚠️ Using fallback image: ${imageUrl}`);
+                logger.warn({ imageUrl }, 'Using fallback image');
               }
             }
 
@@ -290,13 +290,13 @@ export default async function productRoutes(server: FastifyInstance) {
               created.processingTime = Math.round((Date.now() - startTime) / 1000);
               
               createdProducts.push(created);
-              console.log(`✅ Created product: ${created.name} (ID: ${created.id}, Quality: ${qualityScore}%, ROI: ${estimatedROI}%)`);
+              logger.info({ productName: created.name, productId: created.id, qualityScore, estimatedROI }, 'Created product');
             } else {
               const errorData = await response.json().catch(() => ({}));
               
               // Wenn Bild-Upload fehlschlägt, versuche ohne Bild
               if (errorData.code === 'woocommerce_product_image_upload_error' && imageUrl) {
-                console.log(`⚠️ Image upload failed for ${productIdea.name}, retrying without image...`);
+                logger.warn({ productName: productIdea.name }, 'Image upload failed, retrying without image');
                 delete wooPayload.images;
                 
                 const retryResponse = await fetch(`${wooConfig.url}/wp-json/wc/v3/products`, {
@@ -320,7 +320,7 @@ export default async function productRoutes(server: FastifyInstance) {
                   created.processingTime = Math.round((Date.now() - startTime) / 1000);
                   
                   createdProducts.push(created);
-                  console.log(`✅ Created product without image: ${created.name} (ID: ${created.id}, Quality: ${qualityScore}%, ROI: ${estimatedROI}%)`);
+                  logger.info({ productName: created.name, productId: created.id, qualityScore, estimatedROI }, 'Created product without image');
                 } else {
                   const errorText = await retryResponse.text();
                   errors.push(`${productIdea.name}: ${errorText}`);
@@ -368,7 +368,7 @@ export default async function productRoutes(server: FastifyInstance) {
           }
         });
       } catch (_error) {
-        console.error('❌ Error in auto-create:', _error);
+        logger.error({ error: _error instanceof Error ? _error.message : 'Unknown', function: 'autoCreateProducts' }, 'Error in auto-create');
         return reply.status(500).send({
           success: false,
           error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
@@ -427,7 +427,7 @@ export default async function productRoutes(server: FastifyInstance) {
     async (request: FastifyRequest<{ Body: WooProductBody & { image?: string } }>, reply: FastifyReply) => {
       try {
         const productData = request.body;
-        console.log('📥 Received product data:', JSON.stringify(productData, null, 2));
+        logger.debug({ productName: productData.name }, 'Received product data');
 
         // ✅ WooCommerce API Integration (aus zentraler config)
         const wooConfig = getConfig().woocommerce || {};
@@ -472,18 +472,18 @@ export default async function productRoutes(server: FastifyInstance) {
         // 🎨 Handle Product Image - WooCommerce kann direkt eine Image-URL importieren
         if (productData.image) {
           try {
-            console.log('🎨 Adding product image from URL:', productData.image);
+            logger.debug({ imageUrl: productData.image }, 'Adding product image from URL');
             wooPayload.images = [
               {
                 src: productData.image
               }
             ];
           } catch (imageError) {
-            console.warn('⚠️ Image processing error, continuing without image:', imageError instanceof Error ? imageError.message : imageError);
+            logger.warn({ error: imageError instanceof Error ? imageError.message : 'Unknown' }, 'Image processing error, continuing without image');
           }
         }
 
-        console.log('📤 Sending to WooCommerce:', JSON.stringify(wooPayload, null, 2));
+        logger.debug({ productName: wooPayload.name }, 'Sending to WooCommerce');
 
         const response = await fetch(`${wooConfig.url}/wp-json/wc/v3/products`, {
           method: 'POST',
@@ -496,13 +496,13 @@ export default async function productRoutes(server: FastifyInstance) {
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('❌ WooCommerce API Error:', response.status, errorText);
+          logger.error({ status: response.status, error: errorText }, 'WooCommerce API error');
           const errorData = JSON.parse(errorText || '{}');
           throw new Error(errorData.message || `WooCommerce API Error: ${response.status}`);
         }
 
         const createdProduct = await response.json();
-        console.log('✅ Product created:', createdProduct.id);
+        logger.info({ productId: createdProduct.id }, 'Product created in WooCommerce');
 
         return reply.send({
           success: true,
@@ -549,7 +549,7 @@ export default async function productRoutes(server: FastifyInstance) {
         }
 
         const products = await response.json();
-        console.log(`✅ Loaded ${products.length} products from WooCommerce`);
+        logger.info({ count: products.length }, 'Loaded products from WooCommerce');
 
         return reply.send({
           success: true,
@@ -557,7 +557,7 @@ export default async function productRoutes(server: FastifyInstance) {
           total: products.length
         });
       } catch (_error) {
-        console.error('❌ Error loading products:', _error);
+        logger.error({ error: _error instanceof Error ? _error.message : 'Unknown', function: 'loadProducts' }, 'Error loading products');
         return reply.status(500).send({
           success: false,
           error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
@@ -597,7 +597,7 @@ export default async function productRoutes(server: FastifyInstance) {
         const { productId } = request.params;
         const updatePayload = request.body;
 
-        console.log(`🔄 Updating single product ${productId} with AI values:`, updatePayload);
+        logger.debug({ productId, updatePayload }, 'Updating single product with AI values');
 
         const wooConfig = getConfig().woocommerce || {};
         if (!wooConfig.url || !wooConfig.consumerKey || !wooConfig.consumerSecret) {
@@ -620,7 +620,7 @@ export default async function productRoutes(server: FastifyInstance) {
         }
 
         const updatedProduct = await response.json();
-        console.log(`✅ Product ${productId} updated successfully`);
+        logger.info({ productId }, 'Product updated successfully');
 
         return reply.send({
           success: true,
@@ -628,7 +628,7 @@ export default async function productRoutes(server: FastifyInstance) {
         });
 
       } catch (_error) {
-        console.error('❌ Error updating single product:', _error);
+        logger.error({ error: _error, function: 'updateSingleProduct' }, 'Error updating single product');
         return reply.status(500).send({
           success: false,
           error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
@@ -658,7 +658,7 @@ export default async function productRoutes(server: FastifyInstance) {
     async (request: FastifyRequest<{ Body: UpdateProductBody }>, reply: FastifyReply) => {
       try {
         const { type, productIds } = request.body;
-        console.log(`🔄 Updating ${productIds?.length || 0} products (${type})`);
+        logger.debug({ count: productIds?.length || 0, type }, 'Updating products');
 
         if (!productIds || productIds.length === 0) {
           throw new Error('Keine Produkt-IDs angegeben');
@@ -679,11 +679,11 @@ export default async function productRoutes(server: FastifyInstance) {
               dryRun: false,
             });
             results.push(res);
-            console.log(`✅ Woo realtime update success for product ${productId}`);
+            logger.debug({ productId }, 'Woo realtime update success');
           } catch (err) {
             const msg = err instanceof Error ? err.message : 'Unknown error';
             errors.push(`Product ${productId}: ${msg}`);
-            console.error(`❌ Woo realtime update failed for product ${productId}:`, err);
+            logger.error({ productId, error: err }, 'Woo realtime update failed');
           }
         }
 
@@ -695,7 +695,7 @@ export default async function productRoutes(server: FastifyInstance) {
           products: results,
         });
       } catch (_error) {
-        console.error('❌ Error updating products:', _error);
+        logger.error({ error: _error, function: 'updateProducts' }, 'Error updating products');
         return reply.status(500).send({
           success: false,
           error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
@@ -725,7 +725,7 @@ export default async function productRoutes(server: FastifyInstance) {
         const count = parseInt(request.query.count || '3', 10) || 3;
         const category = request.query.category || 'all';
 
-        console.log('🤖 Generating product ideas:', { count, category });
+        logger.debug({ count, category }, 'Generating product ideas');
 
         // OpenAI für Produktideen
         const openai = new OpenAI({
@@ -759,14 +759,14 @@ Antwort-Format (streng):
         });
 
         const responseContent = completion.choices[0].message.content || '{}';
-        console.log('🤖 OpenAI Ideas Response:', responseContent);
+        logger.debug({ responsePreview: responseContent.substring(0, 200) }, 'OpenAI Ideas Response');
         
         let ideas: any[] = [];
         try {
           const parsed = JSON.parse(responseContent);
           ideas = Array.isArray(parsed) ? parsed : (parsed.ideas || parsed.products || []);
         } catch (parseError) {
-          console.error('❌ JSON Parse Error:', parseError);
+          logger.error({ error: parseError }, 'JSON Parse Error');
           ideas = [];
         }
 
@@ -781,7 +781,7 @@ Antwort-Format (streng):
           reason: idea.reason || 'Trending im Markt'
         }));
 
-        console.log(`✅ Generated ${ideas.length} product ideas`);
+        logger.info({ count: ideas.length }, 'Generated product ideas');
 
         return reply.send({
           success: true,
@@ -790,7 +790,7 @@ Antwort-Format (streng):
           timestamp: new Date().toISOString()
         });
       } catch (error) {
-        console.error('❌ Error generating product ideas:', error);
+        logger.error({ error, function: 'generateProductIdeas' }, 'Error generating product ideas');
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Fehler bei der Generierung von Produktideen'

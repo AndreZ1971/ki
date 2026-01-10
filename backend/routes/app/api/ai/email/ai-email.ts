@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import OpenAI from 'openai';
+import { logger } from '../../../../../logger';
 
 // ✅ NEU (richtig - lazy Initialisierung)
 let openai: OpenAI | null = null;
@@ -10,14 +11,14 @@ function initializeOpenAI() {
   try {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey || apiKey.trim() === '' || !apiKey.startsWith('sk-')) {
-      console.warn('⚠️ OpenAI API Key nicht konfiguriert');
+      logger.warn('OpenAI API Key not configured');
       openai = null;
     } else {
       openai = new OpenAI({ apiKey });
-      console.log('✅ OpenAI Client erfolgreich initialisiert');
+      logger.info('OpenAI client initialized successfully');
     }
   } catch (_error) {
-    console.error('❌ Fehler bei OpenAI Initialisierung:', _error);
+    logger.error({ error: _error }, 'OpenAI initialization failed');
     openai = null;
   }
   

@@ -1,4 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { logger } from '../logger';
 
 // Type Definitionen
 interface HealthMetric {
@@ -190,7 +191,7 @@ export default async function registerHealthRoutes(fastify: FastifyInstance) {
           }
         });
       } catch (error: any) {
-        console.error('Health ML-Analysis Error:', error);
+        logger.error({ error, endpoint: '/health-ml-insights' }, 'Health ML-Analysis failed');
         return reply.status(500).send({
           success: false,
           error: error.message || 'KI-Analyse fehlgeschlagen',

@@ -1,9 +1,10 @@
 import { FastifyInstance } from 'fastify';
 import { getConfig } from '@config';
+import { logger } from '../../../../../logger';
 
 export class WooCommerceService {
   constructor() {
-    console.log('✅ WooCommerce Service initialisiert');
+    logger.info('WooCommerce Service initialized');
   }
 
   // ✅ KRITISCH: getConfig() bei JEDER Anfrage aufrufen, nicht nur im Constructor!
@@ -16,11 +17,11 @@ export class WooCommerceService {
     const consumerSecret = cfg.consumerSecret || process.env.WOOCOMMERCE_CONSUMER_SECRET || process.env.CONSUMER_SECRET;
 
     if (!baseUrl || !consumerKey || !consumerSecret) {
-      console.error('[WooCommerceService] ❌ Konfiguration fehlt:', {
-        baseUrl: baseUrl ? '✓' : '✗',
-        consumerKey: consumerKey ? '✓' : '✗',
-        consumerSecret: consumerSecret ? '✓' : '✗'
-      });
+      logger.error({
+        hasBaseUrl: !!baseUrl,
+        hasConsumerKey: !!consumerKey,
+        hasConsumerSecret: !!consumerSecret
+      }, 'WooCommerce configuration missing');
       return null;
     }
 
@@ -44,7 +45,7 @@ export class WooCommerceService {
       const url = `${creds.baseUrl}/wp-json/wc/v3/products/${productId}`;
       
       server.log.info(`[WooCommerce] Updating product ${productId}`);
-      console.log(`[WooCommerce] 📤 PUT ${url}`);
+      logger.debug({ url, productId }, 'WooCommerce PUT request');
       
       const response = await fetch(url, {
         method: 'PUT',
@@ -63,12 +64,12 @@ export class WooCommerceService {
       }
 
       const updatedProduct = await response.json();
-      console.log(`[WooCommerce] ✅ Product ${productId} updated successfully`);
+      logger.info({ productId }, 'Product updated successfully');
       
       return updatedProduct;
 
     } catch (error: any) {
-      console.error('[WooCommerce] ❌ Update error:', error.message);
+      logger.error({ error: error.message, productId, function: 'updateProduct' }, 'WooCommerce update error');
       server.log.error('WooCommerce update error:', error);
       throw error;
     }
@@ -82,7 +83,7 @@ export class WooCommerceService {
 
     try {
       const url = `${creds.baseUrl}/wp-json/wc/v3/products/${productId}`;
-      console.log(`[WooCommerce] 📥 GET ${url}`);
+      logger.debug({ url, productId }, 'WooCommerce GET request');
       
       const response = await fetch(url, {
         headers: {
@@ -96,11 +97,11 @@ export class WooCommerceService {
       }
 
       const product = await response.json();
-      console.log(`[WooCommerce] ✅ Product ${productId} loaded (${product.name})`);
+      logger.debug({ productId, name: product.name }, 'Product loaded');
       return product;
 
     } catch (error: any) {
-      console.error('[WooCommerce] ❌ Get product error:', error.message);
+      logger.error({ error: error.message, productId, function: 'getProduct' }, 'WooCommerce get product error');
       server.log.error('WooCommerce get product error:', error);
       throw error;
     }
@@ -114,7 +115,7 @@ export class WooCommerceService {
 
     try {
       const url = `${creds.baseUrl}/wp-json/wc/v3/products`;
-      console.log(`[WooCommerce] 📤 POST ${url}`);
+      logger.debug({ url }, 'WooCommerce POST request');
       
       const response = await fetch(url, {
         method: 'POST',
@@ -128,17 +129,17 @@ export class WooCommerceService {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`[WooCommerce] ❌ HTTP ${response.status}: ${errorText}`);
+        logger.error({ status: response.status, error: errorText }, 'WooCommerce HTTP error');
         throw new Error(`WooCommerce create failed: ${response.status} ${response.statusText}`);
       }
 
       const newProduct = await response.json();
-      console.log(`[WooCommerce] ✅ Product created (ID: ${newProduct.id})`);
+      logger.info({ productId: newProduct.id }, 'Product created');
       
       return newProduct;
 
     } catch (error: any) {
-      console.error('[WooCommerce] ❌ Create product error:', error.message);
+      logger.error({ error: error.message, function: 'createProduct' }, 'WooCommerce create product error');
       server.log.error('WooCommerce create product error:', error);
       throw error;
     }
@@ -153,7 +154,7 @@ export class WooCommerceService {
     try {
       const urlParams = new URLSearchParams(params).toString();
       const url = `${creds.baseUrl}/wp-json/wc/v3/products${urlParams ? `?${urlParams}` : ''}`;
-      console.log(`[WooCommerce] 📥 GET ${url}`);
+      logger.debug({ url, params }, 'WooCommerce GET request for products list');
       
       const response = await fetch(url, {
         headers: {
@@ -167,11 +168,11 @@ export class WooCommerceService {
       }
 
       const products = await response.json();
-      console.log(`[WooCommerce] ✅ Listed ${Array.isArray(products) ? products.length : 'unknown'} products`);
+      logger.debug({ count: Array.isArray(products) ? products.length : 'unknown' }, 'Products listed');
       return products;
 
     } catch (error: any) {
-      console.error('[WooCommerce] ❌ List products error:', error.message);
+      logger.error({ error: error.message, function: 'listProducts' }, 'WooCommerce list products error');
       server.log.error('WooCommerce list products error:', error);
       throw error;
     }

@@ -4,6 +4,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { transformContentForPlatform } from '../../../../utils/social-ai-transform';
 import { getConfig } from '@config';
+import { logger } from '../../../../logger';
 
 interface WebhookPostRequest {
   platform: string;
@@ -43,16 +44,17 @@ export default async function webhookRoutes(fastify: FastifyInstance) {
         let finalContent = content;
         
         if (useAI && (platform === 'linkedin' || platform === 'facebook' || platform === 'tiktok' || platform === 'twitter' || platform === 'instagram')) {
-          console.log(`✨ AI-Transformation aktiviert für ${platform}...`);
+          logger.info({ platform }, 'AI transformation activated');
           const transformed = await transformContentForPlatform({
             platform: platform as 'linkedin' | 'facebook' | 'tiktok' | 'twitter' | 'instagram',
             content
           });
           finalContent = transformed.content;
-          console.log(`✅ AI-Transformation erfolgreich:`, {
-            original: content.substring(0, 30) + '...',
-            transformed: finalContent.substring(0, 30) + '...'
-          });
+          logger.info({
+            platform,
+            originalPreview: content.substring(0, 30) + '...',
+            transformedPreview: finalContent.substring(0, 30) + '...'
+          }, 'AI transformation successful');
         }
 
         // Send data to webhook (Make.com/Zapier/n8n)
@@ -67,7 +69,7 @@ export default async function webhookRoutes(fastify: FastifyInstance) {
           aiTransformed: useAI
         };
 
-        console.log(`📤 Sende Post an Webhook für ${platform}:`, webhookUrl);
+        logger.debug({ platform, webhookUrl: webhookUrl.substring(0, 50) + '...' }, 'Sending post to webhook');
 
         const response = await fetch(webhookUrl, {
           method: 'POST',
@@ -84,7 +86,7 @@ export default async function webhookRoutes(fastify: FastifyInstance) {
 
         const result = await response.json().catch(() => ({ status: 'success' }));
 
-        console.log(`✅ Post erfolgreich an ${platform} Webhook gesendet:`, result);
+        logger.info({ platform, result }, 'Post sent to webhook successfully');
 
         return reply.send({
           success: true,
@@ -101,7 +103,7 @@ export default async function webhookRoutes(fastify: FastifyInstance) {
         });
 
       } catch (error) {
-        console.error(`❌ Webhook Error für ${platform}:`, error);
+        logger.error({ platform, error }, 'Webhook error');
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'Webhook fehlgeschlagen',

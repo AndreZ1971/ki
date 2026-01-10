@@ -1,6 +1,7 @@
 // services/emailService.ts - Neutral & konfigurierbar
 import nodemailer from 'nodemailer';
 import { getConfig } from '@config';
+import { logger } from '../logger';
 
 // Baut die SMTP-Konfiguration aus connection.json (Fallback ENV für Rückwärtskompatibilität)
 const buildEmailConfig = () => {
@@ -31,28 +32,39 @@ let transporterInstance: nodemailer.Transporter | null = null;
 export const getTransporter = () => {
   if (!transporterInstance) {
     const emailConfig = buildEmailConfig();
+    const isDev = process.env.NODE_ENV === 'development';
     
-    console.log('🔧 Email Konfiguration geladen:', {
-      host: emailConfig.host,
-      port: emailConfig.port,
-      secure: emailConfig.secure,
-      user: emailConfig.auth.user
-    });
+    if (isDev) {
+      logger.info({
+        host: emailConfig.host,
+        port: emailConfig.port,
+        secure: emailConfig.secure,
+        user: emailConfig.auth.user
+      }, 'Email Konfiguration geladen');
+    } else {
+      logger.info({ host: emailConfig.host, port: emailConfig.port }, 'Email Konfiguration geladen');
+    }
 
     transporterInstance = nodemailer.createTransport(emailConfig);
 
     // Verbindung testen mit besserem Error Handling
     transporterInstance.verify(function(error, _success) {
       if (error) {
-        console.log('❌ SMTP Verbindung fehlgeschlagen:', error.message);
-        console.log('🔍 Details:', {
-          host: emailConfig.host,
-          port: emailConfig.port,
-          secure: emailConfig.secure
-        });
+        if (isDev) {
+          logger.error({
+            error: error.message,
+            host: emailConfig.host,
+            port: emailConfig.port,
+            secure: emailConfig.secure
+          }, 'SMTP Verbindung fehlgeschlagen');
+        } else {
+          logger.error({ error: error.message }, 'SMTP Verbindung fehlgeschlagen');
+        }
       } else {
-        console.log('✅ SMTP Server ist bereit');
-        console.log('🔍 Verbunden zu:', emailConfig.host + ':' + emailConfig.port);
+        logger.info('SMTP Server ist bereit');
+        if (isDev) {
+          logger.info({ host: emailConfig.host, port: emailConfig.port }, 'SMTP verbunden');
+        }
       }
     });
   }

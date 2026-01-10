@@ -1,12 +1,13 @@
 // backend/routes/app/api/marketing/email-enhancement.ts
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { EmailEnhancementService } from '../../../../services/emailEnhancementService';
+import { logger } from '../../../../logger';
 
 export async function emailEnhancementRoutes(fastify: FastifyInstance) {
   // 🎯 Smart Subject Lines
   fastify.post('/subject-lines', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      console.log('📨 POST /email-enhancement/subject-lines');
+      logger.debug('Email enhancement subject-lines endpoint called');
       const body = request.body as any;
       const variantsRaw = await EmailEnhancementService.generateSmartSubjectLines(body);
       const variants = (variantsRaw || []).map((v: any) => ({
@@ -22,7 +23,7 @@ export async function emailEnhancementRoutes(fastify: FastifyInstance) {
         message: `${variants.length} Subject Line Varianten generiert`
       });
     } catch (error: any) {
-      console.error('❌ Fehler bei subject-lines:', error.message);
+      logger.error({ error: error.message, function: 'subjectLines' }, 'Subject lines generation failed');
       reply.status(500).send({
         success: false,
         error: error.message
@@ -33,7 +34,7 @@ export async function emailEnhancementRoutes(fastify: FastifyInstance) {
   // 🔍 Customer Segmentation
   fastify.post('/segment-customers', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      console.log('🔍 POST /email-enhancement/segment-customers');
+      logger.debug('Email enhancement segment-customers endpoint called');
       const body = request.body as any;
       const segments = await EmailEnhancementService.segmentCustomers(body.customers);
       
@@ -43,7 +44,7 @@ export async function emailEnhancementRoutes(fastify: FastifyInstance) {
         message: `${segments.length} Kundensegmente erstellt`
       });
     } catch (error: any) {
-      console.error('❌ Fehler bei segment-customers:', error.message);
+      logger.error({ error: error.message, function: 'segmentCustomers' }, 'Customer segmentation failed');
       reply.status(500).send({
         success: false,
         error: error.message
@@ -54,7 +55,7 @@ export async function emailEnhancementRoutes(fastify: FastifyInstance) {
   // ✨ Email Personalization
   fastify.post('/personalize-email', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      console.log('✨ POST /email-enhancement/personalize-email');
+      logger.debug('Email enhancement personalize-email endpoint called');
       const body = request.body as any;
       const personalizedEmail = await EmailEnhancementService.personalizeEmail(body);
       
@@ -64,7 +65,7 @@ export async function emailEnhancementRoutes(fastify: FastifyInstance) {
         message: 'Email erfolgreich personalisiert'
       });
     } catch (error: any) {
-      console.error('❌ Fehler bei personalize-email:', error.message);
+      logger.error({ error: error.message, function: 'personalizeEmail' }, 'Email personalization failed');
       reply.status(500).send({
         success: false,
         error: error.message
@@ -75,7 +76,7 @@ export async function emailEnhancementRoutes(fastify: FastifyInstance) {
   // ⏰ Send Time Optimization
   fastify.post('/optimize-send-time', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      console.log('⏰ POST /email-enhancement/optimize-send-time');
+      logger.debug('Email enhancement optimize-send-time endpoint called');
       const body = request.body as any;
       const sendTimesRaw = await EmailEnhancementService.optimizeSendTime(body.customers);
       const sendTimes = (sendTimesRaw || []).map((item: any) => ({
@@ -93,7 +94,7 @@ export async function emailEnhancementRoutes(fastify: FastifyInstance) {
         message: 'Optimale Versandzeiten berechnet'
       });
     } catch (error: any) {
-      console.error('❌ Fehler bei optimize-send-time:', error.message);
+      logger.error({ error: error.message, function: 'optimizeSendTime' }, 'Send time optimization failed');
       reply.status(500).send({
         success: false,
         error: error.message
@@ -104,7 +105,7 @@ export async function emailEnhancementRoutes(fastify: FastifyInstance) {
   // 📊 Email Performance Forecast
   fastify.post('/forecast-performance', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      console.log('📊 POST /email-enhancement/forecast-performance');
+      logger.debug('Email enhancement forecast-performance endpoint called');
       const body = request.body as any;
       const forecastRaw = await EmailEnhancementService.forecastEmailPerformance(body);
       const forecast = {
@@ -124,7 +125,7 @@ export async function emailEnhancementRoutes(fastify: FastifyInstance) {
         message: 'Performance-Prognose erstellt'
       });
     } catch (error: any) {
-      console.error('❌ Fehler bei forecast-performance:', error.message);
+      logger.error({ error: error.message, function: 'forecastPerformance' }, 'Performance forecast failed');
       reply.status(500).send({
         success: false,
         error: error.message

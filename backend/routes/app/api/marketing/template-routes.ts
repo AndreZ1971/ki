@@ -136,7 +136,7 @@ Formatiere den Code sauber und gut lesbar.`;
           createdAt: new Date().toISOString(),
         };
 
-        console.log(`✅ Template generiert: ${template.name}`);
+        logger.info({ templateName: template.name, category: templateCategory }, 'Template generated successfully');
 
         return reply.send({
           success: true,

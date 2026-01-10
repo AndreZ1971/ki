@@ -1,6 +1,7 @@
 // backend/routes/app/api/marketing/content-routes.ts
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { getConfig } from '@config';
+import { logger } from '../../../../logger';
 
 interface CreateDigitalProductBody {
   contentTitle: string;
@@ -237,7 +238,7 @@ Liefer ein JSON { "headline": "...", "body": "...", "cta": "..." }.`;
         }
       });
     } catch (_error) {
-      console.error('❌ Error loading revenue data:', _error);
+      logger.error({ error: _error instanceof Error ? _error.message : 'Unknown', function: 'loadRevenueData' }, 'Error loading revenue data');
       return reply.status(500).send({
         success: false,
         error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
@@ -293,7 +294,7 @@ Liefer ein JSON { "headline": "...", "body": "...", "cta": "..." }.`;
 
         const product = await response.json();
 
-        console.log(`✅ Digitales Produkt erstellt: ${product.name} (ID: ${product.id})`);
+        logger.info({ productId: product.id, productName: product.name }, 'Digital product created');
 
         return reply.send({
           success: true,
@@ -306,7 +307,7 @@ Liefer ein JSON { "headline": "...", "body": "...", "cta": "..." }.`;
           }
         });
       } catch (_error) {
-        console.error('❌ Error creating digital product:', _error);
+        logger.error({ error: _error instanceof Error ? _error.message : 'Unknown', function: 'createDigitalProduct' }, 'Error creating digital product');
         return reply.status(500).send({
           success: false,
           error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'

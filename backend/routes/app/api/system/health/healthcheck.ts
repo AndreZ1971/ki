@@ -1,5 +1,6 @@
 import http from 'http';
 import process from 'process';
+import { logger } from '../../../../../logger';
 
 const options = {
   host: 'localhost',
@@ -9,7 +10,7 @@ const options = {
 };
 
 const request = http.request(options, (res: http.IncomingMessage) => {
-  console.log(`STATUS: ${res.statusCode}`);
+  logger.info({ status: res.statusCode }, 'Health check response');
   if (res.statusCode === 200) {
     process.exit(0);
   } else {
@@ -18,7 +19,7 @@ const request = http.request(options, (res: http.IncomingMessage) => {
 });
 
 request.on('error', (err: Error) => {
-  console.log('ERROR', err);
+  logger.error({ error: err }, 'Health check failed');
   process.exit(1);
 });
 

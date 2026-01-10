@@ -253,8 +253,9 @@ export class DeadLetterQueue {
 
   private async loadFromDisk(): Promise<void> {
     try {
-      const files = await fs.readdir(this.options.storagePath);
-      const jsonFiles = files.filter(f => f.endsWith('.json'));
+      const filesRaw = await fs.readdir(this.options.storagePath);
+      const files = Array.isArray(filesRaw) ? filesRaw : [];
+      const jsonFiles = files.filter((f) => f.endsWith('.json'));
 
       for (const file of jsonFiles) {
         try {

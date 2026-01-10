@@ -103,6 +103,24 @@ export class SpecializationPersistenceManager {
   );
 
   /**
+   * Produces a canonical, stable JSON string with sorted keys recursively.
+   * Ensures checksum consistency across serialize/deserialize cycles.
+   */
+  private static stableStringify(value: unknown): string {
+    const normalize = (val: any): any => {
+      if (val === null || typeof val !== 'object') return val;
+      if (Array.isArray(val)) return val.map((v) => normalize(v));
+      const keys = Object.keys(val).sort();
+      const obj: Record<string, any> = {};
+      for (const k of keys) {
+        obj[k] = normalize(val[k]);
+      }
+      return obj;
+    };
+    return JSON.stringify(normalize(value));
+  }
+
+  /**
    * Initialisiert das Persistenz-System
    * Erstellt notwendige Verzeichnisse und Indizes
    */
@@ -162,7 +180,7 @@ export class SpecializationPersistenceManager {
       // Berechne Checksum
       const checksum = crypto
         .createHash('sha256')
-        .update(JSON.stringify(specialization))
+        .update(this.stableStringify(specialization))
         .digest('hex');
 
       // Speichere Spezialisierung mit atomic write (write-to-temp + rename)
@@ -266,7 +284,7 @@ export class SpecializationPersistenceManager {
         // Validiere Integrität
         const checksum = crypto
           .createHash('sha256')
-          .update(JSON.stringify(specialization))
+          .update(SpecializationPersistenceManager.stableStringify(specialization))
           .digest('hex');
 
         logger.debug(
@@ -453,7 +471,7 @@ export class SpecializationPersistenceManager {
           // Validiere Checksum
           const actualChecksum = crypto
             .createHash('sha256')
-            .update(JSON.stringify(spec))
+            .update(this.stableStringify(spec))
             .digest('hex');
 
           if (actualChecksum === metadata.checksum) {

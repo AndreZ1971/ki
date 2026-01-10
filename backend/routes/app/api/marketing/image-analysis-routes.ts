@@ -6,6 +6,7 @@ import sharp from 'sharp';
 import OpenAI from 'openai';
 
 import { getConfig } from '@config';
+import { logger } from '../../../../logger';
 
 // Lazy initialization - OpenAI wird erst beim ersten API-Call initialisiert
 let openai: OpenAI | null = null;
@@ -566,11 +567,7 @@ export default async function imageAnalysisRoutes(fastify: FastifyInstance) {
             .send({ success: false, error: 'Bild ist leer' });
         }
 
-        console.log(
-          '📸 Color analysis input - size:',
-          bufferImage.length,
-          'bytes'
-        );
+        logger.debug({ size: bufferImage.length }, 'Color analysis input');
 
         // Get metadata first
         const metadata = await sharp(bufferImage).metadata();
@@ -582,12 +579,12 @@ export default async function imageAnalysisRoutes(fastify: FastifyInstance) {
           .raw()
           .toBuffer();
 
-        console.log('🔧 Buffer info - length:', buffer.length, 'bytes');
+        logger.debug({ bufferLength: buffer.length }, 'Buffer info');
 
         // Calculate expected pixel count
         const pixelCount = 50 * 50; // 2500 pixels
         const bytesPerPixel = buffer.length / pixelCount;
-        console.log('📐 Bytes per pixel:', bytesPerPixel);
+        logger.debug({ bytesPerPixel }, 'Bytes per pixel calculated');
 
         const colorMap = new Map<string, number>();
         const step = Math.round(bytesPerPixel);
@@ -603,14 +600,14 @@ export default async function imageAnalysisRoutes(fastify: FastifyInstance) {
           }
         }
 
-        console.log('🎯 Unique colors found:', colorMap.size);
+        logger.debug({ uniqueColors: colorMap.size }, 'Unique colors found');
 
         const topColors = Array.from(colorMap.entries())
           .sort((a, b) => b[1] - a[1])
           .slice(0, 5)
           .map(([c]) => c);
 
-        console.log('✅ Top 5 colors:', topColors);
+        logger.debug({ topColors }, 'Top 5 colors extracted');
 
         return reply.send({
           success: true,
@@ -630,7 +627,7 @@ export default async function imageAnalysisRoutes(fastify: FastifyInstance) {
             ? _error.message
             : 'Farbanalyse fehlgeschlagen';
         const stack = (_error as any)?.stack || 'No stack trace';
-        console.error('❌ Color analysis error:', { error: errorMsg, stack });
+        logger.error({ error: errorMsg, stack }, 'Color analysis error');
         return reply.status(500).send({ success: false, error: errorMsg });
       }
     }

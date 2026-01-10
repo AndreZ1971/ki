@@ -3,6 +3,7 @@ import { AnalyticsMLService } from '../../../../services/analyticsMLService';
 import { getConfig } from '@config';
 // Update the import path if the file exists elsewhere, for example:
 import { getOpenAIClient, executeOpenAI } from '../../../../utils/openaiHelper';
+import { logger } from '../../../../logger';
 // Or create the file at '../../../utils/openaiHelper.ts' if it does not exist.
 
 export default async function trendsRoutes(fastify: FastifyInstance) {
@@ -48,7 +49,7 @@ export default async function trendsRoutes(fastify: FastifyInstance) {
         timestamp: new Date().toISOString()
       });
     } catch (error) {
-      console.error('Trend Analysis failed:', error);
+      logger.error({ error: error instanceof Error ? error.message : 'Unknown', keyword: decodedKeyword }, 'Trend analysis failed');
       // Fallback bei Fehler
       return reply.send({
         success: true,
@@ -97,10 +98,10 @@ export default async function trendsRoutes(fastify: FastifyInstance) {
       if (res.ok) {
         orders = await res.json();
       } else {
-        console.warn(`⚠️ [trends] Orders API returned ${res.status}`);
+        logger.warn({ status: res.status }, 'Orders API returned error status');
       }
     } catch (err) {
-      console.warn('⚠️ [trends] Fehler beim Laden von Orders:', err);
+      logger.warn({ error: err instanceof Error ? err.message : 'Unknown' }, 'Error loading orders');
       // Ignoriere Fehler, KI kann auch ohne Kontext antworten
     }
     // Aggregiere Top-Produkte
@@ -150,7 +151,7 @@ export default async function trendsRoutes(fastify: FastifyInstance) {
         next_steps = nextMatch[1].split(/\n|,|;/).map((s: string) => s.trim()).filter(Boolean);
       }
     } catch (err) {
-      console.error('[KI-Analyse] Fehler bei OpenAI:', err);
+      logger.error({ error: err instanceof Error ? (err as Error).message : 'Unknown' }, 'KI-Analyse OpenAI error');
     }
     return reply.send({
       success: true,
@@ -182,27 +183,22 @@ export default async function trendsRoutes(fastify: FastifyInstance) {
     const WC_CONSUMER_SECRET = config.woocommerce?.consumerSecret || '';
 
     // Logging der Konfiguration
-    console.log('[TrendAnalysis] WC_API_URL:', WC_API_URL);
-    console.log('[TrendAnalysis] WC_CONSUMER_KEY:', WC_CONSUMER_KEY ? 'SET' : 'NOT SET');
-    console.log('[TrendAnalysis] WC_CONSUMER_SECRET:', WC_CONSUMER_SECRET ? 'SET' : 'NOT SET');
-
-    // Hole Bestellungen für den Zeitraum
     const ordersUrl = `${WC_API_URL}/wp-json/wc/v3/orders?after=${after.toISOString()}&per_page=100&consumer_key=${WC_CONSUMER_KEY}&consumer_secret=${WC_CONSUMER_SECRET}`;
-    console.log('[TrendAnalysis] ordersUrl:', ordersUrl);
+    logger.debug({ hasUrl: !!WC_API_URL, hasKey: !!WC_CONSUMER_KEY, hasSecret: !!WC_CONSUMER_SECRET, ordersUrl }, 'TrendAnalysis WooCommerce config');
     let orders = [];
     try {
       const res = await fetch(ordersUrl);
-      console.log('[TrendAnalysis] WooCommerce-API Status:', res.status, res.statusText);
+      logger.debug({ status: res.status, statusText: res.statusText }, 'WooCommerce API status');
       if (res.ok) {
         orders = await res.json();
-        console.log('[TrendAnalysis] Orders loaded:', Array.isArray(orders) ? orders.length : typeof orders);
+        logger.info({ count: Array.isArray(orders) ? orders.length : 'unknown' }, 'Orders loaded from WooCommerce');
       } else {
         const errorText = await res.text();
-        console.error('[TrendAnalysis] WooCommerce-API Error:', errorText);
+        logger.error({ status: res.status, error: errorText }, 'WooCommerce API error');
         return reply.code(500).send({ success: false, error: 'WooCommerce-API-Error', status: res.status, details: errorText });
       }
     } catch (err) {
-      console.error('[TrendAnalysis] WooCommerce-API-Fetch-Exception:', err);
+      logger.error({ error: err instanceof Error ? err.message : 'Unknown' }, 'WooCommerce API fetch exception');
       return reply.code(500).send({ success: false, error: 'WooCommerce-API-Fehler', details: String(err) });
     }
 

@@ -1,6 +1,7 @@
 // services/chatbotFunctionCaller.ts - Smart Intent-based Function Caller für Chatbot
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
 import { getConfig } from '@config';
+import { logger } from '../logger';
 
 interface FunctionCallResult {
   functionName: string;
@@ -18,6 +19,60 @@ interface CacheEntry {
 // Cache für häufige Anfragen (5 Minuten TTL)
 const functionCache = new Map<string, CacheEntry>();
 const cacheTTL = 5 * 60 * 1000; // 5 Minuten
+
+const MAX_RETRIES = 3;
+const BASE_RETRY_DELAY = 500; // 500ms
+
+/**
+ * Retry-Helper mit exponentiellem Backoff
+ */
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  maxAttempts: number = MAX_RETRIES
+): Promise<T> {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      const isLastAttempt = attempt === maxAttempts - 1;
+      const isDev = process.env.NODE_ENV === 'development';
+      
+      if (isLastAttempt) {
+        throw error;
+      }
+      
+      const delay = BASE_RETRY_DELAY * Math.pow(2, attempt);
+      if (isDev) {
+        logger.info({ attempt: attempt + 1, maxAttempts: maxAttempts - 1, delay }, 'API Retry');
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  throw new Error('Max retries exceeded');
+}
+
+/**
+ * Timeout-Helper mit Promise.race
+ */
+async function withTimeout<T>(
+  fn: () => Promise<T>,
+  timeoutMs: number = 3000
+): Promise<T> {
+  const isDev = process.env.NODE_ENV === 'development';
+  
+  return Promise.race([
+    fn(),
+    new Promise<T>((_, reject) => {
+      setTimeout(() => {
+        if (isDev) {
+          logger.warn({ timeoutMs }, 'API call timed out');
+        }
+        reject(new Error(`API call timed out after ${timeoutMs}ms`));
+      }, timeoutMs);
+    })
+  ]);
+}
 
 // Query-Pattern Recognition
 const queryPatterns = {
@@ -48,7 +103,9 @@ const getWooConfig = () => {
 async function getProductCount(): Promise<FunctionCallResult> {
   try {
     const wooCommerce = new WooCommerceRestApi(getWooConfig());
-    const response = await wooCommerce.get('products', { per_page: 1 });
+    const response = await withTimeout(() => 
+      withRetry(() => wooCommerce.get('products', { per_page: 1 }))
+    );
     const totalProducts = response.headers['x-wp-total'] || 0;
     
     return {
@@ -61,7 +118,12 @@ async function getProductCount(): Promise<FunctionCallResult> {
       isLive: true
     };
   } catch (error) {
-    console.error('❌ productCount error:', error);
+    const isDev = process.env.NODE_ENV === 'development';
+    if (isDev) {
+      logger.error({ error, function: 'productCount' }, 'API call failed');
+    } else {
+      logger.error({ function: 'productCount' }, 'API call failed');
+    }
     return {
       functionName: 'productCount',
       result: { error: 'Produkte konnten nicht abgerufen werden' },
@@ -74,7 +136,9 @@ async function getProductCount(): Promise<FunctionCallResult> {
 async function getCategoryCount(): Promise<FunctionCallResult> {
   try {
     const wooCommerce = new WooCommerceRestApi(getWooConfig());
-    const response = await wooCommerce.get('products/categories', { per_page: 1 });
+    const response = await withTimeout(() => 
+      withRetry(() => wooCommerce.get('products/categories', { per_page: 1 }))
+    );
     const totalCategories = response.headers['x-wp-total'] || 0;
     
     return {
@@ -87,7 +151,10 @@ async function getCategoryCount(): Promise<FunctionCallResult> {
       isLive: true
     };
   } catch (error) {
-    console.error('❌ categoryCount error:', error);
+    const isDev = process.env.NODE_ENV === 'development';
+    if (isDev) {
+      logger.error({ error, function: 'categoryCount' }, 'API call failed');
+    }
     return {
       functionName: 'categoryCount',
       result: { error: 'Kategorien konnten nicht abgerufen werden' },
@@ -100,11 +167,13 @@ async function getCategoryCount(): Promise<FunctionCallResult> {
 async function getTopProducts(limit = 5): Promise<FunctionCallResult> {
   try {
     const wooCommerce = new WooCommerceRestApi(getWooConfig());
-    const response = await wooCommerce.get('products', {
-      per_page: limit,
-      orderby: 'rating',
-      order: 'desc'
-    });
+    const response = await withTimeout(() => 
+      withRetry(() => wooCommerce.get('products', {
+        per_page: limit,
+        orderby: 'rating',
+        order: 'desc'
+      }))
+    );
     
     const topProducts = (response.data as any[]).map((p: any) => ({
       name: p.name,
@@ -122,7 +191,10 @@ async function getTopProducts(limit = 5): Promise<FunctionCallResult> {
       isLive: true
     };
   } catch (error) {
-    console.error('❌ topProducts error:', error);
+    const isDev = process.env.NODE_ENV === 'development';
+    if (isDev) {
+      logger.error({ error, function: 'topProducts' }, 'API call failed');
+    }
     return {
       functionName: 'topProducts',
       result: { error: 'Top-Produkte konnten nicht abgerufen werden' },
@@ -135,7 +207,7 @@ async function getTopProducts(limit = 5): Promise<FunctionCallResult> {
 async function getTotalCustomers(): Promise<FunctionCallResult> {
   try {
     const wooCommerce = new WooCommerceRestApi(getWooConfig());
-    const response = await wooCommerce.get('customers', { per_page: 1 });
+    const response = await withRetry(() => wooCommerce.get('customers', { per_page: 1 }));
     const totalCustomers = response.headers['x-wp-total'] || 0;
     
     return {
@@ -148,7 +220,10 @@ async function getTotalCustomers(): Promise<FunctionCallResult> {
       isLive: true
     };
   } catch (error) {
-    console.error('❌ totalCustomers error:', error);
+    const isDev = process.env.NODE_ENV === 'development';
+    if (isDev) {
+      logger.error({ error, function: 'totalCustomers' }, 'API call failed');
+    }
     return {
       functionName: 'totalCustomers',
       result: { error: 'Kundenzahl konnte nicht abgerufen werden' },
@@ -161,11 +236,11 @@ async function getTotalCustomers(): Promise<FunctionCallResult> {
 async function getLowStockProducts(threshold = 5): Promise<FunctionCallResult> {
   try {
     const wooCommerce = new WooCommerceRestApi(getWooConfig());
-    const response = await wooCommerce.get('products', {
+    const response = await withRetry(() => wooCommerce.get('products', {
       per_page: 100,
       orderby: 'stock_quantity',
       order: 'asc'
-    });
+    }));
     
     const lowStockProducts = (response.data as any[])
       .filter((p: any) => p.stock_quantity !== null && p.stock_quantity <= threshold)
@@ -187,7 +262,10 @@ async function getLowStockProducts(threshold = 5): Promise<FunctionCallResult> {
       isLive: true
     };
   } catch (error) {
-    console.error('❌ lowStockProducts error:', error);
+    const isDev = process.env.NODE_ENV === 'development';
+    if (isDev) {
+      logger.error({ error, function: 'lowStockProducts' }, 'API call failed');
+    }
     return {
       functionName: 'lowStockProducts',
       result: { error: 'Lagerbestände konnten nicht abgerufen werden' },
@@ -200,7 +278,7 @@ async function getLowStockProducts(threshold = 5): Promise<FunctionCallResult> {
 async function getTotalOrders(): Promise<FunctionCallResult> {
   try {
     const wooCommerce = new WooCommerceRestApi(getWooConfig());
-    const response = await wooCommerce.get('orders', { per_page: 1 });
+    const response = await withRetry(() => wooCommerce.get('orders', { per_page: 1 }));
     const totalOrders = response.headers['x-wp-total'] || 0;
     
     return {
@@ -213,7 +291,10 @@ async function getTotalOrders(): Promise<FunctionCallResult> {
       isLive: true
     };
   } catch (error) {
-    console.error('❌ totalOrders error:', error);
+    const isDev = process.env.NODE_ENV === 'development';
+    if (isDev) {
+      logger.error({ error, function: 'totalOrders' }, 'API call failed');
+    }
     return {
       functionName: 'totalOrders',
       result: { error: 'Bestellungen konnten nicht abgerufen werden' },
@@ -231,7 +312,7 @@ export async function callChatbotFunction(query: string): Promise<FunctionCallRe
   // Prüfe Cache
   const cached = functionCache.get(cacheKey);
   if (cached && Date.now() - cached.timestamp < cached.ttl) {
-    console.log(`✅ Cached result for: ${cacheKey}`);
+    logger.info({ cacheKey }, 'Cache hit');
     return cached.data;
   }
 
@@ -318,5 +399,5 @@ export function getCommonQueries(limit = 10) {
 
 export function clearCache() {
   functionCache.clear();
-  console.log('✅ Function cache cleared');
+  logger.info('Function cache cleared');
 }

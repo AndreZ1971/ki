@@ -7,6 +7,7 @@ import { getShopStats, getSystemHealth } from '../../../services/shopData';
 import { getOpenAIClient, executeOpenAI } from '../../../utils/openaiHelper';
 import { SpecializationService } from '../../../services/specializationService';
 import { callChatbotFunction, recordQuery } from '../../../services/chatbotFunctionCaller';
+import { logger } from '../../../logger';
 
 dotenv.config();
 
@@ -31,7 +32,7 @@ const apiBase = getConfig().apiBaseUrl || 'http://localhost:3000';
 const shopBaseUrl = String(getWooConfig().url || process.env.WOOCOMMERCE_URL || 'https://example.com').replace(/\/$/, '');
 
 if (!getWooConfig().url || !getWooConfig().consumerKey || !getWooConfig().consumerSecret) {
-  console.error('❌ WooCommerce Config fehlt: Bitte URL / ConsumerKey / ConsumerSecret setzen.');
+  logger.warn('WooCommerce config missing - please set URL, ConsumerKey, ConsumerSecret');
 }
 
 export default async function chatbotMessageRoute(server: FastifyInstance) {
@@ -298,7 +299,7 @@ ${activeSpec.contextInstructions ? activeSpec.contextInstructions.join('\n') : '
 // 🔍 A.R.I. PAYMENT FEHLERANALYSE FUNKTION
 async function analyzePaymentIssues(): Promise<string> {
   try {
-    console.log('🔧 A.R.I. startet Payment-Fehleranalyse...');
+    logger.info('A.R.I. starting payment error analysis');
 
     // 1. Stornierte Bestellungen der letzten 7 Tage abrufen
     const sevenDaysAgo = new Date();
@@ -407,7 +408,7 @@ async function analyzePaymentIssues(): Promise<string> {
     return diagnosis;
 
   } catch (error: any) {
-    console.error('❌ Fehler bei Payment-Analyse:', error.message);
+    logger.error({ error: error.message }, 'Payment analysis failed');
     return '❌ Fehler bei der Payment-Analyse. Bitte prüfe die WooCommerce-Verbindung und versuche es erneut.';
   }
 }
@@ -415,7 +416,7 @@ async function analyzePaymentIssues(): Promise<string> {
 // 📊 CONVERSION-ANALYSE
 async function analyzeConversionIssues(): Promise<string> {
   try {
-    console.log('📊 Ari analysiert Conversion-Probleme...');
+    logger.info('Ari analyzing conversion problems');
     
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -478,7 +479,7 @@ async function analyzeConversionIssues(): Promise<string> {
     return report;
     
   } catch (error: any) {
-    console.error('❌ Fehler bei Conversion-Analyse:', error.message);
+    logger.error({ error: error.message }, 'Conversion analysis failed');
     return '❌ Fehler bei der Conversion-Analyse.';
   }
 }
@@ -486,7 +487,7 @@ async function analyzeConversionIssues(): Promise<string> {
 // 🏥 SYSTEM HEALTH CHECK
 async function performSystemHealthCheck(): Promise<string> {
   try {
-    console.log('🏥 Ari führt System-Gesundheitscheck durch...');
+    logger.info('Ari performing system health check');
     
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -561,7 +562,7 @@ async function performSystemHealthCheck(): Promise<string> {
     return report;
     
   } catch (error: any) {
-    console.error('❌ Fehler bei Health Check:', error.message);
+    logger.error({ error: error.message }, 'System health check failed');
     return '❌ Fehler beim System-Gesundheitscheck.';
   }
 }
@@ -569,7 +570,7 @@ async function performSystemHealthCheck(): Promise<string> {
 // 📝 CONTENT PERFORMANCE ANALYSE
 async function analyzeContentPerformance(): Promise<string> {
   try {
-    console.log('📝 Ari analysiert Content-Performance...');
+    logger.info('Ari analyzing content performance');
     
     const productsResponse = await wooCommerce.get('products', { per_page: 100, status: 'publish' });
     const products = productsResponse.data;
@@ -613,7 +614,7 @@ async function analyzeContentPerformance(): Promise<string> {
     return report;
     
   } catch (error: any) {
-    console.error('❌ Fehler bei Content-Analyse:', error.message);
+    logger.error({ error: error.message }, 'Content analysis failed');
     return '❌ Fehler bei der Content-Analyse.';
   }
 }
@@ -621,7 +622,7 @@ async function analyzeContentPerformance(): Promise<string> {
 // 🎯 PRODUKT-PERFORMANCE ANALYSE
 async function analyzeProductPerformance(): Promise<string> {
   try {
-    console.log('🎯 Ari analysiert Produkt-Performance...');
+    logger.info('Ari analyzing product performance');
     
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -690,7 +691,7 @@ async function analyzeProductPerformance(): Promise<string> {
     return report;
     
   } catch (error: any) {
-    console.error('❌ Fehler bei Produkt-Analyse:', error.message);
+    logger.error({ error: error.message }, 'Product analysis failed');
     return '❌ Fehler bei der Produkt-Analyse.';
   }
 }
@@ -770,7 +771,7 @@ async function summarizeMonitoring(): Promise<string> {
 
     return report;
   } catch (error: any) {
-    console.error('Monitoring summary error:', error.message);
+    logger.error({ error: error.message }, 'Monitoring summary failed');
     return '❌ Konnte System-Health-Summary nicht laden.';
   }
 }

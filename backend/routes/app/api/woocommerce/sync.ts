@@ -1,6 +1,7 @@
 // backend/routes/app/api/woocommerce/sync.ts
 import { FastifyPluginAsync } from 'fastify';
 import { getConfig } from '@config';
+import { logger } from '../../../../logger';
 
 interface SyncResult {
   products: number;
@@ -43,7 +44,7 @@ const fetchCount = async (
     headers['Authorization'] = `Basic ${auth}`;
   }
 
-  console.log(`[WooSync] Fetching count for ${resource} from ${url.replace(/consumer_(key|secret)=[^&]+/g, 'consumer_$1=***')}`);
+  logger.debug({ resource, url: url.replace(/consumer_(key|secret)=[^&]+/g, 'consumer_$1=***') }, 'WooSync fetching count');
 
   const response = await fetch(url, {
     method: 'GET',
@@ -61,7 +62,7 @@ const fetchCount = async (
   for (const [key, value] of response.headers.entries()) {
     if (key.toLowerCase() === 'x-wp-total') {
       total = Number(value);
-      console.log(`[WooSync] Found ${resource} count in header: ${total}`);
+      logger.debug({ resource, total }, 'WooSync count from header');
       return total;
     }
   }
@@ -71,18 +72,18 @@ const fetchCount = async (
     const data = await response.json();
     if (Array.isArray(data)) {
       total = data.length;
-      console.log(`[WooSync] Counted ${resource} items in response: ${total}`);
+      logger.debug({ resource, total }, 'WooSync counted items in response');
       return total;
     } else if (data?.data && Array.isArray(data.data)) {
       total = data.data.length;
-      console.log(`[WooSync] Counted ${resource} items in response.data: ${total}`);
+      logger.debug({ resource, total }, 'WooSync counted items in response.data');
       return total;
     }
   } catch (_e) {
-    console.warn(`[WooSync] Could not parse response for ${resource}`);
+    logger.warn({ resource }, 'Could not parse WooSync response');
   }
 
-  console.warn(`[WooSync] No count found for ${resource}, returning 0`);
+  logger.warn({ resource }, 'No count found in WooSync, returning 0');
   return 0;
 };
 
@@ -135,7 +136,7 @@ const syncRoutes: FastifyPluginAsync = async (fastify) => {
           return await fetchCount(url!, consumerKey!, consumerSecret!, resource, preferQuery);
         } catch (_e1) {
           // Retry with alternate auth mode
-          console.log(`[WooSync] Retry ${resource} with ${preferQuery ? 'basic' : 'query'} auth`);
+          logger.debug({ resource, retryAuthMode: preferQuery ? 'basic' : 'query' }, 'WooSync retrying with alternate auth');
           return await fetchCount(url!, consumerKey!, consumerSecret!, resource, !preferQuery);
         }
       };

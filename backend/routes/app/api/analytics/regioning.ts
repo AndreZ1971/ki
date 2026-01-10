@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { AnalyticsMLService } from '../../../../services/analyticsMLService';
 import { getConfig } from '@config';
+import { logger } from '../../../../logger';
 
 export default async function regioningRoutes(fastify: FastifyInstance) {
   // GET /api/analytics/regioning/data
@@ -55,7 +56,7 @@ export default async function regioningRoutes(fastify: FastifyInstance) {
         timestamp: new Date().toISOString()
       });
     } catch (error) {
-      console.error('Regional ML Analysis failed:', error);
+      logger.error({ error, function: 'regioningMlAnalysis' }, 'Regional ML Analysis failed');
       // Fallback bei Fehler
       return reply.send({
         success: true,

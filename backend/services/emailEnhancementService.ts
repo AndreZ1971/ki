@@ -1,6 +1,7 @@
 // backend/services/emailEnhancementService.ts
 import { getOpenAIClient, executeOpenAI } from '../utils/openaiHelper';
 import { getConfig } from '../config';
+import { logger } from '../logger.js';
 
 const OPENAI_MODEL = getConfig().openAI?.model?.trim() || 'gpt-4-turbo';
 
@@ -63,7 +64,7 @@ export class EmailEnhancementService {
     brandVoice?: string;
   }): Promise<SubjectLineVariant[]> {
     const openai = getOpenAIClient();
-    console.log('🎯 [EmailEnhancementService] generateSmartSubjectLines:', data.emailType);
+    logger.info({ emailType: data.emailType, hasSubject: false }, 'generateSmartSubjectLines called');
 
     const prompt = `Du bist ein Email Marketing Expert. Generiere 5 hocheffektive Subject Lines für:
     
@@ -102,7 +103,7 @@ Alle Zeilen auf DEUTSCH, max 60 Zeichen, hochkonvertierend.`;
       const result = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
       return result;
     } catch (error: any) {
-      console.error('❌ Fehler bei generateSmartSubjectLines:', error.message);
+      logger.error({ error, function: 'generateSmartSubjectLines' }, 'Failed to generate subject lines');
       throw error;
     }
   }
@@ -112,9 +113,8 @@ Alle Zeilen auf DEUTSCH, max 60 Zeichen, hochkonvertierend.`;
    */
   static async segmentCustomers(customers: any[]): Promise<CustomerSegment[]> {
     const openai = getOpenAIClient();
-    console.log('🔍 [EmailEnhancementService] segmentCustomers:', customers.length);
+    logger.info({ customerCount: customers.length }, 'segmentCustomers called');
 
-    // Kundendaten zusammenfassen für KI-Analyse
     const customerSummary = customers.map(c => ({
       id: c.id,
       name: c.name,
@@ -162,7 +162,7 @@ Erstelle 3-5 Kundensegmente mit Charakteristiken als JSON:
       const result = jsonMatch ? JSON.parse(jsonMatch[0]) : { segments: [] };
       return result.segments || [];
     } catch (error: any) {
-      console.error('❌ Fehler bei segmentCustomers:', error.message);
+      logger.error({ error, function: 'segmentCustomers' }, 'Failed to segment customers');
       throw error;
     }
   }
@@ -184,7 +184,7 @@ Erstelle 3-5 Kundensegmente mit Charakteristiken als JSON:
     };
   }): Promise<PersonalizedEmail> {
     const openai = getOpenAIClient();
-    console.log('✨ [EmailEnhancementService] personalizeEmail:', data.customerName);
+    logger.info({ customerName: data.customerName, emailType: data.emailType }, 'personalizeEmail called');
 
     const historyContext = data.customerHistory
       ? `LETZTE PRODUKTE: ${data.customerHistory.lastProducts.join(', ')}
@@ -245,7 +245,7 @@ Gib das Ergebnis als JSON zurück:
         estimatedConversionRate: parsedResult.estimatedConversionRate || 0
       };
     } catch (error: any) {
-      console.error('❌ Fehler bei personalizeEmail:', error.message);
+      logger.error({ error, function: 'personalizeEmail' }, 'Failed to personalize email');
       throw error;
     }
   }
@@ -255,7 +255,7 @@ Gib das Ergebnis als JSON zurück:
    */
   static async optimizeSendTime(customers: any[]): Promise<OptimalSendTime[]> {
     const openai = getOpenAIClient();
-    console.log('⏰ [EmailEnhancementService] optimizeSendTime:', customers.length);
+    logger.info({ customerCount: customers.length }, 'optimizeSendTime called');
 
     const prompt = `Du bist ein Send-Time Optimization Expert. Analysiere diese Kunden und bestimme optimale Versandzeiten:
 
@@ -299,7 +299,7 @@ Gib für jeden Kunden die beste Versandzeit als JSON zurück:
       const result = jsonMatch ? JSON.parse(jsonMatch[0]) : { sendTimes: [] };
       return result.sendTimes || [];
     } catch (error: any) {
-      console.error('❌ Fehler bei optimizeSendTime:', error.message);
+      logger.error({ error, function: 'optimizeSendTime' }, 'Failed to optimize send time');
       throw error;
     }
   }
@@ -316,7 +316,7 @@ Gib für jeden Kunden die beste Versandzeit als JSON zurück:
     historicalCTR?: number;
   }): Promise<EmailPerformanceForecast> {
     const openai = getOpenAIClient();
-    console.log('📊 [EmailEnhancementService] forecastEmailPerformance:', data.emailType);
+    logger.info({ emailType: data.emailType, recipientCount: data.recipientCount }, 'forecastEmailPerformance called');
 
     const prompt = `Du bist ein Email Performance Analyst. Prognostiziere die Performance dieser Email:
 
@@ -367,7 +367,7 @@ Basiere auf Industrie-Benchmarks und Best Practices.`;
         recommendations: parsedResult.recommendations || []
       };
     } catch (error: any) {
-      console.error('❌ Fehler bei forecastEmailPerformance:', error.message);
+      logger.error({ error, function: 'forecastEmailPerformance' }, 'Failed to forecast email performance');
       throw error;
     }
   }

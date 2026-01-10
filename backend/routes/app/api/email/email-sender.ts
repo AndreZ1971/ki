@@ -2,6 +2,7 @@
 import { FastifyPluginAsync } from 'fastify';
 import nodemailer from 'nodemailer';
 import { getConfig } from '@config';
+import { logger } from '../../../../logger';
 
 const emailSenderRoutes: FastifyPluginAsync = async (fastify, _options) => {
   
@@ -32,10 +33,7 @@ const emailSenderRoutes: FastifyPluginAsync = async (fastify, _options) => {
     try {
       const { customers, subject, body, emailType } = _request.body as any;
       
-      console.log('📧 Starte echten Email-Versand:');
-      console.log(`- An: ${customers.length} Kunden`);
-      console.log(`- Betreff: ${subject}`);
-      console.log(`- Typ: ${emailType}`);
+      logger.info({ customerCount: customers.length, subject, emailType }, 'Starting email send');
 
       // SMTP Transporter erstellen
       const transporter = createTransporter();
@@ -62,13 +60,13 @@ const emailSenderRoutes: FastifyPluginAsync = async (fastify, _options) => {
             status: 'sent'
           });
           
-          console.log(`✅ Email an ${customer.email} gesendet: ${result.messageId}`);
+          logger.debug({ email: customer.email, messageId: result.messageId }, 'Email sent');
           
           // Kurze Pause zwischen Emails (100ms)
           await new Promise(resolve => setTimeout(resolve, 100));
           
         } catch (_error) {
-          console.error(`❌ Fehler bei ${customer.email}:`, _error);
+          logger.error({ email: customer.email, error: _error }, 'Error sending email');
           failedEmails.push({
             email: customer.email,
             error: _error instanceof Error ? _error.message : String(_error)
@@ -93,7 +91,7 @@ const emailSenderRoutes: FastifyPluginAsync = async (fastify, _options) => {
       };
       
     } catch (_error) {
-      console.error('Email Send Error:', _error);
+      logger.error({ error: _error, function: 'emailSend' }, 'Email Send Error');
       _reply.status(500).send({ 
         success: false, 
         error: 'Email-Versand fehlgeschlagen',
@@ -131,7 +129,7 @@ const emailSenderRoutes: FastifyPluginAsync = async (fastify, _options) => {
       };
       
     } catch (_error) {
-      console.error('SMTP Test Error:', _error);
+      logger.error({ error: _error, function: 'testSmtp' }, 'SMTP Test Error');
       _reply.status(500).send({ 
         success: false, 
         error: 'SMTP Verbindungstest fehlgeschlagen',

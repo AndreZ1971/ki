@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { getConfig } from '../../../../config';
 import { getTickets } from '../../../../services/supportTickets';
+import { logger } from '../../../../logger.js';
 
 export default async function feedbackRoutes(fastify: FastifyInstance) {
   // GET /api/analytics/feedback/reviews - WooCommerce Produktbewertungen
@@ -73,7 +74,7 @@ export default async function feedbackRoutes(fastify: FastifyInstance) {
             });
             return res.ok ? await res.json() : [];
           } catch (e) {
-            console.warn('⚠️ [feedback/analyze] Reviews-Fehler:', e);
+            logger.warn({ error: e }, 'Feedback analyze - Reviews error');
             return [];
           }
         })(),
@@ -81,16 +82,13 @@ export default async function feedbackRoutes(fastify: FastifyInstance) {
           try {
             return await getTickets();
           } catch (e) {
-            console.warn('⚠️ [feedback/analyze] Tickets-Fehler:', e);
+            logger.warn({ error: e }, 'Feedback analyze - Tickets error');
             return [];
           }
         })()
       ]);
 
-      console.log('✅ [feedback/analyze] Daten gesammelt:', {
-        reviews: reviews.length,
-        tickets: tickets.length
-      });
+      logger.info({ reviews: reviews.length, tickets: tickets.length }, 'Feedback data collected');
 
       return reply.send({
         success: true,
@@ -107,7 +105,7 @@ export default async function feedbackRoutes(fastify: FastifyInstance) {
         timestamp: new Date().toISOString()
       });
     } catch (error) {
-      console.error('❌ Feedback Analyze Error:', error);
+      logger.error({ error, function: 'feedbackAnalyze' }, 'Feedback Analyze Error');
       return reply.status(500).send({
         success: false,
         error: error instanceof Error ? error.message : 'Feedback-Analyse konnte nicht durchgeführt werden'

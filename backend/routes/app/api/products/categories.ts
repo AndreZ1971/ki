@@ -2,6 +2,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { getConfig } from '../../../../config';
 import { getOpenAIClient, executeOpenAI } from '../../../../utils/openaiHelper';
+import { logger } from '../../../../logger';
 
 interface Category {
   id: number;
@@ -96,7 +97,7 @@ export default async function categoryRoutes(server: FastifyInstance) {
           source: 'woocommerce-api'
         });
       } catch (_error) {
-        console.error('Categories API Error:', _error);
+        logger.error({ error: _error instanceof Error ? _error.message : 'Unknown', function: 'getCategories' }, 'Categories API error');
         return reply.status(500).send({
           success: false,
           error: _error instanceof Error ? _error.message : 'Unbekannter Fehler'
@@ -250,20 +251,20 @@ export default async function categoryRoutes(server: FastifyInstance) {
         );
 
         const rawContent = completion.choices[0]?.message?.content || '';
-        console.log('🔍 [CategorySuggest] OpenAI Response:', rawContent.substring(0, 200));
+        logger.debug({ responsePreview: rawContent.substring(0, 200) }, 'CategorySuggest OpenAI response');
 
         let parsed: { suggestions?: CategorySuggestion[] } = {};
         try {
           parsed = JSON.parse(rawContent);
         } catch (_parseError) {
-          console.warn('⚠️ [CategorySuggest] Konnte JSON nicht direkt parsen, versuche zu reparieren', _parseError);
+          logger.warn({ error: _parseError instanceof Error ? _parseError.message : 'Unknown' }, 'Could not parse JSON directly, trying to repair');
           // Fallback: versuche JSON in der Response zu finden
           const jsonMatch = rawContent.match(/\{[\s\S]*\}/);
           if (jsonMatch) {
             try {
               parsed = JSON.parse(jsonMatch[0]);
             } catch (e2) {
-              console.error('❌ JSON-Reparatur fehlgeschlagen:', e2);
+              logger.error({ error: e2 instanceof Error ? e2.message : 'Unknown' }, 'JSON repair failed');
             }
           }
         }
@@ -279,7 +280,7 @@ export default async function categoryRoutes(server: FastifyInstance) {
 
         // Fallback mit bekannten Kategorien falls AI fehlschlägt
         if (suggestions.length === 0) {
-          console.warn('⚠️ [CategorySuggest] Keine gültigen AI-Vorschläge, nutze Fallback');
+          logger.warn('No valid AI category suggestions, using fallback');
           const categories = await fetchWooCategories();
           const fallbackSuggestions = categories
             .sort((a, b) => b.productCount - a.productCount)
@@ -297,7 +298,7 @@ export default async function categoryRoutes(server: FastifyInstance) {
 
         return reply.send({ success: true, suggestions });
       } catch (_error) {
-        console.error('❌ Category ML Suggest Error:', _error);
+        logger.error({ error: _error instanceof Error ? _error.message : 'Unknown', function: 'categorySuggest' }, 'Category ML suggest error');
         return reply.status(500).send({
           success: false,
           error: _error instanceof Error ? _error.message : 'Kategorievorschläge konnten nicht generiert werden'

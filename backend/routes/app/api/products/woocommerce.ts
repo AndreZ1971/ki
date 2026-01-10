@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify';
 import OpenAI from 'openai';
 import { getConfig } from '../../../../config';
 import { wooCache } from '../../../../utils/woo-cache';
+import { logger } from '../../../../logger';
 
 // ✅ Korrekte lazy Initialisierung
 let openai: OpenAI | null = null;
@@ -15,14 +16,14 @@ function initializeOpenAI() {
     const envKey = process.env.OPENAI_API_KEY;
     const apiKey = configKey || envKey;
     if (!apiKey || apiKey.trim() === '' || !apiKey.startsWith('sk-')) {
-      console.warn('⚠️ OpenAI API Key nicht konfiguriert (getConfig/process.env)');
+      logger.warn('OpenAI API Key not configured');
       openai = null;
     } else {
       openai = new OpenAI({ apiKey });
-      console.log('✅ OpenAI Client erfolgreich initialisiert');
+      logger.info('OpenAI client initialized successfully');
     }
   } catch (_error) {
-    console.error('❌ Fehler bei OpenAI Initialisierung:', _error);
+    logger.error({ error: _error }, 'OpenAI initialization failed');
     openai = null;
   }
 
@@ -50,31 +51,31 @@ class WooCommerceClient {
 
   private validateConfig() {
     const isValid = !!(this.baseUrl && this.consumerKey && this.consumerSecret);
-    console.log('[WooCommerceClient] Config Check:', {
+    logger.debug({
       baseUrl: this.baseUrl,
-      consumerKey: this.consumerKey,
-      consumerSecret: this.consumerSecret ? 'SET' : 'MISSING'
-    });
+      hasConsumerKey: !!this.consumerKey,
+      hasConsumerSecret: !!this.consumerSecret
+    }, 'WooCommerce config check');
     if (!isValid) {
-      console.warn('⚠️ WooCommerce API nicht korrekt konfiguriert - bitte Werte in connection.json setzen');
+      logger.warn('WooCommerce API not properly configured - check connection.json');
     } else {
-      console.log('✅ WooCommerce Client erfolgreich konfiguriert');
+      logger.info('WooCommerce client configured successfully');
     }
   }
 
   constructor() {
     const woo = this.woo;
-    console.log('[WooCommerceClient] Initialisierte Daten:', woo);
+    logger.debug({ hasWooConfig: !!woo }, 'WooCommerceClient initialized');
     this.validateConfig();
   }
 
   private async makeRequest(endpoint: string, options: any = {}) {
     if (!this.baseUrl || !this.consumerKey || !this.consumerSecret) {
-      console.error('[WooCommerceClient] ❌ Fehlende Konfiguration:', {
-        baseUrl: this.baseUrl ? '✓' : '✗',
-        consumerKey: this.consumerKey ? '✓' : '✗',
-        consumerSecret: this.consumerSecret ? '✓' : '✗'
-      });
+      logger.error({
+        hasBaseUrl: !!this.baseUrl,
+        hasConsumerKey: !!this.consumerKey,
+        hasConsumerSecret: !!this.consumerSecret
+      }, 'WooCommerce API configuration missing');
       throw new Error('WooCommerce API nicht konfiguriert. Bitte Werte in connection.json setzen');
     }
     const url = `${this.baseUrl}${endpoint}`;
@@ -92,23 +93,23 @@ class WooCommerceClient {
       dispatcher: new Agent({ connect: { timeout: 30000 } })
     };
     
-    console.log(`[WooCommerce] 📡 Request to: ${url}`);
+    logger.debug({ url, endpoint }, 'WooCommerce API request');
      
      // Versuche Cache zuerst
      const cacheKey = `woo_${endpoint}`;
      const cached = wooCache.get(cacheKey);
      if (cached) {
-       console.log(`[WooCommerce] ✓ Cache HIT für ${endpoint}`);
+       logger.debug({ endpoint }, 'WooCommerce cache hit');
        return cached;
      }
      
      try {
        const response = await fetch(url, { ...defaultOptions, ...options });
-       console.log(`[WooCommerce] Response Status: ${response.status}`);
+       logger.debug({ status: response.status, endpoint }, 'WooCommerce response received');
        
        if (!response.ok) {
          const text = await response.text();
-         console.error(`[WooCommerce] ❌ HTTP ${response.status}: ${text.substring(0, 200)}`);
+         logger.error({ status: response.status, endpoint, preview: text.substring(0, 200) }, 'WooCommerce API error response');
          
          // Bessere Fehlermeldungen basierend auf Status
          if (response.status === 401 || response.status === 403) {
@@ -123,7 +124,7 @@ class WooCommerceClient {
        }
        
        const json = await response.json();
-       console.log(`[WooCommerce] ✅ Response loaded successfully`);
+       logger.debug({ endpoint }, 'WooCommerce response loaded successfully');
        
        // Cache erfolgreiche Antwort (60s)
        wooCache.set(cacheKey, json, 60);
@@ -131,12 +132,12 @@ class WooCommerceClient {
        return json;
      } catch (_error) {
        const errorMsg = _error instanceof Error ? _error.message : 'Unknown error';
-       console.error(`[WooCommerce] ❌ Request failed for ${endpoint}:`, errorMsg);
+       logger.error({ error: errorMsg, endpoint }, 'WooCommerce request failed');
        
        // Fallback zu Cache auch bei Fehler
        const cachedFallback = wooCache.get(cacheKey);
        if (cachedFallback) {
-         console.log(`[WooCommerce] ⚠️  Using cache fallback für ${endpoint}`);
+         logger.warn({ endpoint }, 'Using cache fallback for WooCommerce request');
          return cachedFallback;
        }
        
@@ -154,18 +155,17 @@ class WooCommerceClient {
     const endpoint = `/wp-json/wc/v3/products${queryParams.toString() ? `?${queryParams}` : ''}`;
     
     try {
-      console.log('[getProducts] Loading with params:', params);
-      console.log('[getProducts] Endpoint:', endpoint);
+      logger.debug({ params, endpoint }, 'Loading products with params');
       const result = await this.makeRequest(endpoint);
-      console.log('[getProducts] Successfully loaded', Array.isArray(result) ? result.length : '?', 'products');
+      logger.debug({ count: Array.isArray(result) ? result.length : '?' }, 'Successfully loaded products');
       return result;
     } catch (error: any) {
-      console.error('[getProducts] Error:', {
-        message: error?.message,
+      logger.error({
+        error: error?.message,
         url: `${this.baseUrl}${endpoint}`,
         hasConfig: !!(this.baseUrl && this.consumerKey && this.consumerSecret),
         params
-      });
+      }, 'getProducts error');
       throw error;
     }
   }
@@ -300,7 +300,7 @@ export default async function wooCommerceRoutes(server: FastifyInstance) {
   }, async (request: any, reply) => {
     try {
       const { page = 1, per_page = 100, search, category } = request.query;
-      console.log('[Route /woo/products] 📥 Request received with params:', { page, per_page, search, category });
+      logger.debug({ page, per_page, search, category }, 'WooCommerce products route request received');
       
       // Validiere Query-Parameter
       if (per_page > 100) {
@@ -318,7 +318,7 @@ export default async function wooCommerceRoutes(server: FastifyInstance) {
         throw new Error('No products returned from WooCommerce API');
       }
       
-      console.log(`[Route /woo/products] ✅ Successfully loaded ${Array.isArray(products) ? products.length : 'unknown'} products`);
+      logger.info({ count: Array.isArray(products) ? products.length : 'unknown' }, 'Successfully loaded products');
       
       return { 
         success: true, 
@@ -329,12 +329,12 @@ export default async function wooCommerceRoutes(server: FastifyInstance) {
       const errorMsg = error?.message || 'Unknown error';
       const errorStack = error?.stack || '';
       
-      console.error('[Route /woo/products] ❌ Error:', {
-        message: errorMsg,
+      logger.error({
+        error: errorMsg,
         stack: errorStack.split('\n').slice(0, 5).join('\n'),
         queryParams: request.query,
         timestamp: new Date().toISOString()
-      });
+      }, 'WooCommerce products route error');
       
       const status = errorMsg.includes('timeout') ? 504 : 500;
       const isConfigError = errorMsg.includes('nicht konfiguriert') || errorMsg.includes('WooCommerce API');
@@ -787,7 +787,7 @@ export default async function wooCommerceRoutes(server: FastifyInstance) {
     // ✅ Erst HIER wird initialisiert
     const openAIClient = initializeOpenAI();
     
-    console.log(`[AI Description] OpenAI verfügbar: ${!!openAIClient}`);
+    logger.debug({ hasOpenAI: !!openAIClient }, 'AI description OpenAI availability check');
     
     if (!openAIClient) {
       server.log.warn('OpenAI nicht verfügbar - verwende Fallback');

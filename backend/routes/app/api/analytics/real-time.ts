@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { getConfig } from '@config';
+import { logger } from '../../../../logger';
 
 const PER_PAGE = 100;
 const MAX_PAGES = 5;
@@ -30,15 +31,17 @@ async function fetchAllDirect(path: string, params: Record<string, unknown> = {}
     });
 
     if (!res.ok) {
-      console.error(`❌ [fetchAllDirect] ${path} page ${page}: ${res.status}`);
+      logger.error({ path, page, status: res.status }, 'fetchAllDirect request failed');
       break;
     }
 
     const chunk = await res.json();
-    console.log(`📍 [fetchAllDirect] ${path} page ${page}:`, {
+    logger.debug({
+      path,
+      page,
       isArray: Array.isArray(chunk),
       length: Array.isArray(chunk) ? chunk.length : 0
-    });
+    }, 'fetchAllDirect page retrieved');
 
     if (Array.isArray(chunk)) {
       all.push(...chunk);
@@ -133,11 +136,11 @@ function aggregateTopProducts(orders: any[]) {
 function computeUniqueCustomers(orders: any[], customers: any[]) {
   // Priorität 1: Direkter Customer-Count aus WooCommerce
   if (Array.isArray(customers) && customers.length > 0) {
-    console.log('✅ [uniqueCustomers] Nutze direkten Customer-Count:', customers.length);
+    logger.debug({ count: customers.length }, 'Using direct customer count');
     return customers.length;
   }
 
-  console.warn('⚠️ [uniqueCustomers] Keine direkten Customer-Daten, berechne aus Orders');
+  logger.warn('No direct customer data, calculating from orders');
 
   // Priorität 2: Eindeutige Billingingadressen (=kaufende Personen)
   const uniqueBillingAddresses = new Set<string>();
@@ -179,13 +182,13 @@ function computeUniqueCustomers(orders: any[], customers: any[]) {
     uniqueCount = orders.length; // Pessimistischer Fallback
   }
 
-  console.log('🔍 [uniqueCustomers] Berechnung:', {
+  logger.debug({
     totalOrders: orders.length,
     byId: idCount,
     byEmail: emailCount,
     byBillingAddress: addressCount,
     selected: uniqueCount
-  });
+  }, 'Unique customers calculation');
 
   return uniqueCount;
 }
@@ -200,18 +203,16 @@ export default async function realTimeRoutes(fastify: FastifyInstance) {
         fetchAllDirect('customers')
       ]);
 
-      console.log('🔍 [Dashboard] Rohdaten:');
-      console.log('  - products:', products.length);
-      console.log('  - orders:', orders.length);
-      console.log('  - customers:', customers.length);
-
-      if (orders.length > 0) {
-        console.log('  - Erste Order customer_id:', orders[0]?.customer_id);
-        console.log('  - Erste Order email:', orders[0]?.billing?.email);
-      }
+      logger.debug({
+        products: products.length,
+        orders: orders.length,
+        customers: customers.length,
+        firstOrderCustomerId: orders[0]?.customer_id,
+        firstOrderEmail: orders[0]?.billing?.email
+      }, 'Dashboard raw data retrieved');
 
       const totalCustomers = computeUniqueCustomers(orders, customers);
-      console.log('🔍 [Dashboard] Berechnete totalCustomers:', totalCustomers);
+      logger.debug({ totalCustomers }, 'Calculated total customers');
 
       const now = new Date();
       const startOfDay = new Date(now);
@@ -251,7 +252,7 @@ export default async function realTimeRoutes(fastify: FastifyInstance) {
         }
       });
     } catch (error: any) {
-      console.error('❌ Real-Time Dashboard Fehler:', error?.message || error);
+      logger.error({ error: error?.message }, 'Real-time dashboard failed');
       return reply.status(500).send({
         success: false,
         error: 'WooCommerce-Daten konnten nicht geladen werden',
@@ -287,7 +288,7 @@ export default async function realTimeRoutes(fastify: FastifyInstance) {
         timestamp: new Date().toISOString()
       });
     } catch (error: any) {
-      console.error('❌ Sales-Route Fehler:', error?.message || error);
+      logger.error({ error: error?.message }, 'Sales route failed');
       return reply.status(500).send({
         success: false,
         error: 'WooCommerce-Bestellungen konnten nicht geladen werden',
@@ -342,7 +343,7 @@ export default async function realTimeRoutes(fastify: FastifyInstance) {
         timestamp: new Date().toISOString()
       });
     } catch (error: any) {
-      console.error('❌ Products-Route Fehler:', error?.message || error);
+      logger.error({ error: error?.message }, 'Products route failed');
       return reply.status(500).send({
         success: false,
         error: 'Produkte konnten nicht geladen werden',

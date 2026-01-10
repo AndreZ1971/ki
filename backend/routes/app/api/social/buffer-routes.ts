@@ -1,6 +1,7 @@
 // backend/routes/app/api/social/buffer-routes.ts
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { getConfig } from '@config';
+import { logger } from '../../../../logger.js';
 
 interface BufferPostRequest {
   platform: string;
@@ -82,7 +83,7 @@ export default async function bufferRoutes(fastify: FastifyInstance) {
           throw new Error(result.message || 'Buffer API Fehler');
         }
 
-        console.log('✅ Buffer Post erstellt:', result);
+        logger.info({ postId: result.id, platform }, 'Buffer post created successfully');
 
         return reply.send({
           success: true,
@@ -96,7 +97,7 @@ export default async function bufferRoutes(fastify: FastifyInstance) {
         });
 
       } catch (_error) {
-        console.error('❌ Buffer API Error:', _error);
+        logger.error({ error: _error }, 'Buffer API error');
         return reply.status(500).send({
           success: false,
           error: _error instanceof Error ? _error.message : 'Post fehlgeschlagen'
@@ -141,7 +142,7 @@ export default async function bufferRoutes(fastify: FastifyInstance) {
       });
 
     } catch (_error) {
-      console.error('❌ Buffer Profiles Error:', _error);
+      logger.error({ error: _error }, 'Buffer profiles fetch failed');
       return reply.status(500).send({
         success: false,
         error: _error instanceof Error ? _error.message : 'Konnte Profile nicht laden'

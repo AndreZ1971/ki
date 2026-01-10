@@ -1,6 +1,7 @@
 // backend/routes/app/api/marketing/ml-marketing.ts
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { MarketingMLService } from '../../../../services/marketingMLService';
+import { logger } from '../../../../logger';
 
 export default async function mlMarketingRoutes(fastify: FastifyInstance) {
   // POST /api/marketing/ml/ideas - Generiere Marketing-Ideen
@@ -15,7 +16,7 @@ export default async function mlMarketingRoutes(fastify: FastifyInstance) {
         });
       }
 
-      console.log('🎯 [ML Marketing] Generiere Ideas für:', goal);
+      logger.info({ goal }, 'Generating marketing ideas');
 
       const result = await MarketingMLService.generateMarketingIdeas({
         goal,
@@ -29,7 +30,7 @@ export default async function mlMarketingRoutes(fastify: FastifyInstance) {
         data: result
       });
     } catch (error: any) {
-      console.error('❌ Fehler bei /ideas:', error.message);
+      logger.error({ error: error.message }, 'Failed to generate marketing ideas');
       return reply.status(500).send({
         success: false,
         error: error.message || 'Fehler bei der Ideengenerierung'
@@ -49,7 +50,7 @@ export default async function mlMarketingRoutes(fastify: FastifyInstance) {
         });
       }
 
-      console.log('📧 [ML Marketing] Generiere Email für:', campaignType);
+      logger.info({ campaignType }, 'Generating email campaign');
 
       const result = await MarketingMLService.generateEmailCampaign({
         productName,
@@ -63,7 +64,7 @@ export default async function mlMarketingRoutes(fastify: FastifyInstance) {
         data: result
       });
     } catch (error: any) {
-      console.error('❌ Fehler bei /email:', error.message);
+      logger.error({ error: error.message }, 'Failed to generate email campaign');
       return reply.status(500).send({
         success: false,
         error: error.message || 'Fehler bei der Email-Generierung'
@@ -83,7 +84,7 @@ export default async function mlMarketingRoutes(fastify: FastifyInstance) {
         });
       }
 
-      console.log('📱 [ML Marketing] Generiere Social Content für:', platforms);
+      logger.info({ platforms }, 'Generating social media content');
 
       const result = await MarketingMLService.generateSocialMediaContent({
         topic,
@@ -96,7 +97,7 @@ export default async function mlMarketingRoutes(fastify: FastifyInstance) {
         data: result
       });
     } catch (error: any) {
-      console.error('❌ Fehler bei /social:', error.message);
+      logger.error({ error: error.message }, 'Failed to generate social media content');
       return reply.status(500).send({
         success: false,
         error: error.message || 'Fehler bei der Content-Generierung'
@@ -116,7 +117,7 @@ export default async function mlMarketingRoutes(fastify: FastifyInstance) {
         });
       }
 
-      console.log('✏️ [ML Marketing] Optimiere Copy');
+      logger.info('Optimizing marketing copy');
 
       const result = await MarketingMLService.optimizeMarketingCopy({
         currentCopy,
@@ -129,7 +130,7 @@ export default async function mlMarketingRoutes(fastify: FastifyInstance) {
         data: result
       });
     } catch (error: any) {
-      console.error('❌ Fehler bei /optimize:', error.message);
+      logger.error({ error: error.message }, 'Failed to optimize marketing copy');
       return reply.status(500).send({
         success: false,
         error: error.message || 'Fehler bei der Optimierung'
@@ -149,7 +150,7 @@ export default async function mlMarketingRoutes(fastify: FastifyInstance) {
         });
       }
 
-      console.log('📊 [ML Marketing] Forecast für:', campaignType);
+      logger.info({ campaignType }, 'Forecasting campaign performance');
 
       const result = await MarketingMLService.forecastCampaignPerformance({
         campaignType,
@@ -164,7 +165,7 @@ export default async function mlMarketingRoutes(fastify: FastifyInstance) {
         data: result
       });
     } catch (error: any) {
-      console.error('❌ Fehler bei /forecast:', error.message);
+      logger.error({ error: error.message }, 'Failed to forecast campaign performance');
       return reply.status(500).send({
         success: false,
         error: error.message || 'Fehler bei der Prognose'
