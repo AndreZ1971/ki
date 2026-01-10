@@ -125,7 +125,7 @@ export default async function chatbotMessageRoute(server: FastifyInstance) {
           // Ignorieren
         }
         recordQuery(message, false);
-        return { success: true, reply: 'Produktverwaltung, Bestseller-Analysen und Sortimentsoptimierung findest du im Modul "Produkte". Dort kannst du neue Artikel anlegen, bearbeiten und auswerten.' };
+        return { success: true, reply: 'Konnte die Produktanzahl gerade nicht laden. Bitte WooCommerce-Verbindung/Keys prüfen oder später erneut versuchen.' };
       }
       if (orderKeywords.some(k => lowerMsg.includes(k))) {
         return { success: true, reply: 'Alle Bestellungen und Transaktionen findest du im Modul "Bestellungen". Dort kannst du Aufträge verwalten, exportieren und analysieren.' };

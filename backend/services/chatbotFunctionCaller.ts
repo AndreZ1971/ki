@@ -21,14 +21,14 @@ const cacheTTL = 5 * 60 * 1000; // 5 Minuten
 
 // Query-Pattern Recognition
 const queryPatterns = {
-  productCount: /^(wieviele|wie viele|anzahl|how many|count).*(produkte?|artikel|items?)/i,
-  categoryCount: /^(wieviele|wie viele|anzahl|how many).*(kategorien|categories)/i,
-  totalRevenue: /^(wie viel|wieviel|how much).*(umsatz|revenue|sales|erlös)/i,
-  topProducts: /^(beste|top|meist|best|most).*(produkte?|artikel|verkauft|sold)/i,
-  totalCustomers: /^(wieviele|wie viele|anzahl).*(kunden|customers|benutzer|users)/i,
-  lowStockProducts: /^(welche|which).*(produkte?|artikel).*(lagerbestand|stock|lagern|wenig|low)/i,
-  totalOrders: /^(wieviele|wie viele|anzahl).*(bestellungen|orders|verkäufe|sales)/i,
-  shopMetrics: /^(dashboard|überblick|overview|kennzahlen|metrics|zahlen)/i,
+  productCount: /(wieviele|wie viele|anzahl|how many|count|anz).*(produkte?|artikel|items?|stück|sortiment)/i,
+  categoryCount: /(wieviele|wie viele|anzahl|how many).*(kategorien|categories|cats?)/i,
+  totalRevenue: /(wie viel|wieviel|how much).*(umsatz|revenue|sales|erlös)/i,
+  topProducts: /(beste|top|meist|best|most).*(produkte?|artikel|verkauft|sold|bestseller)/i,
+  totalCustomers: /(wieviele|wie viele|anzahl).*(kunden|customers|benutzer|users)/i,
+  lowStockProducts: /(welche|which).*(produkte?|artikel).*(lagerbestand|stock|lagern|wenig|low)/i,
+  totalOrders: /(wieviele|wie viele|anzahl).*(bestellungen|orders|verkäufe|sales)/i,
+  shopMetrics: /(dashboard|überblick|overview|kennzahlen|metrics|zahlen)/i,
 };
 
 // WooCommerce Client
