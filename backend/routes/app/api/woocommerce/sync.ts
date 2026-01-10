@@ -27,12 +27,18 @@ const fetchCount = async (
     'User-Agent': 'ARI-WooSync/1.0'
   };
 
+  // Spezielle Query-Parameter für verschiedene Ressourcen
+  let resourceQuery = 'per_page=1';
+  if (resource === 'customers') {
+    resourceQuery = 'per_page=100&role=all'; // Wichtig: role=all für alle Kundenrollen
+  }
+
   if (useQueryAuth) {
     // Query String Auth
-    url = `${baseUrl}/wp-json/wc/v3/${resource}?per_page=1&consumer_key=${encodeURIComponent(consumerKey)}&consumer_secret=${encodeURIComponent(consumerSecret)}`;
+    url = `${baseUrl}/wp-json/wc/v3/${resource}?${resourceQuery}&consumer_key=${encodeURIComponent(consumerKey)}&consumer_secret=${encodeURIComponent(consumerSecret)}`;
   } else {
     // Basic Auth
-    url = `${baseUrl}/wp-json/wc/v3/${resource}?per_page=1`;
+    url = `${baseUrl}/wp-json/wc/v3/${resource}?${resourceQuery}`;
     const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
     headers['Authorization'] = `Basic ${auth}`;
   }
