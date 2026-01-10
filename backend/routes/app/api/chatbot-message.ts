@@ -6,6 +6,7 @@ import { getConfig } from '@config';
 import { getShopStats, getSystemHealth } from '../../../services/shopData';
 import { getOpenAIClient, executeOpenAI } from '../../../utils/openaiHelper';
 import { SpecializationService } from '../../../services/specializationService';
+import { callChatbotFunction, recordQuery } from '../../../services/chatbotFunctionCaller';
 
 dotenv.config();
 
@@ -84,6 +85,28 @@ export default async function chatbotMessageRoute(server: FastifyInstance) {
         return { success: true, reply: analysis };
       }
       if (productKeywords.some(k => lowerMsg.includes(k))) {
+        // Versuche Live-Daten abzurufen (Produkt- und Kategorieanzahl)
+        try {
+          const productRes = await callChatbotFunction(message);
+          if (productRes && productRes.functionName === 'productCount' && productRes.result && !productRes.result.error) {
+            // Kategorien zusätzlich abrufen
+            const categoryRes = await callChatbotFunction('wieviele kategorien gibt es?');
+            const prodCount = Number(productRes.result.count || 0);
+            const catCount = categoryRes && categoryRes.result && !categoryRes.result.error
+              ? Number(categoryRes.result.count || 0)
+              : undefined;
+
+            const reply = typeof catCount === 'number'
+              ? `${prodCount} Produkte in ${catCount} Kategorien`
+              : `${prodCount} Produkte im Shop`;
+
+            recordQuery(message, true);
+            return { success: true, reply };
+          }
+        } catch (_e) {
+          // Fallback unten
+        }
+        recordQuery(message, false);
         return { success: true, reply: 'Produktverwaltung, Bestseller-Analysen und Sortimentsoptimierung findest du im Modul "Produkte". Dort kannst du neue Artikel anlegen, bearbeiten und auswerten.' };
       }
       if (orderKeywords.some(k => lowerMsg.includes(k))) {
@@ -181,6 +204,17 @@ export default async function chatbotMessageRoute(server: FastifyInstance) {
         const stats = await getShopStats();
         const health = await getSystemHealth();
         
+        // 🧠 SMART FUNCTION CALLING - Zuerst Daten holen
+        const functionResult = await callChatbotFunction(message);
+        let enrichedContext = '';
+        
+        if (functionResult && functionResult.result && !functionResult.result.error) {
+          enrichedContext = `\n\n📊 **LIVE-DATEN:** ${functionResult.result.message || JSON.stringify(functionResult.result)}`;
+          recordQuery(message, true);
+        } else {
+          recordQuery(message, false);
+        }
+        
         // Load active specialization if available
         const userId = request.user?.id || (typeof request.headers['x-user-id'] === 'string' ? request.headers['x-user-id'] : undefined) || 'default';
         const activeSpec = await SpecializationService.getActiveSpecialization(userId);
@@ -196,7 +230,7 @@ export default async function chatbotMessageRoute(server: FastifyInstance) {
       - Kundenverwaltung: Im Modul "Kunden"
       - Automatisierungen: Im Modul "Automation"
 
-      Shopname: ${stats.shopName}. Umsatz heute: ${stats.salesToday} EUR. Bestellungen: ${stats.ordersToday}. Produkte: ${stats.products}. Systemstatus: ${health.status}. CPU: ${health.cpu}%. RAM: ${health.memory}%. Antworte freundlich, präzise und auf Basis dieser Shopdaten.`;
+      Shopname: ${stats.shopName}. Umsatz heute: ${stats.salesToday} EUR. Bestellungen: ${stats.ordersToday}. Produkte: ${stats.products}. Systemstatus: ${health.status}. CPU: ${health.cpu}%. RAM: ${health.memory}%. Antworte freundlich, präzise und auf Basis dieser Shopdaten.${enrichedContext}`;
       
         // Override with specialization systemPrompt if active
         if (activeSpec && activeSpec.systemPrompt) {
@@ -209,7 +243,7 @@ Bestellungen: ${stats.ordersToday}
 Produkte: ${stats.products}
 Systemstatus: ${health.status}
 CPU: ${health.cpu}%
-RAM: ${health.memory}%
+RAM: ${health.memory}%${enrichedContext}
 
 ${activeSpec.contextInstructions ? activeSpec.contextInstructions.join('\n') : ''}`;
         }
