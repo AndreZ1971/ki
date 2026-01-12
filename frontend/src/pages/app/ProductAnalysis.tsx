@@ -1,6 +1,8 @@
 import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { formatTime, formatDateTime } from "../../lib/i18n-utils";
+import { useNavigate } from "react-router-dom";
 import "./page.css";
+import "../shared-analytics.css";
 import "./ProductAnalysis.css";
 
 // ✅ Typen für Produktanalyse
@@ -56,6 +58,7 @@ interface AnalysisResult {
 export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
   productId,
 }) => {
+  const navigate = useNavigate();
   const apiBase = useMemo(() => {
     const raw = (import.meta.env.VITE_API_URL || "http://localhost:3000")
       .trim()
@@ -442,56 +445,33 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
   };
 
   return (
-    <div className="app-page">
-      {/* Header */}
-      <div className="product-analysis-header">
-        <h2>🔍 Produktanalyse & KI-Optimierung</h2>
-        <p>
-          Detaillierte Analyse Ihres Produkts mit intelligenten
-          Verbesserungsvorschlägen
-        </p>
+    <div className="analytics-page">
+      {/* Floating Back Button */}
+      <button className="back-button floating-back" onClick={() => navigate("/")}>← Zurück</button>
+
+      {/* Unified Header */}
+      <div className="analytics-header">
+        <h1>🔍 Produktanalyse & KI-Optimierung</h1>
+        <p>Detaillierte Analyse Ihres Produkts mit intelligenten Verbesserungsvorschlägen</p>
+        <div className="header-controls">
+          <button
+            className={`refresh-button ${loading ? "scanning" : ""}`}
+            onClick={fetchAnalysis}
+            disabled={loading}
+          >
+            {loading ? "⏳ Analysiere..." : "🔍 Analyse starten"}
+          </button>
+        </div>
       </div>
 
-      {/* Analyse Button */}
-      <button
-        onClick={fetchAnalysis}
-        disabled={loading}
-        className="product-analysis-btn"
-      >
-        {loading ? "⏳ Analysiere..." : "🔍 Analyse starten"}
-      </button>
-
       {/* Error */}
-      {error && (
-        <div
-          style={{
-            background: "rgba(255, 59, 48, 0.1)",
-            border: "1px solid rgba(255, 59, 48, 0.5)",
-            borderRadius: "12px",
-            padding: "16px",
-            color: "#ff3b30",
-            marginBottom: "24px",
-            fontSize: "14px",
-          }}
-        >
-          ⚠️ {error}
-        </div>
-      )}
+      {error && <div className="ml-error-message">⚠️ {error}</div>}
 
       {/* Loading Skeleton */}
       {loading && (
-        <div
-          style={{
-            background: "rgba(255, 255, 255, 0.03)",
-            borderRadius: "12px",
-            padding: "32px",
-            textAlign: "center",
-            animation: "pulse 2s infinite",
-          }}
-        >
-          <div style={{ fontSize: "32px", marginBottom: "16px" }}>🔄</div>
-          <div style={{ color: "rgba(255,255,255,0.6)" }}>
-            Analysiere Ihr Produkt...
+        <div className="analysis-section">
+          <div className="loading-container">
+            <div className="loading-spinner" />
           </div>
         </div>
       )}
@@ -500,15 +480,7 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
       {result && !loading && (
         <div style={{ display: "grid", gap: "24px" }}>
           {/* Score Übersicht */}
-          <div
-            style={{
-              background:
-                "linear-gradient(135deg, rgba(52, 199, 89, 0.1), rgba(52, 199, 89, 0.05))",
-              border: "1px solid rgba(52, 199, 89, 0.3)",
-              borderRadius: "12px",
-              padding: "24px",
-            }}
-          >
+          <div className="analysis-section">
             <div
               style={{
                 fontSize: "12px",
@@ -614,14 +586,7 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
           </div>
 
           {/* Produktinfo */}
-          <div
-            style={{
-              background: "rgba(255, 255, 255, 0.03)",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
-              borderRadius: "12px",
-              padding: "20px",
-            }}
-          >
+          <div className="analysis-section">
             <h3
               style={{
                 fontSize: "14px",
@@ -754,7 +719,7 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
 
           {/* Issues/Probleme */}
           {result.issues && result.issues.length > 0 && (
-            <div>
+            <div className="analysis-section">
               <h3
                 style={{
                   fontSize: "14px",
@@ -863,15 +828,7 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
 
           {/* AI Insights */}
           {result.aiInsights && (
-            <div
-              style={{
-                background:
-                  "linear-gradient(135deg, rgba(175, 82, 222, 0.1), rgba(175, 82, 222, 0.05))",
-                border: "1px solid rgba(175, 82, 222, 0.3)",
-                borderRadius: "12px",
-                padding: "24px",
-              }}
-            >
+            <div className="analysis-section">
               <h3
                 style={{
                   fontSize: "14px",
@@ -1010,16 +967,7 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
           )}
 
           {/* Action Board */}
-          <div
-            style={{
-              background: "rgba(255,255,255,0.02)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              borderRadius: "12px",
-              padding: "20px",
-              display: "grid",
-              gap: "16px",
-            }}
-          >
+          <div className="analysis-section">
             <div
               style={{
                 display: "flex",
@@ -1490,7 +1438,7 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
           <div
             style={{
               fontSize: "12px",
-              color: "rgba(255,255,255,0.5)",
+              color: "var(--text-tertiary)",
               textAlign: "center",
               paddingTop: "16px",
             }}
@@ -1502,18 +1450,9 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
 
       {/* Keine Analyse */}
       {!result && !loading && !error && (
-        <div
-          style={{
-            background: "rgba(255, 255, 255, 0.03)",
-            borderRadius: "12px",
-            padding: "48px 24px",
-            textAlign: "center",
-            color: "rgba(255,255,255,0.5)",
-          }}
-        >
+        <div className="analysis-section" style={{ textAlign: "center", padding: "32px 24px" }}>
           <div style={{ fontSize: "32px", marginBottom: "12px" }}>🔍</div>
-          Klicken Sie oben auf „Mit KI analysieren", um eine detaillierte
-          Produktanalyse zu starten
+          Klicken Sie oben auf „Analyse starten", um eine detaillierte Produktanalyse zu starten
         </div>
       )}
 

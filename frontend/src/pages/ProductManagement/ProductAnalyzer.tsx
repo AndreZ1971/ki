@@ -5,6 +5,7 @@ import { ToastContainer } from '../../components/Toast/ToastContainer';
 import { ProductAnalysis } from '../app/ProductAnalysis';
 import { apiClient } from '../../lib/api-client';
 import './page.css';
+import '../shared-analytics.css';
 
 interface Product {
   id: number;
@@ -184,60 +185,34 @@ const ProductAnalyzer: React.FC = () => {
   }, []);
 
   return (
-    <div className="app-page" style={{ maxWidth: '1200px', margin: '0 auto' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-        <div>
-          <button className="back-button floating-back" onClick={handleBackToDashboard}>← Zurück</button>
-          <h1 style={{ marginTop: '16px', color: '#0b1220' }}>🔍 Product Analyzer</h1>
-          <p style={{ color: '#475569', fontSize: '14px', marginTop: '8px' }}>
-            Analysiere deine Produkte mit KI und erhalte detaillierte Verbesserungsvorschläge
-          </p>
-        </div>
+    <div className="analytics-page">
+      {/* Floating Back Button */}
+      <button className="back-button floating-back" onClick={handleBackToDashboard}>← Zurück</button>
+      {/* Unified Header */}
+      <div className="analytics-header">
+        <h1>🔍 Product Analyzer</h1>
+        <p>Analysiere deine Produkte mit KI und erhalte detaillierte Verbesserungsvorschläge</p>
       </div>
 
       {/* Product Selection */}
-      <div 
-        className="product-analyzer-selection"
-        style={{
-          background: '#ffffff',
-          border: '1px solid #E2E8F0',
-          borderRadius: '12px',
-          padding: '24px',
-          marginBottom: '32px'
-        }}
-      >
-        <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '16px', textTransform: 'uppercase', color: '#0b1220' }}>
-          🎯 Produkt auswählen
-        </div>
+      <div className="analysis-section">
+        <h3 style={{ textTransform: 'uppercase', marginTop: 0 }}>🎯 Produkt auswählen</h3>
         {productsLoading ? (
-          <div style={{ color: '#475569', textAlign: 'center', padding: '20px' }}>
+          <div style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: '20px' }}>
             📦 Produkte werden geladen...
           </div>
         ) : products.length === 0 ? (
-          <div style={{ color: '#475569', textAlign: 'center', padding: '20px' }}>
+          <div style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: '20px' }}>
             ⚠️ Keine Produkte gefunden. Bitte WooCommerce konfigurieren.
           </div>
         ) : (
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
-            <div style={{ flex: 1 }}>
-              <label style={{ fontSize: '12px', color: '#0b1220', display: 'block', marginBottom: '8px' }}>
-                Produkt
-              </label>
+          <div className="filters-container" style={{ alignItems: 'flex-end' }}>
+            <div className="filter-group" style={{ flex: 1 }}>
+              <label className="filter-label">Produkt</label>
               <select
+                className="filter-select"
                 value={selectedProductId || ''}
                 onChange={(e) => setSelectedProductId(Number(e.target.value))}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  background: '#ffffff',
-                  border: '1px solid #CBD5E1',
-                  borderRadius: '8px',
-                  color: '#0b1220',
-                  fontSize: '14px',
-                  outline: 'none',
-                  cursor: 'pointer'
-                }}
               >
                 <option value="">-- Produkt wählen --</option>
                 {products.map((p) => (
@@ -248,40 +223,16 @@ const ProductAnalyzer: React.FC = () => {
               </select>
             </div>
             <button
+              className={selectedProductId ? 'export-button primary' : 'export-button'}
               onClick={openDetailsModal}
               disabled={!selectedProductId}
-              style={{
-                padding: '12px 24px',
-                background: selectedProductId
-                  ? 'linear-gradient(135deg, rgba(37, 99, 235, 0.10), rgba(34, 197, 94, 0.08))'
-                  : 'rgba(37, 99, 235, 0.06)',
-                border: '1px solid rgba(37, 99, 235, 0.35)',
-                borderRadius: '8px',
-                color: '#1d4ed8',
-                cursor: selectedProductId ? 'pointer' : 'not-allowed',
-                fontSize: '14px',
-                fontWeight: '600',
-                transition: 'all 0.2s',
-                whiteSpace: 'nowrap'
-              }}
-              onMouseEnter={(e) => {
-                if (selectedProductId) {
-                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(37, 99, 235, 0.14), rgba(34, 197, 94, 0.12))';
-                  e.currentTarget.style.boxShadow = '0 0 16px rgba(37, 99, 235, 0.15)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (selectedProductId) {
-                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(37, 99, 235, 0.10), rgba(34, 197, 94, 0.08))';
-                  e.currentTarget.style.boxShadow = 'none';
-                }
-              }}
+              title="Produktdetails anzeigen und analysieren"
             >
               🔍 Details & Analyse
             </button>
           </div>
         )}
-        <div style={{ fontSize: '12px', color: '#64748b', marginTop: '12px' }}>
+        <div style={{ fontSize: '12px', color: 'var(--text-tertiary)', marginTop: '12px' }}>
           💡 Wählen Sie ein Produkt aus der Liste und klicken Sie auf „Analyse starten"
         </div>
       </div>
@@ -530,12 +481,7 @@ const ProductAnalyzer: React.FC = () => {
 
       {/* Product Analysis Component */}
       {selectedProductId && (
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.02)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '12px',
-          overflow: 'hidden'
-        }}>
+        <div className="analysis-section">
           <ProductAnalysis productId={selectedProductId} />
         </div>
       )}
@@ -552,44 +498,7 @@ const ProductAnalyzer: React.FC = () => {
           50% { opacity: 0.4; }
         }
         
-        /* Override global CSS - higher specificity than div[style*="background"] */
-        div.product-analyzer-modal-backdrop,
-        div.product-analyzer-modal,
-        .product-analyzer-modal div[style*="background"],
-        .product-analyzer-modal div[style*="rgba"] {
-          background: revert !important;
-        }
-        
-        div.product-analyzer-modal {
-          background: rgb(45, 50, 75) !important;
-        }
-        
-        /* Protect Product Selection from global CSS overrides */
-        .product-analyzer-selection,
-        .product-analyzer-selection * {
-          background: revert !important;
-          color: revert !important;
-        }
-        
-        .product-analyzer-selection {
-          background: #ffffff !important;
-        }
-        
-        .product-analyzer-selection label,
-        .product-analyzer-selection div {
-          color: #0b1220 !important;
-        }
-        
-        .product-analyzer-selection select {
-          background: #ffffff !important;
-          color: #0b1220 !important;
-          border: 1px solid #CBD5E1 !important;
-        }
-        
-        .product-analyzer-selection option {
-          background: #ffffff !important;
-          color: #0b1220 !important;
-        }
+        /* Modal bleibt unverändert */
       `}</style>
     </div>
   );

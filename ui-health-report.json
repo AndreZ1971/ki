@@ -1,0 +1,296 @@
+{
+  "timestamp": "2026-01-11T22:15:01.219Z",
+  "results": [
+    {
+      "tool": "Mini Audit",
+      "file": "frontend/src/pages/AnalyseMetrics/MiniAudit.tsx",
+      "exists": true,
+      "hasErrors": false,
+      "errors": [],
+      "warnings": [
+        "Found hardcoded strings in JSX - should use t() for i18n"
+      ],
+      "issues": []
+    },
+    {
+      "tool": "Trend Dashboard",
+      "file": "frontend/src/pages/AnalyseMetrics/TrendDashboard.tsx",
+      "exists": false,
+      "hasErrors": true,
+      "errors": [
+        "File does not exist"
+      ],
+      "warnings": [],
+      "issues": []
+    },
+    {
+      "tool": "Analytics Dashboard",
+      "file": "frontend/src/pages/AnalyseMetrics/AnalyticsDashboard.tsx",
+      "exists": false,
+      "hasErrors": true,
+      "errors": [
+        "File does not exist"
+      ],
+      "warnings": [],
+      "issues": []
+    },
+    {
+      "tool": "Auto Product Creator",
+      "file": "frontend/src/pages/ProductManagement/AutoProductCreator.tsx",
+      "exists": true,
+      "hasErrors": false,
+      "errors": [],
+      "warnings": [],
+      "issues": []
+    },
+    {
+      "tool": "Product Analyzer",
+      "file": "frontend/src/pages/ProductManagement/ProductAnalyzer.tsx",
+      "exists": true,
+      "hasErrors": false,
+      "errors": [],
+      "warnings": [
+        "Found 3 console.log statements - consider using logger"
+      ],
+      "issues": [
+        "Missing <h1> header"
+      ]
+    },
+    {
+      "tool": "Product AI Analysis",
+      "file": "frontend/src/pages/ProductManagement/ProductAIAnalysis.tsx",
+      "exists": true,
+      "hasErrors": false,
+      "errors": [],
+      "warnings": [
+        "Missing BackButton component",
+        "No try/catch error handling found",
+        "No loading state found"
+      ],
+      "issues": [
+        "Missing <h1> header"
+      ]
+    },
+    {
+      "tool": "Create Freebies",
+      "file": "frontend/src/pages/ProductManagement/CreateFreebies.tsx",
+      "exists": true,
+      "hasErrors": false,
+      "errors": [],
+      "warnings": [],
+      "issues": []
+    },
+    {
+      "tool": "Run Auto Product Creator",
+      "file": "frontend/src/pages/ProductManagement/RunAutoProductCreator.tsx",
+      "exists": true,
+      "hasErrors": false,
+      "errors": [],
+      "warnings": [
+        "Found hardcoded strings in JSX - should use t() for i18n"
+      ],
+      "issues": []
+    },
+    {
+      "tool": "Run Create Freebies",
+      "file": "frontend/src/pages/ProductManagement/RunCreateFreebies.tsx",
+      "exists": true,
+      "hasErrors": false,
+      "errors": [],
+      "warnings": [
+        "Found hardcoded strings in JSX - should use t() for i18n"
+      ],
+      "issues": []
+    },
+    {
+      "tool": "Product Bundles",
+      "file": "frontend/src/pages/ProductManagement/ProductBundles.tsx",
+      "exists": true,
+      "hasErrors": false,
+      "errors": [],
+      "warnings": [],
+      "issues": []
+    },
+    {
+      "tool": "Categories Manager",
+      "file": "frontend/src/pages/ProductManagement/CategoriesManager.tsx",
+      "exists": true,
+      "hasErrors": false,
+      "errors": [],
+      "warnings": [
+        "Found hardcoded strings in JSX - should use t() for i18n"
+      ],
+      "issues": []
+    },
+    {
+      "tool": "Woo Product Create",
+      "file": "frontend/src/pages/ProductManagement/WooProductCreate.tsx",
+      "exists": true,
+      "hasErrors": false,
+      "errors": [],
+      "warnings": [
+        "Found hardcoded strings in JSX - should use t() for i18n"
+      ],
+      "issues": []
+    },
+    {
+      "tool": "Woo Product Update",
+      "file": "frontend/src/pages/ProductManagement/WooProductUpdate.tsx",
+      "exists": true,
+      "hasErrors": false,
+      "errors": [],
+      "warnings": [
+        "Found 3 console.log statements - consider using logger",
+        "Found hardcoded strings in JSX - should use t() for i18n"
+      ],
+      "issues": []
+    },
+    {
+      "tool": "ML Product Idea Generator",
+      "file": "frontend/src/pages/ProductManagement/MLProductIdeaGenerator.tsx",
+      "exists": true,
+      "hasErrors": false,
+      "errors": [],
+      "warnings": [
+        "Missing BackButton component"
+      ],
+      "issues": [
+        "Missing <h1> header"
+      ]
+    },
+    {
+      "tool": "ML Freebie Generator",
+      "file": "frontend/src/pages/ProductManagement/MLFreebieGenerator.tsx",
+      "exists": true,
+      "hasErrors": false,
+      "errors": [],
+      "warnings": [
+        "Missing BackButton component"
+      ],
+      "issues": [
+        "Missing <h1> header"
+      ]
+    },
+    {
+      "tool": "ML Category Suggester",
+      "file": "frontend/src/pages/ProductManagement/MLCategorySuggester.tsx",
+      "exists": true,
+      "hasErrors": false,
+      "errors": [],
+      "warnings": [
+        "Missing BackButton component"
+      ],
+      "issues": [
+        "Missing <h1> header"
+      ]
+    },
+    {
+      "tool": "Email Campaign Creator",
+      "file": "frontend/src/pages/marketing/EmailCampaignCreator.tsx",
+      "exists": false,
+      "hasErrors": true,
+      "errors": [
+        "File does not exist"
+      ],
+      "warnings": [],
+      "issues": []
+    },
+    {
+      "tool": "Email Scheduler",
+      "file": "frontend/src/pages/marketing/EmailScheduler.tsx",
+      "exists": false,
+      "hasErrors": true,
+      "errors": [
+        "File does not exist"
+      ],
+      "warnings": [],
+      "issues": []
+    },
+    {
+      "tool": "Email Enhancement",
+      "file": "frontend/src/pages/marketing/EmailEnhancement.tsx",
+      "exists": false,
+      "hasErrors": true,
+      "errors": [
+        "File does not exist"
+      ],
+      "warnings": [],
+      "issues": []
+    },
+    {
+      "tool": "Blog Post Generator",
+      "file": "frontend/src/pages/marketing/BlogPostGenerator.tsx",
+      "exists": true,
+      "hasErrors": false,
+      "errors": [],
+      "warnings": [],
+      "issues": [
+        "Missing <h1> header"
+      ]
+    },
+    {
+      "tool": "Image Analyzer",
+      "file": "frontend/src/pages/marketing/ImageAnalyzer.tsx",
+      "exists": true,
+      "hasErrors": false,
+      "errors": [],
+      "warnings": [
+        "Found hardcoded strings in JSX - should use t() for i18n"
+      ],
+      "issues": []
+    },
+    {
+      "tool": "Payment Verifier",
+      "file": "frontend/src/pages/PaymentFinances/PaymentVerifier.tsx",
+      "exists": true,
+      "hasErrors": false,
+      "errors": [],
+      "warnings": [],
+      "issues": []
+    },
+    {
+      "tool": "Payment Validation",
+      "file": "frontend/src/pages/PaymentFinances/PaymentValidation.tsx",
+      "exists": true,
+      "hasErrors": false,
+      "errors": [],
+      "warnings": [],
+      "issues": []
+    },
+    {
+      "tool": "ML Dashboard",
+      "file": "frontend/src/pages/ML/MLDashboard.tsx",
+      "exists": true,
+      "hasErrors": false,
+      "errors": [],
+      "warnings": [
+        "Found hardcoded strings in JSX - should use t() for i18n"
+      ],
+      "issues": []
+    },
+    {
+      "tool": "Settings",
+      "file": "frontend/src/pages/Settings/Settings.tsx",
+      "exists": true,
+      "hasErrors": false,
+      "errors": [],
+      "warnings": [
+        "Found 3 console.log statements - consider using logger"
+      ],
+      "issues": [
+        "Missing <h1> header"
+      ]
+    },
+    {
+      "tool": "ML Settings",
+      "file": "frontend/src/pages/Settings/MLSettings.tsx",
+      "exists": true,
+      "hasErrors": false,
+      "errors": [],
+      "warnings": [],
+      "issues": [
+        "Missing <h1> header"
+      ]
+    }
+  ]
+}

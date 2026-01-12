@@ -6,3 +6,72 @@
 @import "../shared-analytics.css";
 
 /* Seiten-spezifische Overrides hier hinzufügen falls nötig */
+
+/* Shop Health Report: Header-Buttons gezielt verstärken */
+.analytics-header .header-controls {
+	justify-content: center;
+}
+.analytics-header .header-controls .refresh-button,
+.analytics-header .header-controls .ml-analytics-btn {
+	padding: var(--spacing-md) var(--spacing-xl) !important;
+	min-height: 44px !important;
+	border-radius: var(--radius-xl) !important;
+	font-weight: var(--font-bold) !important;
+}
+
+.analytics-header .header-controls .refresh-button {
+	background: var(--glass-bg-secondary) !important;
+	border: 2px solid var(--glass-border) !important;
+	color: var(--text-primary) !important;
+}
+
+.analytics-header .header-controls .refresh-button:hover:not(:disabled) {
+	background: var(--glass-bg-primary) !important;
+	border-color: var(--color-info) !important;
+	transform: translateY(-2px) !important;
+	box-shadow: var(--shadow-md) !important;
+}
+
+.analytics-header .header-controls .ml-analytics-btn {
+	background: linear-gradient(90deg, #5b6de8 0%, #6f3fb0 100%) !important;
+	border: 2px solid rgba(102, 126, 234, 0.35) !important;
+	color: #fff !important;
+}
+
+.analytics-header .header-controls .ml-analytics-btn:hover:not(:disabled) {
+	transform: translateY(-2px) !important;
+	filter: brightness(1.05) !important;
+	box-shadow: var(--shadow-lg) !important;
+}
+
+.analytics-header .header-controls .refresh-button:focus-visible,
+.analytics-header .header-controls .ml-analytics-btn:focus-visible {
+	outline: none !important;
+	box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3) !important;
+}
+
+.analytics-header .header-controls .refresh-button:disabled,
+.analytics-header .header-controls .ml-analytics-btn:disabled {
+	opacity: 0.65 !important;
+	cursor: not-allowed !important;
+	transform: none !important;
+	box-shadow: none !important;
+}
+
+/* Scanning-Indikator explizit im Health-Report aktivieren */
+.analytics-header .header-controls .refresh-button.scanning {
+	cursor: progress !important;
+	position: relative !important;
+	background-image: linear-gradient(
+		135deg,
+		rgba(102, 126, 234, 0.15) 25%,
+		transparent 25%,
+		transparent 50%,
+		rgba(102, 126, 234, 0.15) 50%,
+		rgba(102, 126, 234, 0.15) 75%,
+		transparent 75%,
+		transparent
+	) !important;
+	background-size: 16px 16px !important;
+	animation: scanning-stripes 1s linear infinite !important;
+}

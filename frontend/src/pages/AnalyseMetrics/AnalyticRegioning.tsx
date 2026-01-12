@@ -385,13 +385,7 @@ const AnalyticRegioning = () => {
 
       {/* Regional Insights */}
       <div className="analysis-section">
-        <div
-          className="metric-card full-width info"
-          style={{
-            background: "rgba(255,255,255,0.97)",
-            boxShadow: "0 4px 24px rgba(102,126,234,0.10)",
-          }}
-        >
+        <div className="metric-card full-width">
           <h3>💡 Regionale Insights</h3>
           <div className="insights-grid">
             <div className="insight-item positive">

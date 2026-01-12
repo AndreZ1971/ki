@@ -308,7 +308,7 @@ const MiniAudit = () => {
           <p>Schneller Check der wichtigsten Shop-Kennzahlen</p>
         </div>
         
-        <div className="header-controls" style={{display:'flex', gap:'16px', alignItems:'center', flexWrap:'wrap'}}>
+        <div className="header-controls">
           <div className="scan-info">
             <span className="scan-time">⏱️ {scanTime}ms</span>
             <span className="scan-status">{isScanning ? 'Scannt...' : 'Bereit'}</span>
@@ -325,25 +325,12 @@ const MiniAudit = () => {
             onClick={handleMLAnalyze} 
             disabled={mlLoading}
             title="KI-gestützte Mini-Audit Analyse"
-            style={{
-              fontSize:'1em', 
-              padding:'8px 16px', 
-              borderRadius:'8px', 
-              background:'linear-gradient(90deg, #667eea 0%, #764ba2 100%)', 
-              color:'#fff', 
-              border:'none', 
-              display:'flex', 
-              alignItems:'center', 
-              gap:'8px',
-              cursor: mlLoading ? 'not-allowed' : 'pointer',
-              opacity: mlLoading ? 0.5 : 1
-            }}
           >
-            <span role="img" aria-label="AI" style={{fontSize: '1.2em'}}>🤖</span>
+            <span role="img" aria-label="AI">🤖</span>
             {mlLoading ? 'KI analysiert...' : 'KI-Insights'}
           </button>
         </div>
-        {mlError && <div style={{color:'#e74c3c', marginTop:'8px'}}>{mlError}</div>}
+        {mlError && <div className="ml-error-message">{mlError}</div>}
       </div>
 
       {/* Quick Overview */}
@@ -373,61 +360,34 @@ const MiniAudit = () => {
       {/* KI-Insights Sektion */}
       {mlInsights.length > 0 && (
         <div className="analysis-section">
-          <div style={{marginBottom: 24, padding: '20px', background: 'rgba(102,126,234,0.05)', borderRadius: 12, border: '2px solid rgba(102,126,234,0.2)'}}>
-            <h4 style={{marginBottom: 16, color: '#667eea', display: 'flex', alignItems: 'center', gap: 8}}>
+          <div className="ml-insights-box">
+            <h4 className="ml-insights-title">
               <span role="img" aria-label="AI">🤖</span>
               KI-Audit-Analyse
             </h4>
-            <ul style={{listStyle:'none', padding:0, margin:0}}>
+            <ul className="ml-insights-list">
               {mlInsights.map((insight: MLInsight, idx: number) => (
                 <li 
                   key={idx} 
-                  style={{
-                    background: insight.priority === 'critical' ? 'rgba(231,76,60,0.1)' : 
-                               insight.priority === 'high' ? 'rgba(230,126,34,0.1)' :
-                               insight.priority === 'medium' ? 'rgba(241,196,15,0.08)' : '#f6f8fa',
-                    borderLeft: `4px solid ${
-                      insight.priority === 'critical' ? '#e74c3c' :
-                      insight.priority === 'high' ? '#e67e22' :
-                      insight.priority === 'medium' ? '#f1c40f' : '#2563eb'
-                    }`,
-                    borderRadius: 8,
-                    marginBottom: 12,
-                    padding: '16px 18px',
-                    boxShadow: '0 2px 8px rgba(102,126,234,0.08)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 6
-                  }}
+                  className={`ml-insight-item ${insight.priority || 'low'}`}
                 >
-                  <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4}}>
-                    <span style={{fontWeight: 600, color: '#667eea', fontSize: '1.05em'}}>{insight.title}</span>
+                  <div className="insight-header">
+                    <span className="insight-title">{insight.title}</span>
                     {insight.priority && (
-                      <span style={{
-                        padding: '4px 10px',
-                        borderRadius: 6,
-                        fontSize: '0.85em',
-                        fontWeight: 600,
-                        background: insight.priority === 'critical' ? '#e74c3c' :
-                                   insight.priority === 'high' ? '#e67e22' :
-                                   insight.priority === 'medium' ? '#f1c40f' : '#27ae60',
-                        color: '#fff'
-                      }}>
+                      <span className={`insight-priority-badge ${insight.priority}`}>
                         {insight.priority.toUpperCase()}
                       </span>
                     )}
                   </div>
-                  <span style={{fontSize: '1.08em', color: '#222', lineHeight: 1.5}}>{insight.value}</span>
+                  <span className="insight-value">{insight.value}</span>
                   {insight.detail && (
-                    <span style={{color: '#6c757d', fontSize: '0.95em', marginTop: 4}}>{insight.detail}</span>
+                    <span className="insight-detail">{insight.detail}</span>
                   )}
                   {insight.category && (
-                    <span style={{color: '#764ba2', fontSize: '0.9em', fontWeight: 500}}>
-                      📂 {insight.category}
-                    </span>
+                    <span className="insight-category">📂 {insight.category}</span>
                   )}
                   {insight.score !== undefined && (
-                    <span style={{color: '#764ba2', fontWeight: 600, fontSize: '0.95em'}}>
+                    <span className="insight-confidence">
                       KI-Confidence: {Math.round(insight.score * 100)}%
                     </span>
                   )}

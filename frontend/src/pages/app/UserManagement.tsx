@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { formatDate, formatDateTime } from "../../lib/i18n-utils";
 import { useNavigate } from "react-router-dom";
 import "./page.css";
+import "../shared-analytics.css";
 import "./UserManagement.css";
 import { MLPersonalization } from "./MLPersonalization";
 
@@ -199,40 +200,19 @@ const UserManagement: React.FC = () => {
   };
 
   return (
-    <div className="app-page" style={{ maxWidth: "1400px", margin: "0 auto" }}>
-      {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "32px",
-        }}
-      >
-        <div>
-          <button className="back-button floating-back" onClick={handleBack}>
-            ← Zurück
-          </button>
-          <h1 style={{ marginTop: "16px" }}>🛒 User Management & Analyse</h1>
-        </div>
+    <div className="analytics-page">
+      {/* Floating Back Button */}
+      <button className="back-button floating-back" onClick={handleBack}>
+        ← Zurück
+      </button>
+      {/* Unified Header */}
+      <div className="analytics-header">
+        <h1>🛒 User Management & Analyse</h1>
+        <p>Verwaltung und Analyse deiner Shop-Nutzer</p>
       </div>
 
       {/* Error Handling */}
-      {error && (
-        <div
-          style={{
-            background: "rgba(255, 59, 48, 0.1)",
-            border: "1px solid rgba(255, 59, 48, 0.5)",
-            borderRadius: "12px",
-            padding: "16px",
-            color: "#ff3b30",
-            marginBottom: "24px",
-            fontSize: "14px",
-          }}
-        >
-          ⚠️ {error}
-        </div>
-      )}
+      {error && <div className="ml-error-message">⚠️ {error}</div>}
 
       {/* Loading Skeleton */}
       {loading && (
@@ -377,44 +357,18 @@ const UserManagement: React.FC = () => {
 
       {/* Suchzeile & Sortierung */}
       {!loading && customers.length > 0 && (
-        <div
-          style={{
-            display: "flex",
-            gap: "12px",
-            marginBottom: "24px",
-            flexWrap: "wrap",
-            alignItems: "center",
-          }}
-        >
+        <div className="filters-container">
           <input
+            className="filter-input"
             type="text"
             placeholder="🔍 Nach Name oder Email suchen..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            style={{
-              flex: 1,
-              minWidth: "200px",
-              padding: "10px 16px",
-              background: "rgba(255, 255, 255, 0.05)",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
-              borderRadius: "8px",
-              color: "white",
-              fontSize: "14px",
-              outline: "none",
-            }}
           />
           <select
+            className="filter-select"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            style={{
-              padding: "10px 12px",
-              background: "rgba(255, 255, 255, 0.05)",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
-              borderRadius: "8px",
-              color: "white",
-              fontSize: "14px",
-              cursor: "pointer",
-            }}
           >
             <option value="name">📝 Name</option>
             <option value="revenue">💰 Umsatz</option>
@@ -426,82 +380,16 @@ const UserManagement: React.FC = () => {
       {/* Kundentabelle */}
       {!loading &&
         (filteredCustomers.length > 0 ? (
-          <div
-            style={{
-              overflowX: "auto",
-              borderRadius: "12px",
-              marginBottom: "32px",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
-            }}
-          >
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                fontSize: "14px",
-              }}
-            >
+          <div className="analytics-section">
+            <table className="analytics-table">
               <thead>
-                <tr
-                  style={{
-                    background: "rgba(255, 255, 255, 0.05)",
-                    borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
-                  }}
-                >
-                  <th
-                    style={{
-                      padding: "16px",
-                      textAlign: "left",
-                      fontWeight: "600",
-                    }}
-                  >
-                    👤 Name
-                  </th>
-                  <th
-                    style={{
-                      padding: "16px",
-                      textAlign: "left",
-                      fontWeight: "600",
-                    }}
-                  >
-                    📧 Email
-                  </th>
-                  <th
-                    style={{
-                      padding: "16px",
-                      textAlign: "left",
-                      fontWeight: "600",
-                    }}
-                  >
-                    💰 Umsatz
-                  </th>
-                  <th
-                    style={{
-                      padding: "16px",
-                      textAlign: "left",
-                      fontWeight: "600",
-                    }}
-                  >
-                    📊 Bestellungen
-                  </th>
-                  <th
-                    style={{
-                      padding: "16px",
-                      textAlign: "left",
-                      fontWeight: "600",
-                    }}
-                  >
-                    📅 Registriert
-                  </th>
-                  <th
-                    style={{
-                      padding: "16px",
-                      textAlign: "center",
-                      fontWeight: "600",
-                    }}
-                  >
-                    Aktion
-                  </th>
+                <tr>
+                  <th>👤 Name</th>
+                  <th>📧 Email</th>
+                  <th>💰 Umsatz</th>
+                  <th>📊 Bestellungen</th>
+                  <th>📅 Registriert</th>
+                  <th style={{ textAlign: "center" }}>Aktion</th>
                 </tr>
               </thead>
               <tbody>
@@ -521,60 +409,19 @@ const UserManagement: React.FC = () => {
                       (e.currentTarget.style.background = "transparent")
                     }
                   >
-                    <td style={{ padding: "12px 16px" }}>{customer.name}</td>
-                    <td
-                      style={{
-                        padding: "12px 16px",
-                        color: "rgba(255,255,255,0.7)",
-                      }}
-                    >
-                      {customer.email}
-                    </td>
-                    <td
-                      style={{
-                        padding: "12px 16px",
-                        fontWeight: "600",
-                        color: "#34c759",
-                      }}
-                    >
+                    <td>{customer.name}</td>
+                    <td style={{ color: "var(--text-secondary)" }}>{customer.email}</td>
+                    <td style={{ fontWeight: 600, color: "var(--color-success)" }}>
                       {parseFloat(customer.total_spent || "0").toFixed(2)} €
                     </td>
-                    <td style={{ padding: "12px 16px" }}>
-                      {customer.orders_count}
-                    </td>
-                    <td
-                      style={{
-                        padding: "12px 16px",
-                        color: "rgba(255,255,255,0.7)",
-                      }}
-                    >
+                    <td>{customer.orders_count}</td>
+                    <td style={{ color: "var(--text-secondary)" }}>
                       {formatDate(new Date(customer.date_created))}
                     </td>
-                    <td style={{ padding: "12px 16px", textAlign: "center" }}>
+                    <td style={{ textAlign: "center" }}>
                       <button
+                        className="export-button"
                         onClick={() => setSelectedUser(customer)}
-                        style={{
-                          padding: "6px 12px",
-                          background: "rgba(0, 122, 255, 0.2)",
-                          border: "1px solid rgba(0, 122, 255, 0.5)",
-                          borderRadius: "6px",
-                          color: "#007aff",
-                          cursor: "pointer",
-                          fontSize: "12px",
-                          fontWeight: "500",
-                          transition: "all 0.2s",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background =
-                            "rgba(0, 122, 255, 0.3)";
-                          e.currentTarget.style.boxShadow =
-                            "0 0 12px rgba(0, 122, 255, 0.3)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background =
-                            "rgba(0, 122, 255, 0.2)";
-                          e.currentTarget.style.boxShadow = "none";
-                        }}
                       >
                         ℹ️ Details
                       </button>
