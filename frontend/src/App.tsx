@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/auth/Login";
+import Onboarding from "./pages/Onboarding/Onboarding";
 
 // Pages
 import AIDashboard from "./pages/AIDashboard";
@@ -84,8 +85,9 @@ function App() {
       <AuthProvider>
         <Router>
           <Routes>
-            {/* Public Route - Login */}
+            {/* Public Routes - Login & Onboarding */}
             <Route path="/login" element={<Login />} />
+            <Route path="/onboarding" element={<Onboarding />} />
 
             {/* Protected Routes */}
             <Route path="/" element={<ProtectedRoute><AIDashboard /></ProtectedRoute>} />

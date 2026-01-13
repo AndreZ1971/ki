@@ -65,7 +65,10 @@ import imageAnalysisRoutes from './routes/app/api/marketing/image-analysis-route
 // 🔐 AUTH ROUTES
 import authRoutes from './routes/app/api/auth';
 
-// 🔐 SPECIALIZATION PERSISTENCE & AUTO-LOAD
+// � ONBOARDING ROUTES
+import onboardingRoutes from './routes/app/api/onboarding';
+
+// �🔐 SPECIALIZATION PERSISTENCE & AUTO-LOAD
 import { SpecializationPersistenceManager } from './services/specializationPersistenceManager';
 import { initializeSpecializationAutoLoad as _initializeSpecializationAutoLoad } from './services/specializationAutoLoad';
 
@@ -550,7 +553,11 @@ async function buildServer() {
     await server.register(connectionRoutes, { prefix: '/api/settings' });
     console.log('✅ Settings Routes erfolgreich registriert');
 
-    // 🔥 MONITORING ROUTES (System Health & Performance)
+    // � ONBOARDING ROUTES
+    await server.register(onboardingRoutes, { prefix: '/api/onboarding' });
+    console.log('✅ Onboarding Routes erfolgreich registriert');
+
+    // �🔥 MONITORING ROUTES (System Health & Performance)
     await server.register(monitoringRoutes, { prefix: '/api/monitoring' });
     console.log('✅ Monitoring Routes erfolgreich registriert');
 

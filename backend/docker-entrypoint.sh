@@ -197,19 +197,41 @@ else
   echo "[Entrypoint] 📄 Bestehende connection.json gefunden – Überschreiben wird übersprungen"
 fi
 
-# 4. BERECHTIGUNGEN FÜR CONNECTION.JSON
-echo "[Entrypoint] 🔒 Setze Berechtigungen für connection.json..."
+# 4. .ENV.PRODUCTION INITIALISIEREN (FÜR SHOP_URL)
+if [ ! -f /app/data/.env.production ]; then
+  echo "[Entrypoint] 📝 Erstelle leere .env.production (wird beim Onboarding gefüllt)..."
+  echo "# A.R.I. Production Configuration" > /app/data/.env.production
+  echo "# Wird beim Onboarding befüllt" >> /app/data/.env.production
+  echo "SHOP_URL=" >> /app/data/.env.production
+else
+  echo "[Entrypoint] ✅ .env.production gefunden"
+fi
+
+# Lade .env.production falls vorhanden
+if [ -f /app/data/.env.production ]; then
+  echo "[Entrypoint] 📋 Lade .env.production..."
+  export $(cat /app/data/.env.production | grep -v '^#' | xargs)
+  if [ -n "$SHOP_URL" ]; then
+    echo "[Entrypoint] ✅ SHOP_URL geladen: $SHOP_URL"
+  fi
+fi
+
+# 5. BERECHTIGUNGEN FÜR CONNECTION.JSON
+echo "[Entrypoint] 🔒 Setze Berechtigungen für connection.json und .env.production..."
 chown nodeuser:nodejs /app/connection.json 2>/dev/null || true
 chmod 600 /app/connection.json 2>/dev/null || true
+chown nodeuser:nodejs /app/data/.env.production 2>/dev/null || true
+chmod 600 /app/data/.env.production 2>/dev/null || true
 
-# 5. VERIFIZIERUNG
+# 6. VERIFIZIERUNG
 echo "[Entrypoint] 📋 Final Setup Verification:"
 echo "[Entrypoint]    ✓ connection.json size: $(stat -f%z /app/connection.json 2>/dev/null || stat -c%s /app/connection.json 2>/dev/null || echo 'unknown') bytes"
+echo "[Entrypoint]    ✓ .env.production: $([ -f /app/data/.env.production ] && echo 'vorhanden' || echo 'nicht gefunden')"
 echo "[Entrypoint]    ✓ Data directory: /app/data (backups, dlq)"
 echo "[Entrypoint]    ✓ NODE_ENV: ${NODE_ENV:-production}"
 echo "[Entrypoint]    ✓ Port: ${PORT:-3000}"
 
-# 6. STARTUP
+# 7. STARTUP
 echo "[Entrypoint] ✅ A.R.I. Backend Container startet jetzt..."
 echo "[Entrypoint] 🚀 API verfügbar unter: http://localhost:3000"
 if [ -f /app/connection.json ]; then
