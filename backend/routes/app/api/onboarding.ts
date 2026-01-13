@@ -25,9 +25,9 @@ const onboardingRoutes: FastifyPluginAsync = async (fastify) => {
    */
   const getEnvProductionPath = (): string => {
     // Im Container: /app/data/.env.production (Volume-Mount)
-    // Lokal: Project-Root/.env.production
+    // Lokal: Project-Root/.env.production (aktuell nicht verwendet)
     const containerPath = path.join('/app/data', '.env.production');
-    const localPath = path.resolve(process.cwd(), '.env.production');
+    // const _localPath = path.resolve(process.cwd(), '.env.production');
 
     return containerPath; // Immer Container-Pfad, da dort alles persistent ist
   };
@@ -40,7 +40,7 @@ const onboardingRoutes: FastifyPluginAsync = async (fastify) => {
     try {
       const content = await fs.readFile(envPath, 'utf-8');
       return content;
-    } catch (error) {
+    } catch (_error) {
       logger.debug(`[onboarding] .env.production nicht gefunden: ${envPath}`);
       return null;
     }
@@ -89,7 +89,7 @@ const onboardingRoutes: FastifyPluginAsync = async (fastify) => {
         const envDir = path.dirname(envPath);
         try {
           await fs.mkdir(envDir, { recursive: true });
-        } catch (err) {
+        } catch (_err) {
           logger.warn(`[onboarding] Konnte Verzeichnis nicht erstellen: ${envDir}`);
         }
 

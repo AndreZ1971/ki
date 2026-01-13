@@ -12,7 +12,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { execSync } from 'child_process';
+// import { execSync } from 'child_process'; // Aktuell nicht verwendet
 
 interface UIHealthResult {
   tool: string;
