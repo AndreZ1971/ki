@@ -15,8 +15,9 @@
 2. [Configure OpenAI](#configure-openai)
 3. [Upload Specializations](#upload-specializations)
 4. [Understand Backend Dashboard](#understand-backend-dashboard)
-5. [Security & Privacy](#security--privacy)
-6. [Troubleshooting](#troubleshooting)
+5. [Understanding Agentic Loops](#understanding-agentic-loops)
+6. [Security & Privacy](#security--privacy)
+7. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -251,7 +252,110 @@ The backend is **NOT** for daily use. It shows:
 
 ---
 
-## 🔐 Security & Privacy
+## � Understanding Agentic Loops
+
+### What are Agentic Loops?
+
+**Agentic Loops** are automated processes that analyze your shop data and suggest improvements:
+
+- **🚨 Anomaly Detection** → Finds suspicious payments
+- **📈 Product Performance** → Analyzes best/worst products
+- **💳 Payment Recovery** → Rescues failed orders
+- **📊 Analytics Insights** → Generates automatic reports
+
+### How do the Loops work?
+
+**The Loops are "Batch Processes"** – they don't run continuously, instead they perform a **discrete analysis session**:
+
+```
+1. SENSE    → Collect data (orders, payments, products)
+2. THINK    → Analyze and make decisions
+3. ACT      → Generate recommendations/actions
+4. LEARN    → Save results and learn
+5. STOP     → Loop is done
+```
+
+**Each iteration takes ~1 second.** With **5 iterations per run** = **~5 seconds total runtime**.
+
+### "The Loop stops after a few seconds" – is this normal?
+
+**YES! It's completely normal!** ✅
+
+This is not a bug, it's **designed this way**:
+
+| What | Why |
+|------|-----|
+| **5 iterations per run** | Efficient data processing (not running all the time) |
+| **~5 seconds runtime** | Enough time for thorough analysis |
+| **Then stop** | Loop has completed its job |
+| **Next run via Cron** | Automatically at scheduled time |
+
+**Comparison:** It's like a "maintenance task" that runs regularly, not like a server running 24/7.
+
+### When do the Loops run automatically?
+
+The Loops are **time-controlled via Cron**:
+
+| Loop | Schedule |
+|------|----------|
+| **Anomaly Detection** | Daily 09:00 AM |
+| **Product Performance** | Monday & Thursday 10:00 AM |
+| **Payment Recovery** | Every 30 minutes |
+| **Analytics Insights** | Daily 8:00 PM |
+
+### Can I manually trigger a Loop?
+
+**YES!** In the **Loop Monitoring Dashboard**:
+
+1. Go to **Agent → Loop Monitoring**
+2. Click **"Start Scheduler"**
+3. The scheduler starts – all 4 loops run individually
+4. Each loop runs ~5 seconds (5 iterations)
+5. ✅ Done – results are saved
+
+### What happens to the results?
+
+**The Loops save:**
+- ✅ Found anomalies/insights in database
+- ✅ Recommendations for you
+- ✅ Performance statistics
+- ✅ Execution history (recent runs)
+
+**You see the results in:**
+- 📊 **Analytics Dashboard** (summaries)
+- 🚨 **Anomaly Alerts** (if problems found)
+- 📈 **Performance Reports** (best/worst products)
+- 📋 **Loop History** (detailed log of all runs)
+
+### Why not run continuously?
+
+**Batch processes are better because:**
+
+| Reason | Benefit |
+|--------|---------|
+| **Save resources** | Don't use CPU/memory all the time |
+| **More cost-effective** | Fewer OpenAI API calls |
+| **Clean analysis** | Each session is a complete analysis |
+| **Easier to debug** | Clear start/end points |
+| **Scalable** | Works even with thousands of products |
+
+### I'm unsure – is everything really ok?
+
+**Yes!** To reassure yourself, check the **Loop History**:
+
+1. Go to **Agent → Loop Monitoring**
+2. Scroll to **"Recent Executions"** (at bottom)
+3. You'll see:
+   - ✅ Status (success/failed)
+   - ⏱️ Duration (~5 seconds = normal)
+   - 📈 Iterations (5 = normal)
+   - 💡 Insights generated
+
+If you see **✅ success** and **~5 seconds** = **everything is running perfectly!**
+
+---
+
+## �🔐 Security & Privacy
 
 ### Is A.R.I. GDPR-compliant?
 

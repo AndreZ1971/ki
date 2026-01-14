@@ -15,8 +15,9 @@
 2. [OpenAI konfigurieren](#openai-konfigurieren)
 3. [Spezialisierungen hochladen](#spezialisierungen-hochladen)
 4. [Backend-Dashboard verstehen](#backend-dashboard-verstehen)
-5. [Sicherheit & Datenschutz](#sicherheit--datenschutz)
-6. [Troubleshooting](#troubleshooting)
+5. [Agentic Loops verstehen](#agentic-loops-verstehen)
+6. [Sicherheit & Datenschutz](#sicherheit--datenschutz)
+7. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -251,7 +252,110 @@ Das Backend ist **NICHT** für die tägliche Nutzung. Es zeigt:
 
 ---
 
-## 🔐 Sicherheit & Datenschutz
+## � Agentic Loops verstehen
+
+### Was sind Agentic Loops?
+
+**Agentic Loops** sind automatische Prozesse, die deine Shop-Daten analysieren und Verbesserungen vorschlagen:
+
+- **🚨 Anomaly Detection** → Findet verdächtige Zahlungen
+- **📈 Product Performance** → Analysiert beste/schlechteste Produkte
+- **💳 Payment Recovery** → Rettet fehlgeschlagene Bestellungen
+- **📊 Analytics Insights** → Generiert automatische Reports
+
+### Wie funktionieren die Loops?
+
+**Die Loops sind "Batch-Prozesse"** – sie laufen nicht kontinuierlich, sondern führen eine **diskrete Analyse-Session** durch:
+
+```
+1. SENSE    → Daten sammeln (Bestellungen, Zahlungen, Produkte)
+2. THINK    → Analysieren und Entscheidungen treffen
+3. ACT      → Empfehlungen/Aktionen generieren
+4. LEARN    → Ergebnisse speichern und lernen
+5. STOP     → Loop ist fertig
+```
+
+**Jede Iteration dauert ca. 1 Sekunde.** Mit **5 Iterationen pro Durchlauf** = **~5 Sekunden Laufzeit**.
+
+### "Die Loop stoppt nach ein paar Sekunden" – ist das normal?
+
+**JA! Das ist völlig normal!** ✅
+
+Das ist kein Fehler, sondern **designed so**:
+
+| Was | Warum |
+|-----|-------|
+| **5 Iterationen pro Durchlauf** | Effiziente Datenverarbeitung (nicht die ganze Zeit laufen) |
+| **~5 Sekunden Laufzeit** | Genug Zeit für gründliche Analyse |
+| **Dann stoppen** | Loop hat ihre Arbeit erledigt |
+| **Nächster Durchlauf via Cron** | Automatisch zu geplanter Zeit |
+
+**Vergleich:** Es ist wie eine "Wartungsaufgabe" die regelmäßig läuft, nicht wie ein Server der 24/7 läuft.
+
+### Wann laufen die Loops automatisch?
+
+Die Loops sind **zeitgesteuert via Cron**:
+
+| Loop | Zeitplan |
+|------|----------|
+| **Anomaly Detection** | Täglich 09:00 Uhr |
+| **Product Performance** | Montag & Donnerstag 10:00 Uhr |
+| **Payment Recovery** | Alle 30 Minuten |
+| **Analytics Insights** | Täglich 20:00 Uhr |
+
+### Kann ich eine Loop manuell starten?
+
+**JA!** Im **Loop-Monitoring Dashboard**:
+
+1. Gehe zu **Agent → Loop Monitoring**
+2. Klick auf **"Start Scheduler"**
+3. Der Scheduler startet – alle 4 Loops werden einzeln ausgeführt
+4. Jede Loop läuft ~5 Sekunden (5 Iterationen)
+5. ✅ Fertig – die Ergebnisse werden gespeichert
+
+### Was passiert mit den Ergebnissen?
+
+**Die Loops speichern:**
+- ✅ Gefundene Anomalien/Insights in der Datenbank
+- ✅ Empfehlungen für dich
+- ✅ Performance-Statistiken
+- ✅ Execution History (letzte Läufe)
+
+**Du siehst die Ergebnisse in:**
+- 📊 **Analytics Dashboard** (Zusammenfassungen)
+- 🚨 **Anomaly Alerts** (wenn Probleme gefunden werden)
+- 📈 **Performance Reports** (beste/schlechteste Produkte)
+- 📋 **Loop History** (detaillierter Log aller Durchläufe)
+
+### Warum nicht kontinuierlich?
+
+**Batch-Prozesse sind besser weil:**
+
+| Grund | Vorteil |
+|-------|---------|
+| **Ressourcen sparen** | Nicht die ganze Zeit CPU/Memory nutzen |
+| **Kostengünstiger** | Weniger OpenAI-API-Calls |
+| **Saubere Analysen** | Jede Session ist eine komplette Analyse |
+| **Einfacher zu debuggen** | Klare Anfang/Ende Punkte |
+| **Skalierbar** | Funktioniert auch bei 1000en von Produkten |
+
+### Ich bin unsicher – ist wirklich alles ok?
+
+**Ja!** Um dich zu beruhigen, schau dir die **Loop History** an:
+
+1. Gehe zu **Agent → Loop Monitoring**
+2. Scrolle zu **"Recent Executions"** (am Ende)
+3. Du siehst:
+   - ✅ Status (success/failed)
+   - ⏱️ Laufzeit (~5 Sekunden = normal)
+   - 📈 Iterationen (5 = normal)
+   - 💡 Insights generiert
+
+Wenn du **✅ success** und **~5 Sekunden** siehst = **alles läuft perfekt!**
+
+---
+
+## �🔐 Sicherheit & Datenschutz
 
 ### Ist A.R.I. DSGVO-konform?
 
