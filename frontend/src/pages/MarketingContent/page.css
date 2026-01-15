@@ -47,6 +47,17 @@
   box-shadow: var(--shadow-lg), var(--glow-green);
 }
 
+.glass-button.primary {
+  background: var(--gradient-blue);
+  color: white;
+  border: none;
+}
+
+.glass-button.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), var(--glow-blue);
+}
+
 /* Social Media Poster Layout */
 .social-poster-select-grid {
 	display: grid;
