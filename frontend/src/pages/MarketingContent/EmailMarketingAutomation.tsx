@@ -97,7 +97,7 @@ const EmailMarketingAutomation: React.FC = () => {
 
   const handleCreateCampaign = async () => {
     if (!campaignName.trim() || !emailSubject.trim() || !emailContent.trim()) {
-      showToast('Bitte fülle alle Pflichtfelder aus', 'error');
+      showToast(t('validation.fillRequired'), 'error');
       return;
     }
 

@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 interface EmailPreviewModalProps {
   isOpen: boolean;
@@ -22,6 +23,8 @@ export const EmailPreviewModal = ({
   onCopy,
   isSending
 }: EmailPreviewModalProps) => {
+  const { t } = useTranslation();
+  
   if (!isOpen || !emailData) return null;
 
   return (
@@ -42,7 +45,7 @@ export const EmailPreviewModal = ({
         >
           <div className="modal-header">
             <div>
-              <h2 className="modal-title">📧 Email Vorschau</h2>
+              <h2 className="modal-title">📧 {t('email.preview.title')}</h2>
               <p style={{ margin: 0 }}>
                 Wird an {selectedCustomers.length} Kunden gesendet
               </p>
@@ -60,14 +63,14 @@ export const EmailPreviewModal = ({
           <div className="modal-body">
             <div style={{ marginBottom: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <label>Betreff</label>
+                <label>{t('email.preview.subject')}</label>
                 <motion.button
                   className="btn btn-ghost btn-sm"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => onCopy(emailData.subject)}
                 >
-                  📋 Kopieren
+                  📋 {t('common.copy')}
                 </motion.button>
               </div>
               <div className="glass-card-compact" style={{ padding: '16px' }}>
@@ -84,7 +87,7 @@ export const EmailPreviewModal = ({
                   whileTap={{ scale: 0.95 }}
                   onClick={() => onCopy(emailData.body)}
                 >
-                  📋 Kopieren
+                  📋 {t('common.copy')}
                 </motion.button>
               </div>
               <div className="glass-card" style={{ padding: '16px', maxHeight: '400px', overflowY: 'auto', whiteSpace: 'pre-wrap' }}>

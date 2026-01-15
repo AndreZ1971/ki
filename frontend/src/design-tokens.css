@@ -51,6 +51,15 @@
   --color-error: #ef4444;
   --color-purple: #8b5cf6;
   
+  /* Primärfarben (für Buttons, Badges, etc.) */
+  --color-primary: #667eea;
+  --color-primary-dark: #764ba2;
+  --color-primary-light: #a78bfa;
+  
+  /* Zusätzliche Semantic Colors */
+  --color-danger: #e74c3c;
+  --color-orange: #e67e22;
+  
   /* Gradient-Farben für Buttons */
   --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   --gradient-green: linear-gradient(135deg, #10b981 0%, #059669 100%);
@@ -90,6 +99,7 @@
      SPACING
      ============================================ */
   
+  --spacing-xxs: 0.25rem; /* 4px */
   --spacing-xs: 0.5rem;   /* 8px */
   --spacing-sm: 0.75rem;  /* 12px */
   --spacing-md: 1rem;     /* 16px */
@@ -150,4 +160,20 @@
   --z-modal: 1050;
   --z-popover: 1060;
   --z-tooltip: 1070;
+  
+  /* ============================================
+     LAYOUT/CONTAINER
+     ============================================ */
+  
+  --container-sm: 800px;   /* Forms, Settings */
+  --container-md: 1200px;  /* Standard Content */
+  --container-lg: 1400px;  /* Analytics, Dashboards */
+  --container-xl: 1600px;  /* Wide Layouts */
+  
+  /* ============================================
+     UTILITY GRADIENTS (für Migration)
+     ============================================ */
+  
+  --gradient-accent: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-neutral: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
 }

@@ -1,0 +1,657 @@
+ 
+,
+.
+../lib/api-client
+./views/About.vue
+./views/Home.vue
+@
+/api
+/api/audit/premium
+/api/audit/premium/scan
+/api/audit/standard
+/api/audit/standard/scan
+/api/marketing/content/german
+/api/payments/ml/predict-success
+/api/products/ai/generate-description
+/api/products/ai/generate-image
+/api/products/ai/optimize-description-trends
+/api/products/ai/quality-score
+/api/products/ai/reddit-sentiment
+/api/products/ai/seo-optimize
+/api/products/ai/suggest-pricing
+/api/products/ai/trend-pricing
+/api/products/auto-create
+/api/products/woo/list
+\n
+#app
+✅ All 64 pages have translation support
+✅ Analyse abgeschlossen!
+✅ Can translate English keys
+✅ Can translate German keys
+✅ Dashboard keys exist in both languages
+✅ Default fallback language works
+✅ English locale is available
+✅ German locale is available
+✅ German umlauts display correctly
+✅ i18n is initialized
+✅ Kampagne erfolgreich erstellt!
+✅ KI-Expansionsplan erstellt!
+✅ KI-Notfall-Analyse abgeschlossen!
+✅ KI-Optimierung abgeschlossen!
+✅ Language persists in localStorage
+✅ Missing translation key returns key name as fallback
+✅ Namespace isolation works
+✅ Pages section exists in translations
+✅ Report erfolgreich exportiert!
+✅ Settings connection keys exist in both languages
+✨ Verbesserungen geladen!
+❌ Analyse fehlgeschlagen
+❌ Conversion-Analyse fehlgeschlagen
+❌ Empfehlungen konnten nicht geladen werden
+❌ Enhancement-Analyse fehlgeschlagen
+❌ Farbanalyse fehlgeschlagen
+❌ Fehler beim Export
+❌ Fraud-Check fehlgeschlagen
+❌ Quick Check fehlgeschlagen
+❌ Scan fehlgeschlagen
+❌ Zielgruppen-Analyse fehlgeschlagen
+🎨 Farbanalyse abgeschlossen!
+👥 Zielgruppen-Analyse abgeschlossen!
+📊 Conversion-Analyse abgeschlossen!
+📧 Email Vorschau
+🤖 KI-Kampagne erfolgreich generiert!
+🧠 UX Quick Wins geladen
+🩺 Diagnose erstellt
+a
+all
+Analyse abgeschlossen!
+Analyse fehlgeschlagen
+analytics.conversionAnalysis.aiAnalysisButton
+analytics.conversionAnalysis.errorLoadingData
+analytics.conversionAnalysis.loading
+analytics.conversionAnalysis.mlAnalysisFailed
+analytics.conversionAnalysis.subtitle
+analytics.conversionAnalysis.title
+analytics.standardAudit.checking
+analytics.standardAudit.contentCategory
+analytics.standardAudit.performanceCategory
+analytics.standardAudit.securityCategory
+analytics.standardAudit.seoCategory
+analytics.standardAudit.subtitle
+analytics.standardAudit.title
+analytics.standardAudit.uxCategory
+auth.login
+auth.loginError
+auth.password
+auth.secureLogin
+auth.securityNote
+auth.username
+Betrag muss > 0 sein
+Betreff
+Bitte Beschreibung eingeben
+Bitte Content-Titel angeben
+Bitte E-Mail Adresse eingeben!
+Bitte eine Länge zwischen 4 und 128 wählen
+Bitte fülle alle Felder aus
+Bitte fülle alle Pflichtfelder aus
+Bitte geben Sie Produktinfo ein
+Bitte gib ein Conversion-Ziel ein
+Bitte gib ein Thema ein
+Bitte gib einen Namen für das Template ein
+Bitte gib einen Produktnamen ein
+Bitte gib einen Projektnamen ein
+Bitte gib einen Text ein
+Bitte gib mindestens Kampagnenname oder Produktbeschreibung an
+Bitte gültige E-Mail Adresse eingeben!
+Bitte Kunden-Email eingeben
+Bitte Kunden-ID eingeben
+Bitte Log- oder Fehlermeldungen einfügen
+Bitte Produktname und Preis angeben
+Bitte Transaktions-ID eingeben
+Bitte wähle Kunden aus und gib einen Produktnamen ein
+Bitte wähle mindestens einen Kunden aus
+Bitte zuerst Code generieren
+Body
+category
+chart.demo
+chart.salesTitle
+chatbot.greeting
+common.activate
+common.aiAnalyzing
+common.allCategories
+common.analyzing
+common.back
+common.deactivate
+common.edit
+common.error
+common.fillRequiredFields
+common.generate
+common.loading
+common.noEventsInRange
+common.privacyNotice
+common.thisMonth
+common.thisWeek
+common.thisYear
+common.timeRange
+common.today
+common.validating
+Content erfolgreich generiert!
+copies subject and body when copy buttons are clicked
+csv
+currency
+dashboard.categories.advanced
+dashboard.categories.all
+dashboard.categories.analytics
+dashboard.categories.marketing
+dashboard.categories.payments
+dashboard.categories.products
+dashboard.subtitle
+dashboard.title
+dashboard.tools.aiEmailGenerator.description
+dashboard.tools.aiEmailGenerator.title
+dashboard.tools.analyticRegioning.description
+dashboard.tools.analyticRegioning.title
+dashboard.tools.autoFramplementator.description
+dashboard.tools.autoFramplementator.title
+dashboard.tools.autoProductCreator.description
+dashboard.tools.autoProductCreator.title
+dashboard.tools.blogpostGenerator.description
+dashboard.tools.blogpostGenerator.title
+dashboard.tools.categoriesManager.description
+dashboard.tools.categoriesManager.title
+dashboard.tools.contentMonetized.description
+dashboard.tools.contentMonetized.title
+dashboard.tools.contextGenerator.description
+dashboard.tools.contextGenerator.title
+dashboard.tools.conversionAnalysis.description
+dashboard.tools.conversionAnalysis.title
+dashboard.tools.conversionReported.description
+dashboard.tools.conversionReported.title
+dashboard.tools.createFreebies.description
+dashboard.tools.createFreebies.title
+dashboard.tools.emailMarketingAutomation.description
+dashboard.tools.emailMarketingAutomation.title
+dashboard.tools.feedbackAnalysis.description
+dashboard.tools.feedbackAnalysis.title
+dashboard.tools.freeToPostConverter.description
+dashboard.tools.freeToPostConverter.title
+dashboard.tools.germanContentGenerator.description
+dashboard.tools.germanContentGenerator.title
+dashboard.tools.imageAnalyzer.description
+dashboard.tools.imageAnalyzer.title
+dashboard.tools.kiteTemplates.description
+dashboard.tools.kiteTemplates.title
+dashboard.tools.memorySystem.description
+dashboard.tools.memorySystem.title
+dashboard.tools.miniAudit.description
+dashboard.tools.miniAudit.title
+dashboard.tools.paymentDelisoger.description
+dashboard.tools.paymentDelisoger.title
+dashboard.tools.paymentEnergency.description
+dashboard.tools.paymentEnergency.title
+dashboard.tools.paymentFast.description
+dashboard.tools.paymentFast.title
+dashboard.tools.paymentFrompansion.description
+dashboard.tools.paymentFrompansion.title
+dashboard.tools.paymentIssuedDetector.description
+dashboard.tools.paymentIssuedDetector.title
+dashboard.tools.paymentQuickcheck.description
+dashboard.tools.paymentQuickcheck.title
+dashboard.tools.paymentSimplified.description
+dashboard.tools.paymentSimplified.title
+dashboard.tools.paymentSuccess.description
+dashboard.tools.paymentSuccess.title
+dashboard.tools.paymentTester.description
+dashboard.tools.paymentTester.title
+dashboard.tools.paymentUserFavor.description
+dashboard.tools.paymentUserFavor.title
+dashboard.tools.paymentValidation.description
+dashboard.tools.paymentValidation.title
+dashboard.tools.paymentVerifier.description
+dashboard.tools.paymentVerifier.title
+dashboard.tools.premiumAudit.description
+dashboard.tools.premiumAudit.title
+dashboard.tools.productAnalysis.description
+dashboard.tools.productAnalysis.title
+dashboard.tools.productBundles.description
+dashboard.tools.productBundles.title
+dashboard.tools.realAnalytics.description
+dashboard.tools.realAnalytics.title
+dashboard.tools.realWebAnalytics.description
+dashboard.tools.realWebAnalytics.title
+dashboard.tools.runAutoProductCreator.description
+dashboard.tools.runAutoProductCreator.title
+dashboard.tools.runCreateFreebies.description
+dashboard.tools.runCreateFreebies.title
+dashboard.tools.runTrendAnalysis.description
+dashboard.tools.runTrendAnalysis.title
+dashboard.tools.shopHealthReport.description
+dashboard.tools.shopHealthReport.title
+dashboard.tools.shopMetrics.description
+dashboard.tools.shopMetrics.title
+dashboard.tools.socialMediaAudio.description
+dashboard.tools.socialMediaAudio.title
+dashboard.tools.socialMediaPoster.description
+dashboard.tools.socialMediaPoster.title
+dashboard.tools.standardAudit.description
+dashboard.tools.standardAudit.title
+dashboard.tools.stringGenerator.description
+dashboard.tools.stringGenerator.title
+dashboard.tools.systemHealth.description
+dashboard.tools.systemHealth.title
+dashboard.tools.trendAnalysis.description
+dashboard.tools.trendAnalysis.title
+dashboard.tools.userManagement.description
+dashboard.tools.userManagement.title
+dashboard.tools.woocommerceSync.description
+dashboard.tools.woocommerceSync.title
+dashboard.tools.wooProductCreate.description
+dashboard.tools.wooProductCreate.title
+dashboard.tools.wooProductUpdate.description
+dashboard.tools.wooProductUpdate.title
+de-DE
+Diese Plattform wird noch nicht unterstützt
+div
+Download gestartet
+Email erfolgreich generiert!
+Email-Konfiguration fehlerhaft. Bitte prüfe die SMTP-Einstellungen im Backend.
+Empfehlung fehlgeschlagen
+error.apiDetails
+error.apiLabel
+error.connectionBackendError
+error.specializationAriFormatInvalid
+error.specializationFileInvalid
+error.specializationFileTooLarge
+error.specializationFormatInvalid
+Fehler bei der Performance-Prognose
+Fehler beim Generieren der Email. Bitte versuche es erneut.
+Fehler beim Generieren der Subject Lines
+Fehler beim Kopieren
+Fehler beim Optimieren der Versandzeit
+Fehler beim Segmentieren
+Fehler beim Senden der Email: 
+Fehler beim Speichern des Templates
+Framework-Code generiert
+header.settings
+header.subtitle
+header.title
+In Zwischenablage kopiert
+In Zwischenablage kopiert!
+invokes onClose when overlay is clicked
+json
+Kampagne gespeichert!
+Keine Kunden vorhanden
+Keine Prognosedaten erhalten
+Keine Report-Daten verfügbar
+keywords
+KI-Kampagne generiert
+KI-Text fehlgeschlagen
+KI-Text generiert
+Kontext erfolgreich generiert!
+loading.subtitle
+loading.title
+Memory geleert
+Memory optimiert
+metrics.conversion.hasData
+metrics.conversion.live
+metrics.conversion.noData
+metrics.conversion.title
+metrics.customers.hasData
+metrics.customers.live
+metrics.customers.noData
+metrics.customers.title
+metrics.orders.hasData
+metrics.orders.live
+metrics.orders.noData
+metrics.orders.title
+metrics.sales.hasData
+metrics.sales.live
+metrics.sales.noData
+metrics.sales.title
+ml.analyticsGenerator.error
+ml.analyticsGenerator.generate
+ml.analyticsGenerator.generating
+ml.analyticsGenerator.title
+ml.categorySuggester.confidence
+ml.categorySuggester.error
+ml.categorySuggester.generate
+ml.categorySuggester.generating
+ml.categorySuggester.suggestions
+ml.freebieGenerator.error
+ml.freebieGenerator.generate
+ml.freebieGenerator.generating
+ml.freebieGenerator.suggestions
+ml.marketingGenerator.error
+ml.marketingGenerator.generate
+ml.marketingGenerator.generating
+ml.marketingGenerator.title
+ml.paymentAnalyzer.analyzeButton
+ml.paymentAnalyzer.analyzing
+ml.paymentAnalyzer.error
+ml.paymentAnalyzer.title
+ml.personalization.analyze
+ml.personalization.analyzing
+ml.personalization.error
+ml.personalization.title
+ml.productIdeaGenerator.error
+ml.productIdeaGenerator.generate
+ml.productIdeaGenerator.generating
+ml.productIdeaGenerator.ideas
+ml.productIdeaGenerator.title
+ml.stringGenerator.generate
+ml.stringGenerator.generating
+ml.stringGenerator.length
+ml.stringGenerator.title
+ml.stringGenerator.type
+ml.supportGenerator.error
+ml.supportGenerator.generate
+ml.supportGenerator.generating
+ml.supportGenerator.title
+Netzwerkfehler. Bitte prüfe die Verbindung zum Backend.
+nonexistent.key.test
+Optimierung fehlgeschlagen
+orderId
+pages.analytics_pages.realWebAnalytics.aboutDescription
+pages.analytics_pages.realWebAnalytics.aboutTitle
+pages.analytics_pages.realWebAnalytics.analysisDetails
+pages.analytics_pages.realWebAnalytics.analyzedProductsLabel
+pages.analytics_pages.realWebAnalytics.analyzeFailed
+pages.analytics_pages.realWebAnalytics.analyzing
+pages.analytics_pages.realWebAnalytics.avgScoreLabel
+pages.analytics_pages.realWebAnalytics.confidenceLabel
+pages.analytics_pages.realWebAnalytics.kiReport
+pages.analytics_pages.realWebAnalytics.lastUpdate
+pages.analytics_pages.realWebAnalytics.loadProductsError
+pages.analytics_pages.realWebAnalytics.noProductsForAnalysis
+pages.analytics_pages.realWebAnalytics.noProductsFound
+pages.analytics_pages.realWebAnalytics.noTrendData
+pages.analytics_pages.realWebAnalytics.noTrendsFound
+pages.analytics_pages.realWebAnalytics.noValidProductNames
+pages.analytics_pages.realWebAnalytics.productsInShop
+pages.analytics_pages.realWebAnalytics.scoreLabel
+pages.analytics_pages.realWebAnalytics.subtitle
+pages.analytics_pages.realWebAnalytics.timeIntervalsExplanation
+pages.analytics_pages.realWebAnalytics.title
+pages.analytics_pages.realWebAnalytics.topTrendLabel
+pages.analytics_pages.realWebAnalytics.trendAnalysis
+pages.analytics_pages.trendAnalysis.aiSectionDescription
+pages.analytics_pages.trendAnalysis.aiSectionTitle
+pages.analytics_pages.trendAnalysis.analysisFailed
+pages.analytics_pages.trendAnalysis.analysisUnavailable
+pages.analytics_pages.trendAnalysis.analyzeButton
+pages.analytics_pages.trendAnalysis.analyzing
+pages.analytics_pages.trendAnalysis.defaultRecommendation
+pages.analytics_pages.trendAnalysis.errorLoadingData
+pages.analytics_pages.trendAnalysis.googleTrendsEmpty
+pages.analytics_pages.trendAnalysis.googleTrendsPlaceholder
+pages.analytics_pages.trendAnalysis.googleTrendsTitle
+pages.analytics_pages.trendAnalysis.historyDuration
+pages.analytics_pages.trendAnalysis.historyRange1y
+pages.analytics_pages.trendAnalysis.historyRange30d
+pages.analytics_pages.trendAnalysis.historyRange7d
+pages.analytics_pages.trendAnalysis.historyRange90d
+pages.analytics_pages.trendAnalysis.historyRangeFallback
+pages.analytics_pages.trendAnalysis.historyTitle
+pages.analytics_pages.trendAnalysis.historyTrends
+pages.analytics_pages.trendAnalysis.insightScore
+pages.analytics_pages.trendAnalysis.metrics.customerGrowth
+pages.analytics_pages.trendAnalysis.metrics.detailNegative
+pages.analytics_pages.trendAnalysis.metrics.detailPositive
+pages.analytics_pages.trendAnalysis.metrics.lastUpdated
+pages.analytics_pages.trendAnalysis.metrics.marketTrend
+pages.analytics_pages.trendAnalysis.metrics.marketTrendValue
+pages.analytics_pages.trendAnalysis.metrics.popularProducts
+pages.analytics_pages.trendAnalysis.metrics.salesGrowth
+pages.analytics_pages.trendAnalysis.metrics.seasonality
+pages.analytics_pages.trendAnalysis.metrics.seasonalTrend
+pages.analytics_pages.trendAnalysis.metrics.trendStrength
+pages.analytics_pages.trendAnalysis.metrics.updated
+pages.analytics_pages.trendAnalysis.nextStepsTitle
+pages.analytics_pages.trendAnalysis.range1y
+pages.analytics_pages.trendAnalysis.range30d
+pages.analytics_pages.trendAnalysis.range7d
+pages.analytics_pages.trendAnalysis.range90d
+pages.analytics_pages.trendAnalysis.redditTrendsEmpty
+pages.analytics_pages.trendAnalysis.redditTrendsPlaceholder
+pages.analytics_pages.trendAnalysis.redditTrendsTitle
+pages.analytics_pages.trendAnalysis.subtitle
+pages.analytics_pages.trendAnalysis.summaryTitle
+pages.analytics_pages.trendAnalysis.timeRangeLabel
+pages.analytics_pages.trendAnalysis.title
+pages.blogpost.error
+pages.blogpost.generate
+pages.blogpost.generating
+pages.blogpost.keywords
+pages.blogpost.language
+pages.blogpost.length
+pages.blogpost.lengthLong
+pages.blogpost.lengthMedium
+pages.blogpost.lengthShort
+pages.blogpost.result
+pages.blogpost.seo
+pages.blogpost.title
+pages.blogpost.topic
+pages.productAnalysis.title
+Payment erfolgreich verarbeitet! ⚡
+payment.delivery.city
+payment.delivery.country
+payment.delivery.express
+payment.delivery.optimizationConfig
+payment.delivery.orderId
+payment.delivery.overnight
+payment.delivery.postalCode
+payment.delivery.privacyText
+payment.delivery.standard
+payment.delivery.startOptimization
+payment.delivery.subtitle
+payment.delivery.title
+payment.delivery.urgency
+payment.issueDetector.analyzedEvents
+payment.issueDetector.critical
+payment.issueDetector.deep
+payment.issueDetector.degraded
+payment.issueDetector.failureRate
+payment.issueDetector.healthy
+payment.issueDetector.kiConfidence
+payment.issueDetector.quick
+payment.issueDetector.scanDepth
+payment.issueDetector.scanSettingsHeader
+payment.issueDetector.standard
+payment.issueDetector.subtitle
+payment.issueDetector.systemHealth
+payment.issueDetector.title
+payment.success.analyzeButton
+payment.success.avgConfidence
+payment.success.eventsByFeature
+payment.success.lastEvent
+payment.success.metricsHeader
+payment.success.noMetricsAvailable
+payment.success.subtitle
+payment.success.successRate
+payment.success.timeRangeLabel
+payment.success.title
+payment.success.verifiedTransactions
+payment.validation.securityChecks
+payment.validation.subtitle
+payment.validation.title
+payment.validation.validateButton
+payment.verifier.title
+payment.verifier.verify
+payment.verifier.verifying
+pdf
+Planung fehlgeschlagen
+Posts erfolgreich generiert!
+Preisempfehlung fehlgeschlagen
+Preset angewendet
+priceRange
+product
+product.autoCreator.create
+product.autoCreator.creating
+product.autoCreator.title
+product.bundles.aiCreation
+product.bundles.allCategories
+product.bundles.categoryLabel
+product.bundles.coursesTraining
+product.bundles.designTemplates
+product.bundles.digitalProducts
+product.bundles.generateButton
+product.bundles.generatingIdeas
+product.bundles.ideasHeader
+product.bundles.marketing
+product.bundles.myBundles
+product.bundles.performanceHeader
+product.bundles.priceRangeLabel
+product.bundles.subtitle
+product.bundles.targetAudienceLabel
+product.bundles.targetAudiencePlaceholder
+product.bundles.title
+product.createFreebies.creating
+product.createFreebies.generate
+product.createFreebies.title
+Produktname und Kunden erforderlich
+provides a working jsdom document
+renders subject, body, and customer count
+returns null when closed or without email data
+settings.agentic.availableLoops
+settings.agentic.dashboardDescription
+settings.agentic.dashboardTitle
+settings.agentic.loopAnalyticsDesc
+settings.agentic.loopAnalyticsName
+settings.agentic.loopAnomalyDesc
+settings.agentic.loopAnomalyName
+settings.agentic.loopPaymentDesc
+settings.agentic.loopPaymentName
+settings.agentic.loopProductDesc
+settings.agentic.loopProductName
+settings.agentic.subtitle
+settings.agentic.title
+settings.agentic.toDashboard
+settings.connection.connectionFailed
+settings.connection.connectionSuccess
+settings.connection.enableAnalytics
+settings.connection.enableAutoProducts
+settings.connection.enableEmailMarketing
+settings.connection.importConfig
+settings.connection.importError
+settings.connection.importSuccess
+settings.connection.jobInterval
+settings.connection.jobIntervalHint
+settings.connection.jobMode
+settings.connection.jobModeHint
+settings.connection.jobModeInterval
+settings.connection.jobModeOnce
+settings.connection.loading
+settings.connection.modelGpt35Turbo
+settings.connection.modelGpt4o
+settings.connection.modelGpt4oMini
+settings.connection.modelGpt4Turbo
+settings.connection.openaiApiKey
+settings.connection.openaiHint
+settings.connection.openaiModel
+settings.connection.redditApi
+settings.connection.redditClientId
+settings.connection.redditClientSecret
+settings.connection.saveConfiguration
+settings.connection.saving
+settings.connection.setupDescription
+settings.connection.setupHeader
+settings.connection.smtpFrom
+settings.connection.smtpHost
+settings.connection.smtpPassword
+settings.connection.smtpPort
+settings.connection.smtpSecure
+settings.connection.smtpUser
+settings.connection.supportCptHint
+settings.connection.supportCptSlug
+settings.connection.supportEndpointHint
+settings.connection.supportPerPage
+settings.connection.supportProvider
+settings.connection.supportProviderAuto
+settings.connection.supportProviderAwesome
+settings.connection.supportProviderNone
+settings.connection.supportProviderWooNotes
+settings.connection.supportProviderWpCpt
+settings.connection.supportTicketsEndpoint
+settings.connection.testConnection
+settings.connection.testingConnection
+settings.connection.title
+settings.connection.wcApiHint
+settings.connection.wcApiKeys
+settings.connection.wcApiUrl
+settings.connection.wcAuthMode
+settings.connection.wcAuthModeBasic
+settings.connection.wcAuthModeOAuth
+settings.connection.wcConsumerKey
+settings.connection.wcConsumerSecret
+settings.connection.wcTimeout
+settings.connection.wpAppPassword
+settings.connection.wpCredentials
+settings.connection.wpPasswordHint
+settings.connection.wpUrl
+settings.connection.wpUsername
+settings.schedule.dailyLabel
+settings.schedule.intervalLabel
+settings.schedule.saveError
+settings.schedule.weeklyLabel
+settings.social.accessToken
+settings.social.connected
+settings.social.enabled
+settings.social.facebookPageId
+settings.social.guideStep1
+settings.social.guideStep2
+settings.social.guideStep3
+settings.social.guideStep4
+settings.social.guideStep5
+settings.social.guideTitle
+settings.social.instagramBusinessId
+settings.social.notConnected
+settings.social.save
+settings.social.saving
+settings.social.subtitle
+settings.social.title
+settings.social.twitterApiKey
+settings.social.twitterApiSecret
+settings.social.youtubeChannelId
+settings.specialization.active
+settings.specialization.subtitle
+settings.specialization.title
+settings.specialization.uploadButton
+settings.specialization.uploadDescription
+settings.specialization.uploadSection
+settings.subscription.activate
+settings.subscription.active
+settings.subscription.containerExpiration
+settings.subscription.placeholder
+settings.subscription.purchasedTitle
+settings.subscription.renewalInfo
+settings.subscription.renewalUnavailable
+settings.subscription.renewButton
+settings.subscription.renewPending
+settings.subscription.subtitle
+settings.subscription.title
+settings.subscription.validUntil
+settings.subtitle
+settings.tabs.agentic
+settings.tabs.connection
+settings.tabs.social
+settings.tabs.specialization
+settings.tabs.subscription
+settings.title
+Skript generiert! 🎉
+SMTP Test erfolgreich! Testmail gesendet.
+SMTP-Test Fehler: 
+style
+Subject
+Subject Line kopiert! ✅
+T
+targetAudience
+Template erfolgreich gespeichert!
+Template geladen!
+Template heruntergeladen!
+Template in Zwischenablage kopiert!
+Template optimiert!
+tools.openPage
+tools.running
+tools.startTool
+type
+Validierung fehlgeschlagen

@@ -73,7 +73,7 @@ const ContentMonetized: React.FC = () => {
 
   const handleMonetize = async () => {
     if (!contentTitle.trim() || !pricing.trim()) {
-      showToast('Bitte fülle alle Pflichtfelder aus', 'error');
+      showToast(t('validation.fillRequired'), 'error');
       return;
     }
 

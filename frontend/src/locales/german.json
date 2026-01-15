@@ -72,7 +72,26 @@
     "aiAnalyzing": "KI analysiert...",
     "noEventsInRange": "Keine Events im Zeitraum",
     "privacyNotice": "Datenschutz-Hinweis",
-    "allCategories": "Alle Kategorien"
+    "allCategories": "Alle Kategorien",
+    "completed": "Abgeschlossen",
+    "created": "Erstellt",
+    "send": "Senden"
+  },
+  "validation": {
+    "fillRequired": "Bitte fülle alle Pflichtfelder aus",
+    "amountPositive": "Betrag muss größer als 0 sein",
+    "emailInvalid": "Ungültige E-Mail-Adresse",
+    "required": "Dieses Feld ist erforderlich",
+    "minLength": "Mindestens {{count}} Zeichen erforderlich",
+    "maxLength": "Maximal {{count}} Zeichen erlaubt"
+  },
+  "email": {
+    "preview": {
+      "title": "E-Mail Vorschau",
+      "subject": "Betreff",
+      "recipient": "Empfänger",
+      "sender": "Absender"
+    }
   },
   "specialization": {
     "title": "🎯 Agent-Spezialisierung wählen",

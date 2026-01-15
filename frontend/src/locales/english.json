@@ -72,7 +72,26 @@
     "aiAnalyzing": "AI analyzing...",
     "noEventsInRange": "No events in range",
     "privacyNotice": "Privacy Notice",
-    "allCategories": "All Categories"
+    "allCategories": "All Categories",
+    "completed": "Completed",
+    "created": "Created",
+    "send": "Send"
+  },
+  "validation": {
+    "fillRequired": "Please fill in all required fields",
+    "amountPositive": "Amount must be greater than 0",
+    "emailInvalid": "Invalid email address",
+    "required": "This field is required",
+    "minLength": "Minimum {{count}} characters required",
+    "maxLength": "Maximum {{count}} characters allowed"
+  },
+  "email": {
+    "preview": {
+      "title": "Email Preview",
+      "subject": "Subject",
+      "recipient": "Recipient",
+      "sender": "Sender"
+    }
   },
   "specialization": {
     "title": "🎯 Choose agent specialization",

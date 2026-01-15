@@ -335,22 +335,22 @@
 }
 
 .analysis-insight-critical {
-  border-left-color: #f44336;
+  border-left-color: var(--color-error);
   background: rgba(244, 67, 54, 0.08);
 }
 
 .analysis-insight-high {
-  border-left-color: #ff9800;
+  border-left-color: var(--color-warning);
   background: rgba(255, 152, 0, 0.08);
 }
 
 .analysis-insight-medium {
-  border-left-color: #f59e0b;
+  border-left-color: var(--color-warning);
   background: rgba(245, 158, 11, 0.08);
 }
 
 .analysis-insight-low {
-  border-left-color: #10b981;
+  border-left-color: var(--color-success);
   background: rgba(16, 185, 129, 0.08);
 }
 
@@ -721,7 +721,7 @@
   display: inline-block;
   padding: var(--spacing-xs) var(--spacing-md);
   background: rgba(167, 139, 250, 0.2);
-  color: #a78bfa;
+  color: var(--color-primary-light);
   border-radius: var(--radius-full);
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
@@ -829,7 +829,7 @@
 }
 
 .ml-analytics-btn {
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-primary);
   color: white;
 }
 
@@ -1084,7 +1084,7 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  color: #667eea;
+  color: var(--color-primary);
   font-size: var(--text-lg);
   font-weight: var(--font-bold);
   margin-bottom: var(--spacing-lg);
@@ -1110,17 +1110,17 @@
 
 .ml-insight-item.critical {
   background: rgba(231, 76, 60, 0.1);
-  border-left: 4px solid #e74c3c;
+  border-left: 4px solid var(--color-danger);
 }
 
 .ml-insight-item.high {
   background: rgba(230, 126, 34, 0.1);
-  border-left: 4px solid #e67e22;
+  border-left: 4px solid var(--color-orange);
 }
 
 .ml-insight-item.medium {
   background: rgba(241, 196, 15, 0.08);
-  border-left: 4px solid #f1c40f;
+  border-left: 4px solid var(--color-warning);
 }
 
 .ml-insight-item.low {
@@ -1136,7 +1136,7 @@
 
 .insight-title {
   font-weight: var(--font-semibold);
-  color: #667eea;
+  color: var(--color-primary);
   font-size: var(--text-base);
 }
 
@@ -1149,11 +1149,11 @@
 }
 
 .insight-priority-badge.critical {
-  background: #e74c3c;
+  background: var(--color-danger);
 }
 
 .insight-priority-badge.high {
-  background: #e67e22;
+  background: var(--color-orange);
 }
 
 .insight-priority-badge.medium {
@@ -1162,7 +1162,7 @@
 }
 
 .insight-priority-badge.low {
-  background: #27ae60;
+  background: var(--color-success);
 }
 
 .insight-value {
@@ -1177,13 +1177,13 @@
 }
 
 .insight-category {
-  color: #764ba2;
+  color: var(--color-primary-dark);
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
 }
 
 .insight-confidence {
-  color: #764ba2;
+  color: var(--color-primary-dark);
   font-weight: var(--font-semibold);
   font-size: var(--text-sm);
 }
