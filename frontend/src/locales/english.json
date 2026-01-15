@@ -91,6 +91,17 @@
       "subject": "Subject",
       "recipient": "Recipient",
       "sender": "Sender"
+    },
+    "validation": {
+      "selectCustomersAndProduct": "Please select customers and enter a product name",
+      "selectMinOneCustomer": "Please select at least one customer",
+      "enterTemplateName": "Please enter a name for the template",
+      "enterProductName": "Please enter a product name"
+    },
+    "errors": {
+      "generationFailed": "Failed to generate email. Please try again.",
+      "smtpConfig": "Email configuration error. Please check SMTP settings in backend.",
+      "networkError": "Network error. Please check backend connection."
     }
   },
   "specialization": {

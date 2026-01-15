@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
 import { BackButton } from '../../components/shared';
@@ -36,6 +37,7 @@ const mockCustomers: Customer[] = [
 ];
 
 const AIEmailGenerator: React.FC = () => {
+  const { t } = useTranslation();
   const { handleBackToDashboard } = useProductManagement();
   const { toasts, showToast } = useToast();
   const [emailData, setEmailData] = useState<any>(null);
@@ -169,7 +171,7 @@ const AIEmailGenerator: React.FC = () => {
 
   const generateEmail = async () => {
     if (!formData.productName.trim() || selectedCustomers.length === 0) {
-      showToast('Bitte wähle Kunden aus und gib einen Produktnamen ein', 'error');
+      showToast(t('email.validation.selectCustomersAndProduct'), 'error');
       return;
     }
 
@@ -202,7 +204,7 @@ const AIEmailGenerator: React.FC = () => {
       showToast('Email erfolgreich generiert!', 'success');
     } catch (error) {
       console.error('Email generation failed:', error);
-      showToast('Fehler beim Generieren der Email. Bitte versuche es erneut.', 'error');
+      showToast(t('email.errors.generationFailed'), 'error');
     } finally {
       setLoading(false);
     }
@@ -211,7 +213,7 @@ const AIEmailGenerator: React.FC = () => {
   // 🔥 KORRIGIERT: Vereinfachte sendEmail ohne vorherige Config-Prüfung
   const sendEmail = async () => {
     if (selectedCustomers.length === 0) {
-      showToast('Bitte wähle mindestens einen Kunden aus', 'error');
+      showToast(t('email.validation.selectMinOneCustomer'), 'error');
       return;
     }
 
@@ -262,9 +264,9 @@ const AIEmailGenerator: React.FC = () => {
       // 🔥 Verbesserte Fehlerbehandlung
       const errorMessage = error.message.toLowerCase();
       if (errorMessage.includes('smtp') || errorMessage.includes('email') || errorMessage.includes('config') || errorMessage.includes('auth')) {
-        showToast('Email-Konfiguration fehlerhaft. Bitte prüfe die SMTP-Einstellungen im Backend.', 'error');
+        showToast(t('email.errors.smtpConfig'), 'error');
       } else if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
-        showToast('Netzwerkfehler. Bitte prüfe die Verbindung zum Backend.', 'error');
+        showToast(t('email.errors.networkError'), 'error');
       } else {
         showToast('Fehler beim Senden der Email: ' + error.message, 'error');
       }
@@ -294,7 +296,7 @@ const AIEmailGenerator: React.FC = () => {
 
   const saveAsTemplate = async () => {
     if (!formData.templateName.trim()) {
-      showToast('Bitte gib einen Namen für das Template ein', 'error');
+      showToast(t('email.validation.enterTemplateName'), 'error');
       return;
     }
 
@@ -325,7 +327,7 @@ const AIEmailGenerator: React.FC = () => {
   // 🔥 KI FEATURE 1: SMART SUBJECT LINES
   const generateSmartSubjectLines = async () => {
     if (!formData.productName.trim()) {
-      showToast('Bitte gib einen Produktnamen ein', 'error');
+      showToast(t('email.validation.enterProductName'), 'error');
       return;
     }
     
@@ -390,7 +392,7 @@ const AIEmailGenerator: React.FC = () => {
   // 🔥 KI FEATURE 3: SEND TIME OPTIMIZATION
   const optimizeSendTimes = async () => {
     if (selectedCustomers.length === 0) {
-      showToast('Bitte wähle mindestens einen Kunden aus', 'error');
+      showToast(t('email.validation.selectMinOneCustomer'), 'error');
       return;
     }
     
