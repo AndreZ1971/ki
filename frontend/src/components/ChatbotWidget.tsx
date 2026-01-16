@@ -66,7 +66,7 @@ export const ChatbotWidget: React.FC<ChatbotWidgetProps> = ({ userRole = 'admin'
         ))}
         <div ref={chatEndRef} />
       </div>
-      <div className="chatbot-input-row">
+      <div className="chatbot-input-row" style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
         <input
           type="text"
           value={input}
@@ -75,7 +75,21 @@ export const ChatbotWidget: React.FC<ChatbotWidgetProps> = ({ userRole = 'admin'
           placeholder="Frage stellen..."
           disabled={loading}
         />
-        <button onClick={sendMessage} disabled={loading || !input.trim()}>
+        <button 
+          onClick={sendMessage} 
+          disabled={loading || !input.trim()}
+          style={{
+            padding: '10px 16px',
+            background: 'var(--color-primary)',
+            color: 'var(--text-primary)',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
+            opacity: loading || !input.trim() ? 0.6 : 1,
+            fontSize: '14px',
+            fontWeight: '600',
+          }}
+        >
           Senden
         </button>
       </div>

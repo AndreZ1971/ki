@@ -110,8 +110,8 @@ const PaymentVerifier: React.FC = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1>{t("payment.verifier.title")}</h1>
-        <p>{t("payment.verifier.title")}</p>
+        <h1>Payment Verifier</h1>
+        <p>Automatische Payment-Verifikation und Validierung</p>
       </motion.div>
 
       {error && <ErrorMessage message={error} />}
@@ -130,7 +130,7 @@ const PaymentVerifier: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <h3 style={{ color: "white", marginBottom: "20px" }}>
-            ⚙️ {t("payment.verifier.verify")}
+            ⚙️ Verification Form
           </h3>
 
           <div className="form-group">
@@ -245,9 +245,9 @@ const PaymentVerifier: React.FC = () => {
             <LoadingButton
               onClick={handleVerify}
               loading={loading}
-              loadingText={t("payment.verifier.verifying")}
+              loadingText={t("common.aiAnalyzing")}
             >
-              ✅ {t("payment.verifier.verify")}
+              ✅ Verify Payment
             </LoadingButton>
           </div>
         </motion.div>

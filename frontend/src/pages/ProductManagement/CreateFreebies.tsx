@@ -117,8 +117,8 @@ const CreateFreebies = () => {
       <BackButton onClick={handleBackToDashboard} />
 
       <div className="analytics-header">
-        <h1>{t("product.createFreebies.title")}</h1>
-        <p>{t("product.createFreebies.title")}</p>
+        <h1>Freebies Creator</h1>
+        <p>Erstelle automatisch Gratis-Produkte</p>
       </div>
 
       <div className="metric-card full-width">
@@ -169,7 +169,7 @@ const CreateFreebies = () => {
         >
           {ideasLoading
             ? t("product.createFreebies.creating")
-            : t("product.createFreebies.generate")}
+            : "create Freebies"}
         </button>
       </div>
 

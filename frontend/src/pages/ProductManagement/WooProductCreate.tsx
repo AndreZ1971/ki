@@ -199,7 +199,7 @@ const WooProductCreate = () => {
 
   const handleCreate = async () => {
     if (!validateForm()) {
-      toast.error(t('validation.fillRequired'));
+      toast.error('Bitte füllen Sie alle erforderlichen Felder aus');
       return;
     }
 

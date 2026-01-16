@@ -85,8 +85,8 @@ const AutoProductCreator = () => {
       <BackButton onClick={handleBackToDashboard} />
 
       <div className="analytics-header">
-        <h1>{t("product.autoCreator.title")}</h1>
-        <p>{t("product.autoCreator.title")}</p>
+        <h1>Auto Product Creator</h1>
+        <p>Automatische Erstellung und Optimierung von Produkten</p>
       </div>
 
       <div className="metric-card full-width">

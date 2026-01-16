@@ -316,42 +316,69 @@
 .analysis-insight-card {
   padding: var(--spacing-md);
   border-radius: var(--radius-md);
-  background: var(--glass-bg-secondary);
+  background: var(--glass-bg-primary);
   border: 1px solid var(--glass-border);
-  border-left: 3px solid var(--color-info);
-  box-shadow: var(--shadow-sm);
-  color: var(--text-secondary);
+  border-left: 4px solid var(--color-info);
+  box-shadow: var(--shadow-md);
+  color: var(--text-primary) !important;
+  backdrop-filter: var(--blur-md);
+  -webkit-backdrop-filter: var(--blur-md);
+  transition: all var(--transition-base);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.analysis-insight-card * {
+  color: var(--text-primary) !important;
+}
+
+.analysis-insight-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
 
 .analysis-insight-title {
   font-weight: var(--font-semibold);
-  color: var(--heading-primary);
+  color: var(--text-primary) !important;
   margin-bottom: var(--spacing-xs);
 }
 
 .analysis-insight-meta {
   font-size: var(--text-sm);
-  color: var(--text-tertiary);
+  color: var(--text-secondary) !important;
 }
 
 .analysis-insight-critical {
   border-left-color: var(--color-error);
-  background: rgba(244, 67, 54, 0.08);
+}
+
+.analysis-insight-critical .analysis-insight-title {
+  color: var(--color-error) !important;
 }
 
 .analysis-insight-high {
   border-left-color: var(--color-warning);
-  background: rgba(255, 152, 0, 0.08);
+}
+
+.analysis-insight-high .analysis-insight-title {
+  color: var(--color-warning) !important;
 }
 
 .analysis-insight-medium {
-  border-left-color: var(--color-warning);
-  background: rgba(245, 158, 11, 0.08);
+  border-left-color: var(--color-primary);
+}
+
+.analysis-insight-medium .analysis-insight-title {
+  color: var(--color-primary) !important;
 }
 
 .analysis-insight-low {
   border-left-color: var(--color-success);
-  background: rgba(16, 185, 129, 0.08);
+}
+
+.analysis-insight-low .analysis-insight-title {
+  color: var(--color-success) !important;
 }
 
 /* Loading States */

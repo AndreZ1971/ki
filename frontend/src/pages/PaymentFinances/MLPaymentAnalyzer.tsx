@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
 import { apiClient } from '../../lib/api-client';
 
 interface MLPaymentInsight {
@@ -16,7 +15,6 @@ interface MLPaymentAnalyzerProps {
 export const MLPaymentAnalyzer: React.FC<MLPaymentAnalyzerProps> = ({
   paymentId,
 }) => {
-  const { t } = useTranslation();
   const [insights, setInsights] = useState<MLPaymentInsight[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,10 +27,10 @@ export const MLPaymentAnalyzer: React.FC<MLPaymentAnalyzerProps> = ({
       if (data.success && data.insights) {
         setInsights(data.insights);
       } else {
-        setError(data.error || t("ml.paymentAnalyzer.error"));
+        setError(data.error || "Error analyzing payment data");
       }
     } catch (err: any) {
-      setError(err.message || t("ml.paymentAnalyzer.error"));
+      setError(err.message || "Analysis failed");
     } finally {
       setLoading(false);
     }
@@ -40,12 +38,12 @@ export const MLPaymentAnalyzer: React.FC<MLPaymentAnalyzerProps> = ({
 
   return (
     <div className="ml-payment-analyzer">
-      <button onClick={fetchInsights} disabled={loading}>{t("ml.paymentAnalyzer.analyzeButton")}</button>
-      {loading && <div>{t("ml.paymentAnalyzer.analyzing")}</div>}
+      <button onClick={fetchInsights} disabled={loading}>Analyze Payments</button>
+      {loading && <div>Analyzing...</div>}
       {error && <div className="error">{error}</div>}
       {insights.length > 0 && (
         <div className="insights-list">
-          <h4>{t("ml.paymentAnalyzer.title")}</h4>
+          <h4>Payment Insights</h4>
           <ul>
             {insights.map((insight, i) => (
               <li key={i}>

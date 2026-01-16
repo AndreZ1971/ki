@@ -332,7 +332,7 @@ const PremiumAudit = () => {
                       borderLeft: `4px solid ${
                         insight.priority === 'critical' ? '#e74c3c' :
                         insight.priority === 'high' ? '#e67e22' :
-                        insight.priority === 'medium' ? '#f1c40f' : '#2563eb'
+                        insight.priority === 'medium' ? '#f1c40f' : 'white'
                       }`,
                       borderRadius: 8,
                       marginBottom: 12,
@@ -344,7 +344,7 @@ const PremiumAudit = () => {
                     }}
                   >
                     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4}}>
-                      <span style={{fontWeight: 600, color: '#2563eb', fontSize: '1.05em'}}>{insight.title}</span>
+                      <span style={{fontWeight: 600, color: "white", fontSize: '1.05em'}}>{insight.title}</span>
                       {insight.priority && (
                         <span style={{
                           padding: '4px 10px',

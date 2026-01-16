@@ -149,7 +149,7 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
           z-index: 1001;
           width: 340px;
           max-width: 95vw;
-          background: #fff;
+          background: rgba(30, 41, 59, 0.95);
           border-radius: 18px;
           box-shadow: 0 8px 32px rgba(0,0,0,0.18);
           display: flex;
@@ -187,7 +187,7 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
         .chatbot-messages {
           flex: 1;
           padding: 16px;
-          background: #f8f9fa;
+          background: rgba(15, 23, 42, 0.8);
           overflow-y: auto;
           max-height: 320px;
         }
@@ -199,33 +199,37 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
           word-break: break-word;
         }
         .chatbot-message.user {
-          background: #e0e7ff;
+          background: rgba(102, 126, 234, 0.3);
           align-self: flex-end;
-          color: #333;
+          color: rgba(255, 255, 255, 0.95);
         }
         .chatbot-message.assistant {
-          background: #fff;
-          border: 1px solid #eee;
-          color: #764ba2;
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          color: rgba(255, 255, 255, 0.95);
         }
         .chatbot-input-row {
           display: flex;
           padding: 10px 12px;
-          background: #f1f3f6;
-          border-top: 1px solid #eee;
+          background: rgba(15, 23, 42, 0.9);
+          border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
         .chatbot-input-row input {
           flex: 1;
-          border: none;
           border-radius: 8px;
-          padding: 8px 12px;
-          font-size: 1rem;
           margin-right: 8px;
-          background: #fff;
+          color: rgba(255, 255, 255, 0.95) !important;
+          background: rgba(255, 255, 255, 0.05) !important;
+          border: 1px solid rgba(255, 255, 255, 0.2) !important;
+          padding: 8px 12px;
+          font-size: 14px;
+        }
+        .chatbot-input-row input::placeholder {
+          color: rgba(255, 255, 255, 0.6);
         }
         .chatbot-input-row button {
-          background: #764ba2;
-          color: #fff;
+          background: #667eea;
+          color: rgba(255, 255, 255, 0.95);
           border: none;
           border-radius: 8px;
           padding: 8px 18px;
@@ -234,9 +238,10 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
           transition: background 0.2s;
         }
         .chatbot-input-row button:disabled {
-          background: #ccc;
-          color: #888;
+          background: rgba(255, 255, 255, 0.05);
+          color: rgba(255, 255, 255, 0.6);
           cursor: not-allowed;
+          opacity: 0.6;
         }
         .chatbot-loading {
           color: #667eea;

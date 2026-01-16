@@ -135,6 +135,7 @@ const ShopMetrics: React.FC = () => {
             display: "flex",
             gap: "16px",
             alignItems: "center",
+            justifyContent: "center",
             flexWrap: "wrap",
             marginTop: "12px",
           }}
@@ -215,7 +216,7 @@ const ShopMetrics: React.FC = () => {
                           ? "#e67e22"
                           : insight.priority === "medium"
                             ? "#f1c40f"
-                            : "#2563eb"
+                            : "white"
                     }`,
                     borderRadius: 8,
                     marginBottom: 12,

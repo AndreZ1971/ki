@@ -95,8 +95,8 @@ const PaymentIssuedDetector: React.FC = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1>{t("payment.issueDetector.title")}</h1>
-        <p>{t("payment.issueDetector.subtitle")}</p>
+        <h1>Payment Issued Detector</h1>
+        <p>Erkenne und behandle Payment-Probleme automatisch</p>
       </motion.div>
 
       {error && <ErrorMessage message={error} />}
@@ -131,7 +131,7 @@ const PaymentIssuedDetector: React.FC = () => {
                   marginBottom: "5px",
                 }}
               >
-                {t("payment.issueDetector.systemHealth")}
+                System Health
               </div>
               <div
                 style={{
@@ -142,11 +142,11 @@ const PaymentIssuedDetector: React.FC = () => {
                 }}
               >
                 {detectionResult.systemHealth === "healthy" &&
-                  `✅ ${t("payment.issueDetector.healthy")}`}
+                  `✅ Healthy`}
                 {detectionResult.systemHealth === "degraded" &&
-                  `⚠️ ${t("payment.issueDetector.degraded")}`}
+                  `⚠️ Degraded`}
                 {detectionResult.systemHealth === "critical" &&
-                  `🚨 ${t("payment.issueDetector.critical")}`}
+                  `🚨 Critical`}
               </div>
             </div>
             <div>
@@ -157,7 +157,7 @@ const PaymentIssuedDetector: React.FC = () => {
                   marginBottom: "5px",
                 }}
               >
-                {t("payment.issueDetector.kiConfidence")}
+                AI Confidence
               </div>
               <div
                 style={{
@@ -177,7 +177,7 @@ const PaymentIssuedDetector: React.FC = () => {
                   marginBottom: "5px",
                 }}
               >
-                {t("payment.issueDetector.analyzedEvents")}
+                Analyzed Events
               </div>
               <div
                 style={{ fontSize: "24px", fontWeight: "bold", color: "white" }}
@@ -193,7 +193,7 @@ const PaymentIssuedDetector: React.FC = () => {
                   marginBottom: "5px",
                 }}
               >
-                {t("payment.issueDetector.failureRate")}
+                Failure Rate
               </div>
               <div
                 style={{

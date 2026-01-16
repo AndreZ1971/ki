@@ -25,9 +25,12 @@ export const MLPersonalization: React.FC<MLPersonalizationProps> = ({
     setLoading(true);
     setError(null);
     try {
-      const data = await apiClient.get(
-        `/api/personalization/ml/offers?userId=${userId}`
-      );
+      const apiBase = (import.meta.env.VITE_API_URL || '').trim().replace(/\/$/, '');
+      const url = apiBase 
+        ? `${apiBase}/api/personalization/ml/offers?userId=${userId}`
+        : `/api/personalization/ml/offers?userId=${userId}`;
+      
+      const data = await apiClient.get(url);
       if (data.success && data.offers) {
         setOffers(data.offers);
       } else {

@@ -365,7 +365,7 @@ const ConversionReported = () => {
         <p
           style={{
             marginBottom: 12,
-            color: "#2563eb",
+            color: "white",
             fontSize: "0.95rem",
             lineHeight: "1.5",
           }}
@@ -392,19 +392,20 @@ const ConversionReported = () => {
         {summary && (
           <div
             style={{
-              marginTop: 14,
-              padding: "12px",
-              background: "#f8f9fa",
-              borderRadius: 8,
-              borderLeft: "3px solid #3498db",
+              marginTop: 'var(--spacing-md)',
+              padding: 'var(--spacing-md)',
+              background: 'var(--glass-bg-primary)',
+              border: '1px solid var(--glass-border)',
+              borderRadius: 'var(--radius-md)',
+              borderLeft: '4px solid var(--color-info)',
             }}
           >
             <div
               style={{
-                fontSize: "0.95rem",
-                color: "#f5f7ff",
-                lineHeight: "1.6",
-                marginBottom: 8,
+                fontSize: '0.95rem',
+                color: 'var(--text-primary)',
+                lineHeight: '1.6',
+                marginBottom: 'var(--spacing-sm)',
               }}
             >
               {summary}
@@ -413,18 +414,21 @@ const ConversionReported = () => {
               <div
                 style={{
                   display: "flex",
-                  gap: 10,
+                  gap: 'var(--spacing-sm)',
                   flexWrap: "wrap",
                   fontSize: "0.85rem",
+                  marginTop: 'var(--spacing-md)',
                 }}
               >
                 {summaryDetails.overallScore !== undefined && (
                   <span
                     style={{
-                      background: "#e3f2fd",
-                      padding: "4px 8px",
-                      borderRadius: 4,
+                      background: 'var(--glass-bg-secondary)',
+                      color: 'var(--color-primary)',
+                      padding: 'var(--spacing-xs) var(--spacing-md)',
+                      borderRadius: 'var(--radius-md)',
                       fontWeight: 600,
+                      border: '1px solid var(--glass-border)',
                     }}
                   >
                     Score: {summaryDetails.overallScore}
@@ -433,10 +437,12 @@ const ConversionReported = () => {
                 {summaryDetails.trend && (
                   <span
                     style={{
-                      background: "#e8f5e9",
-                      padding: "4px 8px",
-                      borderRadius: 4,
+                      background: 'var(--glass-bg-secondary)',
+                      color: summaryDetails.trend === 'positive' ? 'var(--color-success)' : summaryDetails.trend === 'negative' ? 'var(--color-error)' : 'var(--color-warning)',
+                      padding: 'var(--spacing-xs) var(--spacing-md)',
+                      borderRadius: 'var(--radius-md)',
                       fontWeight: 600,
+                      border: '1px solid var(--glass-border)',
                     }}
                   >
                     {summaryDetails.trend === "positive"
@@ -483,9 +489,9 @@ const ConversionReported = () => {
                   style={{
                     marginTop: 10,
                     padding: "6px 10px",
-                    background: "#e8f4fd",
+                    background: "var(--glass-bg-primary)",
                     borderRadius: 6,
-                    color: "#2563eb",
+                    color: "white",
                     fontSize: "0.85rem",
                     fontWeight: 600,
                   }}

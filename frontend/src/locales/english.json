@@ -607,6 +607,14 @@
       "totalProducts": "Total Products",
       "conversionRate": "Conversion Rate",
       "lastUpdated": "Last Updated"
+    },
+    "conversionAnalysis": {
+      "title": "📈 Conversion Analysis",
+      "subtitle": "Detailed analysis of conversion rates and optimization",
+      "loading": "📈 Loading Conversion Analysis...",
+      "errorLoadingData": "Error loading conversion data",
+      "mlAnalysisFailed": "ML analysis failed",
+      "aiAnalysisButton": "🤖 AI Analysis"
     }
   },
   "ml": {
@@ -736,6 +744,7 @@
       },
       "autoCreator": {
         "title": "🤖 Auto Product Creator",
+        "subtitle": "Automatic creation and optimization of products",
         "create": "Create automatically",
         "creating": "Creating products...",
         "error": "Error creating"
@@ -917,14 +926,6 @@
         "securityCategory": "🛡️ Security",
         "uxCategory": "🎨 UX/Conversion",
         "contentCategory": "📝 Content"
-      },
-      "conversionAnalysis": {
-        "title": "📈 Conversion Analysis",
-        "subtitle": "Detailed analysis of conversion rates and optimization",
-        "loading": "📈 Loading Conversion Analysis...",
-        "errorLoadingData": "Error loading conversion data",
-        "mlAnalysisFailed": "ML analysis failed",
-        "aiAnalysisButton": "🤖 AI Analysis"
       }
     }
   },

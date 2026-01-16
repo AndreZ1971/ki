@@ -216,7 +216,7 @@ const AnalyticRegioning = () => {
           {mlLoading && (
             <div
               className="ml-analytics-loading"
-              style={{ marginLeft: "12px", color: "#2563eb" }}
+              style={{ marginLeft: "12px", color: "white" }}
             >
               KI-Analyse läuft...
             </div>

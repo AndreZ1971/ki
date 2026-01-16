@@ -314,7 +314,7 @@ const TrendAnalysis = () => {
         <div className="metric-card full-width">
           <h3>{t("pages.analytics_pages.trendAnalysis.googleTrendsTitle")}</h3>
           {googleTrends.length === 0 ? (
-            <div style={{ color: "#6c757d" }}>
+            <div style={{ color: "var(--text-secondary)" }}>
               {t("pages.analytics_pages.trendAnalysis.googleTrendsEmpty")}
             </div>
           ) : (
@@ -343,7 +343,7 @@ const TrendAnalysis = () => {
         <div className="metric-card full-width">
           <h3>{t("pages.analytics_pages.trendAnalysis.redditTrendsTitle")}</h3>
           {redditTrends.length === 0 ? (
-            <div style={{ color: "#6c757d" }}>
+            <div style={{ color: "var(--text-secondary)" }}>
               {t("pages.analytics_pages.trendAnalysis.redditTrendsEmpty")}
             </div>
           ) : (
@@ -370,7 +370,7 @@ const TrendAnalysis = () => {
       <div className="analysis-section">
         <div className="metric-card full-width">
           <h3>{t("pages.analytics_pages.trendAnalysis.aiSectionTitle")}</h3>
-          <p style={{ marginBottom: 18, color: "#2563eb", fontWeight: 500 }}>
+          <p style={{ marginBottom: 18, color: "var(--color-primary)", fontWeight: 500 }}>
             {t("pages.analytics_pages.trendAnalysis.aiSectionDescription")}
           </p>
           <button
@@ -392,7 +392,7 @@ const TrendAnalysis = () => {
               <div
                 style={{
                   fontSize: "1.1rem",
-                  color: "#f5f7ff",
+                  color: "var(--text-primary)",
                   marginBottom: 12,
                 }}
               >
@@ -437,7 +437,7 @@ const TrendAnalysis = () => {
                     <div
                       style={{
                         fontWeight: 700,
-                        color: "#2563eb",
+                        color: "white",
                         marginTop: 8,
                       }}
                     >
@@ -489,9 +489,9 @@ const TrendAnalysis = () => {
                   key={idx}
                   style={{
                     padding: "12px 16px",
-                    background: idx === 0 ? "#e8f4fd" : "#f8f9fa",
+                    background: idx === 0 ? "var(--glass-bg-primary)" : "var(--glass-bg-secondary)",
                     border:
-                      idx === 0 ? "2px solid #2563eb" : "1px solid #e0e0e0",
+                      idx === 0 ? "2px solid white" : "1px solid var(--glass-border)",
                     borderRadius: 8,
                     cursor: "pointer",
                     transition: "all 0.2s",
@@ -573,7 +573,7 @@ const TrendAnalysis = () => {
                           style={{
                             fontSize: "1.2rem",
                             fontWeight: 700,
-                            color: "#2563eb",
+                            color: "white",
                           }}
                         >
                           {analysis.trends || analysis.insightsCount}

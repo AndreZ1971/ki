@@ -168,9 +168,11 @@ const ConversionAnalysis = () => {
         <div
           style={{
             display: "flex",
-            justifyContent: "space-between",
+            flexDirection: "column",
+            justifyContent: "center",
             alignItems: "center",
             width: "100%",
+            textAlign: "center",
           }}
         >
           <div>
@@ -181,7 +183,7 @@ const ConversionAnalysis = () => {
             onClick={handleMLAnalyze}
             disabled={mlLoading || !conversionData}
             className={`btn btn-purple ${mlLoading ? "disabled" : ""}`}
-            style={{ whiteSpace: "nowrap" }}
+            style={{ whiteSpace: "nowrap", marginTop: "16px" }}
           >
             {mlLoading
               ? `${t("common.analyzing")}`

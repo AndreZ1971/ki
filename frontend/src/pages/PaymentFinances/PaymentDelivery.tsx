@@ -79,8 +79,8 @@ const PaymentDelivery: React.FC = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1>{t("payment.delivery.title")}</h1>
-        <p>{t("payment.delivery.subtitle")}</p>
+        <h1>Payment Delivery</h1>
+        <p>Payment-Delivery und Versandabwicklung</p>
       </motion.div>
 
       {/* Datenschutz-Hinweis */}
@@ -117,7 +117,7 @@ const PaymentDelivery: React.FC = () => {
               lineHeight: "1.5",
             }}
           >
-            {t("payment.delivery.privacyText")}
+            Alle Versand- und Payment-Daten werden verschlüsselt übertragen und nach Lieferung gelöscht.
           </div>
         </div>
       </motion.div>
@@ -138,11 +138,11 @@ const PaymentDelivery: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <h3 style={{ color: "white", marginBottom: "20px" }}>
-            {t("payment.delivery.optimizationConfig")}
+            Delivery Optimization Configuration
           </h3>
 
           <div className="form-group">
-            <label>{t("payment.delivery.orderId")}</label>
+            <label>Order ID</label>
             <input
               type="text"
               value={orderId}
@@ -153,7 +153,7 @@ const PaymentDelivery: React.FC = () => {
           </div>
 
           <div className="form-group">
-            <label>{t("payment.delivery.city")}</label>
+            <label>City</label>
             <input
               type="text"
               value={destination.city}
@@ -166,7 +166,7 @@ const PaymentDelivery: React.FC = () => {
           </div>
 
           <div className="form-group">
-            <label>{t("payment.delivery.postalCode")}</label>
+            <label>Postal Code</label>
             <input
               type="text"
               value={destination.postalCode}
@@ -179,7 +179,7 @@ const PaymentDelivery: React.FC = () => {
           </div>
 
           <div className="form-group">
-            <label>{t("payment.delivery.country")}</label>
+            <label>Country</label>
             <input
               type="text"
               value={destination.country}
@@ -192,17 +192,15 @@ const PaymentDelivery: React.FC = () => {
           </div>
 
           <div className="form-group">
-            <label>{t("payment.delivery.urgency")}</label>
+            <label>Urgency</label>
             <select
               value={urgency}
               onChange={(e) => setUrgency(e.target.value as any)}
               className="form-input"
             >
-              <option value="standard">{t("payment.delivery.standard")}</option>
-              <option value="express">{t("payment.delivery.express")}</option>
-              <option value="overnight">
-                {t("payment.delivery.overnight")}
-              </option>
+              <option value="standard">Standard</option>
+              <option value="express">Express</option>
+              <option value="overnight">Overnight</option>
             </select>
           </div>
 
@@ -212,7 +210,7 @@ const PaymentDelivery: React.FC = () => {
               loading={loading}
               loadingText={t("common.aiAnalyzing")}
             >
-              {t("payment.delivery.startOptimization")}
+              Start Optimization
             </LoadingButton>
           </div>
         </motion.div>

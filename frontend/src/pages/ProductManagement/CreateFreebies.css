@@ -132,8 +132,8 @@
 /* ========== Idea Card ========== */
 
 .idea-card {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  border: 2px solid #e0e7ff;
+  background: var(--glass-bg-secondary);
+  border: 2px solid var(--glass-border);
   border-radius: 10px;
   padding: 16px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -155,8 +155,8 @@
 }
 
 .idea-card:hover {
-  border-color: #667eea;
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+  border-color: var(--color-primary);
+  box-shadow: 0 8px 24px var(--shadow-lg);
   transform: translateY(-4px);
 }
 
@@ -165,8 +165,8 @@
 }
 
 .idea-card.expanded {
-  border-color: #667eea;
-  background: linear-gradient(135deg, #e0e7ff 0%, #f5f7fa 100%);
+  border-color: var(--color-primary);
+  background: var(--glass-bg-secondary);
 }
 
 /* ========== Idea Header ========== */
@@ -180,7 +180,7 @@
 }
 
 .idea-header h4 {
-  color: #1e3c72;
+  color: var(--text-primary);
   font-size: 16px;
   font-weight: 600;
   margin: 0;
@@ -212,7 +212,7 @@
 /* ========== Idea Description ========== */
 
 .idea-description {
-  color: #4b5563;
+  color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.5;
   margin: 12px 0;
@@ -256,10 +256,10 @@
 .create-idea-btn {
   flex: 1;
   padding: 8px 12px;
-  border: 1px solid #667eea;
+  border: 1px solid var(--glass-border);
   border-radius: 6px;
-  background: white;
-  color: #667eea;
+  background: var(--glass-bg-secondary);
+  color: var(--text-primary);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -272,10 +272,10 @@
 
 .expand-btn:hover,
 .create-idea-btn:hover {
-  background: #667eea;
-  color: white;
+  background: var(--glass-bg-primary);
+  color: var(--text-primary);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: var(--shadow-md);
 }
 
 .expand-btn:disabled,
@@ -345,16 +345,17 @@
   justify-content: space-between;
   align-items: center;
   padding: 14px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  background: var(--glass-bg-secondary);
   border-radius: 8px;
-  border-left: 4px solid #2563eb;
+  border: 1px solid var(--glass-border);
+  border-left: 4px solid var(--glass-border);
   transition: all 0.3s ease;
 }
 
 .freebie-item:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
   transform: translateX(4px);
-  border-left-color: #667eea;
+  border-left-color: var(--color-primary);
 }
 
 .freebie-info {
@@ -365,13 +366,13 @@
 }
 
 .freebie-name {
-  color: #1e3c72;
+  color: var(--text-primary);
   font-weight: 600;
   font-size: 14px;
 }
 
 .freebie-type {
-  color: #667eea;
+  color: var(--text-secondary);
   font-size: 12px;
   font-weight: 500;
   text-transform: uppercase;
@@ -387,7 +388,7 @@
 .downloads,
 .date {
   font-size: 12px;
-  color: #4b5563;
+  color: var(--text-secondary);
 }
 
 /* ========== Modal Overlay ========== */

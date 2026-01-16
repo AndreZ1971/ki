@@ -95,11 +95,19 @@ const BlogPostGenerator: React.FC = () => {
       <div style={{ marginBottom: 12 }}>
         <label>
           {t("pages.blogpost.language")}:&nbsp;
-          <input
+          <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
-            style={{ width: 100 }}
-          />
+          >
+            <option value="de">Deutsch (DE)</option>
+            <option value="en">English (EN)</option>
+            <option value="fr">Français (FR)</option>
+            <option value="es">Español (ES)</option>
+            <option value="it">Italiano (IT)</option>
+            <option value="pt">Português (PT)</option>
+            <option value="nl">Nederlands (NL)</option>
+            <option value="pl">Polski (PL)</option>
+          </select>
         </label>
       </div>
       <button onClick={handleGenerate} disabled={loading || !topic}>

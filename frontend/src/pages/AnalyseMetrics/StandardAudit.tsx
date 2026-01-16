@@ -471,7 +471,7 @@ const StandardAudit = () => {
                           ? "#e67e22"
                           : insight.priority === "medium"
                             ? "#f1c40f"
-                            : "#2563eb"
+                            : "white"
                     }`,
                     borderRadius: 8,
                     marginBottom: 12,
@@ -493,7 +493,7 @@ const StandardAudit = () => {
                     <span
                       style={{
                         fontWeight: 600,
-                        color: "#2563eb",
+                        color: "white",
                         fontSize: "1.05em",
                       }}
                     >

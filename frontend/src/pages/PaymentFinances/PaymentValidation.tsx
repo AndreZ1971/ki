@@ -124,8 +124,8 @@ const PaymentValidation: React.FC = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1>{t("payment.validation.title")}</h1>
-        <p>{t("payment.validation.subtitle")}</p>
+        <h1>Payment Validation</h1>
+        <p>Sichere Payment-Validierung und Fraud-Check</p>
       </motion.div>
 
       {error && <ErrorMessage message={error} />}
@@ -235,7 +235,7 @@ const PaymentValidation: React.FC = () => {
               loading={loading}
               loadingText={t("common.validating")}
             >
-              {t("payment.validation.validateButton")}
+              Validate Payment
             </LoadingButton>
           </div>
         </motion.div>
@@ -338,7 +338,7 @@ const PaymentValidation: React.FC = () => {
                     marginBottom: "12px",
                   }}
                 >
-                  {t("payment.validation.securityChecks")}
+                  Security Checks
                 </div>
                 <div
                   style={{

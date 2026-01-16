@@ -248,19 +248,21 @@ const FeedbackAnalysis: React.FC = () => {
           <div style={{display: 'grid', gap: 16}}>
             {reviews.map((review: any) => (
               <div key={review.id} style={{
-                background: '#f8f9fa',
-                padding: '16px 20px',
-                borderRadius: 8,
-                borderLeft: '4px solid #ffc107'
+                background: 'var(--glass-bg-primary)',
+                padding: 'var(--spacing-md)',
+                borderRadius: 'var(--radius-md)',
+                borderLeft: '4px solid var(--color-warning)',
+                border: '1px solid var(--glass-border)',
+                color: 'var(--text-primary)'
               }}>
-                <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: 8}}>
-                  <strong style={{color: '#f5f7ff', fontSize: '1.05rem'}}>{review.author}</strong>
-                  <span style={{color: '#ffc107', fontSize: '1.1rem'}}>
+                <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-sm)'}}>
+                  <strong style={{color: 'var(--text-primary)', fontSize: '1.05rem'}}>{review.author}</strong>
+                  <span style={{color: 'var(--color-warning)', fontSize: '1.1rem'}}>
                     {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
                   </span>
                 </div>
-                <p style={{color: '#34495e', lineHeight: '1.6', margin: '8px 0'}}>{review.text}</p>
-                <div style={{color: '#7f8c8d', fontSize: '0.85rem', marginTop: 8}}>📅 {review.date}</div>
+                <p style={{color: 'var(--text-secondary)', lineHeight: '1.6', margin: 'var(--spacing-sm) 0'}}>{review.text}</p>
+                <div style={{color: 'var(--text-tertiary)', fontSize: '0.85rem', marginTop: 'var(--spacing-sm)'}}>📅 {review.date}</div>
               </div>
             ))}
           </div>
@@ -277,19 +279,21 @@ const FeedbackAnalysis: React.FC = () => {
               const priorityColor = ticket.priority === 'high' ? '#e74c3c' : ticket.priority === 'medium' ? '#f39c12' : '#95a5a6';
               return (
                 <div key={ticket.id} style={{
-                  background: '#f8f9fa',
-                  padding: '16px 20px',
-                  borderRadius: 8,
-                  borderLeft: `4px solid ${statusColor}`
+                  background: 'var(--glass-bg-primary)',
+                  padding: 'var(--spacing-md)',
+                  borderRadius: 'var(--radius-md)',
+                  borderLeft: `4px solid ${statusColor}`,
+                  border: '1px solid var(--glass-border)',
+                  color: 'var(--text-primary)'
                 }}>
-                  <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8}}>
-                    <strong style={{color: '#f5f7ff', fontSize: '1.05rem'}}>{ticket.title}</strong>
-                    <div style={{display: 'flex', gap: 8}}>
+                  <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-sm)'}}>
+                    <strong style={{color: 'var(--text-primary)', fontSize: '1.05rem'}}>{ticket.title}</strong>
+                    <div style={{display: 'flex', gap: 'var(--spacing-sm)'}}>
                       <span style={{
                         background: priorityColor,
                         color: 'white',
-                        padding: '3px 10px',
-                        borderRadius: 12,
+                        padding: 'var(--spacing-xs) var(--spacing-md)',
+                        borderRadius: 'var(--radius-full)',
                         fontSize: '0.75rem',
                         fontWeight: 600,
                         textTransform: 'uppercase'
@@ -299,8 +303,8 @@ const FeedbackAnalysis: React.FC = () => {
                       <span style={{
                         background: statusColor,
                         color: 'white',
-                        padding: '3px 10px',
-                        borderRadius: 12,
+                        padding: 'var(--spacing-xs) var(--spacing-md)',
+                        borderRadius: 'var(--radius-full)',
                         fontSize: '0.75rem',
                         fontWeight: 600,
                         textTransform: 'uppercase'
@@ -309,8 +313,8 @@ const FeedbackAnalysis: React.FC = () => {
                       </span>
                     </div>
                   </div>
-                  <p style={{color: '#34495e', lineHeight: '1.6', margin: '8px 0'}}>{ticket.description}</p>
-                  <div style={{display: 'flex', gap: 16, marginTop: 8, fontSize: '0.85rem', color: '#7f8c8d'}}>
+                  <p style={{color: 'var(--text-secondary)', lineHeight: '1.6', margin: 'var(--spacing-sm) 0'}}>{ticket.description}</p>
+                  <div style={{display: 'flex', gap: 'var(--spacing-md)', marginTop: 'var(--spacing-sm)', fontSize: '0.85rem', color: 'var(--text-tertiary)'}}>
                     <span>📅 Erstellt: {ticket.created}</span>
                     {ticket.resolved && <span>✅ Gelöst: {ticket.resolved}</span>}
                   </div>

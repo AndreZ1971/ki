@@ -449,7 +449,7 @@ const RunTrendAnalysis = () => {
                             )}
                             {insightObj.score !== undefined && (
                               <div
-                                style={{ color: "#2563eb", fontWeight: 700 }}
+                                style={{ color: "white", fontWeight: 700 }}
                               >
                                 KI-Score: {Math.round(insightObj.score * 100)}%
                               </div>

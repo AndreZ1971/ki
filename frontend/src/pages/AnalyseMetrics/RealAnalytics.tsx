@@ -205,7 +205,7 @@ const RealAnalytics = () => {
             ⚠️ {dataError}
           </div>
         )}
-        <div style={{ marginTop: 16, marginBottom: 8, textAlign: "center" }}>
+        <div style={{ marginTop: 16, marginBottom: 8, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
           <button
             className="action-button primary"
             onClick={runKIAnalysis}
@@ -404,7 +404,7 @@ const RealAnalytics = () => {
                     <div style={{ color: "#6c757d" }}>{insight.detail}</div>
                   )}
                   {insight.score !== undefined && (
-                    <div style={{ color: "#2563eb", fontWeight: 700 }}>
+                    <div style={{ color: "white", fontWeight: 700 }}>
                       KI-Score: {Math.round(insight.score * 100)}%
                     </div>
                   )}
