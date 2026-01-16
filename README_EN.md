@@ -2,9 +2,10 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-6.3.0-blue.svg)
+![Version](https://img.shields.io/badge/version-6.9.0-blue.svg)
 ![Tests](https://img.shields.io/badge/tests-350%2F350-success.svg)
 ![ML Integration](https://img.shields.io/badge/ML%20Integration-100%25-green.svg)
+![Design System](https://img.shields.io/badge/Design_Tokens-100%25-purple.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 **The Digital Employee for Your Online Store**
@@ -89,10 +90,13 @@ Your shop is on Facebook, Instagram, LinkedIn, TikTok, email. A.R.I. posts smart
 - ✅ Real-time analytics with real recommendations
 - ✅ Email automation (carts, welcome series, reactivation)
 - ✅ Social media posts (6 platforms)
-- ✅ **NEW:** Multi-source trend analysis (Google Trends + Reddit OAuth)
-- ✅ **NEW:** Percentage-based price suggestions with intelligent fallback logic
-- ✅ **NEW:** Dark glass theme with improved contrast
-- ✅ **NEW:** Manual validation of AI suggestions before adoption
+- ✅ **NEW v6.9.0:** Global Design Token System with Dark Mode
+- ✅ **NEW v6.9.0:** 8-language support (DE, EN, FR, ES, IT, PT, NL, PL)
+- ✅ **NEW v6.9.0:** Fully dark chatbot design with perfect readability
+- ✅ **NEW v6.9.0:** Specialization-aware AI personalization
+- ✅ Multi-source trend analysis (Google Trends + Reddit OAuth)
+- ✅ Percentage-based price suggestions with intelligent fallback logic
+- ✅ Manual validation of AI suggestions before adoption
 
 ## 🚀 Features
 
