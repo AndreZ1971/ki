@@ -1,0 +1,98 @@
+###############################################################################
+# A.R.I. Maintenance Docker Compose Configuration
+#
+# Zweck: Container Update/Kill (Repair) mit Config-Übernahme vom alten Container
+#
+# Workflow:
+# 1. Alter Container läuft (docker-compose.yml)
+# 2. Maintenance Container starten: docker-compose -f maintenance-docker-compose.yml up -d
+# 3. Neuer Container kopiert Configs vom alten (via shared volumes)
+# 4. Alten Container stoppen: docker-compose down
+# 5. Neuer Container übernimmt
+#
+# Version: 6.9.1 | Updated: Jan 2026
+###############################################################################
+
+services:
+  # Maintenance Container (für Update/Kill)
+  ari-maintenance:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: woo-app-maintenance
+    restart: "no"  # Läuft nur temporär während Update/Kill
+    ports:
+      - "3001:3000"  # Anderer Port während parallelem Betrieb
+    environment:
+      - NODE_ENV=production
+      - MODE=update  # Oder: MODE=kill
+      - PORT=3000
+    volumes:
+      # Zugriff auf alten Container (via shared volumes)
+      - ari-old-data:/mnt/old/data:ro  # Read-only: alte .env.production
+      - ari-old-root:/mnt/old:ro       # Read-only: alte connection.json
+      
+      # Eigene Volumes (werden die neuen Daten)
+      - ./backend/data:/app/data:rw
+      - ./.env.production:/app/.env.production:ro
+    entrypoint: ["/bin/sh", "/app/maintenance-entrypoint.sh"]
+    command: ["node", "dist/index.js"]
+    networks:
+      - app-network
+
+  # NGINX kann während Maintenance weiter auf Port 80/443 laufen
+  # und Traffic auf 3001 umleiten, dann nahtlos zurück auf 3000
+  nginx:
+    image: nginx:latest
+    container_name: woo-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - ./frontend/dist:/app/public:ro
+    networks:
+      - app-network
+
+# Shared Volumes zwischen altem und neuem Container
+volumes:
+  ari-old-data:
+    external: true  # Muss vom alten Container (docker-compose.yml) bereits existieren
+    name: ki_backend_data  # Name vom Volume des alten Containers
+    
+  ari-old-root:
+    external: true  # Muss vom alten Container bereits existieren
+    name: ki_backend_root
+
+networks:
+  app-network:
+    name: ${NETWORK_NAME:-app-network}
+    driver: bridge
+
+###############################################################################
+# VERWENDUNG:
+#
+# 1. ALTER CONTAINER LÄUFT:
+#    docker-compose up -d
+#
+# 2. MAINTENANCE CONTAINER STARTEN (parallel):
+#    docker-compose -f maintenance-docker-compose.yml up -d
+#    -> Kopiert Configs, läuft auf Port 3001
+#
+# 3. NGINX UMSCHALTEN (optional, für Zero-Downtime):
+#    upstream backend { server app:3001; }
+#
+# 4. ALTEN CONTAINER STOPPEN:
+#    docker-compose down
+#
+# 5. MAINTENANCE CONTAINER AUF PORT 3000 UMSTELLEN:
+#    docker-compose -f maintenance-docker-compose.yml down
+#    # Dann mit normalem docker-compose.yml starten (hat jetzt neue Configs)
+#    docker-compose up -d
+#
+# KUBERNETES ALTERNATIVE:
+# - Job/CronJob mit shared PersistentVolumeClaim
+# - Configs in ConfigMap/Secret
+# - MODE=update als env variable
+###############################################################################
