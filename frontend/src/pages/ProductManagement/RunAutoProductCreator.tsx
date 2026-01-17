@@ -170,7 +170,7 @@ const RunAutoProductCreator = () => {
       setProgress(100);
       setCurrentStatus('✨ Fertig!');
       toast.success(resultData.message || 'Produkte erfolgreich erstellt!');
-    } catch {
+    } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unbekannter Fehler';
       setResult({ success: false, message: errorMessage });
       toast.error(errorMessage);

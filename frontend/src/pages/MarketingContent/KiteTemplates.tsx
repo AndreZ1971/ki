@@ -65,7 +65,7 @@ const KiteTemplates: React.FC = () => {
       } else {
         throw new Error(data.error || 'Fehler beim Laden des Templates');
       }
-    } catch {
+    } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten';
       setError(errorMessage);
       showToast(errorMessage, 'error');

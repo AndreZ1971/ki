@@ -269,7 +269,7 @@ const WooProductUpdate = () => {
         }
       }
       
-    } catch {
+    } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unbekannter Fehler';
       setError(errorMessage);
       toast.error(errorMessage);

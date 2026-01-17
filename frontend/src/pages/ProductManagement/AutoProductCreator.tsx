@@ -69,7 +69,7 @@ const AutoProductCreator = () => {
       } else {
         throw new Error(response.error || "Fehler bei der Produkterstellung");
       }
-    } catch {
+    } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Unbekannter Fehler";
       setError(errorMessage);

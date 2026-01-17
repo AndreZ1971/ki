@@ -96,7 +96,7 @@ const EmailMarketingAutomation: React.FC = () => {
 
   const handleCreateCampaign = async () => {
     if (!campaignName.trim() || !emailSubject.trim() || !emailContent.trim()) {
-      showToast(t('validation.fillRequired'), 'error');
+      showToast('Bitte füllen Sie alle erforderlichen Felder aus', 'error');
       return;
     }
 
@@ -133,7 +133,7 @@ const EmailMarketingAutomation: React.FC = () => {
       } else {
         throw new Error(data.error || 'Fehler beim Senden der E-Mails');
       }
-    } catch {
+    } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten';
       setError(errorMessage);
       showToast(errorMessage, 'error');
@@ -183,7 +183,7 @@ const EmailMarketingAutomation: React.FC = () => {
       }
 
       showToast('KI-Kampagne generiert', 'success');
-    } catch {
+    } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten';
       setError(errorMessage);
       showToast(errorMessage, 'error');

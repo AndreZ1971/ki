@@ -230,7 +230,7 @@ const WooProductCreate = () => {
       } else {
         throw new Error(response.error || 'Fehler beim Erstellen');
       }
-    } catch {
+    } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unbekannter Fehler';
       setError(errorMessage);
       toast.error(errorMessage);

@@ -79,7 +79,7 @@ const RunCreateFreebies = () => {
           response.error || "KI-Ideen konnten nicht geladen werden"
         );
       }
-    } catch {
+    } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Unbekannter Fehler";
       toast.error(errorMessage);
@@ -114,7 +114,7 @@ const RunCreateFreebies = () => {
       setLastCreated(payload);
       toast.success(`Freebie "${response.data.name}" erfolgreich erstellt!`);
       await loadFreebies();
-    } catch {
+    } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Unbekannter Fehler";
       toast.error(errorMessage);
@@ -145,7 +145,7 @@ const RunCreateFreebies = () => {
         : selectedIdea || sourceIdeas[0];
 
       await handleCreateFromIdea(best);
-    } catch {
+    } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Unbekannter Fehler";
       toast.error(errorMessage);

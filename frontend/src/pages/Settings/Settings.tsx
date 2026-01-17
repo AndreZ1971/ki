@@ -842,7 +842,7 @@ const Settings = () => {
       setTimeout(() => {
         window.location.reload();
       }, 2000);
-    } catch {
+    } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unbekannter Fehler";
       setConnectionMessage(`❌ Fehler: ${errorMessage}`);
