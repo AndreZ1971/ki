@@ -43,6 +43,16 @@ const UserManagement: React.FC = () => {
     return raw || "";
   }, []);
 
+  // 🔧 Hilfsfunktion: Robustes Parsing von Geldbeträgen (unterstützt "1.00" und "1,00")
+  const parseAmount = (value: string | number | undefined | null): number => {
+    if (value === null || value === undefined) return 0;
+    if (typeof value === "number") return value;
+    // String: Ersetze Komma durch Punkt, entferne Währungssymbole
+    const cleaned = String(value).replace(/[€$\s]/g, "").replace(",", ".");
+    const parsed = parseFloat(cleaned);
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -59,32 +69,14 @@ const UserManagement: React.FC = () => {
         // 🔗 Vereinfachte URL-Konstruktion (robuster)
         let url: string;
         if (apiBase) {
-          // Wenn apiBase gesetzt ist, nutze es als Basis
           const base = apiBase.endsWith("/") ? apiBase.slice(0, -1) : apiBase;
           url = `${base}/api/woocommerce/customers`;
         } else {
-          // Fallback: nutze relative URL (funktioniert wenn Frontend und Backend auf gleichem Host)
           url = "/api/woocommerce/customers";
         }
 
-        console.log("🔗 API URL:", url);
-        console.log("🔗 VITE_API_URL env:", import.meta.env.VITE_API_URL);
-        console.log("🔗 apiBase resolved:", apiBase);
-
         const res = await fetch(url);
-        console.log("📊 Response Status:", res.status, res.statusText);
-
         const data: any = await res.json();
-        console.log("📥 API Response:", data);
-        console.log("📥 API Response data.data:", data.data);
-        console.log("📥 API Response is Array?:", Array.isArray(data));
-        console.log(
-          "📥 API Response data.data is Array?:",
-          Array.isArray(data.data)
-        );
-        console.log("📥 API Response data.success:", data.success);
-        console.log("📥 API Response data.total:", data.total);
-        console.log("📥 API Response data.message:", data.message);
 
         // ✅ Verbesserte Fehlerbehandlung für verschiedene API-Antworten
         if (!res.ok) {
@@ -114,19 +106,13 @@ const UserManagement: React.FC = () => {
           );
         } else {
           // Unbekanntes Format
-          console.warn("⚠️ Unerwartetes Response-Format:", data);
-          throw new Error(
-            "Ungültige API-Antwort: " + JSON.stringify(data).substring(0, 100)
-          );
+          throw new Error("Ungültige API-Antwort");
         }
 
-        console.log(`✅ ${customers.length} Kunden geladen`);
-        console.log("📋 Customers array:", customers);
         setCustomers(customers);
       } catch (err) {
         const message =
           err instanceof Error ? err.message : "Unbekannter Fehler";
-        console.error("❌ Fehler beim Laden der Kunden:", message, err);
         setError(`Kundendaten konnten nicht geladen werden: ${message}`);
         setCustomers([]);
       } finally {
@@ -149,13 +135,14 @@ const UserManagement: React.FC = () => {
     }
 
     const totalRevenue = customers.reduce(
-      (sum, c) => sum + parseFloat(c.total_spent || "0"),
+      (sum, c) => sum + parseAmount(c.total_spent),
       0
     );
-    const avgOrderValue = totalRevenue / customers.length;
+    const totalOrders = customers.reduce((sum, c) => sum + (c.orders_count || 0), 0);
+    const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
     const activeCount = customers.filter((c) => c.status === "aktiv").length;
     const topCustomer = customers.reduce((max, c) =>
-      parseFloat(c.total_spent || "0") > parseFloat(max.total_spent || "0")
+      parseAmount(c.total_spent) > parseAmount(max.total_spent)
         ? c
         : max
     );
@@ -174,9 +161,7 @@ const UserManagement: React.FC = () => {
     result.sort((a, b) => {
       if (sortBy === "name") return a.name.localeCompare(b.name);
       if (sortBy === "revenue")
-        return (
-          parseFloat(b.total_spent || "0") - parseFloat(a.total_spent || "0")
-        );
+        return parseAmount(b.total_spent) - parseAmount(a.total_spent);
       if (sortBy === "date")
         return (
           new Date(b.date_created).getTime() -
@@ -184,11 +169,6 @@ const UserManagement: React.FC = () => {
         );
       return 0;
     });
-
-    console.log(
-      `📊 filteredCustomers: ${result.length} (von ${customers.length} Kunden)`
-    );
-    console.log(`📊 searchTerm: "${searchTerm}", sortBy: "${sortBy}"`);
 
     return result;
   }, [customers, searchTerm, sortBy]);
@@ -412,7 +392,7 @@ const UserManagement: React.FC = () => {
                     <td>{customer.name}</td>
                     <td style={{ color: "var(--text-secondary)" }}>{customer.email}</td>
                     <td style={{ fontWeight: 600, color: "var(--color-success)" }}>
-                      {parseFloat(customer.total_spent || "0").toFixed(2)} €
+                      {parseAmount(customer.total_spent).toFixed(2)} €
                     </td>
                     <td>{customer.orders_count}</td>
                     <td style={{ color: "var(--text-secondary)" }}>
@@ -486,7 +466,7 @@ const UserManagement: React.FC = () => {
                   💰 Gesamtumsatz
                 </div>
                 <div className="user-info-value" style={{ color: "#34c759" }}>
-                  {parseFloat(selectedUser.total_spent || "0").toFixed(2)} €
+                  {parseAmount(selectedUser.total_spent).toFixed(2)} €
                 </div>
               </div>
               <div className="user-info-field">
