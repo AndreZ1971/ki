@@ -62,8 +62,8 @@ const MLDashboard: React.FC = () => {
 
       // Bis echte Verlaufsdaten verfügbar sind, zeigen wir keine Dummy-Historie
       setPredictionHistory([]);
-    } catch (error) {
-    } finally {
+    } catch (_error) {
+      // Silent fail - no history available finally {
       setLoading(false);
     }
   };

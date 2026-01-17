@@ -65,7 +65,7 @@ const KiteTemplates: React.FC = () => {
       } else {
         throw new Error(data.error || 'Fehler beim Laden des Templates');
       }
-    } catch (err) {
+    } catch {
       const errorMessage = err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten';
       setError(errorMessage);
       showToast(errorMessage, 'error');
@@ -92,8 +92,8 @@ const KiteTemplates: React.FC = () => {
         setEngagementScore(data.prediction.engagementScore);
         setEngagementConfidence(data.prediction.confidence);
       }
-    } catch (_err) {
-
+        } catch {
+      // Prediction failed - silent
     }
   };
 
@@ -114,8 +114,8 @@ const KiteTemplates: React.FC = () => {
       if (data.success && data.forecast) {
         setPerformanceForecast(data.forecast);
       }
-    } catch (_err) {
-
+        } catch {
+      // Prediction failed - silent
     }
   };
 
@@ -144,7 +144,7 @@ const KiteTemplates: React.FC = () => {
           content: data.optimized.optimized_copy || selectedTemplate.content
         });
       }
-    } catch (_err) {
+    } catch {
       showToast('Optimierung fehlgeschlagen', 'error');
     } finally {
       setOptimizing(false);
@@ -177,7 +177,7 @@ const KiteTemplates: React.FC = () => {
           'success'
         );
       }
-    } catch (_err) {
+    } catch {
       showToast('Empfehlung fehlgeschlagen', 'error');
     }
   };

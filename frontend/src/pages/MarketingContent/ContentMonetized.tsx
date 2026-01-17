@@ -47,7 +47,8 @@ const ContentMonetized: React.FC = () => {
         if (forecastData.success) {
           setForecast({ week: forecastData.data.forecastWeek, month: forecastData.data.forecastMonth, avgDay: forecastData.data.avgDay });
         }
-      } catch (err) {
+      } catch (_err) {
+        // Silent fail - no forecast
       }
     };
     

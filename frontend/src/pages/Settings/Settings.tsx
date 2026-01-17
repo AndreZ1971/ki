@@ -345,7 +345,8 @@ const Settings = () => {
       if (data.success) {
         setLoopSchedules(data.schedules);
       }
-    } catch (error) {
+        } catch {
+      // Silent failure
     }
   };
 
@@ -379,7 +380,7 @@ const Settings = () => {
         setConnectionStatus("success");
         setEditingLoop(null);
       }
-    } catch (error) {
+    } catch {
       setConnectionMessage(t("settings.schedule.saveError"));
       setConnectionStatus("error");
     } finally {
@@ -481,7 +482,7 @@ const Settings = () => {
         };
         setCredentials({ ...defaultCredentials, ...mapped });
         setConnectionMessage(t("settings.connection.importSuccess"));
-      } catch (_err) {
+      } catch {
         setConnectionMessage(t("settings.connection.importError"));
       }
     };
@@ -691,7 +692,7 @@ const Settings = () => {
           ...data.credentials,
         }));
       }
-    } catch (error) {
+    } catch {
       setConnectionMessage(
         "ℹ️ Ihr Agent ist noch nicht konfiguriert. Bitte füllen Sie alle Pflichtfelder aus, um die Verbindung herzustellen."
       );
@@ -710,7 +711,8 @@ const Settings = () => {
       if (data.success && data.specializations) {
         setPurchasedSpecializations(data.specializations);
       }
-    } catch (error) {
+        } catch {
+      // Silent failure
     }
   };
 
@@ -731,7 +733,8 @@ const Settings = () => {
 
       // Reload list to update active state
       await loadPurchasedSpecializations();
-    } catch (error) {
+        } catch {
+      // Silent failure
     }
   };
 
@@ -779,7 +782,7 @@ const Settings = () => {
 
       try {
         specialization = JSON.parse(fileContent);
-      } catch (_error) {
+      } catch {
         setConnectionMessage(t("error.specializationFormatInvalid"));
         setTestingConnection(false);
         return;
@@ -839,7 +842,7 @@ const Settings = () => {
       setTimeout(() => {
         window.location.reload();
       }, 2000);
-    } catch (error) {
+    } catch {
       const errorMessage =
         error instanceof Error ? error.message : "Unbekannter Fehler";
       setConnectionMessage(`❌ Fehler: ${errorMessage}`);
@@ -877,7 +880,7 @@ const Settings = () => {
         setConnectionStatus("error");
         setConnectionMessage(data.message || "Verbindungstest fehlgeschlagen");
       }
-    } catch (error) {
+    } catch {
       setConnectionStatus("error");
       setConnectionMessage(t("error.connectionBackendError"));
     } finally {
@@ -974,7 +977,7 @@ const Settings = () => {
       } else {
         throw new Error("Speichern fehlgeschlagen");
       }
-    } catch (error) {
+    } catch {
       setConnectionStatus("error");
       setConnectionMessage("❌ Fehler beim Speichern der Konfiguration");
     } finally {

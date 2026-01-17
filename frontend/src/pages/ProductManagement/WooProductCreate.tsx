@@ -36,8 +36,9 @@ const WooProductCreate = () => {
         if (response.success && response.data) {
           setCategories(response.data);
         }
-      } catch (err) {
-      }
+          } catch {
+      // Load failed - silent
+    }
     };
     loadCategories();
   }, []);
@@ -229,7 +230,7 @@ const WooProductCreate = () => {
       } else {
         throw new Error(response.error || 'Fehler beim Erstellen');
       }
-    } catch (err) {
+    } catch {
       const errorMessage = err instanceof Error ? err.message : 'Unbekannter Fehler';
       setError(errorMessage);
       toast.error(errorMessage);

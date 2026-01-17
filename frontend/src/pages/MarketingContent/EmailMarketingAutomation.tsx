@@ -68,7 +68,7 @@ const EmailMarketingAutomation: React.FC = () => {
           { value: 'active', label: 'Aktive Kunden', icon: '⭐', count: seg.active.toString() },
           { value: 'inactive', label: 'Inaktive Kunden', icon: '😴', count: seg.inactive.toString() }
         ]);
-      } catch (err) {
+      } catch {
         setSegments([
           { value: 'all', label: 'Alle Kunden', icon: '👥', count: '0' },
           { value: 'new', label: 'Neue Kunden', icon: '🆕', count: '0' },
@@ -133,7 +133,7 @@ const EmailMarketingAutomation: React.FC = () => {
       } else {
         throw new Error(data.error || 'Fehler beim Senden der E-Mails');
       }
-    } catch (err) {
+    } catch {
       const errorMessage = err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten';
       setError(errorMessage);
       showToast(errorMessage, 'error');
@@ -183,7 +183,7 @@ const EmailMarketingAutomation: React.FC = () => {
       }
 
       showToast('KI-Kampagne generiert', 'success');
-    } catch (err) {
+    } catch {
       const errorMessage = err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten';
       setError(errorMessage);
       showToast(errorMessage, 'error');

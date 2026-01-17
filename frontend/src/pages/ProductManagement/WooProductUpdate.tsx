@@ -70,9 +70,8 @@ const WooProductUpdate = () => {
         if (data.success && data.data) {
           setProducts(data.data);
           setSelectedProducts(data.data.map((p: ProductItem) => p.id));
-        } else {
         }
-      } catch (err) {
+      } catch {
         toast.error('Fehler beim Laden der Produkte');
       } finally {
         setLoadingProducts(false);
@@ -126,7 +125,7 @@ const WooProductUpdate = () => {
       } else {
         toast.error('Trend-Analyse fehlgeschlagen');
       }
-    } catch (_error) {
+    } catch {
       toast.error('Fehler bei Trend-Analyse');
     } finally {
       setAiLoading(false);
@@ -149,7 +148,7 @@ const WooProductUpdate = () => {
       } else {
         toast.error('Reddit-Analyse fehlgeschlagen');
       }
-    } catch (_error) {
+    } catch {
       toast.error('Fehler bei Reddit-Analyse');
     } finally {
       setAiLoading(false);
@@ -192,7 +191,7 @@ const WooProductUpdate = () => {
       } else {
         toast.error('Beschreibungs-Optimierung fehlgeschlagen');
       }
-    } catch (_error) {
+    } catch {
       toast.error('Fehler bei Beschreibungs-Optimierung');
     } finally {
       setAiLoading(false);
@@ -241,7 +240,7 @@ const WooProductUpdate = () => {
           try {
             await apiClient.put(`/api/products/woo/update-single/${productId}`, updatePayload);
             successCount++;
-          } catch (error) {
+          } catch {
             errorCount++;
 
           }
@@ -270,7 +269,7 @@ const WooProductUpdate = () => {
         }
       }
       
-    } catch (err) {
+    } catch {
       const errorMessage = err instanceof Error ? err.message : 'Unbekannter Fehler';
       setError(errorMessage);
       toast.error(errorMessage);
@@ -678,7 +677,7 @@ const WooProductUpdate = () => {
                                     });
                                     toast.success(`✅ Preis für "${product.name}" auf €${trend.suggestedPrice} aktualisiert!`);
                                     await loadProducts();
-                                  } catch (_error) {
+                                  } catch {
                                     toast.error('Fehler beim Aktualisieren');
                                   }
                                 }}

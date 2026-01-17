@@ -187,7 +187,7 @@ const RunTrendAnalysis = () => {
         // Simuliere die Analyse für Demo
         simulateProgress();
       }
-    } catch (err) {
+    } catch (_err) {
       setResult({
         status: "error",
         progress: 0,

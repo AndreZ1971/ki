@@ -49,7 +49,8 @@ const RunCreateFreebies = () => {
       if (data.success && data.data) {
         setRecentFreebies(data.data.slice(0, 5)); // Nur die letzten 5
       }
-    } catch (err) {
+        } catch {
+      // Load failed - silent
     }
   };
 
@@ -78,7 +79,7 @@ const RunCreateFreebies = () => {
           response.error || "KI-Ideen konnten nicht geladen werden"
         );
       }
-    } catch (err) {
+    } catch {
       const errorMessage =
         err instanceof Error ? err.message : "Unbekannter Fehler";
       toast.error(errorMessage);
@@ -113,7 +114,7 @@ const RunCreateFreebies = () => {
       setLastCreated(payload);
       toast.success(`Freebie "${response.data.name}" erfolgreich erstellt!`);
       await loadFreebies();
-    } catch (err) {
+    } catch {
       const errorMessage =
         err instanceof Error ? err.message : "Unbekannter Fehler";
       toast.error(errorMessage);
@@ -144,7 +145,7 @@ const RunCreateFreebies = () => {
         : selectedIdea || sourceIdeas[0];
 
       await handleCreateFromIdea(best);
-    } catch (err) {
+    } catch {
       const errorMessage =
         err instanceof Error ? err.message : "Unbekannter Fehler";
       toast.error(errorMessage);

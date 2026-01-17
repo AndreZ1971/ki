@@ -77,7 +77,8 @@ const RunAutoProductCreator = () => {
     try {
       const data = await apiClient.get(`/api/trends/trending-keywords?category=${selectedCategory}`);
       setTrendingKeywords(data.keywords || []);
-    } catch (err) {
+        } catch {
+      // Load failed - silent
     } finally {
       setLoadingKeywords(false);
     }
@@ -169,7 +170,7 @@ const RunAutoProductCreator = () => {
       setProgress(100);
       setCurrentStatus('✨ Fertig!');
       toast.success(resultData.message || 'Produkte erfolgreich erstellt!');
-    } catch (err) {
+    } catch {
       const errorMessage = err instanceof Error ? err.message : 'Unbekannter Fehler';
       setResult({ success: false, message: errorMessage });
       toast.error(errorMessage);

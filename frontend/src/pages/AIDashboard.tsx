@@ -106,7 +106,7 @@ const AIDashboard: React.FC = () => {
             { day: "So", sales: 1700 },
           ]);
         }
-      } catch (err) {
+      } catch (_err) {
 
         // Bei Background-Updates keinen Error anzeigen
         if (isInitialLoad) {

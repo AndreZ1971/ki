@@ -109,7 +109,7 @@ const AIEmailGenerator: React.FC = () => {
       } else {
         setApiStatus('disconnected');
       }
-    } catch (_error) {
+    } catch {
       setApiStatus('disconnected');
     }
   };
@@ -134,7 +134,7 @@ const AIEmailGenerator: React.FC = () => {
         // Fallback zu Mock-Daten
         setCustomers(mockCustomers);
       }
-    } catch (_error) {
+    } catch {
       setCustomers(mockCustomers);
     }
   };
@@ -149,8 +149,8 @@ const AIEmailGenerator: React.FC = () => {
         setSubscribers(result.data);
 
       }
-    } catch (error) {
-
+        } catch {
+      // Silent - continue
     }
   };
 
@@ -163,8 +163,8 @@ const AIEmailGenerator: React.FC = () => {
         { id: 4, name: 'Support Response Standard', type: 'support-response', data: {} }
       ];
       setSavedTemplates(mockTemplates);
-    } catch (error) {
-
+        } catch {
+      // Silent - continue
     }
   };
 
@@ -201,7 +201,7 @@ const AIEmailGenerator: React.FC = () => {
       setEmailData(result);
       setIsPreviewModalOpen(true); // 🔥 MODAL ÖFFNEN
       showToast('Email erfolgreich generiert!', 'success');
-    } catch (error) {
+    } catch {
 
       showToast(t('email.errors.generationFailed'), 'error');
     } finally {
@@ -308,7 +308,7 @@ const AIEmailGenerator: React.FC = () => {
       setSavedTemplates(prev => [...prev, newTemplate]);
       setFormData(prev => ({ ...prev, templateName: '' }));
       showToast('Template erfolgreich gespeichert!', 'success');
-    } catch (error) {
+    } catch {
 
       showToast('Fehler beim Speichern des Templates', 'error');
     }
@@ -348,7 +348,7 @@ const AIEmailGenerator: React.FC = () => {
       } else {
         throw new Error(result.error);
       }
-    } catch (error: any) {
+    } catch {
       showToast('Fehler beim Generieren der Subject Lines', 'error');
 
     } finally {
@@ -378,7 +378,7 @@ const AIEmailGenerator: React.FC = () => {
       } else {
         throw new Error(result.error);
       }
-    } catch (error: any) {
+    } catch {
       showToast('Fehler beim Segmentieren', 'error');
 
     } finally {
@@ -409,7 +409,7 @@ const AIEmailGenerator: React.FC = () => {
       } else {
         throw new Error(result.error);
       }
-    } catch (error: any) {
+    } catch {
       showToast('Fehler beim Optimieren der Versandzeit', 'error');
 
     } finally {
@@ -444,7 +444,7 @@ const AIEmailGenerator: React.FC = () => {
       } else {
         throw new Error(result.error);
       }
-    } catch (error: any) {
+    } catch {
       showToast('Fehler bei der Performance-Prognose', 'error');
 
     } finally {

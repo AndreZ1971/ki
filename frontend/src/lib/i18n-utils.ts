@@ -59,7 +59,7 @@ export const formatDateTime = (
       ...(options || {}),
     };
     return new Intl.DateTimeFormat(getLocale(), fmtOptions).format(date);
-  } catch (error) {
+  } catch {
 
     return 'Unbekannt';
   }

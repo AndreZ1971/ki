@@ -46,8 +46,9 @@ const AutoProductCreator = () => {
         if (response.success && response.data) {
           setCategories(response.data);
         }
-      } catch (err) {
-      }
+          } catch {
+      // Load failed - silent
+    }
     };
     loadCategories();
   }, []);
@@ -68,7 +69,7 @@ const AutoProductCreator = () => {
       } else {
         throw new Error(response.error || "Fehler bei der Produkterstellung");
       }
-    } catch (err) {
+    } catch {
       const errorMessage =
         err instanceof Error ? err.message : "Unbekannter Fehler";
       setError(errorMessage);

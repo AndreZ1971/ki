@@ -119,9 +119,9 @@ const FreeToPostConverter: React.FC = () => {
         if (data.success) setMlSegments(data.data.segments);
       } catch (err) {
         if (err instanceof Error && err.name === "AbortError") {
-
+          // Timeout - expected
         } else {
-
+          // Load failed - silent
         }
       }
     };

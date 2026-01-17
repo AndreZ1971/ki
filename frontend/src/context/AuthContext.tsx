@@ -76,27 +76,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const login = async (username: string, password: string) => {
-      const { buildApiUrl } = await import('../lib/api-client');
-      const response = await fetch(buildApiUrl('/api/auth/login'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
+    const { buildApiUrl } = await import('../lib/api-client');
+    const response = await fetch(buildApiUrl('/api/auth/login'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username, password }),
+    });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Login failed');
-      }
-
-      const data = await response.json();
-      localStorage.setItem('authToken', data.token);
-      setUser(data.user);
-    } catch (error) {
-
-      throw error;
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Login failed');
     }
+
+    const data = await response.json();
+    localStorage.setItem('authToken', data.token);
+    setUser(data.user);
   };
 
   const logout = () => {
