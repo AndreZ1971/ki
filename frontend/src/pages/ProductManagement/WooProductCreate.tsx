@@ -37,7 +37,6 @@ const WooProductCreate = () => {
           setCategories(response.data);
         }
       } catch (err) {
-        console.error('Failed to load categories:', err);
       }
     };
     loadCategories();

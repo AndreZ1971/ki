@@ -57,11 +57,11 @@ export const useWooCommerce = () => {
     } catch (err) {
       const error = err as Error;
       setError(error);
-      console.error('Failed to fetch shop metrics:', error);
+
       
       // Fallback mock data for development
       if (import.meta.env.DEV) {
-        console.warn('Using mock data for development');
+
         setMetrics({
           totalSales: 12450.75,
           todaySales: 1247.50,

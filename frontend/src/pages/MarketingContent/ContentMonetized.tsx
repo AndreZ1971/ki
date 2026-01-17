@@ -48,7 +48,6 @@ const ContentMonetized: React.FC = () => {
           setForecast({ week: forecastData.data.forecastWeek, month: forecastData.data.forecastMonth, avgDay: forecastData.data.avgDay });
         }
       } catch (err) {
-        console.error('Fehler beim Laden der Revenue-Daten:', err);
       }
     };
     

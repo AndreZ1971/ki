@@ -68,8 +68,8 @@ const RunTrendAnalysis = () => {
           );
           setAnalysisHistory(mappedHistory);
         }
-      } catch (error) {
-        console.error("Failed to load analysis history:", error);
+      } catch (_error) {
+    
         // Fallback to empty array on error
         setAnalysisHistory([]);
       }
@@ -188,7 +188,6 @@ const RunTrendAnalysis = () => {
         simulateProgress();
       }
     } catch (err) {
-      console.error("Analyse-Fehler:", err);
       setResult({
         status: "error",
         progress: 0,

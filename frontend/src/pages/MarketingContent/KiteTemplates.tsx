@@ -93,7 +93,7 @@ const KiteTemplates: React.FC = () => {
         setEngagementConfidence(data.prediction.confidence);
       }
     } catch (_err) {
-      console.error('Engagement-Vorhersage fehlgeschlagen:', _err);
+
     }
   };
 
@@ -115,7 +115,7 @@ const KiteTemplates: React.FC = () => {
         setPerformanceForecast(data.forecast);
       }
     } catch (_err) {
-      console.error('Performance-Vorhersage fehlgeschlagen:', _err);
+
     }
   };
 

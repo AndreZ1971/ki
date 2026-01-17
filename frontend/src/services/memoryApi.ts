@@ -42,7 +42,6 @@ async function apiRequest<T>(
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error(`API Error [${endpoint}]:`, error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unbekannter Fehler",

@@ -78,7 +78,6 @@ const RunAutoProductCreator = () => {
       const data = await apiClient.get(`/api/trends/trending-keywords?category=${selectedCategory}`);
       setTrendingKeywords(data.keywords || []);
     } catch (err) {
-      console.error('Fehler beim Laden von Trending Keywords:', err);
     } finally {
       setLoadingKeywords(false);
     }

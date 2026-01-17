@@ -138,7 +138,7 @@ const SocialMediaPoster: React.FC = () => {
           });
         }
       })
-      .catch(err => console.error('Status check failed:', err));
+      .catch(() => {});
   }, [apiBase]);
 
   // Sync tile contents whenever new posts are generated

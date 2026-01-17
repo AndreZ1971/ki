@@ -335,17 +335,16 @@ const ShopHealthReport = () => {
   };
 
   // Notification-Funktionen
-  const showSuccessNotification = (message: string) => {
-    console.log("✅ " + message);
+  const showSuccessNotification = (_message: string) => {
     // Optional: Hier könnten Sie ein Toast-System einbinden
   };
 
-  const showErrorNotification = (message: string) => {
-    console.error("❌ " + message);
+  const showErrorNotification = (_message: string) => {
+    // Error notification
   };
 
-  const showCriticalAlert = (data: { title: string; message: string }) => {
-    console.warn(`🚨 ${data.title}: ${data.message}`);
+  const showCriticalAlert = (_data: { title: string; message: string }) => {
+    // Critical alert
   };
 
   // Funktionen für Schnellaktionen - MIT FUNKTIONIERENDEN API CALLS
@@ -412,7 +411,7 @@ const ShopHealthReport = () => {
       );
     } catch (error: any) {
       // Fehlerbehandlung
-      console.error("Aktion fehlgeschlagen:", error);
+
       setQuickActions((prev) =>
         prev.map((action) =>
           action.id === actionId ? { ...action, loading: false } : action

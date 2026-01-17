@@ -49,12 +49,8 @@ const ShopMetrics: React.FC = () => {
       const apiUrl = base
         ? `${base}/api/analytics/metrics/dashboard`
         : `/api/analytics/metrics/dashboard`;
-      if (apiUrl.includes(":3000")) {
-        console.warn(
-          "Warnung: API-URL enthält Port 3000. Bei HTTPS/Proxy sollte die URL ohne Port sein!"
-        );
-      }
-      console.log("ShopMetrics API-URL:", apiUrl);
+
+
       const response = await fetch(apiUrl);
       const data = await response.json();
       if (data.success) {

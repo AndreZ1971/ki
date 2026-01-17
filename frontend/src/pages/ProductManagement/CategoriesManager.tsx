@@ -22,14 +22,12 @@ const CategoriesManager = () => {
   const loadCategories = async () => {
     try {
       setInitialLoading(true);
-      console.log('🔍 Starting to load categories...');
       
       if (!categoryApi || !categoryApi.getCategories) {
         throw new Error('Category API is not available');
       }
       
       const response = await categoryApi.getCategories();
-      console.log('📦 API Response:', response);
       
       if (response.success && response.data) {
         setCategories(response.data);
@@ -40,7 +38,6 @@ const CategoriesManager = () => {
         throw new Error(response.error || 'Kategorien konnten nicht geladen werden');
       }
     } catch (err) {
-      console.error('❌ Load Categories Error:', err);
       const errorMessage = err instanceof Error ? err.message : 'Fehler beim Laden der Kategorien';
       if (setError) setError(errorMessage);
       if (toast && toast.error) toast.error(errorMessage);

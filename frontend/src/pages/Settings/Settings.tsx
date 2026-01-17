@@ -346,7 +346,6 @@ const Settings = () => {
         setLoopSchedules(data.schedules);
       }
     } catch (error) {
-      console.error("Failed to load loop schedules:", error);
     }
   };
 
@@ -381,7 +380,6 @@ const Settings = () => {
         setEditingLoop(null);
       }
     } catch (error) {
-      console.error("Failed to save schedule:", error);
       setConnectionMessage(t("settings.schedule.saveError"));
       setConnectionStatus("error");
     } finally {
@@ -694,7 +692,6 @@ const Settings = () => {
         }));
       }
     } catch (error) {
-      console.warn("Hinweis: Einstellungen noch nicht ausgefüllt.", error);
       setConnectionMessage(
         "ℹ️ Ihr Agent ist noch nicht konfiguriert. Bitte füllen Sie alle Pflichtfelder aus, um die Verbindung herzustellen."
       );
@@ -714,7 +711,6 @@ const Settings = () => {
         setPurchasedSpecializations(data.specializations);
       }
     } catch (error) {
-      console.warn("Konnte gekaufte Spezialisierungen nicht laden:", error);
     }
   };
 
@@ -730,14 +726,12 @@ const Settings = () => {
       );
       
       if (!response.ok) {
-        console.error("Aktivierung fehlgeschlagen");
         return;
       }
 
       // Reload list to update active state
       await loadPurchasedSpecializations();
     } catch (error) {
-      console.error("Fehler beim Aktivieren:", error);
     }
   };
 
@@ -827,12 +821,6 @@ const Settings = () => {
 
       if (!response.ok) {
         const errorDetails = responseData.error || responseData.message || `Status: ${response.status}`;
-        console.error("❌ Backend-Fehler:", {
-          status: response.status,
-          error: responseData.error,
-          message: responseData.message,
-          code: responseData.code,
-        });
         throw new Error(
           `Upload fehlgeschlagen: ${errorDetails}`
         );
@@ -854,7 +842,6 @@ const Settings = () => {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unbekannter Fehler";
-      console.error("❌ Spezialisierungs-Upload Fehler:", errorMessage);
       setConnectionMessage(`❌ Fehler: ${errorMessage}`);
       setConnectionStatus("error");
     } finally {
@@ -890,12 +877,9 @@ const Settings = () => {
         setConnectionStatus("error");
         setConnectionMessage(data.message || "Verbindungstest fehlgeschlagen");
       }
-
-      console.log("🔍 Verbindungstest:", data);
     } catch (error) {
       setConnectionStatus("error");
       setConnectionMessage(t("error.connectionBackendError"));
-      console.error("❌ Verbindungsfehler:", error);
     } finally {
       setTestingConnection(false);
     }
@@ -983,7 +967,6 @@ const Settings = () => {
       if (data.success) {
         setConnectionStatus("success");
         setConnectionMessage("✅ Konfiguration erfolgreich gespeichert!");
-        console.log("✅ Konfiguration gespeichert");
         setTimeout(() => {
           setConnectionMessage("");
           setConnectionStatus("idle");
@@ -994,7 +977,6 @@ const Settings = () => {
     } catch (error) {
       setConnectionStatus("error");
       setConnectionMessage("❌ Fehler beim Speichern der Konfiguration");
-      console.error("❌ Fehler beim Speichern:", error);
     } finally {
       setSaving(false);
     }
@@ -1009,7 +991,6 @@ const Settings = () => {
   };
 
   const _purchaseSpecialization = (spec: Specialization) => {
-    console.log("🛒 Kaufe Spezialisierung:", spec.name);
     alert(`🛒 Weiterleitung zum Kauf: ${spec.name} (${spec.price}€)`);
   };
 

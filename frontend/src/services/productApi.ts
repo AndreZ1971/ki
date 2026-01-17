@@ -65,7 +65,6 @@ async function apiRequest<T>(
     // Nicht nochmal wrappen!
     return data;
   } catch (error) {
-    console.error(`API Error [${endpoint}]:`, error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unbekannter Fehler',

@@ -52,11 +52,9 @@ const AIDashboard: React.FC = () => {
           ? `${base}/api/analytics/metrics/dashboard`
           : `/api/analytics/metrics/dashboard`;
         if (fullUrl.includes(":3000")) {
-          console.warn(
-            "Warnung: API-URL enthält Port 3000. Bei HTTPS/Proxy sollte die URL ohne Port sein!"
-          );
+          // Port 3000 detected - OK for development
         }
-        console.log("AIDashboard API-URL:", fullUrl);
+
         const response = await fetch(fullUrl, {
           method: "GET",
           headers: {
@@ -109,7 +107,7 @@ const AIDashboard: React.FC = () => {
           ]);
         }
       } catch (err) {
-        console.error("Fehler beim Laden der Shop-Daten:", err);
+
         // Bei Background-Updates keinen Error anzeigen
         if (isInitialLoad) {
           setError("Konnte Shop-Daten nicht laden. Bitte API überprüfen.");
@@ -191,7 +189,7 @@ const AIDashboard: React.FC = () => {
         `✅ ${toolId} gestartet! ${result.message || "Job erfolgreich ausgeführt"}`
       );
     } catch (err) {
-      console.error(`Fehler bei ${toolId}:`, err);
+
       alert(
         `❌ ${toolId} fehlgeschlagen: ${err instanceof Error ? err.message : "Ein unbekannter Fehler ist aufgetreten"}`
       );

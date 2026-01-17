@@ -72,7 +72,7 @@ const RealAnalytics = () => {
         lastUpdated: data.data.lastUpdated || new Date().toISOString(),
       });
     } catch (error: any) {
-      console.error("Keine Live-Daten verfügbar:", error);
+
       setDataError(
         error?.message || "Echtzeit-Daten konnten nicht geladen werden"
       );

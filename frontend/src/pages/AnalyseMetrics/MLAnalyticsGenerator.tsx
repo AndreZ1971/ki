@@ -40,7 +40,7 @@ export const MLAnalyticsGenerator: React.FC<MLAnalyticsGeneratorProps> = ({
       });
       const data = await res.json();
 
-      console.log("API Response:", data);
+
 
       if (data.success && data.insights) {
         setInsights(data.insights);
@@ -51,7 +51,7 @@ export const MLAnalyticsGenerator: React.FC<MLAnalyticsGeneratorProps> = ({
         setError(data.error || t("ml.analyticsGenerator.error"));
       }
     } catch (err: any) {
-      console.error("Fetch Error:", err);
+
       setError(err.message || t("ml.analyticsGenerator.error"));
     } finally {
       setLoading(false);

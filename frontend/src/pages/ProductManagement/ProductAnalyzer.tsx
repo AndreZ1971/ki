@@ -39,9 +39,7 @@ const ProductAnalyzer: React.FC = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        console.log('📥 Lade Produkte von:', `${apiBase}/api/products/woo/products?per_page=100`);
         const data = await apiClient.get(`${apiBase}/api/products/woo/products?per_page=100`);
-        console.log('📋 Response Data:', data);
         
         // Handle both response formats
         let productsArray = null;
@@ -70,9 +68,8 @@ const ProductAnalyzer: React.FC = () => {
         if (mapped.length > 0) {
           setSelectedProductId(mapped[0].id);
         }
-        console.log('✅ Produkte geladen:', mapped.length);
+
       } catch (err) {
-        console.error('❌ Fehler beim Laden der Produkte:', err);
         setProducts([]);
         setAnalysisError(err instanceof Error ? err.message : 'Produkte konnten nicht geladen werden');
       } finally {

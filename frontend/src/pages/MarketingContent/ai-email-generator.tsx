@@ -128,14 +128,13 @@ const AIEmailGenerator: React.FC = () => {
           email: customer.email
         }));
         setCustomers(transformedCustomers);
-        console.log('✅ Echte Kundendaten geladen:', transformedCustomers.length);
+
       } else {
-        console.error('Fehler beim Laden der Kunden:', result.error);
+
         // Fallback zu Mock-Daten
         setCustomers(mockCustomers);
       }
-    } catch (error) {
-      console.error('Fehler beim Laden der Kunden:', error);
+    } catch (_error) {
       setCustomers(mockCustomers);
     }
   };
@@ -148,10 +147,10 @@ const AIEmailGenerator: React.FC = () => {
       
       if (result.success) {
         setSubscribers(result.data);
-        console.log('✅ Abonnenten-Daten geladen:', result.data.length);
+
       }
     } catch (error) {
-      console.error('Fehler beim Laden der Abonnenten:', error);
+
     }
   };
 
@@ -165,7 +164,7 @@ const AIEmailGenerator: React.FC = () => {
       ];
       setSavedTemplates(mockTemplates);
     } catch (error) {
-      console.error('Fehler beim Laden der Templates:', error);
+
     }
   };
 
@@ -203,7 +202,7 @@ const AIEmailGenerator: React.FC = () => {
       setIsPreviewModalOpen(true); // 🔥 MODAL ÖFFNEN
       showToast('Email erfolgreich generiert!', 'success');
     } catch (error) {
-      console.error('Email generation failed:', error);
+
       showToast(t('email.errors.generationFailed'), 'error');
     } finally {
       setLoading(false);
@@ -227,24 +226,23 @@ const AIEmailGenerator: React.FC = () => {
         emailType: formData.emailType
       });
       
-      console.log('📧 Email Send Result:', result);
+
       
       if (result.success) {
         const { sent, failed, failed_emails } = result.data || {};
         
         // Prüfe ob ALLE Mails fehlgeschlagen sind
         if (failed > 0 && sent === 0) {
-          console.error('❌ Alle Emails fehlgeschlagen:');
-          console.table(failed_emails); // Zeige Details in Tabelle
-          failed_emails?.forEach((fail: any) => {
-            console.error(`  ❌ ${fail.email}: ${fail.error}`);
+ // Zeige Details in Tabelle
+          failed_emails?.forEach((_fail: any) => {
+
           });
           const firstError = failed_emails?.[0]?.error || 'Unbekannter SMTP-Fehler';
           showToast(`Alle ${failed} Emails fehlgeschlagen: ${firstError}`, 'error');
         } 
         // Teilerfolg
         else if (failed > 0) {
-          console.warn(`⚠️ ${sent} erfolgreich, ${failed} fehlgeschlagen:`, failed_emails);
+
           showToast(`⚠️ ${sent} erfolgreich, ${failed} fehlgeschlagen. Details in der Console.`, 'warning');
         } 
         // Voller Erfolg
@@ -259,7 +257,6 @@ const AIEmailGenerator: React.FC = () => {
       }
       
     } catch (error: any) {
-      console.error('Email sending failed:', error);
       
       // 🔥 Verbesserte Fehlerbehandlung
       const errorMessage = error.message.toLowerCase();
@@ -312,7 +309,7 @@ const AIEmailGenerator: React.FC = () => {
       setFormData(prev => ({ ...prev, templateName: '' }));
       showToast('Template erfolgreich gespeichert!', 'success');
     } catch (error) {
-      console.error('Fehler beim Speichern:', error);
+
       showToast('Fehler beim Speichern des Templates', 'error');
     }
   };
@@ -353,7 +350,7 @@ const AIEmailGenerator: React.FC = () => {
       }
     } catch (error: any) {
       showToast('Fehler beim Generieren der Subject Lines', 'error');
-      console.error('Subject Lines Error:', error);
+
     } finally {
       setLoadingSubjectLines(false);
     }
@@ -383,7 +380,7 @@ const AIEmailGenerator: React.FC = () => {
       }
     } catch (error: any) {
       showToast('Fehler beim Segmentieren', 'error');
-      console.error('Segmentation Error:', error);
+
     } finally {
       setLoadingSegments(false);
     }
@@ -414,7 +411,7 @@ const AIEmailGenerator: React.FC = () => {
       }
     } catch (error: any) {
       showToast('Fehler beim Optimieren der Versandzeit', 'error');
-      console.error('SendTime Error:', error);
+
     } finally {
       setLoadingSendTimes(false);
     }
@@ -449,7 +446,7 @@ const AIEmailGenerator: React.FC = () => {
       }
     } catch (error: any) {
       showToast('Fehler bei der Performance-Prognose', 'error');
-      console.error('Forecast Error:', error);
+
     } finally {
       setLoadingForecast(false);
     }

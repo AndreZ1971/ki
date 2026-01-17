@@ -63,7 +63,6 @@ const MLDashboard: React.FC = () => {
       // Bis echte Verlaufsdaten verfügbar sind, zeigen wir keine Dummy-Historie
       setPredictionHistory([]);
     } catch (error) {
-      console.error('Failed to fetch ML data:', error);
     } finally {
       setLoading(false);
     }

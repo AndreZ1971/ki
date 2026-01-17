@@ -37,7 +37,7 @@ export const MLDashboardWidget: React.FC = () => {
         setMlStatus(data);
       } catch (_error) {
         setError('Fehler beim Laden des ML-Status. Bitte API prüfen.');
-        console.error('Failed to fetch ML status:', _error);
+  
       }
     }, [baseApi]);
   const [mlStatus, setMlStatus] = useState<MLStatus | null>(null);
@@ -58,7 +58,7 @@ export const MLDashboardWidget: React.FC = () => {
       setMlStats(data.data as MLStats);
     } catch (_error) {
       setError('Fehler beim Laden der ML-Statistiken.');
-      console.error('Failed to fetch ML stats:', _error);
+
     } finally {
       setLoading(false);
     }

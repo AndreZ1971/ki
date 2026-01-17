@@ -66,17 +66,13 @@ const WooProductUpdate = () => {
     const loadProducts = React.useCallback(async () => {
       try {
         setLoadingProducts(true);
-        console.log('[WooProductUpdate] Requesting products from /api/products/woo/list');
         const data = await apiClient.get('/api/products/woo/list');
-        console.log('[WooProductUpdate] Response:', data);
         if (data.success && data.data) {
           setProducts(data.data);
           setSelectedProducts(data.data.map((p: ProductItem) => p.id));
         } else {
-          console.warn('[WooProductUpdate] API returned no products or success=false:', data);
         }
       } catch (err) {
-        console.error('[WooProductUpdate] Failed to load products:', err);
         toast.error('Fehler beim Laden der Produkte');
       } finally {
         setLoadingProducts(false);
@@ -130,9 +126,8 @@ const WooProductUpdate = () => {
       } else {
         toast.error('Trend-Analyse fehlgeschlagen');
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Fehler bei Trend-Analyse');
-      console.error(error);
     } finally {
       setAiLoading(false);
     }
@@ -154,9 +149,8 @@ const WooProductUpdate = () => {
       } else {
         toast.error('Reddit-Analyse fehlgeschlagen');
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Fehler bei Reddit-Analyse');
-      console.error(error);
     } finally {
       setAiLoading(false);
     }
@@ -194,14 +188,12 @@ const WooProductUpdate = () => {
         } else {
           toast.success(`📝 Beschreibung optimiert! SEO-Score: ${result.data.seoScore}% (klicke "Updates starten" zum Übernehmen)`);
         }
-        
-        console.log('Optimierte Beschreibung:', result.data.optimizedDescription);
+
       } else {
         toast.error('Beschreibungs-Optimierung fehlgeschlagen');
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Fehler bei Beschreibungs-Optimierung');
-      console.error(error);
     } finally {
       setAiLoading(false);
     }
@@ -251,7 +243,7 @@ const WooProductUpdate = () => {
             successCount++;
           } catch (error) {
             errorCount++;
-            console.error(`Update failed for product ${productId}:`, error);
+
           }
         }
 

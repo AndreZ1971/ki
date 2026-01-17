@@ -69,7 +69,6 @@ const EmailMarketingAutomation: React.FC = () => {
           { value: 'inactive', label: 'Inaktive Kunden', icon: '😴', count: seg.inactive.toString() }
         ]);
       } catch (err) {
-        console.error('Fehler beim Laden der Kundensegmente:', err);
         setSegments([
           { value: 'all', label: 'Alle Kunden', icon: '👥', count: '0' },
           { value: 'new', label: 'Neue Kunden', icon: '🆕', count: '0' },

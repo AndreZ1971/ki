@@ -50,7 +50,6 @@ const RunCreateFreebies = () => {
         setRecentFreebies(data.data.slice(0, 5)); // Nur die letzten 5
       }
     } catch (err) {
-      console.error("Failed to load freebies:", err);
     }
   };
 

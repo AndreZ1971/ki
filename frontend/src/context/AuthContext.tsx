@@ -76,7 +76,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const login = async (username: string, password: string) => {
-    try {
       const { buildApiUrl } = await import('../lib/api-client');
       const response = await fetch(buildApiUrl('/api/auth/login'), {
         method: 'POST',
@@ -95,7 +94,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem('authToken', data.token);
       setUser(data.user);
     } catch (error) {
-      console.error('Login error:', error);
+
       throw error;
     }
   };

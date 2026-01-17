@@ -28,8 +28,7 @@ export function EmailGenerator() {
     try {
       const response = await aiApi.generateEmail(formData);
       setResult(response);
-    } catch (error) {
-      console.error('Error generating email:', error);
+    } catch (_error) {
       setResult({ error: 'Failed to generate email' });
     } finally {
       setLoading(false);
