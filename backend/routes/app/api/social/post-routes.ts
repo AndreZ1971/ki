@@ -476,17 +476,21 @@ export default async function postRoutes(fastify: FastifyInstance) {
         description: snippet.description?.substring(0, 100)
       }, 'Starting YouTube video upload');
 
+      // YouTube Data API v3 - Resumable Upload Init
+      // Only include essential fields to avoid "Invalid Argument" errors
       const initBody = {
         snippet,
         status: {
-          privacyStatus: 'public', // or 'private', 'unlisted'
-          selfDeclaredMadeForKids: false,
-          embeddable: true,
-          license: 'youtube' // Change from 'creativeCommon' to 'youtube'
+          privacyStatus: 'public' // Only required field for status
         }
       };
 
-      logger.info({ initBody: JSON.stringify(initBody).substring(0, 500) }, 'YouTube init request body');
+      logger.info({ 
+        title: snippet.title,
+        categoryId: snippet.categoryId,
+        tagsCount: snippet.tags?.length,
+        privacyStatus: initBody.status.privacyStatus
+      }, 'YouTube init request body');
 
       let initResponse = await fetch(initUrl, {
         method: 'POST',
