@@ -247,6 +247,8 @@
       "twitter": "Twitter/X",
       "twitterApiKey": "API Key:",
       "twitterApiSecret": "API Secret:",
+      "twitterAccessToken": "Access Token:",
+      "twitterAccessTokenSecret": "Access Token Secret:",
       "tiktok": "TikTok",
       "youtube": "YouTube",
       "youtubeChannelId": "Channel ID:",

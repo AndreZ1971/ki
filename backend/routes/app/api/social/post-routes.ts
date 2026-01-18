@@ -2,6 +2,8 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { getConfig } from '@config';
 import { logger } from '../../../../logger';
+import * as fs from 'fs';
+import * as path from 'path';
 
 interface PostRequest {
   platform: 'facebook' | 'instagram' | 'tiktok' | 'all';
@@ -11,6 +13,18 @@ interface PostRequest {
 }
 
 export default async function postRoutes(fastify: FastifyInstance) {
+
+  // Helper: Get socialMedia config from connection.json
+  const getSocialMediaConfig = () => {
+    try {
+      const configPath = path.resolve(__dirname, '../../../../../connection.json');
+      const configData = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+      return configData.socialMedia || {};
+    } catch (error) {
+      logger.error({ error }, 'Failed to read socialMedia config');
+      return {};
+    }
+  };
 
   // ==================== POST TO SOCIAL MEDIA ====================
   
@@ -67,12 +81,14 @@ export default async function postRoutes(fastify: FastifyInstance) {
   // ==================== FACEBOOK POSTING ====================
 
   async function postToFacebook(message: string, link?: string) {
-    const config = getConfig();
-    const pageId = config.webhooks?.facebookPageId || process.env.FACEBOOK_PAGE_ID;
-    const accessToken = config.webhooks?.facebookPageAccessToken || process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
+    const socialMedia = getSocialMediaConfig();
+    const facebookConfig = socialMedia.facebook;
+    
+    const pageId = facebookConfig?.pageId || process.env.FACEBOOK_PAGE_ID;
+    const accessToken = facebookConfig?.accessToken || process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
 
     if (!pageId || !accessToken) {
-      throw new Error('Facebook credentials nicht konfiguriert');
+      throw new Error('Facebook credentials nicht konfiguriert. Bitte fügen Sie den Access Token und die Page ID in den Einstellungen hinzu.');
     }
 
     const url = `https://graph.facebook.com/v18.0/${pageId}/feed`;
@@ -111,9 +127,11 @@ export default async function postRoutes(fastify: FastifyInstance) {
   // ==================== INSTAGRAM POSTING ====================
 
   async function postToInstagram(caption: string, imageUrl?: string, mediaType: string = 'image') {
-    const config = getConfig();
-    const igAccountId = config.webhooks?.instagramBusinessAccountId || process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID;
-    const accessToken = config.webhooks?.facebookPageAccessToken || process.env.FACEBOOK_PAGE_ACCESS_TOKEN; // Instagram uses Facebook token
+    const socialMedia = getSocialMediaConfig();
+    const instagramConfig = socialMedia.instagram;
+    
+    const igAccountId = instagramConfig?.businessAccountId || process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID;
+    const accessToken = instagramConfig?.accessToken || process.env.FACEBOOK_PAGE_ACCESS_TOKEN; // Instagram uses Facebook token
 
     if (!igAccountId || !accessToken) {
       throw new Error('Instagram credentials nicht konfiguriert');
@@ -183,7 +201,10 @@ export default async function postRoutes(fastify: FastifyInstance) {
   // ==================== TIKTOK POSTING ====================
 
   async function postToTikTok(caption: string, videoUrl?: string) {
-    const accessToken = getConfig().webhooks?.tiktokAccessToken || process.env.TIKTOK_ACCESS_TOKEN;
+    const socialMedia = getSocialMediaConfig();
+    const tiktokConfig = socialMedia.tiktok;
+    
+    const accessToken = tiktokConfig?.accessToken || process.env.TIKTOK_ACCESS_TOKEN;
 
     if (!accessToken) {
       throw new Error('TikTok credentials nicht konfiguriert');

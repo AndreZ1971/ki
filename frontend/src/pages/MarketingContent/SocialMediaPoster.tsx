@@ -193,17 +193,15 @@ const SocialMediaPoster: React.FC = () => {
     }
   };
 
-  const webhookConfig: Record<string, boolean> = {}; // Stub für Build-Kompatibilität
-
   const handlePublishPost = async (platform: string, content: string) => {
     try {
-      const supportedWebhookPlatforms = ['linkedin', 'facebook', 'tiktok'];
+      const supportedWebhookPlatforms = ['linkedin', 'facebook', 'tiktok', 'twitter'];
       if (!supportedWebhookPlatforms.includes(platform)) {
         showToast('Diese Plattform wird noch nicht unterstützt', 'error');
         return;
       }
-      if (!webhookConfig[platform]) {
-        showToast(`${platform.charAt(0).toUpperCase() + platform.slice(1)} ist nicht aktiviert. Siehe Bedienungsanleitung.`, 'error');
+      if (!connectedAccounts[platform as keyof typeof connectedAccounts]) {
+        showToast(`${platform.charAt(0).toUpperCase() + platform.slice(1)} ist nicht verbunden. Konfigurieren Sie die Credentials in den Einstellungen.`, 'error');
         return;
       }
 

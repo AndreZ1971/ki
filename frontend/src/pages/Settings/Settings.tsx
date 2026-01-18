@@ -956,6 +956,41 @@ const Settings = () => {
           cacheResults: credentials.mlCacheResults,
           cacheTtl: credentials.mlCacheTtl,
         },
+        socialMedia: {
+          linkedin: {
+            enabled: credentials.linkedinEnabled,
+            accessToken: credentials.linkedinAccessToken,
+            refreshToken: credentials.linkedinRefreshToken,
+          },
+          facebook: {
+            enabled: credentials.facebookEnabled,
+            accessToken: credentials.facebookAccessToken,
+            pageId: credentials.facebookPageId,
+          },
+          instagram: {
+            enabled: credentials.instagramEnabled,
+            accessToken: credentials.instagramAccessToken,
+            businessAccountId: credentials.instagramBusinessAccountId,
+          },
+          twitter: {
+            enabled: credentials.twitterEnabled,
+            apiKey: credentials.twitterApiKey,
+            apiSecret: credentials.twitterApiSecret,
+            accessToken: credentials.twitterAccessToken,
+            accessTokenSecret: credentials.twitterAccessTokenSecret,
+          },
+          tiktok: {
+            enabled: credentials.tiktokEnabled,
+            accessToken: credentials.tiktokAccessToken,
+            refreshToken: credentials.tiktokRefreshToken,
+          },
+          youtube: {
+            enabled: credentials.youtubeEnabled,
+            accessToken: credentials.youtubeAccessToken,
+            refreshToken: credentials.youtubeRefreshToken,
+            channelId: credentials.youtubeChannelId,
+          },
+        },
       };
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/settings/connection`,
@@ -3222,6 +3257,62 @@ const Settings = () => {
                     value={credentials.twitterApiSecret}
                     onChange={(e) =>
                       handleCredentialChange("twitterApiSecret", e.target.value)
+                    }
+                    style={{
+                      width: "100%",
+                      padding: "10px",
+                      background: "rgba(0,0,0,0.3)",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                      borderRadius: "6px",
+                      color: "white",
+                      fontSize: "13px",
+                      marginBottom: "10px",
+                    }}
+                  />
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "8px",
+                      color: "rgba(255,255,255,0.8)",
+                      fontSize: "12px",
+                    }}
+                  >
+                    {t("settings.social.twitterAccessToken")}
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="Twitter Access Token"
+                    value={credentials.twitterAccessToken}
+                    onChange={(e) =>
+                      handleCredentialChange("twitterAccessToken", e.target.value)
+                    }
+                    style={{
+                      width: "100%",
+                      padding: "10px",
+                      background: "rgba(0,0,0,0.3)",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                      borderRadius: "6px",
+                      color: "white",
+                      fontSize: "13px",
+                      marginBottom: "10px",
+                    }}
+                  />
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "8px",
+                      color: "rgba(255,255,255,0.8)",
+                      fontSize: "12px",
+                    }}
+                  >
+                    {t("settings.social.twitterAccessTokenSecret")}
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="Twitter Access Token Secret"
+                    value={credentials.twitterAccessTokenSecret}
+                    onChange={(e) =>
+                      handleCredentialChange("twitterAccessTokenSecret", e.target.value)
                     }
                     style={{
                       width: "100%",

@@ -194,21 +194,49 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
 
   // Get connected accounts status
   fastify.get('/auth/status', async (_request: FastifyRequest, reply: FastifyReply) => {
-    // In production, check database for stored tokens
+    // Read connection.json directly to get socialMedia config
+    const fs = await import('fs');
+    const path = await import('path');
+    
+    let socialMedia: any = {};
+    try {
+      // From backend/dist/routes/app/api/social -> backend/connection.json = ../../../../../connection.json
+      const configPath = path.resolve(__dirname, '../../../../../connection.json');
+      const configData = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+      socialMedia = configData.socialMedia || {};
+    } catch (error) {
+      logger.error({ error }, 'Failed to read socialMedia config');
+    }
+
     return reply.send({
       success: true,
       accounts: {
+        linkedin: {
+          connected: socialMedia.linkedin?.enabled && !!socialMedia.linkedin?.accessToken,
+          hasToken: !!socialMedia.linkedin?.accessToken
+        },
         facebook: {
-          connected: !!(getConfig().webhooks?.facebookPageAccessToken || process.env.FACEBOOK_PAGE_ACCESS_TOKEN),
-          pageId: getConfig().webhooks?.facebookPageId || process.env.FACEBOOK_PAGE_ID || null
+          connected: socialMedia.facebook?.enabled && !!socialMedia.facebook?.accessToken,
+          pageId: socialMedia.facebook?.pageId || null,
+          hasToken: !!socialMedia.facebook?.accessToken
         },
         instagram: {
-          connected: !!(getConfig().webhooks?.instagramBusinessAccountId || process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID),
-          accountId: getConfig().webhooks?.instagramBusinessAccountId || process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID || null
+          connected: socialMedia.instagram?.enabled && !!socialMedia.instagram?.accessToken,
+          accountId: socialMedia.instagram?.businessAccountId || null,
+          hasToken: !!socialMedia.instagram?.accessToken
+        },
+        twitter: {
+          connected: socialMedia.twitter?.enabled && !!socialMedia.twitter?.accessToken,
+          hasToken: !!socialMedia.twitter?.accessToken
         },
         tiktok: {
-          connected: false, // Check in DB
-          username: null
+          connected: socialMedia.tiktok?.enabled && !!socialMedia.tiktok?.accessToken,
+          hasToken: !!socialMedia.tiktok?.accessToken
+        },
+        youtube: {
+          connected: socialMedia.youtube?.enabled && !!socialMedia.youtube?.accessToken,
+          channelId: socialMedia.youtube?.channelId || null,
+          hasToken: !!socialMedia.youtube?.accessToken
         }
       }
     });
