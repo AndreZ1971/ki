@@ -48,23 +48,37 @@ export default async function postRoutes(fastify: FastifyInstance) {
 
         if (contentType.includes('multipart/form-data')) {
           // FormData upload (for video files)
-          const fields = await request.files();
+          logger.info('Parsing FormData request');
           const parts: any = {};
 
-          for await (const part of fields) {
-            if (part.file) {
-              // This is a file field
-              parts[part.fieldname] = await part.toBuffer();
-            } else {
-              // This is a regular field
-              const buffer = await part.toBuffer();
-              const value = buffer.toString('utf-8');
-              try {
-                parts[part.fieldname] = JSON.parse(value);
-              } catch {
-                parts[part.fieldname] = value;
+          try {
+            const files = await request.files();
+            
+            for await (const part of files) {
+              const fieldname = part.fieldname;
+              
+              if (part.type === 'file') {
+                // This is a file field
+                logger.info({ fieldname, filename: part.filename }, 'Processing file field');
+                parts[fieldname] = await part.toBuffer();
+              } else {
+                // This is a regular text field
+                const buffer = await part.toBuffer();
+                const value = buffer.toString('utf-8');
+                logger.info({ fieldname, value: value.substring(0, 100) }, 'Processing text field');
+                try {
+                  parts[fieldname] = JSON.parse(value);
+                } catch {
+                  parts[fieldname] = value;
+                }
               }
             }
+          } catch (err) {
+            logger.error({ err }, 'FormData parsing error');
+            return reply.status(400).send({
+              success: false,
+              error: 'Failed to parse FormData'
+            });
           }
 
           platform = parts.platform;
@@ -74,9 +88,23 @@ export default async function postRoutes(fastify: FastifyInstance) {
           videoDescription = parts.videoDescription;
           videoTags = parts.videoTags || [];
 
-          if (typeof videoTags === 'string') {
-            videoTags = JSON.parse(videoTags);
+          if (!platform || !content) {
+            logger.error({ platform, content: !!content }, 'Missing required fields');
+            return reply.status(400).send({
+              success: false,
+              error: `Missing required fields: ${!platform ? 'platform' : ''} ${!content ? 'content' : ''}`
+            });
           }
+
+          if (typeof videoTags === 'string') {
+            try {
+              videoTags = JSON.parse(videoTags);
+            } catch {
+              logger.warn('Failed to parse videoTags, using as-is');
+            }
+          }
+
+          logger.info({ platform, contentLength: content?.length, hasVideo: !!videoFile }, 'FormData parsed successfully');
         } else {
           // JSON upload
           const body = request.body as PostRequest;

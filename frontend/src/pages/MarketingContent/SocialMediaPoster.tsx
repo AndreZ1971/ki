@@ -232,11 +232,19 @@ const SocialMediaPoster: React.FC = () => {
           });
 
           const data = await response.json();
-          if (data.success) {
+          
+          if (!response.ok) {
+            showToast(`YouTube Upload Fehler: ${data.error || response.statusText}`, 'error');
+            console.error('Backend error:', data);
+            return;
+          }
+          
+          if (data.success && data.results && data.results.youtube) {
             showToast(`✅ Video erfolgreich auf YouTube hochgeladen: ${data.results.youtube.url}`, 'success');
             setPostStats(prev => ({ ...prev, published: prev.published + 1 }));
           } else {
-            showToast(`Fehler: ${data.results.youtube.error}`, 'error');
+            const errorMsg = data.results?.youtube?.error || data.error || 'Unbekannter Fehler';
+            showToast(`Fehler: ${errorMsg}`, 'error');
           }
         } catch (err) {
           showToast('Fehler beim YouTube-Upload. Bitte versuche es später erneut.', 'error');
