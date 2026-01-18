@@ -52,20 +52,21 @@ export default async function postRoutes(fastify: FastifyInstance) {
           const parts: any = {};
 
           try {
-            const files = await request.files();
+            // Get all parts (both files and fields)
+            const partsIterator = request.parts();
             
-            for await (const part of files) {
+            for await (const part of partsIterator) {
               const fieldname = part.fieldname;
               
               if (part.type === 'file') {
                 // This is a file field
-                logger.info({ fieldname, filename: part.filename }, 'Processing file field');
+                logger.info({ fieldname, filename: part.filename, mimetype: part.mimetype }, 'Processing file field');
                 parts[fieldname] = await part.toBuffer();
               } else {
-                // This is a regular text field
-                const buffer = await part.toBuffer();
-                const value = buffer.toString('utf-8');
-                logger.info({ fieldname, value: value.substring(0, 100) }, 'Processing text field');
+                // This is a regular text field (part.type === 'field')
+                // For field parts, the value is directly in part.value (not a stream)
+                const value = (part as any).value || '';
+                logger.info({ fieldname, valueLength: value.length }, 'Processing text field');
                 try {
                   parts[fieldname] = JSON.parse(value);
                 } catch {
@@ -88,8 +89,16 @@ export default async function postRoutes(fastify: FastifyInstance) {
           videoDescription = parts.videoDescription;
           videoTags = parts.videoTags || [];
 
+          logger.info({ 
+            receivedFields: Object.keys(parts),
+            platform, 
+            contentLength: content?.length, 
+            hasVideo: !!videoFile,
+            videoSize: videoFile?.length 
+          }, 'FormData fields received');
+
           if (!platform || !content) {
-            logger.error({ platform, content: !!content }, 'Missing required fields');
+            logger.error({ platform, hasContent: !!content }, 'Missing required fields');
             return reply.status(400).send({
               success: false,
               error: `Missing required fields: ${!platform ? 'platform' : ''} ${!content ? 'content' : ''}`
