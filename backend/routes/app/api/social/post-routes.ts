@@ -375,6 +375,49 @@ export default async function postRoutes(fastify: FastifyInstance) {
     return { title, description, tags };
   }
 
+  // Helper: Refresh YouTube Access Token
+  async function refreshYouTubeToken(refreshToken: string, clientId: string, clientSecret: string): Promise<string> {
+    const tokenUrl = 'https://oauth2.googleapis.com/token';
+    
+    const response = await fetch(tokenUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: clientId,
+        client_secret: clientSecret,
+        refresh_token: refreshToken,
+        grant_type: 'refresh_token'
+      })
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      logger.error({ status: response.status, errorBody }, 'Token refresh failed');
+      throw new Error(`Token refresh fehlgeschlagen: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const newAccessToken = data.access_token;
+
+    // Save new access token to connection.json
+    try {
+      const configPath = path.resolve(__dirname, '../../../../../connection.json');
+      const configData = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+      
+      if (!configData.socialMedia) configData.socialMedia = {};
+      if (!configData.socialMedia.youtube) configData.socialMedia.youtube = {};
+      
+      configData.socialMedia.youtube.accessToken = newAccessToken;
+      
+      fs.writeFileSync(configPath, JSON.stringify(configData, null, 2));
+      logger.info('YouTube access token refreshed and saved');
+    } catch (error) {
+      logger.error({ error }, 'Failed to save refreshed token');
+    }
+
+    return newAccessToken;
+  }
+
   async function postToYouTube(uploadRequest: {
     content: string;
     videoBuffer?: Buffer;
@@ -385,7 +428,10 @@ export default async function postRoutes(fastify: FastifyInstance) {
     const socialMedia = getSocialMediaConfig();
     const youtubeConfig = socialMedia.youtube;
     
-    const accessToken = youtubeConfig?.accessToken || process.env.YOUTUBE_ACCESS_TOKEN;
+    let accessToken = youtubeConfig?.accessToken || process.env.YOUTUBE_ACCESS_TOKEN;
+    const refreshToken = youtubeConfig?.refreshToken;
+    const clientId = youtubeConfig?.clientId;
+    const clientSecret = youtubeConfig?.clientSecret;
 
     if (!accessToken) {
       throw new Error('YouTube credentials nicht konfiguriert. Bitte verbinden Sie Ihren YouTube-Kanal in den Einstellungen.');
@@ -442,7 +488,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
 
       logger.info({ initBody: JSON.stringify(initBody).substring(0, 500) }, 'YouTube init request body');
 
-      const initResponse = await fetch(initUrl, {
+      let initResponse = await fetch(initUrl, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -455,6 +501,32 @@ export default async function postRoutes(fastify: FastifyInstance) {
         body: JSON.stringify(initBody)
       });
 
+      // Handle 401 Unauthorized - try to refresh token
+      if (initResponse.status === 401 && refreshToken && clientId && clientSecret) {
+        logger.info('Access token expired - refreshing...');
+        
+        try {
+          accessToken = await refreshYouTubeToken(refreshToken, clientId, clientSecret);
+          
+          // Retry with new token
+          initResponse = await fetch(initUrl, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+              'X-Goog-Upload-Protocol': 'resumable',
+              'X-Goog-Upload-Command': 'start',
+              'X-Goog-Upload-Header-Content-Type': 'video/*',
+              'X-Goog-Upload-Header-Content-Length': buffer.length.toString()
+            },
+            body: JSON.stringify(initBody)
+          });
+        } catch (refreshError) {
+          logger.error({ refreshError }, 'Token refresh failed');
+          throw new Error('YouTube Token abgelaufen. Bitte verbinden Sie YouTube erneut in den Einstellungen.');
+        }
+      }
+
       if (!initResponse.ok) {
         const errorBody = await initResponse.text();
         logger.error({ 
@@ -463,6 +535,12 @@ export default async function postRoutes(fastify: FastifyInstance) {
           errorBody,
           headers: Object.fromEntries(initResponse.headers.entries())
         }, 'YouTube init failed');
+        
+        // Provide user-friendly error message
+        if (initResponse.status === 401) {
+          throw new Error('YouTube Authentifizierung fehlgeschlagen. Bitte verbinden Sie YouTube erneut in den Einstellungen.');
+        }
+        
         throw new Error(`YouTube init failed: ${initResponse.statusText} - ${errorBody}`);
       }
 
