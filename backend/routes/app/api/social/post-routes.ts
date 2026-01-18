@@ -423,7 +423,24 @@ export default async function postRoutes(fastify: FastifyInstance) {
         categoryId: '24' // Entertainment category
       };
 
-      logger.info({ videoSize: videoBuffer.length, title: snippet.title }, 'Starting YouTube video upload');
+      logger.info({ 
+        videoSize: buffer.length, 
+        title: snippet.title,
+        tags: snippet.tags,
+        description: snippet.description?.substring(0, 100)
+      }, 'Starting YouTube video upload');
+
+      const initBody = {
+        snippet,
+        status: {
+          privacyStatus: 'public', // or 'private', 'unlisted'
+          selfDeclaredMadeForKids: false,
+          embeddable: true,
+          license: 'youtube' // Change from 'creativeCommon' to 'youtube'
+        }
+      };
+
+      logger.info({ initBody: JSON.stringify(initBody).substring(0, 500) }, 'YouTube init request body');
 
       const initResponse = await fetch(initUrl, {
         method: 'POST',
@@ -432,21 +449,21 @@ export default async function postRoutes(fastify: FastifyInstance) {
           'Content-Type': 'application/json',
           'X-Goog-Upload-Protocol': 'resumable',
           'X-Goog-Upload-Command': 'start',
-          'X-Goog-Upload-Header-Content-Type': 'video/*'
+          'X-Goog-Upload-Header-Content-Type': 'video/*',
+          'X-Goog-Upload-Header-Content-Length': buffer.length.toString()
         },
-        body: JSON.stringify({
-          snippet,
-          status: {
-            privacyStatus: 'public', // or 'private', 'unlisted'
-            selfDeclaredMadeForKids: false,
-            embeddable: true,
-            license: 'creativeCommon'
-          }
-        })
+        body: JSON.stringify(initBody)
       });
 
       if (!initResponse.ok) {
-        throw new Error(`YouTube init failed: ${initResponse.statusText}`);
+        const errorBody = await initResponse.text();
+        logger.error({ 
+          status: initResponse.status, 
+          statusText: initResponse.statusText,
+          errorBody,
+          headers: Object.fromEntries(initResponse.headers.entries())
+        }, 'YouTube init failed');
+        throw new Error(`YouTube init failed: ${initResponse.statusText} - ${errorBody}`);
       }
 
       const sessionUri = initResponse.headers.get('location');
