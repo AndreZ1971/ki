@@ -10,7 +10,7 @@ interface PostRequest {
   content: string;
   mediaUrl?: string;
   mediaType?: 'image' | 'video';
-  videoFile?: string; // Base64 encoded video for YouTube
+  videoFile?: string; // Base64 encoded video for YouTube (deprecated - use FormData instead)
   videoTitle?: string;
   videoDescription?: string;
   videoTags?: string[];
@@ -35,51 +35,119 @@ export default async function postRoutes(fastify: FastifyInstance) {
   fastify.post<{ Body: PostRequest }>(
     '/social/post',
     async (request: FastifyRequest<{ Body: PostRequest }>, reply: FastifyReply) => {
-      const { platform, content, mediaUrl, mediaType } = request.body;
-
-      if (!content) {
-        return reply.status(400).send({
-          success: false,
-          error: 'Content ist erforderlich'
-        });
-      }
-
       try {
-        const results: any = {};
+        // Handle both JSON and FormData uploads
+        let platform: string;
+        let content: string;
+        let videoFile: Buffer | undefined;
+        let videoTitle: string | undefined;
+        let videoDescription: string | undefined;
+        let videoTags: string[] = [];
 
-        // Post to all platforms if 'all' is selected
-        const platforms = platform === 'all' 
-          ? ['facebook', 'instagram', 'tiktok'] 
-          : [platform];
+        const contentType = request.headers['content-type'] || '';
 
-        for (const targetPlatform of platforms) {
-          switch (targetPlatform) {
-            case 'facebook':
-              results.facebook = await postToFacebook(content, mediaUrl);
-              break;
-            case 'instagram':
-              results.instagram = await postToInstagram(content, mediaUrl, mediaType);
-              break;
-            case 'tiktok':
-              results.tiktok = await postToTikTok(content, mediaUrl);
-              break;
-            case 'youtube':
-              results.youtube = await postToYouTube(request.body as PostRequest);
-              break;
+        if (contentType.includes('multipart/form-data')) {
+          // FormData upload (for video files)
+          const fields = await request.files();
+          const parts: any = {};
+
+          for await (const part of fields) {
+            if (part.file) {
+              // This is a file field
+              parts[part.fieldname] = await part.toBuffer();
+            } else {
+              // This is a regular field
+              const buffer = await part.toBuffer();
+              const value = buffer.toString('utf-8');
+              try {
+                parts[part.fieldname] = JSON.parse(value);
+              } catch {
+                parts[part.fieldname] = value;
+              }
+            }
+          }
+
+          platform = parts.platform;
+          content = parts.content;
+          videoFile = parts.video;
+          videoTitle = parts.videoTitle;
+          videoDescription = parts.videoDescription;
+          videoTags = parts.videoTags || [];
+
+          if (typeof videoTags === 'string') {
+            videoTags = JSON.parse(videoTags);
+          }
+        } else {
+          // JSON upload
+          const body = request.body as PostRequest;
+          platform = body.platform;
+          content = body.content;
+          videoTitle = body.videoTitle;
+          videoDescription = body.videoDescription;
+          videoTags = body.videoTags || [];
+
+          // Legacy: support base64 in body
+          if (body.videoFile) {
+            videoFile = Buffer.from(body.videoFile, 'base64');
           }
         }
 
-        return reply.send({
-          success: true,
-          message: `Post erfolgreich auf ${platforms.join(', ')} veröffentlicht!`,
-          results
-        });
+        if (!content) {
+          return reply.status(400).send({
+            success: false,
+            error: 'Content ist erforderlich'
+          });
+        }
 
+        try {
+          const results: any = {};
+
+          // Post to all platforms if 'all' is selected
+          const platforms = platform === 'all' 
+            ? ['facebook', 'instagram', 'tiktok'] 
+            : [platform];
+
+          for (const targetPlatform of platforms) {
+            switch (targetPlatform) {
+              case 'facebook':
+                results.facebook = await postToFacebook(content);
+                break;
+              case 'instagram':
+                results.instagram = await postToInstagram(content);
+                break;
+              case 'tiktok':
+                results.tiktok = await postToTikTok(content);
+                break;
+              case 'youtube':
+                results.youtube = await postToYouTube({
+                  content,
+                  videoBuffer: videoFile,
+                  videoTitle,
+                  videoDescription,
+                  videoTags
+                });
+                break;
+            }
+          }
+
+          return reply.send({
+            success: true,
+            message: `Post erfolgreich auf ${platforms.join(', ')} veröffentlicht!`,
+            results
+          });
+
+        } catch (error) {
+          logger.error({ error }, 'Social media post error');
+          return reply.status(500).send({
+            success: false,
+            error: error instanceof Error ? error.message : 'Post failed'
+          });
+        }
       } catch (error) {
-        logger.error({ error }, 'Social media post error');
-        return reply.status(500).send({
+        logger.error({ error }, 'Request parsing error');
+        return reply.status(400).send({
           success: false,
-          error: error instanceof Error ? error.message : 'Post failed'
+          error: 'Invalid request format'
         });
       }
     }
@@ -87,7 +155,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
 
   // ==================== FACEBOOK POSTING ====================
 
-  async function postToFacebook(message: string, link?: string) {
+  async function postToFacebook(message: string) {
     const socialMedia = getSocialMediaConfig();
     const facebookConfig = socialMedia.facebook;
     
@@ -104,10 +172,6 @@ export default async function postRoutes(fastify: FastifyInstance) {
       message,
       access_token: accessToken
     };
-
-    if (link) {
-      body.link = link;
-    }
 
     const response = await fetch(url, {
       method: 'POST',
@@ -133,7 +197,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
 
   // ==================== INSTAGRAM POSTING ====================
 
-  async function postToInstagram(caption: string, imageUrl?: string, mediaType: string = 'image') {
+  async function postToInstagram(caption: string) {
     const socialMedia = getSocialMediaConfig();
     const instagramConfig = socialMedia.instagram;
     
@@ -144,24 +208,14 @@ export default async function postRoutes(fastify: FastifyInstance) {
       throw new Error('Instagram credentials nicht konfiguriert');
     }
 
-    if (!imageUrl) {
-      throw new Error('Instagram benötigt ein Bild oder Video');
-    }
-
     // Step 1: Create media container
     const createUrl = `https://graph.facebook.com/v18.0/${igAccountId}/media`;
     
     const createBody: any = {
       caption,
-      access_token: accessToken
+      access_token: accessToken,
+      media_type: 'IMAGE'
     };
-
-    if (mediaType === 'video') {
-      createBody.media_type = 'VIDEO';
-      createBody.video_url = imageUrl;
-    } else {
-      createBody.image_url = imageUrl;
-    }
 
     const createResponse = await fetch(createUrl, {
       method: 'POST',
@@ -284,23 +338,36 @@ export default async function postRoutes(fastify: FastifyInstance) {
     return { title, description, tags };
   }
 
-  async function postToYouTube(postRequest: PostRequest) {
+  async function postToYouTube(uploadRequest: {
+    content: string;
+    videoBuffer?: Buffer;
+    videoTitle?: string;
+    videoDescription?: string;
+    videoTags?: string[];
+  }) {
     const socialMedia = getSocialMediaConfig();
     const youtubeConfig = socialMedia.youtube;
     
     const accessToken = youtubeConfig?.accessToken || process.env.YOUTUBE_ACCESS_TOKEN;
-    const refreshToken = youtubeConfig?.refreshToken || process.env.YOUTUBE_REFRESH_TOKEN;
-    const clientId = youtubeConfig?.clientId || process.env.YOUTUBE_CLIENT_ID;
-    const clientSecret = youtubeConfig?.clientSecret || process.env.YOUTUBE_CLIENT_SECRET;
 
     if (!accessToken) {
       throw new Error('YouTube credentials nicht konfiguriert. Bitte verbinden Sie Ihren YouTube-Kanal in den Einstellungen.');
     }
 
-    const { content, videoFile, videoTitle, videoDescription, videoTags } = postRequest;
+    const { content, videoBuffer, videoTitle, videoDescription, videoTags } = uploadRequest;
 
-    if (!videoFile) {
+    if (!videoBuffer) {
       throw new Error('YouTube benötigt ein Video');
+    }
+
+    // Ensure videoBuffer is a Node Buffer
+    const buffer = Buffer.isBuffer(videoBuffer) 
+      ? videoBuffer 
+      : Buffer.from(videoBuffer as ArrayBuffer | ArrayBufferLike);
+
+    // Validate video size
+    if (buffer.length > 100 * 1024 * 1024) {
+      throw new Error('Video zu groß! Max. 100 MB.');
     }
 
     // Generate metadata from content if not provided
@@ -309,10 +376,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
       : await generateYouTubeMetadata(content);
 
     try {
-      // Step 1: Decode base64 video
-      const videoBuffer = Buffer.from(videoFile, 'base64');
-
-      // Step 2: Initialize resumable upload session
+      // Step 1: Initialize resumable upload session
       const initUrl = 'https://www.googleapis.com/youtube/v3/videos?uploadType=resumable&part=snippet,status';
       
       const snippet = {
@@ -321,6 +385,8 @@ export default async function postRoutes(fastify: FastifyInstance) {
         tags: metadata.tags || [],
         categoryId: '24' // Entertainment category
       };
+
+      logger.info({ videoSize: videoBuffer.length, title: snippet.title }, 'Starting YouTube video upload');
 
       const initResponse = await fetch(initUrl, {
         method: 'POST',
@@ -359,7 +425,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
           'X-Goog-Upload-Command': 'upload, finalize',
           'X-Goog-Upload-Offset': '0'
         },
-        body: videoBuffer
+        body: buffer as any
       });
 
       if (!uploadResponse.ok) {

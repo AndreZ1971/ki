@@ -206,37 +206,42 @@ const SocialMediaPoster: React.FC = () => {
           return;
         }
 
-        // Convert video file to base64
-        const reader = new FileReader();
-        reader.onload = async () => {
-          const base64Video = (reader.result as string).split(',')[1];
-          
-          try {
-            const response = await fetch(`${apiBase}/api/social/post`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                platform: 'youtube',
-                content,
-                videoFile: base64Video,
-                videoTitle: tileContents['youtube']?.substring(0, 100) || 'Video',
-                videoDescription: content,
-                videoTags: content.match(/#\w+/g)?.map((tag: string) => tag.substring(1)) || []
-              })
-            });
+        // Check file size (max 100MB for YouTube uploads via API)
+        const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB
+        if (youtubeVideoFile.size > MAX_VIDEO_SIZE) {
+          showToast('Video zu groß! Max. 100 MB. Bitte komprimiere das Video.', 'error');
+          return;
+        }
 
-            const data = await response.json();
-            if (data.success) {
-              showToast(`✅ Video erfolgreich auf YouTube hochgeladen: ${data.results.youtube.url}`, 'success');
-              setPostStats(prev => ({ ...prev, published: prev.published + 1 }));
-            } else {
-              showToast(`Fehler: ${data.results.youtube.error}`, 'error');
-            }
-          } catch (err) {
-            showToast('Fehler beim YouTube-Upload', 'error');
+        showToast('⏳ Video wird hochgeladen...', 'info');
+
+        // Use FormData for direct file upload (no base64)
+        const formData = new FormData();
+        formData.append('platform', 'youtube');
+        formData.append('content', content);
+        formData.append('video', youtubeVideoFile);
+        formData.append('videoTitle', tileContents['youtube']?.substring(0, 100) || 'Video');
+        formData.append('videoDescription', content);
+        formData.append('videoTags', JSON.stringify(content.match(/#\w+/g)?.map((tag: string) => tag.substring(1)) || []));
+
+        try {
+          const response = await fetch(`${apiBase}/api/social/post`, {
+            method: 'POST',
+            body: formData
+            // Don't set Content-Type header - browser will set it with boundary
+          });
+
+          const data = await response.json();
+          if (data.success) {
+            showToast(`✅ Video erfolgreich auf YouTube hochgeladen: ${data.results.youtube.url}`, 'success');
+            setPostStats(prev => ({ ...prev, published: prev.published + 1 }));
+          } else {
+            showToast(`Fehler: ${data.results.youtube.error}`, 'error');
           }
-        };
-        reader.readAsDataURL(youtubeVideoFile);
+        } catch (err) {
+          showToast('Fehler beim YouTube-Upload. Bitte versuche es später erneut.', 'error');
+          console.error('YouTube upload error:', err);
+        }
         return;
       }
 
