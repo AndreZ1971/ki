@@ -6,10 +6,14 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 interface PostRequest {
-  platform: 'facebook' | 'instagram' | 'tiktok' | 'all';
+  platform: 'facebook' | 'instagram' | 'tiktok' | 'youtube' | 'all';
   content: string;
   mediaUrl?: string;
   mediaType?: 'image' | 'video';
+  videoFile?: string; // Base64 encoded video for YouTube
+  videoTitle?: string;
+  videoDescription?: string;
+  videoTags?: string[];
 }
 
 export default async function postRoutes(fastify: FastifyInstance) {
@@ -58,6 +62,9 @@ export default async function postRoutes(fastify: FastifyInstance) {
               break;
             case 'tiktok':
               results.tiktok = await postToTikTok(content, mediaUrl);
+              break;
+            case 'youtube':
+              results.youtube = await postToYouTube(request.body as PostRequest);
               break;
           }
         }
@@ -255,6 +262,131 @@ export default async function postRoutes(fastify: FastifyInstance) {
       platform: 'tiktok',
       status: data.data?.status
     };
+  }
+
+  // ==================== YOUTUBE POSTING ====================
+
+  async function generateYouTubeMetadata(content: string) {
+    // Generate title, description, and tags from content using simple heuristics
+    // In production, this could use OpenAI or Claude API
+    const lines = content.split('\n').filter(l => l.trim());
+    
+    // Title: first line or first 100 chars
+    const title = (lines[0] || content).substring(0, 100);
+    
+    // Extract hashtags or keywords
+    const hashtagRegex = /#\w+/g;
+    const tags = content.match(hashtagRegex)?.map(tag => tag.substring(1)) || [];
+    
+    // Description: full content
+    const description = content;
+    
+    return { title, description, tags };
+  }
+
+  async function postToYouTube(postRequest: PostRequest) {
+    const socialMedia = getSocialMediaConfig();
+    const youtubeConfig = socialMedia.youtube;
+    
+    const accessToken = youtubeConfig?.accessToken || process.env.YOUTUBE_ACCESS_TOKEN;
+    const refreshToken = youtubeConfig?.refreshToken || process.env.YOUTUBE_REFRESH_TOKEN;
+    const clientId = youtubeConfig?.clientId || process.env.YOUTUBE_CLIENT_ID;
+    const clientSecret = youtubeConfig?.clientSecret || process.env.YOUTUBE_CLIENT_SECRET;
+
+    if (!accessToken) {
+      throw new Error('YouTube credentials nicht konfiguriert. Bitte verbinden Sie Ihren YouTube-Kanal in den Einstellungen.');
+    }
+
+    const { content, videoFile, videoTitle, videoDescription, videoTags } = postRequest;
+
+    if (!videoFile) {
+      throw new Error('YouTube benötigt ein Video');
+    }
+
+    // Generate metadata from content if not provided
+    const metadata = videoTitle && videoDescription
+      ? { title: videoTitle, description: videoDescription, tags: videoTags || [] }
+      : await generateYouTubeMetadata(content);
+
+    try {
+      // Step 1: Decode base64 video
+      const videoBuffer = Buffer.from(videoFile, 'base64');
+
+      // Step 2: Initialize resumable upload session
+      const initUrl = 'https://www.googleapis.com/youtube/v3/videos?uploadType=resumable&part=snippet,status';
+      
+      const snippet = {
+        title: metadata.title || 'Untitled Video',
+        description: metadata.description || content,
+        tags: metadata.tags || [],
+        categoryId: '24' // Entertainment category
+      };
+
+      const initResponse = await fetch(initUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+          'X-Goog-Upload-Protocol': 'resumable',
+          'X-Goog-Upload-Command': 'start',
+          'X-Goog-Upload-Header-Content-Type': 'video/*'
+        },
+        body: JSON.stringify({
+          snippet,
+          status: {
+            privacyStatus: 'public', // or 'private', 'unlisted'
+            selfDeclaredMadeForKids: false,
+            embeddable: true,
+            license: 'creativeCommon'
+          }
+        })
+      });
+
+      if (!initResponse.ok) {
+        throw new Error(`YouTube init failed: ${initResponse.statusText}`);
+      }
+
+      const sessionUri = initResponse.headers.get('location');
+      if (!sessionUri) {
+        throw new Error('No upload session URI returned');
+      }
+
+      // Step 3: Upload video file
+      const uploadResponse = await fetch(sessionUri, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'video/mp4',
+          'X-Goog-Upload-Command': 'upload, finalize',
+          'X-Goog-Upload-Offset': '0'
+        },
+        body: videoBuffer
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error(`YouTube upload failed: ${uploadResponse.statusText}`);
+      }
+
+      const uploadedVideo = await uploadResponse.json();
+
+      logger.info({ videoId: uploadedVideo.id }, 'YouTube video uploaded successfully');
+
+      return {
+        success: true,
+        videoId: uploadedVideo.id,
+        platform: 'youtube',
+        title: metadata.title,
+        url: `https://youtube.com/watch?v=${uploadedVideo.id}`,
+        status: uploadedVideo.status?.uploadStatus || 'processing'
+      };
+
+    } catch (error) {
+      // If token expired, try refresh
+      if (error instanceof Error && error.message.includes('401')) {
+        logger.warn('YouTube access token expired, attempting refresh');
+        // Token refresh logic would go here
+      }
+      throw error;
+    }
   }
 
   // ==================== GET POST STATS ====================

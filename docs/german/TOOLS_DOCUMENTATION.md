@@ -2,9 +2,9 @@
 
 > **Fokus dieser Dokumentation**: Technische Details der ML/KI-Integration für alle Dashboard-Tools. Die User-Dokumentation mit Screenshots und Bedienanleitung befindet sich in `Bedienungsanleitung.md`.
 
-**Zuletzt aktualisiert**: 8. Januar 2026  
-**Version**: 6.3.0  
-**Status**: ✅ Production Ready - Reddit OAuth, prozentuale Preislimits, Dark Glass Theme, verbesserte Fehlerbehandlung
+**Zuletzt aktualisiert**: 18. Januar 2026  
+**Version**: 6.4.0  
+**Status**: ✅ Production Ready - YouTube Video Upload, Metadata Auto-Generierung, Reddit OAuth, prozentuale Preislimits, Dark Glass Theme, verbesserte Fehlerbehandlung
 
 ---
 
@@ -15,13 +15,78 @@
 | **Analytics**           | 13 Tools     | 🟢 Ja (13/13)  | Abgeschlossen |
 | **Product Management**  | 8 Tools      | 🟢 Ja (8/8)    | Abgeschlossen |
 | **Payment & Finances**  | 13 Tools     | 🟢 Ja (13/13)  | Abgeschlossen |
-| **Marketing & Content** | 10 Tools     | 🟢 Ja (10/10)  | Abgeschlossen |
+| **Marketing & Content** | 11 Tools     | 🟢 Ja (11/11)  | Abgeschlossen |
 | **Advanced AI**         | 9 Tools      | 🟢 Ja (9/9)    | Abgeschlossen |
-| **GESAMT**              | **53 Tools** | 🟢 53/53 (100%)| Fertiggestellt |
+| **GESAMT**              | **54 Tools** | 🟢 54/54 (100%)| Fertiggestellt |
 
 ---
 
 ## 🆕 Januar 2026 Updates
+
+### ✅ YouTube Video Upload Integration
+**Implementierung**: OAuth 2.0 + Resumable Upload API mit Auto-Metadaten-Generierung  
+**Status**: Production Ready (Phase 1)  
+**Dateien**:
+- `backend/routes/app/api/social/oauth-routes.ts` (YouTube OAuth Flow)
+- `backend/routes/app/api/social/post-routes.ts` (YouTube Video Upload + Metadata Generation)
+- `frontend/src/pages/MarketingContent/SocialMediaPoster.tsx` (Video Upload UI)
+
+**Technische Details**:
+```typescript
+// generateYouTubeMetadata: Text → Titel, Tags, Beschreibung
+const title = lines[0]; // Erste Zeile
+const tags = extractHashtags(text); // #hashtag → tag
+const description = text; // Vollständiger Text
+
+// postToYouTube: Base64 Video → Resumable Upload → YouTube API
+const buffer = Buffer.from(videoBase64, 'base64');
+const response = await fetch('https://www.googleapis.com/youtube/v3/videos?uploadType=resumable', {
+  headers: {
+    'Authorization': `Bearer ${accessToken}`,
+    'X-Goog-Upload-Protocol': 'resumable',
+    'X-Goog-Upload-Command': 'start',
+    'X-Goog-Upload-Header-Content-Length': buffer.length
+  }
+});
+```
+
+**Features (Phase 1)**:
+- Manuelle Text-Eingabe + Video-Upload
+- Auto-Metadaten aus Content-Text
+- OAuth mit connection.json Credentials
+- Resumable Upload für große Dateien
+- Video-Validierung (MP4, MOV, AVI, etc.)
+
+**Geplant (Phase 2)**:
+- Auto-Generierung von Videos aus Text
+- AI Video-Editing & Thumbnail-Generierung
+- YouTube Shorts Support
+- Batch Video Upload
+
+**Voraussetzungen**:
+- YouTube Data API v3 aktiviert (Google Cloud Console)
+- OAuth 2.0 Client ID (Desktop App)
+- Redirect URI: `http://localhost:3000` (Dev) oder `https://domain.com` (Prod)
+- connection.json mit clientId, clientSecret, redirectUri
+
+### ✅ Metadata Auto-Generierung
+**Implementierung**: Text-Analyse → Title/Tags/Description Extraction  
+**Status**: Production Ready  
+**Logik**:
+```typescript
+// Titel: Erste Zeile des Textes
+const title = contentText.split('\n')[0].substring(0, 100);
+
+// Tags: Extrahierte Hashtags
+const tags = (contentText.match(/#[\w]+/g) || []).map(tag => tag.substring(1));
+
+// Beschreibung: Vollständiger Text (bis 5000 Zeichen)
+const description = contentText.substring(0, 5000);
+```
+**Besonderheiten**: 
+- Automatisch auf YouTube Upload angewendet
+- Benutzer kann Metadaten vor Upload ändern
+- Hashtags aus Content automatisch als YouTube-Tags
 
 ### ✅ Reddit OAuth Integration
 **Implementierung**: Echte OAuth 2.0 mit Client Credentials Flow (nicht Public Search)  
@@ -113,7 +178,41 @@ const aggregatedScore =
 
 ---
 
+---
+
 ## ✅ Fertiggestellte Tools mit voller ML/KI-Integration
+
+### Marketing & Content (11/11 Tools)
+
+#### 🎥 **Social Media Poster** (mit YouTube Video Upload)
+**Übersicht:**
+- **Zweck**: Marketing-Content auf mehreren Plattformen mit Auto-Metadaten-Generierung
+- **Use Cases**: Multi-Platform Content Distribution, YouTube Video Uploads
+- **Kategorie**: Marketing & Content
+
+**Technische Details:**
+- **Frontend**: `frontend/src/pages/MarketingContent/SocialMediaPoster.tsx`
+- **Backend APIs**:
+  - `POST /api/social/post` (platform-agnostisches Posting)
+  - `GET /api/auth/status` (Connection Checking)
+  - `POST /api/auth/youtube/start` (OAuth Flow)
+- **Features**: Text Input, Video Upload, Metadata Preview, Multi-Platform Selection
+
+**YouTube-Spezifische Features**:
+- Video File Upload (MP4, MOV, AVI Formate)
+- Auto-Metadaten: Titel (erste Zeile), Tags (extrahierte Hashtags), Beschreibung (vollständiger Text)
+- Resumable Upload Protocol für zuverlässige Transfers
+- OAuth Tokens automatisch in connection.json gespeichert
+
+**Implementation Notes**:
+- Metadata Auto-Generierung gilt für alle Content
+- Benutzer kann Metadaten vor Publishing überschreiben
+- Phase 1 fertig: Manueller Upload
+- Phase 2 geplant: Auto-Video-Generierung aus Text
+
+**Status**: ✅ Vollständig implementiert (18. Januar 2026)
+
+---
 
 ### Product Management (8/8 Tools)
 

@@ -5,7 +5,7 @@
 ## 📋 Übersicht
 
 Diese Roadmap definiert die strategischen Updates für **A.R.I.** nach dem erfolgreichen **v6.7.0 Release**.  
-Der Fokus liegt auf **Verfeinerung bestehender Features**, **Erweiterung der KI-Fähigkeiten** und **Internationalisierung**.
+Der Fokus liegt auf **Verfeinerung bestehender Features**, **Erweiterung der KI-Fähigkeiten**, **YouTube Video Upload** und **Internationalisierung**.
 
 ---
 
@@ -80,5 +80,26 @@ Optionale Erweiterung der Trend-Datenquellen.
 
 ---
 
+## � Track 7: Videos DIREKT in Social Media Poster generieren (Phase 1 ✅ aktiv)
+
+### 🎯 Ziel
+Deine Marketing-Texte automatisch in hochwertige Videos umwandeln.
+
+### 📋 Features (Phase 1 - ✅ Fertig)
+- [x] YouTube Video Upload mit manueller Text-Eingabe
+- [x] Auto-Metadaten-Generierung (Titel, Tags, Beschreibung)
+- [x] OAuth 2.0 Integration
+- [x] Resumable Upload für große Dateien
+- [x] Video-Validierung
+
+### 📋 Features (Phase 2 - ⏳ Geplant)
+- [ ] Marketing-Text → Video-Script Konvertierung
+- [ ] Text-to-Speech Generierung (Google, ElevenLabs)
+- [ ] Automatische Stock-Footage Einbindung
+- [ ] Video-Assembly mit Effekten
+- [ ] YouTube Shorts Support
+
+---
+
 **Autor:** André Zabel  
-**Status:** ✅ Aktualisiert – 11. Januar 2026
+**Status:** ✅ Aktualisiert – 18. Januar 2026

@@ -77,17 +77,51 @@ This document serves as a technical guide for setting up API interfaces to publi
 ---
 
 ## 🎥 6. YouTube (Video Content)
-**Goal:** Video uploads and channel management.
+**Goal:** Video uploads, auto-metadata generation, and channel management.
 
 ### Procedure:
 1.  **Portal:** [Google Cloud Console](https://console.cloud.google.com/).
 2.  **API:** Enable the **"YouTube Data API v3"**.
 3.  **OAuth Screen:** Set up the OAuth consent screen and add your email as a test user.
 4.  **Credentials:** Create an "OAuth 2.0 Client ID" for a desktop application.
-5.  **Obtain Token:**
+5.  **Redirect URI (IMPORTANT!):** Enter in your OAuth credentials:
+    * `http://localhost:3000` (for local development)
+    * `https://your-domain.com` (for production)
+6.  **Obtain Token:**
     * Use the [OAuth 2.0 Playground](https://developers.google.com/oauthplayground/).
     * Scope: `https://www.googleapis.com/auth/youtube.force-ssl`.
     * Click "Authorize" and exchange the code for the `Access Token` and **`Refresh Token`**.
 
+### 🆕 YouTube Video Upload (Phase 1 - Phase 2 coming)
+**New in v6.3:**
+- **Video Upload**: Upload videos directly from the Social Media Poster UI
+- **Auto-Metadata**: Title, tags, and description are automatically generated from your content
+- **Video Validation**: Supported formats (MP4, MOV, AVI, etc.)
+- **Resumable Upload**: Upload large files in chunks
+
+**Configuration** (in `connection.json`):
+```json
+{
+  "youtube": {
+    "enabled": true,
+    "clientId": "your-client-id.apps.googleusercontent.com",
+    "clientSecret": "your-client-secret",
+    "redirectUri": "http://localhost:3000",
+    "accessToken": "auto-saved",
+    "refreshToken": "auto-saved",
+    "channelId": "auto-saved"
+  }
+}
+```
+
+**Metadata Auto-Generation**:
+- **Title**: First line of your content text
+- **Tags**: Automatically extracted hashtags from your text
+- **Description**: Full content text
+
+**Highlights**:
+- Phase 1: Manual text input + video upload
+- Phase 2 (planned): Auto-generate videos from text + AI video editing
+
 ---
-## Created on: December 22, 2025
+## Updated on: January 18, 2026

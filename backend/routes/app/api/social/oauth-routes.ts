@@ -1,10 +1,32 @@
 // backend/routes/app/api/social/oauth-routes.ts
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import fs from 'fs';
+import path from 'path';
 import { getConfig } from '@config';
 import { logger } from '../../../../logger.js';
 
 interface OAuthCallbackQuery {
   code: string;
+}
+
+const connectionPath = path.resolve(__dirname, '../../../../../connection.json');
+
+function loadConnection(): any {
+  try {
+    return JSON.parse(fs.readFileSync(connectionPath, 'utf-8'));
+  } catch (error) {
+    logger.error({ error }, 'Failed to read connection.json');
+    return {};
+  }
+}
+
+function saveConnection(data: any) {
+  try {
+    fs.writeFileSync(connectionPath, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (error) {
+    logger.error({ error }, 'Failed to write connection.json');
+    throw error;
+  }
 }
 
 export default async function oauthRoutes(fastify: FastifyInstance) {
@@ -185,6 +207,128 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
         return reply.status(500).send({
           success: false,
           error: error instanceof Error ? error.message : 'TikTok OAuth failed'
+        });
+      }
+    }
+  );
+
+  // ==================== YOUTUBE ====================
+
+  // YouTube OAuth Start
+  fastify.get('/auth/youtube', async (_request: FastifyRequest, reply: FastifyReply) => {
+    const config = loadConnection();
+    const youtube = config.socialMedia?.youtube || {};
+    const clientId = youtube.clientId || process.env.YOUTUBE_CLIENT_ID;
+    const redirectBase = youtube.redirectUri || process.env.OAUTH_CALLBACK_BASE_URL || config.apiBaseUrl || '';
+    const redirectUri = `${redirectBase}/api/auth/youtube/callback`;
+
+    if (!clientId || !redirectBase) {
+      logger.error('Missing YouTube clientId or redirectUri');
+      return reply
+        .status(400)
+        .send({ success: false, error: 'YouTube clientId oder Redirect-URL fehlt' });
+    }
+
+    const scopes = [
+      'https://www.googleapis.com/auth/youtube.upload',
+      'https://www.googleapis.com/auth/youtube.readonly',
+    ].join(' ');
+
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(
+      clientId
+    )}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(
+      scopes
+    )}&access_type=offline&prompt=consent`;
+
+    return reply.redirect(authUrl);
+  });
+
+  // YouTube OAuth Callback
+  fastify.get<{ Querystring: OAuthCallbackQuery }>(
+    '/auth/youtube/callback',
+    async (request: FastifyRequest<{ Querystring: OAuthCallbackQuery }>, reply: FastifyReply) => {
+      const { code } = request.query;
+
+      if (!code) {
+        return reply.status(400).send({ success: false, error: 'No authorization code received' });
+      }
+
+      const config = loadConnection();
+      const youtube = config.socialMedia?.youtube || {};
+      const clientId = youtube.clientId || process.env.YOUTUBE_CLIENT_ID;
+      const clientSecret = youtube.clientSecret || process.env.YOUTUBE_CLIENT_SECRET;
+      const redirectBase = youtube.redirectUri || process.env.OAUTH_CALLBACK_BASE_URL || config.apiBaseUrl || '';
+      const redirectUri = `${redirectBase}/api/auth/youtube/callback`;
+
+      if (!clientId || !clientSecret) {
+        logger.error('Missing YouTube clientId/clientSecret');
+        return reply.status(400).send({ success: false, error: 'YouTube Client Daten fehlen' });
+      }
+
+      try {
+        const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+            code,
+            client_id: clientId,
+            client_secret: clientSecret,
+            redirect_uri: redirectUri,
+            grant_type: 'authorization_code',
+          }),
+        });
+
+        const tokenData = await tokenResponse.json();
+
+        if (!tokenData.access_token) {
+          throw new Error('Failed to get access token');
+        }
+
+        // Fetch channelId if missing
+        let channelId = youtube.channelId || '';
+        if (!channelId) {
+          try {
+            const channelResp = await fetch(
+              'https://www.googleapis.com/youtube/v3/channels?part=id&mine=true',
+              {
+                headers: { Authorization: `Bearer ${tokenData.access_token}` },
+              }
+            );
+            const channelJson = await channelResp.json();
+            channelId = channelJson.items?.[0]?.id || channelId;
+          } catch (err) {
+            logger.warn({ err }, 'Could not fetch YouTube channelId');
+          }
+        }
+
+        const updated = loadConnection();
+        if (!updated.socialMedia) updated.socialMedia = {};
+        if (!updated.socialMedia.youtube) updated.socialMedia.youtube = {};
+        updated.socialMedia.youtube.enabled = true;
+        updated.socialMedia.youtube.accessToken = tokenData.access_token;
+        if (tokenData.refresh_token) {
+          updated.socialMedia.youtube.refreshToken = tokenData.refresh_token;
+        }
+        if (channelId) {
+          updated.socialMedia.youtube.channelId = channelId;
+        }
+
+        saveConnection(updated);
+
+        return reply.send({
+          success: true,
+          message: 'YouTube erfolgreich verbunden',
+          data: {
+            accessToken: !!tokenData.access_token,
+            hasRefresh: !!tokenData.refresh_token,
+            channelId: channelId || null,
+          },
+        });
+      } catch (error) {
+        logger.error({ error }, 'YouTube OAuth failed');
+        return reply.status(500).send({
+          success: false,
+          error: error instanceof Error ? error.message : 'OAuth failed',
         });
       }
     }

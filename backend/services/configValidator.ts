@@ -358,14 +358,43 @@ class ConfigValidator {
     }
 
     // SOCIAL MEDIA OPTIONAL VALIDATION
-    if (credentials.linkedinEnabled && !credentials.linkedinAccessToken) {
-      warnings.push({
-        field: 'linkedinAccessToken',
-        value: '',
-        rule: 'dependency',
-        message: 'LinkedIn ist aktiviert, aber kein Access Token gesetzt',
-        severity: 'warning',
-      });
+    if (credentials.linkedinEnabled) {
+      if (!credentials.linkedinAccessToken) {
+        warnings.push({
+          field: 'linkedinAccessToken',
+          value: '',
+          rule: 'dependency',
+          message: 'LinkedIn ist aktiviert, aber kein Access Token gesetzt',
+          severity: 'warning',
+        });
+      }
+      if (!credentials.linkedinClientId) {
+        warnings.push({
+          field: 'linkedinClientId',
+          value: '',
+          rule: 'dependency',
+          message: 'LinkedIn ist aktiviert, aber keine Client ID gesetzt',
+          severity: 'warning',
+        });
+      }
+      if (!credentials.linkedinClientSecret) {
+        warnings.push({
+          field: 'linkedinClientSecret',
+          value: '',
+          rule: 'dependency',
+          message: 'LinkedIn ist aktiviert, aber kein Client Secret gesetzt',
+          severity: 'warning',
+        });
+      }
+      if (!credentials.linkedinUrn) {
+        warnings.push({
+          field: 'linkedinUrn',
+          value: '',
+          rule: 'dependency',
+          message: 'LinkedIn ist aktiviert, aber keine Owner URN gesetzt (z.B. urn:li:organization:XXX)',
+          severity: 'warning',
+        });
+      }
     }
 
     if (credentials.facebookEnabled && !credentials.facebookAccessToken) {

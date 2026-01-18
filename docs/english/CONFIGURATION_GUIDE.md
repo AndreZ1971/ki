@@ -147,6 +147,97 @@ if (!config.woocommerce?.url) {
 
 ---
 
+## 🔑 OAuth & API Authentication
+
+### YouTube OAuth Setup (NEW in v6.4)
+
+YouTube video uploads require OAuth 2.0 authentication. Configuration is done via `connection.json`:
+
+**1. Google Cloud Console Setup:**
+- Go to [Google Cloud Console](https://console.cloud.google.com/)
+- Create a new project
+- Enable "YouTube Data API v3"
+- Create OAuth 2.0 Credentials (Desktop Application)
+- Copy `Client ID`, `Client Secret`, and `Redirect URI`
+
+**2. Configure connection.json:**
+```json
+{
+  "youtube": {
+    "enabled": true,
+    "clientId": "your-client-id.apps.googleusercontent.com",
+    "clientSecret": "your-client-secret",
+    "redirectUri": "http://localhost:3000",
+    "accessToken": "",
+    "refreshToken": "",
+    "channelId": ""
+  }
+}
+```
+
+**3. Redirect URI is important:**
+- Local development: `http://localhost:3000`
+- Production: `https://your-domain.com`
+- **Important**: Redirect URI MUST be without `/api/auth/youtube/callback` (backend appends it automatically)
+
+**4. Authorization in UI:**
+- Open Settings → Social Media Connections → YouTube
+- Click "Connect to YouTube"
+- Sign in with your Google Account
+- Approve permissions
+- Tokens are automatically saved to `connection.json`
+
+**5. Verify tokens:**
+After successful authentication, these fields should be populated:
+- `accessToken` - Used for uploads
+- `refreshToken` - Used to renew access token
+- `channelId` - Your YouTube channel
+
+### Reddit OAuth Setup
+
+Reddit data for customer opinions requires OAuth:
+
+```json
+{
+  "reddit": {
+    "enabled": true,
+    "clientId": "your-reddit-client-id",
+    "clientSecret": "your-reddit-secret",
+    "username": "your-reddit-username",
+    "password": "your-reddit-password"
+  }
+}
+```
+
+**Token Rotation:**
+- Reddit tokens are automatically renewed
+- No manual renewal needed
+- If error: Re-authenticate connection
+
+### Best Practices for OAuth
+
+| ✅ Correct | ❌ Wrong |
+|-----------|---------|
+| Secrets in `connection.json` (not in Git) | Secrets in `.ts` files |
+| `connection.json` in .gitignore | Secrets in hardcoded env vars |
+| Auto-refresh tokens | Manual token refresh |
+| Redirect URI = base URL | Redirect URI with `/callback` appended |
+
+### OAuth Error Handling
+
+**401 Unauthorized:**
+```
+Solution: Token expired or user needs to re-authenticate
+```
+
+**Redirect URI Mismatch:**
+```
+Error: "redirect_uri_mismatch"
+Solution: Check that Redirect URI in Google Console EXACTLY matches connection.json
+```
+
+---
+
 ## See also
 
 - [README.md](../../README_EN.md) - Project overview

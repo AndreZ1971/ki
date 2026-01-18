@@ -11,9 +11,61 @@
 - WordPress user account
 - OpenAI API Key (enter in `connection.json`)
 - Optional: Reddit OAuth Credentials (for real customer opinions)
+- Optional: YouTube OAuth (for video uploads to YouTube)
 
 ### What happens automatically?
 A.R.I. reads your data (products, orders, trends) and creates **hints, drafts, and suggestions**. You review and decide – no autonomous shop changes without your approval.
+
+---
+
+## 🎥 Social Media & Marketing
+
+### 🆕 Social Media Poster (with YouTube Video Upload)
+**What it does:** Publish marketing content across multiple platforms (LinkedIn, TikTok, Instagram, X/Twitter, Facebook, **YouTube**).
+
+**New in v6.4:**
+- **YouTube Video Upload**: Upload videos directly with auto-generated metadata
+- **Metadata Auto-Generation**: Title, tags, description generated from your text
+- **Cross-Platform**: Write once, publish to multiple channels
+
+**Usage:**
+1. Open "Social Media Poster"
+2. Write your content text (first sentence becomes title)
+3. Use hashtags in text → automatically become YouTube tags
+4. **For YouTube:** Select video file (MP4, MOV, AVI, etc.)
+5. Preview: Title, Tags, Description
+6. Click "Publish to YouTube"
+7. Video uploads with metadata
+
+**Example:**
+```
+Content Text:
+"🚀 Our new course is live! #ArtificialIntelligence #Learning #Tech
+
+Learn AI basics in 4 hours with hands-on projects..."
+
+YouTube Metadata (auto-generated):
+- Title: "🚀 Our new course is live!"
+- Tags: ["ArtificialIntelligence", "Learning", "Tech"]
+- Description: "Learn AI basics in 4 hours with hands-on projects..."
+```
+
+**Highlights:**
+- All platforms optional (enable/disable as you like)
+- OAuth connection one-time, then automatic
+- Video upload runs in background
+- Phase 2 (planned): Auto-generate videos from text
+
+**Required Connections:**
+- YouTube OAuth (see Social Media Onboarding Guide)
+- Other platforms optional (LinkedIn, TikTok, etc.)
+
+**YouTube Setup (one-time):**
+1. Go to Settings → Social Media Connections → YouTube
+2. Click "Connect to YouTube"
+3. Sign in with your Google Account
+4. Approve permissions
+5. Done! Tokens are automatically saved
 
 ---
 

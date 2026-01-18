@@ -96,6 +96,8 @@ const SocialMediaPoster: React.FC = () => {
     tiktok: false,
     youtube: false
   });
+  const [youtubeVideoFile, setYoutubeVideoFile] = useState<File | null>(null);
+  const [youtubeVideoPreview, setYoutubeVideoPreview] = useState<string>('');
 
   const apiBase = import.meta.env.VITE_API_URL || '';
 
@@ -196,6 +198,48 @@ const SocialMediaPoster: React.FC = () => {
   const handlePublishPost = async (platform: string, content: string) => {
     try {
       const supportedWebhookPlatforms = ['linkedin', 'facebook', 'tiktok', 'twitter'];
+      
+      // YouTube needs special handling for video upload
+      if (platform === 'youtube') {
+        if (!youtubeVideoFile) {
+          showToast('Bitte lade ein Video für YouTube hoch', 'error');
+          return;
+        }
+
+        // Convert video file to base64
+        const reader = new FileReader();
+        reader.onload = async () => {
+          const base64Video = (reader.result as string).split(',')[1];
+          
+          try {
+            const response = await fetch(`${apiBase}/api/social/post`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                platform: 'youtube',
+                content,
+                videoFile: base64Video,
+                videoTitle: tileContents['youtube']?.substring(0, 100) || 'Video',
+                videoDescription: content,
+                videoTags: content.match(/#\w+/g)?.map((tag: string) => tag.substring(1)) || []
+              })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+              showToast(`✅ Video erfolgreich auf YouTube hochgeladen: ${data.results.youtube.url}`, 'success');
+              setPostStats(prev => ({ ...prev, published: prev.published + 1 }));
+            } else {
+              showToast(`Fehler: ${data.results.youtube.error}`, 'error');
+            }
+          } catch (err) {
+            showToast('Fehler beim YouTube-Upload', 'error');
+          }
+        };
+        reader.readAsDataURL(youtubeVideoFile);
+        return;
+      }
+
       if (!supportedWebhookPlatforms.includes(platform)) {
         showToast('Diese Plattform wird noch nicht unterstützt', 'error');
         return;
@@ -428,6 +472,14 @@ const SocialMediaPoster: React.FC = () => {
             const title = !isConnected
               ? 'Plattform nicht verbunden. Bitte in den Einstellungen verbinden.'
               : (!content?.trim() ? 'Bitte erst Inhalt generieren oder eingeben' : '');
+            
+            // Special handling for YouTube
+            const isYouTube = p.value === 'youtube';
+            const youtubeDisabled = disabled || (isYouTube && !youtubeVideoFile);
+            const youtubeTitle = youtubeDisabled && isYouTube && !youtubeVideoFile
+              ? 'Bitte lade ein Video hoch'
+              : title;
+            
             return (
               <motion.div
                 key={p.value}
@@ -444,21 +496,47 @@ const SocialMediaPoster: React.FC = () => {
                     <p className="social-poster-post-chars">{characterCount} Zeichen</p>
                   </div>
                 </div>
+                
+                {/* YouTube Video Upload */}
+                {isYouTube && (
+                  <div style={{ marginBottom: '12px', padding: '12px', background: 'rgba(255, 0, 0, 0.05)', borderRadius: '8px', border: '1px solid rgba(255, 0, 0, 0.2)' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '12px', fontWeight: 'bold', color: '#ff6b6b' }}>
+                      🎬 Video hochladen (erforderlich)
+                    </label>
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setYoutubeVideoFile(file);
+                          setYoutubeVideoPreview(`📹 ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+                        }
+                      }}
+                      style={{ display: 'block', marginBottom: '8px', fontSize: '12px' }}
+                    />
+                    {youtubeVideoPreview && (
+                      <div style={{ fontSize: '12px', color: '#10b981' }}>✅ {youtubeVideoPreview}</div>
+                    )}
+                  </div>
+                )}
+                
                 <textarea
                   value={content}
                   onChange={(e) => setTileContents(prev => ({ ...prev, [p.value]: e.target.value }))}
                   className="form-textarea"
-                  rows={6}
+                  rows={isYouTube ? 4 : 6}
+                  placeholder={isYouTube ? 'Video-Beschreibung / Details...' : ''}
                   style={{ fontFamily: 'monospace', fontSize: '12px' }}
                 />
                 <div className="social-poster-actions">
                   <button
                     onClick={() => handlePublishPost(p.value, content)}
                     className="social-poster-btn social-poster-btn-primary"
-                    disabled={disabled}
-                    title={title}
+                    disabled={youtubeDisabled}
+                    title={youtubeTitle}
                   >
-                    📤 Senden
+                    {isYouTube ? '🎥 Hochladen' : '📤 Senden'}
                   </button>
                 </div>
               </motion.div>

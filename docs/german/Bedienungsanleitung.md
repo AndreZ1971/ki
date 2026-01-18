@@ -11,9 +11,61 @@
 - WordPress Benutzerkonto
 - OpenAI API Key (in `connection.json` eintragen)
 - Optional: Reddit OAuth Credentials (für echte Kundenmeinungen)
+- Optional: YouTube OAuth (für Video-Upload auf YouTube)
 
 ### Was passiert automatisch?
 A.R.I. liest deine Daten (Produkte, Bestellungen, Trends) und erstellt **Hinweise, Entwürfe und Vorschläge**. Du prüfst und entscheidest – keine autonomen Änderungen am Shop ohne dein OK.
+
+---
+
+## 🎥 Social Media & Marketing
+
+### 🆕 Social Media Poster (mit YouTube Video Upload)
+**Was es tut:** Veröffentliche Marketing-Content auf mehreren Plattformen (LinkedIn, TikTok, Instagram, X/Twitter, Facebook, **YouTube**).
+
+**Neu in v6.4:**
+- **YouTube Video Upload**: Lade Videos direkt hoch mit Auto-Metadaten
+- **Metadata Auto-Generierung**: Titel, Tags, Beschreibung aus deinem Text
+- **Platform-übergreifend**: Schreibe einmal, veröffentliche auf mehreren Kanälen
+
+**Verwendung:**
+1. Öffne "Social Media Poster"
+2. Schreibe deinen Content-Text (erster Satz wird Titel)
+3. Nutze Hashtags im Text → werden automatisch zu YouTube-Tags
+4. **Für YouTube:** Wähle Video-Datei (MP4, MOV, AVI, etc.)
+5. Sehe Preview: Titel, Tags, Beschreibung
+6. Klicke "Veröffentlichen auf YouTube"
+7. Video wird mit Metadaten hochgeladen
+
+**Beispiel:**
+```
+Content-Text:
+"🚀 Unser neuer Kurs ist live! #KünstlicheIntelligenz #Lernen #Tech
+
+Lerne die Grundlagen von KI in 4 Stunden mit praktischen Projekten..."
+
+YouTube Metadaten (auto-generiert):
+- Titel: "🚀 Unser neuer Kurs ist live!"
+- Tags: ["KünstlicheIntelligenz", "Lernen", "Tech"]
+- Beschreibung: "Lerne die Grundlagen von KI in 4 Stunden mit praktischen Projekten..."
+```
+
+**Besonderheiten:**
+- Alle Plattformen optional (aktivier/deaktivier wie du möchtest)
+- OAuth-Verbindung einmalig, danach automatisch
+- Video-Upload läuft im Hintergrund
+- Phase 2 (geplant): Auto-Video-Generierung aus Text
+
+**Benötigte Verbindungen:**
+- YouTube OAuth (s. Social Media Onboarding Guide)
+- Weitere Plattformen optional (LinkedIn, TikTok, etc.)
+
+**YouTube Setup (einmalig):**
+1. Gehe zu Settings → Social Media Connections → YouTube
+2. Klicke "Mit YouTube verbinden"
+3. Melde dich mit deinem Google-Account an
+4. Bestätige die Berechtigungen
+5. Done! Tokens werden automatisch gespeichert
 
 ---
 

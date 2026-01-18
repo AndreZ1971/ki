@@ -217,6 +217,109 @@ export default async function webhookRoutes(fastify: FastifyInstance) {
           }
         }
 
+        // ✨ LINKEDIN DIRECT POSTING
+        if (platform === 'linkedin') {
+          const socialMedia = getSocialMediaConfig();
+          const linkedinConfig = socialMedia.linkedin;
+
+          if (!linkedinConfig?.enabled || !linkedinConfig?.accessToken || !linkedinConfig?.urn) {
+            return reply.status(400).send({
+              success: false,
+              error: 'LinkedIn ist nicht konfiguriert. Bitte Client ID, Client Secret, Access Token und URN in den Einstellungen hinterlegen.',
+              platform
+            });
+          }
+
+          // Transform content if AI is enabled
+          let finalContent = content;
+          if (useAI) {
+            try {
+              const transformed = await transformContentForPlatform({
+                platform: 'linkedin',
+                content
+              });
+              finalContent = transformed.content;
+              logger.info({ platform: 'linkedin' }, 'AI transformation successful');
+            } catch (transformError) {
+              logger.warn({ error: transformError }, 'AI transformation failed, using original content');
+              finalContent = content;
+            }
+          }
+
+          const body = {
+            author: linkedinConfig.urn,
+            lifecycleState: 'PUBLISHED',
+            specificContent: {
+              'com.linkedin.ugc.ShareContent': {
+                shareCommentary: { text: finalContent },
+                shareMediaCategory: 'NONE'
+              }
+            },
+            visibility: {
+              'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC'
+            }
+          };
+
+          try {
+            const response = await fetch('https://api.linkedin.com/v2/ugcPosts', {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${linkedinConfig.accessToken}`,
+                'Content-Type': 'application/json',
+                'X-Restli-Protocol-Version': '2.0.0'
+              },
+              body: JSON.stringify(body)
+            });
+
+            const result = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+              logger.error({ 
+                error: result, 
+                requestBody: body,
+                statusCode: response.status,
+                statusText: response.statusText
+              }, 'LinkedIn API error');
+              
+              // Parse LinkedIn error message
+              let errorMsg = result.message || result.status || 'LinkedIn posting fehlgeschlagen';
+              if (result.serviceErrorCode) {
+                errorMsg = `LinkedIn Error: ${result.serviceErrorCode} - ${result.message || 'Unbekannter Fehler'}`;
+              }
+              
+              return reply.status(400).send({
+                success: false,
+                error: errorMsg,
+                hint: 'Prüfen Sie: 1) URN ist korrekt 2) Token hat write-Berechtigung 3) Organisation ist mit App verknüpft',
+                details: result,
+                platform
+              });
+            }
+
+            logger.info({ platform: 'linkedin', entity: result.id || result }, 'Post sent to LinkedIn successfully');
+
+            return reply.send({
+              success: true,
+              message: `✨ Post erfolgreich auf LinkedIn veröffentlicht! ${useAI ? '(AI-optimiert)' : ''}`,
+              data: {
+                platform: 'linkedin',
+                entity: result.id || result,
+                status: 'published',
+                aiTransformed: useAI,
+                originalContent: content,
+                transformedContent: finalContent !== content ? finalContent : undefined
+              }
+            });
+          } catch (error) {
+            logger.error({ error }, 'LinkedIn posting failed');
+            return reply.status(500).send({
+              success: false,
+              error: error instanceof Error ? error.message : 'LinkedIn posting fehlgeschlagen',
+              platform
+            });
+          }
+        }
+
         // For other platforms, use webhook system
         const config = getConfig();
         const webhookUrls: { [key: string]: string | undefined } = {

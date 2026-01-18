@@ -34,7 +34,10 @@ interface ShopCredentials {
 
   // Social Media Accounts
   linkedinEnabled: boolean;
+  linkedinClientId: string;
+  linkedinClientSecret: string;
   linkedinAccessToken: string;
+  linkedinUrn: string;
   linkedinRefreshToken: string;
 
   facebookEnabled: boolean;
@@ -56,6 +59,9 @@ interface ShopCredentials {
   tiktokRefreshToken: string;
 
   youtubeEnabled: boolean;
+  youtubeClientId: string;
+  youtubeClientSecret: string;
+  youtubeRedirectUri: string;
   youtubeAccessToken: string;
   youtubeRefreshToken: string;
   youtubeChannelId: string;
@@ -176,9 +182,14 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
 
           // Social Media - Convert from structured to flat
           linkedinEnabled: fileData.socialMedia?.linkedin?.enabled ?? false,
+          linkedinClientId: fileData.socialMedia?.linkedin?.clientId || '',
+          linkedinClientSecret: fileData.socialMedia?.linkedin?.clientSecret
+            ? '****'
+            : '',
           linkedinAccessToken: fileData.socialMedia?.linkedin?.accessToken
             ? '****'
             : '',
+          linkedinUrn: fileData.socialMedia?.linkedin?.urn || '',
           linkedinRefreshToken: fileData.socialMedia?.linkedin?.refreshToken
             ? '****'
             : '',
@@ -218,6 +229,11 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
             : '',
 
           youtubeEnabled: fileData.socialMedia?.youtube?.enabled ?? false,
+          youtubeClientId: fileData.socialMedia?.youtube?.clientId || '',
+          youtubeClientSecret: fileData.socialMedia?.youtube?.clientSecret
+            ? '****'
+            : '',
+          youtubeRedirectUri: fileData.socialMedia?.youtube?.redirectUri || '',
           youtubeAccessToken: fileData.socialMedia?.youtube?.accessToken
             ? '****'
             : '',
@@ -268,8 +284,11 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
           redditClientSecret: '',
           // Social Media Defaults
           linkedinEnabled: false,
+              linkedinClientId: '',
+              linkedinClientSecret: '',
           linkedinAccessToken: '',
-          linkedinRefreshToken: '',
+              linkedinUrn: '',
+              linkedinRefreshToken: '',
           facebookEnabled: false,
           facebookAccessToken: '',
           facebookPageId: '',
@@ -285,6 +304,9 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
           tiktokAccessToken: '',
           tiktokRefreshToken: '',
           youtubeEnabled: false,
+              youtubeClientId: '',
+              youtubeClientSecret: '',
+              youtubeRedirectUri: '',
           youtubeAccessToken: '',
           youtubeRefreshToken: '',
           youtubeChannelId: '',
@@ -345,7 +367,10 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         enableEmailMarketing: payload.features?.enableEmailMarketing ?? true,
         // Social Media (extract from payload.socialMedia or legacy format)
         linkedinEnabled: payload.socialMedia?.linkedin?.enabled ?? false,
+        linkedinClientId: payload.socialMedia?.linkedin?.clientId || '',
+        linkedinClientSecret: payload.socialMedia?.linkedin?.clientSecret || '',
         linkedinAccessToken: payload.socialMedia?.linkedin?.accessToken || '',
+        linkedinUrn: payload.socialMedia?.linkedin?.urn || '',
         linkedinRefreshToken: payload.socialMedia?.linkedin?.refreshToken || '',
         facebookEnabled: payload.socialMedia?.facebook?.enabled ?? false,
         facebookAccessToken: payload.socialMedia?.facebook?.accessToken || '',
@@ -364,6 +389,9 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         tiktokAccessToken: payload.socialMedia?.tiktok?.accessToken || '',
         tiktokRefreshToken: payload.socialMedia?.tiktok?.refreshToken || '',
         youtubeEnabled: payload.socialMedia?.youtube?.enabled ?? false,
+        youtubeClientId: payload.socialMedia?.youtube?.clientId || '',
+        youtubeClientSecret: payload.socialMedia?.youtube?.clientSecret || '',
+        youtubeRedirectUri: payload.socialMedia?.youtube?.redirectUri || '',
         youtubeAccessToken: payload.socialMedia?.youtube?.accessToken || '',
         youtubeRefreshToken: payload.socialMedia?.youtube?.refreshToken || '',
         youtubeChannelId: payload.socialMedia?.youtube?.channelId || '',
@@ -433,9 +461,21 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         ),
         openaiApiKey: unmaskValue(newCredentials.openaiApiKey, oldOpenaiApiKey),
         // Social Media - unmask tokens
+        linkedinClientId: unmaskValue(
+          newCredentials.linkedinClientId,
+          getOldSocialMediaValue('linkedin', 'clientId')
+        ),
+        linkedinClientSecret: unmaskValue(
+          newCredentials.linkedinClientSecret,
+          getOldSocialMediaValue('linkedin', 'clientSecret')
+        ),
         linkedinAccessToken: unmaskValue(
           newCredentials.linkedinAccessToken,
           getOldSocialMediaValue('linkedin', 'accessToken')
+        ),
+        linkedinUrn: unmaskValue(
+          newCredentials.linkedinUrn,
+          getOldSocialMediaValue('linkedin', 'urn')
         ),
         linkedinRefreshToken: unmaskValue(
           newCredentials.linkedinRefreshToken,
@@ -480,6 +520,18 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         youtubeRefreshToken: unmaskValue(
           newCredentials.youtubeRefreshToken,
           getOldSocialMediaValue('youtube', 'refreshToken')
+        ),
+        youtubeClientId: unmaskValue(
+          newCredentials.youtubeClientId,
+          getOldSocialMediaValue('youtube', 'clientId')
+        ),
+        youtubeClientSecret: unmaskValue(
+          newCredentials.youtubeClientSecret,
+          getOldSocialMediaValue('youtube', 'clientSecret')
+        ),
+        youtubeRedirectUri: unmaskValue(
+          newCredentials.youtubeRedirectUri,
+          getOldSocialMediaValue('youtube', 'redirectUri')
         ),
       };
 
@@ -542,7 +594,10 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
       const socialMediaStructured: any = {
         linkedin: {
           enabled: cleanedCredentials.linkedinEnabled,
+          clientId: cleanedCredentials.linkedinClientId,
+          clientSecret: cleanedCredentials.linkedinClientSecret,
           accessToken: cleanedCredentials.linkedinAccessToken,
+          urn: cleanedCredentials.linkedinUrn,
           refreshToken: cleanedCredentials.linkedinRefreshToken,
         },
         facebook: {
@@ -569,6 +624,9 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         },
         youtube: {
           enabled: cleanedCredentials.youtubeEnabled,
+          clientId: cleanedCredentials.youtubeClientId,
+          clientSecret: cleanedCredentials.youtubeClientSecret,
+          redirectUri: cleanedCredentials.youtubeRedirectUri,
           accessToken: cleanedCredentials.youtubeAccessToken,
           refreshToken: cleanedCredentials.youtubeRefreshToken,
           channelId: cleanedCredentials.youtubeChannelId,

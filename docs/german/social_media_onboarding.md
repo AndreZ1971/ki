@@ -76,17 +76,51 @@ Dieses Dokument dient als technischer Leitfaden für die Einrichtung von API-Sch
 ---
 
 ## 🎥 6. YouTube (Video Content)
-**Ziel:** Video-Uploads und Kanal-Management.
+**Ziel:** Video-Uploads, Auto-Metadaten-Generierung und Kanal-Management.
 
 ### Vorgehensweise:
 1.  **Portal:** [Google Cloud Console](https://console.cloud.google.com/).
 2.  **API:** Aktiviere die **"YouTube Data API v3"**.
 3.  **OAuth Screen:** Richte den OAuth-Zustimmungsbildschirm ein und füge deine E-Mail als Test-Nutzer hinzu.
 4.  **Credentials:** Erstelle eine "OAuth 2.0 Client ID" für eine Desktop-Anwendung.
-5.  **Token-Erhalt:**
+5.  **Redirect URI (WICHTIG!):** Trage in den OAuth-Credentials ein:
+    * `http://localhost:3000` (für lokale Entwicklung)
+    * `https://deine-domain.com` (für Production)
+6.  **Token-Erhalt:**
     * Nutze den [OAuth 2.0 Playground](https://developers.google.com/oauthplayground/).
     * Scope: `https://www.googleapis.com/auth/youtube.force-ssl`.
     * Klicke auf "Authorize" und tausche den Code gegen den `Access Token` und den **`Refresh Token`** aus.
 
+### 🆕 YouTube Video Upload (Phase 1 - Phase 2 folgt)
+**Neu in v6.3:**
+- **Video Upload**: Lade Videos direkt aus der Social Media Poster UI hoch
+- **Auto-Metadaten**: Titel, Tags und Beschreibung werden automatisch aus deinem Content generiert
+- **Video-Validierung**: Unterstützte Formate (MP4, MOV, AVI, etc.)
+- **Resumable Upload**: Große Dateien in Chunks hochladen
+
+**Konfiguration** (in `connection.json`):
+```json
+{
+  "youtube": {
+    "enabled": true,
+    "clientId": "deine-client-id.apps.googleusercontent.com",
+    "clientSecret": "dein-client-secret",
+    "redirectUri": "http://localhost:3000",
+    "accessToken": "wird-automatisch-gespeichert",
+    "refreshToken": "wird-automatisch-gespeichert",
+    "channelId": "wird-automatisch-gespeichert"
+  }
+}
+```
+
+**Metadata-Auto-Generierung**:
+- **Titel**: Erste Zeile deines Content-Textes
+- **Tags**: Automatisch extrahierte Hashtags aus dem Text
+- **Beschreibung**: Vollständiger Content-Text
+
+**Besonderheiten**:
+- Phase 1: Manuelle Text-Eingabe + Video-Upload
+- Phase 2 (geplant): Auto-Generierung von Videos aus Text + AI Video-Editing
+
 ---
-## Erstellt am: 22. Dezember 2025
+## Aktualisiert am: 18. Januar 2026

@@ -147,6 +147,97 @@ if (!config.woocommerce?.url) {
 
 ---
 
+## 🔑 OAuth & API Authentifizierung
+
+### YouTube OAuth Setup (NEU in v6.4)
+
+YouTube Video Upload benötigt OAuth 2.0 Authentifizierung. Die Konfiguration erfolgt über `connection.json`:
+
+**1. Google Cloud Console Setup:**
+- Gehe zu [Google Cloud Console](https://console.cloud.google.com/)
+- Erstelle ein neues Projekt
+- Aktiviere "YouTube Data API v3"
+- Erstelle OAuth 2.0 Credentials (Desktop Application)
+- Kopiere `Client ID`, `Client Secret` und `Redirect URI`
+
+**2. connection.json konfigurieren:**
+```json
+{
+  "youtube": {
+    "enabled": true,
+    "clientId": "dein-client-id.apps.googleusercontent.com",
+    "clientSecret": "dein-client-secret",
+    "redirectUri": "http://localhost:3000",
+    "accessToken": "",
+    "refreshToken": "",
+    "channelId": ""
+  }
+}
+```
+
+**3. Redirect URI wichtig:**
+- Lokale Entwicklung: `http://localhost:3000`
+- Production: `https://deine-domain.com`
+- **Wichtig**: Redirect URI MUSS ohne `/api/auth/youtube/callback` sein (Backend hängt das automatisch an)
+
+**4. Autorisierung im UI:**
+- Öffne Settings → Social Media Connections → YouTube
+- Klicke "Mit YouTube verbinden"
+- Melde dich mit Google-Account an
+- Bestätige Berechtigungen
+- Tokens werden automatisch in `connection.json` gespeichert
+
+**5. Tokens prüfen:**
+Nach erfolgreicher Authentifizierung sollten diese Felder gefüllt sein:
+- `accessToken` - Zum Upload verwenden
+- `refreshToken` - Zum erneuern des Access Tokens
+- `channelId` - Dein YouTube Channel
+
+### Reddit OAuth Setup
+
+Reddit-Daten für Kundenmeinungen benötigen OAuth:
+
+```json
+{
+  "reddit": {
+    "enabled": true,
+    "clientId": "dein-reddit-client-id",
+    "clientSecret": "dein-reddit-secret",
+    "username": "dein-reddit-username",
+    "password": "dein-reddit-password"
+  }
+}
+```
+
+**Tokens-Rotation:**
+- Reddit Tokens werden automatisch erneuert
+- Kein manuelles Erneuern nötig
+- Falls Fehler: Connection neu authentifizieren
+
+### Best Practices für OAuth
+
+| ✅ Richtig | ❌ Falsch |
+|-----------|---------|
+| Secrets in `connection.json` (nicht in Git) | Secrets in `.ts` Dateien |
+| `connection.json` .gitignore | Secrets in Environment-Variablen hardcoden |
+| Tokens automatisch erneuern | Manuelles Token-Refresh |
+| Redirect URI = Base URL | Redirect URI mit `/callback` appended |
+
+### Fehlerbehandlung OAuth
+
+**401 Unauthorized:**
+```
+Lösung: Token erneuert oder User muss neu authentifizieren
+```
+
+**Redirect URI Mismatch:**
+```
+Fehler: "redirect_uri_mismatch"
+Lösung: Prüfe dass Redirect URI in Google Console EXAKT mit connection.json matched
+```
+
+---
+
 ## Siehe auch
 
 - [README.md](../../README.md) - Projektübersicht
