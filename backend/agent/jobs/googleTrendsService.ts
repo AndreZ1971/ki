@@ -6,8 +6,6 @@ import googleTrends from 'google-trends-api';
 class GoogleTrendsService {
   static async getIndustryTrends() {
     try {
-      console.log('🔍 Analysiere Google Trends für Datenschutz-Branche...');
-      
       // Keywords die für dein Business relevant sind
       const keywords = [
         'datenschutz',
@@ -23,8 +21,7 @@ class GoogleTrendsService {
 
       return trends;
     } catch (_error) {
-      console.error('❌ Fehler beim Laden der Google Trends:', _error);
-      return this.getFallbackTrendData();
+      return [];
     }
   }
 
@@ -61,15 +58,15 @@ class GoogleTrendsService {
         lastUpdated: new Date().toISOString()
       };
     } catch (error) {
-      console.warn(`⚠️ Google Trends Fehler für "${keyword}":`, error instanceof Error ? error.message : 'Unknown error');
-      // Fallback zu Mock-Daten wenn API fehlschlägt
+      const message = error instanceof Error ? error.message : 'Unknown error';
       return {
         keyword,
-        trendScore: Math.floor(Math.random() * 100) + 1,
-        change: (Math.random() - 0.5) * 20,
-        seasonality: this.calculateSeasonality(),
-        dataSource: 'fallback',
-        lastUpdated: new Date().toISOString()
+        trendScore: 0,
+        change: 0,
+        seasonality: 'unknown',
+        dataSource: 'unavailable',
+        lastUpdated: new Date().toISOString(),
+        error: message
       };
     }
   }
@@ -79,16 +76,6 @@ class GoogleTrendsService {
     // Höhere Nachfrage für Datenschutz in Q1 (Steuerzeit) und Q3 (Urlaubszeit)
     return month >= 0 && month <= 2 ? 'high' : 
            month >= 6 && month <= 8 ? 'medium' : 'normal';
-  }
-
-  private static getFallbackTrendData() {
-    return [
-      { keyword: 'datenschutz', trendScore: 85, change: 12.5, seasonality: 'high' },
-      { keyword: 'dsgvo', trendScore: 78, change: 8.3, seasonality: 'medium' },
-      { keyword: 'cookie consent', trendScore: 92, change: 15.7, seasonality: 'high' },
-      { keyword: 'datenschutz schulung', trendScore: 65, change: 5.2, seasonality: 'normal' },
-      { keyword: 'dsgvo compliance', trendScore: 88, change: 10.1, seasonality: 'high' }
-    ];
   }
 }
 

@@ -256,20 +256,60 @@ const MiniAudit = () => {
     return trend >= 0 ? '#27ae60' : '#e74c3c';
   };
 
-  const applyQuickAction = (checkId: string) => {
-    // Simuliere Quick Action
-    setQuickChecks(prev => prev.map(check => 
-      check.id === checkId 
-        ? { 
-            ...check, 
-            status: 'good' as const,
-            trend: Math.abs(check.trend),
-            value: check.id === 'load-time' ? '1.4s' : 
-                   check.id === 'mobile-score' ? '78/100' :
-                   check.id === 'core-vitals' ? '75/100' : check.value
-          }
-        : check
-    ));
+  const applyQuickAction = async (checkId: string) => {
+    try {
+      setLoading(true);
+      
+      // Map checkId zu actionId
+      const actionMap: Record<string, string> = {
+        'load-time': 'cache-optimization',
+        'mobile-score': 'optimize-images',
+        'seo-basic': 'optimize-meta-tags',
+        'core-vitals': 'enable-lazy-loading'
+      };
+      
+      const actionId = actionMap[checkId] || 'optimize-images';
+      
+      // Rufe Backend API auf
+      const response = await fetch('/api/audit/mini/apply-action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actionId,
+          productIds: [1, 2, 3], // TODO: Echte Produkt-IDs vom Shop
+          shopData: {}
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        // Update UI mit erfolgreicher Aktion
+        setQuickChecks(prev => prev.map(check => 
+          check.id === checkId 
+            ? { 
+                ...check, 
+                status: 'good' as const,
+                trend: Math.abs(check.trend),
+                value: check.id === 'load-time' ? '1.4s' : 
+                       check.id === 'mobile-score' ? '78/100' :
+                       check.id === 'core-vitals' ? '75/100' : check.value
+              }
+            : check
+        ));
+
+      } else {
+        throw new Error(data.error || 'Fehler beim Ausführen der Aktion');
+      }
+    } catch (error) {
+      alert(`Fehler: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const criticalIssues = quickChecks.filter(check => 

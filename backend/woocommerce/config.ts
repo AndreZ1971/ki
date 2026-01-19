@@ -10,19 +10,37 @@ export interface WooCommerceConfig {
 
 import fs from 'fs';
 import path from 'path';
+import { getConfig } from '../config.js';
 
 export const getWooConfig = (): WooCommerceConfig => {
-  // Hole zentrale Konfiguration direkt aus connection.json, um ESM/CJS-Interop-Probleme in Tests zu vermeiden
-  const configPath = path.resolve(__dirname, '../connection.json');
+  // Hole zentrale Konfiguration: erst lokale connection.json (dist/connection), dann backend/connection.json, dann root.
+  const candidatePaths = [
+    // dist/connection.json (if copied)
+    path.resolve(__dirname, '../connection.json'),
+    // backend/connection.json
+    path.resolve(__dirname, '../../connection.json'),
+    // repository root connection.json
+    path.resolve(__dirname, '../../../connection.json')
+  ];
+
   let woo: any = {};
-  if (fs.existsSync(configPath)) {
-    try {
-      const raw = fs.readFileSync(configPath, 'utf-8');
-      const parsed = JSON.parse(raw);
-      woo = parsed.woocommerce || {};
-    } catch {
-      woo = {};
+  for (const p of candidatePaths) {
+    if (fs.existsSync(p)) {
+      try {
+        const raw = fs.readFileSync(p, 'utf-8');
+        const parsed = JSON.parse(raw);
+        woo = parsed.woocommerce || {};
+        break;
+      } catch {
+        woo = {};
+      }
     }
+  }
+
+  // Fallback: nutze zentrales getConfig, falls Dateien fehlen
+  if (!woo.url) {
+    const cfg = getConfig();
+    woo = cfg.woocommerce || woo;
   }
   return {
     url: woo.url || '',

@@ -39,6 +39,7 @@ const StandardAudit = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [scanInProgress, setScanInProgress] = useState(false);
+  const [isFixLoading, setIsFixLoading] = useState(false);
 
   // KI/ML-Analyse States
   const [mlLoading, setMlLoading] = useState(false);
@@ -83,70 +84,19 @@ const StandardAudit = () => {
     setMlError(null);
     setMlInsights([]);
     try {
+      if (auditChecks.length === 0 || summary.totalChecks === 0) {
+        throw new Error("Keine Audit-Daten geladen. Bitte zuerst Scan ausführen.");
+      }
+
       let base = (import.meta.env.VITE_API_URL || "").trim();
       if (base.endsWith("/")) base = base.slice(0, -1);
       const apiUrl = base
         ? `${base}/api/audit/standard/ml-analysis`
         : `/api/audit/standard/ml-analysis`;
 
-      // Mit Mock-Daten arbeiten, wenn keine echten Daten da sind
       const payload = {
-        auditChecks:
-          auditChecks.length > 0
-            ? auditChecks
-            : [
-                {
-                  id: "check1",
-                  name: "Mobile Responsiveness",
-                  category: "ux" as const,
-                  status: "passed" as const,
-                  importance: "high" as const,
-                  description: "Mobile-Ansicht prüfen",
-                  fixSuggestion: "CSS Media Queries verwenden",
-                  quickFix: false,
-                },
-                {
-                  id: "check2",
-                  name: "SSL/HTTPS",
-                  category: "security" as const,
-                  status: "passed" as const,
-                  importance: "critical" as const,
-                  description: "Verschlüsselung überprüfen",
-                  fixSuggestion: "SSL-Zertifikat installieren",
-                  quickFix: false,
-                },
-                {
-                  id: "check3",
-                  name: "Meta-Tags vorhanden",
-                  category: "seo" as const,
-                  status: "warning" as const,
-                  importance: "medium" as const,
-                  description: "SEO-Meta-Tags überprüfen",
-                  fixSuggestion: "Meta-Descriptions hinzufügen",
-                  quickFix: true,
-                },
-                {
-                  id: "check4",
-                  name: "Bilder optimiert",
-                  category: "performance" as const,
-                  status: "warning" as const,
-                  importance: "high" as const,
-                  description: "Bildgröße überprüfen",
-                  fixSuggestion: "Bilder komprimieren",
-                  quickFix: true,
-                },
-              ],
-        summary:
-          summary.totalChecks > 0
-            ? summary
-            : {
-                totalChecks: 4,
-                passed: 2,
-                warnings: 2,
-                failed: 0,
-                overallScore: 75,
-                criticalIssues: 0,
-              },
+        auditChecks,
+        summary,
       };
 
       const data = await apiClient.post(apiUrl, payload);
@@ -250,22 +200,59 @@ const StandardAudit = () => {
     }
   };
 
-  const applyQuickFix = (checkId: string) => {
-    // Simuliere Quick Fix Anwendung
-    setAuditChecks((prev) =>
-      prev.map((check) =>
-        check.id === checkId ? { ...check, status: "passed" as const } : check
-      )
-    );
+  const applyQuickFix = async (checkId: string) => {
+    try {
+      setIsFixLoading(true);
+      
+      // Finde den Check um fixId zu bestimmen
+      const check = auditChecks.find(c => c.id === checkId);
+      if (!check) {
+        throw new Error('Check nicht gefunden');
+      }
 
-    // Recalculate summary after fix
-    setTimeout(() => {
-      calculateSummary(
-        auditChecks.map((check) =>
-          check.id === checkId ? { ...check, status: "passed" as const } : check
-        )
-      );
-    }, 500);
+      // Rufe Backend API auf
+      const response = await fetch('/api/audit/standard/apply-fix', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fixId: checkId,
+          checkId: checkId,
+          productIds: [1, 2, 3], // TODO: Echte Produkt-IDs vom Shop
+          category: check.category
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        // Update UI mit erfolgreicher Aktion
+        setAuditChecks((prev) =>
+          prev.map((c) =>
+            c.id === checkId ? { ...c, status: "passed" as const } : c
+          )
+        );
+
+        // Recalculate summary after fix
+        setTimeout(() => {
+          calculateSummary(
+            auditChecks.map((c) =>
+              c.id === checkId ? { ...c, status: "passed" as const } : c
+            )
+          );
+        }, 500);
+
+      } else {
+        throw new Error(data.error || 'Fehler beim Ausführen des Fixes');
+      }
+    } catch (error) {
+      alert(`Fehler: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
+    } finally {
+      setIsFixLoading(false);
+    }
   };
 
   const categories = ["all", "performance", "seo", "security", "ux", "content"];
@@ -417,8 +404,9 @@ const StandardAudit = () => {
                   <button
                     className="quick-fix-button"
                     onClick={() => applyQuickFix(check.id)}
+                    disabled={isFixLoading}
                   >
-                    🔧 Jetzt fixen
+                    {isFixLoading ? '🔧 Fix läuft...' : '🔧 Jetzt fixen'}
                   </button>
                 </div>
               ))}

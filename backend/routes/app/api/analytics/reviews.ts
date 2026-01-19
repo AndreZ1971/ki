@@ -2,11 +2,68 @@ import { FastifyInstance } from 'fastify';
 import OpenAI from 'openai';
 import { getConfig } from '@config';
 import { logger } from '../../../../logger';
+import { WooCommerceClient } from '../../../../woocommerce/client.js';
 
 // ✅ NEU (richtig - lazy Initialisierung)
 let openai: OpenAI | null = null;
 let lastApiKey: string | undefined = undefined;
 let lastModel: string | undefined = undefined;
+
+const REVIEW_STOP_WORDS = new Set([
+  'der','die','das','und','mit','fuer','für','eine','ein','ist','sind','nicht','auf','von','den','im','aber','auch','oder','ohne','mehr','als','zum','zur','ich','wir','man','dass','dieses','diese','dieser','einfach','sehr'
+]);
+
+async function fetchProductReviews(client: WooCommerceClient, productId: string) {
+  const perPage = 100;
+  const maxPages = 10;
+  const all: any[] = [];
+
+  for (let page = 1; page <= maxPages; page += 1) {
+    const batch = await client.get(`products/reviews?product=${encodeURIComponent(productId)}&per_page=${perPage}&page=${page}`);
+    if (!Array.isArray(batch)) {
+      throw new Error('Unerwartete Antwort von der WooCommerce Reviews API');
+    }
+
+    all.push(...batch);
+    if (batch.length < perPage) break;
+  }
+
+  return all;
+}
+
+function extractThemes(reviews: any[]): string[] {
+  const text = reviews
+    .map((review: any) => {
+      if (typeof review?.review === 'string') return review.review;
+      if (typeof review?.review?.rendered === 'string') return review.review.rendered;
+      return '';
+    })
+    .join(' ')
+    .toLowerCase();
+
+  const words = text.split(/[^a-zäöüß0-9]+/i).filter(word => word.length >= 5 && !REVIEW_STOP_WORDS.has(word));
+  const counts = new Map<string, number>();
+  for (const word of words) {
+    counts.set(word, (counts.get(word) ?? 0) + 1);
+  }
+
+  return Array.from(counts.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([word]) => word);
+}
+
+function calculateSentimentScore(ratings: number[]): number {
+  if (!ratings.length) return 0;
+  const normalized = ratings.map(rating => {
+    const value = Number(rating);
+    const score = (value - 3) / 2; // 1->-1, 3->0, 5->1
+    return Math.max(-1, Math.min(1, score));
+  });
+
+  const average = normalized.reduce((sum, value) => sum + value, 0) / normalized.length;
+  return parseFloat(average.toFixed(2));
+}
 
 function initializeOpenAI() {
   const config = getConfig();
@@ -30,6 +87,7 @@ function initializeOpenAI() {
 }
 
 export default async function reviewsRoutes(server: FastifyInstance) {
+  const wooCommerce = new WooCommerceClient();
   
   // 📊 Einzelne Bewertung analysieren
   server.post('/reviews/analyze', {
@@ -326,20 +384,64 @@ Antworte im JSON Format:
   }, async (request: any) => {
     const { productId } = request.params;
 
-    // Hier würde normalerweise die Datenbank abgefragt werden
-    // Für dieses Beispiel geben wir eine Mock-Antwort zurück
-    
-    return {
-      success: true,
-      productId,
-      overallSentiment: 'positive',
-      sentimentScore: 0.75,
-      totalReviews: 42,
-      positiveReviews: 32,
-      negativeReviews: 5,
-      neutralReviews: 5,
-      trendingThemes: ['Benutzerfreundlichkeit', 'Leistung', 'Design'],
-      message: 'Sentiment analysis would query database in production'
-    };
+    try {
+      const reviews = await fetchProductReviews(wooCommerce, productId);
+
+      if (!reviews.length) {
+        return {
+          success: true,
+          productId,
+          overallSentiment: 'neutral',
+          sentimentScore: 0,
+          totalReviews: 0,
+          positiveReviews: 0,
+          negativeReviews: 0,
+          neutralReviews: 0,
+          trendingThemes: [],
+          message: 'Keine Bewertungen für dieses Produkt vorhanden'
+        };
+      }
+
+      const ratings = reviews
+        .map((review: any) => Number(review.rating ?? review?.rating?.rendered))
+        .filter((rating: number) => Number.isFinite(rating));
+
+      const totalReviews = ratings.length;
+      const positiveReviews = ratings.filter((rating: number) => rating >= 4).length;
+      const negativeReviews = ratings.filter((rating: number) => rating <= 2).length;
+      const neutralReviews = totalReviews - positiveReviews - negativeReviews;
+
+      const sentimentScore = calculateSentimentScore(ratings);
+      const overallSentiment = sentimentScore > 0.25 ? 'positive' : sentimentScore < -0.25 ? 'negative' : 'neutral';
+
+      const trendingThemes = extractThemes(reviews);
+
+      return {
+        success: true,
+        productId,
+        overallSentiment,
+        sentimentScore,
+        totalReviews,
+        positiveReviews,
+        negativeReviews,
+        neutralReviews,
+        trendingThemes,
+        message: 'Bewertungen aus WooCommerce analysiert'
+      };
+    } catch (error: any) {
+      logger.error({ error: error.message, productId }, 'Reviews sentiment fetching failed');
+      return {
+        success: false,
+        productId,
+        overallSentiment: 'neutral',
+        sentimentScore: 0,
+        totalReviews: 0,
+        positiveReviews: 0,
+        negativeReviews: 0,
+        neutralReviews: 0,
+        trendingThemes: [],
+        error: error.message
+      };
+    }
   });
 }

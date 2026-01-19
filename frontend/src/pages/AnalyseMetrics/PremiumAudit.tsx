@@ -53,10 +53,19 @@ const PremiumAudit = () => {
     setLoading(true);
     try {
       const data = await apiClient.get('/api/audit/premium');
-      setAuditData(data.categories || []);
-      setRecommendations(data.recommendations || []);
-      if (data.categories && data.categories.length > 0) {
-        const totalScore = data.categories.reduce((sum: number, cat: any) => sum + cat.score, 0) / data.categories.length;
+      const categoriesToUse = (data.categories && data.categories.length > 0)
+        ? data.categories
+        : [];
+
+      const recommendationsToUse = (data.recommendations && data.recommendations.length > 0)
+        ? data.recommendations
+        : [];
+
+      setAuditData(categoriesToUse);
+      setRecommendations(recommendationsToUse);
+
+      if (categoriesToUse.length > 0) {
+        const totalScore = categoriesToUse.reduce((sum: number, cat: any) => sum + cat.score, 0) / categoriesToUse.length;
         setOverallScore(Math.round(totalScore));
       } else {
         setOverallScore(0);
@@ -126,6 +135,56 @@ const PremiumAudit = () => {
   const closeDetailsModal = () => {
     setShowDetailsModal(false);
     setTimeout(() => setSelectedRecommendation(null), 300);
+  };
+
+  // Premium-Audit Empfehlung umsetzen
+  const applyRecommendation = async (recommendationId: string, categoryOverride?: string) => {
+    try {
+      setMlLoading(true);
+      
+      // Rufe Backend API auf
+      const response = await fetch('/api/audit/premium/apply-recommendation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          recommendationId: recommendationId,
+          category: categoryOverride || selectedRecommendation?.category || 'general',
+          productIds: [1, 2, 3] // TODO: Echte Produkt-IDs vom Shop
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        closeDetailsModal();
+        // Optional: Audit neu laden um aktualisierte Daten zu zeigen
+        await fetchAudit();
+      } else {
+        throw new Error(data.error || 'Fehler beim Umsetzen der Empfehlung');
+      }
+    } catch (error) {
+      alert(`Fehler: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
+    } finally {
+      setMlLoading(false);
+    }
+  };
+
+  // Quick Action Buttons trigger passende Empfehlungen direkt
+  const quickActionCategoryMap: Record<string, string> = {
+    'seo-optimization': 'seo',
+    'performance-premium': 'performance',
+    'conversion-optimization': 'conversion',
+    'security-hardening': 'security'
+  };
+
+  const handleQuickAction = async (recommendationId: string) => {
+    const rec = recommendations.find((r) => r.id === recommendationId);
+    const category = rec?.category || quickActionCategoryMap[recommendationId] || 'general';
+    await applyRecommendation(recommendationId, category);
   };
 
   const getStatusColor = (status: string) => {
@@ -430,10 +489,34 @@ const PremiumAudit = () => {
         <div className="metric-card full-width">
           <h3>⚡ Schnellaktionen</h3>
           <div className="quick-actions">
-            <button className="action-button primary">📈 SEO sofort optimieren</button>
-            <button className="action-button warning">⚡ Performance boosten</button>
-            <button className="action-button success">💰 Conversion erhöhen</button>
-            <button className="action-button secondary">🔒 Sicherheit prüfen</button>
+            <button
+              className="action-button primary"
+              disabled={mlLoading}
+              onClick={() => handleQuickAction('seo-optimization')}
+            >
+              {mlLoading ? '⏳ Läuft...' : '📈 SEO sofort optimieren'}
+            </button>
+            <button
+              className="action-button warning"
+              disabled={mlLoading}
+              onClick={() => handleQuickAction('performance-premium')}
+            >
+              {mlLoading ? '⏳ Läuft...' : '⚡ Performance boosten'}
+            </button>
+            <button
+              className="action-button success"
+              disabled={mlLoading}
+              onClick={() => handleQuickAction('conversion-optimization')}
+            >
+              {mlLoading ? '⏳ Läuft...' : '💰 Conversion erhöhen'}
+            </button>
+            <button
+              className="action-button secondary"
+              disabled={mlLoading}
+              onClick={() => handleQuickAction('security-hardening')}
+            >
+              {mlLoading ? '⏳ Läuft...' : '🔒 Sicherheit prüfen'}
+            </button>
           </div>
         </div>
       </div>
@@ -590,22 +673,25 @@ const PremiumAudit = () => {
             <div style={{display: 'flex', gap: 12}}>
               <button 
                 onClick={() => {
-                  closeDetailsModal();
+                  if (selectedRecommendation) {
+                    applyRecommendation(selectedRecommendation.id);
+                  }
                 }}
+                disabled={mlLoading}
                 style={{
                   flex: 1,
                   padding: '12px 20px',
-                  background: '#27ae60',
+                  background: mlLoading ? '#95a5a6' : '#27ae60',
                   color: '#fff',
                   border: 'none',
                   borderRadius: 8,
-                  cursor: 'pointer',
+                  cursor: mlLoading ? 'not-allowed' : 'pointer',
                   fontSize: '1em',
                   fontWeight: 600,
                   transition: 'background 0.2s'
                 }}
               >
-                ✅ Jetzt umsetzen
+                {mlLoading ? '⏳ Wird umgesetzt...' : '✅ Jetzt umsetzen'}
               </button>
               <button 
                 onClick={closeDetailsModal}
