@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiClient } from '../../lib/api-client';
 import './page.css';
+import './premium-audit-override.css';
 
 interface AuditCategory {
   id: string;
@@ -387,11 +388,11 @@ const PremiumAudit = () => {
                     style={{
                       background: insight.priority === 'critical' ? 'rgba(231,76,60,0.1)' : 
                                  insight.priority === 'high' ? 'rgba(230,126,34,0.1)' :
-                                 insight.priority === 'medium' ? 'rgba(241,196,15,0.08)' : '#f6f8fa',
+                                 insight.priority === 'medium' ? 'rgba(241,196,15,0.08)' : 'rgba(102,126,234,0.12)',
                       borderLeft: `4px solid ${
                         insight.priority === 'critical' ? '#e74c3c' :
                         insight.priority === 'high' ? '#e67e22' :
-                        insight.priority === 'medium' ? '#f1c40f' : 'white'
+                        insight.priority === 'medium' ? '#f1c40f' : '#667eea'
                       }`,
                       borderRadius: 8,
                       marginBottom: 12,
@@ -403,7 +404,7 @@ const PremiumAudit = () => {
                     }}
                   >
                     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4}}>
-                      <span style={{fontWeight: 600, color: "white", fontSize: '1.05em'}}>{insight.title}</span>
+                      <span style={{fontWeight: 600, color: "#1a1d23", fontSize: '1.05em'}}>{insight.title}</span>
                       {insight.priority && (
                         <span style={{
                           padding: '4px 10px',
@@ -586,17 +587,17 @@ const PremiumAudit = () => {
           }}
         >
           <div 
-            className="modal-content"
+            className="modal-content premium-audit-modal"
             onClick={(e) => e.stopPropagation()}
             style={{
-              background: '#fff',
               borderRadius: 12,
               padding: 32,
               maxWidth: 600,
-              maxHeight: 80 + 'vh',
+              maxHeight: '80vh',
               overflow: 'auto',
               boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-              animation: 'slideUp 0.3s ease-out'
+              animation: 'slideUp 0.3s ease-out',
+              border: 'none'
             }}
           >
             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 24}}>
@@ -627,7 +628,7 @@ const PremiumAudit = () => {
                   fontSize: '1.5em',
                   cursor: 'pointer',
                   padding: 0,
-                  color: '#6c757d',
+                  color: '#f5f7ff',
                   transition: 'color 0.2s'
                 }}
               >
@@ -637,7 +638,7 @@ const PremiumAudit = () => {
 
             <div style={{marginBottom: 24}}>
               <h3 style={{margin: '0 0 12px 0', color: '#f5f7ff'}}>📝 Beschreibung</h3>
-              <p style={{margin: 0, color: '#555', lineHeight: 1.6}}>{selectedRecommendation.description}</p>
+              <p style={{margin: 0, color: '#f5f7ff', lineHeight: 1.6}}>{selectedRecommendation.description}</p>
             </div>
 
             <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24}}>

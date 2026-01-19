@@ -1,0 +1,12 @@
+/* Premium Audit Modal Override - MUSS NACH ALLEN ANDEREN CSS GELADEN WERDEN */
+
+div.modal-content.premium-audit-modal {
+  background: #1a1d23 !important;
+  background-color: #1a1d23 !important;
+}
+
+.modal-content.premium-audit-modal {
+  background: #1a1d23 !important;
+  background-color: #1a1d23 !important;
+}
+

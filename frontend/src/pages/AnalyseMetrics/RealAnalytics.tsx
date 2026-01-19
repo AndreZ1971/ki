@@ -401,7 +401,7 @@ const RealAnalytics = () => {
                   <div style={{ fontWeight: 600 }}>{insight.title}</div>
                   <div>{insight.value}</div>
                   {insight.detail && (
-                    <div style={{ color: "#6c757d" }}>{insight.detail}</div>
+                    <div style={{ color: "#343a40", fontSize: "0.95rem" }}>{insight.detail}</div>
                   )}
                   {insight.score !== undefined && (
                     <div style={{ color: "white", fontWeight: 700 }}>

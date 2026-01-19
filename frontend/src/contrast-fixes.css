@@ -4,17 +4,17 @@
    GLOBALE TEXT-KONTRAST FIXES
    ============================================ */
 
-/* Auf dunklen Glas-Hintergründen helle Schrift erzwingen */
+/* Standard-Textfarbe für Analytics-Seiten - dunkel für gute Lesbarkeit */
 .analytics-page,
 .analytics-page * {
-  color: var(--text-primary, #f5f7ff);
+  color: var(--text-primary, #212529);
 }
 
 .analytics-page h1,
 .analytics-page h2,
 .analytics-page h3,
 .analytics-page h4 {
-  color: var(--heading-primary, #f9fbff) !important;
+  color: var(--heading-primary, #1a1d23) !important;
 }
 
 .analytics-page .loading-spinner {
