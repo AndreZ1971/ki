@@ -1,6 +1,6 @@
 # 🤖 A.R.I. - Artificial Retail Intelligence
 
-![Version](https://img.shields.io/badge/version-7.0.1-blue.svg)
+![Version](https://img.shields.io/badge/version-7.0.2-blue.svg)
 ![Tests](https://img.shields.io/badge/tests-350%2F350-success.svg)
 ![ML Integration](https://img.shields.io/badge/ML%20Integration-100%25-green.svg)
 ![Design System](https://img.shields.io/badge/Design_Tokens-100%25-purple.svg)

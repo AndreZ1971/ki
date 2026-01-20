@@ -1,4 +1,4 @@
-# A.R.I. User Guide v6.3.0 (January 2026)
+# A.R.I. User Guide v7.0.2 (January 2026)
 
 **Status:** Production Ready with advanced trend analysis and price optimization
 

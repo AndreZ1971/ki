@@ -42,16 +42,9 @@ const PaymentDelivery: React.FC = () => {
     setError(null);
 
     try {
-      // Mock items für Demo
-      const items = [
-        { productType: "Electronics", weight: 1.2, value: 299.99 },
-        { productType: "Accessories", weight: 0.3, value: 49.99 },
-      ];
-
       const response = await paymentApi.optimizeDelivery({
         orderId,
         destination,
-        items,
         urgency,
       });
 

@@ -455,5 +455,3 @@ A.R.I. is proprietary software. All rights reserved.
 ---
 
 **Thank you for upgrading to v7.0.0! 🎉**
-
-For detailed migration instructions from v6.x, see [MIGRATION_GUIDE.md](docs/english/MIGRATION_GUIDE.md)

@@ -29,13 +29,6 @@ interface Customer {
   email: string;
 }
 
-// Mock-Daten als Fallback
-const mockCustomers: Customer[] = [
-  { id: '1', name: 'Max Mustermann', email: 'max@mustermann.de' },
-  { id: '2', name: 'Anna Schmidt', email: 'anna@schmidt.com' },
-  { id: '3', name: 'Thomas Weber', email: 'jannro771@gmail.com' }
-];
-
 const AIEmailGenerator: React.FC = () => {
   const { t } = useTranslation();
   const { handleBackToDashboard } = useProductManagement();
@@ -129,12 +122,10 @@ const AIEmailGenerator: React.FC = () => {
         setCustomers(transformedCustomers);
 
       } else {
-
-        // Fallback zu Mock-Daten
-        setCustomers(mockCustomers);
+        setCustomers([]);
       }
     } catch {
-      setCustomers(mockCustomers);
+      setCustomers([]);
     }
   };
 
@@ -155,15 +146,11 @@ const AIEmailGenerator: React.FC = () => {
 
   const loadSavedTemplates = async () => {
     try {
-      const mockTemplates: EmailTemplate[] = [
-        { id: 1, name: 'Willkommens-Email Premium', type: 'welcome-email', data: {} },
-        { id: 2, name: 'Bestellbestätigung Pro', type: 'order-confirmation', data: {} },
-        { id: 3, name: 'Newsletter Herbst 2024', type: 'newsletter', data: {} },
-        { id: 4, name: 'Support Response Standard', type: 'support-response', data: {} }
-      ];
-      setSavedTemplates(mockTemplates);
-        } catch {
-      // Silent - continue
+      // Hinweis: Es gibt keinen Endpoint für Vorlagen, daher starten wir leer
+      // Templates können nur lokal oder über den Generator erstellt werden
+      setSavedTemplates([]);
+    } catch {
+      setSavedTemplates([]);
     }
   };
 

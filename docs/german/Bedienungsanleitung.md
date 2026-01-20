@@ -1,4 +1,4 @@
-# A.R.I. Bedienungsanleitung v6.3.0 (Januar 2026)
+# A.R.I. Bedienungsanleitung v7.0.2 (Januar 2026)
 
 **Status:** Production Ready mit erweiterten Trend-Analysen und Preisoptimierungen
 

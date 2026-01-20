@@ -1,6 +1,6 @@
 {
   "name": "ari-artificial-retail-intelligence-backend",
-  "version": "7.0.1",
+  "version": "7.0.2",
   "description": "Backend for A.R.I. Artificial Retail Intelligence System",
   "main": "dist/server.js",
   "type": "commonjs",
@@ -12,6 +12,7 @@
     "start": "node dist/server.js",
     "start:agent": "node dist/agent/planner.js",
     "start:jobs": "node dist/agent/jobs/index.js",
+    "generate-admin-hash": "tsx scripts/generate-admin-hash.ts",
     "run:createFreebie": "tsx agent/jobs/runCreateFreebie.ts",
     "trend-analysis": "tsx agent/jobs/runTrendAnalysis.ts",
     "auto-product": "tsx agent/jobs/runAutoProductCreator.ts",
@@ -60,9 +61,9 @@
     "payment-emergency": "tsx agent/jobs/paymentEmergency.ts",
     "validate-payment-success": "tsx agent/jobs/paymentSuccessValidator.ts",
     "ultimate-payment-fix": "npm run payment-emergency && npm run validate-payment-success",
-      "_moduleAliases": {
-        "@config": "./dist/config.js"
-      },
+    "_moduleAliases": {
+      "@config": "./dist/config.js"
+    },
     "simple-payment-fix": "tsx agent/jobs/paymentSimpleFix.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -107,10 +108,11 @@
     "@fastify/under-pressure": "^9.0.0",
     "@sinclair/typebox": "^0.34.41",
     "@woocommerce/woocommerce-rest-api": "^1.0.2",
-    "check-disk-space": "^3.3.1",
     "axios": "^1.13.2",
+    "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "better-sqlite3": "^12.4.1",
+    "check-disk-space": "^3.3.1",
     "cheerio": "^1.0.0-rc.12",
     "dotenv": "^17.2.3",
     "fastify": "^5.6.1",
@@ -119,6 +121,7 @@
     "form-data": "^4.0.4",
     "google-trends-api": "^4.9.2",
     "helmet": "^8.1.0",
+    "ioredis": "^5.4.1",
     "jsonwebtoken": "^9.0.2",
     "knex": "^3.1.0",
     "minimist": "^1.2.8",
@@ -126,7 +129,6 @@
     "node-cron": "^4.2.1",
     "node-fetch": "^3.3.2",
     "nodemailer": "^7.0.10",
-    "ioredis": "^5.4.1",
     "openai": "^6.15.0",
     "pino": "^10.0.0",
     "prom-client": "^15.0.0",
@@ -136,6 +138,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.37.0",
+    "@types/bcrypt": "^6.0.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/express": "^5.0.5",
     "@types/jest": "^30.0.0",

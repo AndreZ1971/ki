@@ -3,7 +3,7 @@ import { getConfig } from '@config';
 import { logger } from '../../../../logger';
 
 const PER_PAGE = 100;
-const MAX_PAGES = 5;
+const MAX_PAGES = 50; // safety cap to avoid endless pagination
 
 async function fetchAllDirect(path: string, params: Record<string, unknown> = {}) {
   const config = getConfig();
@@ -35,17 +35,23 @@ async function fetchAllDirect(path: string, params: Record<string, unknown> = {}
       break;
     }
 
+    const totalPagesHeader = res.headers.get('x-wp-totalpages');
+    const totalPages = totalPagesHeader ? parseInt(totalPagesHeader, 10) : undefined;
+
     const chunk = await res.json();
     logger.debug({
       path,
       page,
       isArray: Array.isArray(chunk),
-      length: Array.isArray(chunk) ? chunk.length : 0
+      length: Array.isArray(chunk) ? chunk.length : 0,
+      totalPages
     }, 'fetchAllDirect page retrieved');
 
     if (Array.isArray(chunk)) {
       all.push(...chunk);
-      if (chunk.length < PER_PAGE) break;
+      const reachedHeaderLimit = totalPages !== undefined && page >= totalPages;
+      const reachedDataLimit = chunk.length < PER_PAGE;
+      if (reachedHeaderLimit || reachedDataLimit) break;
     }
   }
   return all;
@@ -199,7 +205,7 @@ export default async function realTimeRoutes(fastify: FastifyInstance) {
     try {
       const [products, orders, customers] = await Promise.all([
         fetchAllDirect('products', { status: 'publish' }),
-        fetchAllDirect('orders', { status: 'completed' }),  // Nur completed Orders!
+        fetchAllDirect('orders', { status: 'completed,processing,on-hold' }),
         fetchAllDirect('customers')
       ]);
 
@@ -321,7 +327,7 @@ export default async function realTimeRoutes(fastify: FastifyInstance) {
     try {
       const [products, orders] = await Promise.all([
         fetchAllDirect('products', { status: 'publish' }),
-        fetchAllDirect('orders', { status: 'completed' })  // Nur completed Orders!
+        fetchAllDirect('orders', { status: 'completed,processing,on-hold' })
       ]);
 
       const { topSelling } = aggregateTopProducts(orders);

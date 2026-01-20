@@ -35,7 +35,7 @@ export const useWooCommerce = () => {
         throw new Error('Backend URL is not configured. Please check your environment variables.');
       }
 
-      const response = await fetch(`${API_URL}/api/shop-metrics`, {
+      const response = await fetch(`${API_URL}/api/analytics/metrics/dashboard`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -57,23 +57,6 @@ export const useWooCommerce = () => {
     } catch (err) {
       const error = err as Error;
       setError(error);
-
-      
-      // Fallback mock data for development
-      if (import.meta.env.DEV) {
-
-        setMetrics({
-          totalSales: 12450.75,
-          todaySales: 1247.50,
-          totalOrders: 156,
-          todayOrders: 23,
-          totalCustomers: 89,
-          todayCustomers: 18,
-          totalProducts: 42,
-          conversionRate: 4.2,
-          lastUpdated: new Date().toISOString(),
-        });
-      }
     } finally {
       setLoading(false);
     }

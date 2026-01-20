@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { authMiddleware } from '../../../middleware/authMiddleware';
-import crypto from 'crypto';
+import { hashPassword, getSecureAdminHash } from '../../../security/authUtils';
+import { logger } from '../../../logger';
 
 // Shared user store (same as auth routes)
 interface User {
@@ -11,20 +12,27 @@ interface User {
   passwordHash: string;
 }
 
-// Import from environment (same logic as auth)
-const ADMIN_USER = process.env.ADMIN_USER || 'admin';
-const ADMIN_PASS_HASH =
-  process.env.ADMIN_PASS_HASH ||
-  crypto.createHash('sha256').update(process.env.ADMIN_PASS || 'ARI#2026!Secure').digest('hex');
-
+// SHARED user store with auth routes - must be synchronized!
+// TODO: Replace with proper database in production
 const users: Map<string, User> = new Map();
-users.set(ADMIN_USER, {
-  id: '1',
-  username: ADMIN_USER,
-  email: process.env.ADMIN_EMAIL || 'admin@ari.local',
-  role: 'admin',
-  passwordHash: ADMIN_PASS_HASH,
-});
+
+const ADMIN_USER = process.env.ADMIN_USER || 'admin';
+
+// Initialize admin user asynchronously (same as auth routes)
+(async () => {
+  try {
+    const ADMIN_PASS_HASH = await getSecureAdminHash();
+    users.set(ADMIN_USER, {
+      id: '1',
+      username: ADMIN_USER,
+      email: process.env.ADMIN_EMAIL || 'admin@ari.local',
+      role: 'admin',
+      passwordHash: ADMIN_PASS_HASH,
+    });
+  } catch (error) {
+    logger.error({ error }, 'Failed to initialize admin user in users routes');
+  }
+})();
 
 export default async function userRoutes(server: FastifyInstance) {
   // GET /api/users - nur für authentifizierte Admins
@@ -71,11 +79,16 @@ export default async function userRoutes(server: FastifyInstance) {
       return reply.status(400).send({ success: false, error: 'Username, email and password required' });
     }
     
+    if (password.length < 8) {
+      return reply.status(400).send({ success: false, error: 'Password must be at least 8 characters' });
+    }
+    
     if (users.has(username)) {
       return reply.status(409).send({ success: false, error: 'Username already exists' });
     }
     
-    const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
+    // Use bcrypt for new users
+    const passwordHash = await hashPassword(password);
     const newUser: User = {
       id: String(users.size + 1),
       username,
@@ -85,6 +98,7 @@ export default async function userRoutes(server: FastifyInstance) {
     };
     
     users.set(username, newUser);
+    logger.info({ username, role: newUser.role }, 'New user created');
     
     const { passwordHash: _, ...userWithoutPassword } = newUser;
     reply.send({ success: true, user: userWithoutPassword });
@@ -115,7 +129,11 @@ export default async function userRoutes(server: FastifyInstance) {
     if (email) user.email = email;
     if (role && request.user?.role === 'admin') user.role = role; // Nur Admin darf Rolle ändern
     if (password) {
-      user.passwordHash = crypto.createHash('sha256').update(password).digest('hex');
+      if (password.length < 8) {
+        return reply.status(400).send({ success: false, error: 'Password must be at least 8 characters' });
+      }
+      user.passwordHash = await hashPassword(password);
+      logger.info({ username: user.username }, 'Password updated with bcrypt');
     }
     
     users.set(user.username, user);

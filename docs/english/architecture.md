@@ -901,6 +901,6 @@ A.R.I. (Artificial Retail Intelligence) is a **production-ready**, **resilient**
 - Marketing & Content: 10 Tools
 - Advanced AI: 12 Tools
 
-**Version**: 2.0.0  
+**Version**: 7.0.2  
 **Date**: January 2026  
 **Author**: André Zabel (AndreZ1971)

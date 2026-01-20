@@ -64,105 +64,9 @@ const MiniAudit = () => {
         setMiniMetrics(data.data.miniMetrics);
       }
     } catch (_err) {
-      // Fallback zu Mock-Daten
-      const mockQuickChecks: QuickCheck[] = [
-        {
-          id: 'load-time',
-          name: 'Ladezeit',
-          icon: '⚡',
-          status: 'good',
-          value: '1.8s',
-          trend: 12,
-          description: 'Seiten-Geschwindigkeit',
-          quickAction: 'Cache optimieren'
-        },
-        {
-          id: 'mobile-score',
-          name: 'Mobile',
-          icon: '📱',
-          status: 'warning',
-          value: '72/100',
-          trend: -5,
-          description: 'Mobile Performance',
-          quickAction: 'Responsive prüfen'
-        },
-        {
-          id: 'seo-basic',
-          name: 'SEO Basis',
-          icon: '🔍',
-          status: 'good',
-          value: '85/100',
-          trend: 3,
-          description: 'Grundlegende SEO',
-          quickAction: 'Meta-Tags prüfen'
-        },
-        {
-          id: 'security',
-          name: 'Sicherheit',
-          icon: '🛡️',
-          status: 'excellent',
-          value: '95/100',
-          trend: 2,
-          description: 'Basic Security Check'
-        },
-        {
-          id: 'uptime',
-          name: 'Verfügbarkeit',
-          icon: '📈',
-          status: 'excellent',
-          value: '99.9%',
-          trend: 0,
-          description: 'Uptime letzten 30 Tage'
-        },
-        {
-          id: 'core-vitals',
-          name: 'Core Vitals',
-          icon: '🎯',
-          status: 'warning',
-          value: '68/100',
-          trend: -8,
-          description: 'Google Core Web Vitals',
-          quickAction: 'CLS optimieren'
-        }
-      ];
-
-      const mockMiniMetrics: MiniMetric[] = [
-        {
-          id: 'conversion',
-          name: 'Conversion Rate',
-          value: 2.3,
-          target: 3.0,
-          unit: '%',
-          status: 'warning'
-        },
-        {
-          id: 'bounce-rate',
-          name: 'Absprungrate',
-          value: 42,
-          target: 35,
-          unit: '%',
-          status: 'critical'
-        },
-        {
-          id: 'page-views',
-          name: 'Seitenaufrufe',
-          value: 12450,
-          target: 10000,
-          unit: '',
-          status: 'excellent'
-        },
-        {
-          id: 'avg-session',
-          name: 'Session-Dauer',
-          value: 2.8,
-          target: 3.0,
-          unit: 'min',
-          status: 'good'
-        }
-      ];
-
-      setQuickChecks(mockQuickChecks);
-      setMiniMetrics(mockMiniMetrics);
+      // Bei Fehler: leere States, User wird über Error-UI informiert
+      setQuickChecks([]);
+      setMiniMetrics([]);
     } finally {
       setScanTime(Date.now() - startTime);
       setLoading(false);
@@ -184,15 +88,8 @@ const MiniAudit = () => {
       const apiUrl = base ? `${base}/api/audit/mini/ml-analysis` : `/api/audit/mini/ml-analysis`;
       
       const payload = {
-        quickChecks: quickChecks.length > 0 ? quickChecks : [
-          { id: 'load-time', name: 'Ladezeit', icon: '⚡', status: 'good' as const, value: '1.8s', trend: 12, description: 'Seiten-Geschwindigkeit' },
-          { id: 'mobile-score', name: 'Mobile', icon: '📱', status: 'warning' as const, value: '72/100', trend: -5, description: 'Mobile Performance' },
-          { id: 'seo-basic', name: 'SEO Basis', icon: '🔍', status: 'good' as const, value: '85/100', trend: 3, description: 'Grundlegende SEO' }
-        ],
-        miniMetrics: miniMetrics.length > 0 ? miniMetrics : [
-          { id: 'conversion', name: 'Conversion Rate', value: 2.3, target: 3.0, unit: '%', status: 'warning' as const },
-          { id: 'bounce-rate', name: 'Absprungrate', value: 42, target: 35, unit: '%', status: 'critical' as const }
-        ]
+        quickChecks,
+        miniMetrics
       };
       
       const res = await fetch(apiUrl, {

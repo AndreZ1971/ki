@@ -60,30 +60,25 @@ export default async function shopMetricsRoutes(server: FastifyInstance) {
         };
       }
 
-      const fetchJson = async (endpoint: string) => {
-        // Versuche Cache zuerst
-        const cacheKey = `woo_dashboard_${endpoint}`;
-        const cached = wooCache.get(cacheKey);
-        if (cached) {
-          logger.debug({ endpoint }, 'Shop metrics cache hit');
-          return cached;
-        }
-
+      const buildUrlAndHeaders = (endpoint: string) => {
         let url = `${wooCommerceConfig.url}${endpoint}`;
         const headers: HeadersInit = { 'Content-Type': 'application/json' };
 
-        // Auth-Modus: 'basic' (Header) oder 'query' (URL-Parameter)
         if (wooCommerceConfig.authMode === 'basic') {
           const auth = Buffer.from(
             `${wooCommerceConfig.consumerKey}:${wooCommerceConfig.consumerSecret}`
           ).toString('base64');
           headers['Authorization'] = `Basic ${auth}`;
         } else {
-          // Query-Parameter OAuth (z.B. WooCommerce OAuth 1.0)
           const separator = endpoint.includes('?') ? '&' : '?';
           url += `${separator}consumer_key=${encodeURIComponent(wooCommerceConfig.consumerKey)}&consumer_secret=${encodeURIComponent(wooCommerceConfig.consumerSecret)}`;
         }
 
+        return { url, headers };
+      };
+
+      const fetchWoo = async (endpoint: string) => {
+        const { url, headers } = buildUrlAndHeaders(endpoint);
         const res = await fetch(url, {
           headers,
           signal: AbortSignal.timeout(30000),
@@ -91,19 +86,65 @@ export default async function shopMetricsRoutes(server: FastifyInstance) {
         if (!res.ok) {
           throw new Error(`HTTP ${res.status} for ${url}`);
         }
+
+        const totalPagesHeader = res.headers.get('x-wp-totalpages');
+        const totalPages = totalPagesHeader ? parseInt(totalPagesHeader, 10) : undefined;
         const json = await res.json();
 
-        // Cache erfolgreiche Antwort (60s)
-        wooCache.set(cacheKey, json, 60);
-
-        return json;
+        return { data: json, totalPages };
       };
 
-      // Parallel alle Daten von WooCommerce abrufen
+      const fetchPaginated = async (baseEndpoint: string, cacheKey: string) => {
+        const cached = wooCache.get(cacheKey);
+        if (cached) {
+          logger.debug({ cacheKey }, 'Shop metrics cache hit (aggregated)');
+          return cached as any[];
+        }
+
+        const allItems: any[] = [];
+        let page = 1;
+        let totalPages: number | undefined;
+
+        while (true) {
+          const endpoint = baseEndpoint.includes('?')
+            ? `${baseEndpoint}&per_page=100&page=${page}`
+            : `${baseEndpoint}?per_page=100&page=${page}`;
+
+          const { data, totalPages: pageTotalPages } = await fetchWoo(endpoint);
+          const items = Array.isArray(data) ? data : [];
+          allItems.push(...items);
+
+          if (totalPages === undefined && pageTotalPages !== undefined) {
+            totalPages = pageTotalPages;
+          }
+
+          const reachedHeaderLimit = totalPages !== undefined && page >= totalPages;
+          const reachedDataLimit = items.length < 100;
+
+          if (reachedHeaderLimit || reachedDataLimit) {
+            break;
+          }
+
+          page += 1;
+        }
+
+        wooCache.set(cacheKey, allItems, 60);
+        return allItems;
+      };
+
       const [orders, customers, products] = await Promise.all([
-        fetchJson('/wp-json/wc/v3/orders?status=completed&per_page=100'),
-        fetchJson('/wp-json/wc/v3/customers?per_page=100&role=all'),
-        fetchJson('/wp-json/wc/v3/products?per_page=100'),
+        fetchPaginated(
+          '/wp-json/wc/v3/orders?status=completed,processing,on-hold',
+          'woo_dashboard_orders_all'
+        ),
+        fetchPaginated(
+          '/wp-json/wc/v3/customers?role=all',
+          'woo_dashboard_customers_all'
+        ),
+        fetchPaginated(
+          '/wp-json/wc/v3/products',
+          'woo_dashboard_products_all'
+        ),
       ]);
 
       const ordersTyped: WooCommerceOrder[] = orders as WooCommerceOrder[];
@@ -164,15 +205,9 @@ export default async function shopMetricsRoutes(server: FastifyInstance) {
 
       // Fallback: Versuche gecachte Daten zu nutzen
       try {
-        const cachedOrders = wooCache.get(
-          `woo_dashboard_/wp-json/wc/v3/orders?status=completed&per_page=100`
-        );
-        const cachedCustomers = wooCache.get(
-          `woo_dashboard_/wp-json/wc/v3/customers?per_page=100&role=all`
-        );
-        const cachedProducts = wooCache.get(
-          `woo_dashboard_/wp-json/wc/v3/products?per_page=100`
-        );
+        const cachedOrders = wooCache.get('woo_dashboard_orders_all');
+        const cachedCustomers = wooCache.get('woo_dashboard_customers_all');
+        const cachedProducts = wooCache.get('woo_dashboard_products_all');
 
         if (cachedOrders && cachedCustomers && cachedProducts) {
           logger.info('Using cached shop metrics due to error');

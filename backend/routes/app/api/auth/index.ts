@@ -2,7 +2,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { generateToken, authMiddleware } from '../../../../middleware/authMiddleware';
 import { logger } from '../../../../logger';
-import crypto from 'crypto';
+import { verifyPasswordHybrid, getSecureAdminHash } from '../../../../security/authUtils';
 
 interface LoginRequest {
   username: string;
@@ -20,21 +20,38 @@ interface User {
 // In-memory user store (TODO: Replace with database in production)
 const users: Map<string, User> = new Map();
 
-// Initialize default admin user from ENV (fallback to safe default)
-// Configure via .env.production or environment variables:
-// ADMIN_USER, ADMIN_PASS (plaintext) or ADMIN_PASS_HASH (sha256)
+// Initialize admin user from ENV
+// ⚠️ SECURITY: No default password! Set ADMIN_PASS or ADMIN_PASS_HASH
+// Configure via .env or environment variables:
+// - ADMIN_USER (default: 'admin')
+// - ADMIN_PASS (plaintext - will be hashed with bcrypt)
+// - ADMIN_PASS_HASH (bcrypt hash - recommended for production)
+// Generate hash: npm run generate-admin-hash
 const ADMIN_USER = process.env.ADMIN_USER || 'admin';
-const ADMIN_PASS_HASH =
-  process.env.ADMIN_PASS_HASH ||
-  crypto.createHash('sha256').update(process.env.ADMIN_PASS || 'ARI#2026!Secure').digest('hex');
+let ADMIN_PASS_HASH: string;
 
-users.set(ADMIN_USER, {
-  id: '1',
-  username: ADMIN_USER,
-  email: 'admin@ari.local',
-  role: 'admin',
-  passwordHash: ADMIN_PASS_HASH,
-});
+// Initialize admin user asynchronously
+(async () => {
+  try {
+    ADMIN_PASS_HASH = await getSecureAdminHash();
+    users.set(ADMIN_USER, {
+      id: '1',
+      username: ADMIN_USER,
+      email: process.env.ADMIN_EMAIL || 'admin@ari.local',
+      role: 'admin',
+      passwordHash: ADMIN_PASS_HASH,
+    });
+    logger.info({ username: ADMIN_USER }, 'Admin user initialized successfully');
+  } catch (error) {
+    logger.error({ error }, 'CRITICAL: Failed to initialize admin user');
+    logger.error('Set ADMIN_PASS or ADMIN_PASS_HASH environment variable');
+    logger.error('Run: npm run generate-admin-hash');
+    // In production, this should halt the application
+    if (process.env.NODE_ENV === 'production') {
+      process.exit(1);
+    }
+  }
+})();
 
 export default async function authRoutes(fastify: FastifyInstance) {
   // Login endpoint
@@ -54,10 +71,22 @@ export default async function authRoutes(fastify: FastifyInstance) {
           return reply.code(401).send({ error: 'Invalid credentials' });
         }
 
-        const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
-        if (passwordHash !== user.passwordHash) {
-          logger.warn({ username }, 'Failed login attempt');
+        // Hybrid password verification with automatic migration
+        const { valid, needsMigration, newHash } = await verifyPasswordHybrid(
+          password,
+          user.passwordHash
+        );
+
+        if (!valid) {
+          logger.warn({ username }, 'Failed login attempt - invalid password');
           return reply.code(401).send({ error: 'Invalid credentials' });
+        }
+
+        // Auto-migrate SHA-256 to bcrypt on successful login
+        if (needsMigration && newHash) {
+          logger.info({ username }, 'Migrating password from SHA-256 to bcrypt');
+          user.passwordHash = newHash;
+          users.set(username, user);
         }
 
         const userPayload = {
