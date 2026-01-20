@@ -27,17 +27,11 @@ const PaymentUserFavor: React.FC = () => {
     setError(null);
 
     try {
-      // Simuliere Purchase History (in Produktion würde das aus DB kommen)
-      const mockPurchaseHistory = [
-        { amount: 49.99, currency: 'EUR', paymentMethod: 'card', timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() },
-        { amount: 29.99, currency: 'EUR', paymentMethod: 'paypal', timestamp: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString() },
-        { amount: 99.99, currency: 'EUR', paymentMethod: 'card', timestamp: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() },
-      ];
-
+      // Hole echte Purchase History von WooCommerce API
       const response = await paymentApi.analyzeUserPreferences({
         customerId,
         customerEmail: customerEmail || undefined,
-        purchaseHistory: mockPurchaseHistory
+        // purchaseHistory wird vom Backend automatisch aus WooCommerce abgerufen
       });
 
       if (response.success && response.data) {

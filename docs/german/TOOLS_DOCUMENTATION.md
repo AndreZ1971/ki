@@ -3,7 +3,7 @@
 > **Fokus dieser Dokumentation**: Technische Details der ML/KI-Integration für alle Dashboard-Tools. Die User-Dokumentation mit Screenshots und Bedienanleitung befindet sich in `Bedienungsanleitung.md`.
 
 **Zuletzt aktualisiert**: 20. Januar 2026  
-**Version**: 7.0.2  
+**Version**: 7.0.3  
 **Status**: ✅ Production Ready - Keine Mock-Daten, vollständige WooCommerce-Integration, Support-Ticket HTML-Bereinigung, deterministische Scoring-Algorithmen
 
 ---

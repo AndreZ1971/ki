@@ -45,19 +45,20 @@ const PaymentTester: React.FC = () => {
     setTestResults([]);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const mockTests: TestResult[] = [
-        { name: 'Payment Gateway Connection', status: Math.random() > 0.1 ? 'passed' : 'failed', duration: `${Math.floor(Math.random() * 500)}ms` },
-        { name: 'Transaction Processing', status: Math.random() > 0.1 ? 'passed' : 'failed', duration: `${Math.floor(Math.random() * 1000)}ms` },
-        { name: 'Refund Handling', status: Math.random() > 0.1 ? 'passed' : 'failed', duration: `${Math.floor(Math.random() * 800)}ms` },
-        { name: 'Webhook Delivery', status: Math.random() > 0.1 ? 'passed' : 'failed', duration: `${Math.floor(Math.random() * 300)}ms` },
-        { name: 'Error Recovery', status: Math.random() > 0.1 ? 'passed' : 'failed', duration: `${Math.floor(Math.random() * 600)}ms` }
-      ];
-      
-      setTestResults(mockTests);
-      const failed = mockTests.filter(t => t.status === 'failed').length;
-      showToast(failed === 0 ? 'Alle Tests bestanden! ✅' : `${failed} Test(s) fehlgeschlagen`, failed === 0 ? 'success' : 'error');
+      // Rufe echte Payment-Tests vom Backend ab
+      const response = await paymentApi.runPaymentTests({
+        testType,
+        target: testTarget,
+        riskTolerance,
+      });
+
+      if (response.success && response.data) {
+        setTestResults(response.data);
+        const failed = response.data.filter(t => t.status === 'failed').length;
+        showToast(failed === 0 ? 'Alle Tests bestanden! ✅' : `${failed} Test(s) fehlgeschlagen`, failed === 0 ? 'success' : 'error');
+      } else {
+        throw new Error('Keine Test-Ergebnisse erhalten');
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Test-Fehler';
       setError(errorMessage);

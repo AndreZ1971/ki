@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.0.3] - 2026-01-21
+
+### Mock Data Removal & Real API Integration
+
+#### Fixed
+- ✅ Removed mock data from PaymentTester.tsx (Math.random() test simulations)
+- ✅ Removed mock purchase history from PaymentUserFavor.tsx
+- ✅ Integrated real WooCommerce API for purchase history retrieval
+- ✅ Fixed WooCommerceClient import path in payment routes
+- ✅ Fixed lint warnings for unused variables in payment tests
+
+#### Added
+- ✅ New endpoint: POST /api/payments/ml/run-tests (5 payment gateway tests)
+- ✅ Real WooCommerce order fetching in /api/payments/ml/user-preferences
+- ✅ Frontend API method runPaymentTests() for test execution
+- ✅ Legacy login fallback documentation (ARI#2026!Secure) in deployment guides
+
+#### Changed
+- 🔄 PaymentTester now uses real backend API instead of mock data
+- 🔄 PaymentUserFavor fetches real customer orders from WooCommerce (up to 50 orders)
+- 🔄 Payment tests use placeholder simulations (ready for real gateway integration)
+- 🔄 Updated all documentation to v7.0.3 versioning
+
+#### Documentation
+- ✅ 49 documentation files updated to v7.0.3
+- ✅ Added legacy login fallback info to DEPLOYMENT.md (DE/EN)
+- ✅ Version consistency across all documentation
+
+---
+
 ## [7.0.2] - 2026-01-20
 
 ### Documentation Update & Version Consistency

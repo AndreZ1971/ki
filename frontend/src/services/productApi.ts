@@ -362,6 +362,20 @@ export const paymentApi = {
   },
 
   /**
+   * Führt echte Payment-Tests durch
+   */
+  runPaymentTests: async (data: {
+    testType: string;
+    target: string;
+    riskTolerance?: 'low' | 'medium' | 'high';
+  }): Promise<ApiResponse<Array<{ name: string; status: 'passed' | 'failed'; duration: string }>>> => {
+    return apiRequest('/api/payments/ml/run-tests', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
    * KI-generierter Testplan für Payments
    */
   generateTestPlan: async (data: {

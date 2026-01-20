@@ -149,4 +149,4 @@ Wir wissen, wie wichtig dein Shop ist. Daher wurde A.R.I. mit folgendem Prinzip 
 
 **Viel Spaß mit A.R.I.! 🚀**  
 
-Version: 7.0.2 | Januar 2026
+Version: 7.0.3 | Januar 2026

@@ -403,6 +403,6 @@ Bei Problemen:
 
 ---
 
-**Version:** 7.0.2+  
+**Version:** 7.0.3+  
 **Datum:** 20. Januar 2026  
 **Status:** ✅ Production Ready

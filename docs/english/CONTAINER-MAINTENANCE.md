@@ -437,6 +437,6 @@ For issues:
 
 ---
 
-**Version:** 7.0.2  
+**Version:** 7.0.3  
 **Last Updated:** January 2026  
 **Tested with:** Docker 24.x, Kubernetes 1.28+, Terraform 1.6+

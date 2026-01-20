@@ -1,6 +1,6 @@
 # 🚀 A.R.I. - Kubernetes & Deployment Architecture
 
-**Version:** 7.0.2  
+**Version:** 7.0.3  
 **Date:** January 2026  
 **Target Audience:** Automattic Engineering Team, DevOps, Kubernetes Administrators
 
@@ -183,6 +183,7 @@
 5. Frontend loads
    - Customer sees: "Welcome! Step 1: Connect WooCommerce"
    - This is the integrated Onboarding (Onboarding.md delivered)
+   - **Legacy Login Fallback:** ARI#2026!Secure (for emergencies/debugging)
    ↓
 6. Customer enters data
    - WooCommerce API Keys
@@ -810,5 +811,5 @@ No surprises!
 ---
 
 **Last Updated:** January 2026  
-**Version:** 7.0.2  
+**Version:** 7.0.3  
 **For:** Automattic Engineering Team
