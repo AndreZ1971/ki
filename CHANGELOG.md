@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.0.1] - 2026-01-20
+
+### CRITICAL BUGFIX - Accurate Customer Order Counting
+
+#### Fixed
+- ✅ Incorrect customer order counts (real-time via WooCommerce API)
+- ✅ Stale metadata from WooCommerce orders_count field
+- ✅ Missing detailed order view in customer modal
+
+#### Added
+- ✅ New endpoint: GET /api/woocommerce/customers/:customerId/orders
+- ✅ Real-time order counting using x-wp-total header
+- ✅ Order Details table in UserManagement modal
+- ✅ "View Orders" button with dynamic loading
+- ✅ Order status badges (completed, pending, etc.)
+- ✅ Comprehensive error handling and logging
+
+#### Changed
+- 🔄 /api/woocommerce/customers endpoint enhanced with real order counts
+- 🔄 Parallel Promise.all() for improved performance
+
+#### Performance
+- ✅ Bundle size: 1,789.65 kB (467.17 kB gzip) - minimal increase
+- ✅ Build time: 10.09s
+- ✅ Efficient parallel order fetching
+
+---
+
 ## [7.0.0] - 2026-01-20
 
 ### Production Release - Complete Real-Data Integration

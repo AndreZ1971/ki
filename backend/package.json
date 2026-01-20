@@ -1,6 +1,6 @@
 {
   "name": "ari-artificial-retail-intelligence-backend",
-  "version": "1.0.0",
+  "version": "7.0.1",
   "description": "Backend for A.R.I. Artificial Retail Intelligence System",
   "main": "dist/server.js",
   "type": "commonjs",
