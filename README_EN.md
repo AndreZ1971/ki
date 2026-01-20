@@ -150,6 +150,25 @@ Your shop is on Facebook, Instagram, LinkedIn, TikTok, email. A.R.I. posts smart
 | 📊 **Insights** | You understand your business better – clear, actionable insights instead of data clutter |
 | 🚀 **Scaling** | You can scale – without hiring more people |
 
+### Implemented Features
+
+- ✅ Optimized product texts (SEO-optimized, sales-promoting)
+- ✅ AI-generated product images (DALL-E integration)
+- ✅ Real-time analytics with authentic WooCommerce data (no mock data)
+- ✅ Email automation (carts, welcome series, reactivation)
+- ✅ Social media posts (6 platforms)
+- ✅ **NEW v6.9.0:** Global design token system with dark mode
+- ✅ **NEW v6.9.0:** 8-language support (DE, EN, FR, ES, IT, PT, NL, PL)
+- ✅ **NEW v6.9.0:** Fully dark chatbot design with perfect readability
+- ✅ **NEW v6.9.0:** Specialization-aware AI personalization
+- ✅ Multi-source trend analysis (Google Trends + Reddit OAuth)
+- ✅ Percentage-based price suggestions with deterministic calculation
+- ✅ Manual validation of AI suggestions before adoption
+- ✅ **NEW v6.9.1:** Complete WooCommerce integration without placeholders
+- ✅ **NEW v6.9.1:** Support tickets with HTML sanitization
+- ✅ **NEW v6.9.1:** Product idea scoring without random values
+| 🚀 **Scaling** | You can scale – without hiring more people |
+
 ### Concretely Implemented Through:
 
 - ✅ Optimized product texts (SEO-optimized, sales-promoting)

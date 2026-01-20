@@ -988,19 +988,23 @@ Return VALID JSON:
         };
 
         const categoryTemplates = templates[templateCategory] || [];
-        const selectedTemplate = categoryTemplates[Math.floor(Math.random() * categoryTemplates.length)];
+        // Wähle deterministisch das erste Template, keine Random-Preview/URL
+        const selectedTemplate = categoryTemplates[0] || null;
 
         return reply.send({
           success: true,
-          template: selectedTemplate ? {
-            ...selectedTemplate,
-            industry,
-            customization: customization || 'Standard',
-            preview: `Template Preview für ${selectedTemplate.name}\n\nBranche: ${industry}\n${customization ? `\nAnpassungen: ${customization}` : ''}\n\nDies ist eine Vorschau des Templates...`,
-            downloadUrl: `https://example.com/templates/${selectedTemplate.id}.html`
-          } : null,
+          template: selectedTemplate
+            ? {
+                ...selectedTemplate,
+                industry,
+                customization: customization || 'Standard',
+              }
+            : null,
           available: categoryTemplates.length,
-          category: templateCategory
+          category: templateCategory,
+          templates: categoryTemplates, // vollständige Liste zurückgeben
+          note:
+            'Keine Zufalls-Previews oder Fake-URLs. Für echte Inhalte bitte KI-Generierung (template-routes) nutzen.'
         });
 
       } catch (_error) {

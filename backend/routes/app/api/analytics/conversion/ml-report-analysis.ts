@@ -156,7 +156,15 @@ export async function registerConversionReportMLAnalysis(server: FastifyInstance
           nextSteps,
           summary,
           summaryDetails: {
-            overallScore: 75 + Math.random() * 20,
+            overallScore: (() => {
+              const scores = mlInsights.map(i => typeof i.score === 'number' ? i.score : 70);
+              if (scores.length === 0) return 70;
+              const avg = scores.reduce((s, n) => s + n, 0) / scores.length;
+              const criticalCount = mlInsights.filter(i => i.priority === 'critical').length;
+              const highCount = mlInsights.filter(i => i.priority === 'high').length;
+              const penalty = criticalCount * 15 + highCount * 7;
+              return Math.max(40, Math.min(95, Math.round(avg - penalty)));
+            })(),
             trend: mlInsights.length < 2 ? 'Positive ✓' : 'Improvement needed ⚠️',
             recommendation: mlInsights.length < 2 ? 'Weiterhin wie bisher' : 'Schnelle Aktion erforderlich'
           }

@@ -81,7 +81,6 @@ const AIEmailGenerator: React.FC = () => {
     { value: 'newsletter', label: 'Newsletter', icon: '📰', category: 'marketing' },
     { value: 'product-update', label: 'Produkt-Update', icon: '🆕', category: 'marketing' },
     { value: 'special-offer', label: 'Sonderangebot', icon: '🎁', category: 'marketing' },
-    { value: 'abandoned-cart', label: 'Warenkorb-Erinnerung', icon: '🛒', category: 'marketing' },
     { value: 'review-request', label: 'Bewertungsanfrage', icon: '⭐', category: 'marketing' }
   ];
 

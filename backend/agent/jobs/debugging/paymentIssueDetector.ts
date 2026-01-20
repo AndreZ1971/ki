@@ -1,7 +1,7 @@
 // agent/jobs/paymentIssueDetector.ts
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
 import * as dotenv from 'dotenv';
-import { getWooConfig } from '../../woocommerce/config.js';
+import { getWooConfig } from '../../../woocommerce/config.js';
 
 dotenv.config();
 

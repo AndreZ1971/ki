@@ -1,5 +1,21 @@
 import { getConfig } from '../config';
 
+// HTML-Entities dekodieren und Tags entfernen
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&#(\d+);/g, (_match, dec) => String.fromCharCode(Number(dec)))
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&#8211;/g, '–')
+    .replace(/&#8220;/g, '"')
+    .replace(/&#8221;/g, '"')
+    .replace(/&#8222;/g, '„')
+    .replace(/<[^>]*>/g, ''); // HTML-Tags entfernen
+}
+
 export type Ticket = {
   id: number | string;
   title: string;
@@ -80,8 +96,10 @@ export async function getTickets(): Promise<Ticket[]> {
         return items.map((ticket: any) => {
           // Mappe Awesome Support API Response auf Ticket-Interface
           // title: { rendered: string }, content: { rendered: string }, ticket_priority, state, date, etc.
-          const title = ticket.title?.rendered || ticket.title || `Ticket #${ticket.id || ticket.ID}`;
-          const description = ticket.content?.rendered || ticket.content || '';
+          const rawTitle = ticket.title?.rendered || ticket.title || `Ticket #${ticket.id || ticket.ID}`;
+          const rawDescription = ticket.content?.rendered || ticket.content || '';
+          const title = decodeHtmlEntities(rawTitle);
+          const description = decodeHtmlEntities(rawDescription);
           const status = ticket.status || ticket.post_status || ticket.state || 'open';
           const priority = ticket['ticket_priority'] || ticket.priority || (ticket.meta?.priority) || 'normal';
           const created = ticket.date || ticket.post_date || ticket.date_gmt;
@@ -114,8 +132,8 @@ export async function getTickets(): Promise<Ticket[]> {
       if (!Array.isArray(items)) return null;
       return items.map((p: any) => ({
         id: p.id || p.ID,
-        title: (p.title?.rendered ?? p.title) || `Ticket #${p.id || p.ID}`,
-        description: (p.content?.rendered ?? p.content) || '',
+        title: decodeHtmlEntities((p.title?.rendered ?? p.title) || `Ticket #${p.id || p.ID}`),
+        description: decodeHtmlEntities((p.content?.rendered ?? p.content) || ''),
         status: p.status || p.post_status || 'open',
         created: p.date || p.post_date,
         resolved: p.meta?.date_resolved || null,
@@ -147,8 +165,8 @@ export async function getTickets(): Promise<Ticket[]> {
             for (const n of notes) {
               tickets.push({
                 id: `order-${order.id}-note-${n.id}`,
-                title: `Bestell-Notiz #${n.id} (Order ${order.id})`,
-                description: n.note || '',
+                title: decodeHtmlEntities(`Bestell-Notiz #${n.id} (Order ${order.id})`),
+                description: decodeHtmlEntities(n.note || ''),
                 status: order.status || 'open',
                 created: n.date_created || order.date_created,
                 priority: 'normal',

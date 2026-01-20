@@ -199,8 +199,8 @@ export default async function conversionRoutes(server: FastifyInstance) {
               return customerValue < avgValue;
             }
             case 'abandoned-cart': {
-              // Simuliert - könnte mit WooCommerce Plugins erweitert werden
-              return Math.random() > 0.85;
+              // Kein echtes Abandoned-Cart-Tracking ohne entsprechendes Plugin
+              return false;
             }
             default:
               return true;

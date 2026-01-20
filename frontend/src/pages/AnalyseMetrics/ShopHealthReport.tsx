@@ -67,6 +67,10 @@ const shopHealthService = {
     const res = await fetch("/api/health/seo-analysis", { method: "POST" });
     return await res.json();
   },
+  async getInventoryMetrics() {
+    const res = await fetch("/api/health/inventory-metrics", { method: "GET" });
+    return await res.json();
+  },
 };
 
 interface HealthMetric {
@@ -157,38 +161,54 @@ const ShopHealthReport = () => {
     setLoading(true);
     try {
       // Run all health checks in parallel
-      const [perf, sec, seo] = await Promise.all([
+      const [perf, sec, seo, inventory] = await Promise.all([
         shopHealthService.generatePerformanceReport(),
         shopHealthService.runSecurityScan(),
         shopHealthService.analyzeSEO(),
+        shopHealthService.getInventoryMetrics(),
       ]);
-      // Compose healthData from real API responses
+
+      const inventoryScore = inventory?.score ?? 0;
+      const securityScore = (() => {
+        const c = sec?.vulnerabilities || { critical: 0, high: 0, medium: 0, low: 0 };
+        if (c.critical > 0) return 40;
+        return Math.max(0, 100 - c.high * 10 - c.medium * 5 - c.low * 2);
+      })();
+      const performanceScore = (() => {
+        const lt = perf?.metrics?.loadTime ?? 10;
+        // simple mapping: under 2s -> 100, under 3.5s -> 80, else 50-
+        if (lt <= 2) return 100;
+        if (lt <= 3.5) return 80;
+        if (lt <= 5) return 65;
+        return 50;
+      })();
+
       const metrics: HealthMetric[] = [
         {
           name: "Ladezeit",
-          value: perf.metrics.loadTime,
-          status: perf.metrics.loadTime < 2 ? "excellent" : "warning",
+          value: Number((perf.metrics.loadTime ?? 0).toFixed(2)),
+          status: perf.metrics.loadTime < 2 ? "excellent" : perf.metrics.loadTime < 3.5 ? "good" : "warning",
           target: 2.0,
           trend: 0,
         },
         {
           name: "TTFB",
-          value: perf.metrics.ttfb,
-          status: perf.metrics.ttfb < 1 ? "excellent" : "warning",
+          value: Number((perf.metrics.ttfb ?? 0).toFixed(2)),
+          status: perf.metrics.ttfb < 1 ? "excellent" : perf.metrics.ttfb < 2 ? "good" : "warning",
           target: 1.0,
           trend: 0,
         },
         {
           name: "FCP",
-          value: perf.metrics.fcp,
-          status: perf.metrics.fcp < 2 ? "good" : "warning",
+          value: Number((perf.metrics.fcp ?? 0).toFixed(2)),
+          status: perf.metrics.fcp < 2 ? "good" : perf.metrics.fcp < 3 ? "warning" : "critical",
           target: 2.0,
           trend: 0,
         },
         {
           name: "LCP",
-          value: perf.metrics.lcp,
-          status: perf.metrics.lcp < 2.5 ? "good" : "critical",
+          value: Number((perf.metrics.lcp ?? 0).toFixed(2)),
+          status: perf.metrics.lcp < 2.5 ? "good" : perf.metrics.lcp < 4 ? "warning" : "critical",
           target: 2.5,
           trend: 0,
         },
@@ -202,30 +222,40 @@ const ShopHealthReport = () => {
         },
         {
           name: "Sicherheits-Updates",
-          value: sec.vulnerabilities.critical === 0 ? 100 : 60,
-          status: sec.vulnerabilities.critical === 0 ? "excellent" : "critical",
+          value: securityScore,
+          status: securityScore >= 90 ? "excellent" : securityScore >= 70 ? "good" : securityScore >= 50 ? "warning" : "critical",
           target: 100,
           trend: 0,
         },
+        {
+          name: "Inventar",
+          value: inventoryScore,
+          status: inventoryScore >= 90 ? "excellent" : inventoryScore >= 70 ? "good" : inventoryScore >= 50 ? "warning" : "critical",
+          target: 90,
+          trend: 0,
+        },
       ];
+
+      const issuesFound =
+        (sec?.vulnerabilities?.critical ?? 0) +
+        (sec?.vulnerabilities?.high ?? 0) +
+        (sec?.vulnerabilities?.medium ?? 0) +
+        (sec?.vulnerabilities?.low ?? 0) +
+        (seo?.issues?.length ?? 0);
+
+      const recommendations = (seo?.issues?.length ?? 0) + (inventory?.lowStock ?? 0) + (inventory?.outOfStock ?? 0);
+
       setHealthData({
         overallScore: Math.round(
-          (perf.metrics.loadTime < 2 ? 30 : 10) +
-            seo.score / 2 +
-            (sec.vulnerabilities.critical === 0 ? 30 : 10)
+          (performanceScore * 0.35 + securityScore * 0.25 + seo.score * 0.2 + inventoryScore * 0.2) / 1
         ),
-        performance: Math.round(perf.metrics.loadTime < 2 ? 100 : 60),
-        security: Math.round(sec.vulnerabilities.critical === 0 ? 100 : 60),
-        seo: seo.score,
-        inventory: 90, // TODO: Replace with real inventory data
+        performance: Math.round(performanceScore),
+        security: Math.round(securityScore),
+        seo: Math.round(seo.score),
+        inventory: Math.round(inventoryScore),
         lastScan: new Date().toISOString(),
-        issuesFound:
-          sec.vulnerabilities.critical +
-          sec.vulnerabilities.high +
-          sec.vulnerabilities.medium +
-          sec.vulnerabilities.low +
-          seo.issues.length,
-        recommendations: seo.issues.length,
+        issuesFound,
+        recommendations,
         metrics,
       });
       setLastUpdate(new Date());

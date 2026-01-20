@@ -46,9 +46,44 @@ class WordPressAnalyticsService {
       published: post.date,
       lastModified: post.modified,
       url: post.link,
-      pageViews: Math.floor(Math.random() * 1000) + 100,
-      engagement: Math.floor(Math.random() * 50) + 10
+      // pageViews und engagement nur wenn von WordPress-Analytics-Plugin verfügbar
+      pageViews: post.meta?.pageviews || 0,
+      engagement: post.meta?.engagement || 0
     }));
+  }
+
+  static async getWooCommerceAnalytics() {
+    try {
+      console.log('📊 Lade WooCommerce Analytics...');
+      
+      if (!process.env.WOO_URL || !process.env.WOO_KEY || !process.env.WOO_SECRET) {
+        throw new Error('WooCommerce Environment Variables fehlen');
+      }
+
+      // Abrufen von echten WooCommerce Report-Daten
+      const reportResponse = await fetch(
+        `${process.env.WOO_URL}/wp-json/wc/v3/reports/orders/totals`,
+        {
+          headers: {
+            'Authorization': `Basic ${Buffer.from(
+              `${process.env.WOO_KEY}:${process.env.WOO_SECRET}`
+            ).toString('base64')}`
+          }
+        }
+      );
+
+      if (!reportResponse.ok) {
+        throw new Error(`WooCommerce Analytics API Error: ${reportResponse.status}`);
+      }
+
+      const analyticsData = await reportResponse.json();
+      console.log('✅ WooCommerce Analytics geladen:', analyticsData);
+      
+      return analyticsData;
+    } catch (error: any) {
+      console.error('❌ Fehler beim Laden von WooCommerce Analytics:', error.message);
+      return this.getFallbackAnalyticsData();
+    }
   }
 
   private static getFallbackContentData() {
@@ -69,6 +104,15 @@ class WordPressAnalyticsService {
         engagement: 45
       }
     ];
+  }
+
+  private static getFallbackAnalyticsData() {
+    return {
+      orders_count: 0,
+      products_sold: 0,
+      total_revenue: 0,
+      source: 'fallback - WooCommerce Analytics Plugin required'
+    };
   }
 }
 

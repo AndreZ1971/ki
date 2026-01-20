@@ -1,6 +1,43 @@
 # Konfigurationsguide
 
-## 🔧 Dynamische Shop-URLs
+## � Authentifizierung & Datenzugriff
+
+### Aktuelle Implementierung (v6.9.1)
+
+**Authentifizierung:**
+- Temporäre In-Memory-Authentifizierung via ENV-Variablen
+- Konfiguration über `ADMIN_USER` und `ADMIN_PASS` / `ADMIN_PASS_HASH`
+- Geplant: Automattic-Integration für Produktivumgebung
+
+**Datenzugriff:**
+- **WooCommerce:** Direkt über REST API (connection.json)
+- **Kunden:** Von WooCommerce `customers` Endpoint
+- **Bestellungen:** Von WooCommerce `orders` Endpoint
+- **Support-Tickets:** Awesome Support Plugin mit HTML-Bereinigung
+- **Keine Mock-Daten:** Alle Routen nutzen echte API-Calls
+
+### connection.json Konfiguration
+
+```json
+{
+  "openAI": {
+    "apiKey": "sk-...",
+    "model": "gpt-4o-mini"
+  },
+  "woocommerce": {
+    "url": "https://deinshop.de",
+    "consumerKey": "ck_...",
+    "consumerSecret": "cs_..."
+  },
+  "wordpress": {
+    "url": "https://deinshop.de",
+    "username": "admin",
+    "appPassword": "xxxx xxxx xxxx xxxx"
+  }
+}
+```
+
+## �🔧 Dynamische Shop-URLs
 
 Das System ist vollständig konfigurierbar und verwendet **keine hardcodierten Shop-URLs**. Dies ermöglicht es, den Container für beliebig viele Shops einzusetzen.
 

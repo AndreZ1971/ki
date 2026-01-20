@@ -2,9 +2,9 @@
 
 > **Focus of this documentation**: Technical details of ML/AI integration for all dashboard tools. User documentation with screenshots and operating instructions can be found in `User-Guide.md`.
 
-**Last updated**: January 18, 2026  
-**Version**: 6.4.0
-**Status**: ✅ Production Ready - YouTube Video Upload, Metadata Auto-Generation, Reddit OAuth, Notes Feature with Autosave, critical fixes for Rate-Limiting and IP-Block-Prevention
+**Last updated**: January 20, 2026  
+**Version**: 6.9.1
+**Status**: ✅ Production Ready - No Mock Data, Full WooCommerce Integration, Support Ticket HTML Sanitization, Deterministic Scoring Algorithms
 
 ---
 
@@ -21,7 +21,71 @@
 
 ---
 
-## 🆕 January 2026 Updates
+## 🆕 January 2026 Updates (v6.9.1)
+
+### ✅ Removal of All Mock Data
+**Implementation**: All routes now use real WooCommerce/OpenAI data  
+**Status**: Complete  
+**Changed Areas**:
+- **Customer Data**: Removed `visit_count` and `last_login` fields (not WooCommerce standard fields)
+- **System Metrics**: Real `process.memoryUsage()` and `os` metrics instead of random values
+- **Trend History**: Removed mock route `/history`
+- **Template Engagement**: Deterministic score from `engagementScore` (no `Math.random()`)
+- **Marketing Templates**: First template deterministic, no fake URLs
+- **Conversion Segments**: Abandoned-cart without random selection
+- **Product Idea Scoring**: Heuristic calculation based on description length, price, features
+- **Analytics Fallback**: Deterministic score from insight values and priority penalties
+
+### ✅ WooCommerce Job Implementation
+**Implementation**: Real API calls instead of placeholders  
+**Status**: Complete  
+**Files**:
+- `backend/agent/jobs/wooCreateProduct.ts` - Product creation via `wooPost`
+- `backend/agent/jobs/wooUpdateProduct.ts` - Product updates via `wooPost`
+- `backend/agent/jobs/wooListCategories.ts` - Category listing via `wooGet`
+
+**Features**:
+```typescript
+// wooCreateProduct: Type-safe product creation
+await run({
+  name: 'New Product',
+  type: 'simple',
+  regular_price: '29.99',
+  description: '...',
+  categories: [{ id: 15 }]
+});
+
+// wooUpdateProduct: Flexible product updates
+await run({
+  productId: 123,
+  updates: {
+    regular_price: '24.99',
+    stock_status: 'instock'
+  }
+});
+
+// wooListCategories: Categories with filtering
+await run({
+  per_page: 100,
+  orderby: 'name',
+  hide_empty: false
+});
+```
+
+### ✅ Support Ticket HTML Sanitization
+**Implementation**: `decodeHtmlEntities` function in `supportTickets.ts`  
+**Status**: Complete  
+**Features**:
+- Decoding of HTML entities (`&#8211;`, `&amp;`, etc.)
+- Removal of all HTML tags (`<p>`, `<strong>`, `<br>`)
+- Clean text output for ticket titles and descriptions
+- Automatic application to all ticket sources (Awesome Support, WP CPT, WooCommerce Order Notes)
+
+**Example**:
+```typescript
+// Before: "<p>&#8222;Test&#8220; &amp; <strong>HTML</strong></p>"
+// After: "„Test“ & HTML"
+```
 
 ### ✅ YouTube Video Upload Integration
 **Implementation**: OAuth 2.0 + Resumable Upload API with Auto-Metadata Generation  

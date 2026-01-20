@@ -128,19 +128,62 @@ const GERMAN_EMAIL_CONTENT = {
   ]
 };
 
-// Simulierte Email-Sender-Funktion
+// ✅ ECHTE Email-Sender-Funktion via SMTP (connection.json)
+import nodemailer from 'nodemailer';
+import { getConfig } from '../../config';
+
 const EMAIL_SERVICE = {
   send: async (to: string, subject: string, html: string) => {
-    console.log(`📧 Email an: ${to}`);
-    console.log(`   Betreff: ${subject}`);
-    console.log(`   Inhalt: ${html.substring(0, 100)}...`);
-    
-    // In der echten Implementation: SendGrid, Mailchimp, etc.
-    return { 
-      success: true, 
-      messageId: 'simulated_email_' + Date.now(),
-      to: to
-    };
+    try {
+      const config = getConfig();
+      const smtpConfig = config.smtp;
+      
+      if (!smtpConfig?.host || !smtpConfig?.user) {
+        console.warn('⚠️ SMTP nicht konfiguriert - Email wird nicht versendet');
+        return { 
+          success: false, 
+          error: 'SMTP configuration missing',
+          messageId: null
+        };
+      }
+
+      // Erstelle SMTP-Transporter mit echten Credentials
+      const transporter = nodemailer.createTransport({
+        host: smtpConfig.host,
+        port: smtpConfig.port || 465,
+        secure: smtpConfig.secure !== false,
+        auth: {
+          user: smtpConfig.user,
+          pass: smtpConfig.password
+        }
+      });
+
+      // Sende echte Email
+      const info = await transporter.sendMail({
+        from: smtpConfig.from || smtpConfig.user,
+        to: to,
+        subject: subject,
+        html: html,
+        replyTo: smtpConfig.from || smtpConfig.user
+      });
+
+      console.log(`✅ Email versendet an: ${to}`);
+      console.log(`   Betreff: ${subject}`);
+      console.log(`   Message-ID: ${info.messageId}`);
+      
+      return { 
+        success: true, 
+        messageId: info.messageId,
+        to: to
+      };
+    } catch (error: any) {
+      console.error(`❌ Fehler beim Email-Versand an ${to}:`, error.message);
+      return { 
+        success: false, 
+        error: error.message,
+        messageId: null
+      };
+    }
   }
 };
 
@@ -158,12 +201,21 @@ async function runWelcomeEmailCampaign() {
   console.log('👋 Starte Welcome Email Kampagne...\n');
   
   try {
-    // Simulierte neue Abonnenten
-    const newSubscribers = [
-      'max.mustermann@example.com',
-      'sarah.berger@example.com', 
-      'thomas.schmidt@example.com'
-    ];
+    // Abrufen echte Abonnenten/Kunden aus WooCommerce
+    const customersResponse = await wooGet('/customers', { per_page: 100 });
+    const newSubscribers = Array.isArray(customersResponse) 
+      ? customersResponse.map((c: any) => c.email).filter(Boolean)
+      : [];
+    
+    if (newSubscribers.length === 0) {
+      console.warn('⚠️ Keine Abonnenten in WooCommerce gefunden');
+      return {
+        campaign: 'welcome',
+        sent: 0,
+        failed: 0,
+        results: []
+      };
+    }
     
     const tip = getRandomItem(GERMAN_EMAIL_CONTENT.tips);
     
@@ -215,23 +267,29 @@ async function runNewsletterCampaign() {
   console.log('\n📰 Starte Newsletter Kampagne...\n');
   
   try {
-    // Simulierte Newsletter-Abonnenten
-    const subscribers = [
-      'newsletter@example.com',
-      'abonnent@example.com',
-      'kunde@example.com'
-    ];
+    // Abrufen echte Abonnenten aus WooCommerce
+    const customersResponse = await wooGet('/customers', { per_page: 100 });
+    const subscribers = Array.isArray(customersResponse) 
+      ? customersResponse.map((c: any) => c.email).filter(Boolean)
+      : [];
+    
+    if (subscribers.length === 0) {
+      console.warn('⚠️ Keine Abonnenten für Newsletter gefunden');
+      return { campaign: 'newsletter', sent: 0, failed: 0, results: [] };
+    }
     
     const currentMonth = new Date().toLocaleString('de-DE', { month: 'long' });
     const newsUpdate = getRandomItem(GERMAN_EMAIL_CONTENT.newsUpdates);
     const monthlyTip = getRandomItem(GERMAN_EMAIL_CONTENT.monthlyTips);
     const statistic = getRandomItem(GERMAN_EMAIL_CONTENT.statistics);
     
-    // Neue Produkte für Newsletter
-    const products = await wooGet('/products') as any[];
-    const newProducts = products.slice(0, 2).map(p => 
-      `<li><strong>${p.name}</strong> - ${p.short_description || p.description.substring(0, 80)}...</li>`
-    ).join('');
+    // Neue Produkte für Newsletter aus WooCommerce
+    const products = await wooGet('/products', { per_page: 10 }) as any[];
+    const newProducts = Array.isArray(products) && products.length > 0
+      ? products.slice(0, 2).map(p => 
+          `<li><strong>${p.name}</strong> - ${p.short_description || p.description?.replace(/<[^>]*>/g, '').substring(0, 80) || 'Neues Produkt'}...</li>`
+        ).join('')
+      : '';
     
     const emailResults = [];
     
@@ -281,20 +339,26 @@ async function runProductRecommendationCampaign() {
   console.log('\n🎯 Starte Produkt-Empfehlungs Kampagne...\n');
   
   try {
-    const products = await wooGet('/products') as any[];
-    const targetProduct = products[0]; // Erstes Produkt als Empfehlung
+    // Abrufen echte Kunden und Produkte aus WooCommerce
+    const customersResponse = await wooGet('/customers', { per_page: 100 });
+    const targetedCustomers = Array.isArray(customersResponse)
+      ? customersResponse.map((c: any) => c.email).filter(Boolean)
+      : [];
     
-    if (!targetProduct) {
+    if (targetedCustomers.length === 0) {
+      console.warn('⚠️ Keine Kunden für Empfehlungen gefunden');
+      return { campaign: 'product_recommendation', sent: 0, failed: 0, results: [] };
+    }
+    
+    const productsResponse = await wooGet('/products', { per_page: 10 });
+    const products = Array.isArray(productsResponse) ? productsResponse : [];
+    
+    if (products.length === 0) {
       console.log('❌ Kein Produkt für Empfehlungen gefunden');
       return { campaign: 'product_recommendation', sent: 0, failed: 0, results: [] };
     }
     
-    // Simulierte Kunden mit passendem Interessenprofil
-    const targetedCustomers = [
-      'interessent@example.com',
-      'lead@example.com',
-      'potential@example.com'
-    ];
+    const targetProduct = products[0]; // Erstes Produkt als Empfehlung
     
     const benefits = [
       'Einfache Integration in bestehende Prozesse',
@@ -305,9 +369,13 @@ async function runProductRecommendationCampaign() {
     const emailResults = [];
     
     for (const customer of targetedCustomers) {
+      const description = targetProduct.short_description 
+        ? targetProduct.short_description 
+        : (targetProduct.description ? targetProduct.description.replace(/<[^>]*>/g, '') : 'Neues Produkt');
+      
       const emailHtml = GERMAN_EMAIL_TEMPLATES.productRecommendation.template
         .replace('{productName}', targetProduct.name)
-        .replace('{productDescription}', targetProduct.short_description || targetProduct.description)
+        .replace('{productDescription}', description)
         .replace('{productPrice}', targetProduct.price || '49,99')
         .replace('{productLink}', `${base}/produkt/${targetProduct.slug}`)
         .replace('{benefit1}', benefits[0])

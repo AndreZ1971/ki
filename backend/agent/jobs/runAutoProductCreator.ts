@@ -77,8 +77,8 @@ Beispiele:
       
       if (result.products && result.products.length > 0) {
         console.log('\n📦 Erstellte Produkte:');
-        result.products.forEach((product, index) => {
-          console.log(`  ${index + 1}. ${product.name} - €${product.price} (${product.status})`);
+        result.products.forEach((product: any, index) => {
+          console.log(`  ${index + 1}. ${product.name} - €${product.price} (ID: ${product.wooCommerceId || product.id || 'N/A'})`);
           if (product.categories) {
             console.log(`     📁 Kategorien: ${JSON.stringify(product.categories)}`);
           }
@@ -86,8 +86,12 @@ Beispiele:
       }
     }
     
-  } catch (_error) {
-    console.error('❌ Fehler bei deutscher Produkt-Kreation:', _error);
+  } catch (error: any) {
+    // ❌ NICHT IGNORIEREN! Fehler muss sichtbar sein
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('❌ KRITISCHER FEHLER bei Produkt-Kreation:');
+    console.error(`   ${errorMessage}`);
+    console.error('\n🔍 DEBUG: Prüfe deine WooCommerce-Konfiguration in connection.json');
     process.exit(1);
   }
 }

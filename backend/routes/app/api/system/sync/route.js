@@ -1,6 +1,42 @@
+import os from 'os';
+
+function getMemoryUsage() {
+  const memUsage = process.memoryUsage();
+  const totalMem = os.totalmem();
+  const freeMem = os.freemem();
+  const heapUsedPercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
+  const systemMemUsedPercent = ((totalMem - freeMem) / totalMem) * 100;
+  
+  return {
+    heapUsed: (memUsage.heapUsed / 1024 / 1024).toFixed(2),
+    heapTotal: (memUsage.heapTotal / 1024 / 1024).toFixed(2),
+    heapUsedPercent: heapUsedPercent.toFixed(1),
+    rss: (memUsage.rss / 1024 / 1024).toFixed(2),
+    systemMemUsedPercent: systemMemUsedPercent.toFixed(1)
+  };
+}
+
+function getCPUUsage() {
+  const cpus = os.cpus();
+  const loadAvg = os.loadavg();
+  const cpuCount = cpus.length;
+  
+  return {
+    cores: cpuCount,
+    loadAverage: {
+      one: loadAvg[0].toFixed(2),
+      five: loadAvg[1].toFixed(2),
+      fifteen: loadAvg[2].toFixed(2)
+    },
+    loadPercentage: ((loadAvg[0] / cpuCount) * 100).toFixed(1)
+  };
+}
+
 export async function POST(request) {
   try {
     const { operation, parameters = {} } = await request.json();
+    const memUsage = getMemoryUsage();
+    const cpuUsage = getCPUUsage();
     
     const systemOp = {
       id: `sys_${Date.now()}`,
@@ -8,11 +44,13 @@ export async function POST(request) {
       parameters,
       status: 'completed',
       results: {
-        performance: 'optimal',
+        performance: memUsage.heapUsedPercent < 80 && cpuUsage.loadPercentage < 80 ? 'optimal' : 'degraded',
         resources: {
-          memory: (Math.random() * 30 + 50).toFixed(1) + '%',
-          cpu: (Math.random() * 20 + 10).toFixed(1) + '%',
-          storage: (Math.random() * 40 + 30).toFixed(1) + '%'
+          memory: memUsage.heapUsedPercent + '%',
+          cpu: cpuUsage.loadPercentage + '%',
+          heapUsed: memUsage.heapUsed + ' MB',
+          heapTotal: memUsage.heapTotal + ' MB',
+          systemMemUsed: memUsage.systemMemUsedPercent + '%'
         },
         services: {
           database: 'connected',
@@ -29,7 +67,7 @@ export async function POST(request) {
       data: systemOp,
       metadata: {
         operationType: operation,
-        processingTime: '${(Math.random() * 0.5 + 0.1).toFixed(1)}s',
+        processingTime: '0.1s',
         system: 'production'
       }
     });
@@ -42,12 +80,18 @@ export async function POST(request) {
 }
 
 export async function GET() {
+  const memUsage = getMemoryUsage();
+  const cpuUsage = getCPUUsage();
+  
   return Response.json({
     service: 'System-Synchronisation',
     version: '1.0',
     status: 'active',
     system: 'production',
-    health: 'excellent',
-    uptime: '${Math.floor(process.uptime())} seconds'
+    health: memUsage.heapUsedPercent < 80 ? 'excellent' : 'warning',
+    metrics: {
+      memory: memUsage,
+      cpu: cpuUsage
+    }
   });
 }

@@ -1,6 +1,6 @@
-// agent/jobs/paymentLiveFixer.ts
+// agent/jobs/debugging/paymentLiveFixer.ts - DEBUG ONLY
 import * as dotenv from 'dotenv';
-import { getWooConfig } from '../../woocommerce/config.js';
+import { getWooConfig } from '../../../woocommerce/config.js';
 
 dotenv.config();
 

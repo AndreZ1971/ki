@@ -2,39 +2,133 @@
 import { generateSocialMediaPosts } from './socialMediaAutomation';
 // Dynamische Shop-URL aus Konfiguration
 const { getWooConfig } = require('../../woocommerce/config.js');
+const { getConfig } = require('../../config/config.js');
+
 const shopUrl: string = (getWooConfig()?.url) || process.env.WOOCOMMERCE_URL || 'https://example.com';
 const base: string = String(shopUrl).replace(/\/$/, '');
 
-// Social Media API Configuration (Placeholder - später mit echten APIs)
+// ✅ ECHTE Social Media API Configuration mit OAuth Integration
+// LinkedIn, Twitter/X: Nutzen oauth-routes.ts und post-routes.ts für echte API-Integration
+// Instagram: Erfordert Meta Business API Setup
+// Für vollständige Integration siehe: backend/routes/app/api/social/
+
 const SOCIAL_MEDIA_APIS = {
   linkedin: {
     name: 'LinkedIn',
     post: async (content: string) => {
-      console.log(`📝 LinkedIn Post gesendet: ${content.substring(0, 50)}...`);
-      // Hier würde die echte LinkedIn API Integration kommen
-      return { success: true, platform: 'linkedin', id: 'simulated_post_' + Date.now() };
+      const config = getConfig();
+      const linkedInOAuth = config?.socialMedia?.linkedin;
+      
+      // ❌ NICHT KONFIGURIERT: Fehler werfen statt simulated_post_
+      if (!linkedInOAuth?.enabled || !linkedInOAuth?.accessToken) {
+        console.warn(`⚠️ LinkedIn nicht konfiguriert - Überspringen`);
+        return { 
+          success: false, 
+          platform: 'linkedin', 
+          error: 'LinkedIn OAuth nicht konfiguriert. Bitte Token in connection.json setzen',
+          status: 'not-configured'
+        };
+      }
+      
+      try {
+        console.log(`📝 LinkedIn Post gesendet via OAuth API: ${content.substring(0, 50)}...`);
+        // ECHTE LinkedIn API Integration über oauth-routes.ts
+        // POST /api/social/linkedin/post mit accessToken
+        const response = await fetch('http://localhost:3001/api/social/linkedin/post', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${linkedInOAuth.accessToken}` },
+          body: JSON.stringify({ content, visibility: 'PUBLIC' })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`LinkedIn API error: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        return { success: true, platform: 'linkedin', id: data.id || data.urnId };
+      } catch (error: any) {
+        return { success: false, platform: 'linkedin', error: error.message };
+      }
     }
   },
   
   twitter: {
     name: 'Twitter/X',
     post: async (content: string) => {
-      console.log(`🐦 Twitter Post gesendet: ${content.substring(0, 50)}...`);
-      // Hier würde die echte Twitter API Integration kommen
-      return { success: true, platform: 'twitter', id: 'simulated_post_' + Date.now() };
+      const config = getConfig();
+      const twitterOAuth = config?.socialMedia?.twitter;
+      
+      // ❌ NICHT KONFIGURIERT: Fehler werfen statt simulated_post_
+      if (!twitterOAuth?.enabled || !twitterOAuth?.accessToken) {
+        console.warn(`⚠️ Twitter nicht konfiguriert - Überspringen`);
+        return { 
+          success: false, 
+          platform: 'twitter', 
+          error: 'Twitter OAuth nicht konfiguriert. Bitte Token in connection.json setzen',
+          status: 'not-configured'
+        };
+      }
+      
+      try {
+        console.log(`🐦 Twitter Post gesendet via OAuth API: ${content.substring(0, 50)}...`);
+        // ECHTE Twitter API Integration über oauth-routes.ts
+        const response = await fetch('http://localhost:3001/api/social/twitter/post', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${twitterOAuth.accessToken}` },
+          body: JSON.stringify({ text: content })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Twitter API error: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        return { success: true, platform: 'twitter', id: data.data?.id };
+      } catch (error: any) {
+        return { success: false, platform: 'twitter', error: error.message };
+      }
     }
   },
   
-  // Instagram benötigt spezielle Handling für Bilder
+  // ✅ Instagram benötigt Meta Business API (nicht simulated!)
   instagram: {
     name: 'Instagram',
     post: async (content: string, imageUrl?: string) => {
-      console.log(`📸 Instagram Post gesendet: ${content.substring(0, 50)}...`);
-      if (imageUrl) {
-        console.log(`   🖼️ Mit Bild: ${imageUrl}`);
+      const config = getConfig();
+      const instagramOAuth = config?.socialMedia?.instagram;
+      
+      // ❌ NICHT KONFIGURIERT: Fehler werfen statt simulated_post_
+      if (!instagramOAuth?.enabled || !instagramOAuth?.accessToken) {
+        console.warn(`⚠️ Instagram nicht konfiguriert - Überspringen`);
+        return { 
+          success: false, 
+          platform: 'instagram', 
+          error: 'Instagram (Meta) nicht konfiguriert. Bitte Business Account Token in connection.json setzen',
+          status: 'not-configured'
+        };
       }
-      // Hier würde die echte Instagram API Integration kommen
-      return { success: true, platform: 'instagram', id: 'simulated_post_' + Date.now() };
+      
+      try {
+        console.log(`📸 Instagram Post gesendet via Meta Business API: ${content.substring(0, 50)}...`);
+        if (imageUrl) {
+          console.log(`   🖼️ Mit Bild: ${imageUrl}`);
+        }
+        
+        const response = await fetch('http://localhost:3001/api/social/instagram/post', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${instagramOAuth.accessToken}` },
+          body: JSON.stringify({ caption: content, image_url: imageUrl, media_type: 'IMAGE' })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Instagram API error: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        return { success: true, platform: 'instagram', id: data.id };
+      } catch (error: any) {
+        return { success: false, platform: 'instagram', error: error.message };
+      }
     }
   }
 };

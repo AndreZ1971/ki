@@ -1,20 +1,34 @@
 import { logger } from '../../logger.js';
+import { wooGet } from '../../tools/woo.js';
+
+export interface ListCategoriesConfig {
+  per_page?: number;
+  orderby?: 'id' | 'name' | 'slug' | 'count';
+  order?: 'asc' | 'desc';
+  hide_empty?: boolean;
+}
 
 /**
  * Listet alle WooCommerce Produktkategorien
- * TODO: Echte WooCommerce API Integration (Implementation pending)
  */
-export async function run(): Promise<void> {
+export async function run(config: ListCategoriesConfig = {}): Promise<any[]> {
   try {
-    logger.info('Starte wooListCategories Job');
+    logger.info({ config }, 'Starte wooListCategories Job');
     
-    // Placeholder: Queries WooCommerce REST API for product categories
-    // const categories = await wooCommerceAPI.get('products/categories');
+    const params = {
+      per_page: config.per_page || 100,
+      orderby: config.orderby || 'name',
+      order: config.order || 'asc',
+      hide_empty: config.hide_empty !== undefined ? config.hide_empty : false
+    };
+
+    const categories = await wooGet('products/categories', params) as any[];
     
-    logger.info('wooListCategories abgeschlossen (Platzhalter)');
-  } catch (_error) {
-    logger.error({ error: _error }, 'Fehler in wooListCategories');
-    throw _error;
+    logger.info({ count: categories.length }, 'wooListCategories erfolgreich abgeschlossen');
+    return categories;
+  } catch (error: any) {
+    logger.error({ error: error.message }, 'Fehler in wooListCategories');
+    throw error;
   }
 }
 

@@ -1,5 +1,12 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { logger } from '../logger';
+import {
+  runCacheClear,
+  runInventoryMetrics,
+  runPerformanceReport,
+  runSecurityScan,
+  runSeoAnalysis,
+} from './health-helpers';
 
 // Type Definitionen
 interface HealthMetric {
@@ -201,93 +208,75 @@ export default async function registerHealthRoutes(fastify: FastifyInstance) {
     }
   );
 
-  // POST: /api/health/clear-cache
-  fastify.post('/clear-cache', async (request: FastifyRequest, reply: FastifyReply) => {
+  // POST: /api/health/clear-cache - ehrliche Rückmeldung (kein Mock)
+  fastify.post('/clear-cache', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
-      // Simuliere Cache-Clear
-      const clearedItems = ['HTML Cache', 'Database Cache', 'Image Cache', 'Static Assets'];
-      return reply.send({
-        success: true,
-        message: `✅ ${clearedItems.length} Cache-Elemente geleert`,
-        clearedItems,
-        timestamp: new Date().toISOString()
-      });
+      const result = await runCacheClear();
+      const status = result.success ? 200 : result.notConfigured ? 501 : 500;
+      return reply.status(status).send(result);
     } catch (error: any) {
       return reply.status(500).send({
         success: false,
         message: 'Cache-Clear fehlgeschlagen',
-        error: error.message
+        error: error.message,
       });
     }
   });
 
-  // POST: /api/health/performance-report
-  fastify.post('/performance-report', async (request: FastifyRequest, reply: FastifyReply) => {
+  // POST: /api/health/performance-report - reale Messung gegen Shop-URL
+  fastify.post('/performance-report', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
-      return reply.send({
-        success: true,
-        reportId: `PERF-${Date.now()}`,
-        reportUrl: `/reports/performance-${Date.now()}.pdf`,
-        metrics: {
-          loadTime: 2.1,
-          ttfb: 0.8,
-          fcp: 1.2,
-          lcp: 2.3
-        },
-        timestamp: new Date().toISOString()
-      });
+      const result = await runPerformanceReport();
+      return reply.send(result);
     } catch (error: any) {
+      logger.error({ error }, 'Performance report failed');
       return reply.status(500).send({
         success: false,
         message: 'Performance-Bericht fehlgeschlagen',
-        error: error.message
+        error: error.message,
       });
     }
   });
 
-  // POST: /api/health/security-scan
-  fastify.post('/security-scan', async (request: FastifyRequest, reply: FastifyReply) => {
+  // POST: /api/health/security-scan - echte Header/TLS-Prüfung
+  fastify.post('/security-scan', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
-      return reply.send({
-        success: true,
-        vulnerabilities: {
-          critical: 0,
-          high: 1,
-          medium: 2,
-          low: 3
-        },
-        scannedAt: new Date().toISOString(),
-        details: [
-          { severity: 'high', issue: 'Outdated SSL Certificate' },
-          { severity: 'medium', issue: 'Missing Security Headers' }
-        ]
-      });
+      const result = await runSecurityScan();
+      return reply.send(result);
     } catch (error: any) {
       return reply.status(500).send({
         success: false,
         message: 'Sicherheits-Scan fehlgeschlagen',
-        error: error.message
+        error: error.message,
       });
     }
   });
 
-  // POST: /api/health/seo-analysis
-  fastify.post('/seo-analysis', async (request: FastifyRequest, reply: FastifyReply) => {
+  // POST: /api/health/seo-analysis - echte HTML-Auswertung (Startseite)
+  fastify.post('/seo-analysis', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
-      return reply.send({
-        success: true,
-        score: 78,
-        issues: [
-          { severity: 'high', message: 'Missing meta descriptions', suggestion: 'Add meta descriptions to all pages' },
-          { severity: 'medium', message: 'Mobile optimization needed', suggestion: 'Implement responsive design' }
-        ],
-        analyzedAt: new Date().toISOString()
-      });
+      const result = await runSeoAnalysis();
+      return reply.send(result);
     } catch (error: any) {
       return reply.status(500).send({
         success: false,
         message: 'SEO-Analyse fehlgeschlagen',
-        error: error.message
+        error: error.message,
+      });
+    }
+  });
+
+  // GET: /api/health/inventory-metrics - echte Lagerbestandsauswertung
+  fastify.get('/inventory-metrics', async (_request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      const result = await runInventoryMetrics();
+      const status = result.success ? 200 : 500;
+      return reply.status(status).send(result);
+    } catch (error: any) {
+      return reply.status(500).send({
+        success: false,
+        message: 'Inventory-Analyse fehlgeschlagen',
+        error: error.message,
       });
     }
   });

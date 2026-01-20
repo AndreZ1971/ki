@@ -1,6 +1,13 @@
 // backend/routes/app/api/health/index.ts
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { logger } from '../../../../logger';
+import {
+  runCacheClear,
+  runPerformanceReport,
+  runSecurityScan,
+  runSeoAnalysis,
+  runInventoryMetrics,
+} from '../../../health-helpers';
 
 export default async function healthRoutes(fastify: FastifyInstance) {
   
@@ -8,22 +15,11 @@ export default async function healthRoutes(fastify: FastifyInstance) {
    * POST /clear-cache
    * Leert verschiedene Cache-Bereiche
    */
-  fastify.post('/clear-cache', async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/clear-cache', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
-      // Simuliere Cache-Leerung
-      const clearedItems = [
-        'Page Cache',
-        'Object Cache', 
-        'Browser Cache',
-        'CDN Cache'
-      ];
-
-      return reply.send({
-        success: true,
-        message: 'Cache erfolgreich geleert',
-        clearedItems,
-        timestamp: new Date().toISOString()
-      });
+      const result = await runCacheClear();
+      const status = result.success ? 200 : result.notConfigured ? 501 : 500;
+      return reply.status(status).send(result);
     } catch (error: any) {
       logger.error({ error: error.message, function: 'clearCache' }, 'Cache clear error');
       return reply.status(500).send({
@@ -38,22 +34,10 @@ export default async function healthRoutes(fastify: FastifyInstance) {
    * POST /performance-report
    * Erstellt einen Performance-Report
    */
-  fastify.post('/performance-report', async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/performance-report', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
-      const reportId = `perf-${Date.now()}`;
-      
-      return reply.send({
-        success: true,
-        reportId,
-        reportUrl: `/reports/${reportId}`,
-        metrics: {
-          loadTime: 1.2,
-          ttfb: 0.3,
-          fcp: 0.8,
-          lcp: 1.5
-        },
-        timestamp: new Date().toISOString()
-      });
+      const result = await runPerformanceReport();
+      return reply.send(result);
     } catch (error: any) {
       logger.error({ error: error.message, function: 'performanceReport' }, 'Performance report error');
       return reply.status(500).send({
@@ -68,29 +52,10 @@ export default async function healthRoutes(fastify: FastifyInstance) {
    * POST /security-scan
    * Führt einen Sicherheits-Scan durch
    */
-  fastify.post('/security-scan', async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/security-scan', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
-      // Simuliere Sicherheits-Scan
-      const vulnerabilities = {
-        critical: Math.floor(Math.random() * 3),
-        high: Math.floor(Math.random() * 5),
-        medium: Math.floor(Math.random() * 10),
-        low: Math.floor(Math.random() * 15)
-      };
-
-      return reply.send({
-        success: true,
-        vulnerabilities,
-        scannedAt: new Date().toISOString(),
-        details: [
-          {
-            severity: 'high',
-            title: 'Outdated WordPress Plugin',
-            description: 'Plugin XYZ has a known security vulnerability',
-            recommendation: 'Update to version 2.0.1 or higher'
-          }
-        ]
-      });
+      const result = await runSecurityScan();
+      return reply.send(result);
     } catch (error: any) {
       logger.error({ error: error.message, function: 'securityScan' }, 'Security scan error');
       return reply.status(500).send({
@@ -105,37 +70,29 @@ export default async function healthRoutes(fastify: FastifyInstance) {
    * POST /seo-analysis
    * Analysiert SEO-Metriken
    */
-  fastify.post('/seo-analysis', async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/seo-analysis', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
-      const score = Math.floor(Math.random() * 30) + 70; // 70-100
-      
-      return reply.send({
-        success: true,
-        score,
-        issues: [
-          {
-            severity: 'medium',
-            message: 'Missing meta descriptions on 5 pages',
-            suggestion: 'Add unique meta descriptions to improve click-through rates'
-          },
-          {
-            severity: 'low',
-            message: 'Some images missing alt text',
-            suggestion: 'Add descriptive alt text to all product images'
-          },
-          {
-            severity: 'high',
-            message: 'Slow page load time',
-            suggestion: 'Optimize images and enable caching'
-          }
-        ],
-        analyzedAt: new Date().toISOString()
-      });
+      const result = await runSeoAnalysis();
+      return reply.send(result);
     } catch (error: any) {
       logger.error({ error: error.message, function: 'seoAnalysis' }, 'SEO analysis error');
       return reply.status(500).send({
         success: false,
         message: 'Fehler bei der SEO-Analyse',
+        error: error.message
+      });
+    }
+  });
+
+  fastify.get('/inventory-metrics', async (_request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      const result = await runInventoryMetrics();
+      const status = result.success ? 200 : 500;
+      return reply.status(status).send(result);
+    } catch (error: any) {
+      return reply.status(500).send({
+        success: false,
+        message: 'Fehler bei der Inventory-Analyse',
         error: error.message
       });
     }

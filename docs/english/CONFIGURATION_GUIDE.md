@@ -1,6 +1,43 @@
 # Configuration Guide
 
-## 🔧 Dynamic Shop URLs
+## � Authentication & Data Access
+
+### Current Implementation (v6.9.1)
+
+**Authentication:**
+- Temporary in-memory authentication via ENV variables
+- Configuration via `ADMIN_USER` and `ADMIN_PASS` / `ADMIN_PASS_HASH`
+- Planned: Automattic integration for production environment
+
+**Data Access:**
+- **WooCommerce:** Direct via REST API (connection.json)
+- **Customers:** From WooCommerce `customers` endpoint
+- **Orders:** From WooCommerce `orders` endpoint
+- **Support Tickets:** Awesome Support Plugin with HTML sanitization
+- **No Mock Data:** All routes use real API calls
+
+### connection.json Configuration
+
+```json
+{
+  "openAI": {
+    "apiKey": "sk-...",
+    "model": "gpt-4o-mini"
+  },
+  "woocommerce": {
+    "url": "https://yourshop.com",
+    "consumerKey": "ck_...",
+    "consumerSecret": "cs_..."
+  },
+  "wordpress": {
+    "url": "https://yourshop.com",
+    "username": "admin",
+    "appPassword": "xxxx xxxx xxxx xxxx"
+  }
+}
+```
+
+## �🔧 Dynamic Shop URLs
 
 The system is completely configurable and uses **no hardcoded shop URLs**. This enables the container to be deployed for any number of shops.
 

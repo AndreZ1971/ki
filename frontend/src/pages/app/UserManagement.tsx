@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { formatDate, formatDateTime } from "../../lib/i18n-utils";
+import { formatDate } from "../../lib/i18n-utils";
 import { useNavigate } from "react-router-dom";
 import "./page.css";
 import "../shared-analytics.css";
@@ -17,8 +17,6 @@ interface Customer {
   orders_count: number;
   last_viewed_product?: string;
   cart?: Array<{ name: string; price: number }>;
-  visit_count?: number;
-  last_login?: string;
   role?: string;
 }
 
@@ -471,14 +469,6 @@ const UserManagement: React.FC = () => {
               </div>
               <div className="user-info-field">
                 <div className="user-info-label">
-                  👁️ Shopbesuche
-                </div>
-                <div className="user-info-value">
-                  {selectedUser.visit_count ?? "–"}
-                </div>
-              </div>
-              <div className="user-info-field">
-                <div className="user-info-label">
                   📅 Registriert
                 </div>
                 <div className="user-info-value">
@@ -496,14 +486,6 @@ const UserManagement: React.FC = () => {
                 </div>
               </div>
             </div>
-            {selectedUser.last_login && (
-              <div className="last-login-info">
-                <span className="last-login-text">
-                  ⏱️ Letzter Login:{" "}
-                  {formatDateTime(new Date(selectedUser.last_login))}
-                </span>
-              </div>
-            )}
             {selectedUser.cart &&
               Array.isArray(selectedUser.cart) &&
               selectedUser.cart.length > 0 && (

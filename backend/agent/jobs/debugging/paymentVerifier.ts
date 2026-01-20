@@ -1,7 +1,7 @@
-// agent/jobs/paymentVerifier.ts
+// agent/jobs/debugging/paymentVerifier.ts - DEBUG ONLY
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
 import * as dotenv from 'dotenv';
-import { getWooConfig } from '../../woocommerce/config.js';
+import { getWooConfig } from '../../../woocommerce/config.js';
 
 dotenv.config();
 

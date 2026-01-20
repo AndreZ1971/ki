@@ -122,7 +122,7 @@ Abandoned Carts? Kunden, die lange nichts gekauft haben? A.R.I. kennt sie und er
 
 - ✅ Optimierte Produkttexte (SEO-optimiert, verkaufsfördernd)
 - ✅ KI-generierte Produktbilder (DALL-E Integration)
-- ✅ Echtzeit-Analytics mit echten Empfehlungen
+- ✅ Echtzeit-Analytics mit echten WooCommerce-Daten (keine Mock-Daten)
 - ✅ Email-Automation (Carts, Willkommensserie, Reaktivierung)
 - ✅ Social-Media-Posts (6 Plattformen)
 - ✅ **NEU v6.9.0:** Globales Design Token System mit Dark Mode
@@ -130,8 +130,11 @@ Abandoned Carts? Kunden, die lange nichts gekauft haben? A.R.I. kennt sie und er
 - ✅ **NEU v6.9.0:** Vollständig dunkles Chatbot-Design mit perfekter Lesbarkeit
 - ✅ **NEU v6.9.0:** Spezialisierungs-aware KI-Personalisierung
 - ✅ Multi-Source Trend-Analyse (Google Trends + Reddit OAuth)
-- ✅ Prozentuale Preissuggestionen mit intelligenter Fallback-Logik
+- ✅ Prozentuale Preissuggestionen mit deterministischer Berechnung
 - ✅ Manuelle Validierung von AI-Vorschlägen vor Übernahme
+- ✅ **NEU v6.9.1:** Vollständige WooCommerce-Integration ohne Platzhalter
+- ✅ **NEU v6.9.1:** Support-Tickets mit HTML-Bereinigung
+- ✅ **NEU v6.9.1:** Produktideen-Scoring ohne Zufallswerte
 
 ## ⚙️ Technologie
 
@@ -162,6 +165,13 @@ Abandoned Carts? Kunden, die lange nichts gekauft haben? A.R.I. kennt sie und er
 - **DALL-E:** Automatische Bild-Generierung
 - **Embeddings:** Semantic Search & Matching
 - **Custom ML:** Trend-Analyse, Sentiment Detection, Pattern Recognition
+
+### 🔐 Authentifizierung
+
+- **Aktuell:** Temporäre In-Memory-Authentifizierung (ENV-konfiguriert)
+- **Geplant:** Automattic-Integration für Produktiv-Umgebung
+- **WooCommerce-Daten:** Direkt von WooCommerce API (connection.json)
+- **Support-Tickets:** Awesome Support Plugin Integration mit HTML-Bereinigung
 
 ## 🔧 Tool-Übersicht
 

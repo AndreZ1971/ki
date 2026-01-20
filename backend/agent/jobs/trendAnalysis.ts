@@ -26,6 +26,9 @@ export async function trendAnalysisJob(options?: {
   geo?: string;
   includeReddit?: boolean;
 }): Promise<TrendAnalysisResult> {
+  const { getConfig } = require('../../config');
+  const config = getConfig();
+  
   // ...existing code...
   const geo = options?.geo || 'DE';
   const keyword = options?.keyword || '';
@@ -37,7 +40,7 @@ export async function trendAnalysisJob(options?: {
 
   // 2. Reddit Daten (optional)
   let redditData: TrendData[] = [];
-  if (options?.includeReddit && process.env.REDDIT_CLIENT_ID) {
+  if (options?.includeReddit && config.reddit?.clientId) {
     redditData = await analyzeRedditTrends(keyword);
   }
 
@@ -102,10 +105,82 @@ async function analyzeGoogleTrends(keyword: string, geo: string): Promise<TrendD
 /**
  * Reddit Trends Analyse
  */
-async function analyzeRedditTrends(_keyword: string): Promise<TrendData[]> {
-  // Für später - erstmal Platzhalter
-  console.log('📝 Reddit Analysis coming soon...');
-  return [];
+async function analyzeRedditTrends(keyword: string): Promise<TrendData[]> {
+  try {
+    console.log('📝 Analysiere Reddit Trends...');
+    
+    const { getConfig } = require('../../config');
+    const config = getConfig();
+    const redditConfig = config.reddit;
+    
+    if (!redditConfig?.clientId || !redditConfig?.clientSecret) {
+      console.warn('⚠️ Reddit credentials nicht konfiguriert');
+      return [];
+    }
+
+    // Reddit OAuth Token abrufen
+    const authResponse = await fetch('https://www.reddit.com/api/v1/access_token', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${Buffer.from(
+          `${redditConfig.clientId}:${redditConfig.clientSecret}`
+        ).toString('base64')}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'KI-TrendAnalyzer/1.0'
+      },
+      body: 'grant_type=client_credentials'
+    });
+
+    if (!authResponse.ok) {
+      console.error('❌ Reddit OAuth Fehler:', authResponse.statusText);
+      return [];
+    }
+
+    const authData = await authResponse.json();
+    const accessToken = authData.access_token;
+
+    // Suche nach Trends mit diesem Keyword
+    const searchResponse = await fetch(
+      `https://oauth.reddit.com/r/all/search?q=${encodeURIComponent(keyword)}&sort=hot&limit=50&type=link`,
+      {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'User-Agent': 'KI-TrendAnalyzer/1.0'
+        }
+      }
+    );
+
+    if (!searchResponse.ok) {
+      console.error('❌ Reddit Search Fehler:', searchResponse.statusText);
+      return [];
+    }
+
+    const searchData = await searchResponse.json();
+    const trends: TrendData[] = [];
+
+    // Reddit Posts in TrendData konvertieren
+    if (searchData?.data?.children) {
+      searchData.data.children.slice(0, 15).forEach((post: any, index: number) => {
+        const postData = post.data;
+        
+        trends.push({
+          niche: postData.title,
+          demandScore: Math.min(100, Math.max(20, 100 - index * 5)),
+          competition: Math.min(100, Math.max(10, index * 4)),
+          seasonality: analyzeSeasonality(),
+          priceRange: estimatePriceRange(postData.title),
+          keywords: extractKeywords(postData.title)
+        });
+      });
+    }
+
+    console.log(`✅ Reddit Trends: ${trends.length} Posts gefunden für "${keyword}"`);
+    return trends;
+
+  } catch (error: any) {
+    console.error('❌ Reddit Trends Fehler:', error.message);
+    return [];
+  }
 }
 
 /**

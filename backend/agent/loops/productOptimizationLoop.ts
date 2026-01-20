@@ -126,33 +126,47 @@ export class ProductOptimizationLoop extends AgenticLoop {
       name: 'act',
       description: 'Execute A/B tests on product variants',
       action: async () => {
-        logger.info('⚡ ACT: Running A/B tests...');
+        logger.info('⚡ ACT: Fetching real conversion data from WooCommerce...');
 
-        // Simuliere A/B Test Results
-        for (const variant of this.candidates) {
-          const baselineConversions = Math.floor(Math.random() * 100);
-          const variantConversions = Math.floor(
-            baselineConversions * (1 + variant.expectedImpact / 100) +
-              Math.random() * 20
-          );
+        // Hole echte Konversionsdaten aus WooCommerce Orders
+        try {
+          for (const variant of this.candidates) {
+            // Abrufen von Orders für dieses Produkt (A/B Variante)
+            const ordersResponse = await fetch(
+              `${process.env.WOO_URL}/wp-json/wc/v3/orders?product=${variant.productId}&per_page=100`,
+              {
+                headers: {
+                  'Authorization': `Basic ${Buffer.from(
+                    `${process.env.WOO_KEY}:${process.env.WOO_SECRET}`
+                  ).toString('base64')}`
+                }
+              }
+            );
 
-          const winner = variantConversions > baselineConversions ? 'B' : 'A';
-          const improvement = (
-            ((variantConversions - baselineConversions) / baselineConversions) *
-            100
-          ).toFixed(2);
+            if (!ordersResponse.ok) {
+              logger.warn(`Could not fetch orders for product ${variant.productId}`);
+              continue;
+            }
 
-          this.results.push({
-            productId: variant.productId,
-            variant,
-            aResult: baselineConversions,
-            bResult: variantConversions,
-            winner,
-            improvement: parseFloat(improvement as any),
-          });
+            const orders = await ordersResponse.json();
+            const conversions = orders.length;
+
+            this.results.push({
+              productId: variant.productId,
+              variant,
+              aResult: conversions,
+              bResult: conversions,
+              winner: 'A',
+              improvement: 0,
+            });
+
+            logger.info(`📦 Product ${variant.productId}: ${conversions} real conversions`);
+          }
+        } catch (error: any) {
+          logger.error('Error fetching conversion data:', error.message);
         }
 
-        logger.info(`✅ ACT: Completed ${this.results.length} A/B tests`);
+        logger.info(`✅ ACT: Analyzed ${this.results.length} products with real conversion data`);
         return this.results;
       },
     });

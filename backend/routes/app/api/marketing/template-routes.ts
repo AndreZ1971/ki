@@ -292,7 +292,8 @@ Antworte mit strukturierten Verbesserungen.`;
         engagementScore = Math.min(100, Math.max(0, engagementScore));
 
         // Confidence Score
-        const confidence = 0.72 + Math.random() * 0.15; // 0.72 - 0.87
+        // Vertrauen deterministisch aus Score ableiten (keine Randomness)
+        const confidence = Math.max(0.70, Math.min(0.95, 0.70 + engagementScore / 500));
 
         return reply.send({
           success: true,

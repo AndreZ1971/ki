@@ -203,19 +203,14 @@ async function createProductFromTrend(trend: TrendData, autoPublish: boolean = f
     }
     
   } catch (_error) {
-    // 2. SICHERER FALLBACK
-    console.warn(`⚠️ WooCommerce fehlgeschlagen, verwende Simulation`);
-    console.log(`📦 Simuliertes Produkt: "${productData.name}"`);
+    // ❌ NICHT SIMULATED! WooCommerce FEHLER - muss geloggt und geworfen werden
+    console.error(`❌ KRITISCHER FEHLER: WooCommerce API fehlgeschlagen`);
+    console.error(`   Produkt: "${productData.name}"`);
+    console.error(`   Fehler: ${_error instanceof Error ? _error.message : String(_error)}`);
     
-    return {
-      name: productData.name,
-      price: productPrice,
-      trend: trend.niche,
-      status: 'simulated',
-      source: 'simulation',
-      categories: productData.categories,
-      error: _error instanceof Error ? _error.message : 'Unknown error'
-    };
+    // ❌ NIEMALS 'simulated' zurückgeben - das versteckt Fehler!
+    // Stattdessen: Error werfen oder über Monitoring-System benachrichtigen
+    throw new Error(`Produkt-Erstellung fehlgeschlagen: ${_error instanceof Error ? _error.message : 'Unknown error'}`);
   }
 }
 

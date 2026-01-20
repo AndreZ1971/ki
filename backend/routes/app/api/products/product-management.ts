@@ -774,10 +774,23 @@ Antwort-Format (streng):
           throw new Error('Keine Produktideen vom KI-Dienst erhalten');
         }
 
-        // Generiere Score für jede Idee wenn nicht vorhanden
+        // Generiere deterministischen Score für jede Idee falls nicht vorhanden
+        const computeIdeaScore = (idea: any): number => {
+          let score = 55;
+          const descWords = typeof idea.description === 'string' ? idea.description.split(/\s+/).length : 0;
+          score += Math.min(20, descWords / 5); // längere Beschreibung => mehr Kontext
+          const price = Number(idea.price) || 0;
+          if (price >= 9 && price <= 400) score += 10; // plausibler Preis
+          if (idea.reason) score += 5;
+          if (idea.features && Array.isArray(idea.features)) {
+            score += Math.min(10, idea.features.length * 2);
+          }
+          return Math.max(50, Math.min(95, Math.round(score)));
+        };
+
         ideas = ideas.map((idea) => ({
           ...idea,
-          score: idea.score || Math.floor(70 + Math.random() * 25),
+          score: idea.score || computeIdeaScore(idea),
           reason: idea.reason || 'Trending im Markt'
         }));
 
