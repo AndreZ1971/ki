@@ -57,6 +57,8 @@ const UserManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "revenue" | "date">("name");
   const [selectedUser, setSelectedUser] = useState<Customer | null>(null);
+  const [userOrders, setUserOrders] = useState<any[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
 
   // ✅ Kundendaten laden
   useEffect(() => {
@@ -121,7 +123,32 @@ const UserManagement: React.FC = () => {
     fetchCustomers();
   }, [apiBase]);
 
-  // 📊 Berechnete Statistiken
+  // � Bestellungen eines Kunden laden
+  const fetchCustomerOrders = async (customerId: number) => {
+    setOrdersLoading(true);
+    try {
+      const url = apiBase
+        ? `${apiBase.replace(/\/$/, "")}/api/woocommerce/customers/${customerId}/orders`
+        : `/api/woocommerce/customers/${customerId}/orders`;
+
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (res.ok && data.success && Array.isArray(data.data)) {
+        setUserOrders(data.data);
+      } else {
+        setUserOrders([]);
+        console.warn("Could not fetch orders:", data);
+      }
+    } catch (err) {
+      console.error("Error fetching orders:", err);
+      setUserOrders([]);
+    } finally {
+      setOrdersLoading(false);
+    }
+  };
+
+  // �📊 Berechnete Statistiken
   const stats = useMemo((): CustomerStats => {
     if (customers.length === 0) {
       return {
@@ -175,6 +202,7 @@ const UserManagement: React.FC = () => {
 
   const closeModal = () => {
     setSelectedUser(null);
+    setUserOrders([]);
   };
 
   return (
@@ -552,6 +580,129 @@ const UserManagement: React.FC = () => {
               </h3>
               <MLPersonalization userId={selectedUser.id} />
             </div>
+
+            {/* 📋 Bestellungen-Sektion */}
+            <div
+              style={{
+                marginBottom: "24px",
+                paddingTop: "24px",
+                borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                <h3
+                  style={{
+                    fontSize: "14px",
+                    fontWeight: "600",
+                    textTransform: "uppercase",
+                    color: "rgba(255,255,255,0.95)",
+                    margin: 0,
+                  }}
+                >
+                  📦 Bestellungen ({selectedUser.orders_count})
+                </h3>
+                {selectedUser.orders_count > 0 && (
+                  <button
+                    onClick={() => fetchCustomerOrders(selectedUser.id)}
+                    disabled={ordersLoading}
+                    style={{
+                      padding: "6px 12px",
+                      background: "rgba(52, 199, 89, 0.2)",
+                      border: "1px solid rgba(52, 199, 89, 0.4)",
+                      borderRadius: "6px",
+                      color: "#34c759",
+                      cursor: ordersLoading ? "not-allowed" : "pointer",
+                      fontSize: "12px",
+                      fontWeight: "600",
+                      opacity: ordersLoading ? 0.6 : 1,
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    {ordersLoading ? "Lädt..." : "Anzeigen"}
+                  </button>
+                )}
+              </div>
+
+              {userOrders.length > 0 && (
+                <div
+                  style={{
+                    background: "rgba(255, 255, 255, 0.03)",
+                    borderRadius: "8px",
+                    overflow: "hidden",
+                    fontSize: "12px",
+                  }}
+                >
+                  <div style={{ overflowX: "auto" }}>
+                    <table
+                      style={{
+                        width: "100%",
+                        borderCollapse: "collapse",
+                        textAlign: "left",
+                      }}
+                    >
+                      <thead>
+                        <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
+                          <th style={{ padding: "8px", color: "rgba(255,255,255,0.7)" }}>Bestellung</th>
+                          <th style={{ padding: "8px", color: "rgba(255,255,255,0.7)" }}>Status</th>
+                          <th style={{ padding: "8px", color: "rgba(255,255,255,0.7)" }}>Datum</th>
+                          <th style={{ padding: "8px", color: "rgba(255,255,255,0.7)", textAlign: "right" }}>Betrag</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {userOrders.map((order: any) => (
+                          <tr
+                            key={order.id}
+                            style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+                          >
+                            <td style={{ padding: "8px", color: "rgba(255,255,255,0.95)" }}>
+                              #{order.order_number}
+                            </td>
+                            <td style={{ padding: "8px" }}>
+                              <span
+                                style={{
+                                  background:
+                                    order.status === "completed"
+                                      ? "rgba(52, 199, 89, 0.2)"
+                                      : order.status === "pending"
+                                        ? "rgba(255, 159, 64, 0.2)"
+                                        : "rgba(100, 100, 100, 0.2)",
+                                  color:
+                                    order.status === "completed"
+                                      ? "#34c759"
+                                      : order.status === "pending"
+                                        ? "#ff9f40"
+                                        : "rgba(255,255,255,0.7)",
+                                  padding: "4px 8px",
+                                  borderRadius: "4px",
+                                  fontSize: "11px",
+                                  textTransform: "capitalize",
+                                }}
+                              >
+                                {order.status}
+                              </span>
+                            </td>
+                            <td style={{ padding: "8px", color: "rgba(255,255,255,0.8)" }}>
+                              {new Date(order.date_created).toLocaleDateString("de-DE")}
+                            </td>
+                            <td
+                              style={{
+                                padding: "8px",
+                                color: "#34c759",
+                                fontWeight: "600",
+                                textAlign: "right",
+                              }}
+                            >
+                              {parseFloat(order.total).toFixed(2)} {order.currency}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <button
               onClick={closeModal}
               style={{

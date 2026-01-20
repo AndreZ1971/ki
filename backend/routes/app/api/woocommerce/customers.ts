@@ -144,11 +144,56 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
 
       logger.info({ count: transformedCustomers.length }, 'Customers transformed successfully');
 
+      // ✅ WICHTIG: Zähle echte Bestellungen pro Kunde (nicht dem WooCommerce meta-field vertrauen!)
+      logger.info('Fetching actual order counts for each customer...');
+      const customersWithRealOrderCounts = await Promise.all(
+        transformedCustomers.map(async (customer) => {
+          try {
+            // Hole alle Bestellungen für diesen Kunden
+            const ordersResponse = await fetch(
+              `${wooUrl}/wp-json/wc/v3/orders?customer=${customer.id}&per_page=1`,
+              {
+                headers: {
+                  Authorization: `Basic ${auth}`,
+                  'Content-Type': 'application/json',
+                },
+              }
+            );
+
+            if (ordersResponse.ok) {
+              const orders = await ordersResponse.json();
+              const totalHeader = ordersResponse.headers.get('x-wp-total');
+              const actualOrderCount = totalHeader ? parseInt(totalHeader, 10) : (Array.isArray(orders) ? orders.length : 0);
+              
+              // Aktualisiere den Bestellzähler
+              return {
+                ...customer,
+                orders_count: actualOrderCount || 0,
+              };
+            } else {
+              logger.warn({ customerId: customer.id }, 'Could not fetch orders for customer');
+              return customer;
+            }
+          } catch (orderErr: any) {
+            logger.warn({ customerId: customer.id, error: orderErr.message }, 'Error fetching orders for customer');
+            return customer;
+          }
+        })
+      );
+
+      logger.info(
+        { 
+          totalCustomers: customersWithRealOrderCounts.length,
+          withOrders: customersWithRealOrderCounts.filter(c => c.orders_count > 0).length 
+        }, 
+        'Order counts updated successfully'
+      );
+
       return {
         success: true,
-        data: transformedCustomers,
-        total: transformedCustomers.length,
-        message: `${transformedCustomers.length} Kunden erfolgreich geladen`,
+        data: customersWithRealOrderCounts,
+        total: customersWithRealOrderCounts.length,
+        message: `${customersWithRealOrderCounts.length} Kunden erfolgreich geladen (mit echten Bestellungszahlen)`,
       };
     } catch (_error) {
       const err: any = _error;
@@ -432,6 +477,103 @@ const customersRoutes: FastifyPluginAsync = async (fastify, _options) => {
       reply.status(500).send({
         success: false,
         error: 'Konnte Statistiken nicht laden',
+      });
+    }
+  });
+
+  // GET: Bestellungen eines spezifischen Kunden
+  fastify.get<{ Params: { customerId: string } }>('/customers/:customerId/orders', async (request, reply) => {
+    try {
+      // Onboarding-Guard
+      if (!isWooConfigured()) {
+        return reply.status(503).send({
+          success: false,
+          code: 'WOO_NOT_CONFIGURED',
+          message: 'WooCommerce ist noch nicht konfiguriert.',
+        });
+      }
+
+      const { customerId } = request.params;
+
+      if (!customerId || isNaN(Number(customerId))) {
+        return reply.status(400).send({
+          success: false,
+          code: 'INVALID_CUSTOMER_ID',
+          message: 'Ungültige Kunden-ID',
+        });
+      }
+
+      const woo = getConfig().woocommerce || {};
+      const auth = Buffer.from(
+        `${woo.consumerKey || ''}:${woo.consumerSecret || ''}`
+      ).toString('base64');
+      const wooUrl = (woo.url || '').endsWith('/')
+        ? (woo.url || '').slice(0, -1)
+        : woo.url || '';
+
+      logger.info({ customerId }, 'Fetching orders for customer');
+
+      // Hole alle Bestellungen für den Kunden (mit Pagination)
+      const ordersResponse = await fetch(
+        `${wooUrl}/wp-json/wc/v3/orders?customer=${customerId}&per_page=100`,
+        {
+          headers: {
+            Authorization: `Basic ${auth}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!ordersResponse.ok) {
+        logger.warn({ customerId, status: ordersResponse.status }, 'Could not fetch orders');
+        return reply.status(ordersResponse.status).send({
+          success: false,
+          code: 'WOO_API_ERROR',
+          message: 'Konnte Bestellungen nicht laden',
+        });
+      }
+
+      const orders = await ordersResponse.json();
+      const totalHeader = ordersResponse.headers.get('x-wp-total');
+      const totalOrders = totalHeader ? parseInt(totalHeader, 10) : (Array.isArray(orders) ? orders.length : 0);
+
+      // Transformiere die Bestellungsdaten
+      const transformedOrders = (Array.isArray(orders) ? orders : []).map((order: any) => ({
+        id: order.id,
+        order_number: order.number,
+        status: order.status,
+        date_created: order.date_created,
+        total: order.total,
+        currency: order.currency,
+        line_items: order.line_items?.map((item: any) => ({
+          id: item.id,
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+          total: item.total,
+        })) || [],
+        customer_note: order.customer_note,
+        payment_method: order.payment_method,
+        payment_method_title: order.payment_method_title,
+      }));
+
+      logger.info({ customerId, count: transformedOrders.length, total: totalOrders }, 'Orders fetched successfully');
+
+      return {
+        success: true,
+        data: transformedOrders,
+        total: totalOrders,
+        message: `${totalOrders} Bestellung${totalOrders !== 1 ? 'en' : ''} für Kunden ${customerId} geladen`,
+      };
+    } catch (_error) {
+      const err: any = _error;
+      const message = err instanceof Error ? err.message : String(err);
+      logger.error({ error: message }, 'Error fetching customer orders');
+      reply.status(500).send({
+        success: false,
+        code: 'SERVER_ERROR',
+        error: 'Fehler beim Laden der Bestellungen',
+        message,
       });
     }
   });
