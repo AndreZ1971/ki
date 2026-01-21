@@ -46,7 +46,7 @@ export default function MLSettings() {
   const loadConfig = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/ml/config`);
+      const response = await fetch('/api/ml/config');
       if (!response.ok) throw new Error('Fehler');
       const data = await response.json();
       setConfig(data);
@@ -61,7 +61,7 @@ export default function MLSettings() {
     if (!config) return;
     try {
       setSaving(true);
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/ml/config`, {
+  const response = await fetch('/api/ml/config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(config),

@@ -12,11 +12,6 @@ export interface MemoryMessage {
   timestamp: number;
 }
 
-let API_BASE_URL = (import.meta.env.VITE_API_URL || "").trim();
-if (!API_BASE_URL) {
-  API_BASE_URL = "";
-}
-
 async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
@@ -29,7 +24,7 @@ async function apiRequest<T>(
       headers["Content-Type"] = "application/json";
     }
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const response = await fetch(endpoint, {
       headers,
       ...options,
     });

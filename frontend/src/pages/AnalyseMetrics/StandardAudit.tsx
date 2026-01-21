@@ -88,11 +88,7 @@ const StandardAudit = () => {
         throw new Error("Keine Audit-Daten geladen. Bitte zuerst Scan ausführen.");
       }
 
-      let base = (import.meta.env.VITE_API_URL || "").trim();
-      if (base.endsWith("/")) base = base.slice(0, -1);
-      const apiUrl = base
-        ? `${base}/api/audit/standard/ml-analysis`
-        : `/api/audit/standard/ml-analysis`;
+      const apiUrl = `/api/audit/standard/ml-analysis`;
 
       const payload = {
         auditChecks,

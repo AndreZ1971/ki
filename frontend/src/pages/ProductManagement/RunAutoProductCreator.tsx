@@ -23,7 +23,7 @@ interface ProductCreationResult {
 interface CreationConfig {
   count: number;
   category: string;
-  productType: 'simple' | 'variable' | 'bundle';
+  productType: 'simple' | 'virtual' | 'downloadable' | 'variable' | 'bundle';
   optimization: 'low' | 'medium' | 'high' | 'auto';
   minQualityScore: number;
   useAIEnhancements: boolean;
@@ -64,6 +64,11 @@ const RunAutoProductCreator = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [trendingKeywords, setTrendingKeywords] = useState<string[]>([]);
   const [loadingKeywords, setLoadingKeywords] = useState(false);
+  const [dataTransparency, setDataTransparency] = useState({
+    keywords: 'not-requested' as 'not-requested' | 'loading' | 'ok' | 'failed',
+    mlMarketAnalysis: true,
+    seoOptimized: true,
+  });
 
   useEffect(() => {
     if (showAdvanced) {
@@ -74,11 +79,14 @@ const RunAutoProductCreator = () => {
 
   const fetchTrendingKeywords = async () => {
     setLoadingKeywords(true);
+    setDataTransparency((prev) => ({ ...prev, keywords: 'loading' }));
     try {
       const data = await apiClient.get(`/api/trends/trending-keywords?category=${selectedCategory}`);
       setTrendingKeywords(data.keywords || []);
-        } catch {
-      // Load failed - silent
+      setDataTransparency((prev) => ({ ...prev, keywords: 'ok' }));
+    } catch (_err) {
+      setDataTransparency((prev) => ({ ...prev, keywords: 'failed' }));
+      toast.warning('Trending Keywords konnten nicht geladen werden. Es wird ohne Keyword-Boost fortgefahren.');
     } finally {
       setLoadingKeywords(false);
     }
@@ -91,33 +99,32 @@ const RunAutoProductCreator = () => {
     setStats(null);
 
     try {
-      const progressInterval = setInterval(() => {
-        setProgress((prev) => Math.min(prev + Math.random() * 15, 95));
-      }, 500);
-
       setCurrentStatus('🧠 Generiere KI-Produkte...');
-      setProgress(5);
+      setProgress(10);
 
-      // Mappe nicht unterstützte Werte auf das Backend-Schema
-      const mappedProductType: 'simple' | 'virtual' | 'downloadable' =
-        config.productType === 'simple' ? 'simple' : 'simple'; // variable/bundle -> simple
+      // Mappe nur optimization 'auto' -> 'high' (Backend kennt kein 'auto')
       const mappedOptimization: 'low' | 'medium' | 'high' =
         config.optimization === 'auto' ? 'high' : (config.optimization as 'low' | 'medium' | 'high');
+
+      setCurrentStatus('📦 Sende Auftrag ans Backend...');
+      setProgress(25);
 
       const payload = {
         count: config.count,
         category: config.category,
-        productType: mappedProductType,
+        productType: config.productType,
         optimization: mappedOptimization,
         keywords: trendingKeywords.join(', '),
-        seoOptimized: true,
-        mlMarketAnalysis: true,
+        keywordsSource: dataTransparency.keywords === 'ok' ? 'trending' : 'none',
+        seoOptimized: dataTransparency.seoOptimized,
+        mlMarketAnalysis: dataTransparency.mlMarketAnalysis,
         specializationPrompt: '',
         generateImages: config.generateImages
       };
 
       const data = await apiClient.post('/api/products/auto-create', payload);
-      clearInterval(progressInterval);
+      setProgress(60);
+      setCurrentStatus('✅ Backend-Antwort empfangen');
 
       if (!data.success) {
         throw new Error(data.error || 'Fehler bei der Produkterstellung');
@@ -126,15 +133,15 @@ const RunAutoProductCreator = () => {
       const resultData = data.data || data;
 
       setCurrentStatus('✅ Validiere Qualität...');
-      setProgress(85);
+      setProgress(80);
 
       if (config.useAIEnhancements) {
         setCurrentStatus('🚀 Optimiere mit ML...');
-        setProgress(90);
+        setProgress(88);
       }
 
       setCurrentStatus('💾 Speichere Produkte...');
-      setProgress(95);
+      setProgress(94);
 
       // Sicherere Berechnung der Statistiken, jetzt mit echten Backend-Werten
       const successCount = resultData.productsCreated || 0;
@@ -196,6 +203,8 @@ const RunAutoProductCreator = () => {
 
   const productTypes = [
     { value: 'simple', label: '📦 Einfach' },
+    { value: 'virtual', label: '💻 Virtuell' },
+    { value: 'downloadable', label: '⬇️ Download' },
     { value: 'variable', label: '🎨 Mit Varianten' },
     { value: 'bundle', label: '🎁 Bundle' },
   ];
@@ -338,6 +347,32 @@ const RunAutoProductCreator = () => {
               )}
             </motion.div>
           )}
+
+          <div style={{ marginTop: '20px', padding: '14px', background: 'rgba(255,255,255,0.04)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)', display: 'grid', gap: '8px' }}>
+            <div style={{ fontWeight: 700, color: 'white' }}>🔎 Daten-Transparenz</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '8px' }}>
+              <div style={{ padding: '10px', borderRadius: '6px', background: 'rgba(139, 92, 246, 0.12)', border: '1px solid rgba(139, 92, 246, 0.25)', color: 'white' }}>
+                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.65)' }}>Trending Keywords</div>
+                <div style={{ fontWeight: 700 }}>
+                  {dataTransparency.keywords === 'ok' && '✅ Geladen'}
+                  {dataTransparency.keywords === 'loading' && '⏳ Lädt...'}
+                  {dataTransparency.keywords === 'failed' && '⚠️ Nicht verfügbar'}
+                  {dataTransparency.keywords === 'not-requested' && 'ℹ️ Nicht angefordert'}
+                </div>
+              </div>
+              <div style={{ padding: '10px', borderRadius: '6px', background: 'rgba(34, 197, 94, 0.12)', border: '1px solid rgba(34, 197, 94, 0.25)', color: 'white' }}>
+                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.65)' }}>ML-Markt-Analyse</div>
+                <div style={{ fontWeight: 700 }}>{dataTransparency.mlMarketAnalysis ? '🧠 Aktiv' : '⚪ Aus'}</div>
+              </div>
+              <div style={{ padding: '10px', borderRadius: '6px', background: 'rgba(59, 130, 246, 0.12)', border: '1px solid rgba(59, 130, 246, 0.25)', color: 'white' }}>
+                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.65)' }}>SEO/Content Optimierung</div>
+                <div style={{ fontWeight: 700 }}>{dataTransparency.seoOptimized ? '✨ Aktiv' : '⚪ Aus'}</div>
+              </div>
+            </div>
+            {dataTransparency.keywords === 'failed' && (
+              <div style={{ fontSize: '12px', color: '#fca5a5' }}>Keywords fehlen, Erstellung läuft mit Standard-Prompts weiter.</div>
+            )}
+          </div>
         </motion.div>
 
         {config && (

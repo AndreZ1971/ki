@@ -1,5 +1,5 @@
 // src/pages/Advanced/SystemHealth.tsx
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useProductManagement } from "../../hooks/useProductManagement";
 import { useToast } from "../../hooks/useToast";
@@ -33,10 +33,6 @@ const SystemHealth: React.FC = () => {
   const { handleBackToDashboard, loading, setLoading, error, setError } =
     useProductManagement();
   const { toasts, showToast } = useToast();
-  const apiBase = useMemo(() => {
-    const raw = (import.meta.env.VITE_API_URL || "").trim().replace(/\/$/, "");
-    return raw || "";
-  }, []);
 
   const [monitoringEnabled, setMonitoringEnabled] = useState(true);
   const [alertThreshold, setAlertThreshold] = useState("80");
@@ -44,24 +40,13 @@ const SystemHealth: React.FC = () => {
   const [services, setServices] = useState<ServiceStatus[]>([]);
   const [lastUpdated, setLastUpdated] = useState<string>("");
 
-  const buildUrl = (path: string) => {
-    const base =
-      apiBase.endsWith("/api") && path.startsWith("/api")
-        ? apiBase.replace(/\/api$/, "")
-        : apiBase;
-    if (!path.startsWith("/")) {
-      return `${base}/${path}`;
-    }
-    return `${base}${path}`;
-  };
-
   const handleCheckHealth = async () => {
     setLoading(true);
     setError(null);
 
     try {
       // ✅ Hole ECHTE System-Metriken vom Backend
-      const response = await fetch(buildUrl("/api/monitoring/system/metrics"));
+      const response = await fetch("/api/monitoring/system/metrics");
 
       if (!response.ok) {
         throw new Error("Konnte System-Metriken nicht laden");
@@ -87,7 +72,7 @@ const SystemHealth: React.FC = () => {
 
       // Lade auch Services-Status
       const servicesResponse = await fetch(
-        buildUrl("/api/monitoring/services/status")
+        "/api/monitoring/services/status"
       );
       if (servicesResponse.ok) {
         const servicesData = await servicesResponse.json();

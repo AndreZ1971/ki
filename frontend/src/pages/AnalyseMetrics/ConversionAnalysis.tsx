@@ -41,11 +41,7 @@ const ConversionAnalysis = () => {
   useEffect(() => {
     const fetchConversionData = async () => {
       try {
-        let base = (import.meta.env.VITE_API_URL || "").trim();
-        if (base.endsWith("/")) base = base.slice(0, -1);
-        const apiUrl = base
-          ? `${base}/api/analytics/conversion/analysis`
-          : `/api/analytics/conversion/analysis`;
+        const apiUrl = `/api/analytics/conversion/analysis`;
         const res = await fetch(apiUrl);
         if (!res.ok)
           throw new Error(t("analytics.conversionAnalysis.errorLoadingData"));
@@ -70,11 +66,7 @@ const ConversionAnalysis = () => {
     setMlLoading(true);
     setMlError(null);
     try {
-      let base = (import.meta.env.VITE_API_URL || "").trim();
-      if (base.endsWith("/")) base = base.slice(0, -1);
-      const apiUrl = base
-        ? `${base}/api/analytics/conversion/ml/ml-analysis`
-        : `/api/analytics/conversion/ml/ml-analysis`;
+      const apiUrl = `/api/analytics/conversion/ml/ml-analysis`;
       const res = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

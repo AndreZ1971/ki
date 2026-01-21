@@ -133,4 +133,64 @@ export default async function authRoutes(fastify: FastifyInstance) {
     logger.info({ userId: request.user?.id }, 'User logged out');
     return reply.send({ message: 'Logged out successfully' });
   });
+
+  // OAuth/Integration Status endpoint
+  fastify.get('/status', async (_request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      // Check environment variables for OAuth credentials
+      // In real implementation, check actual OAuth token validity from database/cache
+      const accounts = {
+        linkedin: {
+          connected: !!(process.env.LINKEDIN_CLIENT_ID && process.env.LINKEDIN_CLIENT_SECRET),
+          configured: !!process.env.LINKEDIN_CLIENT_ID
+        },
+        facebook: {
+          connected: !!(process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET),
+          configured: !!process.env.FACEBOOK_APP_ID
+        },
+        instagram: {
+          connected: !!(process.env.INSTAGRAM_APP_ID && process.env.INSTAGRAM_APP_SECRET),
+          configured: !!process.env.INSTAGRAM_APP_ID
+        },
+        twitter: {
+          connected: !!(process.env.TWITTER_API_KEY && process.env.TWITTER_API_SECRET),
+          configured: !!process.env.TWITTER_API_KEY
+        },
+        tiktok: {
+          connected: !!(process.env.TIKTOK_CLIENT_KEY && process.env.TIKTOK_CLIENT_SECRET),
+          configured: !!process.env.TIKTOK_CLIENT_KEY
+        },
+        youtube: {
+          connected: !!(process.env.YOUTUBE_CLIENT_ID && process.env.YOUTUBE_CLIENT_SECRET),
+          configured: !!process.env.YOUTUBE_CLIENT_ID
+        }
+      };
+
+      const anyConnected = Object.values(accounts).some(acc => acc.connected);
+      const allConfigured = Object.values(accounts).every(acc => acc.configured);
+
+      return reply.send({
+        success: true,
+        authState: {
+          available: anyConnected,
+          blocked: !anyConnected,
+          mode: anyConnected ? 'connected' : 'unconfigured',
+          completeness: allConfigured ? 100 : Math.round((Object.values(accounts).filter(acc => acc.configured).length / 6) * 100)
+        },
+        accounts
+      });
+    } catch (error) {
+      logger.error({ error }, 'OAuth status check error');
+      return reply.code(500).send({
+        success: false,
+        authState: {
+          available: false,
+          blocked: true,
+          mode: 'error',
+          completeness: 0
+        },
+        error: 'Failed to check OAuth status'
+      });
+    }
+  });
 }

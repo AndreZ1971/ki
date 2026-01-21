@@ -37,17 +37,17 @@ const PaymentValidation: React.FC = () => {
     setError(null);
 
     try {
-      // Rufe echten Backend-Endpoint auf
+      // Rufe ECHTEN Backend-Endpoint auf mit ECHTEN Daten (keine Mock-Daten!)
       const response = await paymentApi.verifyTransaction({
-        transactionId: `tx_${Date.now()}`,
+        transactionId: "", // Wird vom Backend generiert, nicht clientseitig!
         amount: parseFloat(amount),
         currency: "EUR",
         customerEmail: email,
-        ipAddress: ipAddress || "unknown",
+        ipAddress: ipAddress || undefined, // Optional: vom Browser ermittelt
         paymentMethod: "card",
-        signature: `sig_${Math.random().toString(36).substring(7)}`,
-        payload: "verification_payload",
-        environment: "prod",
+        signature: undefined, // Wird vom Backend generiert, nicht Math.random()!
+        payload: cardNumber, // ECHTE Kartendaten zum Validieren
+        environment: undefined, // Wird vom Backend bestimmt, nicht hardcoded!
       });
 
       if (response.success && response.data) {

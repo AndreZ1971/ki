@@ -27,6 +27,7 @@ const AutoProductCreator = () => {
   const toast = useToast();
   const [result, setResult] = useState<ProductCreationResult | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryStatus, setCategoryStatus] = useState<'idle' | 'loading' | 'ok' | 'failed'>('idle');
   const [config, setConfig] = useState({
     count: 5,
     category: "all",
@@ -39,18 +40,34 @@ const AutoProductCreator = () => {
   });
 
   // Lade WooCommerce Kategorien
+   
   useEffect(() => {
+    let isMounted = true;
     const loadCategories = async () => {
+      setCategoryStatus('loading');
       try {
         const response = await categoryApi.getCategories();
+        if (!isMounted) return;
+        
         if (response.success && response.data) {
           setCategories(response.data);
+          setCategoryStatus('ok');
         }
-          } catch {
-      // Load failed - silent
-    }
+        if (!response.success) {
+          setCategoryStatus('failed');
+          toast.warning('Kategorien konnten nicht geladen werden. Bitte Kategorie manuell wählen.');
+        }
+      } catch (_err) {
+        if (!isMounted) return;
+        setCategoryStatus('failed');
+        toast.warning('Kategorien konnten nicht geladen werden. Bitte Kategorie manuell wählen.');
+      }
     };
     loadCategories();
+    return () => {
+      isMounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- toast should not trigger reload
   }, []);
 
   const handleCreateProducts = async () => {
@@ -115,12 +132,22 @@ const AutoProductCreator = () => {
               }
             >
               <option value="all">Alle Kategorien</option>
+              {categoryStatus === 'loading' && (
+                <option value="loading" disabled>
+                  Lädt Kategorien...
+                </option>
+              )}
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
                 </option>
               ))}
             </select>
+            {categoryStatus === 'failed' && (
+              <div className="config-hint" style={{ color: '#fca5a5' }}>
+                Kategorien konnten nicht geladen werden. Bitte eine passende Kategorie manuell wählen.
+              </div>
+            )}
           </div>
           <div className="config-item">
             <label>Produkttyp:</label>
@@ -203,6 +230,34 @@ const AutoProductCreator = () => {
               rows={2}
             />
           </div>
+        </div>
+
+        <div className="config-section" style={{ marginTop: "10px", padding: "12px", background: "rgba(255,255,255,0.03)", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.08)", display: "grid", gap: "8px" }}>
+          <div style={{ fontWeight: 700 }}>🔎 Daten-Transparenz</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "8px" }}>
+            <div style={{ padding: "10px", borderRadius: "6px", background: "rgba(59, 130, 246, 0.12)", border: "1px solid rgba(59, 130, 246, 0.25)" }}>
+              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.65)" }}>Kategorien (Woo)</div>
+              <div style={{ fontWeight: 700 }}>
+                {categoryStatus === 'ok' && '✅ Geladen'}
+                {categoryStatus === 'loading' && '⏳ Lädt...'}
+                {categoryStatus === 'failed' && '⚠️ Nicht verfügbar'}
+                {categoryStatus === 'idle' && 'ℹ️ Noch nicht geladen'}
+              </div>
+            </div>
+            <div style={{ padding: "10px", borderRadius: "6px", background: "rgba(34, 197, 94, 0.12)", border: "1px solid rgba(34, 197, 94, 0.25)" }}>
+              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.65)" }}>ML-Marktanalyse</div>
+              <div style={{ fontWeight: 700 }}>{config.mlMarketAnalysis ? '🧠 Aktiv' : '⚪ Aus'}</div>
+            </div>
+            <div style={{ padding: "10px", borderRadius: "6px", background: "rgba(139, 92, 246, 0.12)", border: "1px solid rgba(139, 92, 246, 0.25)" }}>
+              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.65)" }}>SEO/Content</div>
+              <div style={{ fontWeight: 700 }}>{config.seoOptimized ? '✨ Aktiv' : '⚪ Aus'}</div>
+            </div>
+          </div>
+          {categoryStatus === 'failed' && (
+            <div style={{ fontSize: "12px", color: "#fca5a5" }}>
+              Kategorien fehlen → Tool nutzt Standard-Prompts ohne Kategorie-Spezialisierung.
+            </div>
+          )}
         </div>
 
         {/* ML/AI Produktideen-Generator */}

@@ -88,17 +88,40 @@ const PaymentTester: React.FC = () => {
     }
   };
 
-  const applyScenario = (scenario: PaymentTestScenario) => {
-    // Simuliere Resultate basierend auf successProbability
-    const successProb = scenario.successProbability ?? 0.8;
-    const simulated: TestResult[] = scenario.steps.map((step, idx) => ({
-      name: `${scenario.title} – Schritt ${idx + 1}`,
-      status: Math.random() < successProb ? 'passed' : 'failed',
-      duration: `${Math.floor(Math.random() * 800)}ms`
-    }));
-    setTestResults(simulated);
-    const failed = simulated.filter(t => t.status === 'failed').length;
-    showToast(failed === 0 ? 'Szenario erfolgreich simuliert' : `${failed} Schritte fehlgeschlagen`, failed === 0 ? 'success' : 'error');
+  const applyScenario = async (scenario: PaymentTestScenario) => {
+    // Führe ECHTE Tests via Backend aus (nicht simuliert!)
+    setLoading(true);
+    setError(null);
+    setTestResults([]);
+
+    try {
+      // Erstelle Test-Anfrage basierend auf dem Szenario
+      const response = await paymentApi.runPaymentTests({
+        testType: scenario.riskProfile || testType,
+        target: scenario.steps.length > 0 ? testTarget : 'checkout-api',
+        riskTolerance: riskTolerance,
+      });
+
+      if (response.success && response.data) {
+        setTestResults(response.data);
+        const failed = response.data.filter(t => t.status === 'failed').length;
+        
+        showToast(
+          failed === 0 
+            ? `✅ Szenario "${scenario.title}" erfolgreich` 
+            : `⚠️ ${failed} Schritt(e) in "${scenario.title}" fehlgeschlagen`,
+          failed === 0 ? 'success' : 'error'
+        );
+      } else {
+        throw new Error('Keine Test-Ergebnisse vom Backend erhalten');
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Szenario-Ausführung fehlgeschlagen';
+      setError(errorMessage);
+      showToast(errorMessage, 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDiagnose = async () => {
@@ -286,6 +309,7 @@ const PaymentTester: React.FC = () => {
 
                 <button
                   onClick={() => applyScenario(scenario)}
+                  disabled={loading}
                   style={{
                     marginTop: '6px',
                     padding: '10px',
@@ -295,10 +319,12 @@ const PaymentTester: React.FC = () => {
                     borderRadius: '10px',
                     color: 'white',
                     fontWeight: 600,
-                    cursor: 'pointer'
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    opacity: loading ? 0.6 : 1,
+                    transition: 'all 0.2s'
                   }}
                 >
-                  ▶️ Szenario simulieren
+                  {loading ? '⏳ Führe aus...' : '▶️ Szenario ausführen'}
                 </button>
               </div>
             ))}

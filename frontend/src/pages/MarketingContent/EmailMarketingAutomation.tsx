@@ -46,16 +46,15 @@ const EmailMarketingAutomation: React.FC = () => {
     { value: 'active', label: 'Aktive Kunden', icon: '⭐', count: '...' },
     { value: 'inactive', label: 'Inaktive Kunden', icon: '😴', count: '...' }
   ]);
+  const [segmentMetadata, setSegmentMetadata] = useState<{ mode: 'real' | 'fallback'; dataCompleteness: boolean }>({ mode: 'real', dataCompleteness: false });
   const [aiLoading, setAiLoading] = useState(false);
   const [generatedEmail, setGeneratedEmail] = useState<GeneratedEmail | null>(null);
-
-  const apiBase = import.meta.env.VITE_API_URL || '';
 
   // Lade echte Kundendaten aus WooCommerce
   React.useEffect(() => {
     const loadCustomerSegments = async () => {
       try {
-        const response = await fetch(`${apiBase}/api/customers/segments`);
+        const response = await fetch('/api/customers/segments');
         if (!response.ok) {
           throw new Error(`API Error ${response.status}`);
         }
@@ -68,18 +67,24 @@ const EmailMarketingAutomation: React.FC = () => {
           { value: 'active', label: 'Aktive Kunden', icon: '⭐', count: seg.active.toString() },
           { value: 'inactive', label: 'Inaktive Kunden', icon: '😴', count: seg.inactive.toString() }
         ]);
-      } catch {
+        // REAL Daten vom Backend erhalten
+        setSegmentMetadata({ mode: 'real', dataCompleteness: true });
+      } catch (err) {
+        console.warn('Customer segments API failed - using fallback', err instanceof Error ? err.message : 'Unknown error');
+        // FALLBACK: Sichere Default-Werte
         setSegments([
-          { value: 'all', label: 'Alle Kunden', icon: '👥', count: '0' },
-          { value: 'new', label: 'Neue Kunden', icon: '🆕', count: '0' },
-          { value: 'active', label: 'Aktive Kunden', icon: '⭐', count: '0' },
-          { value: 'inactive', label: 'Inaktive Kunden', icon: '😴', count: '0' }
+          { value: 'all', label: 'Alle Kunden', icon: '👥', count: '0 (fallback)' },
+          { value: 'new', label: 'Neue Kunden', icon: '🆕', count: '0 (fallback)' },
+          { value: 'active', label: 'Aktive Kunden', icon: '⭐', count: '0 (fallback)' },
+          { value: 'inactive', label: 'Inaktive Kunden', icon: '😴', count: '0 (fallback)' }
         ]);
+        // FALLBACK Daten - eindeutig gekennzeichnet
+        setSegmentMetadata({ mode: 'fallback', dataCompleteness: false });
       }
     };
     
     loadCustomerSegments();
-  }, [apiBase]);
+  }, []);
 
   const scheduleOptions = [
     { value: 'immediate', label: 'Sofort senden', icon: '⚡', description: 'Direkt nach Erstellung' },
@@ -208,6 +213,40 @@ const EmailMarketingAutomation: React.FC = () => {
       </motion.div>
 
       {error && <ErrorMessage message={error} />}
+
+      {/* Data Availability Row */}
+      {!segmentMetadata.dataCompleteness && (
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{ 
+            background: segmentMetadata.mode === 'fallback' ? 'rgba(255,159,64,0.1)' : 'rgba(59,130,246,0.1)',
+            border: `1px solid ${segmentMetadata.mode === 'fallback' ? 'rgba(255,159,64,0.3)' : 'rgba(59,130,246,0.3)'}`,
+            borderRadius: '12px', 
+            padding: '12px 16px',
+            marginTop: '20px',
+            marginBottom: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}
+        >
+          <div style={{ fontSize: '18px' }}>
+            {segmentMetadata.mode === 'fallback' ? '⚠️' : 'ℹ️'}
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: '12px', fontWeight: '600', color: segmentMetadata.mode === 'fallback' ? '#ff9f0a' : '#3b82f6', marginBottom: '2px' }}>
+              {segmentMetadata.mode === 'fallback' ? 'Fallback Mode' : 'Source Information'}
+            </div>
+            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)' }}>
+              {segmentMetadata.mode === 'fallback' 
+                ? 'Kundensegmente nicht erreichbar - verwende Fallback-Daten'
+                : 'Kundensegmente werden in Echtzeit von WooCommerce geladen'
+              }
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '20px', marginTop: '20px' }}>
         {/* Kampagnen-Erstellung */}

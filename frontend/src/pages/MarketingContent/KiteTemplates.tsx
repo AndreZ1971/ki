@@ -4,6 +4,7 @@ import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
 import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
+import { productApi } from '../../services/productApi';
 import './page.css';
 
 const KiteTemplates: React.FC = () => {
@@ -45,13 +46,11 @@ const KiteTemplates: React.FC = () => {
     setPerformanceForecast(null);
 
     try {
-      const response = await fetch('/api/marketing/templates/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ templateCategory, industry, customization })
+      const data = await productApi.generateTemplate({
+        templateCategory,
+        industry,
+        customization
       });
-      
-      const data = await response.json();
       
       if (data.success && data.template) {
         setSelectedTemplate(data.template);
@@ -77,17 +76,12 @@ const KiteTemplates: React.FC = () => {
   // 🤖 ML: Engagement-Vorhersage
   const predictEngagement = async (content: string) => {
     try {
-      const response = await fetch('/api/marketing/templates/predict-engagement', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          templateContent: content,
-          templateCategory,
-          industry
-        })
+      const data = await productApi.predictEngagement({
+        templateContent: content,
+        templateCategory,
+        industry
       });
       
-      const data = await response.json();
       if (data.success && data.prediction) {
         setEngagementScore(data.prediction.engagementScore);
         setEngagementConfidence(data.prediction.confidence);
@@ -100,17 +94,12 @@ const KiteTemplates: React.FC = () => {
   // 🤖 ML: Performance-Vorhersage
   const forecastPerformance = async (content: string) => {
     try {
-      const response = await fetch('/api/marketing/templates/forecast-performance', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          templateContent: content,
-          templateCategory,
-          industry
-        })
+      const data = await productApi.forecastPerformance({
+        templateContent: content,
+        templateCategory,
+        industry
       });
       
-      const data = await response.json();
       if (data.success && data.forecast) {
         setPerformanceForecast(data.forecast);
       }
@@ -125,23 +114,19 @@ const KiteTemplates: React.FC = () => {
     
     setOptimizing(true);
     try {
-      const response = await fetch('/api/marketing/templates/optimize', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          templateContent: selectedTemplate.content,
-          industry,
-          targetAudience: customization
-        })
+      const data = await productApi.optimizeTemplate({
+        templateContent: selectedTemplate.content,
+        templateCategory,
+        industry,
+        optimizationGoal: 'engagement'
       });
       
-      const data = await response.json();
       if (data.success) {
         showToast('Template optimiert!', 'success');
         // Update template mit optimiertem Content
         setSelectedTemplate({
           ...selectedTemplate,
-          content: data.optimized.optimized_copy || selectedTemplate.content
+          content: data.optimizedContent || selectedTemplate.content
         });
       }
     } catch {
@@ -159,21 +144,17 @@ const KiteTemplates: React.FC = () => {
     }
 
     try {
-      const response = await fetch('/api/marketing/templates/recommend-category', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productInfo: customization,
-          targetAudience: industry
-        })
+      const data = await productApi.recommendCategory({
+        userIntent: customization,
+        industry,
+        currentContext: templateCategory
       });
       
-      const data = await response.json();
-      if (data.success && data.recommendation) {
-        setRecommendedCategory(data.recommendation);
-        setTemplateCategory(data.recommendation.recommendedCategory);
+      if (data.success && data.recommendedCategory) {
+        setRecommendedCategory(data);
+        setTemplateCategory(data.recommendedCategory);
         showToast(
-          `Empfohlen: ${data.recommendation.recommendedCategory} (Confidence: ${(data.recommendation.confidence * 100).toFixed(0)}%)`,
+          `Empfohlen: ${data.recommendedCategory} - ${data.reason}`,
           'success'
         );
       }

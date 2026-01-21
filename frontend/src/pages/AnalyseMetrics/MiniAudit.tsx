@@ -53,9 +53,7 @@ const MiniAudit = () => {
     const startTime = Date.now();
     
     try {
-      let base = (import.meta.env.VITE_API_URL || '').trim();
-      if (base.endsWith('/')) base = base.slice(0, -1);
-      const apiUrl = base ? `${base}/api/audit/mini` : `/api/audit/mini`;
+      const apiUrl = `/api/audit/mini`;
       const res = await fetch(apiUrl);
       if (!res.ok) throw new Error('Fehler beim Laden der Mini-Audit-Daten');
       const data = await res.json();
@@ -83,9 +81,7 @@ const MiniAudit = () => {
     setMlError(null);
     setMlInsights([]);
     try {
-      let base = (import.meta.env.VITE_API_URL || '').trim();
-      if (base.endsWith('/')) base = base.slice(0, -1);
-      const apiUrl = base ? `${base}/api/audit/mini/ml-analysis` : `/api/audit/mini/ml-analysis`;
+      const apiUrl = `/api/audit/mini/ml-analysis`;
       
       const payload = {
         quickChecks,
@@ -110,9 +106,7 @@ const MiniAudit = () => {
   const runQuickScan = async () => {
     setIsScanning(true);
     try {
-      let base = (import.meta.env.VITE_API_URL || '').trim();
-      if (base.endsWith('/')) base = base.slice(0, -1);
-      const apiUrl = base ? `${base}/api/audit/mini/scan` : `/api/audit/mini/scan`;
+      const apiUrl = `/api/audit/mini/scan`;
       const res = await fetch(apiUrl, { method: 'POST' });
       if (!res.ok) throw new Error('Scan konnte nicht gestartet werden');
       await res.json();

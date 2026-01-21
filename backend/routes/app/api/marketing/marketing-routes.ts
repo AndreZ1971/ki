@@ -386,6 +386,15 @@ Struktur:
 
         return {
           success: true,
+          mode: 'fallback' as const,
+          confidence: 60,
+          inputs: {
+            topic: topic || 'Kein Thema angegeben',
+            platform,
+            tone,
+            targetAudience: targetAudience || 'Allgemein',
+            duration
+          },
           script,
           hooks: [`${topic || 'Thema'}: Du wirst überrascht sein...`, `3 Tipps die dein ${platform} Game verändern...`, `Das hättest du früher wissen sollen...`],
           ctas: ['Jetzt probieren!', 'Schreib mir einen Kommentar!'],
@@ -474,6 +483,15 @@ Deutsch, natürlich, konversionsstark, plattformoptimiert.`;
 
         return reply.send({
           success: true,
+          mode: 'real' as const,
+          confidence: 95,
+          inputs: {
+            topic: topic || 'Kein Thema angegeben',
+            platform,
+            tone,
+            targetAudience: targetAudience || 'Allgemein',
+            duration
+          },
           script,
           hooks: parsed.hooks || [],
           ctas: parsed.ctas || [],
@@ -546,6 +564,13 @@ Deutsch, natürlich, konversionsstark, plattformoptimiert.`;
         
         return reply.send({
           success: true,
+          mode: 'real' as const,
+          confidence: 98,
+          inputs: {
+            audioText: audioText.substring(0, 100) + (audioText.length > 100 ? '...' : ''),
+            voice: openaiVoice,
+            platform
+          },
           audio: {
             id: `audio_${Date.now()}`,
             data: `data:audio/mp3;base64,${base64Audio}`,
@@ -587,23 +612,42 @@ Deutsch, natürlich, konversionsstark, plattformoptimiert.`;
         const charLimit = platformLimits[platform] || 2000;
         const isWithinLimit = postContent.length <= charLimit;
 
+        // Check OAuth status for actual posting capability
+        const hasOAuth = !!(
+          (platform === 'linkedin' && process.env.LINKEDIN_CLIENT_ID) ||
+          (platform === 'facebook' && process.env.FACEBOOK_APP_ID) ||
+          (platform === 'instagram' && process.env.INSTAGRAM_APP_ID) ||
+          (platform === 'twitter' && process.env.TWITTER_API_KEY) ||
+          (platform === 'tiktok' && process.env.TIKTOK_CLIENT_KEY) ||
+          (platform === 'youtube' && process.env.YOUTUBE_CLIENT_ID)
+        );
+
         return reply.send({
           success: true,
+          authState: {
+            available: hasOAuth,
+            blocked: !hasOAuth,
+            mode: hasOAuth ? 'oauth-connected' : 'oauth-required',
+            completeness: hasOAuth ? 100 : 0,
+            message: hasOAuth 
+              ? `${platform} OAuth konfiguriert - Publishing verf\u00fcgbar`
+              : `${platform} OAuth nicht konfiguriert - nur Content-Vorschau`
+          },
           post: {
             id: `post_${Date.now()}`,
             content: postContent,
             platform,
             scheduleTime,
-            status: scheduleTime === 'now' ? 'published' : 'scheduled',
+            status: hasOAuth && scheduleTime === 'now' ? 'published' : hasOAuth && scheduleTime !== 'now' ? 'scheduled' : 'preview-only',
             charCount: postContent.length,
             charLimit,
             isWithinLimit,
-            publishedAt: scheduleTime === 'now' ? new Date().toISOString() : null,
-            scheduledFor: scheduleTime !== 'now' ? new Date(Date.now() + 3600000).toISOString() : null
+            publishedAt: hasOAuth && scheduleTime === 'now' ? new Date().toISOString() : null,
+            scheduledFor: hasOAuth && scheduleTime !== 'now' ? new Date(Date.now() + 3600000).toISOString() : null
           },
           stats: {
-            scheduled: scheduleTime !== 'now' ? 1 : 0,
-            published: scheduleTime === 'now' ? 1 : 0,
+            scheduled: hasOAuth && scheduleTime !== 'now' ? 1 : 0,
+            published: hasOAuth && scheduleTime === 'now' ? 1 : 0,
             engagement: 0
           }
         });
@@ -845,6 +889,13 @@ Return VALID JSON:
 
         return reply.send({
           success: true,
+          authState: {
+            available: true,
+            blocked: false,
+            mode: 'ai-only',
+            completeness: 100,
+            message: 'OAuth nicht benötigt für Content-Generierung'
+          },
           posts,
           metadata: {
             topic,
@@ -858,6 +909,13 @@ Return VALID JSON:
         // Return fallback posts on error
         return reply.send({
           success: true,
+          authState: {
+            available: true,
+            blocked: false,
+            mode: 'fallback',
+            completeness: 60,
+            message: 'OAuth nicht benötigt für Content-Generierung'
+          },
           posts: generateFallbackPosts(topic, platforms, tone, targetAudience, includeHashtags, includeEmojis).posts,
           metadata: {
             topic,

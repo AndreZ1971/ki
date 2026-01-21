@@ -3,6 +3,22 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { MarketingMLService } from '../../../../services/marketingMLService';
 import { logger } from '../../../../logger';
 
+/**
+ * ML Marketing Routes
+ * 
+ * Base path: /api/marketing/ml
+ * 
+ * Endpoints:
+ * - POST /ideas - Generiert Marketing-Ideen basierend auf Kampagnenziel
+ * - POST /email - Generiert Email-Kampagnen mit KI
+ * - POST /social - Generiert Social Media Content für verschiedene Plattformen
+ * - POST /optimize - Optimiert bestehende Marketing-Copy
+ * - POST /forecast - Prognostiziert Campaign-Performance
+ * 
+ * WICHTIG: /generate existiert NICHT mehr
+ * Frontend sollte die spezifischen Endpoints nutzen (/ideas, /email, etc.)
+ */
+
 export default async function mlMarketingRoutes(fastify: FastifyInstance) {
   // POST /api/marketing/ml/ideas - Generiere Marketing-Ideen
   fastify.post('/ideas', async (request: FastifyRequest, reply: FastifyReply) => {

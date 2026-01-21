@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 import "./BlogPostGenerator.css";
 // Entfernt: useNavigate (ungenuzt)
 import { BackButton } from "../../components/shared/BackButton";
@@ -16,12 +17,19 @@ const BlogPostGenerator: React.FC = () => {
   const [language, setLanguage] = useState("de");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const [metadata, setMetadata] = useState<{
+    mode: 'real' | 'fallback';
+    confidence: number;
+    inputs: Record<string, string>;
+  } | null>(null);
 
   const handleGenerate = async () => {
     setLoading(true);
     setResult("");
+    setMetadata(null);
     try {
-      const response = await fetch("/api/marketing/blogpost/generate", {
+      const apiBase = import.meta.env.VITE_API_URL || "";
+      const response = await fetch(`${apiBase}/api/marketing/blogpost/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -36,8 +44,16 @@ const BlogPostGenerator: React.FC = () => {
         }),
       });
       const data = await response.json();
-      if (data.success) setResult(data.content);
-      else
+      if (data.success) {
+        setResult(data.content);
+        if (data.mode && data.confidence !== undefined && data.inputs) {
+          setMetadata({
+            mode: data.mode,
+            confidence: data.confidence,
+            inputs: data.inputs
+          });
+        }
+      } else
         setResult(t("pages.blogpost.error") + ": " + (data.error || "Unknown"));
     } catch (_e) {
       setResult(t("pages.blogpost.error"));
@@ -115,6 +131,53 @@ const BlogPostGenerator: React.FC = () => {
           ? t("pages.blogpost.generating")
           : t("pages.blogpost.generate")}
       </button>
+
+      {/* Metadata Display */}
+      {metadata && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{
+            background: metadata.mode === 'fallback' 
+              ? 'linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%)' 
+              : 'linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%)',
+            border: `2px solid ${metadata.mode === 'fallback' ? '#ffc107' : '#17a2b8'}`,
+            borderRadius: '12px',
+            padding: '16px',
+            marginTop: '20px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+            <span style={{ fontSize: '20px' }}>
+              {metadata.mode === 'fallback' ? '⚠️' : '✅'}
+            </span>
+            <div>
+              <strong style={{ fontSize: '16px', display: 'block' }}>
+                {metadata.mode === 'fallback' ? 'Fallback-Modus' : 'OpenAI GPT'}
+              </strong>
+              <span style={{ fontSize: '13px', opacity: 0.8 }}>
+                Confidence: {metadata.confidence}%
+              </span>
+            </div>
+          </div>
+
+          <div style={{ 
+            fontSize: '13px', 
+            opacity: 0.9, 
+            background: 'rgba(255,255,255,0.6)', 
+            padding: '12px', 
+            borderRadius: '8px' 
+          }}>
+            <strong style={{ display: 'block', marginBottom: '8px' }}>Input-Parameter:</strong>
+            {Object.entries(metadata.inputs).map(([key, value]) => (
+              <div key={key} style={{ marginBottom: '4px' }}>
+                <strong>{key}:</strong> {value}
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
       <div style={{ marginTop: 24 }}>
         <h3>{t("pages.blogpost.result")}</h3>
         <textarea value={result} readOnly rows={16} style={{ width: "100%" }} />

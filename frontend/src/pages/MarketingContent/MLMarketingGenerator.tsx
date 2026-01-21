@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { productApi } from "../../services/productApi";
 
 interface MLMarketingIdea {
   type: "text" | "image" | "audience" | "forecast";
@@ -26,16 +27,15 @@ export const MLMarketingGenerator: React.FC<MLMarketingGeneratorProps> = ({
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/marketing/ml/generate`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ goal: campaignGoal, audience }),
+      const response = await productApi.generateMarketingIdeas({
+        goal: campaignGoal,
+        audience
       });
-      const data = await res.json();
-      if (data.success && data.ideas) {
-        setIdeas(data.ideas);
+      
+      if (response.success && response.data?.ideas) {
+        setIdeas(response.data.ideas);
       } else {
-        setError(data.error || t("ml.marketingGenerator.error"));
+        setError(response.error || t("ml.marketingGenerator.error"));
       }
     } catch (err: any) {
       setError(err.message || t("ml.marketingGenerator.error"));

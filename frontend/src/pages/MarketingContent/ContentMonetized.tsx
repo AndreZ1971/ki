@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
@@ -7,6 +8,7 @@ import { ToastContainer } from '../../components/Toast/ToastContainer';
 import './page.css';
 
 const ContentMonetized: React.FC = () => {
+  const { t } = useTranslation();
   const { handleBackToDashboard, loading, setLoading, error, setError } = useProductManagement();
   const { toasts, showToast } = useToast();
   const apiBase = import.meta.env.VITE_API_URL || '';
@@ -23,6 +25,7 @@ const ContentMonetized: React.FC = () => {
   const [priceReason, setPriceReason] = useState('');
   const [copyLoading, setCopyLoading] = useState(false);
   const [generatedCopy, setGeneratedCopy] = useState<{ headline?: string; body?: string; cta?: string }>({});
+  const [dataCompleteness, setDataCompleteness] = useState<{ revenue: boolean; forecast: boolean }>({ revenue: false, forecast: false });
 
   // Lade echte WooCommerce Revenue-Daten
   React.useEffect(() => {
@@ -39,27 +42,35 @@ const ContentMonetized: React.FC = () => {
             total: data.data.total || 0,
             productCount: data.data.productCount || 0
           });
+          setDataCompleteness(prev => ({ ...prev, revenue: true }));
         }
 
         // Forecast
-        const forecastRes = await fetch(`${apiBase}/api/marketing/content/revenue-forecast`);
-        const forecastData = await forecastRes.json();
-        if (forecastData.success) {
-          setForecast({ week: forecastData.data.forecastWeek, month: forecastData.data.forecastMonth, avgDay: forecastData.data.avgDay });
+        try {
+          const forecastRes = await fetch(`${apiBase}/api/marketing/content/revenue-forecast`);
+          const forecastData = await forecastRes.json();
+          if (forecastData.success) {
+            setForecast({ week: forecastData.data.forecastWeek, month: forecastData.data.forecastMonth, avgDay: forecastData.data.avgDay });
+            setDataCompleteness(prev => ({ ...prev, forecast: true }));
+          }
+        } catch (forecastErr) {
+          // Revenue forecast nicht erreichbar - Fallback wird verwendet
+          console.warn('Revenue forecast unavailable - using fallback', forecastErr instanceof Error ? forecastErr.message : 'Unknown error');
         }
-      } catch (_err) {
-        // Silent fail - no forecast
+      } catch (err) {
+        console.error('Revenue data loading failed', err instanceof Error ? err.message : 'Unknown error');
+        setError('Revenue-Daten konnten nicht vollständig geladen werden');
       }
     };
     
     loadRevenueData();
-  }, [apiBase]);
+  }, [apiBase, setError]);
 
   const contentTypes = [
     { value: 'digital', label: 'Digitales Produkt', icon: '💾', avgPrice: '€49' },
-    { value: 'downloadable', label: 'Download', icon: '�', avgPrice: '€29' },
+    { value: 'downloadable', label: 'Download', icon: '⬇️', avgPrice: '€29' },
     { value: 'virtual', label: 'Virtuelles Produkt', icon: '🌐', avgPrice: '€79' },
-    { value: 'subscription', label: 'Abo-Produkt', icon: '�', avgPrice: '€19/Mo' },
+    { value: 'subscription', label: 'Abo-Produkt', icon: '📦', avgPrice: '€19/Mo' },
     { value: 'course', label: 'Online-Kurs', icon: '🎓', avgPrice: '€149' },
     { value: 'template', label: 'Template/Theme', icon: '🎨', avgPrice: '€59' }
   ];
@@ -200,6 +211,37 @@ const ContentMonetized: React.FC = () => {
           </div>
         )}
       </motion.div>
+
+      {/* ToolStatusBanner: Zeige fehlende Daten an */}
+      {(!dataCompleteness.revenue || !dataCompleteness.forecast) && (
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{ 
+            background: 'rgba(255,159,64,0.1)', 
+            border: '1px solid rgba(255,159,64,0.3)', 
+            borderRadius: '12px', 
+            padding: '12px 16px',
+            marginBottom: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}
+        >
+          <div style={{ fontSize: '18px' }}>⚠️</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: '12px', fontWeight: '600', color: '#ff9f0a', marginBottom: '2px' }}>
+              Fallback Mode - Nicht alle Daten verfügbar
+            </div>
+            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)' }}>
+              {!dataCompleteness.revenue && 'Revenue-Daten '}
+              {!dataCompleteness.revenue && !dataCompleteness.forecast && '& '}
+              {!dataCompleteness.forecast && 'Forecast '}
+              werden mit Fallback-Daten angezeigt
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {error && <ErrorMessage message={error} />}
 

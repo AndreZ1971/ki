@@ -1,6 +1,6 @@
 # 🚀 A.R.I. - Kubernetes & Deployment Architektur
 
-**Version:** 7.0.3  
+**Version:** 7.0.4  
 **Datum:** Januar 2026  
 **Zielgruppe:** Automattic Engineering Team, DevOps, Kubernetes-Administratoren
 
@@ -811,5 +811,5 @@ Keine Überraschungen!
 ---
 
 **Letzte Aktualisierung:** Januar 2026  
-**Version:** 7.0.3  
+**Version:** 7.0.4  
 **Für:** Automattic Engineering Team

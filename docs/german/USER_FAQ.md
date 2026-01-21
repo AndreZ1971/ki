@@ -1,6 +1,6 @@
 # ⚙️ A.R.I. - Settings & Backend Handbuch
 
-**Version:** 7.0.3  
+**Version:** 7.0.4  
 **Datum:** Januar 2026  
 **Zielgruppe:** Shop-Betreiber, die A.R.I. konfigurieren möchten
 
@@ -465,7 +465,7 @@ Wenn du **✅ success** und **~5 Sekunden** siehst = **alles läuft perfekt!**
 ---
 
 **Letzte Aktualisierung:** Januar 2026  
-**Version:** 7.0.3  
+**Version:** 7.0.4  
 **Für:** Alle A.R.I. Shop-Betreiber
 
 ---

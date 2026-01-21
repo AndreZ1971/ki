@@ -5,8 +5,7 @@ import { BackButton } from '../../components/shared/BackButton';
 import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
 import { motion } from 'framer-motion';
-
-const API_URL = '/api/marketing/image/analyze';
+import { productApi } from '../../services/productApi';
 
 interface AnalysisResult {
   quality: any;
@@ -27,12 +26,15 @@ const ImageAnalyzer: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
 
-  // Phase 2 States
-  const [colorAnalysis, setColorAnalysis] = useState<any>(null);
-  const [enhancements, setEnhancements] = useState<any>(null);
-  const [conversionImpact, setConversionImpact] = useState<any>(null);
-  const [audienceRec, setAudienceRec] = useState<any>(null);
-  const [phase2Loading, setPhase2Loading] = useState(false);
+  // Orchestration Status
+  const [orchestrationStatus, setOrchestrationStatus] = useState<{
+    mode: 'real' | 'partial' | 'failed' | 'error';
+    dataCompleteness: number;
+    steps: Array<{ name: string; status: 'success' | 'failed' | 'pending'; mode: string }>;
+  } | null>(null);
+
+  // Full Analysis Results
+  const [fullResults, setFullResults] = useState<any>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -59,113 +61,61 @@ const ImageAnalyzer: React.FC = () => {
     setLoading(true);
     setError(null);
     setResult(null);
+    setFullResults(null);
+    setOrchestrationStatus({
+      mode: 'real',
+      dataCompleteness: 0,
+      steps: [
+        { name: 'Basis-Analyse', status: 'pending', mode: 'real' },
+        { name: 'Farbanalyse', status: 'pending', mode: 'real' },
+        { name: 'Verbesserungsvorschläge', status: 'pending', mode: 'real' },
+        { name: 'Conversion-Prognose', status: 'pending', mode: 'real' },
+        { name: 'Zielgruppen-Analyse', status: 'pending', mode: 'real' }
+      ]
+    });
     
     try {
-      const formData = new FormData();
-      formData.append('image', file);
+      const response = await productApi.fullImageAnalysis(file);
       
-      const res = await fetch(API_URL, {
-        method: 'POST',
-        body: formData,
-      });
-      
-      if (!res.ok) throw new Error('Analyse fehlgeschlagen');
-      
-      const data = await res.json();
-      if (data.success) {
-        setResult(data);
-        showToast('✅ Analyse abgeschlossen!', 'success');
+      if (response.success && response.data) {
+        setOrchestrationStatus({
+          mode: response.data.mode,
+          dataCompleteness: response.data.completeness,
+          steps: response.data.steps
+        });
+        setFullResults(response.data.data);
+        
+        // Legacy result für alte UI-Teile
+        if (response.data.data.basicAnalysis) {
+          setResult({ ...response.data.data.basicAnalysis, success: true });
+        }
+        
+        const successCount = response.data.steps.filter((s: any) => s.status === 'success').length;
+        showToast(`✅ Analyse abgeschlossen! ${successCount}/${response.data.steps.length} Schritte erfolgreich`, 'success');
       } else {
-        throw new Error(data.error || 'Analyse fehlgeschlagen');
+        throw new Error(response.error || 'Analyse fehlgeschlagen');
       }
     } catch (err: any) {
       const errorMessage = err.message || 'Unbekannter Fehler';
       setError(errorMessage);
+      setOrchestrationStatus({
+        mode: 'error',
+        dataCompleteness: 0,
+        steps: [
+          { name: 'Basis-Analyse', status: 'failed', mode: 'error' },
+          { name: 'Farbanalyse', status: 'failed', mode: 'error' },
+          { name: 'Verbesserungsvorschläge', status: 'failed', mode: 'error' },
+          { name: 'Conversion-Prognose', status: 'failed', mode: 'error' },
+          { name: 'Zielgruppen-Analyse', status: 'failed', mode: 'error' }
+        ]
+      });
       showToast(`❌ ${errorMessage}`, 'error');
     } finally {
       setLoading(false);
     }
   };
 
-  // Phase 2: Color Analysis
-  const analyzeColors = async () => {
-    if (!file) return;
-    setPhase2Loading(true);
-    try {
-      const formData = new FormData();
-      formData.append('image', file);
-      const res = await fetch('/api/marketing/image/color-analysis', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (data.success) {
-        setColorAnalysis(data.colors);
-        showToast('🎨 Farbanalyse abgeschlossen!', 'success');
-      }
-    } catch {
-      showToast('❌ Farbanalyse fehlgeschlagen', 'error');
-    } finally {
-      setPhase2Loading(false);
-    }
-  };
 
-  // Phase 2: Enhancement Suggestions
-  const getEnhancements = async () => {
-    if (!file) return;
-    setPhase2Loading(true);
-    try {
-      const formData = new FormData();
-      formData.append('image', file);
-      const res = await fetch('/api/marketing/image/enhancement-suggestions', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (data.success) {
-        setEnhancements(data.enhancements);
-        showToast('✨ Verbesserungen geladen!', 'success');
-      }
-    } catch {
-      showToast('❌ Enhancement-Analyse fehlgeschlagen', 'error');
-    } finally {
-      setPhase2Loading(false);
-    }
-  };
-
-  // Phase 2: Conversion Impact
-  const predictConversion = async () => {
-    if (!file) return;
-    setPhase2Loading(true);
-    try {
-      const formData = new FormData();
-      formData.append('image', file);
-      const res = await fetch('/api/marketing/image/conversion-impact', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (data.success) {
-        setConversionImpact(data.impact);
-        showToast('📊 Conversion-Analyse abgeschlossen!', 'success');
-      }
-    } catch {
-      showToast('❌ Conversion-Analyse fehlgeschlagen', 'error');
-    } finally {
-      setPhase2Loading(false);
-    }
-  };
-
-  // Phase 2: Audience Recommendation
-  const getAudience = async () => {
-    if (!file) return;
-    setPhase2Loading(true);
-    try {
-      const formData = new FormData();
-      formData.append('image', file);
-      const res = await fetch('/api/marketing/image/audience-recommendation', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (data.success) {
-        setAudienceRec(data.audience);
-        showToast('👥 Zielgruppen-Analyse abgeschlossen!', 'success');
-      }
-    } catch {
-      showToast('❌ Zielgruppen-Analyse fehlgeschlagen', 'error');
-    } finally {
-      setPhase2Loading(false);
-    }
-  };
 
   return (
     <div className="image-analyzer-container" style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -244,6 +194,70 @@ const ImageAnalyzer: React.FC = () => {
               {loading ? '🔄 Analysiere...' : '🚀 Jetzt analysieren'}
             </button>
           </form>
+
+          {/* Orchestration Status */}
+          {orchestrationStatus && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              style={{
+                marginTop: '20px',
+                padding: '16px',
+                background: orchestrationStatus.mode === 'error' 
+                  ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1))'
+                  : orchestrationStatus.mode === 'partial'
+                  ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.1))'
+                  : 'linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1))',
+                border: `1px solid ${orchestrationStatus.mode === 'error' ? '#ef4444' : orchestrationStatus.mode === 'partial' ? '#fbbf24' : '#10b981'}`,
+                borderRadius: '8px'
+              }}
+            >
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center',
+                marginBottom: '12px'
+              }}>
+                <strong style={{ color: 'white', fontSize: '14px' }}>
+                  {orchestrationStatus.mode === 'error' ? '❌ Analyse fehlgeschlagen' 
+                    : orchestrationStatus.mode === 'partial' ? '⚠️ Teilweise erfolgreich'
+                    : '✅ Vollständig analysiert'}
+                </strong>
+                <span style={{ 
+                  color: orchestrationStatus.mode === 'error' ? '#ef4444' : orchestrationStatus.mode === 'partial' ? '#fbbf24' : '#10b981',
+                  fontSize: '13px',
+                  fontWeight: 'bold'
+                }}>
+                  {orchestrationStatus.dataCompleteness}%
+                </span>
+              </div>
+              
+              <div style={{ fontSize: '12px', display: 'grid', gap: '6px' }}>
+                {orchestrationStatus.steps.map((step, idx) => (
+                  <div key={idx} style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '6px',
+                    background: 'rgba(255,255,255,0.05)',
+                    borderRadius: '4px'
+                  }}>
+                    <span style={{ fontSize: '14px' }}>
+                      {step.status === 'success' ? '✅' : step.status === 'failed' ? '❌' : '⏳'}
+                    </span>
+                    <span style={{ color: 'rgba(255,255,255,0.8)', flex: 1 }}>{step.name}</span>
+                    <span style={{ 
+                      fontSize: '10px', 
+                      color: step.status === 'success' ? '#10b981' : step.status === 'failed' ? '#ef4444' : '#fbbf24',
+                      fontWeight: 'bold'
+                    }}>
+                      {step.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
         </motion.div>
 
         {/* PREVIEW */}
@@ -496,8 +510,8 @@ const ImageAnalyzer: React.FC = () => {
         </motion.div>
       )}
 
-      {/* PHASE 2: EXTENDED ANALYSIS */}
-      {file && (
+      {/* PHASE 2: EXTENDED ANALYSIS RESULTS */}
+      {fullResults && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -506,72 +520,15 @@ const ImageAnalyzer: React.FC = () => {
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             borderRadius: '12px',
             padding: '30px',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+            boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+            marginTop: '30px'
           }}
         >
-          <h2 style={{ color: 'white', marginTop: 0 }}>🚀 Erweiterte Analysen (Phase 2)</h2>
+          <h2 style={{ color: 'white', marginTop: 0 }}>🚀 Erweiterte Analysen</h2>
           <p style={{ color: 'rgba(255,255,255,0.8)', marginBottom: '20px' }}>Detaillierte Business-Intelligence für maximale Performance</p>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginBottom: '30px' }}>
-            <button onClick={analyzeColors} disabled={phase2Loading} style={{
-              padding: '12px 20px',
-              background: colorAnalysis ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              borderRadius: '8px',
-              color: 'white',
-              cursor: phase2Loading ? 'not-allowed' : 'pointer',
-              fontSize: '14px',
-              fontWeight: '600',
-              transition: 'all 0.3s'
-            }}>
-              {colorAnalysis ? '✅' : '🎨'} Farbanalyse
-            </button>
-            
-            <button onClick={getEnhancements} disabled={phase2Loading} style={{
-              padding: '12px 20px',
-              background: enhancements ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              borderRadius: '8px',
-              color: 'white',
-              cursor: phase2Loading ? 'not-allowed' : 'pointer',
-              fontSize: '14px',
-              fontWeight: '600',
-              transition: 'all 0.3s'
-            }}>
-              {enhancements ? '✅' : '✨'} Verbesserungen
-            </button>
-            
-            <button onClick={predictConversion} disabled={phase2Loading} style={{
-              padding: '12px 20px',
-              background: conversionImpact ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              borderRadius: '8px',
-              color: 'white',
-              cursor: phase2Loading ? 'not-allowed' : 'pointer',
-              fontSize: '14px',
-              fontWeight: '600',
-              transition: 'all 0.3s'
-            }}>
-              {conversionImpact ? '✅' : '📊'} Conversion-Impact
-            </button>
-            
-            <button onClick={getAudience} disabled={phase2Loading} style={{
-              padding: '12px 20px',
-              background: audienceRec ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              borderRadius: '8px',
-              color: 'white',
-              cursor: phase2Loading ? 'not-allowed' : 'pointer',
-              fontSize: '14px',
-              fontWeight: '600',
-              transition: 'all 0.3s'
-            }}>
-              {audienceRec ? '✅' : '👥'} Zielgruppe
-            </button>
-          </div>
-
           {/* Color Analysis Results */}
-          {colorAnalysis && (
+          {fullResults.colors && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{
               background: 'rgba(255,255,255,0.1)',
               borderRadius: '10px',
@@ -580,7 +537,7 @@ const ImageAnalyzer: React.FC = () => {
             }}>
               <h3 style={{ color: 'white', marginTop: 0 }}>🎨 Farbpalette & Harmonie</h3>
               <div style={{ display: 'flex', gap: '10px', marginBottom: '15px', flexWrap: 'wrap' }}>
-                {colorAnalysis.palette?.map((color: string, idx: number) => (
+                {fullResults.colors.palette?.map((color: string, idx: number) => (
                   <div key={idx} style={{
                     width: '60px',
                     height: '60px',
@@ -598,25 +555,25 @@ const ImageAnalyzer: React.FC = () => {
                 ))}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', fontSize: '13px', color: 'rgba(255,255,255,0.9)' }}>
-                <div><strong>Harmonie:</strong> {colorAnalysis.harmony}</div>
-                <div><strong>Score:</strong> {colorAnalysis.harmonyScore}/100</div>
-                <div><strong>Helligkeit:</strong> {colorAnalysis.brightness}%</div>
-                <div><strong>Sättigung:</strong> {colorAnalysis.saturation}%</div>
+                <div><strong>Harmonie:</strong> {fullResults.colors.harmony}</div>
+                <div><strong>Score:</strong> {fullResults.colors.harmonyScore}/100</div>
+                <div><strong>Helligkeit:</strong> {fullResults.colors.brightness}%</div>
+                <div><strong>Sättigung:</strong> {fullResults.colors.saturation}%</div>
               </div>
             </motion.div>
           )}
 
           {/* Enhancement Suggestions */}
-          {enhancements && (
+          {fullResults.enhancements && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{
               background: 'rgba(255,255,255,0.1)',
               borderRadius: '10px',
               padding: '20px',
               marginBottom: '20px'
             }}>
-              <h3 style={{ color: 'white', marginTop: 0 }}>✨ Auto-Enhancement Vorschläge ({enhancements.totalSuggestions})</h3>
+              <h3 style={{ color: 'white', marginTop: 0 }}>✨ Auto-Enhancement Vorschläge ({fullResults.enhancements.totalSuggestions})</h3>
               <div style={{ display: 'grid', gap: '10px' }}>
-                {enhancements.suggestions?.map((sug: any, idx: number) => (
+                {fullResults.enhancements.suggestions?.map((sug: any, idx: number) => (
                   <div key={idx} style={{
                     padding: '12px',
                     background: 'rgba(255,255,255,0.05)',
@@ -641,7 +598,7 @@ const ImageAnalyzer: React.FC = () => {
           )}
 
           {/* Conversion Impact */}
-          {conversionImpact && (
+          {fullResults.conversionImpact && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{
               background: 'rgba(255,255,255,0.1)',
               borderRadius: '10px',
@@ -652,59 +609,95 @@ const ImageAnalyzer: React.FC = () => {
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                padding: '30px',
-                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2))',
-                borderRadius: '10px',
+                gap: '20px',
                 marginBottom: '15px'
               }}>
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '48px', fontWeight: '700', color: '#10b981', marginBottom: '10px' }}>
-                    {conversionImpact.estimatedConversionLift}
-                  </div>
-                  <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>Geschätzter Conversion-Lift</div>
-                  <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '5px' }}>Konfidenz: {(conversionImpact.confidence * 100).toFixed(0)}%</div>
+                <div style={{
+                  fontSize: '42px',
+                  fontWeight: 'bold',
+                  color: '#10b981'
+                }}>
+                  {fullResults.conversionImpact.estimatedConversionLift}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', marginBottom: '4px' }}>Geschätzte Conversion-Steigerung</div>
+                  <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>Confidence: {(fullResults.conversionImpact.confidence * 100).toFixed(0)}%</div>
                 </div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px', fontSize: '12px', color: 'rgba(255,255,255,0.9)' }}>
-                <div style={{ padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px' }}>
-                  <div style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '5px' }}>Qualität</div>
-                  <div style={{ fontWeight: '600' }}>{conversionImpact.factors?.quality}</div>
-                </div>
-                <div style={{ padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px' }}>
-                  <div style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '5px' }}>Format</div>
-                  <div style={{ fontWeight: '600' }}>{conversionImpact.factors?.format}</div>
-                </div>
+              <div style={{
+                padding: '12px',
+                background: 'rgba(255,255,255,0.05)',
+                borderRadius: '6px',
+                fontSize: '12px'
+              }}>
+                <div style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '6px' }}><strong>Einflussfaktoren:</strong></div>
+                {Object.entries(fullResults.conversionImpact.factors || {}).map(([key, value]) => (
+                  <div key={key} style={{ color: 'rgba(255,255,255,0.6)', fontSize: '11px' }}>
+                    • {key}: {String(value)}
+                  </div>
+                ))}
               </div>
             </motion.div>
           )}
 
           {/* Audience Recommendation */}
-          {audienceRec && (
+          {fullResults.audience && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{
               background: 'rgba(255,255,255,0.1)',
               borderRadius: '10px',
               padding: '20px'
             }}>
               <h3 style={{ color: 'white', marginTop: 0 }}>👥 Zielgruppen-Empfehlung</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginBottom: '15px' }}>
-                <div style={{ padding: '15px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
-                  <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: '5px' }}>Altersgruppe</div>
-                  <div style={{ fontSize: '18px', fontWeight: '700', color: 'white' }}>{audienceRec.ageGroup}</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '15px', marginBottom: '15px' }}>
+                <div>
+                  <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: '4px' }}>Altersgruppe</div>
+                  <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#60a5fa' }}>{fullResults.audience.ageGroup}</div>
                 </div>
-                <div style={{ padding: '15px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
-                  <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: '5px' }}>Gender Bias</div>
-                  <div style={{ fontSize: '18px', fontWeight: '700', color: 'white' }}>{audienceRec.genderBias}</div>
+                <div>
+                  <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: '4px' }}>Gender-Bias</div>
+                  <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#a78bfa' }}>{fullResults.audience.genderBias}</div>
                 </div>
-                <div style={{ padding: '15px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
-                  <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: '5px' }}>Einkommensklasse</div>
-                  <div style={{ fontSize: '18px', fontWeight: '700', color: 'white' }}>{audienceRec.incomeLevel}</div>
+                <div>
+                  <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: '4px' }}>Einkommensklasse</div>
+                  <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#fbbf24' }}>{fullResults.audience.incomeLevel}</div>
                 </div>
               </div>
-              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.9)', marginTop: '15px' }}>
-                <div style={{ marginBottom: '8px' }}><strong>Beste Plattformen:</strong> {audienceRec.bestPlatforms?.join(', ')}</div>
-                <div><strong>Content-Style:</strong> {audienceRec.contentStyle}</div>
+              
+              <div style={{ marginBottom: '15px' }}>
+                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', marginBottom: '8px' }}><strong>Empfohlene Plattformen:</strong></div>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {fullResults.audience.bestPlatforms?.map((platform: string, idx: number) => (
+                    <span key={idx} style={{
+                      padding: '6px 14px',
+                      background: 'rgba(59, 130, 246, 0.2)',
+                      border: '1px solid rgba(59, 130, 246, 0.4)',
+                      borderRadius: '20px',
+                      fontSize: '12px',
+                      color: '#93c5fd'
+                    }}>
+                      {platform}
+                    </span>
+                  ))}
+                </div>
               </div>
+
+              {fullResults.audience.recommendations && fullResults.audience.recommendations.length > 0 && (
+                <div>
+                  <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', marginBottom: '8px' }}><strong>Detaillierte Empfehlungen:</strong></div>
+                  {fullResults.audience.recommendations.map((rec: any, idx: number) => (
+                    <div key={idx} style={{
+                      padding: '10px',
+                      background: 'rgba(255,255,255,0.05)',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      color: 'rgba(255,255,255,0.8)',
+                      marginBottom: '6px'
+                    }}>
+                      {rec.demographic} <span style={{ color: '#10b981', fontWeight: 'bold' }}>({(rec.confidence * 100).toFixed(0)}%)</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </motion.div>
           )}
         </motion.div>

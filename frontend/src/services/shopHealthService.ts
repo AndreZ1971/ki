@@ -1,9 +1,7 @@
 // services/shopHealthService.ts
 
-const API_URL = import.meta.env.VITE_API_URL;
 const request = async <T>(url: string, init?: RequestInit): Promise<T> => {
-  const fullUrl = url.startsWith('http') ? url : `${API_URL}${url}`;
-  const response = await fetch(fullUrl, {
+  const response = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
       ...(init?.headers || {})

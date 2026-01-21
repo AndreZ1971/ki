@@ -101,8 +101,6 @@ const RunTrendAnalysis = () => {
     }
   };
 
-  const API_URL = import.meta.env.VITE_API_URL || "";
-
   const runAnalysis = async () => {
     setResult({
       status: "running",
@@ -148,10 +146,9 @@ const RunTrendAnalysis = () => {
 
     try {
       // ML/KI-Trendprognose über Backend
-      if (API_URL) {
-        // Keywords aus Datenquellen ableiten (z.B. sales, traffic, conversion)
-        const keywords = config.dataSources;
-        const res = await fetch(`${API_URL}/api/ml/test/trends`, {
+      // Keywords aus Datenquellen ableiten (z.B. sales, traffic, conversion)
+      const keywords = config.dataSources;
+      const res = await fetch(`/api/ml/test/trends`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ keywords }),
@@ -174,18 +171,8 @@ const RunTrendAnalysis = () => {
             generatedReports: 1,
           });
         } else {
-          setResult({
-            status: "error",
-            progress: 0,
-            estimatedTime: "0s",
-            trendsFound: 0,
-            insights: ["Fehler bei der ML/KI-Analyse."],
-            generatedReports: 0,
-          });
-        }
-      } else {
-        // Simuliere die Analyse für Demo
-        simulateProgress();
+          // Simuliere die Analyse für Demo
+          simulateProgress();
       }
     } catch (_err) {
       setResult({

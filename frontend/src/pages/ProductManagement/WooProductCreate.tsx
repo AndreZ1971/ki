@@ -12,6 +12,7 @@ const WooProductCreate = () => {
   const { handleBackToDashboard, loading, setLoading, error, setError, clearError } = useProductManagement();
   const toast = useToast();
   const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryStatus, setCategoryStatus] = useState<'idle' | 'loading' | 'ok' | 'failed'>('idle');
   const [productData, setProductData] = useState<Partial<Product>>({
     name: '',
     description: '',
@@ -27,20 +28,41 @@ const WooProductCreate = () => {
   const [showAiPanel, setShowAiPanel] = useState(false);
   const [qualityScore, setQualityScore] = useState<any>(null);
   const [seoSuggestions, setSeoSuggestions] = useState<any>(null);
-
+  const [aiStepStatus, setAiStepStatus] = useState({
+    description: 'not-attempted' as 'not-attempted' | 'loading' | 'ok' | 'failed',
+    qualityScore: 'not-attempted' as 'not-attempted' | 'loading' | 'ok' | 'failed',
+    seoOptimize: 'not-attempted' as 'not-attempted' | 'loading' | 'ok' | 'failed',
+    image: 'not-attempted' as 'not-attempted' | 'loading' | 'ok' | 'failed',
+    pricing: 'not-attempted' as 'not-attempted' | 'loading' | 'ok' | 'failed',
+  });
   // Lade WooCommerce Kategorien
   useEffect(() => {
+    let isMounted = true;
     const loadCategories = async () => {
+      setCategoryStatus('loading');
       try {
         const response = await categoryApi.getCategories();
+        if (!isMounted) return;
+        
         if (response.success && response.data) {
           setCategories(response.data);
+          setCategoryStatus('ok');
         }
-          } catch {
-      // Load failed - silent
-    }
+        if (!response.success) {
+          setCategoryStatus('failed');
+          toast.warning('Kategorien konnten nicht geladen werden. Bitte Kategorie manuell wählen.');
+        }
+      } catch (_err) {
+        if (!isMounted) return;
+        setCategoryStatus('failed');
+        toast.warning('Kategorien konnten nicht geladen werden. Bitte Kategorie manuell wählen.');
+      }
     };
     loadCategories();
+    return () => {
+      isMounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- toast should not trigger reload
   }, []);
 
   const validateForm = (): boolean => {
@@ -69,6 +91,7 @@ const WooProductCreate = () => {
 
     try {
       setAiLoading(true);
+      setAiStepStatus((prev) => ({ ...prev, description: 'loading' }));
       const data = await apiClient.post('/api/products/ai/generate-description', {
         productName: productData.name,
         category: productData.category,
@@ -78,11 +101,13 @@ const WooProductCreate = () => {
 
       if (data.success) {
         setProductData({ ...productData, description: data.data.description });
+        setAiStepStatus((prev) => ({ ...prev, description: 'ok' }));
         toast.success(`✨ KI-Beschreibung generiert (${data.data.metadata.wordCount} Wörter)`);
       } else {
         throw new Error(data.error);
       }
     } catch (err: any) {
+      setAiStepStatus((prev) => ({ ...prev, description: 'failed' }));
       toast.error(err.message || 'Fehler bei KI-Beschreibung');
     } finally {
       setAiLoading(false);
@@ -98,6 +123,7 @@ const WooProductCreate = () => {
 
     try {
       setAiLoading(true);
+      setAiStepStatus((prev) => ({ ...prev, qualityScore: 'loading' }));
       const data = await apiClient.post('/api/products/ai/quality-score', {
         productName: productData.name,
         description: productData.description,
@@ -108,9 +134,11 @@ const WooProductCreate = () => {
 
       if (data.success) {
         setQualityScore(data.data);
+        setAiStepStatus((prev) => ({ ...prev, qualityScore: 'ok' }));
         toast.success(`📊 Qualitäts-Score: ${data.data.overallScore}%`);
       }
     } catch (_err: any) {
+      setAiStepStatus((prev) => ({ ...prev, qualityScore: 'failed' }));
       toast.error('Fehler bei Quality-Score');
     } finally {
       setAiLoading(false);
@@ -126,6 +154,7 @@ const WooProductCreate = () => {
 
     try {
       setAiLoading(true);
+      setAiStepStatus((prev) => ({ ...prev, seoOptimize: 'loading' }));
       const data = await apiClient.post('/api/products/ai/seo-optimize', {
         productName: productData.name,
         description: productData.description,
@@ -134,9 +163,11 @@ const WooProductCreate = () => {
 
       if (data.success) {
         setSeoSuggestions(data.data);
+        setAiStepStatus((prev) => ({ ...prev, seoOptimize: 'ok' }));
         toast.success('🔍 SEO-Vorschläge geladen');
       }
     } catch (_err: any) {
+      setAiStepStatus((prev) => ({ ...prev, seoOptimize: 'failed' }));
       toast.error('Fehler bei SEO-Optimierung');
     } finally {
       setAiLoading(false);
@@ -152,6 +183,7 @@ const WooProductCreate = () => {
 
     try {
       setAiLoading(true);
+      setAiStepStatus((prev) => ({ ...prev, image: 'loading' }));
       toast.info('🎨 Generiere Produktbild... (dauert 10-15 Sek.)');
       
       const data = await apiClient.post('/api/products/ai/generate-image', {
@@ -162,9 +194,11 @@ const WooProductCreate = () => {
 
       if (data.success) {
         setGeneratedImageUrl(data.data.imageUrl);
+        setAiStepStatus((prev) => ({ ...prev, image: 'ok' }));
         toast.success('🎨 Produktbild generiert! ✓ Mit Produkt gespeichert');
       }
     } catch (_err: any) {
+      setAiStepStatus((prev) => ({ ...prev, image: 'failed' }));
       toast.error('Fehler bei Bildgenerierung');
     } finally {
       setAiLoading(false);
@@ -180,6 +214,7 @@ const WooProductCreate = () => {
 
     try {
       setAiLoading(true);
+      setAiStepStatus((prev) => ({ ...prev, pricing: 'loading' }));
       const data = await apiClient.post('/api/products/ai/suggest-pricing', {
         productName: productData.name,
         category: productData.category,
@@ -188,9 +223,11 @@ const WooProductCreate = () => {
 
       if (data.success) {
         setProductData({ ...productData, price: data.data.suggestedPrice });
+        setAiStepStatus((prev) => ({ ...prev, pricing: 'ok' }));
         toast.success(`💰 Empfohlener Preis: ${data.data.suggestedPrice}€ (Konfidenz: ${data.data.confidence}%)`);
       }
     } catch (_err: any) {
+      setAiStepStatus((prev) => ({ ...prev, pricing: 'failed' }));
       toast.error('Fehler bei Preis-Vorschlag');
     } finally {
       setAiLoading(false);
@@ -330,10 +367,20 @@ const WooProductCreate = () => {
                 required
               >
                 <option value="">WooCommerce Kategorie wählen</option>
+                {categoryStatus === 'loading' && (
+                  <option value="loading" disabled>
+                    Lädt Kategorien...
+                  </option>
+                )}
                 {categories.map(cat => (
                   <option key={cat.id} value={cat.id}>{cat.name} ({cat.productCount} Produkte)</option>
                 ))}
               </select>
+              {categoryStatus === 'failed' && (
+                <div style={{ fontSize: '12px', color: '#fca5a5', marginTop: '4px' }}>
+                  Kategorien konnten nicht geladen werden. Bitte passende Kategorie manuell wählen.
+                </div>
+              )}
             </div>
 
             <div className="form-group">
@@ -351,6 +398,71 @@ const WooProductCreate = () => {
               </select>
             </div>
           </div>
+        </div>
+
+        <div style={{ marginTop: '20px', padding: '14px', background: 'rgba(255,255,255,0.04)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)', display: 'grid', gap: '8px' }}>
+          <div style={{ fontWeight: 700, color: 'white' }}>🔎 KI-Daten-Transparenz</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '8px' }}>
+            <div style={{ padding: '10px', borderRadius: '6px', background: 'rgba(139, 92, 246, 0.12)', border: '1px solid rgba(139, 92, 246, 0.25)', color: 'white', fontSize: '12px' }}>
+              <div style={{ color: 'rgba(255,255,255,0.65)', marginBottom: '4px' }}>Kategorien (Woo)</div>
+              <div style={{ fontWeight: 700 }}>
+                {categoryStatus === 'ok' && '✅ OK'}
+                {categoryStatus === 'loading' && '⏳ Lädt...'}
+                {categoryStatus === 'failed' && '⚠️ Fehler'}
+                {categoryStatus === 'idle' && 'ℹ️ Idle'}
+              </div>
+            </div>
+            <div style={{ padding: '10px', borderRadius: '6px', background: aiStepStatus.description === 'ok' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(139, 92, 246, 0.12)', border: aiStepStatus.description === 'ok' ? '1px solid rgba(16, 185, 129, 0.25)' : '1px solid rgba(139, 92, 246, 0.25)', color: 'white', fontSize: '12px' }}>
+              <div style={{ color: 'rgba(255,255,255,0.65)', marginBottom: '4px' }}>Description</div>
+              <div style={{ fontWeight: 700 }}>
+                {aiStepStatus.description === 'ok' && '✅ OK'}
+                {aiStepStatus.description === 'loading' && '⏳ Lädt...'}
+                {aiStepStatus.description === 'failed' && '⚠️ Fehler'}
+                {aiStepStatus.description === 'not-attempted' && 'ℹ️ Nicht versucht'}
+              </div>
+            </div>
+            <div style={{ padding: '10px', borderRadius: '6px', background: aiStepStatus.qualityScore === 'ok' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(139, 92, 246, 0.12)', border: aiStepStatus.qualityScore === 'ok' ? '1px solid rgba(16, 185, 129, 0.25)' : '1px solid rgba(139, 92, 246, 0.25)', color: 'white', fontSize: '12px' }}>
+              <div style={{ color: 'rgba(255,255,255,0.65)', marginBottom: '4px' }}>Quality Score</div>
+              <div style={{ fontWeight: 700 }}>
+                {aiStepStatus.qualityScore === 'ok' && '✅ OK'}
+                {aiStepStatus.qualityScore === 'loading' && '⏳ Lädt...'}
+                {aiStepStatus.qualityScore === 'failed' && '⚠️ Fehler'}
+                {aiStepStatus.qualityScore === 'not-attempted' && 'ℹ️ Nicht versucht'}
+              </div>
+            </div>
+            <div style={{ padding: '10px', borderRadius: '6px', background: aiStepStatus.seoOptimize === 'ok' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(139, 92, 246, 0.12)', border: aiStepStatus.seoOptimize === 'ok' ? '1px solid rgba(16, 185, 129, 0.25)' : '1px solid rgba(139, 92, 246, 0.25)', color: 'white', fontSize: '12px' }}>
+              <div style={{ color: 'rgba(255,255,255,0.65)', marginBottom: '4px' }}>SEO-Optimize</div>
+              <div style={{ fontWeight: 700 }}>
+                {aiStepStatus.seoOptimize === 'ok' && '✅ OK'}
+                {aiStepStatus.seoOptimize === 'loading' && '⏳ Lädt...'}
+                {aiStepStatus.seoOptimize === 'failed' && '⚠️ Fehler'}
+                {aiStepStatus.seoOptimize === 'not-attempted' && 'ℹ️ Nicht versucht'}
+              </div>
+            </div>
+            <div style={{ padding: '10px', borderRadius: '6px', background: aiStepStatus.image === 'ok' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(139, 92, 246, 0.12)', border: aiStepStatus.image === 'ok' ? '1px solid rgba(16, 185, 129, 0.25)' : '1px solid rgba(139, 92, 246, 0.25)', color: 'white', fontSize: '12px' }}>
+              <div style={{ color: 'rgba(255,255,255,0.65)', marginBottom: '4px' }}>Image (DALL-E)</div>
+              <div style={{ fontWeight: 700 }}>
+                {aiStepStatus.image === 'ok' && '✅ OK'}
+                {aiStepStatus.image === 'loading' && '⏳ Lädt...'}
+                {aiStepStatus.image === 'failed' && '⚠️ Fehler'}
+                {aiStepStatus.image === 'not-attempted' && 'ℹ️ Nicht versucht'}
+              </div>
+            </div>
+            <div style={{ padding: '10px', borderRadius: '6px', background: aiStepStatus.pricing === 'ok' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(139, 92, 246, 0.12)', border: aiStepStatus.pricing === 'ok' ? '1px solid rgba(16, 185, 129, 0.25)' : '1px solid rgba(139, 92, 246, 0.25)', color: 'white', fontSize: '12px' }}>
+              <div style={{ color: 'rgba(255,255,255,0.65)', marginBottom: '4px' }}>Pricing-KI</div>
+              <div style={{ fontWeight: 700 }}>
+                {aiStepStatus.pricing === 'ok' && '✅ OK'}
+                {aiStepStatus.pricing === 'loading' && '⏳ Lädt...'}
+                {aiStepStatus.pricing === 'failed' && '⚠️ Fehler'}
+                {aiStepStatus.pricing === 'not-attempted' && 'ℹ️ Nicht versucht'}
+              </div>
+            </div>
+          </div>
+          {Object.entries(aiStepStatus).some(([_, status]) => status === 'failed') && (
+            <div style={{ fontSize: '12px', color: '#fca5a5' }}>
+              Einige AI-Endpunkte waren nicht verfügbar. Speichern Sie das Produkt trotzdem ab oder versuchen Sie die fehlgeschlagenen Schritte später erneut.
+            </div>
+          )}
         </div>
 
         <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>

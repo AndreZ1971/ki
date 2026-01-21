@@ -47,14 +47,12 @@ const MLDashboard: React.FC = () => {
 
   const fetchMLData = async () => {
     try {
-      const baseApi = (import.meta.env.VITE_API_URL || '').trim();
-
-      const statusResponse = await fetch(`${baseApi}/api/ml/status`);
+      const statusResponse = await fetch('/api/ml/status');
       if (!statusResponse.ok) throw new Error(`Status API Error: ${statusResponse.status}`);
       const statusData = await statusResponse.json();
       setMlStatus(statusData);
 
-      const statsResponse = await fetch(`${baseApi}/api/ml/stats`);
+      const statsResponse = await fetch('/api/ml/stats');
       if (!statsResponse.ok) throw new Error(`Stats API Error: ${statsResponse.status}`);
       const statsData = await statsResponse.json();
       if (!statsData?.success || !statsData?.data) throw new Error(statsData?.error || 'Ungültige ML-Stats');
@@ -63,7 +61,8 @@ const MLDashboard: React.FC = () => {
       // Bis echte Verlaufsdaten verfügbar sind, zeigen wir keine Dummy-Historie
       setPredictionHistory([]);
     } catch (_error) {
-      // Silent fail - no history available finally {
+      // Silent fail - no history available
+    } finally {
       setLoading(false);
     }
   };

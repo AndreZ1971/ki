@@ -27,11 +27,7 @@ export const MLAnalyticsGenerator: React.FC<MLAnalyticsGeneratorProps> = ({
     setLoading(true);
     setError(null);
     try {
-      let base = (import.meta.env.VITE_API_URL || "").trim();
-      if (base.endsWith("/")) base = base.slice(0, -1);
-      const apiUrl = base
-        ? `${base}/api/analytics/ml/generate`
-        : `/api/analytics/ml/generate`;
+      const apiUrl = `/api/analytics/ml/generate`;
 
       const res = await fetch(apiUrl, {
         method: "POST",

@@ -33,13 +33,11 @@ const ProductAnalyzer: React.FC = () => {
   const [saveLoading, setSaveLoading] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  const apiBase = import.meta.env.VITE_API_URL || '';
-
   // Lade Produktliste beim Mounten
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const data = await apiClient.get(`${apiBase}/api/products/woo/products?per_page=100`);
+        const data = await apiClient.get('/api/products/woo/products?per_page=100');
         
         // Handle both response formats
         let productsArray = null;
@@ -77,7 +75,7 @@ const ProductAnalyzer: React.FC = () => {
       }
     };
     fetchProducts();
-  }, [apiBase]);
+  }, []);
 
   const openDetailsModal = useCallback(async () => {
     if (!selectedProductId) return;
@@ -91,7 +89,7 @@ const ProductAnalyzer: React.FC = () => {
     setEditedProduct(null);
     setSaveError(null);
     try {
-      const data = await apiClient.get(`${apiBase}/api/products/woo/products/${selectedProductId}?ts=${Date.now()}`);
+      const data = await apiClient.get(`/api/products/woo/products/${selectedProductId}?ts=${Date.now()}`);
       setProductDebug(data);
       const productPayload = data?.data ?? data;
       if (data.success && productPayload && Object.keys(productPayload).length > 0) {
@@ -107,7 +105,7 @@ const ProductAnalyzer: React.FC = () => {
     } finally {
       setModalLoading(false);
     }
-  }, [apiBase, selectedProductId]);
+  }, [selectedProductId]);
 
   const runAnalysis = useCallback(async () => {
     if (!selectedProductId) return;
@@ -115,7 +113,7 @@ const ProductAnalyzer: React.FC = () => {
     setAnalysisError(null);
     setAnalysis(null);
     try {
-      const data = await apiClient.post(`${apiBase}/api/products/adviser/analyze/${selectedProductId}`, {});
+      const data = await apiClient.post(`/api/products/adviser/analyze/${selectedProductId}`, {});
       if (data) {
         setAnalysis(data);
       } else {
@@ -126,7 +124,7 @@ const ProductAnalyzer: React.FC = () => {
     } finally {
       setAnalysisLoading(false);
     }
-  }, [apiBase, selectedProductId]);
+  }, [selectedProductId]);
 
   const saveProduct = useCallback(async () => {
     if (!selectedProductId || !editedProduct) return;
@@ -141,7 +139,7 @@ const ProductAnalyzer: React.FC = () => {
         description: editedProduct.description,
         short_description: editedProduct.short_description,
       };
-      const data = await apiClient.put(`${apiBase}/api/products/woo/products/${selectedProductId}`, updateData);
+      const data = await apiClient.put(`/api/products/woo/products/${selectedProductId}`, updateData);
       if (data.success) {
         setProductDetails(data.data);
         setEditedProduct(data.data);
@@ -164,7 +162,7 @@ const ProductAnalyzer: React.FC = () => {
     } finally {
       setSaveLoading(false);
     }
-  }, [apiBase, selectedProductId, editedProduct, toastList]);
+  }, [selectedProductId, editedProduct, toastList]);
 
   const toggleEditMode = useCallback(() => {
     if (editMode) {

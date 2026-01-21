@@ -63,11 +63,7 @@ const ConversionReported = () => {
   useEffect(() => {
     const fetchReportData = async () => {
       try {
-        let base = (import.meta.env.VITE_API_URL || "").trim();
-        if (base.endsWith("/")) base = base.slice(0, -1);
-        const apiUrl = base
-          ? `${base}/api/analytics/conversion/ml/report-analysis`
-          : `/api/analytics/conversion/ml/report-analysis`;
+        const apiUrl = `/api/analytics/conversion/ml/report-analysis`;
 
         const res = await fetch(apiUrl, {
           method: "POST",
@@ -107,11 +103,7 @@ const ConversionReported = () => {
     setSummary(null);
     setSummaryDetails(null);
     try {
-      let base = (import.meta.env.VITE_API_URL || "").trim();
-      if (base.endsWith("/")) base = base.slice(0, -1);
-      const apiUrl = base
-        ? `${base}/api/analytics/conversion/ml/report-analysis`
-        : `/api/analytics/conversion/ml/report-analysis`;
+      const apiUrl = `/api/analytics/conversion/ml/report-analysis`;
       const res = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -144,11 +136,7 @@ const ConversionReported = () => {
     setActiveAction("exporting");
 
     try {
-      let base = (import.meta.env.VITE_API_URL || "").trim();
-      if (base.endsWith("/")) base = base.slice(0, -1);
-      const apiUrl = base
-        ? `${base}/api/analytics/conversion/ml/report-analysis`
-        : `/api/analytics/conversion/ml/report-analysis`;
+      const apiUrl = `/api/analytics/conversion/ml/report-analysis`;
 
       const res = await fetch(apiUrl, {
         method: "POST",
@@ -181,11 +169,7 @@ const ConversionReported = () => {
     setActiveAction("scheduling");
 
     try {
-      let base = (import.meta.env.VITE_API_URL || "").trim();
-      if (base.endsWith("/")) base = base.slice(0, -1);
-      const apiUrl = base
-        ? `${base}/api/analytics/conversion/ml/schedule`
-        : `/api/analytics/conversion/ml/schedule`;
+      const apiUrl = `/api/analytics/conversion/ml/schedule`;
 
       const res = await fetch(apiUrl, {
         method: "POST",
@@ -222,11 +206,7 @@ const ConversionReported = () => {
     setActiveAction("emailing");
 
     try {
-      let base = (import.meta.env.VITE_API_URL || "").trim();
-      if (base.endsWith("/")) base = base.slice(0, -1);
-      const apiUrl = base
-        ? `${base}/api/analytics/conversion/ml/email`
-        : `/api/analytics/conversion/ml/email`;
+      const apiUrl = `/api/analytics/conversion/ml/email`;
 
       const res = await fetch(apiUrl, {
         method: "POST",
@@ -254,11 +234,7 @@ const ConversionReported = () => {
     setActiveAction("generating");
 
     try {
-      let base = (import.meta.env.VITE_API_URL || "").trim();
-      if (base.endsWith("/")) base = base.slice(0, -1);
-      const apiUrl = base
-        ? `${base}/api/analytics/conversion/ml/generate-realtime`
-        : `/api/analytics/conversion/ml/generate-realtime`;
+      const apiUrl = `/api/analytics/conversion/ml/generate-realtime`;
 
       const res = await fetch(apiUrl, {
         method: "POST",

@@ -20,6 +20,8 @@ interface PaymentResult {
   amount: string;
   timestamp: string;
   processingTime: string;
+  riskScore?: number;
+  reason?: string;
 }
 
 const PaymentFast: React.FC = () => {
@@ -131,18 +133,37 @@ const PaymentFast: React.FC = () => {
     const startTime = Date.now();
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      const processingTime = `${Date.now() - startTime}ms`;
-      setPaymentResult({
-        transactionId: `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
-        status: "success",
-        amount: `${amount} ${currency}`,
-        timestamp: formatDateTime(new Date()),
-        processingTime,
+      // ECHTE API-Verarbeitung statt Mock-Simulation
+      const response = await paymentApi.processFastPayment({
+        amount: Number(amount),
+        currency: currency,
+        customerEmail: customerEmail,
+        paymentMethod: paymentMethod || 'card',
+        description: 'Fast Payment'
       });
 
-      showToast("Payment erfolgreich verarbeitet! ⚡", "success");
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Payment processing failed');
+      }
+
+      const processingTime = `${Date.now() - startTime}ms`;
+      const data = response.data;
+      
+      setPaymentResult({
+        transactionId: data.transactionId,
+        status: data.status === 'success' ? 'success' : 'failed',
+        amount: `${data.amount} ${data.currency}`,
+        timestamp: formatDateTime(new Date(data.timestamp)),
+        processingTime,
+        riskScore: data.riskScore,
+        reason: data.reason
+      });
+
+      const toastMessage = data.status === 'success' 
+        ? `Payment erfolgreich verarbeitet! ⚡ (Transaktions-ID: ${data.transactionId.slice(0, 8)}...)`
+        : `Payment fehlgeschlagen: ${data.reason || 'Unbekannter Fehler'}`;
+      
+      showToast(toastMessage, data.status === 'success' ? 'success' : 'error');
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Payment-Fehler";
@@ -557,6 +578,69 @@ const PaymentFast: React.FC = () => {
                     ⚡ {paymentResult.processingTime}
                   </div>
                 </div>
+
+                {/* Risk Score from Backend */}
+                {paymentResult.riskScore !== undefined && (
+                  <div
+                    style={{
+                      background: "rgba(0,0,0,0.3)",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      borderRadius: "12px",
+                      padding: "20px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "11px",
+                        opacity: 0.7,
+                        color: "white",
+                        marginBottom: "5px",
+                      }}
+                    >
+                      Backend Risiko-Score
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "18px",
+                        fontWeight: "bold",
+                        color:
+                          paymentResult.riskScore > 85
+                            ? "#ff3b30"
+                            : paymentResult.riskScore > 50
+                              ? "#ff9f0a"
+                              : "#34c759",
+                      }}
+                    >
+                      {paymentResult.riskScore.toFixed(1)}%
+                    </div>
+                  </div>
+                )}
+
+                {/* Failure Reason */}
+                {paymentResult.reason && (
+                  <div
+                    style={{
+                      background: "rgba(255, 59, 48, 0.1)",
+                      border: "1px solid rgba(255, 59, 48, 0.5)",
+                      borderRadius: "12px",
+                      padding: "20px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "11px",
+                        opacity: 0.7,
+                        color: "#ff3b30",
+                        marginBottom: "5px",
+                      }}
+                    >
+                      Fehlergrund
+                    </div>
+                    <div style={{ fontSize: "14px", color: "white" }}>
+                      {paymentResult.reason}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Fraud Analysis Result */}

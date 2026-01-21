@@ -50,11 +50,7 @@ const RealWebAnalytics = () => {
     setLoading(true);
     setError(null);
     try {
-      let base = (import.meta.env.VITE_API_URL || "").trim();
-      if (base.endsWith("/")) base = base.slice(0, -1);
-      const apiUrl = base
-        ? `${base}/api/products/woo/products?per_page=50`
-        : `/api/products/woo/products?per_page=50`;
+      const apiUrl = `/api/products/woo/products?per_page=50`;
       const response = await fetch(apiUrl);
       if (!response.ok)
         throw new Error(t("pages.analytics_pages.realWebAnalytics.loadProductsError"));
@@ -90,11 +86,7 @@ const RealWebAnalytics = () => {
         setLoading(false);
         return;
       }
-      let base = (import.meta.env.VITE_API_URL || "").trim();
-      if (base.endsWith("/")) base = base.slice(0, -1);
-      const batchUrl = base
-        ? `${base}/api/analytics/trends/analyze`
-        : `/api/analytics/trends/analyze`;
+      const batchUrl = `/api/analytics/trends/analyze`;
       const batchRes = await fetch(batchUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

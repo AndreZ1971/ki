@@ -7,7 +7,7 @@ import { logger } from '../../../../logger';
 interface CreateProductBody {
   count: number;
   category: string;
-  productType?: 'simple' | 'virtual' | 'downloadable';
+  productType?: 'simple' | 'virtual' | 'downloadable' | 'variable' | 'bundle';
   optimization: 'low' | 'medium' | 'high';
   keywords?: string;
   seoOptimized?: boolean;
@@ -46,7 +46,7 @@ export default async function productRoutes(server: FastifyInstance) {
           properties: {
             count: { type: 'number' },
             category: { type: 'string' },
-            productType: { type: 'string', enum: ['simple', 'virtual', 'downloadable'] },
+            productType: { type: 'string', enum: ['simple', 'virtual', 'downloadable', 'variable', 'bundle'] },
             optimization: { type: 'string', enum: ['low', 'medium', 'high'] }
           }
         }

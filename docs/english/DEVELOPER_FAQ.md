@@ -1,6 +1,6 @@
 # 🛠️ A.R.I. - Developer FAQ
 
-**Version:** 7.0.3  
+**Version:** 7.0.4  
 **Date:** January 2026  
 **Target Audience:** DevOps, Developers, System Administrators
 
@@ -1090,7 +1090,7 @@ NODE_OPTIONS=--max-old-space-size=4096 npm run build
 ---
 
 **Last Updated:** January 5, 2026  
-**Version:** 7.0.3  
+**Version:** 7.0.4  
 **Created for:** Developers & System Administrators
 
 ---

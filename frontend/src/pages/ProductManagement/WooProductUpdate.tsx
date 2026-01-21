@@ -43,6 +43,18 @@ interface RedditSentiment {
   }>;
 }
 
+interface AiCallStatus {
+  trendPricing: 'idle' | 'loading' | 'ok' | 'failed';
+  redditSentiment: 'idle' | 'loading' | 'ok' | 'failed';
+  descriptionOptimize: 'idle' | 'loading' | 'ok' | 'failed';
+}
+
+interface AiCallError {
+  trendPricing?: string;
+  redditSentiment?: string;
+  descriptionOptimize?: string;
+}
+
 const WooProductUpdate = () => {
   const { handleBackToDashboard, loading, setLoading, error, setError, clearError } = useProductManagement();
   const toast = useToast();
@@ -54,6 +66,13 @@ const WooProductUpdate = () => {
   // AI/ML States
   const [showAiPanel, setShowAiPanel] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiCallStatus, setAiCallStatus] = useState<Record<number, AiCallStatus>>({});
+  const [aiCallErrors, setAiCallErrors] = useState<Record<number, AiCallError>>({});
+  const [rateLimitInfo, setRateLimitInfo] = useState<{ active: boolean; current: number; total: number }>({ 
+    active: false, 
+    current: 0, 
+    total: 0 
+  });
   const [trendData, setTrendData] = useState<Record<number, TrendData>>({});
   const [redditData, setRedditData] = useState<RedditSentiment | null>(null);
   const [selectedProductForAnalysis, setSelectedProductForAnalysis] = useState<ProductItem | null>(null);
@@ -94,8 +113,12 @@ const WooProductUpdate = () => {
   // ==================== AI/ML Functions ====================
 
   const analyzeTrendPricing = async (product: ProductItem) => {
+    setAiCallStatus(prev => ({
+      ...prev,
+      [product.id]: { ...prev[product.id], trendPricing: 'loading' }
+    }));
+    
     try {
-      setAiLoading(true);
       const result = await apiClient.post('/api/products/ai/trend-pricing', {
         productId: product.id,
         productName: product.name,
@@ -111,6 +134,18 @@ const WooProductUpdate = () => {
           [product.id]: result.data
         }));
         
+        setAiCallStatus(prev => ({
+          ...prev,
+          [product.id]: { ...prev[product.id], trendPricing: 'ok' }
+        }));
+        setAiCallErrors(prev => {
+          const updated = { ...prev };
+          if (updated[product.id]) {
+            delete updated[product.id].trendPricing;
+          }
+          return updated;
+        });
+        
         // Bei AI-Auto-Apply: Preis direkt übernehmen
         if (aiAutoApply && result.data.suggestedPrice) {
           setProducts(prev => prev.map(p => 
@@ -118,25 +153,41 @@ const WooProductUpdate = () => {
               ? { ...p, price: result.data.suggestedPrice }
               : p
           ));
-          toast.success(`✅ Preis automatisch auf €${result.data.suggestedPrice} angepasst!`);
-        } else {
-          toast.success(`🔥 Trend-Analyse für "${product.name}" abgeschlossen!`);
+          toast.success(`✅ Trend-Preis: €${result.data.suggestedPrice}`);
         }
       } else {
-        toast.error('Trend-Analyse fehlgeschlagen');
+        const errorMsg = result.error || 'Trend-Analyse fehlgeschlagen';
+        setAiCallStatus(prev => ({
+          ...prev,
+          [product.id]: { ...prev[product.id], trendPricing: 'failed' }
+        }));
+        setAiCallErrors(prev => ({
+          ...prev,
+          [product.id]: { ...prev[product.id], trendPricing: errorMsg }
+        }));
+        toast.error(`❌ Trend-Preis: ${errorMsg}`);
       }
-    } catch {
-      toast.error('Fehler bei Trend-Analyse');
-    } finally {
-      setAiLoading(false);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Fehler bei Trend-Analyse';
+      setAiCallStatus(prev => ({
+        ...prev,
+        [product.id]: { ...prev[product.id], trendPricing: 'failed' }
+      }));
+      setAiCallErrors(prev => ({
+        ...prev,
+        [product.id]: { ...prev[product.id], trendPricing: errorMsg }
+      }));
     }
   };
 
   const analyzeRedditSentiment = async (product: ProductItem) => {
+    setAiCallStatus(prev => ({
+      ...prev,
+      [product.id]: { ...prev[product.id], redditSentiment: 'loading' }
+    }));
+    setSelectedProductForAnalysis(product);
+    
     try {
-      setAiLoading(true);
-      setSelectedProductForAnalysis(product);
-      
       const result = await apiClient.post('/api/products/ai/reddit-sentiment', {
         productName: product.name,
         category: 'general'
@@ -144,14 +195,40 @@ const WooProductUpdate = () => {
       
       if (result.success) {
         setRedditData(result.data);
-        toast.success(`💬 Reddit-Analyse für "${product.name}" abgeschlossen!`);
+        setAiCallStatus(prev => ({
+          ...prev,
+          [product.id]: { ...prev[product.id], redditSentiment: 'ok' }
+        }));
+        setAiCallErrors(prev => {
+          const updated = { ...prev };
+          if (updated[product.id]) {
+            delete updated[product.id].redditSentiment;
+          }
+          return updated;
+        });
+        toast.success(`✅ Reddit-Sentiment: ${result.data.sentiment}`);
       } else {
-        toast.error('Reddit-Analyse fehlgeschlagen');
+        const errorMsg = result.error || 'Reddit-Analyse fehlgeschlagen';
+        setAiCallStatus(prev => ({
+          ...prev,
+          [product.id]: { ...prev[product.id], redditSentiment: 'failed' }
+        }));
+        setAiCallErrors(prev => ({
+          ...prev,
+          [product.id]: { ...prev[product.id], redditSentiment: errorMsg }
+        }));
+        toast.error(`❌ Reddit-Sentiment: ${errorMsg}`);
       }
-    } catch {
-      toast.error('Fehler bei Reddit-Analyse');
-    } finally {
-      setAiLoading(false);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Fehler bei Reddit-Analyse';
+      setAiCallStatus(prev => ({
+        ...prev,
+        [product.id]: { ...prev[product.id], redditSentiment: 'failed' }
+      }));
+      setAiCallErrors(prev => ({
+        ...prev,
+        [product.id]: { ...prev[product.id], redditSentiment: errorMsg }
+      }));
     }
   };
 
@@ -161,8 +238,12 @@ const WooProductUpdate = () => {
       return;
     }
 
+    setAiCallStatus(prev => ({
+      ...prev,
+      [product.id]: { ...prev[product.id], descriptionOptimize: 'loading' }
+    }));
+
     try {
-      setAiLoading(true);
       const result = await apiClient.post('/api/products/ai/optimize-description-trends', {
         productName: product.name,
         currentDescription: product.description,
@@ -176,6 +257,18 @@ const WooProductUpdate = () => {
           [product.id]: result.data.optimizedDescription
         }));
 
+        setAiCallStatus(prev => ({
+          ...prev,
+          [product.id]: { ...prev[product.id], descriptionOptimize: 'ok' }
+        }));
+        setAiCallErrors(prev => {
+          const updated = { ...prev };
+          if (updated[product.id]) {
+            delete updated[product.id].descriptionOptimize;
+          }
+          return updated;
+        });
+
         // Bei AI-Auto-Apply: Beschreibung direkt übernehmen
         if (aiAutoApply) {
           setProducts(prev => prev.map(p => 
@@ -183,18 +276,32 @@ const WooProductUpdate = () => {
               ? { ...p, description: result.data.optimizedDescription }
               : p
           ));
-          toast.success(`✅ Beschreibung automatisch optimiert! SEO: ${result.data.seoScore}%`);
+          toast.success(`✅ Beschreibung optimiert! SEO: ${result.data.seoScore}%`);
         } else {
-          toast.success(`📝 Beschreibung optimiert! SEO-Score: ${result.data.seoScore}% (klicke "Updates starten" zum Übernehmen)`);
+          toast.success(`📝 SEO-Score: ${result.data.seoScore}%`);
         }
-
       } else {
-        toast.error('Beschreibungs-Optimierung fehlgeschlagen');
+        const errorMsg = result.error || 'Beschreibungs-Optimierung fehlgeschlagen';
+        setAiCallStatus(prev => ({
+          ...prev,
+          [product.id]: { ...prev[product.id], descriptionOptimize: 'failed' }
+        }));
+        setAiCallErrors(prev => ({
+          ...prev,
+          [product.id]: { ...prev[product.id], descriptionOptimize: errorMsg }
+        }));
+        toast.error(`❌ SEO-Optimierung: ${errorMsg}`);
       }
-    } catch {
-      toast.error('Fehler bei Beschreibungs-Optimierung');
-    } finally {
-      setAiLoading(false);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Fehler bei Beschreibungs-Optimierung';
+      setAiCallStatus(prev => ({
+        ...prev,
+        [product.id]: { ...prev[product.id], descriptionOptimize: 'failed' }
+      }));
+      setAiCallErrors(prev => ({
+        ...prev,
+        [product.id]: { ...prev[product.id], descriptionOptimize: errorMsg }
+      }));
     }
   };
 
@@ -463,6 +570,7 @@ const WooProductUpdate = () => {
                   }
                   
                   setAiLoading(true);
+                  setRateLimitInfo({ active: true, current: 0, total: selectedProducts.length });
                   let analyzed = 0;
                   
                   for (const productId of selectedProducts) {
@@ -470,11 +578,15 @@ const WooProductUpdate = () => {
                     if (product) {
                       await analyzeTrendPricing(product);
                       analyzed++;
-                      await new Promise(r => setTimeout(r, 1500)); // Rate-Limiting
+                      setRateLimitInfo({ active: true, current: analyzed, total: selectedProducts.length });
+                      if (analyzed < selectedProducts.length) {
+                        await new Promise(r => setTimeout(r, 1500)); // Rate-Limiting
+                      }
                     }
                   }
                   
                   setAiLoading(false);
+                  setRateLimitInfo({ active: false, current: 0, total: 0 });
                   toast.success(`🎯 ${analyzed} Produkte analysiert!`);
                 }}
                 disabled={aiLoading || selectedProducts.length === 0}
@@ -489,15 +601,240 @@ const WooProductUpdate = () => {
                   whiteSpace: 'nowrap'
                 }}
               >
-                {aiLoading ? '⏳ Analysiere...' : `🎯 Alle analysieren (${selectedProducts.length})`}
+                {aiLoading ? `⏳ ${rateLimitInfo.current}/${rateLimitInfo.total} analysiert` : `🎯 Alle analysieren (${selectedProducts.length})`}
               </button>
             </div>
-            
-            {aiLoading && (
-              <div style={{ textAlign: 'center', padding: '20px' }}>
-                <div className="spinner" style={{ margin: '0 auto' }}></div>
-                <p>🔍 Analysiere Trends und Community-Feedback...</p>
+
+            {/* Rate-Limit Transparenz */}
+            {rateLimitInfo.active && (
+              <div style={{
+                background: 'rgba(255, 193, 7, 0.15)',
+                border: '1px solid rgba(255, 193, 7, 0.3)',
+                borderRadius: '8px',
+                padding: '15px',
+                marginTop: '15px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '18px' }}>⏱️</span>
+                  <strong>Rate-Limit aktiv</strong>
+                </div>
+                <div style={{ fontSize: '13px', opacity: 0.9 }}>
+                  <p>Fortschritt: {rateLimitInfo.current}/{rateLimitInfo.total} Produkte</p>
+                  <p style={{ marginTop: '5px', fontSize: '12px' }}>
+                    💡 1,5 Sekunden Pause zwischen API-Calls zur Vermeidung von Rate-Limiting.
+                    Geschätzte Dauer: ~{Math.ceil(rateLimitInfo.total * 1.5)}s
+                  </p>
+                </div>
+                <div style={{
+                  background: 'rgba(255,255,255,0.2)',
+                  height: '4px',
+                  borderRadius: '2px',
+                  marginTop: '8px',
+                  overflow: 'hidden'
+                }}>
+                  <div style={{
+                    width: `${(rateLimitInfo.current / rateLimitInfo.total) * 100}%`,
+                    height: '100%',
+                    background: '#FFC107',
+                    transition: 'width 0.3s ease'
+                  }} />
+                </div>
               </div>
+            )}
+
+            {/* AI-Status Transparenz-Panel */}
+            {Object.keys(aiCallStatus).length > 0 && (
+              <div style={{
+                background: 'rgba(255,255,255,0.1)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: '8px',
+                padding: '15px',
+                marginTop: '15px',
+                maxHeight: '300px',
+                overflowY: 'auto'
+              }}>
+                <h4 style={{ marginTop: 0, marginBottom: '12px' }}>📊 KI-Analyse Status</h4>
+                {selectedProducts.map(productId => {
+                  const product = products.find(p => p.id === productId);
+                  const status = aiCallStatus[productId];
+                  const errors = aiCallErrors[productId];
+                  
+                  if (!product || !status) return null;
+                  
+                  const hasErrors = errors && (errors.trendPricing || errors.redditSentiment || errors.descriptionOptimize);
+                  const allOk = status.trendPricing === 'ok' && status.redditSentiment === 'ok' && status.descriptionOptimize === 'ok';
+                  
+                  return (
+                    <div key={productId} style={{
+                      background: hasErrors ? 'rgba(239, 68, 68, 0.1)' : allOk ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255,255,255,0.05)',
+                      border: `1px solid ${hasErrors ? 'rgba(239, 68, 68, 0.3)' : allOk ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255,255,255,0.1)'}`,
+                      borderRadius: '6px',
+                      padding: '10px',
+                      marginBottom: '8px',
+                      fontSize: '12px'
+                    }}>
+                      <div style={{ fontWeight: 'bold', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span>{hasErrors ? '⚠️' : allOk ? '✅' : '⏳'}</span>
+                        {product.name}
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', fontSize: '11px' }}>
+                        <div style={{ opacity: 0.85 }}>
+                          💰 Trend-Preis: 
+                          <span style={{ marginLeft: '4px', fontWeight: 'bold', color: 
+                            status.trendPricing === 'ok' ? '#10b981' : 
+                            status.trendPricing === 'failed' ? '#ef4444' : 
+                            status.trendPricing === 'loading' ? '#f59e0b' : '#9ca3af'
+                          }}>
+                            {status.trendPricing === 'ok' ? '✅' : status.trendPricing === 'failed' ? '❌' : status.trendPricing === 'loading' ? '⏳' : 'ℹ️'}
+                          </span>
+                          {errors?.trendPricing && <div style={{ fontSize: '10px', color: '#ef4444', marginTop: '2px' }}>Fehler: {errors.trendPricing}</div>}
+                        </div>
+                        <div style={{ opacity: 0.85 }}>
+                          💬 Reddit: 
+                          <span style={{ marginLeft: '4px', fontWeight: 'bold', color: 
+                            status.redditSentiment === 'ok' ? '#10b981' : 
+                            status.redditSentiment === 'failed' ? '#ef4444' : 
+                            status.redditSentiment === 'loading' ? '#f59e0b' : '#9ca3af'
+                          }}>
+                            {status.redditSentiment === 'ok' ? '✅' : status.redditSentiment === 'failed' ? '❌' : status.redditSentiment === 'loading' ? '⏳' : 'ℹ️'}
+                          </span>
+                          {errors?.redditSentiment && <div style={{ fontSize: '10px', color: '#ef4444', marginTop: '2px' }}>Fehler: {errors.redditSentiment}</div>}
+                        </div>
+                        <div style={{ opacity: 0.85 }}>
+                          📝 SEO: 
+                          <span style={{ marginLeft: '4px', fontWeight: 'bold', color: 
+                            status.descriptionOptimize === 'ok' ? '#10b981' : 
+                            status.descriptionOptimize === 'failed' ? '#ef4444' : 
+                            status.descriptionOptimize === 'loading' ? '#f59e0b' : '#9ca3af'
+                          }}>
+                            {status.descriptionOptimize === 'ok' ? '✅' : status.descriptionOptimize === 'failed' ? '❌' : status.descriptionOptimize === 'loading' ? '⏳' : 'ℹ️'}
+                          </span>
+                          {errors?.descriptionOptimize && <div style={{ fontSize: '10px', color: '#ef4444', marginTop: '2px' }}>Fehler: {errors.descriptionOptimize}</div>}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Batch Analyse Zusammenfassung */}
+            {!rateLimitInfo.active && Object.keys(aiCallStatus).length > 0 && (
+              (() => {
+                const statusArray = Object.values(aiCallStatus);
+                if (statusArray.length === 0) return null;
+                
+                const allOk = statusArray.every(s => 
+                  s.trendPricing === 'ok' && 
+                  s.redditSentiment === 'ok' && 
+                  s.descriptionOptimize === 'ok'
+                );
+                
+                const successCount = statusArray.filter(s => 
+                  s.trendPricing === 'ok' && 
+                  s.redditSentiment === 'ok' && 
+                  s.descriptionOptimize === 'ok'
+                ).length;
+                
+                const partialCount = statusArray.filter(s => {
+                  const failed = [s.trendPricing === 'failed', s.redditSentiment === 'failed', s.descriptionOptimize === 'failed']
+                    .filter(v => v).length;
+                  return failed > 0 && failed < 3;
+                }).length;
+                
+                const completeFailCount = statusArray.filter(s => 
+                  s.trendPricing === 'failed' && 
+                  s.redditSentiment === 'failed' && 
+                  s.descriptionOptimize === 'failed'
+                ).length;
+                
+                return (
+                  <div style={{
+                    background: allOk ? 'rgba(16, 185, 129, 0.1)' : partialCount > 0 || completeFailCount > 0 ? 'rgba(239, 68, 68, 0.1)' : 'rgba(255, 193, 7, 0.1)',
+                    border: allOk ? '2px solid rgba(16, 185, 129, 0.5)' : partialCount > 0 || completeFailCount > 0 ? '2px solid rgba(239, 68, 68, 0.5)' : '2px solid rgba(255, 193, 7, 0.5)',
+                    borderRadius: '10px',
+                    padding: '20px',
+                    marginTop: '15px'
+                  }}>
+                    <h4 style={{ 
+                      marginTop: 0,
+                      marginBottom: '15px',
+                      color: allOk ? '#10b981' : completeFailCount > 0 ? '#ef4444' : '#f59e0b',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px'
+                    }}>
+                      {allOk ? '✅ Batch erfolgreich abgeschlossen' : completeFailCount > 0 ? '❌ Batch mit Fehlern' : '⚠️ Batch partiell erfolgreich'}
+                    </h4>
+                    
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginBottom: '15px' }}>
+                      <div style={{ 
+                        background: 'rgba(16, 185, 129, 0.2)', 
+                        padding: '12px', 
+                        borderRadius: '8px',
+                        border: '1px solid rgba(16, 185, 129, 0.3)'
+                      }}>
+                        <div style={{ fontSize: '12px', opacity: 0.85 }}>✅ Vollständig erfolgreich</div>
+                        <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#10b981' }}>{successCount}/{statusArray.length}</div>
+                      </div>
+                      
+                      {partialCount > 0 && (
+                        <div style={{ 
+                          background: 'rgba(255, 193, 7, 0.2)', 
+                          padding: '12px', 
+                          borderRadius: '8px',
+                          border: '1px solid rgba(255, 193, 7, 0.3)'
+                        }}>
+                          <div style={{ fontSize: '12px', opacity: 0.85 }}>⚠️ Partiell erfolgreich</div>
+                          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#f59e0b' }}>{partialCount}</div>
+                        </div>
+                      )}
+                      
+                      {completeFailCount > 0 && (
+                        <div style={{ 
+                          background: 'rgba(239, 68, 68, 0.2)', 
+                          padding: '12px', 
+                          borderRadius: '8px',
+                          border: '1px solid rgba(239, 68, 68, 0.3)'
+                        }}>
+                          <div style={{ fontSize: '12px', opacity: 0.85 }}>❌ Komplett fehlgeschlagen</div>
+                          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ef4444' }}>{completeFailCount}</div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {(partialCount > 0 || completeFailCount > 0) && (
+                      <div style={{
+                        background: 'rgba(0,0,0,0.3)',
+                        padding: '12px',
+                        borderRadius: '8px',
+                        fontSize: '12px',
+                        lineHeight: '1.6'
+                      }}>
+                        <strong style={{ display: 'block', marginBottom: '8px' }}>🔍 Details zu Fehlern:</strong>
+                        {Object.entries(aiCallErrors).map(([productIdStr, errors]) => {
+                          const productId = Number(productIdStr);
+                          const product = products.find(p => p.id === productId);
+                          if (!product) return null;
+                          
+                          const failedRoutes = [];
+                          if (errors.trendPricing) failedRoutes.push(`💰 Trends: ${errors.trendPricing}`);
+                          if (errors.redditSentiment) failedRoutes.push(`💬 Reddit: ${errors.redditSentiment}`);
+                          if (errors.descriptionOptimize) failedRoutes.push(`📝 SEO: ${errors.descriptionOptimize}`);
+                          
+                          if (failedRoutes.length === 0) return null;
+                          
+                          return (
+                            <div key={productId} style={{ marginBottom: '8px', paddingLeft: '12px', borderLeft: '2px solid rgba(239, 68, 68, 0.5)' }}>
+                              <strong>{product.name}:</strong> {failedRoutes.join(' • ')}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()
             )}
 
             {/* Reddit Sentiment Panel */}

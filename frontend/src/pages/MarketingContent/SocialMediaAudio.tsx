@@ -8,6 +8,15 @@ import { ToastContainer } from '../../components/Toast/ToastContainer';
 import './page.css';
 
 type GeneratedScript = {
+  mode?: 'real' | 'fallback';
+  confidence?: number;
+  inputs?: {
+    topic: string;
+    platform: string;
+    tone: string;
+    targetAudience: string;
+    duration: string;
+  };
   script?: string;
   hooks?: string[];
   ctas?: string[];
@@ -38,6 +47,20 @@ const SocialMediaAudio: React.FC = () => {
   const [duration, setDuration] = useState<'short' | 'medium' | 'long'>('medium');
   const [aiLoading, setAiLoading] = useState(false);
   const [generatedScript, setGeneratedScript] = useState<GeneratedScript | null>(null);
+
+  const [scriptMetadata, setScriptMetadata] = useState<{
+    mode: 'real' | 'fallback';
+    confidence: number;
+    dataCompleteness: boolean;
+    inputs?: Record<string, string>;
+  } | null>(null);
+
+  const [audioMetadata, setAudioMetadata] = useState<{
+    mode: 'real' | 'fallback';
+    confidence: number;
+    dataCompleteness: boolean;
+    inputs?: Record<string, string>;
+  } | null>(null);
 
   const apiBase = import.meta.env.VITE_API_URL || '';
 
@@ -98,6 +121,14 @@ const SocialMediaAudio: React.FC = () => {
       const result: GeneratedScript = await response.json();
       setGeneratedScript(result);
 
+      // Extract metadata
+      setScriptMetadata({
+        mode: result.mode || 'fallback',
+        confidence: result.confidence || 60,
+        dataCompleteness: !!result.script && result.mode === 'real',
+        inputs: result.inputs || { topic, platform, tone, targetAudience, duration }
+      });
+
       if (result.script) {
         setAudioText(result.script);
       }
@@ -145,6 +176,14 @@ const SocialMediaAudio: React.FC = () => {
         setGeneratedAudio(data.audio.data); // Base64 data URL
         setAudioDuration(data.audio.duration);
         showToast(`Audio erfolgreich generiert! (${data.audio.duration}s)`, 'success');
+        
+        // Extract metadata
+        setAudioMetadata({
+          mode: data.mode || 'real',
+          confidence: data.confidence || 98,
+          dataCompleteness: !!data.audio && data.mode === 'real',
+          inputs: data.inputs || { audioText: audioText.substring(0, 50) + '...', voice, platform }
+        });
       } else {
         throw new Error(data.error || 'Fehler beim Generieren des Audios');
       }
@@ -173,6 +212,78 @@ const SocialMediaAudio: React.FC = () => {
       </motion.div>
 
       {error && <ErrorMessage message={error} />}
+
+      {/* Data Availability Indicators */}
+      {(scriptMetadata || audioMetadata) && (
+        <div style={{ display: 'grid', gridTemplateColumns: scriptMetadata && audioMetadata ? 'repeat(2, 1fr)' : '1fr', gap: '16px', marginBottom: '20px' }}>
+          {/* Script Metadata */}
+          {scriptMetadata && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              style={{
+                background: scriptMetadata.mode === 'fallback' ? 'linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%)' : 'linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%)',
+                border: `2px solid ${scriptMetadata.mode === 'fallback' ? '#ffc107' : '#17a2b8'}`,
+                borderRadius: '12px',
+                padding: '14px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                <span style={{ fontSize: '18px' }}>{scriptMetadata.mode === 'fallback' ? '⚠️' : '✅'}</span>
+                <div style={{ flex: 1 }}>
+                  <strong style={{ fontSize: '14px', display: 'block' }}>
+                    Script: {scriptMetadata.mode === 'fallback' ? 'Fallback' : 'OpenAI GPT'}
+                  </strong>
+                  <span style={{ fontSize: '12px', opacity: 0.8 }}>
+                    Confidence: {scriptMetadata.confidence}%
+                  </span>
+                </div>
+              </div>
+              {scriptMetadata.inputs && (
+                <div style={{ fontSize: '12px', opacity: 0.9, background: 'rgba(255,255,255,0.5)', padding: '8px', borderRadius: '6px' }}>
+                  <div><strong>Thema:</strong> {scriptMetadata.inputs.topic}</div>
+                  <div><strong>Plattform:</strong> {scriptMetadata.inputs.platform}</div>
+                  <div><strong>Ton:</strong> {scriptMetadata.inputs.tone}</div>
+                  <div><strong>Zielgruppe:</strong> {scriptMetadata.inputs.targetAudience}</div>
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {/* Audio Metadata */}
+          {audioMetadata && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              style={{
+                background: audioMetadata.mode === 'fallback' ? 'linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%)' : 'linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%)',
+                border: `2px solid ${audioMetadata.mode === 'fallback' ? '#ffc107' : '#17a2b8'}`,
+                borderRadius: '12px',
+                padding: '14px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                <span style={{ fontSize: '18px' }}>{audioMetadata.mode === 'fallback' ? '⚠️' : '✅'}</span>
+                <div style={{ flex: 1 }}>
+                  <strong style={{ fontSize: '14px', display: 'block' }}>
+                    Audio: {audioMetadata.mode === 'fallback' ? 'Fallback' : 'OpenAI TTS'}
+                  </strong>
+                  <span style={{ fontSize: '12px', opacity: 0.8 }}>
+                    Confidence: {audioMetadata.confidence}%
+                  </span>
+                </div>
+              </div>
+              {audioMetadata.inputs && (
+                <div style={{ fontSize: '12px', opacity: 0.9, background: 'rgba(255,255,255,0.5)', padding: '8px', borderRadius: '6px' }}>
+                  <div><strong>Text:</strong> {audioMetadata.inputs.audioText}</div>
+                  <div><strong>Stimme:</strong> {audioMetadata.inputs.voice}</div>
+                  <div><strong>Plattform:</strong> {audioMetadata.inputs.platform}</div>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </div>
+      )}
 
       {/* 2x2 Layout: Generatoren oben, Ergebnisse unten */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px', marginTop: '20px' }}>

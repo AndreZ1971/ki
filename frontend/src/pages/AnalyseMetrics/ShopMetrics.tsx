@@ -42,13 +42,7 @@ const ShopMetrics: React.FC = () => {
 
   const fetchMetrics = async () => {
     try {
-      let base = (import.meta.env.VITE_API_URL || "").trim();
-      // Entferne evtl. abschließenden Slash
-      if (base.endsWith("/")) base = base.slice(0, -1);
-      // Wenn leer, nutze nur den relativen Pfad
-      const apiUrl = base
-        ? `${base}/api/analytics/metrics/dashboard`
-        : `/api/analytics/metrics/dashboard`;
+      const apiUrl = `/api/analytics/metrics/dashboard`;
 
 
       const response = await fetch(apiUrl);
@@ -75,11 +69,7 @@ const ShopMetrics: React.FC = () => {
     setMlError(null);
     setMlInsights([]);
     try {
-      let base = (import.meta.env.VITE_API_URL || "").trim();
-      if (base.endsWith("/")) base = base.slice(0, -1);
-      const apiUrl = base
-        ? `${base}/api/analytics/metrics/ml-analysis`
-        : `/api/analytics/metrics/ml-analysis`;
+      const apiUrl = `/api/analytics/metrics/ml-analysis`;
 
       const payload = {
         metrics: metrics || {

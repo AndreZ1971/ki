@@ -109,15 +109,6 @@ export const apiClient = {
 };
 
 /**
- * Build API URL with base from env
- */
-export const buildApiUrl = (path: string): string => {
-  const apiBase = (import.meta.env.VITE_API_URL || '').trim().replace(/\/$/, '');
-  const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  return apiBase ? `${apiBase}${cleanPath}` : cleanPath;
-};
-
-/**
  * Get current language for manual use
  */
 export const getApiLanguage = getCurrentLanguage;

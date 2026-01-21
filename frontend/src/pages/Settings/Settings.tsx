@@ -264,7 +264,7 @@ const Settings = () => {
   const loadLoopSchedules = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/agent/monitoring/schedules`
+        '/api/agent/monitoring/schedules'
       );
       if (!response.ok) throw new Error("Failed to load schedules");
       const data = await response.json();
@@ -290,7 +290,7 @@ const Settings = () => {
     setSavingSchedule(true);
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/agent/monitoring/schedules/${editingLoop}`,
+        `/api/agent/monitoring/schedules/${editingLoop}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -611,7 +611,7 @@ const Settings = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/settings/connection`
+        '/api/settings/connection'
       );
       if (!response.ok) throw new Error("Fehler beim Laden");
       const data = await response.json();
@@ -636,7 +636,7 @@ const Settings = () => {
   const loadPurchasedSpecializations = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/specializations/list`
+        '/api/specializations/list'
       );
       if (!response.ok) return;
       const data = await response.json();
@@ -651,7 +651,7 @@ const Settings = () => {
   const handleSpecializationActivate = async (specId: string) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/specializations/activate`,
+        '/api/specializations/activate',
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -733,8 +733,7 @@ const Settings = () => {
       }
 
       // Upload to backend
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
-      const uploadUrl = `${apiUrl}/api/specializations/upload`;
+      const uploadUrl = '/api/specializations/upload';
 
       const formData = new FormData();
       formData.append("file", file);
@@ -791,7 +790,7 @@ const Settings = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/settings/connection/test`,
+        '/api/settings/connection/test',
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -931,7 +930,7 @@ const Settings = () => {
         },
       };
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/settings/connection`,
+        '/api/settings/connection',
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -3816,7 +3815,7 @@ const Settings = () => {
                     type="button"
                     onClick={() =>
                       window.open(
-                        `${import.meta.env.VITE_API_URL}/api/auth/youtube`,
+                        '/api/auth/youtube',
                         "_blank",
                         "noopener"
                       )

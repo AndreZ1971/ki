@@ -37,11 +37,7 @@ const RealAnalytics = () => {
     setLoading(true);
     setDataError(null);
     try {
-      let base = (import.meta.env.VITE_API_URL || "").trim();
-      if (base.endsWith("/")) base = base.slice(0, -1);
-      const apiUrl = base
-        ? `${base}/api/analytics/real-time/dashboard`
-        : `/api/analytics/real-time/dashboard`;
+      const apiUrl = `/api/analytics/real-time/dashboard`;
       const response = await fetch(apiUrl, {
         method: "GET",
         headers: {
@@ -90,11 +86,7 @@ const RealAnalytics = () => {
     setKiError(null);
     setKiInsights([]);
     try {
-      let base = (import.meta.env.VITE_API_URL || "").trim();
-      if (base.endsWith("/")) base = base.slice(0, -1);
-      const apiUrl = base
-        ? `${base}/api/analytics/ml/generate`
-        : `/api/analytics/ml/generate`;
+      const apiUrl = `/api/analytics/ml/generate`;
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

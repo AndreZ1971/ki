@@ -46,6 +46,15 @@ const FreeToPostConverter: React.FC = () => {
   const [aiCampaign, setAiCampaign] = useState<any>(null);
   const [showAiCampaign, setShowAiCampaign] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+  const [orchestrationStatus, setOrchestrationStatus] = useState<{
+    mode: 'real' | 'fallback';
+    dataCompleteness: boolean;
+    steps: Array<{ name: string; status: 'success' | 'failed' | 'pending'; mode: 'real' | 'fallback' }>;
+  }>({
+    mode: 'real',
+    dataCompleteness: false,
+    steps: []
+  });
   const [_segments, _setSegments] = useState([
     {
       value: "inactive",
@@ -102,13 +111,17 @@ const FreeToPostConverter: React.FC = () => {
 
   React.useEffect(() => {
     const loadMlSegments = async () => {
+      setOrchestrationStatus(prev => ({
+        ...prev,
+        steps: [{ name: 'ML Segments laden', status: 'pending', mode: 'real' }]
+      }));
+
       try {
-        const apiBase = import.meta.env.VITE_API_URL || "http://localhost:3000";
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
         const response = await fetch(
-          `${apiBase}/api/marketing/conversion/analyze-segments-ai`,
+          '/api/marketing/conversion/analyze-segments-ai',
           {
             signal: controller.signal,
           }
@@ -116,13 +129,24 @@ const FreeToPostConverter: React.FC = () => {
         clearTimeout(timeoutId);
 
         const data = await response.json();
-        if (data.success) setMlSegments(data.data.segments);
-      } catch (err) {
-        if (err instanceof Error && err.name === "AbortError") {
-          // Timeout - expected
+        if (data.success) {
+          setMlSegments(data.data.segments);
+          setOrchestrationStatus({
+            mode: 'real',
+            dataCompleteness: true,
+            steps: [{ name: 'ML Segments laden', status: 'success', mode: 'real' }]
+          });
         } else {
-          // Load failed - silent
+          throw new Error('API returned success: false');
         }
+      } catch (err) {
+        console.warn('ML segments loading failed - using fallback', err instanceof Error ? err.message : 'Unknown error');
+        setOrchestrationStatus({
+          mode: 'fallback',
+          dataCompleteness: false,
+          steps: [{ name: 'ML Segments laden', status: 'failed', mode: 'fallback' }]
+        });
+        // Silent fail - empty segments list ist OK
       }
     };
     loadMlSegments();
@@ -135,8 +159,12 @@ const FreeToPostConverter: React.FC = () => {
     }
 
     setAiLoading(true);
+    setOrchestrationStatus(prev => ({
+      ...prev,
+      steps: [...prev.steps, { name: 'AI Kampagne generieren', status: 'pending', mode: 'real' }]
+    }));
+
     try {
-      const apiBase = import.meta.env.VITE_API_URL || "http://localhost:3000";
       // Find the ML segment if user selected from ML segments
       const selectedMlSegment = mlSegments.find(
         (s) => s.segmentId === userSegment
@@ -167,18 +195,36 @@ const FreeToPostConverter: React.FC = () => {
         setAiCampaign(data.data.proposal);
         setShowAiCampaign(true);
         showToast("🤖 KI-Kampagne erfolgreich generiert!", "success");
+        setOrchestrationStatus(prev => ({
+          ...prev,
+          mode: 'real',
+          steps: prev.steps.map(s => s.name === 'AI Kampagne generieren' ? { ...s, status: 'success', mode: 'real' } : s)
+        }));
       } else {
         showToast(
           "KI-Generierung fehlgeschlagen: " +
             (data.error || "Unbekannter Fehler"),
           "error"
         );
+        setOrchestrationStatus(prev => ({
+          ...prev,
+          mode: 'fallback',
+          dataCompleteness: false,
+          steps: prev.steps.map(s => s.name === 'AI Kampagne generieren' ? { ...s, status: 'failed', mode: 'fallback' } : s)
+        }));
       }
     } catch (err) {
       showToast(
         err instanceof Error ? err.message : "KI-Generierung fehlgeschlagen",
         "error"
       );
+      console.error("AI campaign generation failed:", err);
+      setOrchestrationStatus(prev => ({
+        ...prev,
+        mode: 'fallback',
+        dataCompleteness: false,
+        steps: prev.steps.map(s => s.name === 'AI Kampagne generieren' ? { ...s, status: 'failed', mode: 'fallback' } : s)
+      }));
     } finally {
       setAiLoading(false);
     }
@@ -191,15 +237,18 @@ const FreeToPostConverter: React.FC = () => {
     }
     setLoading(true);
     setError(null);
-    try {
-      const apiBase = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    setOrchestrationStatus(prev => ({
+      ...prev,
+      steps: [...prev.steps, { name: 'Kampagne erstellen', status: 'pending', mode: 'real' }]
+    }));
 
+    try {
       // Map segment ID to API enum value
       const mappedSegment = mapSegmentId(userSegment);
       const mappedIncentiveType = mapIncentiveType(incentiveType);
 
       const response = await fetch(
-        `${apiBase}/api/marketing/conversion/create-campaign`,
+        '/api/marketing/conversion/create-campaign',
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -215,6 +264,12 @@ const FreeToPostConverter: React.FC = () => {
         showToast("✅ Kampagne erfolgreich erstellt!", "success");
         setConversionGoal("");
         setShowAiCampaign(false);
+        setOrchestrationStatus(prev => ({
+          ...prev,
+          mode: 'real',
+          dataCompleteness: true,
+          steps: prev.steps.map(s => s.name === 'Kampagne erstellen' ? { ...s, status: 'success', mode: 'real' } : s)
+        }));
       } else {
         throw new Error(data.error || "Campaign creation failed");
       }
@@ -222,6 +277,13 @@ const FreeToPostConverter: React.FC = () => {
       const msg = err instanceof Error ? err.message : "Fehler";
       setError(msg);
       showToast(msg, "error");
+      console.error("Campaign creation failed:", err);
+      setOrchestrationStatus(prev => ({
+        ...prev,
+        mode: 'fallback',
+        dataCompleteness: false,
+        steps: prev.steps.map(s => s.name === 'Kampagne erstellen' ? { ...s, status: 'failed', mode: 'fallback' } : s)
+      }));
     } finally {
       setLoading(false);
     }
@@ -240,6 +302,70 @@ const FreeToPostConverter: React.FC = () => {
         <p>ML & KI-generierte Kampagnen für maximale Conversions</p>
       </motion.div>
       {error && <ErrorMessage message={error} />}
+
+      {/* Orchestration Status Display */}
+      {orchestrationStatus.steps.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{
+            background: orchestrationStatus.mode === 'fallback' ? 'linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%)' : 'linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%)',
+            border: `2px solid ${orchestrationStatus.mode === 'fallback' ? '#ffc107' : '#17a2b8'}`,
+            borderRadius: '12px',
+            padding: '16px',
+            marginBottom: '20px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+            <span style={{ fontSize: '20px' }}>
+              {orchestrationStatus.mode === 'fallback' ? '⚠️' : '✅'}
+            </span>
+            <div>
+              <strong style={{ fontSize: '16px', display: 'block' }}>
+                {orchestrationStatus.mode === 'fallback' ? 'Fallback-Modus' : 'Orchestrierung aktiv'}
+              </strong>
+              <span style={{ fontSize: '13px', opacity: 0.8 }}>
+                {orchestrationStatus.dataCompleteness 
+                  ? 'Alle Schritte erfolgreich' 
+                  : 'Einige Schritte fehlgeschlagen'}
+              </span>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {orchestrationStatus.steps.map((step, idx) => (
+              <div 
+                key={idx}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '8px 12px',
+                  background: 'rgba(255,255,255,0.7)',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                }}
+              >
+                <span style={{ fontSize: '16px' }}>
+                  {step.status === 'success' ? '✅' : step.status === 'failed' ? '❌' : '⏳'}
+                </span>
+                <span style={{ flex: 1 }}>{step.name}</span>
+                <span style={{ 
+                  fontSize: '12px', 
+                  opacity: 0.7,
+                  padding: '2px 8px',
+                  borderRadius: '4px',
+                  background: step.mode === 'fallback' ? '#ffc107' : '#17a2b8',
+                  color: 'white',
+                }}>
+                  {step.mode}
+                </span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
       <div
         style={{
           display: "grid",

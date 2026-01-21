@@ -24,8 +24,14 @@ const StringGenerator: React.FC = () => {
   const [count, setCount] = useState(1);
   const [includeSymbols, setIncludeSymbols] = useState(true);
   const [generatedStrings, setGeneratedStrings] = useState<
-    Array<{ value: string; entropy: number }>
+    Array<{ value: string; entropy: number; source: "crypto" | "fallback" }>
   >([]);
+  const [toolStatus, setToolStatus] = useState({
+    mode: "local" as const,
+    dataCompleteness: 1,
+    confidence: 1,
+    notes: ["entropy=crypto"],
+  });
 
   const stringTypes = [
     { value: "id", label: "Unique ID", icon: "🆔", description: "UUID/GUID" },
@@ -73,9 +79,10 @@ const StringGenerator: React.FC = () => {
   }, [format, includeSymbols, stringType]);
 
   const secureRandomString = (len: number, charset: string) => {
-    if (len <= 0) return "";
-    if (charset.length === 0) return "";
+    if (len <= 0) return { value: "", source: "crypto" as const };
+    if (charset.length === 0) return { value: "", source: "crypto" as const };
     const array = new Uint32Array(len);
+    let source: "crypto" | "fallback" = "crypto";
     if (typeof crypto !== "undefined" && crypto.getRandomValues) {
       crypto.getRandomValues(array);
     } else {
@@ -83,16 +90,17 @@ const StringGenerator: React.FC = () => {
       for (let i = 0; i < len; i++) {
         array[i] = Math.floor(Math.random() * 0xffffffff);
       }
+      source = "fallback";
     }
     let out = "";
     for (let i = 0; i < len; i++) {
       out += charset[array[i] % charset.length];
     }
-    return out;
+    return { value: out, source };
   };
 
   const toUuidLike = (raw: string) => {
-    const padded = (raw + secureRandomString(32, baseCharSet)).slice(0, 32);
+    const padded = (raw + secureRandomString(32, baseCharSet).value).slice(0, 32);
     return `${padded.slice(0, 8)}-${padded.slice(8, 12)}-${padded.slice(12, 16)}-${padded.slice(16, 20)}-${padded.slice(20)}`;
   };
 
@@ -115,11 +123,16 @@ const StringGenerator: React.FC = () => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 120));
 
-      const results: Array<{ value: string; entropy: number }> = [];
+      const results: Array<{ value: string; entropy: number; source: "crypto" | "fallback" }> = [];
       const iterations = Math.min(Math.max(count, 1), 5);
+      let entropyNote: "entropy=crypto" | "entropy=fallback" = "entropy=crypto";
 
       for (let i = 0; i < iterations; i++) {
-        let raw = secureRandomString(len, baseCharSet);
+        const generated = secureRandomString(len, baseCharSet);
+        let raw = generated.value;
+        if (generated.source === "fallback") {
+          entropyNote = "entropy=fallback";
+        }
 
         if (stringType === "id") {
           raw = toUuidLike(raw);
@@ -129,10 +142,16 @@ const StringGenerator: React.FC = () => {
 
         const entropy =
           Math.round(len * Math.log2(baseCharSet.length) * 100) / 100;
-        results.push({ value: raw, entropy });
+        results.push({ value: raw, entropy, source: generated.source });
       }
 
       setGeneratedStrings(results);
+      setToolStatus({
+        mode: "local",
+        dataCompleteness: 1,
+        confidence: 1,
+        notes: [entropyNote],
+      });
       showToast(`${results.length} String(s) generiert`, "success");
     } catch (err) {
       const errorMessage =
@@ -144,9 +163,30 @@ const StringGenerator: React.FC = () => {
     }
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    showToast("In Zwischenablage kopiert!", "success");
+  const copyToClipboard = async (text: string) => {
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        showToast("In Zwischenablage kopiert!", "success");
+        return;
+      }
+    } catch (_err) {
+      // Fallback below
+    }
+
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      showToast("In Zwischenablage kopiert!", "success");
+    } catch (_err) {
+      showToast("Kopieren nicht möglich", "error");
+    }
   };
 
   return (
@@ -161,7 +201,40 @@ const StringGenerator: React.FC = () => {
         transition={{ duration: 0.5 }}
       >
         <h1>{t("ml.stringGenerator.title")}</h1>
-        <p>{t("ml.stringGenerator.title")}</p>
+        <p>{t("ml.stringGenerator.subtitle", "Generate secure local strings")}</p>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        style={{
+          background: "linear-gradient(135deg, rgba(45, 55, 72, 0.6), rgba(26, 32, 44, 0.8))",
+          border: "1px solid rgba(255,255,255,0.08)",
+          borderRadius: "12px",
+          padding: "12px 16px",
+          marginBottom: "16px",
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "8px",
+          color: "white",
+          fontSize: "12px",
+        }}
+      >
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <span>🛠️</span>
+          <div>
+            <div style={{ fontWeight: 700 }}>Mode: {toolStatus.mode}</div>
+            <div style={{ opacity: 0.8 }}>Confidence: {toolStatus.confidence}</div>
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <span>ℹ️</span>
+          <div>
+            <div style={{ fontWeight: 700 }}>Data Completeness: {toolStatus.dataCompleteness}</div>
+            <div style={{ opacity: 0.8 }}>{toolStatus.notes.join(", ")}</div>
+          </div>
+        </div>
       </motion.div>
 
       {error && <ErrorMessage message={error} />}
@@ -400,7 +473,7 @@ const StringGenerator: React.FC = () => {
                         color: "rgba(255,255,255,0.7)",
                       }}
                     >
-                      Entropy: {item.entropy} bits
+                      Entropy: {item.entropy} bits · Source: {item.source}
                     </div>
                     <motion.button
                       onClick={() => copyToClipboard(item.value)}

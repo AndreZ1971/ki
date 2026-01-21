@@ -51,12 +51,8 @@ const TrendAnalysis = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let base = (import.meta.env.VITE_API_URL || "").trim();
-        if (base.endsWith("/")) base = base.slice(0, -1);
         // Zeitraum-Parameter hinzufügen
-        const apiUrl = base
-          ? `${base}/api/analytics/trends/products?range=${timeRange}`
-          : `/api/analytics/trends/products?range=${timeRange}`;
+        const apiUrl = `/api/analytics/trends/products?range=${timeRange}`;
         const res = await fetch(apiUrl);
         if (!res.ok)
           throw new Error(t("pages.analytics_pages.trendAnalysis.errorLoadingData"));
@@ -185,11 +181,7 @@ const TrendAnalysis = () => {
     setSummary(null);
 
     try {
-      let base = (import.meta.env.VITE_API_URL || "").trim();
-      if (base.endsWith("/")) base = base.slice(0, -1);
-      const apiUrl = base
-        ? `${base}/api/analytics/ml/generate`
-        : `/api/analytics/ml/generate`;
+      const apiUrl = `/api/analytics/ml/generate`;
       const res = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

@@ -5,6 +5,7 @@ import { useProductManagement } from '../../hooks/useProductManagement';
 import { useToast } from '../../hooks/useToast';
 import { BackButton, LoadingButton, ErrorMessage } from '../../components/shared';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
+import { AuthGate, type AuthState } from '../../components/AuthGate/AuthGate';
 import './page.css';
 
 type GeneratedPost = {
@@ -87,6 +88,9 @@ const SocialMediaPoster: React.FC = () => {
   const [postStats, setPostStats] = useState({ scheduled: 0, published: 0, engagement: 0 });
   const [aiTransformOnPublish, setAiTransformOnPublish] = useState(true);
   
+  // Auth State Management
+  const [globalAuthState, setGlobalAuthState] = useState<AuthState | null>(null);
+  
   // Integration Options - connected accounts from Settings
   const [connectedAccounts, setConnectedAccounts] = useState({
     linkedin: false,
@@ -130,6 +134,7 @@ const SocialMediaPoster: React.FC = () => {
       .then(res => res.json())
       .then(data => {
         if (data.success) {
+          setGlobalAuthState(data.authState);
           setConnectedAccounts({
             linkedin: data.accounts?.linkedin?.connected || false,
             facebook: data.accounts?.facebook?.connected || false,
@@ -140,7 +145,15 @@ const SocialMediaPoster: React.FC = () => {
           });
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        setGlobalAuthState({
+          available: false,
+          blocked: true,
+          mode: 'error',
+          completeness: 0,
+          message: 'OAuth-Status konnte nicht geladen werden'
+        });
+      });
   }, [apiBase]);
 
   // Sync tile contents whenever new posts are generated
@@ -182,6 +195,9 @@ const SocialMediaPoster: React.FC = () => {
       const data = await response.json();
       if (data.success) {
         setGeneratedPosts(data.posts);
+        if (data.authState) {
+          setGlobalAuthState(data.authState);
+        }
         showToast('Posts erfolgreich generiert!', 'success');
       } else {
         throw new Error(data.error || 'Fehler bei der Generierung');
@@ -316,6 +332,11 @@ const SocialMediaPoster: React.FC = () => {
 
       {error && <ErrorMessage message={error} />}
 
+      <AuthGate 
+        authState={globalAuthState}
+        toolName="Social Media Poster"
+        requiredPlatforms={['LinkedIn', 'Facebook', 'Instagram', 'Twitter', 'TikTok', 'YouTube']}
+      >
       {/* 2-Column Layout: Left = Post-Inhalt, Right = Plattform-Auswahl; Posts unten full-width */}
       <div className="social-poster-input-grid">
         {/* Left: KI Post Generator Briefing */}
@@ -589,6 +610,7 @@ const SocialMediaPoster: React.FC = () => {
           </div>
         </div>
       </motion.div>
+      </AuthGate>
     </div>
   );
 };

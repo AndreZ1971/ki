@@ -89,9 +89,7 @@ const PremiumAudit = () => {
     setMlError(null);
     setMlInsights([]);
     try {
-      let base = (import.meta.env.VITE_API_URL || '').trim();
-      if (base.endsWith('/')) base = base.slice(0, -1);
-      const apiUrl = base ? `${base}/api/audit/premium/ml-analysis` : `/api/audit/premium/ml-analysis`;
+      const apiUrl = `/api/audit/premium/ml-analysis`;
       
       // Nur echte Daten verwenden - keine Mock-Fallbacks
       const payload = {

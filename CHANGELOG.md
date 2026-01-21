@@ -2,6 +2,43 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.0.4] - 2026-01-21
+
+### Frontend API Standardization & Backend Product Type Extension
+
+#### Fixed
+- ✅ Fixed MLDashboard infinite loading state (malformed try/catch/finally)
+- ✅ Fixed SystemHealth.tsx build error (incomplete function removal)
+- ✅ Fixed ProductAnalyzer.tsx ESLint warnings (apiBase dependencies)
+- ✅ Fixed 20+ API calls with hardcoded environment variables
+
+#### Added
+- ✅ Support for 5 WooCommerce product types (simple, virtual, downloadable, variable, bundle)
+- ✅ Extended CreateProductBody interface in product-management.ts
+- ✅ Schema validation for all 5 product types
+- ✅ RELEASE_NOTES_v7.0.4.md with comprehensive documentation
+
+#### Changed
+- 🔄 Removed all `import.meta.env.VITE_API_URL` from frontend (20+ locations)
+- 🔄 Converted to relative API paths `/api/...` across entire frontend
+- 🔄 Standardized API calls in 13 AnalyseMetrics components
+- 🔄 Cleaned 7 dashboard and service components
+- 🔄 Updated all documentation to v7.0.4 versioning (24 files)
+- 🔄 Frontend is now deployment-agnostic
+
+#### Documentation
+- ✅ 24+ documentation files updated to v7.0.4
+- ✅ Added v7.0.4_QUICK_REF.md quick reference guide
+- ✅ RELEASE_NOTES_v7.0.4.md with detailed changelog
+- ✅ All version badges and headers updated consistently
+
+#### Code Quality
+- ✅ Build: SUCCESS (12,843 modules in 16.62s)
+- ✅ Lint: 0 errors, 0 warnings
+- ✅ Bundle: 1,814.40 KiB (optimized)
+
+---
+
 ## [7.0.3] - 2026-01-21
 
 ### Mock Data Removal & Real API Integration

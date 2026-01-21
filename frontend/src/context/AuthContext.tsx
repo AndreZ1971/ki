@@ -50,8 +50,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         controller.abort();
       }, 5000);
 
-      const { buildApiUrl } = await import('../lib/api-client');
-      const response = await fetch(buildApiUrl('/api/auth/me'), {
+      const response = await fetch('/api/auth/me', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -76,8 +75,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const login = async (username: string, password: string) => {
-    const { buildApiUrl } = await import('../lib/api-client');
-    const response = await fetch(buildApiUrl('/api/auth/login'), {
+    const response = await fetch('/api/auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

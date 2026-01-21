@@ -36,7 +36,7 @@ const PaymentUserFavor: React.FC = () => {
 
       if (response.success && response.data) {
         setPreferences(response.data);
-        showToast(`🤖 KI-Analyse abgeschlossen - Confidence: ${Math.round(response.data.confidence * 100)}%`, 'success');
+        showToast(`✅ Kundenpreferenzen analysiert - Zuverlässigkeit: ${Math.round(response.data.confidence * 100)}%`, 'success');
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Analysefehler');
@@ -58,8 +58,8 @@ const PaymentUserFavor: React.FC = () => {
       <ToastContainer toasts={toasts} onRemove={(_id) => {}} />
 
       <motion.div className="page-header" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <h1>🤖 Payment User Favor (KI-Powered)</h1>
-        <p>GPT-4o-mini gestützte Personalisierung für optimale Conversion</p>
+        <h1>📊 Payment User Favor</h1>
+        <p>Heuristische Kundenanalyse basierend auf WooCommerce Kaufverlauf</p>
       </motion.div>
 
       {/* Datenschutz-Hinweis */}
@@ -80,20 +80,19 @@ const PaymentUserFavor: React.FC = () => {
         <div style={{ fontSize: '24px' }}>🔒</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: '13px', fontWeight: '600', color: '#ff9500', marginBottom: '4px' }}>
-            Datenschutz-Hinweis
+            Datenverarbeitung
           </div>
           <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)', lineHeight: '1.5' }}>
-            KI-Analyse erfolgt in Echtzeit via GPT-4o-mini. Keine dauerhafte Speicherung von Kundendaten. 
-            Analysedaten werden nur temporär im RAM verarbeitet (max. 5000 Events). 
-            OpenAI-API verarbeitet Daten gemäß deren Datenschutzrichtlinien (30-Tage-Retention). 
-            Bei Server-Neustart werden alle Daten automatisch gelöscht.
+            Analyse nutzt heuristische Algorithmen basierend auf WooCommerce-Kaufdaten (keine LLM-Modelle). 
+            Daten werden nur während der Analyse im RAM verarbeitet. 
+            Keine dauerhaften Kundenprofile. Kundendaten bleiben in WooCommerce und werden nicht extern übertragen.
           </div>
         </div>
       </motion.div>
 
       {error && <ErrorMessage message={error} />}
 
-      {/* KI Confidence & Metadata */}
+      {/* Analyseergebnis & Zuverlässigkeit */}
       {preferences && (
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
@@ -111,7 +110,7 @@ const PaymentUserFavor: React.FC = () => {
           }}
         >
           <div>
-            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', marginBottom: '5px' }}>🤖 KI Confidence</div>
+            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', marginBottom: '5px' }}>📈 Analyse-Zuverlässigkeit</div>
             <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#007aff' }}>
               {Math.round(preferences.confidence * 100)}%
             </div>
@@ -165,7 +164,7 @@ const PaymentUserFavor: React.FC = () => {
 
           <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '8px', padding: '15px', marginTop: '15px' }}>
             <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', marginBottom: '8px' }}>
-              🤖 <strong>KI analysiert:</strong>
+              📊 <strong>Analyse umfasst:</strong>
             </div>
             <ul style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', margin: 0, paddingLeft: '20px', lineHeight: '1.6' }}>
               <li>Bevorzugte Zahlungsmethoden</li>
@@ -178,8 +177,8 @@ const PaymentUserFavor: React.FC = () => {
           </div>
 
           <div style={{ marginTop: '20px' }}>
-            <LoadingButton onClick={handleAnalyze} loading={loading} loadingText="🤖 KI analysiert...">
-              🤖 KI-Analyse starten
+            <LoadingButton onClick={handleAnalyze} loading={loading} loadingText="📊 Analysiere...">
+              📊 Kundenanalyse starten
             </LoadingButton>
           </div>
         </motion.div>
@@ -352,7 +351,7 @@ const PaymentUserFavor: React.FC = () => {
             }}>
               <div style={{ fontSize: '48px', marginBottom: '16px' }}>❤️</div>
               <div style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px' }}>Keine Präferenzen geladen</div>
-              <p style={{ fontSize: '13px', margin: 0 }}>Starte KI-Analyse für personalisierte Insights</p>
+              <p style={{ fontSize: '13px', margin: 0 }}>Starte Kundenanalyse für Personalisierungsoptionen</p>
             </div>
           )}
         </motion.div>

@@ -47,11 +47,7 @@ const AnalyticRegioning = () => {
     const fetchRegionData = async () => {
       setLoading(true);
       try {
-        let base = (import.meta.env.VITE_API_URL || "").trim();
-        if (base.endsWith("/")) base = base.slice(0, -1);
-        const apiUrl = base
-          ? `${base}/api/analytics/regioning/data?region=${selectedRegion}`
-          : `/api/analytics/regioning/data?region=${selectedRegion}`;
+        const apiUrl = `/api/analytics/regioning/data?region=${selectedRegion}`;
         const res = await fetch(apiUrl);
         if (!res.ok) throw new Error("Fehler beim Laden der Regions-Daten");
         const data = await res.json();
@@ -81,11 +77,7 @@ const AnalyticRegioning = () => {
     setMlError(null);
     setMlInsights([]);
     try {
-      let base = (import.meta.env.VITE_API_URL || "").trim();
-      if (base.endsWith("/")) base = base.slice(0, -1);
-      const apiUrl = base
-        ? `${base}/api/analytics/regioning/ml-analysis`
-        : `/api/analytics/regioning/ml-analysis`;
+      const apiUrl = `/api/analytics/regioning/ml-analysis`;
       const res = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

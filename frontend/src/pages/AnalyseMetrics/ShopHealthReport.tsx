@@ -279,11 +279,7 @@ const ShopHealthReport = () => {
     setMlError(null);
     setMlInsights([]);
     try {
-      let base = (import.meta.env.VITE_API_URL || "").trim();
-      if (base.endsWith("/")) base = base.slice(0, -1);
-      const apiUrl = base
-        ? `${base}/api/health/ml-analysis`
-        : `/api/health/ml-analysis`;
+      const apiUrl = `/api/health/ml-analysis`;
 
       const payload = {
         healthData: healthData || {
