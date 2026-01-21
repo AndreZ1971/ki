@@ -76,48 +76,54 @@
 
 ```yaml
 # Zeitablauf beim Container-Start
-1. Kubernetes setzt Environment Variables
-   - SHOP_URL: "https://kunden-shop.de"
-   - CONTAINER_ID: "abc123xyz"
-   - MODE: "normal|repair|update"
-
-2. Container startet (Dockerfile ENTRYPOINT)
+1. Container startet (Dockerfile ENTRYPOINT)
    - Base-Services starten (Nginx, Node.js, Fastify)
    - connection.json wird geprüft
+   ⚠️ WICHTIG: Shop-URL kommt NICHT von Kubernetes Environment!
+      → Shop-URL wird während Onboarding vom Kunden eingegeben
+      → Sie wird in connection.json persistent gespeichert
 
-3. Je nach MODE:
-   - MODE=normal: Leere connection.json mit Platzhaltern
-   - MODE=repair: Prüft ob alte connection.json existiert
-   - MODE=update: Prüft ob alte connection.json existiert
+2. Je nach Zustand von connection.json:
+   - connection.json LEER: Frontend zeigt Onboarding-Wizard
+   - connection.json GEFÜLLT: Frontend zeigt Dashboard
+   - connection.json BESCHÄDIGT: Error-Screen mit Repair-Option
 
-4. Frontend wird ausgeliefert
-   - Kunde sieht Onboarding (wenn connection.json leer)
-   - Oder Dashboard (wenn connection.json gefüllt)
+3. Frontend wird ausgeliefert
+   - UI lädt automatisch
+   - Kunde sieht Onboarding oder Dashboard (abhängig von connection.json)
 
-5. Health Checks starten
+4. Health Checks starten
    - Container antwortet auf /health (Liveness)
    - Container antwortet auf /ready (Readiness)
+   - Prüfung: Ist connection.json vorhanden? (für Readiness)
 ```
 
-#### 2. **Connection.json Format**
+#### 2. **Connection.json Format (After Onboarding)**
 
 **Pfad:** `backend/connection.json`
+
+**Nach erfolgreicher Onboarding ist die Datei gefüllt:**
 
 ```json
 {
   "woocommerce": {
-    "shop_url": "https://kunden-shop.de",
-    "consumer_key": "[PLACEHOLDER_UNTIL_ONBOARDED]",
-    "consumer_secret": "[PLACEHOLDER_UNTIL_ONBOARDED]",
-    "validated": false,
-    "connected_at": null
+    "url": "https://kunden-shop.de",
+    "consumerKey": "ck_abc123xyz",
+    "consumerSecret": "cs_def456uvw",
+    "validated": true,
+    "connected_at": "2026-01-05T10:30:00Z"
   },
-  "openai": {
-    "api_key": "[PLACEHOLDER_UNTIL_ONBOARDED]",
+  "openAI": {
+    "apiKey": "sk-proj-abc123xyz",
     "model": "gpt-4o-mini",
     "organization": null,
-    "validated": false,
-    "connected_at": null
+    "validated": true,
+    "connected_at": "2026-01-05T10:35:00Z"
+  },
+  "wordpress": {
+    "url": "https://kunden-shop.de",
+    "username": "admin",
+    "appPassword": "xxxx xxxx xxxx xxxx"
   },
   "subscription": {
     "customer_id": "AUTOMATTIC_CUSTOMER_ID",
@@ -130,13 +136,16 @@
     "available": []
   },
   "created_at": "2026-01-05T10:30:00Z",
-  "last_updated": "2026-01-05T10:30:00Z"
+  "last_updated": "2026-01-05T10:35:00Z"
 }
 ```
 
-**Wichtig:** 
-- `subscription` Teil wird von **Automattic mitgeliefert**
-- Kunde füllt `woocommerce` + `openai` über Onboarding
+**Wichtig (Single Source of Truth):** 
+- `woocommerce.url` = die einzige Stelle, wo die Shop-URL gespeichert ist
+- Alle Services (Backend, Frontend, Tools) lesen von hier
+- Keine Umgebungsvariablen für Shop-URL
+- `subscription` Teil wird von Automattic beim Deployment mitgeliefert
+- Kunde füllt `woocommerce` + `openai` + `wordpress` über Onboarding
 - `specializations` wird später von Kunde verwaltet
 
 #### 3. **Erforderliche Dateien im Container**
@@ -165,34 +174,35 @@
      "event": "subscription.created",
      "customer_id": "cust_12345",
      "subscription_id": "sub_67890",
-     "shop_url": "https://mein-shop.de",
      "active_until": "2026-02-05",
      "container_version": "v7.0.5"
    }
+   ⚠️ WICHTIG: shop_url wird NICHT hier übergeben!
+      → Shop-URL kommt später vom Kunden im Onboarding
    ↓
 3. Kubernetes erstellt:
-   - ConfigMap (mit shop_url, subscription_id, etc.)
+   - ConfigMap (mit subscription_id, etc. - OHNE shop_url)
    - Deployment (mit A.R.I. Container Image)
    - Service (Ingress für externe Erreichbarkeit)
    ↓
 4. Container startet
-   - Liest Environment Variables von ConfigMap
-   - Erstellt connection.json mit Platzhaltern
-   - Schreibt Subscription-Info in connection.json (von ConfigMap)
+   - Erstellt leere connection.json (nur mit Subscription-Info)
+   - Wartet auf Kunde
    ↓
 5. Frontend lädt
    - Kunde sieht: "Willkommen! Schritt 1: WooCommerce verbinden"
    - Das ist das integrierte Onboarding (Onboarding.md delivered)
-   - **Legacy Login Fallback:** ARI#2026!Secure (für Notfälle/Debugging)
    ↓
-6. Kunde gibt Daten ein
+6. Kunde gibt Daten ein (im Onboarding)
+   - **Shop-URL eingeben** (z.B. https://mein-shop.de)
    - WooCommerce API Keys
    - OpenAI API Key
    - Optional: Spezialisierung hochladen
    ↓
-7. Connection.json wird gefüllt
+7. Connection.json wird befüllt
    - Frontend sendet Daten via POST /api/config/save
    - Backend speichert in connection.json
+   - ALLE Daten stammen vom Kunden, NICHTS von Kubernetes
    ↓
 8. Container ist READY
    - Health Checks green ✅
