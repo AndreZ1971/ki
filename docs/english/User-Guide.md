@@ -1,4 +1,44 @@
-# A.R.I. User Guide v7.0.3 (January 2026)
+# A.R.I. User Guide
+
+## ⚠️ Notice About Shop Metrics and Mock Data
+
+**Important:** The revenue charts in Shop Metrics currently use **intentional mock data** instead of live WooCommerce data.
+
+### Why Mock Data?
+
+These visualizations serve as a **vision and roadmap** for A.R.I.'s future development:
+
+- 📊 **Concept Demonstration**: Shows what comprehensive revenue analytics will look like
+- 🎯 **Feature Roadmap**: Illustrates planned analytics capabilities
+- 💡 **User Experience Preview**: Gives users a preview of upcoming dashboards
+- 🔮 **Development Goal**: Symbolizes the intended data integration
+
+### What is Affected?
+
+- **Only** the revenue chart in the dashboard
+
+Everything else uses live data.
+
+### Real Data vs. Mock Data
+
+✅ **Real WooCommerce Data is used for:**
+- Product listings and inventory
+- Order history (Analytics Insights Loop)
+- Categories and attributes
+- Customer data
+
+⚠️ **Mock Data is used for:**
+- Revenue chart in the dashboard
+
+### Future Development
+
+These mock visualizations will be gradually replaced with real WooCommerce data integration once:
+1. WooCommerce Analytics API is fully integrated
+2. Performance optimizations for large datasets are implemented
+3. Caching mechanisms for real-time metrics are available
+
+---
+ v7.0.3 (January 2026)
 
 **Status:** Production Ready with advanced trend analysis and price optimization
 

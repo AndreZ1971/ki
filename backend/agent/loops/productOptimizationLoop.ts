@@ -35,7 +35,7 @@ export class ProductOptimizationLoop extends AgenticLoop {
   private results: OptimizationResult[] = [];
 
   constructor() {
-    super('product-optimization', 5);
+    super('product-performance', 5);
 
 
     const config = getConfig();
@@ -171,12 +171,12 @@ export class ProductOptimizationLoop extends AgenticLoop {
       },
     });
 
-    // LEARN: Speichere beste Varianten
+    // LEARN: Speichere beste Varianten (Analysis & Recommendations, keine Execution)
     this.addStep({
       name: 'learn',
-      description: 'Apply winning variants',
+      description: 'Identify and recommend winning variants (analysis only)',
       action: async () => {
-        logger.info('📚 LEARN: Applying winning variants...');
+        logger.info('📚 LEARN: Identifying winning variants for recommendations...');
 
         const winners = this.results.filter(
           (r) => r.winner === 'B' && r.improvement > 5
@@ -185,16 +185,17 @@ export class ProductOptimizationLoop extends AgenticLoop {
         for (const result of winners) {
           const variant = result.variant;
           logger.info(
-            `✨ Applying ${variant.attribute} optimization for product ${variant.productId}` +
-              ` (+${result.improvement}% improvement)`
+            `✨ Recommending ${variant.attribute} optimization for product ${variant.productId}` +
+              ` (Expected: +${result.improvement}% improvement)`
           );
 
-          // In Real World: würde hier Update an WooCommerce geschehen
+          // NOTE: This loop provides recommendations only - shop changes must be applied manually
+          // In production, this would integrate with a change management system for approval
           // await this.wooCommerce.put(`products/${variant.productId}`, updateData);
         }
 
         return {
-          winnersApplied: winners.length,
+          winnersIdentified: winners.length,
           avgImprovement: (
             winners.reduce((sum, w) => sum + w.improvement, 0) / winners.length
           ).toFixed(2),
@@ -244,6 +245,9 @@ export class ProductOptimizationLoop extends AgenticLoop {
           attribute: w.variant.attribute,
           improvement: `${w.improvement}%`,
         })),
+      // Transparenz: Loop führt keine Änderungen aus, nur Analyse & Empfehlungen
+      executed: false,
+      mode: 'analysis',
     };
   }
 }

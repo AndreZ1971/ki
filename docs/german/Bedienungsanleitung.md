@@ -1,4 +1,44 @@
-# A.R.I. Bedienungsanleitung v7.0.3 (Januar 2026)
+# A.R.I. Bedienungsanleitung
+
+## ⚠️ Hinweis zu Shop-Metriken und Mock-Daten
+
+**Wichtig:** Die Umsatzkurven in den Shop-Metriken verwenden derzeit **absichtlich Mock-Daten** anstelle von Live-WooCommerce-Daten.
+
+### Warum Mock-Daten?
+
+Diese Visualisierungen dienen als **Vision und Richtungsweiser** für die zukünftige Entwicklung von A.R.I.:
+
+- 📊 **Konzept-Demonstration**: Zeigt, wie umfassende Umsatzanalysen aussehen werden
+- 🎯 **Feature-Roadmap**: Verdeutlicht geplante Analytics-Funktionen
+- 💡 **User Experience Preview**: Gibt Nutzern einen Vorgeschmack auf kommende Dashboards
+- 🔮 **Entwicklungsziel**: Symbolisiert die angestrebte Datenintegration
+
+### Was ist betroffen?
+
+- **Nur** die Umsatzkurve im Dashboard (Revenue Chart)
+
+Alles andere nutzt Live-Daten.
+
+### Echte Daten vs. Mock-Daten
+
+✅ **Echte WooCommerce-Daten werden verwendet für:**
+- Produktlisten und Inventar
+- Bestellhistorie (Analytics Insights Loop)
+- Kategorien und Attribute
+- Kundendaten
+
+⚠️ **Mock-Daten werden verwendet für:**
+- Umsatzkurve im Dashboard
+
+### Zukünftige Entwicklung
+
+Diese Mock-Visualisierungen werden schrittweise durch echte WooCommerce-Datenintegration ersetzt, sobald:
+1. WooCommerce Analytics API vollständig integriert ist
+2. Performance-Optimierungen für große Datensätze implementiert sind
+3. Caching-Mechanismen für Echtzeit-Metriken verfügbar sind
+
+---
+ v7.0.3 (Januar 2026)
 
 **Status:** Production Ready mit erweiterten Trend-Analysen und Preisoptimierungen
 

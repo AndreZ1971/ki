@@ -370,6 +370,19 @@ export class PersistentMemory {
       return [];
     }
   }
+
+  /**
+   * Get persistence mode information
+   */
+  getPersistenceInfo() {
+    return {
+      database: false,
+      mode: 'in-memory',
+      storage: 'In-Memory Session Storage',
+      retention: 'Session duration (max 1000 learning records)',
+      note: 'No database configured - all learnings stored in application memory between restarts',
+    };
+  }
 }
 
 // Export singleton wenn DB verfügbar

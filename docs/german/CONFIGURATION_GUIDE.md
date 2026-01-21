@@ -2,7 +2,7 @@
 
 ## � Authentifizierung & Datenzugriff
 
-### Aktuelle Implementierung (v7.0.4)
+### Aktuelle Implementierung (v7.0.5)
 
 **Authentifizierung:**
 - Temporäre In-Memory-Authentifizierung via ENV-Variablen

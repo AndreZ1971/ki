@@ -4,7 +4,7 @@
 
 ## 📋 Übersicht
 
-Diese Roadmap definiert die strategischen Updates für **A.R.I.** nach dem erfolgreichen **v7.0.3 Release**.  
+Diese Roadmap definiert die strategischen Updates für **A.R.I.** nach dem erfolgreichen **v7.0.5 Release**.  
 Der Fokus liegt auf **Verfeinerung bestehender Features**, **Erweiterung der KI-Fähigkeiten**, **YouTube Video Upload** und **Internationalisierung**.
 
 ---

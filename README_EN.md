@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-7.0.4-blue.svg)
+![Version](https://img.shields.io/badge/version-7.0.5-blue.svg)
 ![Tests](https://img.shields.io/badge/tests-350%2F350-success.svg)
 ![ML Integration](https://img.shields.io/badge/ML%20Integration-100%25-green.svg)
 ![Design System](https://img.shields.io/badge/Design_Tokens-100%25-purple.svg)
@@ -90,10 +90,10 @@ Your shop is on Facebook, Instagram, LinkedIn, TikTok, email. A.R.I. posts smart
 - ✅ Real-time analytics with real recommendations
 - ✅ Email automation (carts, welcome series, reactivation)
 - ✅ Social media posts (6 platforms)
-- ✅ **NEW v6.9.0:** Global Design Token System with Dark Mode
-- ✅ **NEW v6.9.0:** 8-language support (DE, EN, FR, ES, IT, PT, NL, PL)
-- ✅ **NEW v6.9.0:** Fully dark chatbot design with perfect readability
-- ✅ **NEW v6.9.0:** Specialization-aware AI personalization
+- ✅ **NEW v7.0.5:** Global Design Token System with Dark Mode
+- ✅ **NEW v7.0.5:** 8-language support (DE, EN, FR, ES, IT, PT, NL, PL)
+- ✅ **NEW v7.0.5:** Fully dark chatbot design with perfect readability
+- ✅ **NEW v7.0.5:** Specialization-aware AI personalization
 - ✅ Multi-source trend analysis (Google Trends + Reddit OAuth)
 - ✅ Percentage-based price suggestions with intelligent fallback logic
 - ✅ Manual validation of AI suggestions before adoption
@@ -157,16 +157,16 @@ Your shop is on Facebook, Instagram, LinkedIn, TikTok, email. A.R.I. posts smart
 - ✅ Real-time analytics with authentic WooCommerce data (no mock data)
 - ✅ Email automation (carts, welcome series, reactivation)
 - ✅ Social media posts (6 platforms)
-- ✅ **NEW v6.9.0:** Global design token system with dark mode
-- ✅ **NEW v6.9.0:** 8-language support (DE, EN, FR, ES, IT, PT, NL, PL)
-- ✅ **NEW v6.9.0:** Fully dark chatbot design with perfect readability
-- ✅ **NEW v6.9.0:** Specialization-aware AI personalization
+- ✅ **NEW v7.0.5:** Global design token system with dark mode
+- ✅ **NEW v7.0.5:** 8-language support (DE, EN, FR, ES, IT, PT, NL, PL)
+- ✅ **NEW v7.0.5:** Fully dark chatbot design with perfect readability
+- ✅ **NEW v7.0.5:** Specialization-aware AI personalization
 - ✅ Multi-source trend analysis (Google Trends + Reddit OAuth)
 - ✅ Percentage-based price suggestions with deterministic calculation
 - ✅ Manual validation of AI suggestions before adoption
-- ✅ **NEW v6.9.1:** Complete WooCommerce integration without placeholders
-- ✅ **NEW v6.9.1:** Support tickets with HTML sanitization
-- ✅ **NEW v6.9.1:** Product idea scoring without random values
+- ✅ **NEW v7.0.5:** Complete WooCommerce integration without placeholders
+- ✅ **NEW v7.0.5:** Support tickets with HTML sanitization
+- ✅ **NEW v7.0.5:** Product idea scoring without random values
 | 🚀 **Scaling** | You can scale – without hiring more people |
 
 ### Concretely Implemented Through:

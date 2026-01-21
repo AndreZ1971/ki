@@ -167,7 +167,7 @@
      "subscription_id": "sub_67890",
      "shop_url": "https://mein-shop.de",
      "active_until": "2026-02-05",
-     "container_version": "v6.0.0"
+     "container_version": "v7.0.5"
    }
    ↓
 3. Kubernetes erstellt:
@@ -242,19 +242,19 @@ SZENARIO: Container crashed, ist unerreichbar, Malware, etc.
 ### Update-Fall: Neue Version verfügbar
 
 ```
-SZENARIO: A.R.I. v6.0.1 ist verfügbar (bessere Tools, Bugfixes)
+SZENARIO: A.R.I. v7.0.5 ist verfügbar (bessere Tools, Bugfixes)
 
 1. A.R.I. Team gibt neue Container-Version frei
-   - Image: ari:v6.0.1
+   - Image: ari:v7.0.5
    - Alle Sicherheits-Patches enthalten
    - Keine technischen Schulden angehäuft
    ↓
 2. Automattic rollt aus (Kubernetes Rolling Update)
    - Strategy: Blue-Green oder RollingUpdate (egal, wir haben connection.json!)
    ↓
-3. Neuer Container (v6.0.1) startet mit:
+3. Neuer Container (v7.0.5) startet mit:
    - Mode: update
-   - Alte connection.json (v6.0.0 Container) als Input
+   - Alte connection.json (v7.0.4 Container) als Input
    ↓
 4. Container prüft auf Startup:
    - Liegt connection.json vor?
@@ -292,7 +292,7 @@ spec:
     spec:
       containers:
       - name: ari
-        image: ari:v6.0.0
+        image: ari:v7.0.5
         ports:
         - containerPort: 3000
         
@@ -396,17 +396,17 @@ app.get('/ready', (req, res) => {
 #### Normal: Deployment with New Version
 
 ```yaml
-# ALT (v6.0.0)
+# ALT (v7.0.4)
 services:
   app:
-    image: ari:v6.0.0
+    image: ari:v7.0.4
     container_name: woo-app-prod
     # ...
 
-# NEU (v6.0.1) - nur 1 Zeile geändert!
+# NEU (v7.0.5) - nur 1 Zeile geändert!
 services:
   app:
-    image: ari:v6.0.1      # ← NUR DIESE ZEILE
+    image: ari:v7.0.5      # ← NUR DIESE ZEILE
     container_name: woo-app-prod
     # ...
 ```
@@ -459,7 +459,7 @@ Payload:
   "shop_url": "https://customer-shop.de",
   "shop_name": "Mein Shop",
   "active_until": "2026-02-05",
-  "container_version": "v6.0.0",
+  "container_version": "v7.0.5",
   "container_config": {
     "replicas": 1,
     "resources": {
@@ -472,7 +472,7 @@ Payload:
 Aktion:
 → Erstelle Kubernetes Namespace: cust-xyz-prod
 → Erstelle ConfigMap mit subscription-info
-→ Starte Deployment mit A.R.I. Image v6.0.0
+→ Starte Deployment mit A.R.I. Image v7.0.5
 ```
 
 #### 2. **Kubernetes ConfigMap Template**

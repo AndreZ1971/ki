@@ -85,26 +85,11 @@ const AIDashboard: React.FC = () => {
           if (realData.data.salesData || realData.data.chartData) {
             setChartData(realData.data.salesData || realData.data.chartData);
           } else {
-            setChartData([
-              { day: "Mo", sales: 1200 },
-              { day: "Di", sales: 1900 },
-              { day: "Mi", sales: 1500 },
-              { day: "Do", sales: 2100 },
-              { day: "Fr", sales: 1800 },
-              { day: "Sa", sales: 2400 },
-              { day: "So", sales: 1700 },
-            ]);
+            // Keine Mock-Daten mehr anzeigen, wenn keine echten Sales-Daten vorhanden sind
+            setChartData([]);
           }
         } else {
-          setChartData([
-            { day: "Mo", sales: 1200 },
-            { day: "Di", sales: 1900 },
-            { day: "Mi", sales: 1500 },
-            { day: "Do", sales: 2100 },
-            { day: "Fr", sales: 1800 },
-            { day: "Sa", sales: 2400 },
-            { day: "So", sales: 1700 },
-          ]);
+          setChartData([]);
         }
       } catch (_err) {
 
@@ -112,15 +97,7 @@ const AIDashboard: React.FC = () => {
         if (isInitialLoad) {
           setError("Konnte Shop-Daten nicht laden. Bitte API überprüfen.");
         }
-        setChartData([
-          { day: "Mo", sales: 1200 },
-          { day: "Di", sales: 1900 },
-          { day: "Mi", sales: 1500 },
-          { day: "Do", sales: 2100 },
-          { day: "Fr", sales: 1800 },
-          { day: "Sa", sales: 2400 },
-          { day: "So", sales: 1700 },
-        ]);
+        setChartData([]);
       } finally {
         if (isInitialLoad) {
           setLoading(false);
@@ -973,34 +950,48 @@ const AIDashboard: React.FC = () => {
       {/* INTERACTIVE CHART */}
       <motion.div className="glass-card">
         <h2 style={{ color: "white", marginBottom: "20px" }}>
-          {t("chart.salesTitle")}{" "}
-          {chartData.some((item) => item.sales > 0) ? "" : t("chart.demo")}
+          {t("chart.salesTitle")}
         </h2>
         <div className="chart-container">
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={chartData}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="rgba(255,255,255,0.1)"
-              />
-              <XAxis dataKey="day" stroke="rgba(255,255,255,0.6)" />
-              <YAxis stroke="rgba(255,255,255,0.6)" />
-              <Tooltip
-                contentStyle={{
-                  background: "rgba(0,0,0,0.8)",
-                  border: "none",
-                  borderRadius: "10px",
-                  color: "white",
-                }}
-              />
-              <Line
-                type="monotone"
-                dataKey="sales"
-                stroke="#8884d8"
-                strokeWidth={3}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          {chartData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={chartData}>
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="rgba(255,255,255,0.1)"
+                />
+                <XAxis dataKey="day" stroke="rgba(255,255,255,0.6)" />
+                <YAxis stroke="rgba(255,255,255,0.6)" />
+                <Tooltip
+                  contentStyle={{
+                    background: "rgba(0,0,0,0.8)",
+                    border: "none",
+                    borderRadius: "10px",
+                    color: "white",
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="sales"
+                  stroke="#8884d8"
+                  strokeWidth={3}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div
+              style={{
+                height: 300,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "rgba(255,255,255,0.7)",
+                fontWeight: 600,
+              }}
+            >
+              Keine Umsatzdaten verfügbar (Live-Daten)
+            </div>
+          )}
         </div>
       </motion.div>
 

@@ -121,8 +121,6 @@ const StringGenerator: React.FC = () => {
     setError(null);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 120));
-
       const results: Array<{ value: string; entropy: number; source: "crypto" | "fallback" }> = [];
       const iterations = Math.min(Math.max(count, 1), 5);
       let entropyNote: "entropy=crypto" | "entropy=fallback" = "entropy=crypto";

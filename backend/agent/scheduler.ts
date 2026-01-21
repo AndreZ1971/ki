@@ -179,7 +179,7 @@ export class LoopScheduler {
       case 'anomaly-detection':
         loop = new AnomalyDetectionLoop();
         break;
-      case 'product-optimization':
+      case 'product-performance':
         loop = new ProductOptimizationLoop();
         break;
       case 'payment-recovery':

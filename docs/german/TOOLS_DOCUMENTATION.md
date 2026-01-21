@@ -21,7 +21,7 @@
 
 ---
 
-## 🆕 Januar 2026 Updates (v6.9.1)
+## 🆕 Januar 2026 Updates (v7.0.5)
 
 ### ✅ Entfernung aller Mock-Daten
 **Implementierung**: Alle Routen nutzen echte WooCommerce/OpenAI-Daten  
@@ -293,7 +293,7 @@ const aggregatedScore =
   - `GET /api/products/adviser/analyze/:id` (Produkt-Details)
 - **UI**: Prozentuale Input-Felder, Live-Preisvorschau, Dark Glass Theme
 
-**Implementation** (neu in v6.3):
+**Implementation** (neu in v7.0.5):
 - Prozentuale Limits mit dynamischem Fallback
 - Multi-Source Aggregation (Google + Reddit + Wiki + News)
 - Manual Override vor Speicherung
@@ -309,7 +309,7 @@ const aggregatedScore =
 ### Analytics (13/13 Tools)
 
 #### 🔄 **Trend Analysis** (Multi-Source)
-**Neue Features v6.3**:
+**Neue Features v7.0.5**:
 - Google Trends mit 7-Tage-Durchschnitt
 - Reddit OAuth mit Upvote-Gewichtung
 - Confidence % basierend auf Quellen-Verfügbarkeit

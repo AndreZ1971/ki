@@ -86,8 +86,8 @@ const KiteTemplates: React.FC = () => {
         setEngagementScore(data.prediction.engagementScore);
         setEngagementConfidence(data.prediction.confidence);
       }
-        } catch {
-      // Prediction failed - silent
+    } catch {
+      showToast('Engagement-Vorhersage fehlgeschlagen', 'error');
     }
   };
 
@@ -103,8 +103,8 @@ const KiteTemplates: React.FC = () => {
       if (data.success && data.forecast) {
         setPerformanceForecast(data.forecast);
       }
-        } catch {
-      // Prediction failed - silent
+    } catch {
+      showToast('Performance-Vorhersage fehlgeschlagen', 'error');
     }
   };
 

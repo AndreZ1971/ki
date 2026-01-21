@@ -373,6 +373,19 @@ export class ExecutionLogger {
       return [];
     }
   }
+
+  /**
+   * Get persistence mode information
+   */
+  getPersistenceInfo() {
+    return {
+      database: false,
+      mode: 'in-memory',
+      storage: 'In-Memory Session Storage',
+      retention: 'Session duration (max 500 execution records)',
+      note: 'No database configured - all executions stored in application memory',
+    };
+  }
 }
 
 // Export singleton

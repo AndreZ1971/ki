@@ -235,7 +235,6 @@ export default app;`;
     setError(null);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 600));
       const code = buildTemplate(framework, projectName, features);
       setGeneratedCode(code);
       showToast('Framework-Code generiert', 'success');

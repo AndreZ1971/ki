@@ -4,6 +4,7 @@ import { useProductManagement } from '../../hooks/useProductManagement';
 import { ToastContainer } from '../../components/Toast/ToastContainer';
 import { ProductAnalysis } from '../app/ProductAnalysis';
 import { apiClient } from '../../lib/api-client';
+import { TransparencyBadge } from '../../components/TransparencyBadges/TransparencyBadge';
 import './page.css';
 import '../shared-analytics.css';
 
@@ -444,6 +445,16 @@ const ProductAnalyzer: React.FC = () => {
               {analysis && (
                 <div style={{ background: 'rgb(55, 60, 85)', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: 12, padding: 16, maxHeight: '320px', overflowY: 'auto' }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: '#f5f7ff', marginBottom: 8 }}>Analyse-Ergebnis</div>
+                  
+                  {/* Transparency Badge */}
+                  <TransparencyBadge 
+                    info={{
+                      mode: 'analysis',
+                      executed: false,
+                    }}
+                    compact={true}
+                  />
+
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
                     <div style={{ background: 'rgba(52, 199, 89, 0.15)', border: '1px solid rgba(52, 199, 89, 0.3)', borderRadius: 8, padding: 10 }}>
                       <div style={{ fontSize: 12, color: 'rgba(52, 199, 89, 0.9)' }}>Gesamt-Score</div>

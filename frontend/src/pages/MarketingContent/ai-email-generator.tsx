@@ -95,7 +95,7 @@ const AIEmailGenerator: React.FC = () => {
   // 🔥 NEU: API Status prüfen
   const checkApiStatus = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/health`);
+      const response = await fetch(`/health`);
       if (response.ok) {
         setApiStatus('connected');
       } else {
@@ -109,7 +109,7 @@ const AIEmailGenerator: React.FC = () => {
   // 🔥 NEU: Echte Kundendaten laden
   const loadRealCustomers = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/woocommerce/customers`);
+      const response = await fetch(`/api/woocommerce/customers`);
       const result = await response.json();
       
       if (result.success) {
@@ -132,7 +132,7 @@ const AIEmailGenerator: React.FC = () => {
   // 🔥 NEU: Echte Abonnenten-Daten laden
   const loadRealSubscribers = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/woocommerce/subscribers`);
+      const response = await fetch(`/api/woocommerce/subscribers`);
       const result = await response.json();
       
       if (result.success) {
@@ -162,7 +162,7 @@ const AIEmailGenerator: React.FC = () => {
 
     setLoading(true);
     try {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/ai/email/email-draft`, {
+  const response = await fetch(`/api/ai/email/email-draft`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -316,7 +316,7 @@ const AIEmailGenerator: React.FC = () => {
     
     setLoadingSubjectLines(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/marketing/email-enhancement/subject-lines`, {
+      const response = await fetch(`/api/marketing/email-enhancement/subject-lines`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -351,7 +351,7 @@ const AIEmailGenerator: React.FC = () => {
     
     setLoadingSegments(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/marketing/email-enhancement/segment-customers`, {
+      const response = await fetch(`/api/marketing/email-enhancement/segment-customers`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ customers })
@@ -382,7 +382,7 @@ const AIEmailGenerator: React.FC = () => {
     setLoadingSendTimes(true);
     try {
       const selectedData = customers.filter(c => selectedCustomers.includes(c.id));
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/marketing/email-enhancement/optimize-send-time`, {
+      const response = await fetch(`/api/marketing/email-enhancement/optimize-send-time`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ customers: selectedData })
@@ -412,7 +412,7 @@ const AIEmailGenerator: React.FC = () => {
     
     setLoadingForecast(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/marketing/email-enhancement/forecast-performance`, {
+      const response = await fetch(`/api/marketing/email-enhancement/forecast-performance`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

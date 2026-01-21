@@ -309,6 +309,9 @@ export class PaymentRecoveryLoop extends AgenticLoop {
         },
         {} as Record<string, { success: number; total: number }>
       ),
+      // Transparenz: Recovery-Strategien nutzen heuristische successRate/priority
+      mode: 'heuristic',
+      confidence: 0.6,
     };
   }
 }

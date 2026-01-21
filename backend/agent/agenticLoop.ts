@@ -157,7 +157,7 @@ export class AgenticLoop {
   /**
    * Bestimmungskriterium: Soll Loop weiterlaufen?
    */
-  protected shouldContinue(_result: unknown): boolean {
+  protected async shouldContinue(_result: unknown): Promise<boolean> {
     if (this.context.iteration >= this.context.maxIterations) {
       logger.info(`[${this.context.type}] Max iterations reached`);
       return false;
@@ -165,8 +165,7 @@ export class AgenticLoop {
 
     const continueStep = this.steps.find((s) => s.name === 'shouldContinue');
     if (continueStep) {
-      // Synchron weil schnelle Entscheidung
-      const continueCondition = continueStep.action();
+      const continueCondition = await continueStep.action();
       return Boolean(continueCondition);
     }
 
@@ -199,7 +198,7 @@ export class AgenticLoop {
         await this.learn(result);
 
         // CONTINUE?
-        if (!this.shouldContinue(result)) {
+        if (!(await this.shouldContinue(result))) {
           this.context.status = 'completed';
           break;
         }

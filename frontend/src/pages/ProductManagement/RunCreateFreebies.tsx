@@ -37,11 +37,6 @@ const RunCreateFreebies = () => {
   const [selectedIdea, setSelectedIdea] = useState<FreebieIdea | null>(null);
   const [autoPickBest, setAutoPickBest] = useState(true);
 
-  // Lade existierende Freebies beim Start
-  useEffect(() => {
-    loadFreebies();
-  }, []);
-
   const loadFreebies = async () => {
     try {
       const response = await fetch("/api/freebies");
@@ -49,10 +44,16 @@ const RunCreateFreebies = () => {
       if (data.success && data.data) {
         setRecentFreebies(data.data.slice(0, 5)); // Nur die letzten 5
       }
-        } catch {
-      // Load failed - silent
+    } catch {
+      toast.error('Freebies konnten nicht geladen werden');
     }
   };
+
+  // Lade existierende Freebies beim Start
+  useEffect(() => {
+    loadFreebies();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleGenerateIdeas = async (): Promise<FreebieIdea[]> => {
     try {
