@@ -21,10 +21,12 @@ Specializations are industry-specific AI configurations that adapt A.R.I. for di
 
 ## Architecture
 
-### Central (marketplace.example.com)
-- WooCommerce shop with digital products
-- After purchase: RSA-signed JSON file generated
-- Download link via email
+## Central
+
+- The customer selects a specific specialization as part of the subscription completion process
+- After completion, an RSA-signed specialization file (JSON) is generated
+- The file is made available to the customer via the designated distribution channel (e.g. email)
+
 
 ### Decentralized (Each A.R.I. Installation)
 - Upload in Settings → Specialization
@@ -287,14 +289,14 @@ npm run test -- -t "Encryption"
 
 **Benchmarks (Windows 11, Node.js 24):**
 
-| Operation | Time |
-|-----------|------|
-| Load Single | 2-5ms |
-| Persist | 7-10ms |
-| List All | 1-3ms |
+| Operation          | Time    |
+| ------------------ | ------- |
+| Load Single        | 2-5ms   |
+| Persist            | 7-10ms  |
+| List All           | 1-3ms   |
 | Validate Integrity | 25-30ms |
-| Cache Hit | < 1ms |
-| Encryption | 2-4ms |
+| Cache Hit          | < 1ms   |
+| Encryption         | 2-4ms   |
 
 ---
 

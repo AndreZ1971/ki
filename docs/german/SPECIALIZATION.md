@@ -21,10 +21,12 @@ Spezialisierungen sind branchenspezifische KI-Konfigurationen, die A.R.I. für v
 
 ## Architektur
 
-### Zentral 
-- WooCommerce-Shop mit digitalen Produkten
-- Nach Kauf: RSA-signierte JSON-Datei generiert
-- Download-Link per E-Mail
+## Zentral
+
+- Kunde wählt im Rahmen des Abonnementabschlusses eine konkrete Spezialisierung
+- Nach Abschluss wird eine RSA-signierte Spezialisierungs-Datei (JSON) bereitgestellt
+- Die Datei wird dem Kunden über den vorgesehenen Distributionskanal (z. B. E-Mail) zur Verfügung gestellt
+
 
 ### Dezentral (Jede A.R.I. Installation)
 - Upload in Settings → Spezialisierung
@@ -287,14 +289,14 @@ npm run test -- -t "Encryption"
 
 **Benchmarks (Windows 11, Node.js 24):**
 
-| Operation | Zeit |
-|-----------|------|
-| Load Single | 2-5ms |
-| Persist | 7-10ms |
-| List All | 1-3ms |
+| Operation          | Zeit    |
+| ------------------ | ------- |
+| Load Single        | 2-5ms   |
+| Persist            | 7-10ms  |
+| List All           | 1-3ms   |
 | Validate Integrity | 25-30ms |
-| Cache Hit | < 1ms |
-| Encryption | 2-4ms |
+| Cache Hit          | < 1ms   |
+| Encryption         | 2-4ms   |
 
 ---
 

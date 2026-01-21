@@ -8,6 +8,15 @@
 
 ---
 
+## ⛔ Non-Goals
+
+- A.R.I. ist kein Plugin-Marketplace.
+- A.R.I. stellt keine DevOps-Oberfläche bereit.
+- A.R.I. erlaubt keine kunden-seitige Änderung von Runtime- oder Sicherheitsflags.
+- Spezialisierungen sind keine Feature-Bundles, sondern Verhaltensprofile.
+
+---
+
 ## 📋 Inhaltsverzeichnis
 
 1. [System-Architektur](#system-architektur)
@@ -449,6 +458,29 @@ services:
 - Findet connection.json
 - Kopiert sie
 - Kunde sieht nichts!
+
+---
+
+### Konfigurationsflags & Schreibpfade
+
+Konfigurationsflags (z. B. Environment-Variablen, Modus-Flags, Feature-Guards)
+sind **nicht kunden-seitig schaltbar**.
+
+Sie werden ausschließlich **einmalig während der Provisionierung bzw. des
+initialen Onboardings** gesetzt.
+
+Nach Abschluss des Onboardings existiert **kein weiterer Schreibpfad**
+für diese Konfigurationswerte:
+- keine UI
+- keine API
+- keine Hintergrundjobs
+- kein Live-Toggling im laufenden Container
+
+Änderungen an diesen Flags erfordern einen **neuen Container-Deploy**
+und können nur durch das A.R.I.-Team bzw. die Plattform-Orchestrierung
+(z. B. Automattic) vorgenommen werden.
+
+**Siehe**: [Ausführungsmodi (Zentrale Definition)](../german/TOOLS_DOCUMENTATION.md#ausführungsmodi-zentrale-definition) für die Übersicht, wie die REAL/FALLBACK/SIMULATION Modi diesen Flags entsprechen.
 
 ---
 

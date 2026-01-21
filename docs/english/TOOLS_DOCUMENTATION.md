@@ -4,7 +4,59 @@
 
 **Last updated**: January 20, 2026  
 **Version**: 7.0.3
-**Status**: ✅ Production Ready - No Mock Data, Full WooCommerce Integration, Support Ticket HTML Sanitization, Deterministic Scoring Algorithms
+**Status**: ✅ Production Ready ([see Glossary](#-glossary)) - No frontend-generated mock data, Full WooCommerce Integration, Support Ticket HTML Sanitization, Deterministic Scoring Algorithms
+
+---
+
+## 📌 Terminology & Clarity
+
+### Production Ready (Definition)
+
+**Production Ready** = Runtime stability, guarded execution paths, and explicit failure modes.  
+*It does NOT imply* that all external integrations (e.g. payment gateways) are fully implemented.  
+*See [Glossary](#glossary) below for all terminology.*
+
+---
+
+### Data Sources
+
+No frontend-generated mock data is used.
+All agentic and analytics results originate from backend execution.
+Simulation and fallback behavior are explicitly gated and labeled via response `source` field.
+
+### Payment Tools - Three-Stage Execution Model
+
+- **REAL**: Requires configured payment gateway (Stripe/PayPal). Gateway response determines outcome.
+- **FALLBACK**: Deterministic, non-random. Returns manual-review-required without charging. Used when gateway is unavailable.
+- **SIMULATION**: Explicitly enabled via `PAYMENT_SIMULATION_MODE=true`. Random outcomes for testing. Development/demo only.
+
+No real payment execution occurs unless a payment gateway is configured and healthy.
+
+---
+
+## 📚 Glossary
+
+| Term | Definition | Reference |
+|------|-----------|----------|
+| **Production Ready** | Runtime stability, guarded paths, explicit errors. NOT: feature-complete or all integrations done. | See above |
+| **Real Data** | Backend-sourced from WooCommerce, OpenAI, or deterministic heuristics. | [Data Sources](#data-sources) |
+| **Mock Data** | Frontend-generated placeholder values. A.R.I. does NOT use these. | [Data Sources](#data-sources) |
+| **Fallback Mode** | Non-random deterministic response when real backend unavailable. | [Payment Model](#payment-tools---three-stage-execution-model) |
+| **Simulation Mode** | Random testing behavior. Only in dev/demo via `PAYMENT_SIMULATION_MODE=true`. | [Payment Model](#payment-tools---three-stage-execution-model) |
+
+---
+
+### Execution Modes (Central Definition)
+
+**The system operates in one of three modes. Modes are configured during provisioning and are NOT customer-toggleable.**
+
+- **REAL**: Uses configured external integrations (WooCommerce, Payment Gateway, OpenAI). Outcome determined by real provider response. Production-only (via `NODE_ENV=production` + gateway configured).
+  
+- **FALLBACK**: Deterministic, non-random, non-executing behavior. Returns safe defaults without attempting real operations. Triggered when external integration unavailable. Always succeeds in returning a response, but result is marked as `"source": "fallback"`.
+  
+- **SIMULATION**: Explicitly enabled via `PAYMENT_SIMULATION_MODE=true`. Random outcomes for testing and demos. Development/demo-only. Marked as `"source": "simulation"` in response.
+
+**Configuration Rule**: Mode is determined once during container startup. Any mode change requires new container deployment via Automattic orchestration layer.
 
 ---
 
@@ -21,10 +73,19 @@
 
 ---
 
+## ⛔ Non-Goals
+
+- A.R.I. is not a plugin marketplace.
+- A.R.I. does not expose a DevOps interface.
+- Customers cannot modify runtime or security configuration flags.
+- Specializations are behavior profiles, not feature bundles.
+
+---
+
 ## 🆕 January 2026 Updates (v6.9.1)
 
-### ✅ Removal of All Mock Data
-**Implementation**: All routes now use real WooCommerce/OpenAI data  
+### ✅ Removal of Frontend-Generated Mock Data
+**Implementation**: All frontend-rendered results now originate from backend APIs (WooCommerce, OpenAI, or deterministic heuristics)  
 **Status**: Complete  
 **Changed Areas**:
 - **Customer Data**: Removed `visit_count` and `last_login` fields (not WooCommerce standard fields)

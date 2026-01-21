@@ -8,6 +8,15 @@
 
 ---
 
+## ⛔ Non-Goals
+
+- A.R.I. is not a plugin marketplace.
+- A.R.I. does not expose a DevOps interface.
+- Customers cannot modify runtime or security configuration flags.
+- Specializations are behavior profiles, not feature bundles.
+
+---
+
 ## 📋 Table of Contents
 
 1. [System Architecture](#system-architecture)
@@ -449,6 +458,28 @@ services:
 - Finds connection.json
 - Copies it
 - Customer sees nothing!
+
+---
+
+### Configuration Flags & Write Paths
+
+Configuration flags (e.g. environment variables, mode flags, feature guards)
+are **not customer-toggleable**.
+
+They are set **once during provisioning and initial onboarding only**.
+
+After onboarding is completed, **no additional write path exists**
+for these configuration values:
+- no UI
+- no API
+- no background jobs
+- no live toggling in a running container
+
+Any change to these flags requires a **new container deployment**
+and can only be performed by the A.R.I. team or the platform
+orchestration layer (e.g. Automattic).
+
+**See**: [Execution Modes (Central Definition)](../english/TOOLS_DOCUMENTATION.md#execution-modes-central-definition) for how REAL/FALLBACK/SIMULATION modes map to these flags.
 
 ---
 

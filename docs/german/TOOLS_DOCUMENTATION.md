@@ -4,7 +4,59 @@
 
 **Zuletzt aktualisiert**: 20. Januar 2026  
 **Version**: 7.0.4  
-**Status**: ✅ Production Ready - Keine Mock-Daten, vollständige WooCommerce-Integration, Support-Ticket HTML-Bereinigung, deterministische Scoring-Algorithmen
+**Status**: ✅ Production Ready ([siehe Glossar](#-glossar)) - Keine Frontend-generierten Mock-Daten, vollständige WooCommerce-Integration, Support-Ticket HTML-Bereinigung, deterministische Scoring-Algorithmen
+
+---
+
+## 📌 Begrifflichkeit & Klarstellung
+
+### Production Ready (Definition)
+
+**Production Ready** = Laufzeitstabilität, abgesicherte Ausführungspfade und explizite Fehlermodi.  
+*Es impliziert NICHT*, dass alle externen Integrationen (z. B. Zahlungs-Gateways) vollständig implementiert sind.  
+*Siehe [Glossar](#-glossar) unten für alle Begriffe.*
+
+---
+
+### Datenquellen
+
+Es werden keine Frontend-generierten Mock-Daten verwendet.
+Agentic- und Analyse-Ergebnisse stammen ausschließlich aus Backend-Ausführungen.
+Simulation und Fallback sind explizit gekennzeichnet und begrenzt (über `source` Feld in der Response).
+
+### Zahlungstools - Dreistufiges Ausführungsmodell
+
+- **REAL**: Erfordert konfiguriertes Payment-Gateway (Stripe/PayPal). Gateway-Response bestimmt Ausgang.
+- **FALLBACK**: Deterministisch, nicht-zufällig. Gibt "manual-review-required" zurück, ohne zu belasten. Wird verwendet, wenn Gateway nicht verfügbar ist.
+- **SIMULATION**: Explizit aktivierbar via `PAYMENT_SIMULATION_MODE=true`. Zufällige Ergebnisse für Tests. Nur Entwicklung/Demo.
+
+Ohne konfiguriertes und funktionierendes Payment-Gateway erfolgt keine echte Zahlungsabwicklung.
+
+---
+
+## 📚 Glossar
+
+| Begriff | Definition | Referenz |
+|---------|-----------|----------|
+| **Production Ready** | Laufzeitstabilität, abgesicherte Pfade, explizite Fehler. NICHT: feature-vollständig oder alle Integrationen abgeschlossen. | Siehe oben |
+| **Echte Daten** | Backend-sourced von WooCommerce, OpenAI oder deterministischen Heuristiken. | [Datenquellen](#datenquellen) |
+| **Mock-Daten** | Frontend-generierte Platzhalter-Werte. A.R.I. verwendet diese NICHT. | [Datenquellen](#datenquellen) |
+| **Fallback-Mode** | Nicht-zufällige deterministische Response, wenn echtes Backend nicht verfügbar. | [Zahlungstools](#zahlungstools---dreistufiges-ausführungsmodell) |
+| **Simulation Mode** | Zufälliges Test-Verhalten. Nur in Dev/Demo via `PAYMENT_SIMULATION_MODE=true`. | [Zahlungstools](#zahlungstools---dreistufiges-ausführungsmodell) |
+
+---
+
+### Ausführungsmodi (Zentrale Definition)
+
+**Das System arbeitet in einem der drei Modi. Modi werden während der Provisionierung konfiguriert und sind NICHT kundenseitig schaltbar.**
+
+- **REAL**: Nutzt konfigurierte externe Integrationen (WooCommerce, Payment-Gateway, OpenAI). Ausgang wird durch echte Provider-Response bestimmt. Nur Production (via `NODE_ENV=production` + Gateway konfiguriert).
+  
+- **FALLBACK**: Deterministisch, nicht-zufällig, nicht-ausführend. Gibt sichere Standardwerte zurück, ohne echte Operationen zu versuchen. Wird ausgelöst, wenn externe Integration nicht verfügbar. Gibt immer eine Response zurück, aber Ergebnis ist mit `"source": "fallback"` gekennzeichnet.
+  
+- **SIMULATION**: Explizit aktivierbar via `PAYMENT_SIMULATION_MODE=true`. Zufällige Ergebnisse zum Testen und für Demos. Nur Entwicklung/Demo. Mit `"source": "simulation"` in der Response gekennzeichnet.
+
+**Konfigurationsregel**: Modus wird einmalig beim Container-Start bestimmt. Jede Modus-Änderung erfordert neuen Container-Deploy via Automattic-Orchestrierungsschicht.
 
 ---
 
@@ -21,10 +73,19 @@
 
 ---
 
+## ⛔ Non-Goals
+
+- A.R.I. ist kein Plugin-Marketplace.
+- A.R.I. stellt keine DevOps-Oberfläche bereit.
+- A.R.I. erlaubt keine kunden-seitige Änderung von Runtime- oder Sicherheitsflags.
+- Spezialisierungen sind keine Feature-Bundles, sondern Verhaltensprofile.
+
+---
+
 ## 🆕 Januar 2026 Updates (v7.0.5)
 
-### ✅ Entfernung aller Mock-Daten
-**Implementierung**: Alle Routen nutzen echte WooCommerce/OpenAI-Daten  
+### ✅ Entfernung Frontend-generierter Mock-Daten
+**Implementierung**: Alle Frontend-Ergebnisse stammen jetzt von Backend-APIs (WooCommerce, OpenAI oder deterministische Heuristiken)  
 **Status**: Abgeschlossen  
 **Geänderte Bereiche**:
 - **Kunden-Daten**: `visit_count` und `last_login` Felder entfernt (keine WooCommerce-Standardfelder)

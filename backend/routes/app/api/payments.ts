@@ -128,7 +128,12 @@ interface SuccessMetricsBody {
  * - Realistisches Verhalten ohne externe Dependencies
  * - Math.random() für Erfolgsraten/Duration
  * - Deutlich gekennzeichnet: "isSimulation": true
- * - Nur wenn VITE_SIMULATION_MODE=true gesetzt
+ * - Nur wenn PAYMENT_SIMULATION_MODE=true gesetzt
+ * 
+ * PRODUCTION GUARDRAILS:
+ * - NODE_ENV=production + kein echtes Gateway → 503 Service Unavailable
+ * - Fallback ist DETERMINISTISCH (kein Math.random())
+ * - Randomized outcomes nur in EXPLICIT simulation mode
  * 
  * KEINE Marketing-Claims erlaubt:
  * - ❌ "echte Payment-Verarbeitung" wenn Simulation läuft
@@ -222,14 +227,43 @@ Bewerte Risiko (0-100):`;
         const { randomUUID } = await import('crypto');
         const transactionId = randomUUID();
 
-        // 4. PROCESS PAYMENT mit ECHTEM Gateway oder FALLBACK
+        // 4. PRODUCTION GUARD: Block random fallback in production
+        const isProduction = process.env.NODE_ENV === 'production';
+        const isSimulation = process.env.PAYMENT_SIMULATION_MODE === 'true';
+        const hasRealGateway = false; // TODO: Set to true when Stripe/PayPal integrated
+
+        if (isProduction && !hasRealGateway) {
+          logger.error('Production payment attempted without real gateway configured');
+          return reply.code(503).send({
+            success: false,
+            error: 'Payment gateway not available',
+            message: 'Real payment gateway required in production. Please configure Stripe/PayPal integration.',
+            code: 'GATEWAY_NOT_CONFIGURED'
+          });
+        }
+
+        // 5. PROCESS PAYMENT: REAL Gateway or DETERMINISTIC Fallback or SIMULATION
         const processingTime = Date.now() - startTime;
         
         // TODO: Hier würde echte Stripe/PayPal API aufgerufen
-        // Für Demo/Fallback: Konservative 85% Erfolgsrate (nicht 95%!)
         // In echter Prod-Integration: Gateway bestimmt Erfolg
-        const isSimulation = process.env.VITE_SIMULATION_MODE === 'true';
-        const shouldSucceed = isSimulation ? Math.random() < 0.95 : Math.random() < 0.85;
+        
+        let shouldSucceed: boolean;
+        let source: 'real' | 'fallback' | 'simulation';
+
+        if (hasRealGateway) {
+          // REAL: Gateway determines success
+          shouldSucceed = true; // Placeholder - would come from gateway response
+          source = 'real';
+        } else if (isSimulation) {
+          // SIMULATION: Randomized for demo purposes
+          shouldSucceed = Math.random() < 0.95;
+          source = 'simulation';
+        } else {
+          // FALLBACK: DETERMINISTIC - always require manual review
+          shouldSucceed = false;
+          source = 'fallback';
+        }
 
         const result = {
           status: shouldSucceed ? 'success' : 'failed',
@@ -242,20 +276,23 @@ Bewerte Risiko (0-100):`;
           processingTime: `${processingTime}ms`,
           riskScore,
           timestamp: new Date().toISOString(),
-          source: isSimulation ? 'simulation' : 'fallback', // Eindeutig gekennzeichnet
+          source, // 'real' | 'fallback' | 'simulation'
           environment: process.env.NODE_ENV || 'development',
           ...(shouldSucceed ? {} : {
-            reason: 'Payment declined by gateway - please try another payment method'
+            reason: source === 'fallback' 
+              ? 'Gateway unavailable - manual review required'
+              : 'Payment declined by gateway - please try another payment method',
+            nextAction: source === 'fallback' ? 'manual_review' : 'retry_payment'
           })
         };
 
         // 5. RECORD SUCCESS METRIC
         if (shouldSucceed) {
           recordMlEvent('payments.fast-process', true, 1 - (riskScore / 100));
-          logger.info({ transactionId, amount, processingTime }, 'Payment processed successfully');
+          logger.info({ transactionId, amount, processingTime, source }, 'Payment processed successfully');
         } else {
           recordMlEvent('payments.fast-process', false, 0.3);
-          logger.warn({ transactionId, amount }, 'Payment declined');
+          logger.warn({ transactionId, amount, source }, source === 'fallback' ? 'Payment requires manual review (gateway unavailable)' : 'Payment declined');
         }
 
         return reply.send({ success: shouldSucceed, data: result });

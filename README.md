@@ -6,6 +6,8 @@
 ![Design System](https://img.shields.io/badge/Design_Tokens-100%25-purple.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
+> **Status**: Production Ready → Runtime stable, no frontend mock data, all results from backend. External integrations (e.g. payment gateways) require configuration. [Full definition](docs/english/TOOLS_DOCUMENTATION.md#-glossary).
+
 ## Der digitale Mitarbeiter für deinen Online-Shop
 
 Ein System, das deinen WooCommerce-Shop analysiert, optimiert und wächst –  

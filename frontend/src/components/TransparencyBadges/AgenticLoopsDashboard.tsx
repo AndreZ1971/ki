@@ -23,15 +23,7 @@ interface LoopDefinition {
   enabled: boolean;
 }
 
-interface AgenticLoopsDashboardProps {
-  onLoopStart?: (loopId: string) => void;
-  loading?: boolean;
-}
-
-export const AgenticLoopsDashboard: React.FC<AgenticLoopsDashboardProps> = ({
-  onLoopStart,
-  loading = false,
-}) => {
+export const AgenticLoopsDashboard: React.FC = () => {
   const navigate = useNavigate();
   const loops = useMemo<LoopDefinition[]>(
     () => [
@@ -129,54 +121,6 @@ export const AgenticLoopsDashboard: React.FC<AgenticLoopsDashboardProps> = ({
     if (ms < 1000) return `${ms}ms`;
     if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
     return `${(ms / 60000).toFixed(1)}m`;
-  };
-
-  const generateMockResult = (loopId: string, duration: number): LoopResult => {
-    const mockResults: Record<string, any> = {
-      'product-performance': {
-        recommendations: [
-          { product: 'Premium T-Shirt', action: 'Increase price by 15%', expectedImpact: '+12% revenue' },
-          { product: 'Basic Hoodie', action: 'A/B test 2 variants', expectedImpact: '+8% conversion' },
-        ],
-        analysisDepth: 'Full product catalog (120 products)',
-      },
-      'analytics-insights': {
-        insights: [
-          { metric: 'Conversion Rate', trend: 'Up 3.2% vs last month', recommendation: 'Maintain current strategy' },
-          { metric: 'Cart Abandonment', trend: 'Down 5.1%', recommendation: 'Optimize checkout flow' },
-        ],
-        dataPeriod: 'Last 60 days',
-      },
-      'payment-recovery': {
-        failedPayments: 12,
-        recoverable: 8,
-        strategies: ['Email reminder', 'Alternative payment method', 'Customer support contact'],
-        estimatedRecovery: '€420',
-      },
-      'anomaly-detection': {
-        anomalies: [
-          { type: 'Traffic spike', severity: 'low', details: '+45% visitors on Jan 20' },
-          { type: 'Price outlier', severity: 'medium', details: 'Product #145 priced 3x above category avg' },
-        ],
-        monitoring: 'Real-time',
-      },
-    };
-
-    return {
-      loopType: loopId,
-      success: true,
-      summary: mockResults[loopId] || { message: 'Analysis complete' },
-      executionTime: duration,
-      iterations: Math.floor(Math.random() * 5) + 3,
-      transparency: {
-        mode: loopId === 'payment-recovery' ? 'heuristic' : 'analysis',
-        executed: false,
-        confidence: loopId === 'payment-recovery' ? 0.6 : 0.85,
-        dataSource: 'woocommerce',
-        dataCompleteness: 0.92,
-        notes: ['Analysis only - no changes applied', 'Based on real shop data'],
-      },
-    };
   };
 
   const downloadResult = (loopId: string) => {
@@ -280,25 +224,51 @@ export const AgenticLoopsDashboard: React.FC<AgenticLoopsDashboardProps> = ({
                     setRunningLoop(loop.id);
                     const start = performance.now();
                     try {
-                      if (onLoopStart) {
-                        await onLoopStart(loop.id);
-                      } else {
-                        // fallback: simulate a short run so the user sees feedback
-                        await new Promise((resolve) => setTimeout(resolve, 800));
+                      // Call real backend API
+                      const response = await fetch(`/api/agent/loops/${loop.id}/run`, {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                      });
+
+                      if (!response.ok) {
+                        throw new Error(`API error: ${response.status} ${response.statusText}`);
                       }
+
+                      const apiResult = await response.json();
                       const duration = Math.round(performance.now() - start);
-                      const mockResult = generateMockResult(loop.id, duration);
-                      setLoopResults((prev) => ({ ...prev, [loop.id]: mockResult }));
+
+                      // Transform API response to LoopResult format
+                      const loopResult: LoopResult = {
+                        loopType: apiResult.loopType || loop.id,
+                        success: apiResult.success,
+                        summary: apiResult.result || {},
+                        executionTime: apiResult.executionTime || duration,
+                        iterations: apiResult.result?.iterations || 0,
+                        transparency: {
+                          mode: apiResult.result?.mode || (loop.id === 'payment-recovery' ? 'heuristic' : 'analysis'),
+                          executed: apiResult.result?.executed || false,
+                          confidence: apiResult.result?.confidence || 0.85,
+                          dataSource: 'woocommerce',
+                          dataCompleteness: apiResult.result?.dataCompleteness || 1.0,
+                          notes: apiResult.result?.notes || ['Analysis complete', 'Based on real WooCommerce data'],
+                        },
+                      };
+
+                      setLoopResults((prev) => ({ ...prev, [loop.id]: loopResult }));
                       setLastRuns((prev) => ({
                         ...prev,
                         [loop.id]: {
                           date: 'Just now',
-                          success: true,
+                          success: apiResult.success,
                           duration,
                         },
                       }));
-                    } catch (_err) {
+                    } catch (error) {
                       const duration = Math.round(performance.now() - start);
+                      console.error(`Failed to execute loop ${loop.id}:`, error);
+                      
                       setLastRuns((prev) => ({
                         ...prev,
                         [loop.id]: {
@@ -307,11 +277,14 @@ export const AgenticLoopsDashboard: React.FC<AgenticLoopsDashboardProps> = ({
                           duration,
                         },
                       }));
+
+                      // Show error to user
+                      alert(`Loop execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
                     } finally {
                       setRunningLoop(null);
                     }
                   }}
-                  disabled={loading || runningLoop !== null || isDisabled.has(loop.id)}
+                  disabled={runningLoop !== null || isDisabled.has(loop.id)}
                 >
                   {runningLoop === loop.id ? '⏳ Running...' : '▶️ Start Loop'}
                 </button>
