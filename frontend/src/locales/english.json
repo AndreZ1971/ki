@@ -106,12 +106,12 @@
   },
   "specialization": {
     "title": "🎯 Choose agent specialization",
-    "subtitle": "Select an industry to optimally train the AI agent for your products",
+    "subtitle": "Select a preconfigured specialization for your industry",
     "activate": "🛒 Activate",
     "active": "✓ ACTIVE",
-    "uploadSection": "📂 Upload training data",
-    "uploadDescription": "Upload product or content data to train your chosen specialization faster.",
-    "uploadButton": "Choose file (CSV/JSON)",
+    "uploadSection": "📂 Upload specialization",
+    "uploadDescription": "Upload a prebuilt specialization file to activate industry-specific behavior profiles.",
+    "uploadButton": "Choose file (JSON)",
     "uploadSuccess": "Specialization uploaded successfully",
     "activated": "Specialization activated",
     "deleted": "Specialization deleted"
@@ -197,15 +197,15 @@
     },
     "specialization": {
       "title": "🎯 Choose agent specialization",
-      "subtitle": "Select an industry to optimally train the AI agent for your products",
+      "subtitle": "Select a preconfigured specialization for your industry",
       "activate": "🛒 Activate",
       "active": "✓ ACTIVE",
       "uploadSuccess": "Specialization uploaded successfully",
       "activated": "Specialization activated",
       "deleted": "Specialization deleted",
-      "uploadSection": "📂 Upload training data",
-      "uploadDescription": "Upload product or content data to train your chosen specialization faster.",
-      "uploadButton": "Choose file (CSV/JSON)"
+      "uploadSection": "📂 Upload specialization",
+      "uploadDescription": "Upload a prebuilt specialization file to activate industry-specific behavior profiles.",
+      "uploadButton": "Choose file (JSON)"
     },
     "license": {
       "title": "🔑 License Management",

@@ -106,12 +106,12 @@
   },
   "specialization": {
     "title": "🎯 Agent-Spezialisierung wählen",
-    "subtitle": "Wähle eine Branche, um den AI-Agent optimal auf deine Produkte zu trainieren",
+    "subtitle": "Wähle eine vorkonfigurierte Spezialisierung für deine Branche",
     "activate": "🛒 Aktivieren",
     "active": "✓ AKTIV",
-    "uploadSection": "📂 Upload für Trainingsdaten",
-    "uploadDescription": "Lade Produkt- oder Content-Daten hoch, damit die gewählte Spezialisierung schneller trainiert wird.",
-    "uploadButton": "Datei wählen (CSV/JSON)",
+    "uploadSection": "📂 Spezialisierung hochladen",
+    "uploadDescription": "Lade eine vorgefertigte Spezialisierungs-Datei hoch, um branchenspezifische Verhaltensprofile zu aktivieren.",
+    "uploadButton": "Datei wählen (JSON)",
     "uploadSuccess": "Spezialisierung erfolgreich hochgeladen",
     "activated": "Spezialisierung aktiviert",
     "deleted": "Spezialisierung gelöscht"
@@ -197,12 +197,12 @@
     },
     "specialization": {
       "title": "🎯 Agent-Spezialisierung wählen",
-      "subtitle": "Wähle eine Branche, um den AI-Agent optimal auf deine Produkte zu trainieren",
+      "subtitle": "Wähle eine vorkonfigurierte Spezialisierung für deine Branche",
       "activate": "🛒 Aktivieren",
       "active": "✓ AKTIV",
-      "uploadSection": "📂 Upload für Trainingsdaten",
-      "uploadDescription": "Lade Produkt- oder Content-Daten hoch, damit die gewählte Spezialisierung schneller trainiert wird.",
-      "uploadButton": "Datei wählen (CSV/JSON)",
+      "uploadSection": "📂 Spezialisierung hochladen",
+      "uploadDescription": "Lade eine vorgefertigte Spezialisierungs-Datei hoch, um branchenspezifische Verhaltensprofile zu aktivieren.",
+      "uploadButton": "Datei wählen (JSON)",
       "uploadSuccess": "Spezialisierung erfolgreich hochgeladen",
       "activated": "Spezialisierung aktiviert",
       "deleted": "Spezialisierung gelöscht"
