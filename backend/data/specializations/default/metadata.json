@@ -18,7 +18,7 @@
     ],
     "installedAt": 1767386932790,
     "filePath": "C:\\Entwicklung\\neuer-git-ordner\\ki\\backend\\data\\specializations\\default\\technik-elektronik.enc",
-    "isActive": true
+    "isActive": false
   },
   {
     "id": "digitale-kurse",
@@ -40,5 +40,26 @@
     "installedAt": 1767387846502,
     "filePath": "C:\\Entwicklung\\neuer-git-ordner\\ki\\backend\\data\\specializations\\default\\digitale-kurse.enc",
     "isActive": false
+  },
+  {
+    "id": "tierbedarf",
+    "name": "Tierbedarf - Der Tierfreund",
+    "description": "Spezialisiert auf Haustierbedarf, Rasse-Spezifika, Ernährung und emotionale Tierliebe",
+    "category": "Haustiere & Tiere",
+    "icon": "🐾",
+    "version": "1.0.0",
+    "features": [
+      "Rasse-spezifische Empfehlungen",
+      "Altersgerechte Ernährung & Futter",
+      "Spielzeug & Beschäftigung Ratgeber",
+      "Gesundheit & Pflege Tipps",
+      "Trainings & Verhaltens-Hinweise",
+      "Allergie-freundliche Optionen",
+      "Reisebedarf & Sicherheit",
+      "Budget-optimierte Tier-Produkte"
+    ],
+    "installedAt": 1769044532484,
+    "filePath": "C:\\Entwicklung\\neuer-git-ordner\\ki\\backend\\data\\specializations\\default\\tierbedarf.enc",
+    "isActive": true
   }
 ]

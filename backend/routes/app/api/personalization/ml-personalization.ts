@@ -59,69 +59,56 @@ export default async function mlPersonalizationRoutes(
         // 🎯 Extrahiere Spezialisierungsdetails
         const specializationName = specialization.name || specialization.id || 'Generisch';
         const specializationDescription = specialization.description || '';
-        const categoryGuideline = (specialization.contextInstructions || []).join(' ') || specialization.category || '';
+        const categoryGuideline = (specialization.contextInstructions || []).join('\n- ') || specialization.category || '';
+        const systemPrompt = specialization.systemPrompt || 'Du bist ein KI-Personalisierungs-Engine für E-Commerce';
 
-        const prompt = `Du bist ein KI-Personalisierungs-Engine für einen E-Commerce Shop.
+        const prompt = `🎯 AKTIVE SHOP-SPEZIALISIERUNG: ${specializationName}
 
+${specializationDescription}
+
+DEINE AUFGABE:
 Generiere 3-5 personalisierte Produktangebote für Nutzer ID: ${userId}
 
-🎯 SPEZIALISIERUNG DES NUTZERS (BINDEND):
-- Name: ${specializationName}
-- Beschreibung: ${specializationDescription}
-- Kategorie-Richtlinie: ${categoryGuideline}
+⚠️ KRITISCHE ANFORDERUNG - ABSOLUTE PRIORITÄT:
+Du MUSST AUSSCHLIESSLICH Produkte aus der Kategorie "${specializationName}" empfehlen!
 
-⚠️ KRITISCH: Du MUSST dich STRIKT an diese Spezialisierung halten. Empfehle KEINE Produkte außerhalb dieser Kategorie!
+KATEGORIERICHTLINIEN:
+${categoryGuideline ? `- ${categoryGuideline}` : ''}
 
-Wenn die Spezialisierung "Technik & Elektronik" ist:
-  → NUR Elektronik, Gadgets, Computer, Smartphones, Zubehör
-  → KEINE Kleidung, Schuhe, Möbel, Bücher
+VERBOTEN:
+- Produkte außerhalb der Spezialisierung "${specializationName}"
+- Generische Empfehlungen ohne Kategoriebezug
+- Cross-Category Vorschläge
 
-Wenn die Spezialisierung "Fashion & Mode" ist:
-  → NUR Kleidung, Schuhe, Accessoires
-  → KEINE Elektronik, Möbel, Technik
-
-Wenn die Spezialisierung "Sport & Fitness" ist:
-  → NUR Sportartikel, Fitness-Geräte, Sportzubehör
-  → KEINE Mode, Elektronik
-
-Wenn die Spezialisierung "Küche & Haushalt" ist:
-  → NUR Küchengeräte, Haushaltswaren
-  → KEINE Mode, Elektronik, Sport
-
-Wenn die Spezialisierung "Bücher & Bildung" ist:
-  → NUR Bücher, E-Books, Lernmaterialien
-  → KEINE Mode, Sport, Küchengeräte
+BEISPIEL für "${specializationName}":
+Wenn Tierbedarf → ONLY: Hundefutter, Katzenstreu, Spielzeug für Tiere, Kratzbäume, Leinen, Näpfe
+Wenn Technik → ONLY: Laptops, Smartphones, Kopfhörer, Tablets, Zubehör, Gadgets
+Wenn Mode → ONLY: Kleidung, Schuhe, Taschen, Accessoires
 
 Antworte STRIKT als JSON:
 {
   "success": true,
   "offers": [
     {
-      "title": "Produktname",
+      "title": "Produktname (passend zu ${specializationName})",
       "description": "Kurze Beschreibung (1-2 Sätze)",
       "score": 0.0-1.0,
-      "reason": "Warum dieses Angebot für diesen Nutzer (1 Satz)"
+      "reason": "Warum relevant für Nutzer (1 Satz)"
     }
   ]
 }
 
-Richtlinien:
-- ALLE Produkte müssen EXAKT zur Spezialisierung passen
-- Score basiert auf Relevanz für diesen Nutzer
-- Beschreibungen sollen kurz und verkaufsfördernd sein
-- Alle Texte auf Deutsch
-- KEINE Produkte außerhalb der Spezialisierungskategorie!`;
+FINALE REGEL: KEINE Produkte außerhalb "${specializationName}"!`;
 
         const completion = await executeOpenAI(
           () =>
             openai.chat.completions.create({
               model: 'gpt-4o-mini',
-              temperature: 0.7,
+              temperature: 0.5, // Reduzierte Temperature für konsistentere Ergebnisse
               messages: [
                 {
                   role: 'system',
-                  content:
-                    'Du bist ein KI-Personalisierungs-Engine. Antworte immer in kompaktem JSON mit der angeforderten Struktur. Du hältst dich strikt an die Spezialisierung des Nutzers!',
+                  content: systemPrompt + `\n\n⚠️ KRITISCH: Du bist AUSSCHLIESSLICH auf die Kategorie "${specializationName}" spezialisiert. Empfehle NIEMALS Produkte außerhalb dieser Kategorie!`,
                 },
                 { role: 'user', content: prompt },
               ],

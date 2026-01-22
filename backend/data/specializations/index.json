@@ -20,6 +20,16 @@
         "updatedAt": 1767387846505,
         "size": 1852,
         "encrypted": false
+      },
+      {
+        "id": "tierbedarf",
+        "name": "Tierbedarf - Der Tierfreund",
+        "version": "1.0.0",
+        "checksum": "8f1ea8a972a64c0cfa101b3808207ec30cef1a2114c6b08047402f1a59f92fd0",
+        "createdAt": 1769044532486,
+        "updatedAt": 1769044532486,
+        "size": 1695,
+        "encrypted": false
       }
     ]
   }
