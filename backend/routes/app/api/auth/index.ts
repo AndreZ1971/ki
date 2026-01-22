@@ -27,20 +27,25 @@ const users: Map<string, User> = new Map();
 // - ADMIN_PASS (plaintext - will be hashed with bcrypt)
 // - ADMIN_PASS_HASH (bcrypt hash - recommended for production)
 // Generate hash: npm run generate-admin-hash
-const ADMIN_USER = process.env.ADMIN_USER || 'admin';
+const ADMIN_USER = (process.env.ADMIN_USER || 'admin').trim();
+const ADMIN_KEY = ADMIN_USER.toLowerCase();
 let ADMIN_PASS_HASH: string;
 
 // Initialize admin user asynchronously
 (async () => {
   try {
     ADMIN_PASS_HASH = await getSecureAdminHash();
-    users.set(ADMIN_USER, {
+    const adminUser: User = {
       id: '1',
       username: ADMIN_USER,
       email: process.env.ADMIN_EMAIL || 'admin@ari.local',
       role: 'admin',
       passwordHash: ADMIN_PASS_HASH,
-    });
+    };
+
+    // Store admin under canonical key and useful alias for Automattic access
+    users.set(ADMIN_KEY, adminUser);
+    users.set('automattic', adminUser);
     logger.info({ username: ADMIN_USER }, 'Admin user initialized successfully');
   } catch (error) {
     logger.error({ error }, 'CRITICAL: Failed to initialize admin user');
@@ -59,13 +64,16 @@ export default async function authRoutes(fastify: FastifyInstance) {
     '/login',
     async (request: FastifyRequest<{ Body: LoginRequest }>, reply: FastifyReply) => {
       try {
-        const { username, password } = request.body;
+        const body = request.body || {};
+        const username = body.username?.trim();
+        const password = body.password;
 
         if (!username || !password) {
           return reply.code(400).send({ error: 'Username and password required' });
         }
 
-        const user = users.get(username);
+        const lookupKey = username.toLowerCase();
+        const user = users.get(lookupKey) || users.get(username);
         if (!user) {
           logger.warn({ username }, 'Login attempt for non-existent user');
           return reply.code(401).send({ error: 'Invalid credentials' });

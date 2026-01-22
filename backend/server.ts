@@ -93,6 +93,9 @@ import { trendAggregatorRoutes } from './routes/app/api/trends/trends-routes';
 // 🔥 SETTINGS ROUTES
 import connectionRoutes from './routes/app/api/settings/connection';
 
+// 🔌 CONNECTION STATUS ROUTES
+import connectionStatusRoute from './routes/app/api/connection/status';
+
 // 🔥 MONITORING ROUTES
 import monitoringRoutes from './routes/app/api/monitoring/system';
 import agentMonitoringRoutes from './routes/agentMonitoring';
@@ -552,6 +555,10 @@ async function buildServer() {
     // 🔥 SETTINGS ROUTES
     await server.register(connectionRoutes, { prefix: '/api/settings' });
     console.log('✅ Settings Routes erfolgreich registriert');
+
+    // 🔌 CONNECTION STATUS ROUTES (Social Media Platform Status)
+    await server.register(connectionStatusRoute);
+    console.log('✅ Connection Status Routes erfolgreich registriert');
 
     // � ONBOARDING ROUTES
     await server.register(onboardingRoutes, { prefix: '/api/onboarding' });
