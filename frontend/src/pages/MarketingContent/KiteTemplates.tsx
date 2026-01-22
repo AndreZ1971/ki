@@ -116,21 +116,23 @@ const KiteTemplates: React.FC = () => {
     try {
       const data = await productApi.optimizeTemplate({
         templateContent: selectedTemplate.content,
-        templateCategory,
         industry,
-        optimizationGoal: 'engagement'
+        targetAudience: `${templateCategory} Nutzer`
       });
       
-      if (data.success) {
+      if (data.success && data.optimized) {
         showToast('Template optimiert!', 'success');
         // Update template mit optimiertem Content
         setSelectedTemplate({
           ...selectedTemplate,
-          content: data.optimizedContent || selectedTemplate.content
+          content: data.optimized.optimized_copy || selectedTemplate.content
         });
+      } else if (data.error) {
+        showToast(data.error, 'error');
       }
-    } catch {
-      showToast('Optimierung fehlgeschlagen', 'error');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Optimierung fehlgeschlagen';
+      showToast(errorMessage, 'error');
     } finally {
       setOptimizing(false);
     }
@@ -145,21 +147,23 @@ const KiteTemplates: React.FC = () => {
 
     try {
       const data = await productApi.recommendCategory({
-        userIntent: customization,
-        industry,
-        currentContext: templateCategory
+        productInfo: customization,
+        targetAudience: industry
       });
       
-      if (data.success && data.recommendedCategory) {
-        setRecommendedCategory(data);
-        setTemplateCategory(data.recommendedCategory);
+      if (data.success && data.recommendation) {
+        setRecommendedCategory(data.recommendation);
+        setTemplateCategory(data.recommendation.recommendedCategory);
         showToast(
-          `Empfohlen: ${data.recommendedCategory} - ${data.reason}`,
+          `Empfohlen: ${data.recommendation.recommendedCategory} - ${data.recommendation.reasoning}`,
           'success'
         );
+      } else if (data.error) {
+        showToast(data.error, 'error');
       }
-    } catch {
-      showToast('Empfehlung fehlgeschlagen', 'error');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Empfehlung fehlgeschlagen';
+      showToast(errorMessage, 'error');
     }
   };
 
@@ -297,7 +301,7 @@ const KiteTemplates: React.FC = () => {
                   srcDoc={selectedTemplate.content}
                   style={{ width: '100%', height: '100%', border: 'none', background: 'white' }}
                   title="Template Preview"
-                  sandbox="allow-same-origin"
+                  sandbox="allow-scripts"
                 />
               </div>
 

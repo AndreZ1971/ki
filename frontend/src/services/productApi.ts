@@ -33,6 +33,8 @@ import type {
     type: 'full' | 'products' | 'orders' | 'customers';
   }
 
+const API_BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+
 /**
  * Generischer API Request Handler mit Error Handling
  */
@@ -41,7 +43,8 @@ async function apiRequest<T>(
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
   try {
-    const response = await fetch(endpoint, {
+    const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
+    const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
@@ -130,6 +133,250 @@ export const productApi = {
       method: 'POST',
       body: JSON.stringify(data),
     });
+  },
+
+  // ==================== MARKETING TEMPLATES ====================
+
+  /**
+   * Generiert ein Marketing-Template basierend auf Kategorie und Industrie
+   */
+  generateTemplate: async (data: {
+    templateCategory: string;
+    industry: string;
+    customization?: string;
+  }): Promise<ApiResponse<{
+    template: {
+      id: string;
+      name: string;
+      content: string;
+      category: string;
+      industry: string;
+    };
+  }>> => {
+    return apiRequest('/api/marketing/templates/generate', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Vorhersage des Engagement-Scores für Template-Content
+   */
+  predictEngagement: async (data: {
+    templateContent: string;
+    templateCategory: string;
+    industry: string;
+  }): Promise<ApiResponse<{
+    prediction: {
+      engagementScore: number;
+      confidence: number;
+    };
+  }>> => {
+    return apiRequest('/api/marketing/templates/predict-engagement', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Performance-Vorhersage für Template-Content
+   */
+  forecastPerformance: async (data: {
+    templateContent: string;
+    templateCategory: string;
+    industry: string;
+  }): Promise<ApiResponse<{
+    forecast: {
+      expectedCtr: number;
+      expectedConversions: number;
+      revenueEstimate: number;
+      confidence: number;
+    };
+  }>> => {
+    return apiRequest('/api/marketing/templates/forecast-performance', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Template-Content optimieren mit AI
+   */
+  optimizeTemplate: async (data: {
+    templateContent: string;
+    industry?: string;
+    targetAudience?: string;
+  }): Promise<ApiResponse<{
+    optimized: {
+      optimized_copy: string;
+      confidence: number;
+    };
+  }>> => {
+    return apiRequest('/api/marketing/templates/optimize', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Empfehlung der besten Template-Kategorie basierend auf Kontext
+   */
+  recommendCategory: async (data: {
+    productInfo: string;
+    targetAudience?: string;
+  }): Promise<ApiResponse<{
+    recommendation: {
+      recommendedCategory: string;
+      confidence: number;
+      reasoning: string;
+      alternativeCategories: string[];
+    };
+  }>> => {
+    return apiRequest('/api/marketing/templates/recommend-category', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // ==================== ML MARKETING ====================
+
+  /**
+   * Generiert Marketing-Ideen mit ML
+   */
+  generateMarketingIdeas: async (data: {
+    goal: string;
+    audience?: string;
+    productInfo?: string;
+    budget?: number;
+  }): Promise<ApiResponse<{
+    ideas: Array<{
+      type: 'text' | 'image' | 'audience' | 'forecast';
+      content: string;
+      score?: number;
+      reason?: string;
+    }>;
+  }>> => {
+    return apiRequest('/api/marketing/ml/ideas', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Generiert Email-Kampagne mit ML
+   */
+  generateEmailCampaign: async (data: {
+    productName: string;
+    productDesc?: string;
+    targetAudience: string;
+    campaignType?: 'promotional' | 'educational' | 'transactional';
+  }): Promise<ApiResponse<{
+    subject: string;
+    preheader: string;
+    body: string;
+    cta: string;
+  }>> => {
+    return apiRequest('/api/marketing/ml/email', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Generiert Social Media Content mit ML
+   */
+  generateSocialContent: async (data: {
+    topic: string;
+    tone?: 'professional' | 'casual' | 'energetic';
+    platforms: string[];
+  }): Promise<ApiResponse<{
+    posts: Array<{
+      platform: string;
+      content: string;
+      hashtags: string[];
+    }>;
+  }>> => {
+    return apiRequest('/api/marketing/ml/social', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Optimiert Marketing-Copy mit ML
+   */
+  optimizeMarketingCopy: async (data: {
+    currentCopy: string;
+    targetAction?: string;
+    audience?: string;
+  }): Promise<ApiResponse<{
+    optimizedCopy: string;
+    improvements: string[];
+    score: number;
+  }>> => {
+    return apiRequest('/api/marketing/ml/optimize', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Prognostiziert Campaign-Performance mit ML
+   */
+  forecastCampaign: async (data: {
+    campaignType: string;
+    budget: number;
+    targetAudience: number;
+    historicalCTR?: number;
+    historicalROI?: number;
+  }): Promise<ApiResponse<{
+    expectedReach: number;
+    expectedClicks: number;
+    expectedConversions: number;
+    projectedROI: number;
+    confidence: number;
+  }>> => {
+    return apiRequest('/api/marketing/ml/forecast', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // ==================== IMAGE ANALYSIS ====================
+
+  /**
+   * Vollständige Bildanalyse mit Orchestration Status
+   */
+  fullImageAnalysis: async (file: File): Promise<ApiResponse<{
+    mode: 'real' | 'partial' | 'failed' | 'error';
+    completeness: number;
+    steps: Array<{
+      name: string;
+      status: 'success' | 'failed' | 'pending';
+      mode: string;
+    }>;
+    data: {
+      basicAnalysis: any;
+      colors: any;
+      enhancements: any;
+      conversionImpact: any;
+      audience: any;
+    };
+  }>> => {
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    const response = await fetch(`${API_BASE_URL}/api/marketing/image/full-analysis`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP Error: ${response.status}`);
+    }
+
+    return response.json();
   },
 
 };
@@ -556,247 +803,5 @@ export const paymentApi = {
       method: 'POST',
       body: JSON.stringify(data),
     });
-  },
-
-  // ==================== MARKETING TEMPLATES ====================
-
-  /**
-   * Generiert ein Marketing-Template basierend auf Kategorie und Industrie
-   */
-  generateTemplate: async (data: {
-    templateCategory: string;
-    industry: string;
-    customization?: string;
-  }): Promise<ApiResponse<{
-    template: {
-      id: string;
-      name: string;
-      content: string;
-      category: string;
-      industry: string;
-    };
-  }>> => {
-    return apiRequest('/api/marketing/templates/generate', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
-
-  /**
-   * Vorhersage des Engagement-Scores für Template-Content
-   */
-  predictEngagement: async (data: {
-    templateContent: string;
-    templateCategory: string;
-    industry: string;
-  }): Promise<ApiResponse<{
-    prediction: {
-      engagementScore: number;
-      confidence: number;
-    };
-  }>> => {
-    return apiRequest('/api/marketing/templates/predict-engagement', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
-
-  /**
-   * Performance-Vorhersage für Template-Content
-   */
-  forecastPerformance: async (data: {
-    templateContent: string;
-    templateCategory: string;
-    industry: string;
-  }): Promise<ApiResponse<{
-    forecast: {
-      expectedCtr: number;
-      expectedConversions: number;
-      revenueEstimate: number;
-      confidence: number;
-    };
-  }>> => {
-    return apiRequest('/api/marketing/templates/forecast-performance', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
-
-  /**
-   * Template-Content optimieren mit AI
-   */
-  optimizeTemplate: async (data: {
-    templateContent: string;
-    templateCategory: string;
-    industry: string;
-    optimizationGoal?: 'engagement' | 'conversion' | 'seo';
-  }): Promise<ApiResponse<{
-    optimizedContent: string;
-    improvements: string[];
-    score: number;
-  }>> => {
-    return apiRequest('/api/marketing/templates/optimize', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
-
-  /**
-   * Empfehlung der besten Template-Kategorie basierend auf Kontext
-   */
-  recommendCategory: async (data: {
-    userIntent: string;
-    industry: string;
-    currentContext?: string;
-  }): Promise<ApiResponse<{
-    recommendedCategory: string;
-    reason: string;
-    alternativeCategories: string[];
-  }>> => {
-    return apiRequest('/api/marketing/templates/recommend-category', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
-
-  // ==================== ML MARKETING ====================
-
-  /**
-   * Generiert Marketing-Ideen mit ML
-   */
-  generateMarketingIdeas: async (data: {
-    goal: string;
-    audience?: string;
-    productInfo?: string;
-    budget?: number;
-  }): Promise<ApiResponse<{
-    ideas: Array<{
-      type: 'text' | 'image' | 'audience' | 'forecast';
-      content: string;
-      score?: number;
-      reason?: string;
-    }>;
-  }>> => {
-    return apiRequest('/api/marketing/ml/ideas', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
-
-  /**
-   * Generiert Email-Kampagne mit ML
-   */
-  generateEmailCampaign: async (data: {
-    productName: string;
-    productDesc?: string;
-    targetAudience: string;
-    campaignType?: 'promotional' | 'educational' | 'transactional';
-  }): Promise<ApiResponse<{
-    subject: string;
-    preheader: string;
-    body: string;
-    cta: string;
-  }>> => {
-    return apiRequest('/api/marketing/ml/email', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
-
-  /**
-   * Generiert Social Media Content mit ML
-   */
-  generateSocialContent: async (data: {
-    topic: string;
-    tone?: 'professional' | 'casual' | 'energetic';
-    platforms: string[];
-  }): Promise<ApiResponse<{
-    posts: Array<{
-      platform: string;
-      content: string;
-      hashtags: string[];
-    }>;
-  }>> => {
-    return apiRequest('/api/marketing/ml/social', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
-
-  /**
-   * Optimiert Marketing-Copy mit ML
-   */
-  optimizeMarketingCopy: async (data: {
-    currentCopy: string;
-    targetAction?: string;
-    audience?: string;
-  }): Promise<ApiResponse<{
-    optimizedCopy: string;
-    improvements: string[];
-    score: number;
-  }>> => {
-    return apiRequest('/api/marketing/ml/optimize', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
-
-  /**
-   * Prognostiziert Campaign-Performance mit ML
-   */
-  forecastCampaign: async (data: {
-    campaignType: string;
-    budget: number;
-    targetAudience: number;
-    historicalCTR?: number;
-    historicalROI?: number;
-  }): Promise<ApiResponse<{
-    expectedReach: number;
-    expectedClicks: number;
-    expectedConversions: number;
-    projectedROI: number;
-    confidence: number;
-  }>> => {
-    return apiRequest('/api/marketing/ml/forecast', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
-
-  // ==================== IMAGE ANALYSIS ====================
-
-  /**
-   * Vollständige Bildanalyse mit Orchestration Status
-   */
-  fullImageAnalysis: async (file: File): Promise<ApiResponse<{
-    mode: 'real' | 'partial' | 'failed' | 'error';
-    completeness: number;
-    steps: Array<{
-      name: string;
-      status: 'success' | 'failed' | 'pending';
-      mode: string;
-    }>;
-    data: {
-      basicAnalysis: any;
-      colors: any;
-      enhancements: any;
-      conversionImpact: any;
-      audience: any;
-    };
-  }>> => {
-    const formData = new FormData();
-    formData.append('image', file);
-    
-    const response = await fetch(`${API_BASE_URL}/api/marketing/image/full-analysis`, {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `HTTP Error: ${response.status}`);
-    }
-
-    return response.json();
   },
 };
