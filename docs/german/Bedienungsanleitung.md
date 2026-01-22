@@ -38,7 +38,7 @@ Diese Mock-Visualisierungen werden schrittweise durch echte WooCommerce-Datenint
 3. Caching-Mechanismen für Echtzeit-Metriken verfügbar sind
 
 ---
- v7.0.3 (Januar 2026)
+ v7.0.7 (Januar 2026)
 
 **Status:** Production Ready mit erweiterten Trend-Analysen und Preisoptimierungen
 

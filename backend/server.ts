@@ -79,6 +79,7 @@ import templateRoutes from './routes/app/api/marketing/template-routes';
 // 🔥 SOCIAL MEDIA ROUTES
 import oauthRoutes from './routes/app/api/social/oauth-routes';
 import postRoutes from './routes/app/api/social/post-routes';
+import assetsRoutes from './routes/app/api/social/assets-routes';
 import bufferRoutes from './routes/app/api/social/buffer-routes';
 import webhookRoutes from './routes/app/api/social/webhook-routes';
 
@@ -545,6 +546,19 @@ async function buildServer() {
 
     await server.register(postRoutes, { prefix: '/api' }); // Post endpoints like /api/social/post
     console.log('✅ Social Media Post Routes erfolgreich registriert');
+
+    await server.register(assetsRoutes, { prefix: '/api' }); // Asset upload endpoints
+    console.log('✅ Social Media Assets Routes erfolgreich registriert');
+
+    // Serve uploaded assets statically
+    const assetsStoragePath = path.join(__dirname, '../data/social-assets');
+    const fastifyStatic = await import('@fastify/static');
+    await server.register(fastifyStatic.default, {
+      root: assetsStoragePath,
+      prefix: '/social/assets/',
+      decorateReply: false
+    });
+    console.log('✅ Social Media Assets Static Serving konfiguriert');
 
     await server.register(bufferRoutes, { prefix: '/api' }); // Buffer API (einfacher als direktes OAuth!)
     console.log('✅ Buffer Routes erfolgreich registriert');

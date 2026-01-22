@@ -1,6 +1,6 @@
 # 🚀 A.R.I. - Kubernetes & Deployment Architektur
 
-**Version:** 7.0.4  
+**Version:** 7.0.7  
 **Datum:** Januar 2026  
 **Zielgruppe:** Automattic Engineering Team, DevOps, Kubernetes-Administratoren
 
@@ -184,7 +184,7 @@
      "customer_id": "cust_12345",
      "subscription_id": "sub_67890",
      "active_until": "2026-02-05",
-     "container_version": "v7.0.5"
+     "container_version": "7.0.7"
    }
    ⚠️ WICHTIG: shop_url wird NICHT hier übergeben!
       → Shop-URL kommt später vom Kunden im Onboarding
@@ -261,19 +261,19 @@ SZENARIO: Container crashed, ist unerreichbar, Malware, etc.
 ### Update-Fall: Neue Version verfügbar
 
 ```
-SZENARIO: A.R.I. v7.0.5 ist verfügbar (bessere Tools, Bugfixes)
+SZENARIO: A.R.I. 7.0.7 ist verfügbar (bessere Tools, Bugfixes)
 
 1. A.R.I. Team gibt neue Container-Version frei
-   - Image: ari:v7.0.5
+   - Image: ari:7.0.7
    - Alle Sicherheits-Patches enthalten
    - Keine technischen Schulden angehäuft
    ↓
 2. Automattic rollt aus (Kubernetes Rolling Update)
    - Strategy: Blue-Green oder RollingUpdate (egal, wir haben connection.json!)
    ↓
-3. Neuer Container (v7.0.5) startet mit:
+3. Neuer Container (7.0.7) startet mit:
    - Mode: update
-   - Alte connection.json (v7.0.4 Container) als Input
+   - Alte connection.json (7.0.7 Container) als Input
    ↓
 4. Container prüft auf Startup:
    - Liegt connection.json vor?
@@ -311,7 +311,7 @@ spec:
     spec:
       containers:
       - name: ari
-        image: ari:v7.0.5
+        image: ari:7.0.7
         ports:
         - containerPort: 3000
         
@@ -415,17 +415,17 @@ app.get('/ready', (req, res) => {
 #### Normal: Deployment with New Version
 
 ```yaml
-# ALT (v7.0.4)
+# ALT (7.0.7)
 services:
   app:
-    image: ari:v7.0.4
+    image: ari:7.0.7
     container_name: woo-app-prod
     # ...
 
-# NEU (v7.0.5) - nur 1 Zeile geändert!
+# NEU (7.0.7) - nur 1 Zeile geändert!
 services:
   app:
-    image: ari:v7.0.5      # ← NUR DIESE ZEILE
+    image: ari:7.0.7      # ← NUR DIESE ZEILE
     container_name: woo-app-prod
     # ...
 ```
@@ -501,7 +501,7 @@ Payload:
   "shop_url": "https://customer-shop.de",
   "shop_name": "Mein Shop",
   "active_until": "2026-02-05",
-  "container_version": "v7.0.5",
+  "container_version": "7.0.7",
   "container_config": {
     "replicas": 1,
     "resources": {
@@ -514,7 +514,7 @@ Payload:
 Aktion:
 → Erstelle Kubernetes Namespace: cust-xyz-prod
 → Erstelle ConfigMap mit subscription-info
-→ Starte Deployment mit A.R.I. Image v7.0.5
+→ Starte Deployment mit A.R.I. Image 7.0.7
 ```
 
 #### 2. **Kubernetes ConfigMap Template**
@@ -853,5 +853,5 @@ Keine Überraschungen!
 ---
 
 **Letzte Aktualisierung:** Januar 2026  
-**Version:** 7.0.4  
+**Version:** 7.0.7  
 **Für:** Automattic Engineering Team

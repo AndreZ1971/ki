@@ -15,6 +15,15 @@ type GeneratedPost = {
   suggestions?: string[];
 };
 
+type UploadedAsset = {
+  assetId: string;
+  publicUrl: string;
+  type: 'image' | 'audio' | 'video';
+  mimeType: string;
+  filename: string;
+  size: number;
+};
+
 const SocialMediaPoster: React.FC = () => {
   const { handleBackToDashboard } = useProductManagement();
   const { toasts, showToast } = useToast();
@@ -39,6 +48,11 @@ const SocialMediaPoster: React.FC = () => {
   // YouTube Video Upload
   const [youtubeVideoFile, setYoutubeVideoFile] = useState<File | null>(null);
   const [youtubeVideoPreview, setYoutubeVideoPreview] = useState<string>('');
+  
+  // Media Assets for Social Posts
+  const [selectedMedia, setSelectedMedia] = useState<Array<{ file: File; type: 'image' | 'audio' | 'video' }>>([]);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
+  const [uploadedAssets, setUploadedAssets] = useState<UploadedAsset[]>([]);
   
   // Integration Options (for manual posting)
   const [connectedAccounts, setConnectedAccounts] = useState({
@@ -150,6 +164,87 @@ const SocialMediaPoster: React.FC = () => {
     }
   };
 
+  const handleMediaSelect = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    const newMedia: Array<{file: File, type: 'image' | 'audio' | 'video', name: string}> = [];
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const mimeType = file.type;
+      
+      let assetType: 'image' | 'audio' | 'video' | null = null;
+      
+      if (mimeType.startsWith('image/')) {
+        assetType = 'image';
+      } else if (mimeType.startsWith('audio/')) {
+        assetType = 'audio';
+      } else if (mimeType.startsWith('video/')) {
+        assetType = 'video';
+      }
+      
+      if (assetType) {
+        newMedia.push({file, type: assetType, name: file.name});
+      }
+    }
+    
+    if (newMedia.length > 0) {
+      setSelectedMedia([...selectedMedia, ...newMedia]);
+      await uploadMediaAssets(newMedia);
+    } else {
+      showToast('Keine gültigen Media-Dateien ausgewählt', 'error');
+    }
+  };
+
+  const uploadMediaAssets = async (mediaToupload: Array<{file: File, type: 'image' | 'audio' | 'video', name: string}>) => {
+    setUploadingMedia(true);
+    const newAssets = [];
+    
+    for (const media of mediaToupload) {
+      try {
+        const formData = new FormData();
+        formData.append('file', media.file);
+        
+        const response = await fetch(`${apiBase}/api/social/assets/upload`, {
+          method: 'POST',
+          body: formData
+        });
+        
+        const data = await response.json();
+        if (data.success && data.asset) {
+          newAssets.push({
+            assetId: data.asset.assetId,
+            publicUrl: data.asset.publicUrl,
+            type: data.asset.type,
+            mimeType: data.asset.mimeType,
+            filename: data.asset.filename,
+            size: data.asset.size
+          });
+          showToast(`${media.name} hochgeladen`, 'success');
+        } else {
+          throw new Error(data.error || 'Upload fehlgeschlagen');
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Upload-Fehler';
+        showToast(`Fehler bei ${media.name}: ${errorMessage}`, 'error');
+      }
+    }
+    
+    setUploadedAssets([...uploadedAssets, ...newAssets]);
+    setUploadingMedia(false);
+  };
+
+  const removeUploadedAsset = (index: number) => {
+    const assetToRemove = uploadedAssets[index];
+    if (assetToRemove.assetId) {
+      fetch(`${apiBase}/api/social/assets/${assetToRemove.assetId}`, {
+        method: 'DELETE'
+      }).catch(err => console.error('Fehler beim Löschen des Assets:', err));
+    }
+    setUploadedAssets(uploadedAssets.filter((_, i) => i !== index));
+    setSelectedMedia(selectedMedia.filter((_, i) => i !== index));
+  };
+
   const handlePublishPost = async (platform: string, content: string) => {
     try {
       // YouTube special handling
@@ -190,12 +285,19 @@ const SocialMediaPoster: React.FC = () => {
         return;
       }
 
+      // Build assets from uploaded media
+      const assets = uploadedAssets.map(asset => ({
+        url: asset.publicUrl,
+        type: asset.type as 'image' | 'audio' | 'video'
+      }));
+
       const response = await fetch(`${apiBase}/api/social/webhook/post`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           platform,
           content,
+          assets: assets.length > 0 ? assets : undefined,
           scheduleTime: 'now',
           useAI: aiTransformOnPublish
         })
@@ -208,6 +310,9 @@ const SocialMediaPoster: React.FC = () => {
           ...prev,
           published: prev.published + 1
         }));
+        // Clear media after successful post
+        setSelectedMedia([]);
+        setUploadedAssets([]);
       } else {
         throw new Error(data.error || 'Veröffentlichung fehlgeschlagen');
       }
@@ -481,8 +586,8 @@ const SocialMediaPoster: React.FC = () => {
                   </div>
                 )}
 
-                {/* YouTube Video Upload */}
-                {post.platform === 'youtube' && (
+                {/* Media Upload Section */}
+                {post.platform === 'youtube' ? (
                   <div style={{ marginTop: '12px', padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
                     <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', color: 'rgba(255,255,255,0.9)' }}>
                       🎥 Video auswählen
@@ -511,6 +616,51 @@ const SocialMediaPoster: React.FC = () => {
                         <div style={{ marginTop: '6px', fontSize: '11px', color: 'rgba(255,255,255,0.6)' }}>
                           ✅ {youtubeVideoFile?.name}
                         </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div style={{ marginTop: '12px', padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', color: 'rgba(255,255,255,0.9)' }}>
+                      📎 Media ({uploadedAssets.length} {uploadedAssets.length === 1 ? 'Datei' : 'Dateien'})
+                    </label>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*,audio/*,video/*"
+                      onChange={(e) => handleMediaSelect(e.target.files)}
+                      disabled={uploadingMedia}
+                      style={{ 
+                        width: '100%',
+                        padding: '8px',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        background: 'rgba(0,0,0,0.3)',
+                        color: 'white',
+                        fontSize: '12px',
+                        cursor: uploadingMedia ? 'not-allowed' : 'pointer',
+                        opacity: uploadingMedia ? 0.5 : 1
+                      }}
+                    />
+                    {uploadingMedia && (
+                      <div style={{ marginTop: '8px', fontSize: '12px', color: '#fbbf24' }}>
+                        ⏳ Dateien werden hochgeladen...
+                      </div>
+                    )}
+                    {uploadedAssets.length > 0 && (
+                      <div style={{ marginTop: '10px' }}>
+                        {uploadedAssets.map((asset, idx) => (
+                          <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px', background: 'rgba(0,0,0,0.2)', borderRadius: '4px', marginBottom: '6px', fontSize: '11px' }}>
+                            <span>✅ {asset.type === 'image' ? '🖼️' : asset.type === 'audio' ? '🎵' : '🎬'} {asset.filename}</span>
+                            <button
+                              onClick={() => removeUploadedAsset(idx)}
+                              style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '14px', padding: '0 4px' }}
+                              title="Datei entfernen"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>
