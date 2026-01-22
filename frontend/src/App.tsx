@@ -48,6 +48,7 @@ import SystemHealth from "./pages/Advanced/SystemHealth";
 // Feedback Analysis Page
 import FeedbackAnalysis from "./pages/app/FeedbackAnalysis";
 import LoopMonitoring from "./pages/app/LoopMonitoring";
+import LoopHistory from "./pages/app/LoopHistory";
 import WooCommerceSync from "./pages/Advanced/WooCommerceSync";
 
 // Marketing Content Pages
@@ -238,6 +239,8 @@ function App() {
 
           {/* Agentic Loop Monitoring */}
           <Route path="/app/loop-monitoring" element={<ProtectedRoute><LoopMonitoring /></ProtectedRoute>} />
+          <Route path="/agentic-loops" element={<ProtectedRoute><LoopMonitoring /></ProtectedRoute>} />
+          <Route path="/app/loop-history" element={<ProtectedRoute><LoopHistory /></ProtectedRoute>} />
 
           {/* User Management Route */}
           <Route path="/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />

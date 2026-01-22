@@ -146,9 +146,14 @@ export const AgenticLoopsDashboard: React.FC = () => {
           <h1>🤖 Agentic Loops</h1>
           <p>Automated intelligence systems analyzing your shop</p>
         </div>
-        <button className="back-button" onClick={() => navigate(-1)}>
-          ← Zurück
-        </button>
+        <div className="header-actions">
+          <button className="history-button" onClick={() => navigate('/app/loop-history')}>
+            📜 Cronjob History
+          </button>
+          <button className="back-button" onClick={() => navigate('/settings')}>
+            ← Zurück
+          </button>
+        </div>
       </div>
 
       <div className="loops-grid">
