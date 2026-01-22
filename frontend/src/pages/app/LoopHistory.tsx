@@ -5,7 +5,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import './LoopHistory.css';
 
 interface HistoryEntry {
@@ -33,7 +32,6 @@ const LOOP_TYPES = [
 
 const LoopHistory: React.FC = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
   const [selectedLoop, setSelectedLoop] = useState<string>('anomaly-detection');
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [stats, setStats] = useState<Record<string, LoopStats>>({});
@@ -130,13 +128,6 @@ const LoopHistory: React.FC = () => {
     if (filter === 'failed') return !entry.success;
     return true;
   });
-
-  const selectedLoopData = LOOP_TYPES.find((l) => l.id === selectedLoop);
-  const selectedStats = stats[selectedLoop] || {
-    totalRuns: 0,
-    successRate: 0,
-    avgExecutionTime: 0,
-  };
 
   return (
     <div className="loop-history">
