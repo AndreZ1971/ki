@@ -269,7 +269,7 @@ const LoopHistory: React.FC = () => {
       </div>
 
       {/* Summary Stats */}
-      {filteredHistory.length > 0 && (
+      {history.length > 0 && (
         <div className="history-summary">
           <div className="summary-card">
             <span className="summary-label">Gesamt</span>
@@ -284,8 +284,8 @@ const LoopHistory: React.FC = () => {
             </span>
           </div>
           <div className="summary-card">
-            <span className="summary-label">Ø Dauer</span>
-            <span className="summary-value">
+            <span className="summary-label">⏱️ Ø Dauer</span>
+            <span className={`summary-value ${filteredHistory.length === 0 ? 'empty' : ''}`}>
               {filteredHistory.length > 0
                 ? formatDuration(
                     filteredHistory.reduce((sum, e) => sum + e.executionTime, 0) /
@@ -295,9 +295,11 @@ const LoopHistory: React.FC = () => {
             </span>
           </div>
           <div className="summary-card">
-            <span className="summary-label">Gesamt Insights</span>
-            <span className="summary-value">
-              {filteredHistory.reduce((sum, e) => sum + e.insights, 0)}
+            <span className="summary-label">💡 Gesamt Insights</span>
+            <span className={`summary-value ${filteredHistory.length === 0 ? 'empty' : ''}`}>
+              {filteredHistory.length > 0
+                ? filteredHistory.reduce((sum, e) => sum + (e.insights || 0), 0)
+                : '–'}
             </span>
           </div>
         </div>

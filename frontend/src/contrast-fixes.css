@@ -300,6 +300,31 @@ table tbody tr:hover td {
    RESPONSIVE - Tablet und Mobile
    ============================================ */
 
+/* LOOP HISTORY - Exception für dunkles Theme */
+.loop-history,
+.loop-history .loop-card,
+.loop-history .history-content,
+.loop-history .loop-selector,
+.loop-history .history-controls {
+  background: transparent !important;
+}
+
+.loop-history .summary-value {
+  color: inherit !important;
+  -webkit-text-fill-color: transparent;
+  background: linear-gradient(135deg, #60a5fa 0%, #34d399 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.loop-history .summary-value.empty {
+  color: #64748b !important;
+  -webkit-text-fill-color: unset;
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+}
+
 @media (max-width: 768px) {
   /* Alle Texte auch auf Mobile lesbar */
   body, p, span, div, label {
