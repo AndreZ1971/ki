@@ -139,9 +139,9 @@ const BlogPostGenerator: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           style={{
             background: metadata.mode === 'fallback' 
-              ? 'linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%)' 
-              : 'linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%)',
-            border: `2px solid ${metadata.mode === 'fallback' ? '#ffc107' : '#17a2b8'}`,
+              ? 'linear-gradient(135deg, rgba(255, 193, 7, 0.15) 0%, rgba(255, 234, 167, 0.15) 100%)' 
+              : 'linear-gradient(135deg, rgba(23, 162, 184, 0.15) 0%, rgba(23, 162, 184, 0.25) 100%)',
+            border: `2px solid ${metadata.mode === 'fallback' ? 'rgba(255, 193, 7, 0.4)' : 'rgba(23, 162, 184, 0.4)'}`,
             borderRadius: '12px',
             padding: '16px',
             marginTop: '20px',
@@ -152,10 +152,10 @@ const BlogPostGenerator: React.FC = () => {
               {metadata.mode === 'fallback' ? '⚠️' : '✅'}
             </span>
             <div>
-              <strong style={{ fontSize: '16px', display: 'block' }}>
+              <strong style={{ fontSize: '16px', display: 'block', color: 'white' }}>
                 {metadata.mode === 'fallback' ? 'Fallback-Modus' : 'OpenAI GPT'}
               </strong>
-              <span style={{ fontSize: '13px', opacity: 0.8 }}>
+              <span style={{ fontSize: '13px', opacity: 0.8, color: 'rgba(255,255,255,0.8)' }}>
                 Confidence: {metadata.confidence}%
               </span>
             </div>
@@ -164,14 +164,15 @@ const BlogPostGenerator: React.FC = () => {
           <div style={{ 
             fontSize: '13px', 
             opacity: 0.9, 
-            background: 'rgba(255,255,255,0.6)', 
+            background: 'rgba(255,255,255,0.05)', 
             padding: '12px', 
-            borderRadius: '8px' 
+            borderRadius: '8px',
+            color: 'rgba(255,255,255,0.9)'
           }}>
-            <strong style={{ display: 'block', marginBottom: '8px' }}>Input-Parameter:</strong>
+            <strong style={{ display: 'block', marginBottom: '8px', color: 'white' }}>Input-Parameter:</strong>
             {Object.entries(metadata.inputs).map(([key, value]) => (
               <div key={key} style={{ marginBottom: '4px' }}>
-                <strong>{key}:</strong> {value}
+                <strong style={{ color: 'rgba(255,255,255,0.9)' }}>{key}:</strong> <span style={{ color: 'rgba(255,255,255,0.8)' }}>{value}</span>
               </div>
             ))}
           </div>
