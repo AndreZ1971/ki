@@ -1,9 +1,9 @@
 {
-  "specializationId": "error-recovery-001",
+  "specializationId": "integrity-test-001",
   "userId": "test-user-persistence",
   "data": {
-    "id": "error-recovery-001",
-    "name": "Error Recovery",
+    "id": "integrity-test-001",
+    "name": "Integrity Test",
     "description": "Testing specialization persistence",
     "systemPrompt": "You are a test agent for specialization persistence testing.",
     "category": "testing",
@@ -13,8 +13,8 @@
       "fallback",
       "recovery"
     ],
-    "createdAt": 1768087801996
+    "createdAt": 1769114493377
   },
-  "timestamp": 1768087802010,
-  "checksum": "c95eb8e96b8e9127ac46d61881ad01a2098fe004c9f226380f7564bef7a52553"
+  "timestamp": 1769114493391,
+  "checksum": "2e8ef2452672f41424800036d6c6de5678c8930f7f1ec86a4c9c204c2fd11677"
 }

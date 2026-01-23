@@ -1,0 +1,10 @@
+{
+  "id": "integrity-test-001",
+  "name": "Integrity Test",
+  "version": "1.0.0",
+  "checksum": "2e8ef2452672f41424800036d6c6de5678c8930f7f1ec86a4c9c204c2fd11677",
+  "createdAt": 1769114493377,
+  "updatedAt": 1769114493379,
+  "size": 294,
+  "encrypted": false
+}

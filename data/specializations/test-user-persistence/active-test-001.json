@@ -1,6 +1,6 @@
 {
-  "id": "fallback-spec-001",
-  "name": "Fallback Test",
+  "id": "active-test-001",
+  "name": "Active Test",
   "description": "Testing specialization persistence",
   "systemPrompt": "You are a test agent for specialization persistence testing.",
   "category": "testing",
@@ -10,5 +10,5 @@
     "fallback",
     "recovery"
   ],
-  "createdAt": 1769114493337
+  "createdAt": 1769114493312
 }
