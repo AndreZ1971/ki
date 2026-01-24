@@ -1,7 +1,7 @@
 {
   "name": "ari-artificial-retail-intelligence-frontend",
   "private": true,
-  "version": "7.0.4",
+  "version": "7.0.9",
   "description": "Frontend for A.R.I. Artificial Retail Intelligence System",
   "type": "module",
   "scripts": {

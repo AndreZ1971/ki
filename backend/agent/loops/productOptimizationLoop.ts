@@ -30,21 +30,41 @@ interface OptimizationResult {
 }
 
 export class ProductOptimizationLoop extends AgenticLoop {
-  private wooCommerce: WooCommerceRestApi;
+  private wooCommerce: WooCommerceRestApi | null = null;
   private candidates: ProductVariant[] = [];
   private results: OptimizationResult[] = [];
+  private hasWooCommerceConfig: boolean = false;
 
   constructor() {
     super('product-performance', 5);
 
+    try {
+      const config = getConfig();
+      
+      // Prüfe ob WooCommerce konfiguriert ist
+      this.hasWooCommerceConfig = !!(
+        config.woocommerce?.url &&
+        config.woocommerce?.consumerKey &&
+        config.woocommerce?.consumerSecret
+      );
 
-    const config = getConfig();
-    this.wooCommerce = new WooCommerceRestApi({
-      url: config.woocommerce?.url || '',
-      consumerKey: config.woocommerce?.consumerKey || '',
-      consumerSecret: config.woocommerce?.consumerSecret || '',
-      version: 'wc/v3',
-    });
+      if (this.hasWooCommerceConfig) {
+        this.wooCommerce = new WooCommerceRestApi({
+          url: config.woocommerce?.url || '',
+          consumerKey: config.woocommerce?.consumerKey || '',
+          consumerSecret: config.woocommerce?.consumerSecret || '',
+          version: 'wc/v3',
+        });
+      } else {
+        logger.warn('⚠️ WooCommerce is not configured, using mock data');
+        this.wooCommerce = null;
+      }
+    } catch (error) {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      logger.error(`Error initializing ProductOptimizationLoop: ${errMsg}`);
+      this.hasWooCommerceConfig = false;
+      this.wooCommerce = null;
+    }
 
     this.setupSteps();
   }
@@ -56,6 +76,34 @@ export class ProductOptimizationLoop extends AgenticLoop {
       description: 'Find products with low conversion rates',
       action: async () => {
         logger.info('🔍 SENSE: Fetching product performance data...');
+
+        // Wenn WooCommerce nicht konfiguriert ist, gebe Mock-Daten zurück
+        if (!this.hasWooCommerceConfig || !this.wooCommerce) {
+          logger.info('📊 SENSE: Using mock data (WooCommerce not configured)');
+          return [
+            {
+              id: 101,
+              name: 'Sample Product 1',
+              price: '29.99',
+              description: 'A great product',
+              category: 'Electronics',
+            },
+            {
+              id: 102,
+              name: 'Sample Product 2',
+              price: '49.99',
+              description: 'Another product',
+              category: 'Accessories',
+            },
+            {
+              id: 103,
+              name: 'Sample Product 3',
+              price: '19.99',
+              description: 'Budget option',
+              category: 'Basics',
+            },
+          ];
+        }
 
         const response = await this.wooCommerce.get('products', {
           per_page: 50,

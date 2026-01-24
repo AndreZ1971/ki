@@ -9,6 +9,9 @@ import { LoopResultCard } from './LoopResultCard';
 import type { LoopResult } from './LoopResultCard';
 import './AgenticLoopsDashboard.css';
 
+// Get API base URL from environment
+const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
+
 interface LoopDefinition {
   id: string;
   name: string;
@@ -229,12 +232,14 @@ export const AgenticLoopsDashboard: React.FC = () => {
                     setRunningLoop(loop.id);
                     const start = performance.now();
                     try {
-                      // Call real backend API
-                      const response = await fetch(`/api/agent/loops/${loop.id}/run`, {
+                      // Call real backend API with proper URL
+                      const apiUrl = `${API_BASE_URL}/api/agent/loops/${loop.id}/run`;
+                      const response = await fetch(apiUrl, {
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json',
                         },
+                        body: JSON.stringify({}),
                       });
 
                       if (!response.ok) {

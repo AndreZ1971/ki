@@ -127,16 +127,16 @@ Abandoned Carts? Kunden, die lange nichts gekauft haben? A.R.I. kennt sie und er
 - ✅ Echtzeit-Analytics mit echten WooCommerce-Daten (keine Mock-Daten)
 - ✅ Email-Automation (Carts, Willkommensserie, Reaktivierung)
 - ✅ Social-Media-Posts (6 Plattformen)
-- ✅ **NEU v7.0.8:** Globales Design Token System mit Dark Mode
-- ✅ **NEU v7.0.8:** 8-Sprachen Support (DE, EN, FR, ES, IT, PT, NL, PL)
-- ✅ **NEU v7.0.8:** Vollständig dunkles Chatbot-Design mit perfekter Lesbarkeit
-- ✅ **NEU v7.0.8:** Spezialisierungs-aware KI-Personalisierung
+- ✅ **NEU v7.0.9:** Globales Design Token System mit Dark Mode
+- ✅ **NEU v7.0.9:** 8-Sprachen Support (DE, EN, FR, ES, IT, PT, NL, PL)
+- ✅ **NEU v7.0.9:** Vollständig dunkles Chatbot-Design mit perfekter Lesbarkeit
+- ✅ **NEU v7.0.9:** Spezialisierungs-aware KI-Personalisierung
 - ✅ Multi-Source Trend-Analyse (Google Trends + Reddit OAuth)
 - ✅ Prozentuale Preissuggestionen mit deterministischer Berechnung
 - ✅ Manuelle Validierung von AI-Vorschlägen vor Übernahme
-- ✅ **NEU v7.0.8:** Vollständige WooCommerce-Integration ohne Platzhalter
-- ✅ **NEU v7.0.8:** Support-Tickets mit HTML-Bereinigung
-- ✅ **NEU v7.0.8:** Produktideen-Scoring ohne Zufallswerte
+- ✅ **NEU v7.0.9:** Vollständige WooCommerce-Integration ohne Platzhalter
+- ✅ **NEU v7.0.9:** Support-Tickets mit HTML-Bereinigung
+- ✅ **NEU v7.0.9:** Produktideen-Scoring ohne Zufallswerte
 
 ## ⚙️ Technologie
 

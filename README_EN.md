@@ -90,10 +90,10 @@ Your shop is on Facebook, Instagram, LinkedIn, TikTok, email. A.R.I. posts smart
 - ✅ Real-time analytics with real recommendations
 - ✅ Email automation (carts, welcome series, reactivation)
 - ✅ Social media posts (6 platforms)
-- ✅ **NEW v7.0.8:** Global Design Token System with Dark Mode
-- ✅ **NEW v7.0.8:** 8-language support (DE, EN, FR, ES, IT, PT, NL, PL)
-- ✅ **NEW v7.0.8:** Fully dark chatbot design with perfect readability
-- ✅ **NEW v7.0.8:** Specialization-aware AI personalization
+- ✅ **NEW v7.0.9:** Global Design Token System with Dark Mode
+- ✅ **NEW v7.0.9:** 8-language support (DE, EN, FR, ES, IT, PT, NL, PL)
+- ✅ **NEW v7.0.9:** Fully dark chatbot design with perfect readability
+- ✅ **NEW v7.0.9:** Specialization-aware AI personalization
 - ✅ Multi-source trend analysis (Google Trends + Reddit OAuth)
 - ✅ Percentage-based price suggestions with intelligent fallback logic
 - ✅ Manual validation of AI suggestions before adoption
@@ -157,16 +157,16 @@ Your shop is on Facebook, Instagram, LinkedIn, TikTok, email. A.R.I. posts smart
 - ✅ Real-time analytics with authentic WooCommerce data (no mock data)
 - ✅ Email automation (carts, welcome series, reactivation)
 - ✅ Social media posts (6 platforms)
-- ✅ **NEW v7.0.8:** Global design token system with dark mode
-- ✅ **NEW v7.0.8:** 8-language support (DE, EN, FR, ES, IT, PT, NL, PL)
-- ✅ **NEW v7.0.8:** Fully dark chatbot design with perfect readability
-- ✅ **NEW v7.0.8:** Specialization-aware AI personalization
+- ✅ **NEW v7.0.9:** Global design token system with dark mode
+- ✅ **NEW v7.0.9:** 8-language support (DE, EN, FR, ES, IT, PT, NL, PL)
+- ✅ **NEW v7.0.9:** Fully dark chatbot design with perfect readability
+- ✅ **NEW v7.0.9:** Specialization-aware AI personalization
 - ✅ Multi-source trend analysis (Google Trends + Reddit OAuth)
 - ✅ Percentage-based price suggestions with deterministic calculation
 - ✅ Manual validation of AI suggestions before adoption
-- ✅ **NEW v7.0.8:** Complete WooCommerce integration without placeholders
-- ✅ **NEW v7.0.8:** Support tickets with HTML sanitization
-- ✅ **NEW v7.0.8:** Product idea scoring without random values
+- ✅ **NEW v7.0.9:** Complete WooCommerce integration without placeholders
+- ✅ **NEW v7.0.9:** Support tickets with HTML sanitization
+- ✅ **NEW v7.0.9:** Product idea scoring without random values
 | 🚀 **Scaling** | You can scale – without hiring more people |
 
 ### Concretely Implemented Through:

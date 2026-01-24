@@ -214,6 +214,26 @@ async function buildServer() {
     // Body Limit erhöhen
     bodyLimit: 1048576 * 100, // 100MB
     requestTimeout: 300000, // 5 Minuten Timeout für lange Requests
+    ignoreTrailingSlash: true,
+    ajv: {
+      customOptions: {
+        removeAdditional: 'all',
+        coerceTypes: true,
+        useDefaults: true,
+        allowUnionTypes: true,
+      },
+    },
+  });
+
+  // ✅ FIX: Allow empty JSON bodies (fixes 400 Bad Request for POST with Content-Type: application/json but no body)
+  server.addContentTypeParser('application/json', { parseAs: 'string' }, function (req, body, done) {
+    try {
+      const json = body === '' ? {} : JSON.parse(body as string);
+      done(null, json);
+    } catch (err: any) {
+      err.statusCode = 400;
+      done(err, undefined);
+    }
   });
 
   const redisUrl = process.env.REDIS_URL?.trim();

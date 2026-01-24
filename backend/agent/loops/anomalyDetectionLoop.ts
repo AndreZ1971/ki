@@ -21,21 +21,41 @@ interface PaymentAnomaly {
 }
 
 export class AnomalyDetectionLoop extends AgenticLoop {
-  private wooCommerce: WooCommerceRestApi;
+  private wooCommerce: WooCommerceRestApi | null = null;
   private anomalies: PaymentAnomaly[] = [];
   private patterns: Map<string, number> = new Map();
+  private hasWooCommerceConfig: boolean = false;
 
   constructor() {
     super('anomaly-detection', 3);
 
+    try {
+      const config = getConfig();
+      
+      // Prüfe ob WooCommerce konfiguriert ist
+      this.hasWooCommerceConfig = !!(
+        config.woocommerce?.url &&
+        config.woocommerce?.consumerKey &&
+        config.woocommerce?.consumerSecret
+      );
 
-    const config = getConfig();
-    this.wooCommerce = new WooCommerceRestApi({
-      url: config.woocommerce?.url || '',
-      consumerKey: config.woocommerce?.consumerKey || '',
-      consumerSecret: config.woocommerce?.consumerSecret || '',
-      version: 'wc/v3',
-    });
+      if (this.hasWooCommerceConfig) {
+        this.wooCommerce = new WooCommerceRestApi({
+          url: config.woocommerce?.url || '',
+          consumerKey: config.woocommerce?.consumerKey || '',
+          consumerSecret: config.woocommerce?.consumerSecret || '',
+          version: 'wc/v3',
+        });
+      } else {
+        logger.warn('⚠️ WooCommerce is not configured, using mock data');
+        this.wooCommerce = null;
+      }
+    } catch (error) {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      logger.error(`Error initializing AnomalyDetectionLoop: ${errMsg}`);
+      this.hasWooCommerceConfig = false;
+      this.wooCommerce = null;
+    }
 
     this.setupSteps();
   }
@@ -47,6 +67,31 @@ export class AnomalyDetectionLoop extends AgenticLoop {
       description: 'Hole Payment-Daten der letzten Orders',
       action: async () => {
         logger.info('🔍 SENSE: Fetching payment data...');
+
+        // Wenn WooCommerce nicht konfiguriert ist, gebe Mock-Daten zurück
+        if (!this.hasWooCommerceConfig || !this.wooCommerce) {
+          logger.info('📊 SENSE: Using mock data (WooCommerce not configured)');
+          return [
+            {
+              id: 1001,
+              status: 'failed',
+              total: '89.99',
+              payment_method: 'card',
+            },
+            {
+              id: 1002,
+              status: 'pending',
+              total: '145.50',
+              payment_method: 'paypal',
+            },
+            {
+              id: 1003,
+              status: 'cancelled',
+              total: '67.50',
+              payment_method: 'card',
+            },
+          ];
+        }
 
         const response = await this.wooCommerce.get('orders', {
           per_page: 100,
@@ -116,7 +161,7 @@ export class AnomalyDetectionLoop extends AgenticLoop {
           }
 
           // 3️⃣ Repeated Attempts
-          const customerHistory = await this.wooCommerce.get(
+          const customerHistory = await this.wooCommerce!.get(
             `customers/${order.customer_id}/orders`
           );
           const failedAttempts = customerHistory.data.filter(

@@ -52,71 +52,101 @@ function createLoop(type: LoopType): AgenticLoop | null {
   }
 }
 
-const agentLoopsRoutes: FastifyPluginAsync = async (
-  fastify: FastifyInstance
-) => {
-  fastify.post('/:type/run', async (request, reply) => {
-    const startTime = Date.now();
-    const { type } = request.params as { type: LoopType };
-    const { maxIterations = 4 } = (request.query || {}) as {
-      maxIterations?: number | string;
-    };
+const agentLoopsRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
+  // Test-Endpoints um zu überprüfen ob die Route registriert ist
+  fastify.get('/test', async (_request, reply) => {
+    return reply.send({ message: 'Agent Loops Routes are working!' });
+  });
 
-    try {
-      const validTypes: LoopType[] = [
-        'anomaly-detection',
-        'product-performance',
-        'payment-recovery',
-        'analytics-insights',
-      ];
+  fastify.post('/test', async (_request, reply) => {
+    return reply.send({ message: 'POST Agent Loops Routes are working!' });
+  });
 
-      if (!validTypes.includes(type)) {
-        logger.warn(`Invalid loop type requested: ${type}`);
-        return reply.code(400).send({
-          success: false,
-          error: `Invalid loop type. Must be one of: ${validTypes.join(', ')}`,
-        });
-      }
-
-      logger.info(`🤖 Starting Agentic Loop: ${type}`);
-
-      const loop = createLoop(type);
-      if (!loop) {
-        throw new Error(`Failed to create loop: ${type}`);
-      }
-
-      if (maxIterations && typeof maxIterations === 'string') {
-        (loop as any).context.maxIterations = parseInt(maxIterations, 10);
-      }
-
-      const result = await loop.execute();
-      const executionTime = Date.now() - startTime;
-
-      logger.info(`✅ Agentic Loop complete: ${type} (${executionTime}ms)`);
-
-      const response: LoopResponse = {
-        success: result.success,
-        loopType: type,
-        startedAt: new Date(startTime).toISOString(),
-        completedAt: new Date().toISOString(),
-        executionTime,
-        result: (loop as any).getSummary?.() || result.context,
-        insights: result.insights,
-        recommendations: result.recommendations as string[],
+  fastify.post<{ Params: { type: string } }>(
+    '/:type/run',
+    async (request, reply) => {
+      const startTime = Date.now();
+      const { type } = request.params as { type: LoopType };
+      const { maxIterations = 4 } = (request.query || {}) as {
+        maxIterations?: number | string;
       };
+
+      console.log(`📥 Agent Loop Request: type=${type}, path=${request.url}`);
+      console.log(`📥 Request params:`, request.params);
+
+      try {
+        const validTypes: LoopType[] = [
+          'anomaly-detection',
+          'product-performance',
+          'payment-recovery',
+          'analytics-insights',
+        ];
+
+        if (!validTypes.includes(type)) {
+          console.warn(`❌ Invalid loop type: ${type}`);
+          logger.warn(`Invalid loop type requested: ${type}`);
+          return reply.code(400).send({
+            success: false,
+            error: `Invalid loop type. Must be one of: ${validTypes.join(', ')}`,
+          });
+        }
+        logger.info(`🤖 Starting Agentic Loop: ${type}`);
+
+        let loop: AgenticLoop | null;
+        try {
+          loop = createLoop(type);
+        } catch (initError) {
+          const errorMsg = initError instanceof Error ? initError.message : String(initError);
+          logger.error(`Failed to initialize loop ${type}: ${errorMsg}`);
+          return reply.code(500).send({
+            success: false,
+            loopType: type,
+            error: `Failed to initialize loop: ${errorMsg}`,
+          });
+        }
+
+        if (!loop) {
+          logger.error(`Loop factory returned null for type: ${type}`);
+          return reply.code(500).send({
+            success: false,
+            loopType: type,
+            error: `Failed to create loop: ${type}`,
+          });
+        }
+
+        if (maxIterations && typeof maxIterations === 'string') {
+          (loop as any).context.maxIterations = parseInt(maxIterations, 10);
+        }
+
+        const result = await loop.execute();
+        const executionTime = Date.now() - startTime;
+
+        logger.info(`✅ Agentic Loop complete: ${type} (${executionTime}ms)`);
+
+        const response: LoopResponse = {
+          success: result.success,
+          loopType: type,
+          startedAt: new Date(startTime).toISOString(),
+          completedAt: new Date().toISOString(),
+          executionTime,
+          result: (loop as any).getSummary?.() || result.context,
+          insights: result.insights,
+          recommendations: result.recommendations as string[],
+        };
 
       return reply.send(response);
     } catch (error) {
       const executionTime = Date.now() - startTime;
-      logger.error(
-        `❌ Agentic Loop failed: ${type} - ${error instanceof Error ? error.message : String(error)}`
-      );
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : '';
+      
+      logger.error(`❌ Agentic Loop failed: ${type} - ${errorMsg} Stack: ${errorStack}`);
 
       return reply.code(500).send({
         success: false,
         loopType: type,
         executionTime,
-        error: error instanceof Error ? error.message : String(error),
+        error: errorMsg,
       });
     }
   });

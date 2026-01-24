@@ -37,22 +37,42 @@ interface Anomaly {
 }
 
 export class AnalyticsInsightsLoop extends AgenticLoop {
-  private wooCommerce: WooCommerceRestApi;
+  private wooCommerce: WooCommerceRestApi | null = null;
   private metrics: DashboardMetrics | null = null;
   private insights: InsightCard[] = [];
   private anomalies: Anomaly[] = [];
+  private hasWooCommerceConfig: boolean = false;
 
   constructor() {
     super('analytics-insights', 4);
 
+    try {
+      const config = getConfig();
+      
+      // Prüfe ob WooCommerce konfiguriert ist
+      this.hasWooCommerceConfig = !!(
+        config.woocommerce?.url &&
+        config.woocommerce?.consumerKey &&
+        config.woocommerce?.consumerSecret
+      );
 
-    const config = getConfig();
-    this.wooCommerce = new WooCommerceRestApi({
-      url: config.woocommerce?.url || '',
-      consumerKey: config.woocommerce?.consumerKey || '',
-      consumerSecret: config.woocommerce?.consumerSecret || '',
-      version: 'wc/v3',
-    });
+      if (this.hasWooCommerceConfig) {
+        this.wooCommerce = new WooCommerceRestApi({
+          url: config.woocommerce?.url || '',
+          consumerKey: config.woocommerce?.consumerKey || '',
+          consumerSecret: config.woocommerce?.consumerSecret || '',
+          version: 'wc/v3',
+        });
+      } else {
+        logger.warn('⚠️ WooCommerce is not configured, using mock data');
+        this.wooCommerce = null;
+      }
+    } catch (error) {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      logger.error(`Error initializing AnalyticsInsightsLoop: ${errMsg}`);
+      this.hasWooCommerceConfig = false;
+      this.wooCommerce = null;
+    }
 
     this.setupSteps();
   }
@@ -65,6 +85,19 @@ export class AnalyticsInsightsLoop extends AgenticLoop {
       action: async () => {
         logger.info('📊 SENSE: Fetching analytics data from WooCommerce...');
 
+        // Wenn WooCommerce nicht konfiguriert ist, gebe Mock-Daten zurück
+        if (!this.hasWooCommerceConfig) {
+          logger.info('📊 SENSE: Using mock data (WooCommerce not configured)');
+          this.metrics = {
+            revenue: { total: 12450.75, change: 15.3 },
+            orders: { count: 234, change: 8.5 },
+            customers: { count: 178, change: 12.1 },
+            conversion: { rate: 3.45, change: 0.8 },
+            avgOrderValue: { value: 53.19, change: 6.2 },
+          };
+          return this.metrics;
+        }
+
         try {
           // Hole echte Orders der letzten 60 Tage
           const sixtyDaysAgo = new Date();
@@ -73,7 +106,7 @@ export class AnalyticsInsightsLoop extends AgenticLoop {
           const thirtyDaysAgo = new Date();
           thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-          const allOrders = await this.wooCommerce.get('orders', {
+          const allOrders = await this.wooCommerce!.get('orders', {
             after: sixtyDaysAgo.toISOString(),
             per_page: 100,
             status: 'completed',

@@ -35,22 +35,42 @@ interface RecoveryAttempt {
 }
 
 export class PaymentRecoveryLoop extends AgenticLoop {
-  private wooCommerce: WooCommerceRestApi;
+  private wooCommerce: WooCommerceRestApi | null = null;
   private failedOrders: FailedOrder[] = [];
   private strategies: Map<string, RecoveryStrategy> = new Map();
   private attempts: RecoveryAttempt[] = [];
+  private hasWooCommerceConfig: boolean = false;
 
   constructor() {
     super('payment-recovery', 4);
 
+    try {
+      const config = getConfig();
+      
+      // Prüfe ob WooCommerce konfiguriert ist
+      this.hasWooCommerceConfig = !!(
+        config.woocommerce?.url &&
+        config.woocommerce?.consumerKey &&
+        config.woocommerce?.consumerSecret
+      );
 
-    const config = getConfig();
-    this.wooCommerce = new WooCommerceRestApi({
-      url: config.woocommerce?.url || '',
-      consumerKey: config.woocommerce?.consumerKey || '',
-      consumerSecret: config.woocommerce?.consumerSecret || '',
-      version: 'wc/v3',
-    });
+      if (this.hasWooCommerceConfig) {
+        this.wooCommerce = new WooCommerceRestApi({
+          url: config.woocommerce?.url || '',
+          consumerKey: config.woocommerce?.consumerKey || '',
+          consumerSecret: config.woocommerce?.consumerSecret || '',
+          version: 'wc/v3',
+        });
+      } else {
+        logger.warn('⚠️ WooCommerce is not configured, using mock data');
+        this.wooCommerce = null;
+      }
+    } catch (error) {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      logger.error(`Error initializing PaymentRecoveryLoop: ${errMsg}`);
+      this.hasWooCommerceConfig = false;
+      this.wooCommerce = null;
+    }
 
     this.initStrategies();
     this.setupSteps();
@@ -89,6 +109,38 @@ export class PaymentRecoveryLoop extends AgenticLoop {
       description: 'Find failed and pending payment orders',
       action: async () => {
         logger.info('🔍 SENSE: Finding failed payment orders...');
+
+        // Wenn WooCommerce nicht konfiguriert ist, gebe Mock-Daten zurück
+        if (!this.hasWooCommerceConfig || !this.wooCommerce) {
+          logger.info('📊 SENSE: Using mock data (WooCommerce not configured)');
+          this.failedOrders = [
+            {
+              id: 2001,
+              customerId: 101,
+              email: 'customer1@example.com',
+              amount: 89.99,
+              failureReason: 'payment_declined',
+              attempts: 2,
+            },
+            {
+              id: 2002,
+              customerId: 102,
+              email: 'customer2@example.com',
+              amount: 145.50,
+              failureReason: 'pending_payment',
+              attempts: 1,
+            },
+            {
+              id: 2003,
+              customerId: 103,
+              email: 'customer3@example.com',
+              amount: 67.50,
+              failureReason: 'payment_declined',
+              attempts: 3,
+            },
+          ];
+          return this.failedOrders;
+        }
 
         const response = await this.wooCommerce.get('orders', {
           per_page: 50,
