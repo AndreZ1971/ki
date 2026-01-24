@@ -25,41 +25,44 @@ const pathsToTry = [localPath, parentPath, cwdPath, cwdBackendPath];
 console.log('[config.ts] Versuche folgende Pfade:');
 pathsToTry.forEach(p => console.log(`  - ${p}`));
 
-for (const tryPath of pathsToTry) {
-  if (fs.existsSync(tryPath)) {
-    configPath = tryPath;
-    try {
-      configData = JSON.parse(fs.readFileSync(tryPath, 'utf-8'));
-      console.log(`✅ [config.ts] connection.json geladen von: ${configPath}`);
-      console.log(
-        '[config.ts] Geladene WooCommerce-Daten:',
-        configData.woocommerce
-      );
-      console.log('[config.ts] Geladene WordPress-Daten:', configData.wordpress);
-      console.log('[config.ts] Geladene OpenAI-Daten:', configData.openAI);
-      // Debug: Zeige OpenAI API-Key
-      if (configData.openAI && configData.openAI.apiKey) {
-        console.log(
-          `[config.ts] OpenAI API-Key gefunden: ${configData.openAI.apiKey.substring(0, 8)}...`
-        );
-      } else {
-        console.warn('[config.ts] OpenAI API-Key NICHT gefunden!');
+function loadConfigFromPaths(): { data: any; path: string } {
+  for (const tryPath of pathsToTry) {
+    if (fs.existsSync(tryPath)) {
+      try {
+        const parsed = JSON.parse(fs.readFileSync(tryPath, 'utf-8'));
+        return { data: parsed, path: tryPath };
+      } catch (error) {
+        console.error(`❌ [config.ts] Fehler beim Parsing von ${tryPath}:`, error);
       }
-      if (configData.reddit?.clientId) {
-        console.log(
-          `[config.ts] Reddit ClientID gefunden: ${configData.reddit.clientId.substring(0, 8)}...`
-        );
-      } else {
-        console.warn('[config.ts] Reddit ClientID NICHT gefunden!');
-      }
-      break;
-    } catch (error) {
-      console.error(`❌ [config.ts] Fehler beim Parsing von ${tryPath}:`, error);
     }
   }
+  return { data: {}, path: '' };
 }
 
-if (!configPath || Object.keys(configData).length === 0) {
+const initialLoad = loadConfigFromPaths();
+configPath = initialLoad.path;
+configData = initialLoad.data;
+
+if (configPath) {
+  console.log(`✅ [config.ts] connection.json geladen von: ${configPath}`);
+  console.log('[config.ts] Geladene WooCommerce-Daten:', configData.woocommerce);
+  console.log('[config.ts] Geladene WordPress-Daten:', configData.wordpress);
+  console.log('[config.ts] Geladene OpenAI-Daten:', configData.openAI);
+  if (configData.openAI?.apiKey) {
+    console.log(
+      `[config.ts] OpenAI API-Key gefunden: ${configData.openAI.apiKey.substring(0, 8)}...`
+    );
+  } else {
+    console.warn('[config.ts] OpenAI API-Key NICHT gefunden!');
+  }
+  if (configData.reddit?.clientId) {
+    console.log(
+      `[config.ts] Reddit ClientID gefunden: ${configData.reddit.clientId.substring(0, 8)}...`
+    );
+  } else {
+    console.warn('[config.ts] Reddit ClientID NICHT gefunden!');
+  }
+} else {
   console.warn(
     '⚠️ [config.ts] connection.json nicht gefunden! Folgende Pfade wurden versucht:'
   );
@@ -234,30 +237,29 @@ const config: Config = {
  */
 export function getConfig(): Config {
   try {
-    const freshConfigPath = path.resolve(__dirname, '../connection.json');
-    if (fs.existsSync(freshConfigPath)) {
-      const freshData = JSON.parse(fs.readFileSync(freshConfigPath, 'utf-8'));
+    const fresh = loadConfigFromPaths();
+    if (fresh.path) {
+      configPath = fresh.path;
+      configData = fresh.data;
       return {
-        webhooks: freshData.webhooks || freshData.social?.webhooks || {},
-        openAI: freshData.openAI || {},
-        woocommerce: freshData.woocommerce || {},
-        wordpress: freshData.wordpress || {},
-        support: freshData.support || {},
-        job: freshData.job || {},
-        features: freshData.features || {},
-        reddit: freshData.reddit || {},
-        ml: freshData.ml || {},
-        regioning: freshData.regioning || {},
-        smtp: freshData.smtp || {},
-        apiBaseUrl: freshData.apiBaseUrl,
-        slackEmergencyWebhook: freshData.slackEmergencyWebhook,
-        emergencyAlertEmail: freshData.emergencyAlertEmail,
-        pagerDutyIntegrationKey: freshData.pagerDutyIntegrationKey,
+        webhooks: fresh.data.webhooks || fresh.data.social?.webhooks || {},
+        openAI: fresh.data.openAI || {},
+        woocommerce: fresh.data.woocommerce || {},
+        wordpress: fresh.data.wordpress || {},
+        support: fresh.data.support || {},
+        job: fresh.data.job || {},
+        features: fresh.data.features || {},
+        reddit: fresh.data.reddit || {},
+        ml: fresh.data.ml || {},
+        regioning: fresh.data.regioning || {},
+        smtp: fresh.data.smtp || {},
+        apiBaseUrl: fresh.data.apiBaseUrl,
+        slackEmergencyWebhook: fresh.data.slackEmergencyWebhook,
+        emergencyAlertEmail: fresh.data.emergencyAlertEmail,
+        pagerDutyIntegrationKey: fresh.data.pagerDutyIntegrationKey,
       };
     }
-    console.warn(
-      '[getConfig] connection.json nicht gefunden, nutze statische Config'
-    );
+    console.warn('[getConfig] connection.json nicht gefunden, nutze statische Config');
     return config;
   } catch (error) {
     console.error('[getConfig] Fehler beim Laden:', error);

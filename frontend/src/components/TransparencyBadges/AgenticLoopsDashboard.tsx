@@ -3,7 +3,7 @@
  * Overview of all available Agentic Loops with start controls
  */
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LoopResultCard } from './LoopResultCard';
 import type { LoopResult } from './LoopResultCard';
@@ -89,8 +89,25 @@ export const AgenticLoopsDashboard: React.FC = () => {
   const [runningLoop, setRunningLoop] = useState<string | null>(null);
   const [loopResults, setLoopResults] = useState<Record<string, LoopResult>>({});
   const [lastRuns, setLastRuns] = useState<Record<string, LoopDefinition['lastRun']>>(() => {
+    try {
+      const stored = localStorage.getItem('agenticLoops:lastRuns');
+      if (stored) {
+        const parsed = JSON.parse(stored) as Record<string, LoopDefinition['lastRun']>;
+        return { ...Object.fromEntries(loops.map((loop) => [loop.id, loop.lastRun])), ...parsed };
+      }
+    } catch (err) {
+      console.warn('Could not read lastRuns from localStorage', err);
+    }
     return Object.fromEntries(loops.map((loop) => [loop.id, loop.lastRun]));
   });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('agenticLoops:lastRuns', JSON.stringify(lastRuns));
+    } catch (err) {
+      console.warn('Could not persist lastRuns to localStorage', err);
+    }
+  }, [lastRuns]);
 
   const isDisabled = useMemo(() => new Set(loops.filter((l) => !l.enabled).map((l) => l.id)), [loops]);
 
@@ -124,6 +141,17 @@ export const AgenticLoopsDashboard: React.FC = () => {
     if (ms < 1000) return `${ms}ms`;
     if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
     return `${(ms / 60000).toFixed(1)}m`;
+  };
+
+  const getCurrentTimeString = () => {
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    return `${day}.${month}.${year} ${hours}:${minutes}:${seconds}`;
   };
 
   const downloadResult = (loopId: string) => {
@@ -270,7 +298,7 @@ export const AgenticLoopsDashboard: React.FC = () => {
                       setLastRuns((prev) => ({
                         ...prev,
                         [loop.id]: {
-                          date: 'Just now',
+                          date: getCurrentTimeString(),
                           success: apiResult.success,
                           duration,
                         },
@@ -282,7 +310,7 @@ export const AgenticLoopsDashboard: React.FC = () => {
                       setLastRuns((prev) => ({
                         ...prev,
                         [loop.id]: {
-                          date: 'Just now',
+                          date: getCurrentTimeString(),
                           success: false,
                           duration,
                         },

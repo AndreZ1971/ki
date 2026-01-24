@@ -176,42 +176,54 @@ export class ProductOptimizationLoop extends AgenticLoop {
       action: async () => {
         logger.info('⚡ ACT: Fetching real conversion data from WooCommerce...');
 
-        // Hole echte Konversionsdaten aus WooCommerce Orders
-        try {
-          for (const variant of this.candidates) {
-            // Abrufen von Orders für dieses Produkt (A/B Variante)
-            const ordersResponse = await fetch(
-              `${process.env.WOO_URL}/wp-json/wc/v3/orders?product=${variant.productId}&per_page=100`,
-              {
-                headers: {
-                  'Authorization': `Basic ${Buffer.from(
-                    `${process.env.WOO_KEY}:${process.env.WOO_SECRET}`
-                  ).toString('base64')}`
-                }
-              }
-            );
+        if (!this.hasWooCommerceConfig || !this.wooCommerce) {
+          logger.warn('⚠️ ACT: WooCommerce not configured – skipping conversion fetch');
+          return this.results;
+        }
 
-            if (!ordersResponse.ok) {
-              logger.warn(`Could not fetch orders for product ${variant.productId}`);
-              continue;
-            }
+        // Deduplicate product IDs - only fetch conversions once per product
+        const uniqueProductIds = Array.from(
+          new Set(this.candidates.map((c) => c.productId))
+        );
+        const conversionCache = new Map<number, number>();
 
-            const orders = await ordersResponse.json();
-            const conversions = orders.length;
-
-            this.results.push({
-              productId: variant.productId,
-              variant,
-              aResult: conversions,
-              bResult: conversions,
-              winner: 'A',
-              improvement: 0,
+        // Fetch conversions for each unique product
+        for (const productId of uniqueProductIds) {
+          try {
+            const ordersResponse = await this.wooCommerce.get('orders', {
+              product: productId,
+              per_page: 100,
+              status: 'completed',
+              orderby: 'date',
+              order: 'desc',
             });
 
-            logger.info(`📦 Product ${variant.productId}: ${conversions} real conversions`);
+            const orders = Array.isArray(ordersResponse.data)
+              ? ordersResponse.data
+              : [];
+            const conversions = orders.length;
+            conversionCache.set(productId, conversions);
+
+            logger.info(`📦 Product ${productId}: ${conversions} real conversions`);
+          } catch (error: any) {
+            logger.warn(
+              `Could not fetch orders for product ${productId}: ${error.message || error}`
+            );
+            conversionCache.set(productId, 0);
           }
-        } catch (error: any) {
-          logger.error('Error fetching conversion data:', error.message);
+        }
+
+        // Now map cached conversions to all variants of each product
+        for (const variant of this.candidates) {
+          const conversions = conversionCache.get(variant.productId) || 0;
+          this.results.push({
+            productId: variant.productId,
+            variant,
+            aResult: conversions,
+            bResult: conversions,
+            winner: 'A',
+            improvement: 0,
+          });
         }
 
         logger.info(`✅ ACT: Analyzed ${this.results.length} products with real conversion data`);
