@@ -60,6 +60,47 @@
     ],
     "installedAt": 1769044532484,
     "filePath": "C:\\Entwicklung\\neuer-git-ordner\\ki\\backend\\data\\specializations\\default\\tierbedarf.enc",
+    "isActive": false
+  },
+  {
+    "id": "wein-feinkost",
+    "name": "Wein & Feinkost - Der Sommelier",
+    "description": "Spezialisiert auf Geschmacksprofile, Herkunft, Food-Pairing und sensorische Beschreibungen",
+    "category": "Genuss & Kulinarik",
+    "icon": "🍷",
+    "version": "1.0.0",
+    "features": [
+      "Tasting Notes & Geschmacksbeschreibungen",
+      "Herkunfts- und Herstellungs-Wissen",
+      "Food-Pairing Empfehlungen",
+      "Jahrgänge & Reife-Beratung",
+      "Richtige Lagerung & Temperaturen",
+      "Sensorische Sprache & Adjektive",
+      "Budget-Tipps (Gutes unter 15€, etc.)",
+      "Weinregionen & Rebsorten Guide"
+    ],
+    "installedAt": 1769223206817,
+    "filePath": "C:\\Entwicklung\\neuer-git-ordner\\ki\\backend\\data\\specializations\\default\\wein-feinkost.enc",
+    "isActive": false
+  },
+  {
+    "id": "ari-selbstbeschreibung",
+    "name": "A.R.I. – Systembeschreibung (intern)",
+    "description": "Interne Spezialisierung zur neutralen Selbstbeschreibung von A.R.I. für Produkttexte, Landingpages und erklärende Inhalte.",
+    "category": "System & Produktbeschreibung",
+    "icon": "🤖",
+    "version": "1.0.0",
+    "features": [
+      "Selbstbeschreibung von A.R.I. ohne Erfolgsversprechen",
+      "Rollenbild: digitaler Mitarbeiter statt Tool/Plugin",
+      "Beschreibung von Arbeitsweise: API-basiert, außerhalb des Dashboards",
+      "Klare Grenzen: keine Strategie, keine Ergebnisverantwortung",
+      "Lernfähigkeit über Spezialisierungen und Nutzung (ohne KI-Erwähnung)",
+      "Neutraler, unaufgeregter Ton (keine Verkaufssprache)",
+      "Konsequente Vermeidung von Outcome-Claims"
+    ],
+    "installedAt": 1769223531252,
+    "filePath": "C:\\Entwicklung\\neuer-git-ordner\\ki\\backend\\data\\specializations\\default\\ari-selbstbeschreibung.enc",
     "isActive": true
   }
 ]

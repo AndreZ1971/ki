@@ -30,6 +30,26 @@
         "updatedAt": 1769044532486,
         "size": 1695,
         "encrypted": false
+      },
+      {
+        "id": "wein-feinkost",
+        "name": "Wein & Feinkost - Der Sommelier",
+        "version": "1.0.0",
+        "checksum": "acfb2978b41d8e59c769e89afede0302fd905351ac82e162e3878870052f1404",
+        "createdAt": 1769223206821,
+        "updatedAt": 1769223206821,
+        "size": 1805,
+        "encrypted": false
+      },
+      {
+        "id": "ari-selbstbeschreibung",
+        "name": "A.R.I. – Systembeschreibung (intern)",
+        "version": "1.0.0",
+        "checksum": "0694c543e05cad846b574d23f63542b660a8424a469b63fbb25761359be9b539",
+        "createdAt": 1769223531255,
+        "updatedAt": 1769223531255,
+        "size": 2332,
+        "encrypted": false
       }
     ]
   }
