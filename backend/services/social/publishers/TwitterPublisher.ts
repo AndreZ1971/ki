@@ -44,25 +44,19 @@ export class TwitterPublisher {
       // Create tweet (with media if available)
       let response;
       if (imageUrl) {
-        try {
-          // Fetch image from URL and convert to buffer
-          const imageBuffer = await fetch(imageUrl).then(res => res.arrayBuffer()).then(ab => Buffer.from(ab));
-          
-          // Upload media first
-          const mediaData = await rwClient.v1.uploadMedia(imageBuffer, { mimeType: 'image/jpeg' });
-          const mediaId = typeof mediaData === 'string' ? mediaData : (mediaData as any).media_id_string;
-          
-          // Tweet with media
-          response = await rwClient.v2.tweet(truncatedContent, {
-            media: {
-              media_ids: [mediaId]
-            }
-          });
-        } catch (mediaError) {
-          logger.warn({ error: mediaError }, 'Failed to upload media, posting text only');
-          // Fall back to text-only tweet
-          response = await rwClient.v2.tweet(truncatedContent);
-        }
+        // Fetch image from URL and convert to buffer
+        const imageBuffer = await fetch(imageUrl).then(res => res.arrayBuffer()).then(ab => Buffer.from(ab));
+        
+        // Upload media first
+        const mediaData = await rwClient.v1.uploadMedia(imageBuffer, { mimeType: 'image/jpeg' });
+        const mediaId = typeof mediaData === 'string' ? mediaData : (mediaData as any).media_id_string;
+        
+        // Tweet with media
+        response = await rwClient.v2.tweet(truncatedContent, {
+          media: {
+            media_ids: [mediaId]
+          }
+        });
       } else {
         response = await rwClient.v2.tweet(truncatedContent);
       }

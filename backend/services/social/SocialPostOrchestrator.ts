@@ -91,8 +91,8 @@ export class SocialPostOrchestrator {
     }
 
     return {
-      success: true,
-      message: `Post erfolgreich auf ${platforms.join(', ')} veröffentlicht!`,
+      success: Object.values(results).some(r => r.success),
+      message: `Post ${Object.values(results).every(r => r.success) ? 'erfolgreich' : 'teilweise'} auf ${platforms.join(', ')} verarbeitet`,
       results
     };
   }
