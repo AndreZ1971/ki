@@ -3,6 +3,7 @@ import { logger } from '../../logger';
 import { FacebookPublisher } from './publishers/FacebookPublisher';
 import { InstagramPublisher } from './publishers/InstagramPublisher';
 import { TikTokPublisher } from './publishers/TikTokPublisher';
+import { TwitterPublisher } from './publishers/TwitterPublisher';
 import { YouTubePublisher } from './publishers/YouTubePublisher';
 import { SocialPostRequest, SocialPostResult } from '../../types/social';
 
@@ -16,12 +17,14 @@ export class SocialPostOrchestrator {
   private facebookPublisher: FacebookPublisher;
   private instagramPublisher: InstagramPublisher;
   private tiktokPublisher: TikTokPublisher;
+  private twitterPublisher: TwitterPublisher;
   private youtubePublisher: YouTubePublisher;
 
   constructor() {
     this.facebookPublisher = new FacebookPublisher();
     this.instagramPublisher = new InstagramPublisher();
     this.tiktokPublisher = new TikTokPublisher();
+    this.twitterPublisher = new TwitterPublisher();
     this.youtubePublisher = new YouTubePublisher();
   }
 
@@ -61,6 +64,10 @@ export class SocialPostOrchestrator {
           
           case 'tiktok':
             results.tiktok = await this.tiktokPublisher.publish(content, videoUrl);
+            break;
+          
+          case 'twitter':
+            results.twitter = await this.twitterPublisher.publish(content, imageUrl);
             break;
           
           case 'youtube':

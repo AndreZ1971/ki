@@ -8,7 +8,7 @@ import { SocialPostOrchestrator } from '../../../../services/social/SocialPostOr
 import { SocialAsset } from '../../../../types/social';
 
 interface PostRequest {
-  platform: 'facebook' | 'instagram' | 'tiktok' | 'youtube' | 'all';
+  platform: 'facebook' | 'instagram' | 'tiktok' | 'twitter' | 'youtube' | 'all';
   content: string;
   assets?: SocialAsset[];
   mediaUrl?: string;

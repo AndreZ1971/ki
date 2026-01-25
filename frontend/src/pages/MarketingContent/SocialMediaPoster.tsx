@@ -316,47 +316,70 @@ const SocialMediaPoster: React.FC = () => {
         }
       }
 
-      const supportedWebhookPlatforms = ['linkedin', 'facebook', 'tiktok'];
-      if (!supportedWebhookPlatforms.includes(platform)) {
-        showToast('Diese Plattform wird noch nicht unterstützt', 'error');
-        return;
-      }
-      if (!webhookConfig[platform]) {
-        showToast(`${platform.charAt(0).toUpperCase() + platform.slice(1)} ist nicht aktiviert. Siehe Bedienungsanleitung.`, 'error');
-        return;
-      }
-
-      // Build assets from uploaded media
+      // Build assets from uploaded media (shared for webhook + direct API)
       const assets = uploadedAssets.map(asset => ({
         url: asset.publicUrl,
         type: asset.type as 'image' | 'audio' | 'video'
       }));
 
-      const response = await fetch(`${apiBase}/api/social/webhook/post`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          platform,
-          content,
-          assets: assets.length > 0 ? assets : undefined,
-          scheduleTime: 'now',
-          useAI: aiTransformOnPublish
-        })
-      });
+      const webhookAvailable = webhookConfig[platform];
+      const directApiAvailable = ['facebook', 'instagram', 'tiktok', 'twitter'].includes(platform) && connectedAccounts[platform as keyof typeof connectedAccounts];
 
-      const data = await response.json();
-      if (data.success) {
-        showToast(`Post auf ${platform} veröffentlicht!`, 'success');
-        setPostStats(prev => ({
-          ...prev,
-          published: prev.published + 1
-        }));
-        // Clear media after successful post
-        setSelectedMedia([]);
-        setUploadedAssets([]);
-      } else {
+      // Prefer webhook if configured, otherwise fall back to direct API publisher
+      if (webhookAvailable) {
+        const response = await fetch(`${apiBase}/api/social/webhook/post`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            platform,
+            content,
+            assets: assets.length > 0 ? assets : undefined,
+            scheduleTime: 'now',
+            useAI: aiTransformOnPublish
+          })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          showToast(`Post auf ${platform} veröffentlicht!`, 'success');
+          setPostStats(prev => ({
+            ...prev,
+            published: prev.published + 1
+          }));
+          setSelectedMedia([]);
+          setUploadedAssets([]);
+          return;
+        }
         throw new Error(data.error || 'Veröffentlichung fehlgeschlagen');
       }
+
+      if (directApiAvailable) {
+        const response = await fetch(`${apiBase}/api/social/post`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            platform,
+            content,
+            assets: assets.length > 0 ? assets : undefined,
+            mediaType: assets.find(a => a.type === 'video') ? 'video' : assets.find(a => a.type === 'image') ? 'image' : undefined
+          })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          showToast(`Post auf ${platform} veröffentlicht!`, 'success');
+          setPostStats(prev => ({
+            ...prev,
+            published: prev.published + 1
+          }));
+          setSelectedMedia([]);
+          setUploadedAssets([]);
+          return;
+        }
+        throw new Error(data.error || 'Veröffentlichung fehlgeschlagen');
+      }
+
+      showToast('Diese Plattform ist nicht verbunden oder aktiviert', 'error');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Fehler';
       showToast(errorMessage, 'error');
@@ -747,14 +770,13 @@ const SocialMediaPoster: React.FC = () => {
                           );
                         }
 
-                        const isConnected = connectedAccounts[post.platform as keyof typeof connectedAccounts];
-                        const disabled = !isConnected;
-                        const title = !isConnected ? 'Diese Plattform ist nicht verbunden' : '';
+                        const isReady = webhookConfig[post.platform] || connectedAccounts[post.platform as keyof typeof connectedAccounts];
+                        const title = isReady ? '' : 'Diese Plattform ist nicht verbunden oder nicht aktiviert';
                         return (
                           <button
                             onClick={() => handlePublishPost(post.platform, post.content)}
                             className="social-poster-btn social-poster-btn-primary"
-                            disabled={disabled}
+                            disabled={!isReady}
                             title={title}
                           >
                             📤 Publish
