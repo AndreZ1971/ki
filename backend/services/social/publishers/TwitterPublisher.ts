@@ -15,7 +15,7 @@ interface TwitterPostResult {
 export class TwitterPublisher {
   async publish(content: string, imageUrl?: string): Promise<TwitterPostResult> {
     try {
-      const config = getConfig();
+      const _config = getConfig();
       const twitterConfig = this._getTwitterConfig();
 
       if (!twitterConfig.apiKey || !twitterConfig.apiSecret || !twitterConfig.accessToken || !twitterConfig.accessTokenSecret) {
