@@ -5,28 +5,14 @@ All notable changes to A.R.I. (Artificial Retail Intelligence) will be documente
 ## [7.1.0] - 2026-01-24
 
 ### ✨ Added
-- **A.R.I. Specialization Creator** - Professional internal tool for creating `.ari-spec.json` files without manual JSON editing
-  - 4-step guided wizard UI with real-time validation
-  - System prompt editor with quick templates
-  - Dynamic feature management
-  - Live JSON preview (formatted & minified)
-  - Import/Export functionality for `.ari-spec` files
-  - Emoji picker and customizable specialization icons
-  - Comprehensive validation with error messages
-  - Professional SaaS admin panel aesthetic using Tailwind CSS
-  - Located at `/tools/spec-creator` - **Internal use only, not part of A.R.I. production**
+- Core improvements and documentation housekeeping
 
-### 🔧 Technical
-- Vite 7.3.0 development server with hot module replacement
-- React 18.2 with TypeScript for type safety
-- Tailwind CSS CDN for styling
-- Lucide React icon library integration
-- Standalone webapp deployment support
+### 🚫 Removed / Externalized
+- Internal spec-creator tool and zugehörige Routen/Docs wurden aus dem Repo entfernt (separate Anwendung).
 
 ### 📝 Documentation
-- Added comprehensive README for spec-creator tool
-- Version consistency across all documentation files
-- Updated package.json versions to 7.1.0
+- Bereinigt, um keine spec-creator Hinweise mehr zu führen
+- Version consistency across documentation files
 
 ---
 

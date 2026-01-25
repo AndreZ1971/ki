@@ -367,6 +367,8 @@ async function buildServer() {
         } else if (
           !origin || // z.B. für Server-zu-Server oder lokale Tests
           origin === 'http://localhost:5173' ||
+          origin === 'http://localhost:5174' ||
+          origin === 'http://localhost:5175' ||
           origin === 'http://localhost:3000'
         ) {
           cb(null, true);

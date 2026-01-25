@@ -66,7 +66,6 @@ cd ki
 npm install
 npm --prefix backend install
 npm --prefix frontend install
-npm --prefix tools/spec-creator install
 ```
 
 ### 3. Environment Configuration
@@ -94,9 +93,6 @@ npm --prefix backend run dev
 
 # Terminal 2: Frontend
 npm --prefix frontend run dev
-
-# Terminal 3: Spec Creator (optional)
-npm --prefix tools/spec-creator run dev
 ```
 
 ---
@@ -418,7 +414,6 @@ docker-compose up -d
 ## Version-Specific Notes
 
 ### v7.1.0 Changes
-- Added Specialization Creator tool (internal use only)
 - Improved deployment documentation
 - Version consistency across all components
 - Enhanced error handling in backend
