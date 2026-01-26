@@ -126,7 +126,7 @@ Abandoned Carts? Kunden, die lange nichts gekauft haben? A.R.I. kennt sie und er
 - ✅ KI-generierte Produktbilder (DALL-E Integration)
 - ✅ Echtzeit-Analytics mit echten WooCommerce-Daten (keine Mock-Daten)
 - ✅ Email-Automation (Carts, Willkommensserie, Reaktivierung)
-- ✅ Social-Media-Posts (6 Plattformen)
+- ✅ Social-Media-Posts (Facebook ✅, YouTube ✅, LinkedIn ready, weitere in Review)
 - ✅ **NEU v7.0.9:** Globales Design Token System mit Dark Mode
 - ✅ **NEU v7.0.9:** 8-Sprachen Support (DE, EN, FR, ES, IT, PT, NL, PL)
 - ✅ **NEU v7.0.9:** Vollständig dunkles Chatbot-Design mit perfekter Lesbarkeit
@@ -208,7 +208,13 @@ Abandoned Carts? Kunden, die lange nichts gekauft haben? A.R.I. kennt sie und er
 ### 📧 Marketing & Content (10 Tools)
 
 - **AI Email Generator:** Personalisierte Email-Entwürfe
-- **Social Media Poster:** 6 Plattformen (LinkedIn, Facebook, Instagram, TikTok, X, YouTube)
+- **Social Media Poster:** Multi-Plattform-Upload
+  - ✅ **Facebook:** Vollständig funktional
+  - ✅ **YouTube:** Funktional (Daily Upload Limit: 6 Videos/Tag)
+  - ✅ **LinkedIn:** API-Integration bereit (erfordert gültige Credentials)
+  - ⚠️ **Twitter/X:** Erfordert kostenpflichtiges API-Guthaben
+  - ⚠️ **Instagram:** Erfordert Meta Business Review
+  - ⚠️ **TikTok:** Erfordert TikTok Developer Account
 - **Blogpost Generator:** SEO-optimierte Blogposts
 - **Image Analyzer:** KI-Bild-Qualitätsprüfung
 - **German Content Generator:** Deutsche Marketing-Texte

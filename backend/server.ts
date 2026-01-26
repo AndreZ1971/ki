@@ -82,6 +82,7 @@ import postRoutes from './routes/app/api/social/post-routes';
 import assetsRoutes from './routes/app/api/social/assets-routes';
 import bufferRoutes from './routes/app/api/social/buffer-routes';
 import webhookRoutes from './routes/app/api/social/webhook-routes';
+import youtubeRoutes from './routes/app/api/social/youtube-routes';
 
 // 🔥 ML CONFIGURATION ROUTES
 import mlConfigRoutes from './routes/app/api/ml/config';
@@ -571,6 +572,9 @@ async function buildServer() {
 
     await server.register(assetsRoutes, { prefix: '/api' }); // Asset upload endpoints
     console.log('✅ Social Media Assets Routes erfolgreich registriert');
+
+    await server.register(youtubeRoutes, { prefix: '/api' }); // YouTube upload endpoint
+    console.log('✅ YouTube Upload Routes erfolgreich registriert');
 
     // Serve uploaded assets statically
     const assetsStoragePath = path.join(__dirname, '../data/social-assets');

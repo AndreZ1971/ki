@@ -6,6 +6,7 @@ import * as path from 'path';
 interface YouTubeUploadRequest {
   content: string;
   videoBuffer?: Buffer;
+  videoMime?: string;
   videoTitle?: string;
   videoDescription?: string;
   videoTags?: string[];
@@ -19,6 +20,10 @@ interface YouTubePostResult {
   url: string;
   status: string;
 }
+
+const EMOJI_AND_SYMBOL_REGEX = /[\u{1F000}-\u{1FFFF}]/gu;
+const CONTROL_CHARS_REGEX = /\p{Cc}/gu;
+const MARKDOWN_REGEX = /[*`_~>#]/g;
 
 export class YouTubePublisher {
   private getSocialMediaConfig() {
@@ -48,6 +53,16 @@ export class YouTubePublisher {
     const description = content;
     
     return { title, description, tags };
+  }
+
+  private sanitizeText(input: string, maxLen: number) {
+    return (input || '')
+      .replace(EMOJI_AND_SYMBOL_REGEX, '') // strip emojis and astral symbols
+      .replace(CONTROL_CHARS_REGEX, '') // control chars
+      .replace(MARKDOWN_REGEX, '') // strip markdown-ish chars
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, maxLen);
   }
 
   private async refreshYouTubeToken(refreshToken: string, clientId: string, clientSecret: string): Promise<string> {
@@ -105,7 +120,7 @@ export class YouTubePublisher {
       throw new Error('YouTube credentials nicht konfiguriert. Bitte verbinden Sie Ihren YouTube-Kanal in den Einstellungen.');
     }
 
-    const { content, videoBuffer, videoTitle, videoDescription, videoTags } = uploadRequest;
+    const { content, videoBuffer, videoTitle, videoDescription, videoTags, videoMime } = uploadRequest;
 
     if (!videoBuffer) {
       throw new Error('YouTube benötigt ein Video');
@@ -126,16 +141,24 @@ export class YouTubePublisher {
       ? { title: videoTitle, description: videoDescription, tags: videoTags || [] }
       : await this.generateYouTubeMetadata(content);
 
+    const cleanTitle = this.sanitizeText(metadata.title || 'Untitled Video', 95) || 'Untitled Video';
+    const cleanDescription = this.sanitizeText(metadata.description || content, 4500);
+    const cleanTags = (metadata.tags || [])
+      .map(tag => this.sanitizeText(tag, 300))
+      .filter(Boolean)
+      .slice(0, 10);
+
     try {
       // Step 1: Initialize resumable upload session
-      const initUrl = 'https://www.googleapis.com/youtube/v3/videos?uploadType=resumable&part=snippet,status';
+      // Use the dedicated upload endpoint (not the data endpoint) for resumable uploads
+      const initUrl = 'https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status';
       
       const snippet = {
-        title: metadata.title || 'Untitled Video',
-        description: metadata.description || content,
-        tags: metadata.tags || [],
-        categoryId: '24' // Entertainment category
-      };
+          title: cleanTitle,
+          description: cleanDescription,
+          tags: cleanTags,
+          categoryId: '24' // Entertainment category
+        };
 
       logger.info({ 
         videoSize: buffer.length, 
@@ -167,8 +190,8 @@ export class YouTubePublisher {
           'Content-Type': 'application/json',
           'X-Goog-Upload-Protocol': 'resumable',
           'X-Goog-Upload-Command': 'start',
-          'X-Goog-Upload-Header-Content-Type': 'video/*',
-          'X-Goog-Upload-Header-Content-Length': buffer.length.toString()
+          'X-Upload-Content-Type': videoMime || 'video/mp4',
+          'X-Upload-Content-Length': buffer.length.toString()
         },
         body: JSON.stringify(initBody)
       });
@@ -188,8 +211,8 @@ export class YouTubePublisher {
               'Content-Type': 'application/json',
               'X-Goog-Upload-Protocol': 'resumable',
               'X-Goog-Upload-Command': 'start',
-              'X-Goog-Upload-Header-Content-Type': 'video/*',
-              'X-Goog-Upload-Header-Content-Length': buffer.length.toString()
+              'X-Upload-Content-Type': videoMime || 'video/mp4',
+              'X-Upload-Content-Length': buffer.length.toString()
             },
             body: JSON.stringify(initBody)
           });

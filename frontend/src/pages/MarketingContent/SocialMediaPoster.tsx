@@ -189,12 +189,24 @@ const SocialMediaPoster: React.FC = () => {
         })
       });
 
-      const data = await response.json();
-      if (data.success) {
+      const raw = await response.text();
+      let data: any = null;
+      try {
+        data = raw ? JSON.parse(raw) : null;
+      } catch (_parseError) {
+        // Keep data null so we can surface a meaningful fallback message.
+      }
+
+      if (!response.ok) {
+        const message = data?.error || data?.message || raw || `Serverfehler (${response.status})`;
+        throw new Error(message);
+      }
+
+      if (data?.success) {
         setGeneratedPosts(data.posts);
         showToast('Posts erfolgreich generiert!', 'success');
       } else {
-        throw new Error(data.error || 'Fehler bei der Generierung');
+        throw new Error(data?.error || 'Fehler bei der Generierung');
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Generierung fehlgeschlagen';
@@ -323,7 +335,7 @@ const SocialMediaPoster: React.FC = () => {
       }));
 
       const webhookAvailable = webhookConfig[platform];
-      const directApiAvailable = ['facebook', 'instagram', 'tiktok', 'twitter'].includes(platform) && connectedAccounts[platform as keyof typeof connectedAccounts];
+      const directApiAvailable = ['facebook', 'instagram', 'tiktok', 'twitter', 'linkedin', 'youtube'].includes(platform) && connectedAccounts[platform as keyof typeof connectedAccounts];
 
       // Prefer webhook if configured, otherwise fall back to direct API publisher
       if (webhookAvailable) {
@@ -365,8 +377,20 @@ const SocialMediaPoster: React.FC = () => {
           })
         });
 
-        const data = await response.json();
-        if (data.success) {
+        const raw = await response.text();
+        let data: any = null;
+        try {
+          data = raw ? JSON.parse(raw) : null;
+        } catch (_parseErr) {
+          // If parsing fails we'll use raw for error context below.
+        }
+
+        if (!response.ok) {
+          const message = data?.error || data?.message || raw || `Serverfehler (${response.status})`;
+          throw new Error(message);
+        }
+
+        if (data?.success) {
           showToast(`Post auf ${platform} veröffentlicht!`, 'success');
           setPostStats(prev => ({
             ...prev,
@@ -376,7 +400,8 @@ const SocialMediaPoster: React.FC = () => {
           setUploadedAssets([]);
           return;
         }
-        throw new Error(data.error || 'Veröffentlichung fehlgeschlagen');
+
+        throw new Error(data?.error || data?.results?.[platform]?.error || 'Veröffentlichung fehlgeschlagen');
       }
 
       showToast('Diese Plattform ist nicht verbunden oder aktiviert', 'error');

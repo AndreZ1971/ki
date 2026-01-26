@@ -8,7 +8,7 @@ import { SocialPostOrchestrator } from '../../../../services/social/SocialPostOr
 import { SocialAsset } from '../../../../types/social';
 
 interface PostRequest {
-  platform: 'facebook' | 'instagram' | 'tiktok' | 'twitter' | 'youtube' | 'all';
+  platform: 'facebook' | 'instagram' | 'tiktok' | 'twitter' | 'linkedin' | 'youtube' | 'all';
   content: string;
   assets?: SocialAsset[];
   mediaUrl?: string;
@@ -52,6 +52,8 @@ export default async function postRoutes(fastify: FastifyInstance) {
         let videoTags: string[] = [];
 
         const contentType = request.headers['content-type'] || '';
+
+  logger.info({ contentType, bodyKeys: Object.keys((request as any).body || {}) }, 'Incoming /social/post request');
 
         if (contentType.includes('multipart/form-data')) {
           // FormData upload (for video files)
@@ -140,17 +142,18 @@ export default async function postRoutes(fastify: FastifyInstance) {
           }
         }
 
-        if (!content) {
+        if (!platform || !content) {
+          logger.error({ platform, hasContent: !!content }, 'Missing required fields for /social/post');
           return reply.status(400).send({
             success: false,
-            error: 'Content ist erforderlich'
+            error: 'Content und Plattform sind erforderlich'
           });
         }
 
         try {
           // Use orchestrator to handle posting
           const result = await orchestrator.publishPost({
-            platform: platform as 'facebook' | 'instagram' | 'tiktok' | 'youtube' | 'all',
+            platform: platform as 'facebook' | 'instagram' | 'tiktok' | 'twitter' | 'linkedin' | 'youtube' | 'all',
             content,
             assets,
             mediaUrl: undefined,
@@ -159,6 +162,8 @@ export default async function postRoutes(fastify: FastifyInstance) {
             videoDescription,
             videoTags
           });
+
+          logger.info({ platform, success: result.success, resultKeys: Object.keys(result.results || {}) }, 'Social post processed');
 
           return reply.send(result);
 

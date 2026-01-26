@@ -1,6 +1,7 @@
+
 // backend/services/social/publishers/TwitterPublisher.ts
 import { logger } from '../../../logger';
-import { getConfig } from '@config';
+import { getConfig as _getConfig } from '@config';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -15,8 +16,15 @@ interface TwitterPostResult {
 export class TwitterPublisher {
   async publish(content: string, imageUrl?: string): Promise<TwitterPostResult> {
     try {
-      const _config = getConfig();
       const twitterConfig = this._getTwitterConfig();
+
+      logger.info({ 
+        hasApiKey: !!twitterConfig.apiKey,
+        hasApiSecret: !!twitterConfig.apiSecret,
+        hasAccessToken: !!twitterConfig.accessToken,
+        hasAccessSecret: !!twitterConfig.accessTokenSecret,
+        enabled: twitterConfig.enabled
+      }, 'Twitter config check');
 
       if (!twitterConfig.apiKey || !twitterConfig.apiSecret || !twitterConfig.accessToken || !twitterConfig.accessTokenSecret) {
         throw new Error('Twitter credentials nicht konfiguriert');
@@ -27,12 +35,16 @@ export class TwitterPublisher {
         throw new Error('twitter-api-v2 package not installed');
       });
 
+      logger.info('Initializing TwitterApi client');
+
       const client = new TwitterApi({
         appKey: twitterConfig.apiKey,
         appSecret: twitterConfig.apiSecret,
         accessToken: twitterConfig.accessToken,
         accessSecret: twitterConfig.accessTokenSecret
       });
+
+      logger.info('TwitterApi client initialized');
 
       const rwClient = client.readWrite;
 
@@ -44,6 +56,7 @@ export class TwitterPublisher {
       // Create tweet (with media if available)
       let response;
       if (imageUrl) {
+        logger.info({ imageUrl }, 'Attempting to upload media');
         // Fetch image from URL and convert to buffer
         const imageBuffer = await fetch(imageUrl).then(res => res.arrayBuffer()).then(ab => Buffer.from(ab));
         
@@ -51,6 +64,8 @@ export class TwitterPublisher {
         const mediaData = await rwClient.v1.uploadMedia(imageBuffer, { mimeType: 'image/jpeg' });
         const mediaId = typeof mediaData === 'string' ? mediaData : (mediaData as any).media_id_string;
         
+        logger.info({ mediaId }, 'Media uploaded, tweeting with media');
+
         // Tweet with media
         response = await rwClient.v2.tweet(truncatedContent, {
           media: {
@@ -58,7 +73,27 @@ export class TwitterPublisher {
           }
         });
       } else {
+        logger.info('Tweeting without media');
         response = await rwClient.v2.tweet(truncatedContent);
+      }
+
+      // Log full response for debugging
+      logger.info({ 
+        fullResponse: JSON.stringify(response, null, 2),
+        responseKeys: Object.keys(response || {}),
+        hasData: !!response?.data,
+        hasErrors: !!(response as any)?.errors
+      }, 'Full Twitter API response');
+
+      // Check for API errors in response
+      if ((response as any).errors && (response as any).errors.length > 0) {
+        const apiError = (response as any).errors[0];
+        throw new Error(`Twitter API Error: ${apiError.message || apiError.detail || JSON.stringify(apiError)}`);
+      }
+
+      if (!response.data?.id) {
+        logger.error({ response }, 'Invalid Twitter API response - no tweet ID');
+        throw new Error('Twitter API returned invalid response - no tweet ID');
       }
 
       const tweetId = response.data.id;
@@ -73,11 +108,17 @@ export class TwitterPublisher {
         url: tweetUrl
       };
     } catch (error) {
-      logger.error({ error }, 'Twitter publish error');
+      const detail = (error as any)?.data?.detail
+        || (error as any)?.error?.detail
+        || (error as any)?.message
+        || 'Veröffentlichung fehlgeschlagen';
+      const status = (error as any)?.code || (error as any)?.data?.status;
+
+      logger.error({ error, status, detail }, 'Twitter publish error');
       return {
         success: false,
         platform: 'twitter',
-        error: error instanceof Error ? error.message : 'Veröffentlichung fehlgeschlagen'
+        error: status ? `Twitter API (${status}): ${detail}` : `Twitter API: ${detail}`
       };
     }
   }
@@ -94,6 +135,7 @@ export class TwitterPublisher {
       for (const candidate of candidates) {
         try {
           configRaw = fs.readFileSync(candidate, 'utf-8');
+          logger.info({ candidate }, 'Loaded connection.json for Twitter config');
           break;
         } catch (_err) {
           // try next
@@ -101,6 +143,7 @@ export class TwitterPublisher {
       }
 
       if (!configRaw) {
+        logger.error('connection.json not found for Twitter config');
         return {};
       }
 

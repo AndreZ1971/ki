@@ -4,6 +4,7 @@ import { FacebookPublisher } from './publishers/FacebookPublisher';
 import { InstagramPublisher } from './publishers/InstagramPublisher';
 import { TikTokPublisher } from './publishers/TikTokPublisher';
 import { TwitterPublisher } from './publishers/TwitterPublisher';
+import { LinkedInPublisher } from './publishers/LinkedInPublisher';
 import { YouTubePublisher } from './publishers/YouTubePublisher';
 import { SocialPostRequest, SocialPostResult } from '../../types/social';
 
@@ -11,6 +12,7 @@ export interface SocialPostResults {
   success: boolean;
   message: string;
   results: Record<string, SocialPostResult>;
+  error?: string;
 }
 
 export class SocialPostOrchestrator {
@@ -18,6 +20,7 @@ export class SocialPostOrchestrator {
   private instagramPublisher: InstagramPublisher;
   private tiktokPublisher: TikTokPublisher;
   private twitterPublisher: TwitterPublisher;
+  private linkedinPublisher: LinkedInPublisher;
   private youtubePublisher: YouTubePublisher;
 
   constructor() {
@@ -25,6 +28,7 @@ export class SocialPostOrchestrator {
     this.instagramPublisher = new InstagramPublisher();
     this.tiktokPublisher = new TikTokPublisher();
     this.twitterPublisher = new TwitterPublisher();
+    this.linkedinPublisher = new LinkedInPublisher();
     this.youtubePublisher = new YouTubePublisher();
   }
 
@@ -48,7 +52,7 @@ export class SocialPostOrchestrator {
 
     // Post to all platforms if 'all' is selected
     const platforms = platform === 'all' 
-      ? ['facebook', 'instagram', 'tiktok'] 
+      ? ['facebook', 'instagram', 'tiktok', 'linkedin'] 
       : [platform];
 
     for (const targetPlatform of platforms) {
@@ -68,6 +72,10 @@ export class SocialPostOrchestrator {
           
           case 'twitter':
             results.twitter = await this.twitterPublisher.publish(content, imageUrl);
+            break;
+          
+          case 'linkedin':
+            results.linkedin = await this.linkedinPublisher.publish(content, imageUrl);
             break;
           
           case 'youtube':
@@ -90,10 +98,18 @@ export class SocialPostOrchestrator {
       }
     }
 
+    const anySuccess = Object.values(results).some(r => r.success);
+    const allSuccess = Object.values(results).every(r => r.success);
+
+    const errors = Object.values(results)
+      .filter(r => !r.success && r.error)
+      .map(r => `${r.platform}: ${r.error}`);
+
     return {
-      success: Object.values(results).some(r => r.success),
-      message: `Post ${Object.values(results).every(r => r.success) ? 'erfolgreich' : 'teilweise'} auf ${platforms.join(', ')} verarbeitet`,
-      results
+      success: anySuccess,
+      message: `Post ${allSuccess ? 'erfolgreich' : 'teilweise'} auf ${platforms.join(', ')} verarbeitet`,
+      results,
+      ...(errors.length ? { error: errors.join(' | ') } : {})
     };
   }
 }

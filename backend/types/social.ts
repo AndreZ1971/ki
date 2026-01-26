@@ -8,7 +8,7 @@ export interface SocialAsset {
 }
 
 export interface SocialPostRequest {
-  platform: 'facebook' | 'instagram' | 'tiktok' | 'youtube' | 'all';
+  platform: 'facebook' | 'instagram' | 'tiktok' | 'twitter' | 'linkedin' | 'youtube' | 'all';
   content: string;
   assets?: SocialAsset[];
   // Legacy support

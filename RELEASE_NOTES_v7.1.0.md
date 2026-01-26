@@ -29,6 +29,17 @@
 - Enhanced changelog structure
 - Updated release notes format
 
+### 📱 Social Media Upload
+- **Fixed:** YouTube upload endpoint (googleapis.com/upload/youtube/v3)
+- **Fixed:** Field sanitization (Emojis, Control Characters, Markdown)
+- **Fixed:** ESLint errors (no-control-regex, no-useless-escape, no-unused-vars)
+- **Status:** Facebook fully functional, YouTube functional (daily limit), LinkedIn API ready
+- **Known Limitations:**
+  - YouTube: 6 videos/day limit (resets 9 AM German time)
+  - Twitter/X: Requires paid API tier
+  - Instagram: Requires Meta Business Review approval
+  - TikTok: Requires Developer Portal account (currently unstable)
+
 ---
 
 ## 📚 Documentation Updates
