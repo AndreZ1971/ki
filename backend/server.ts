@@ -283,8 +283,11 @@ async function buildServer() {
   await server.register(fastifyCookie);
 
   // Register session plugin with @fastify/session (pure JS, no native modules)
+  // Secret must be 32+ chars or an array - generate secure random key in production
+  const sessionSecret = process.env.SESSION_SECRET || 'ThisIsASecureDefaultSessionSecretKeyWith32PlusCharacters!2026';
+  
   await server.register(fastifySession, {
-    secret: process.env.SESSION_SECRET || 'DefaultSessionSecret123!@#$%^&*', // In production: from ENV
+    secret: sessionSecret,
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // Nur HTTPS in Production
