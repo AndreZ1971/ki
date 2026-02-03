@@ -13,8 +13,10 @@ RUN npm run build
 # Stage 2: Build Backend
 FROM node:20-alpine AS backend-builder
 WORKDIR /app/backend
+# Install build dependencies for native modules (sodium-native)
+RUN apk add --no-cache python3 make g++ libsodium-dev
 COPY backend/package*.json ./
-RUN npm ci --ignore-scripts
+RUN npm ci
 COPY backend/ ./
 RUN npm run build
 
@@ -25,10 +27,19 @@ WORKDIR /app
 # HUSKY deaktivieren VOR npm install
 ENV HUSKY=0
 
-# Install production dependencies - WICHTIG: --ignore-scripts HINZUFÜGEN!
-COPY backend/package*.json ./
-RUN npm ci  --ignore-scripts
+# Install libsodium for native modules at runtime
+RUN apk add --no-cache libsodium su-exec python3 make g++
 
+# Install production dependencies
+COPY backend/package*.json ./
+RUN npm ci && npm rebuild
+
+# Create runtime user and directories
+RUN addgroup -g 1001 nodejs && \
+  adduser -u 1001 -G nodejs -D nodeuser && \
+  mkdir -p /app/data /app/data/dlq /app/logs /app/backend /app/data/specializations && \
+  chown -R nodeuser:nodejs /app && \
+  chmod 755 /app/data /app/data/specializations
 
 # Copy built backend
 COPY --from=backend-builder /app/backend/dist ./dist
@@ -40,16 +51,6 @@ COPY --from=frontend-builder /app/frontend/dist ./public
 
 # Copy health check
 COPY healthcheck.js ./
-
-# Tools für Privileg-Absenkung im Entrypoint (Root -> nodeuser)
-RUN apk add --no-cache su-exec
-
-# Create non-root user (ALPINE SYNTAX - nicht Debian!)
-RUN addgroup -g 1001 nodejs && \
-  adduser -u 1001 -G nodejs -D nodeuser && \
-  mkdir -p /app/data /app/data/dlq /app/logs /app/backend /app/data/specializations && \
-  chown -R nodeuser:nodejs /app && \
-  chmod 755 /app/data /app/data/specializations
 
 USER root
 EXPOSE 3000
