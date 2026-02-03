@@ -26,6 +26,9 @@ WORKDIR /app
 # HUSKY deaktivieren VOR npm install
 ENV HUSKY=0
 
+# Install su-exec for user switching in entrypoint (no other build tools needed)
+RUN apk add --no-cache su-exec
+
 # Install production dependencies (no native modules needed - pure JS libraries)
 COPY backend/package*.json ./
 RUN npm ci
