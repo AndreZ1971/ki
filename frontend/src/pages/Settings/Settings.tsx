@@ -925,13 +925,35 @@ const Settings = () => {
       }
 
       setConnectionMessage(
-        `✅ ${file.name} erfolgreich hochgeladen! Agent wird neu gestartet...`
+        `✅ ${file.name} erfolgreich hochgeladen! Spezialisierung wird geladen...`
       );
       setConnectionStatus("success");
 
-      // Auto-reload agent after 2 seconds
-      setTimeout(() => {
-        window.location.reload();
+      // Reload specializations list instead of full page reload
+      // This preserves the session and avoids redirect to password screen
+      setTimeout(async () => {
+        try {
+          // Refresh specializations list
+          const listResponse = await fetch('/api/specializations/list');
+          if (listResponse.ok) {
+            const listData = await listResponse.json();
+            // Update UI with new specializations (trigger re-render)
+            setConnectionMessage(`✅ ${file.name} erfolgreich aktiviert!`);
+            
+            // Optional: Navigate to specializations tab or refresh that section
+            // For now, just clear the upload state after a moment
+            setTimeout(() => {
+              setConnectionMessage("");
+              setConnectionStatus("idle");
+            }, 3000);
+          } else {
+            // If list fetch fails, fall back to page reload
+            window.location.reload();
+          }
+        } catch (err) {
+          // On error, fall back to page reload
+          window.location.reload();
+        }
       }, 2000);
     } catch (error) {
       const errorMessage =

@@ -288,11 +288,12 @@ async function buildServer() {
   
   await server.register(fastifySession, {
     secret: sessionSecret,
+    saveUninitialized: false, // Only save sessions when modified
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // Nur HTTPS in Production
-      sameSite: 'strict', // CSRF-Schutz
-      maxAge: 0, // Session-Cookie: expires wenn Browser geschlossen wird
+      sameSite: 'lax', // CSRF-Schutz, aber erlaubt top-level navigation (Reload funktioniert)
+      maxAge: 24 * 60 * 60 * 1000, // 24 Stunden statt 0 (Session überlebt Reload)
       path: '/',
     },
   });
