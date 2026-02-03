@@ -120,10 +120,15 @@ export function verifySignedSpecialization(
     };
   }
 
-  if (!signedSpec.spec) {
+  // Support both formats:
+  // Format 1 (new): { spec: {...}, signature: "...", issuer: "woocommerce" }
+  // Format 2 (legacy .ari-spec): { data: {...}, signature: "...", issuer: "kaufe-es.eu" }
+  const specData = signedSpec.spec || signedSpec.data;
+  
+  if (!specData) {
     return {
       valid: false,
-      error: 'Signed specialization must contain a "spec" field'
+      error: 'Signed specialization must contain either "spec" or "data" field'
     };
   }
 
@@ -134,14 +139,15 @@ export function verifySignedSpecialization(
     };
   }
 
-  if (signedSpec.issuer && signedSpec.issuer !== 'woocommerce') {
+  // Issuer validation: accept both "woocommerce" and "kaufe-es.eu"
+  if (signedSpec.issuer && !['woocommerce', 'kaufe-es.eu'].includes(signedSpec.issuer)) {
     return {
       valid: false,
-      error: 'Specialization issuer must be "woocommerce"'
+      error: `Specialization issuer must be "woocommerce" or "kaufe-es.eu", got "${signedSpec.issuer}"`
     };
   }
 
   // Verify the signature on the spec data
-  const specData = JSON.stringify(signedSpec.spec);
-  return verifySignature(specData, signedSpec.signature);
+  const dataToVerify = JSON.stringify(specData);
+  return verifySignature(dataToVerify, signedSpec.signature);
 }
