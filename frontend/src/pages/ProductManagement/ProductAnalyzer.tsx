@@ -140,7 +140,7 @@ const ProductAnalyzer: React.FC = () => {
         description: editedProduct.description,
         short_description: editedProduct.short_description,
       };
-      const data = await apiClient.put(`/api/products/woo/products/${selectedProductId}`, updateData);
+      const data = await apiClient.post(`/api/products/adviser/update/${selectedProductId}`, updateData);
       if (data.success) {
         setProductDetails(data.data);
         setEditedProduct(data.data);

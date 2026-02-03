@@ -16,6 +16,8 @@ screenshots/
 !frontend/.env.production
 .env.production
 backend/connection.json  # Niemals ins Repo!
+specialization-key.pem
+wp-config*.php  # WordPress config mit Private Key - nur lokal/Server!
 # Root-level connection.json (nur lokal)
 connection.json
 # Backup snapshots of connection settings (contain secrets)

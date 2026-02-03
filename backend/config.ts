@@ -184,6 +184,19 @@ export interface Config {
   };
   // ...weitere Bereiche nach Bedarf
   /**
+   * Authentication & Session Configuration
+   */
+  auth?: {
+    // Bcrypt-Hash des Passworts (leerer String = First-Login)
+    passwordHash?: string;
+    // Flag: Wurde initiales Passwort bereits gesetzt?
+    isFirstLoginComplete?: boolean;
+    // Timestamp der letzten Passwortänderung
+    lastPasswordSetAt?: string | null;
+    // Passwort-Ablaufdatum (null = kein Ablauf)
+    passwordExpiry?: string | null;
+  };
+  /**
    * SMTP-Konfiguration für E-Mail-Versand
    */
   smtp?: {

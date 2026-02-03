@@ -185,6 +185,14 @@ if [ ! -f /app/connection.json ]; then
   "specialization": {
     "_comment": "ARI Specialization Encryption - Auto-generiert beim Container-Start",
     "encryptionKey": "SPEC_KEY_PLACEHOLDER"
+  },
+
+  "auth": {
+    "_comment": "Login Credentials - Wird beim ersten Start leer sein, beim Setup gefüllt",
+    "passwordHash": "",
+    "isFirstLoginComplete": false,
+    "lastPasswordSetAt": null,
+    "passwordExpiry": null
   }
 }
 CONNECTION_JSON

@@ -7,6 +7,7 @@ import {
 } from '../../../../types/specialization';
 import { logger } from '../../../../logger';
 import { i18nService } from '../../../../services/i18nService';
+import { verifySignedSpecialization } from '../../../../security/signatureVerifier';
 
 /**
  * ARI Spezialisierungs-Dateiformat (.ari-spec)
@@ -238,20 +239,20 @@ export default async function specializationRoutes(server: FastifyInstance) {
                 "Ungültiges ARI-Spezialisierungs-Format"
             );
           }
-          // Optional Signature Validation (enabled when SPEC_PUBLIC_KEY is set)
-          const useSignatureValidation = Boolean(process.env.SPEC_PUBLIC_KEY);
-          if (useSignatureValidation) {
-            const ok = require('../../../../services/specializationService').SpecializationService.validateSignature(
-              specialization as any
+
+          // RSA Signature Verification (mandatory for commercial security)
+          // Verifies that the specialization is signed by WooCommerce with RSA-4096
+          const signatureVerification = verifySignedSpecialization(specialization);
+          if (!signatureVerification.valid) {
+            logger.warn(
+              `⚠️ Upload ${uploadId} abgelehnt: Signatur-Validierung fehlgeschlagen - ${signatureVerification.error}`
             );
-            if (!ok) {
-              return reply.status(400).send({
-                success: false,
-                error: i18nService.translate('error.invalidSignature'),
-                message: 'Signature validation failed or issuer mismatch',
-                code: 'INVALID_SIGNATURE',
-              });
-            }
+            return reply.status(401).send({
+              success: false,
+              error: 'Ungültige oder fehlende Signatur',
+              message: signatureVerification.error || 'Die Spezialisierung konnte nicht verifiziert werden',
+              code: 'INVALID_SIGNATURE',
+            });
           }
         } catch (parseError) {
           const errorMsg =
@@ -445,7 +446,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
 
   /**
    * DELETE /api/specializations/:specId
-   * Löscht eine installierte Spezialisierung
+   * Löscht eine inaktive Spezialisierung
    */
   server.delete(
     '/api/specializations/:specId',
@@ -453,7 +454,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
       schema: {
         tags: ['specializations'],
         summary: 'Delete specialization',
-        description: 'Remove an installed specialization',
+        description: 'Remove an inactive specialization',
         params: {
           type: 'object',
           properties: {
@@ -487,7 +488,7 @@ export default async function specializationRoutes(server: FastifyInstance) {
         });
       } catch (error) {
         logger.error({ err: error }, '❌ Fehler beim Löschen');
-        return reply.status(500).send({
+        return reply.status(409).send({
           success: false,
           error: error instanceof Error ? error.message : i18nService.translate('error.deletionFailed'),
         });

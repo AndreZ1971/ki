@@ -631,7 +631,7 @@ RESPONSE IN JSON FORMAT:
 
   // 🚚 Restock / Bestellvorschlag
   _server.post(
-    '/actions/restock/:id',
+    '/actions/restock/:productId',
     {
       schema: {
         tags: ['product-performance'],
@@ -640,8 +640,8 @@ RESPONSE IN JSON FORMAT:
           'Berechnet einen Bestellvorschlag und aktualisiert WooCommerce Lagerbestand',
         params: {
           type: 'object',
-          properties: { id: { type: 'integer' } },
-          required: ['id'],
+          properties: { productId: { type: 'integer' } },
+          required: ['productId'],
         },
         body: {
           type: 'object',
@@ -656,8 +656,8 @@ RESPONSE IN JSON FORMAT:
       },
     },
     async (_request: any, _reply) => {
-      const { id } = _request.params;
-      const productId = parseInt(id);
+      const { productId } = _request.params;
+      const productIdNum = parseInt(productId);
       const {
         targetStock,
         safetyStock = 5,
@@ -673,7 +673,7 @@ RESPONSE IN JSON FORMAT:
       }
 
       try {
-        const product = await wooCommerceService.getProduct(productId, _server);
+        const product = await wooCommerceService.getProduct(productIdNum, _server);
         const onHand =
           typeof currentStock === 'number'
             ? currentStock
@@ -696,12 +696,12 @@ RESPONSE IN JSON FORMAT:
         };
 
         const updated = await wooCommerceService.updateProduct(
-          productId,
+          productIdNum,
           updatePayload,
           _server
         );
 
-        return {
+        return _reply.send({
           success: true,
           message: 'Bestellvorschlag berechnet und Lager aktualisiert',
           data: {
@@ -711,7 +711,7 @@ RESPONSE IN JSON FORMAT:
             safetyStock,
             newStockQuantity: updated.stock_quantity,
           },
-        };
+        });
       } catch (error: any) {
         _server.log.error('Restock fehlgeschlagen:', error.message);
         return _reply.status(500).send({
@@ -724,7 +724,7 @@ RESPONSE IN JSON FORMAT:
 
   // 💰 Preis-/Promo-Steuerung
   _server.post(
-    '/actions/price/:id',
+    '/actions/price/:productId',
     {
       schema: {
         tags: ['product-performance'],
@@ -732,8 +732,8 @@ RESPONSE IN JSON FORMAT:
         description: 'Setzt neuen Preis/Sale-Preis in WooCommerce',
         params: {
           type: 'object',
-          properties: { id: { type: 'integer' } },
-          required: ['id'],
+          properties: { productId: { type: 'integer' } },
+          required: ['productId'],
         },
         body: {
           type: 'object',
@@ -747,8 +747,8 @@ RESPONSE IN JSON FORMAT:
       },
     },
     async (_request: any, _reply) => {
-      const { id } = _request.params;
-      const productId = parseInt(id);
+      const { productId } = _request.params;
+      const productIdNum = parseInt(productId);
       const { price, salePrice, reason } = _request.body || {};
 
       if (!wooCommerceService.isReady()) {
@@ -765,12 +765,12 @@ RESPONSE IN JSON FORMAT:
         }
 
         const updated = await wooCommerceService.updateProduct(
-          productId,
+          productIdNum,
           payload,
           _server
         );
 
-        return {
+        return _reply.send({
           success: true,
           message: 'Preis aktualisiert',
           data: {
@@ -778,7 +778,7 @@ RESPONSE IN JSON FORMAT:
             sale_price: updated.sale_price,
             reason: reason || 'Preisupdate',
           },
-        };
+        });
       } catch (error: any) {
         _server.log.error('Preisupdate fehlgeschlagen:', error.message);
         return _reply.status(500).send({
@@ -791,7 +791,7 @@ RESPONSE IN JSON FORMAT:
 
   // 🎛️ Produkt-Steuerung (Promote, Depriorisieren, Bundle etc.)
   _server.post(
-    '/actions/steering/:id',
+    '/actions/steering/:productId',
     {
       schema: {
         tags: ['product-performance'],
@@ -799,8 +799,8 @@ RESPONSE IN JSON FORMAT:
         description: 'Promote, de-priorisieren oder Aktionen markieren',
         params: {
           type: 'object',
-          properties: { id: { type: 'integer' } },
-          required: ['id'],
+          properties: { productId: { type: 'integer' } },
+          required: ['productId'],
         },
         body: {
           type: 'object',
@@ -816,8 +816,8 @@ RESPONSE IN JSON FORMAT:
       },
     },
     async (_request: any, _reply) => {
-      const { id } = _request.params;
-      const productId = parseInt(id);
+      const { productId } = _request.params;
+      const productIdNum = parseInt(productId);
       const { action, note } = _request.body || {};
 
       if (!wooCommerceService.isReady()) {
@@ -828,7 +828,7 @@ RESPONSE IN JSON FORMAT:
       }
 
       try {
-        const product = await wooCommerceService.getProduct(productId, _server);
+        const product = await wooCommerceService.getProduct(productIdNum, _server);
         const existingTags: string[] = (product.tags || []).map(
           (t: any) => t.name
         );
@@ -846,19 +846,19 @@ RESPONSE IN JSON FORMAT:
         };
 
         const updated = await wooCommerceService.updateProduct(
-          productId,
+          productIdNum,
           payload,
           _server
         );
 
-        return {
+        return _reply.send({
           success: true,
           message: `Aktion '${action}' gesetzt`,
           data: {
             tags: updated.tags,
             meta_data: updated.meta_data,
           },
-        };
+        });
       } catch (error: any) {
         _server.log.error('Steering fehlgeschlagen:', error.message);
         return _reply.status(500).send({
@@ -871,7 +871,7 @@ RESPONSE IN JSON FORMAT:
 
   // 📝 NOTIZEN SPEICHERN
   _server.post(
-    '/notes/:id',
+    '/notes/:productId',
     {
       schema: {
         tags: ['product-performance'],
@@ -880,8 +880,8 @@ RESPONSE IN JSON FORMAT:
           'Speichere Notizen (Lagerort, Meta-Daten) für ein Produkt in WooCommerce',
         params: {
           type: 'object',
-          properties: { id: { type: 'integer' } },
-          required: ['id'],
+          properties: { productId: { type: 'integer' } },
+          required: ['productId'],
         },
         body: {
           type: 'object',
@@ -893,8 +893,8 @@ RESPONSE IN JSON FORMAT:
       },
     },
     async (_request: any, _reply) => {
-      const { id } = _request.params;
-      const productId = parseInt(id);
+      const { productId } = _request.params;
+      const productIdNum = parseInt(productId);
       const { notes } = _request.body || {};
 
       if (!wooCommerceService.isReady()) {
@@ -905,7 +905,7 @@ RESPONSE IN JSON FORMAT:
       }
 
       try {
-        const product = await wooCommerceService.getProduct(productId, _server);
+        const product = await wooCommerceService.getProduct(productIdNum, _server);
 
         // Entferne alte Notizen und füge neue hinzu
         const existingMetaData = (product.meta_data || []).filter(
@@ -920,19 +920,19 @@ RESPONSE IN JSON FORMAT:
         };
 
         const updated = await wooCommerceService.updateProduct(
-          productId,
+          productIdNum,
           payload,
           _server
         );
 
-        return {
+        return _reply.send({
           success: true,
           message: 'Notizen erfolgreich gespeichert',
           data: {
             notes: notes.trim(),
             meta_data: updated.meta_data,
           },
-        };
+        });
       } catch (error: any) {
         _server.log.error('Notizen speichern fehlgeschlagen:', error.message);
         return _reply.status(500).send({
@@ -943,7 +943,81 @@ RESPONSE IN JSON FORMAT:
     }
   );
 
-  // 🔄 AUTO-UPDATE WOOCOMMERCE MIT SEO OPTIMIERUNGEN
+  // � ALLGEMEINES PRODUKT-UPDATE (für Modal)
+  _server.post(
+    '/update/:productId',
+    {
+      schema: {
+        tags: ['product-performance'],
+        summary: 'Produkt aktualisieren (allgemein)',
+        description:
+          'Aktualisiere mehrere Produktfelder gleichzeitig (für Modal-Bearbeitung)',
+        params: {
+          type: 'object',
+          properties: { productId: { type: 'integer' } },
+          required: ['productId'],
+        },
+        body: {
+          type: 'object',
+          properties: {
+            name: { type: 'string' },
+            regular_price: { type: 'string' },
+            sale_price: { type: 'string' },
+            stock_quantity: { type: 'integer' },
+            description: { type: 'string' },
+            short_description: { type: 'string' },
+          },
+        },
+      },
+    },
+    async (_request: any, _reply) => {
+      const { productId } = _request.params;
+      const productIdNum = parseInt(productId);
+      const updateData = _request.body || {};
+
+      if (!wooCommerceService.isReady()) {
+        return _reply.status(503).send({
+          success: false,
+          error: 'WooCommerce Service nicht verfügbar',
+        });
+      }
+
+      try {
+        // Baue Payload nur mit den übergebenen Feldern
+        const payload: any = {};
+        if (updateData.name !== undefined) payload.name = updateData.name;
+        if (updateData.regular_price !== undefined) payload.regular_price = updateData.regular_price;
+        if (updateData.sale_price !== undefined) payload.sale_price = updateData.sale_price;
+        if (updateData.stock_quantity !== undefined) payload.stock_quantity = updateData.stock_quantity;
+        if (updateData.description !== undefined) payload.description = updateData.description;
+        if (updateData.short_description !== undefined) payload.short_description = updateData.short_description;
+
+        const updated = await wooCommerceService.updateProduct(
+          productIdNum,
+          payload,
+          _server
+        );
+
+        return _reply.send({
+          success: true,
+          message: 'Produkt erfolgreich aktualisiert',
+          data: updated,
+        });
+      } catch (error: any) {
+        _server.log.error(
+          `[product-optimizer] Fehler beim Aktualisieren von Produkt ${productIdNum}`,
+          error
+        );
+        return _reply.status(500).send({
+          success: false,
+          error:
+            error.message || 'Fehler beim Aktualisieren des Produkts',
+        });
+      }
+    }
+  );
+
+  // �🔄 AUTO-UPDATE WOOCOMMERCE MIT SEO OPTIMIERUNGEN
   _server.post(
     '/woo/products/:id/seo-apply',
     {

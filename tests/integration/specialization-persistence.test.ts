@@ -183,29 +183,41 @@ describe("Specialization Persistence & Auto-Load", () => {
     });
 
     /**
-     * Test 7: Delete specialization
+     * Test 7: Delete non-active specialization
      */
-    it("should delete specialization", async () => {
-      const spec = createMockSpecialization({
+    it("should delete non-active specialization", async () => {
+      const spec1 = createMockSpecialization({
         id: "delete-test-001",
-        name: "Delete Test",
+        name: "Delete Test 1",
+      });
+
+      const spec2 = createMockSpecialization({
+        id: "delete-test-002",
+        name: "Delete Test 2",
       });
 
       await SpecializationPersistenceManager.persistSpecialization(
-        spec,
+        spec1,
         TEST_USER
       );
 
+      await SpecializationPersistenceManager.persistSpecialization(
+        spec2,
+        TEST_USER
+      );
+
+      // spec1 is still active, spec2 is inactive
+      // Should be able to delete spec2
       const deleteSuccess =
         await SpecializationPersistenceManager.deleteSpecialization(
-          "delete-test-001",
+          "delete-test-002",
           TEST_USER
         );
 
       expect(deleteSuccess).toBe(true);
 
       const loaded = await SpecializationPersistenceManager.loadSpecialization(
-        "delete-test-001",
+        "delete-test-002",
         TEST_USER
       );
 

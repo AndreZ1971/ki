@@ -7,6 +7,7 @@ import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import fastifyMultipart from '@fastify/multipart';
 import rateLimit from '@fastify/rate-limit';
+import fastifySecureSession from '@fastify/secure-session';
 import dotenv from 'dotenv';
 import Fastify from 'fastify';
 import fs from 'fs';
@@ -26,7 +27,7 @@ import shopMetricsRoutes from './routes/app/api/analytics/metrics/shop-metrics';
 import wooCommerceRoutes from './routes/app/api/products/woocommerce';
 import memoryRoutes from './routes/app/api/system/memory/memory';
 import systemRoutes from './routes/app/api/system/health/system';
-import productOptimizerRoutes from './routes/app/api/products/optimizer/product-optimizer';
+import productAdviserRoutes from './routes/app/api/products/optimizer/product-optimizer';
 import reviewsRoutes from './routes/app/api/analytics/reviews';
 import aiEmailRoutes from './routes/app/api/ai/email/ai-email';
 import contextGeneratorRoutes from './routes/app/api/ai/context-generator';
@@ -276,6 +277,31 @@ async function buildServer() {
     }
   });
 
+  // 🔐 SESSION MIDDLEWARE - HTTPOnly Cookies für sicheres Session-Management
+  await server.register(fastifySecureSession, {
+    key: Buffer.alloc(32, 'SecureSessionKey123!'), // In production: from ENV oder File
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // Nur HTTPS in Production
+      sameSite: 'strict', // CSRF-Schutz
+      maxAge: 0, // Session-Cookie: expires wenn Browser geschlossen wird
+      path: '/',
+    },
+  });
+
+  // Extend Fastify request/reply mit session-Hilfsfunktionen
+  server.decorate('session', {
+    get: async (request: any, key: string) => {
+      return request.session?.get(key) || null;
+    },
+    set: async (request: any, key: string, value: any) => {
+      request.session?.set(key, value);
+    },
+    delete: async (request: any) => {
+      request.session?.delete();
+    },
+  });
+
   // Debug-Route: Gibt alle registrierten Routen als Text zurück
   server.get('/api/debug/routes', async (_request, reply) => {
     const routes = server.printRoutes({ commonPrefix: false });
@@ -449,7 +475,7 @@ async function buildServer() {
     });
     console.log('✅ Memory Routes erfolgreich registriert');
 
-    await server.register(productOptimizerRoutes, {
+    await server.register(productAdviserRoutes, {
       prefix: '/api/products/adviser',
     });
     console.log('✅ Product Adviser Routes erfolgreich registriert');

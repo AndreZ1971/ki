@@ -1,7 +1,7 @@
 import UserManagement from "./pages/app/UserManagement";
 // src/App.tsx
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
+import { SessionProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/auth/Login";
 import Onboarding from "./pages/Onboarding/Onboarding";
@@ -83,7 +83,7 @@ import "./App.css";
 function App() {
   return (
     <div className="App">
-      <AuthProvider>
+      <SessionProvider>
         <Router>
           <Routes>
             {/* Public Routes - Login & Onboarding */}
@@ -246,7 +246,7 @@ function App() {
           <Route path="/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
         </Routes>
       </Router>
-      </AuthProvider>
+      </SessionProvider>
     </div>
   );
 }

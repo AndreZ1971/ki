@@ -316,7 +316,8 @@ export class SpecializationService {
   }
 
   /**
-   * Löscht eine Spezialisierung
+   * Löscht eine Spezialisierung (nur inaktive)
+   * Verhindert Aufblähung durch alte Versionen
    */
   static async deleteSpecialization(
     userId: string,
@@ -327,6 +328,11 @@ export class SpecializationService {
 
     if (!target) {
       throw new Error(`Spezialisierung ${specId} nicht gefunden`);
+    }
+
+    // Nur inaktive Specs können gelöscht werden
+    if (target.isActive) {
+      throw new Error('Aktive Spezialisierung kann nicht gelöscht werden');
     }
 
     // Lösche verschlüsselte Datei

@@ -228,6 +228,8 @@
       "purchasedTitle": "🎯 Gekaufte Spezialisierungen",
       "active": "✓ AKTIV",
       "activate": "Aktivieren",
+      "delete": "Löschen",
+      "confirmDelete": "Möchtest du diese Spezialisierung wirklich löschen? Sie kann jederzeit neu hochgeladen werden.",
       "renewalUnavailable": "❌ Erneuerungslink nicht verfügbar. Kontaktieren Sie den Support.",
       "subscriptionSuccessful": "✅ Subscription erfolgreich erneuert",
       "renewalFailed": "❌ Erneuerung fehlgeschlagen"

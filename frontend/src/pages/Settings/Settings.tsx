@@ -629,6 +629,108 @@ const Settings = () => {
         "Cross-Selling Sets",
       ],
     },
+    {
+      id: "01",
+      name: "Home & Living",
+      description: "Möbel, Deko und Haushaltswaren",
+      price: 119,
+      icon: "🏠",
+      isActive: false,
+      image:
+        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g10" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%236b7280"/%3E%3Cstop offset="100%25" stop-color="%239ca3af"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g10)"/%3E%3Crect x="80" y="110" width="440" height="180" rx="32" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
+      features: [
+        "Stilwelten & Looks",
+        "Material- & Pflegehinweise",
+        "Maßangaben sauber erklärt",
+        "Roomset Storytelling",
+        "Cross-Selling Sets",
+      ],
+    },
+    {
+      id: "02",
+      name: "Home & Living",
+      description: "Möbel, Deko und Haushaltswaren",
+      price: 119,
+      icon: "🏠",
+      isActive: false,
+      image:
+        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g10" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%236b7280"/%3E%3Cstop offset="100%25" stop-color="%239ca3af"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g10)"/%3E%3Crect x="80" y="110" width="440" height="180" rx="32" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
+      features: [
+        "Stilwelten & Looks",
+        "Material- & Pflegehinweise",
+        "Maßangaben sauber erklärt",
+        "Roomset Storytelling",
+        "Cross-Selling Sets",
+      ],
+    },
+    {
+      id: "03",
+      name: "Home & Living",
+      description: "Möbel, Deko und Haushaltswaren",
+      price: 119,
+      icon: "🏠",
+      isActive: false,
+      image:
+        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g10" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%236b7280"/%3E%3Cstop offset="100%25" stop-color="%239ca3af"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g10)"/%3E%3Crect x="80" y="110" width="440" height="180" rx="32" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
+      features: [
+        "Stilwelten & Looks",
+        "Material- & Pflegehinweise",
+        "Maßangaben sauber erklärt",
+        "Roomset Storytelling",
+        "Cross-Selling Sets",
+      ],
+    },
+    {
+      id: "04",
+      name: "Home & Living",
+      description: "Möbel, Deko und Haushaltswaren",
+      price: 119,
+      icon: "🏠",
+      isActive: false,
+      image:
+        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g10" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%236b7280"/%3E%3Cstop offset="100%25" stop-color="%239ca3af"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g10)"/%3E%3Crect x="80" y="110" width="440" height="180" rx="32" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
+      features: [
+        "Stilwelten & Looks",
+        "Material- & Pflegehinweise",
+        "Maßangaben sauber erklärt",
+        "Roomset Storytelling",
+        "Cross-Selling Sets",
+      ],
+    },
+    {
+      id: "05 ",
+      name: "Home & Living",
+      description: "Möbel, Deko und Haushaltswaren",
+      price: 119,
+      icon: "🏠",
+      isActive: false,
+      image:
+        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g10" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%236b7280"/%3E%3Cstop offset="100%25" stop-color="%239ca3af"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g10)"/%3E%3Crect x="80" y="110" width="440" height="180" rx="32" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
+      features: [
+        "Stilwelten & Looks",
+        "Material- & Pflegehinweise",
+        "Maßangaben sauber erklärt",
+        "Roomset Storytelling",
+        "Cross-Selling Sets",
+      ],
+    },
+    {
+      id: "06 ",
+      name: "Home & Living",
+      description: "Möbel, Deko und Haushaltswaren",
+      price: 119,
+      icon: "🏠",
+      isActive: false,
+      image:
+        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g10" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%236b7280"/%3E%3Cstop offset="100%25" stop-color="%239ca3af"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g10)"/%3E%3Crect x="80" y="110" width="440" height="180" rx="32" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
+      features: [
+        "Stilwelten & Looks",
+        "Material- & Pflegehinweise",
+        "Maßangaben sauber erklärt",
+        "Roomset Storytelling",
+        "Cross-Selling Sets",
+      ],
+    },
   ]);
 
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
@@ -698,6 +800,33 @@ const Settings = () => {
       await loadPurchasedSpecializations();
         } catch {
       // Silent failure
+    }
+  };
+
+  const handleSpecializationDelete = async (specId: string) => {
+    if (!confirm(t("settings.subscription.confirmDelete"))) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `/api/specializations/${specId}`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      
+      if (!response.ok) {
+        const data = await response.json();
+        setConnectionMessage(data.error || t("error.deletionFailed"));
+        return;
+      }
+
+      // Reload list
+      await loadPurchasedSpecializations();
+    } catch {
+      setConnectionMessage(t("error.deletionFailed"));
     }
   };
 
@@ -2779,30 +2908,56 @@ const Settings = () => {
                               {t("settings.subscription.active")}
                             </div>
                           ) : (
-                            <button
-                              onClick={() => handleSpecializationActivate(spec.id)}
-                              style={{
-                                background: "rgba(59, 130, 246, 0.8)",
-                                color: "white",
-                                border: "none",
-                                padding: "8px 20px",
-                                borderRadius: "20px",
-                                fontSize: "14px",
-                                fontWeight: "bold",
-                                cursor: "pointer",
-                                transition: "background 0.2s",
-                              }}
-                              onMouseEnter={(e) =>
-                                (e.currentTarget.style.background =
-                                  "rgba(59, 130, 246, 1)")
-                              }
-                              onMouseLeave={(e) =>
-                                (e.currentTarget.style.background =
-                                  "rgba(59, 130, 246, 0.8)")
-                              }
-                            >
-                              {t("settings.subscription.activate")}
-                            </button>
+                            <>
+                              <button
+                                onClick={() => handleSpecializationActivate(spec.id)}
+                                style={{
+                                  background: "rgba(59, 130, 246, 0.8)",
+                                  color: "white",
+                                  border: "none",
+                                  padding: "8px 20px",
+                                  borderRadius: "20px",
+                                  fontSize: "14px",
+                                  fontWeight: "bold",
+                                  cursor: "pointer",
+                                  transition: "background 0.2s",
+                                }}
+                                onMouseEnter={(e) =>
+                                  (e.currentTarget.style.background =
+                                    "rgba(59, 130, 246, 1)")
+                                }
+                                onMouseLeave={(e) =>
+                                  (e.currentTarget.style.background =
+                                    "rgba(59, 130, 246, 0.8)")
+                                }
+                              >
+                                {t("settings.subscription.activate")}
+                              </button>
+                              <button
+                                onClick={() => handleSpecializationDelete(spec.id)}
+                                style={{
+                                  background: "rgba(239, 68, 68, 0.8)",
+                                  color: "white",
+                                  border: "none",
+                                  padding: "8px 20px",
+                                  borderRadius: "20px",
+                                  fontSize: "14px",
+                                  fontWeight: "bold",
+                                  cursor: "pointer",
+                                  transition: "background 0.2s",
+                                }}
+                                onMouseEnter={(e) =>
+                                  (e.currentTarget.style.background =
+                                    "rgba(239, 68, 68, 1)")
+                                }
+                                onMouseLeave={(e) =>
+                                  (e.currentTarget.style.background =
+                                    "rgba(239, 68, 68, 0.8)")
+                                }
+                              >
+                                {t("settings.subscription.delete")}
+                              </button>
+                            </>
                           )}
                         </div>
                       </div>
