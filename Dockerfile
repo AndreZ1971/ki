@@ -13,8 +13,7 @@ RUN npm run build
 # Stage 2: Build Backend
 FROM node:20-alpine AS backend-builder
 WORKDIR /app/backend
-# Install build dependencies for native modules (sodium-native)
-RUN apk add --no-cache python3 make g++ libsodium-dev
+# No build dependencies needed - using pure JS session libraries (@fastify/session + @fastify/cookie)
 COPY backend/package*.json ./
 RUN npm ci
 COPY backend/ ./
@@ -27,12 +26,9 @@ WORKDIR /app
 # HUSKY deaktivieren VOR npm install
 ENV HUSKY=0
 
-# Install libsodium for native modules at runtime
-RUN apk add --no-cache libsodium su-exec python3 make g++
-
-# Install production dependencies
+# Install production dependencies (no native modules needed - pure JS libraries)
 COPY backend/package*.json ./
-RUN npm ci && npm rebuild
+RUN npm ci
 
 # Create runtime user and directories
 RUN addgroup -g 1001 nodejs && \

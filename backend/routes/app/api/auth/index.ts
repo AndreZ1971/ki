@@ -46,7 +46,7 @@ function writeConnectionJson(data: any): boolean {
  * Auth Middleware für geschützte Routes
  */
 export async function authMiddleware(request: FastifyRequest, reply: FastifyReply) {
-  // @fastify/secure-session speichert Daten direkt im request.session
+  // @fastify/session mit @fastify/cookie speichert Daten in request.session
   const authData = (request.session as any)?.auth;
   
   if (!authData?.authenticated) {

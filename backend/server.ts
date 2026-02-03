@@ -7,7 +7,8 @@ import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import fastifyMultipart from '@fastify/multipart';
 import rateLimit from '@fastify/rate-limit';
-import fastifySecureSession from '@fastify/secure-session';
+import fastifySession from '@fastify/session';
+import fastifyCookie from '@fastify/cookie';
 import dotenv from 'dotenv';
 import Fastify from 'fastify';
 import fs from 'fs';
@@ -278,8 +279,12 @@ async function buildServer() {
   });
 
   // 🔐 SESSION MIDDLEWARE - HTTPOnly Cookies für sicheres Session-Management
-  await server.register(fastifySecureSession, {
-    key: Buffer.alloc(32, 'SecureSessionKey123!'), // In production: from ENV oder File
+  // Register cookie plugin first (required by session plugin)
+  await server.register(fastifyCookie);
+
+  // Register session plugin with @fastify/session (pure JS, no native modules)
+  await server.register(fastifySession, {
+    secret: process.env.SESSION_SECRET || 'DefaultSessionSecret123!@#$%^&*', // In production: from ENV
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // Nur HTTPS in Production
