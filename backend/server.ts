@@ -829,7 +829,12 @@ const start = async () => {
     console.log(`🔍 Debug Routes: ${baseUrl}/api/debug/routes`);
     console.log(`📈 Analytics:    ${baseUrl}/api/analytics`);
   } catch (_err) {
-    console.error('💥 Server Start fehlgeschlagen:', _err);
+    const error = _err as Error;
+    console.error('💥 Server Start fehlgeschlagen:');
+    console.error('Error Name:', error.name);
+    console.error('Error Message:', error.message);
+    console.error('Error Stack:', error.stack);
+    console.error('Full Error:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
     process.exit(1);
   }
 };
