@@ -6,10 +6,21 @@
  * 
  * This ensures revenue protection - only officially signed specializations
  * from WooCommerce can be uploaded to the container.
+ * 
+ * Development mode:
+ * Set SKIP_SIGNATURE_VERIFICATION=true to bypass signature checks (development only)
+ * 
+ * Signature format:
+ * - Algorithm: RSA-SHA256
+ * - Data format: JSON.stringify(spec) with NO spaces/indentation
+ * - Encoding: Base64
  */
 
 import { createVerify } from 'crypto';
 import { SignatureVerificationResult } from './signatureTypes';
+
+// Development bypass flag (use with caution - SECURITY RISK!)
+const SKIP_SIGNATURE_VERIFICATION = process.env.SKIP_SIGNATURE_VERIFICATION === 'true';
 
 // RSA-4096 Public Key (SPKI format)
 // This is used to verify signatures created with the corresponding private key
@@ -47,6 +58,12 @@ export function verifySignature(
   signatureB64: string
 ): SignatureVerificationResult {
   try {
+    // Development bypass
+    if (SKIP_SIGNATURE_VERIFICATION) {
+      console.warn('⚠️ WARNING: Signature verification is BYPASSED (SKIP_SIGNATURE_VERIFICATION=true)');
+      return { valid: true };
+    }
+
     // Validate input
     if (!data || typeof data !== 'string') {
       return {
@@ -112,6 +129,12 @@ export function verifySignature(
 export function verifySignedSpecialization(
   signedSpec: any
 ): SignatureVerificationResult {
+  // Development bypass
+  if (SKIP_SIGNATURE_VERIFICATION) {
+    console.warn('⚠️ WARNING: Signature verification is BYPASSED (SKIP_SIGNATURE_VERIFICATION=true)');
+    return { valid: true };
+  }
+
   // Validate structure
   if (!signedSpec || typeof signedSpec !== 'object') {
     return {
