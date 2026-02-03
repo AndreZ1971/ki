@@ -936,7 +936,7 @@ const Settings = () => {
           // Refresh specializations list
           const listResponse = await fetch('/api/specializations/list');
           if (listResponse.ok) {
-            const listData = await listResponse.json();
+            const _listData = await listResponse.json();
             // Update UI with new specializations (trigger re-render)
             setConnectionMessage(`✅ ${file.name} erfolgreich aktiviert!`);
             
@@ -950,7 +950,7 @@ const Settings = () => {
             // If list fetch fails, fall back to page reload
             window.location.reload();
           }
-        } catch (err) {
+        } catch (_err) {
           // On error, fall back to page reload
           window.location.reload();
         }
