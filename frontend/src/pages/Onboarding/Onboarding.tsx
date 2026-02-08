@@ -14,6 +14,7 @@ export const Onboarding: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   // Load aktuelle Konfiguration
   useEffect(() => {
@@ -67,15 +68,33 @@ export const Onboarding: React.FC = () => {
       }
 
       setSuccess(true);
-      
-      // Nach erfolgreicher Speicherung zur Dashboard weiterleiten
-      setTimeout(() => {
-        navigate('/dashboard', { replace: true });
-      }, 1500);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleDownloadConfig = async () => {
+    setError(null);
+    try {
+      setDownloading(true);
+      const response = await fetch('/api/settings/connection/download');
+      if (!response.ok) throw new Error('Download fehlgeschlagen');
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'ari-export.json';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Download fehlgeschlagen');
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -118,7 +137,11 @@ export const Onboarding: React.FC = () => {
           </div>
 
           {error && <div className="error-message">❌ {error}</div>}
-          {success && <div className="success-message">✅ Konfiguration gespeichert! Weiterleitung...</div>}
+          {success && (
+            <div className="success-message">
+              ✅ Konfiguration gespeichert!
+            </div>
+          )}
 
           <button
             type="submit"
@@ -127,6 +150,27 @@ export const Onboarding: React.FC = () => {
           >
             {submitting ? '⏳ Wird gespeichert...' : '✅ Speichern & Fortfahren'}
           </button>
+
+          <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
+            <button
+              type="button"
+              onClick={handleDownloadConfig}
+              disabled={!success || downloading}
+              className="submit-button"
+              style={{ background: '#10b981' }}
+            >
+              {downloading ? '⏳ Download...' : '📥 Konfiguration herunterladen'}
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/dashboard', { replace: true })}
+              disabled={!success}
+              className="submit-button"
+              style={{ background: '#3b82f6' }}
+            >
+              🚀 Weiter zum Dashboard
+            </button>
+          </div>
         </form>
 
         <div className="onboarding-info">

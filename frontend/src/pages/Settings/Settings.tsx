@@ -18,6 +18,7 @@ type Specialization = {
   isActive: boolean;
   image: string;
   features: string[];
+  shopUrl?: string;
 };
 
 type ShopCredentials = {
@@ -241,6 +242,38 @@ const Settings = () => {
   const [loopSchedules, setLoopSchedules] = useState<LoopSchedules | null>(
     null
   );
+
+  const handleDownloadConfig = async () => {
+    setConnectionStatus("idle");
+    setConnectionMessage("");
+
+    try {
+      const response = await fetch('/api/settings/connection/download');
+      if (!response.ok) {
+        throw new Error('Download fehlgeschlagen');
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'ari-export.json';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      setConnectionStatus("success");
+      setConnectionMessage(t("settings.connection.downloadSuccess"));
+      setTimeout(() => {
+        setConnectionMessage("");
+        setConnectionStatus("idle");
+      }, 3000);
+    } catch {
+      setConnectionStatus("error");
+      setConnectionMessage(t("settings.connection.downloadError"));
+    }
+  };
   const [editingLoop, setEditingLoop] = useState<string | null>(null);
   const [savingSchedule, setSavingSchedule] = useState(false);
 
@@ -459,15 +492,17 @@ const Settings = () => {
   // Verfügbare Spezialisierungen
   const [specializations] = useState<Specialization[]>([
     {
-      id: "dsgvo-digital",
-      name: "DSGVO Digitale Produkte",
+      id: "109026",
+      name: "Digitale Produkte & Kurse - Der Mentor",
       description:
-        "Spezialisiert auf datenschutzkonforme digitale Inhalte für EU-Markt",
+        "Digitale Produkte & Kurse",
       price: 99,
-      icon: "🔒",
+      icon: "",
       isActive: false,
       image:
-        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g1" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%233b82f6"/%3E%3Cstop offset="100%25" stop-color="%2310b981"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g1)"/%3E%3Ccircle cx="120" cy="110" r="80" fill="rgba(255,255,255,0.16)"/%3E%3Ccircle cx="420" cy="260" r="120" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
+        '/images/dermentor.png',
+      shopUrl:
+        "https://kaufe-es.eu/index.php/product/digitale-produkte-kurse-der-mentor/",
       features: [
         "DSGVO-konforme Produkttexte",
         "EU-rechtskonforme Beschreibungen",
@@ -477,14 +512,14 @@ const Settings = () => {
       ],
     },
     {
-      id: "reisebuero",
-      name: "Reisebüro",
+      id: "109078",
+      name: "Reisebüro - Der Globetrotter",
       description: "Optimiert für Reise- und Tourismusbranche",
       price: 149,
-      icon: "✈️",
+      icon: "",
       isActive: false,
       image:
-        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g2" x1="0%25" y1="0%25" x2="100%25" y2="0%25"%3E%3Cstop offset="0%25" stop-color="%238b5cf6"/%3E%3Cstop offset="100%25" stop-color="%233b82f6"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g2)"/%3E%3Cpath d="M0 280 Q150 200 300 280 T600 280 V400 H0 Z" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
+        '/images/Globetrotter.png',
       features: [
         "Reisebeschreibungen",
         "Hotel & Unterkunft Marketing",
@@ -494,14 +529,14 @@ const Settings = () => {
       ],
     },
     {
-      id: "3d-druck",
-      name: "3D-Druck Objekte",
-      description: "Spezialisiert auf 3D-Druck E-Commerce",
+      id: "109091",
+      name: "Immobilien - Der Makler",
+      description: "Spezialisiert auf Immobilien",
       price: 129,
-      icon: "🖨️",
+      icon: "",
       isActive: false,
       image:
-        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g3" x1="0%25" y1="100%25" x2="100%25" y2="0%25"%3E%3Cstop offset="0%25" stop-color="%23256f9c"/%3E%3Cstop offset="100%25" stop-color="%233b82f6"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g3)"/%3E%3Crect x="80" y="60" width="140" height="220" rx="24" fill="rgba(255,255,255,0.14)"/%3E%3Crect x="260" y="120" width="240" height="160" rx="30" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
+        '/images/Makler.png',
       features: [
         "Technische Spezifikationen",
         "Material-Beschreibungen",
@@ -511,14 +546,14 @@ const Settings = () => {
       ],
     },
     {
-      id: "fashion",
-      name: "Fashion & Bekleidung",
+      id: "109038",
+      name: "Fashion & Mode - Der Stylist",
       description: "Mode und Bekleidungshandel",
       price: 119,
-      icon: "👗",
+      icon: "",
       isActive: false,
       image:
-        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g4" x1="0%25" y1="0%25" x2="0%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%23ec4899"/%3E%3Cstop offset="100%25" stop-color="%238b5cf6"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g4)"/%3E%3Ccircle cx="180" cy="160" r="90" fill="rgba(255,255,255,0.13)"/%3E%3Ccircle cx="400" cy="260" r="130" fill="rgba(255,255,255,0.1)"/%3E%3C/svg%3E',
+        '/images/Stylist.png',
       features: [
         "Produkt-Styling Texte",
         "Größentabellen",
@@ -528,14 +563,14 @@ const Settings = () => {
       ],
     },
     {
-      id: "beauty",
-      name: "Beauty & Kosmetik",
+      id: "109008",
+      name: "Beauty & Kosmetik - Der Haut-Experte",
       description: "Pflege, Make-up und Wellness-Produkte",
       price: 109,
-      icon: "💄",
+      icon: "",
       isActive: false,
       image:
-        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g5" x1="100%25" y1="0%25" x2="0%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%23f59e0b"/%3E%3Cstop offset="100%25" stop-color="%23ef4444"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g5)"/%3E%3Cpath d="M0 220 Q140 140 280 210 T600 230 V400 H0 Z" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
+        '/images/Experte.png',
       features: [
         "INCI-konforme Beschreibungen",
         "Hauttyp-Empfehlungen",
@@ -545,14 +580,14 @@ const Settings = () => {
       ],
     },
     {
-      id: "sport-fitness",
-      name: "Sport & Fitness",
+      id: "109052",
+      name: "Nahrungsergänzung & Fitness - Der Coach",
       description: "Equipment, Wearables und Supplements",
       price: 119,
-      icon: "🏋️",
+      icon: "",
       isActive: false,
       image:
-        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g6" x1="0%25" y1="50%25" x2="100%25" y2="50%25"%3E%3Cstop offset="0%25" stop-color="%2322c55e"/%3E%3Cstop offset="100%25" stop-color="%2310b981"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g6)"/%3E%3Crect x="60" y="90" width="480" height="220" rx="48" fill="rgba(255,255,255,0.1)"/%3E%3C/svg%3E',
+        '/images/Der%20Coach.png',
       features: [
         "Workout-Beschreibungen",
         "Material- und Größenberatung",
@@ -562,14 +597,14 @@ const Settings = () => {
       ],
     },
     {
-      id: "electronics",
-      name: "Elektronik & Gadgets",
+      id: "109104",
+      name: "Technik & Elektronik - Der Tech-Guide",
       description: "Smartphones, Smart-Home und Zubehör",
       price: 139,
-      icon: "📱",
+      icon: "",
       isActive: false,
       image:
-        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g7" x1="0%25" y1="0%25" x2="100%25" y2="0%25"%3E%3Cstop offset="0%25" stop-color="%231f2937"/%3E%3Cstop offset="100%25" stop-color="%233b82f6"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g7)"/%3E%3Ccircle cx="480" cy="130" r="90" fill="rgba(255,255,255,0.1)"/%3E%3Ccircle cx="200" cy="260" r="130" fill="rgba(255,255,255,0.08)"/%3E%3C/svg%3E',
+        '/images/Guide.png',
       features: [
         "Technische Specs",
         "Vergleichstabellen",
@@ -579,14 +614,14 @@ const Settings = () => {
       ],
     },
     {
-      id: "pet-supplies",
-      name: "Haustierbedarf",
+      id: "109117",
+      name: "Tierbedarf - Der Tierfreund",
       description: "Futter, Pflege und Zubehör für Haustiere",
       price: 99,
-      icon: "🐾",
+      icon: "",
       isActive: false,
       image:
-        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g8" x1="0%25" y1="100%25" x2="100%25" y2="0%25"%3E%3Cstop offset="0%25" stop-color="%23f472b6"/%3E%3Cstop offset="100%25" stop-color="%23fb7185"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g8)"/%3E%3Cpath d="M-20 260 Q180 200 320 260 T640 260 V420 H-20 Z" fill="rgba(255,255,255,0.14)"/%3E%3C/svg%3E',
+        '/images/Tierfreund.png',
       features: [
         "Fütterungsempfehlungen",
         "Rasse-spezifische Hinweise",
@@ -596,14 +631,14 @@ const Settings = () => {
       ],
     },
     {
-      id: "gourmet",
-      name: "Lebensmittel & Feinkost",
+      id: "109130",
+      name: "Wein & Feinkost - Der Sommelier",
       description: "Delikatessen, Getränke und Meal Kits",
       price: 99,
-      icon: "🍷",
+      icon: "",
       isActive: false,
       image:
-        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g9" x1="100%25" y1="0%25" x2="0%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%23f97316"/%3E%3Cstop offset="100%25" stop-color="%23ea580c"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g9)"/%3E%3Ccircle cx="180" cy="220" r="120" fill="rgba(255,255,255,0.1)"/%3E%3Ccircle cx="420" cy="150" r="80" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
+        '/images/Der%20Sommelier.png',
       features: [
         "Geschmacksprofile",
         "Pairing-Empfehlungen",
@@ -613,14 +648,14 @@ const Settings = () => {
       ],
     },
     {
-      id: "home-living",
-      name: "Home & Living",
+      id: "109065",
+      name: "Home & Living - Der Innenarchitekt",
       description: "Möbel, Deko und Haushaltswaren",
       price: 119,
-      icon: "🏠",
+      icon: "",
       isActive: false,
       image:
-        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g10" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%236b7280"/%3E%3Cstop offset="100%25" stop-color="%239ca3af"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g10)"/%3E%3Crect x="80" y="110" width="440" height="180" rx="32" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
+        '/images/Der%20Innenarchitekt.png',
       features: [
         "Stilwelten & Looks",
         "Material- & Pflegehinweise",
@@ -631,106 +666,28 @@ const Settings = () => {
     },
     {
       id: "01",
-      name: "Home & Living",
-      description: "Möbel, Deko und Haushaltswaren",
-      price: 119,
-      icon: "🏠",
+      name: "",
+      description: "",
+      price: 0,
+      icon: "",
       isActive: false,
       image:
-        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g10" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%236b7280"/%3E%3Cstop offset="100%25" stop-color="%239ca3af"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g10)"/%3E%3Crect x="80" y="110" width="440" height="180" rx="32" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
-      features: [
-        "Stilwelten & Looks",
-        "Material- & Pflegehinweise",
-        "Maßangaben sauber erklärt",
-        "Roomset Storytelling",
-        "Cross-Selling Sets",
+        '/images/spaeter.png',
+      features: [      
       ],
     },
     {
       id: "02",
-      name: "Home & Living",
-      description: "Möbel, Deko und Haushaltswaren",
-      price: 119,
-      icon: "🏠",
+      name: "",
+      description: "",
+      price: 0,
+      icon: "",
       isActive: false,
       image:
-        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g10" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%236b7280"/%3E%3Cstop offset="100%25" stop-color="%239ca3af"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g10)"/%3E%3Crect x="80" y="110" width="440" height="180" rx="32" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
+        '/images/spaeter.png',
       features: [
-        "Stilwelten & Looks",
-        "Material- & Pflegehinweise",
-        "Maßangaben sauber erklärt",
-        "Roomset Storytelling",
-        "Cross-Selling Sets",
       ],
-    },
-    {
-      id: "03",
-      name: "Home & Living",
-      description: "Möbel, Deko und Haushaltswaren",
-      price: 119,
-      icon: "🏠",
-      isActive: false,
-      image:
-        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g10" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%236b7280"/%3E%3Cstop offset="100%25" stop-color="%239ca3af"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g10)"/%3E%3Crect x="80" y="110" width="440" height="180" rx="32" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
-      features: [
-        "Stilwelten & Looks",
-        "Material- & Pflegehinweise",
-        "Maßangaben sauber erklärt",
-        "Roomset Storytelling",
-        "Cross-Selling Sets",
-      ],
-    },
-    {
-      id: "04",
-      name: "Home & Living",
-      description: "Möbel, Deko und Haushaltswaren",
-      price: 119,
-      icon: "🏠",
-      isActive: false,
-      image:
-        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g10" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%236b7280"/%3E%3Cstop offset="100%25" stop-color="%239ca3af"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g10)"/%3E%3Crect x="80" y="110" width="440" height="180" rx="32" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
-      features: [
-        "Stilwelten & Looks",
-        "Material- & Pflegehinweise",
-        "Maßangaben sauber erklärt",
-        "Roomset Storytelling",
-        "Cross-Selling Sets",
-      ],
-    },
-    {
-      id: "05 ",
-      name: "Home & Living",
-      description: "Möbel, Deko und Haushaltswaren",
-      price: 119,
-      icon: "🏠",
-      isActive: false,
-      image:
-        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g10" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%236b7280"/%3E%3Cstop offset="100%25" stop-color="%239ca3af"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g10)"/%3E%3Crect x="80" y="110" width="440" height="180" rx="32" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
-      features: [
-        "Stilwelten & Looks",
-        "Material- & Pflegehinweise",
-        "Maßangaben sauber erklärt",
-        "Roomset Storytelling",
-        "Cross-Selling Sets",
-      ],
-    },
-    {
-      id: "06 ",
-      name: "Home & Living",
-      description: "Möbel, Deko und Haushaltswaren",
-      price: 119,
-      icon: "🏠",
-      isActive: false,
-      image:
-        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"%3E%3Cdefs%3E%3ClinearGradient id="g10" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%236b7280"/%3E%3Cstop offset="100%25" stop-color="%239ca3af"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="600" height="400" fill="url(%23g10)"/%3E%3Crect x="80" y="110" width="440" height="180" rx="32" fill="rgba(255,255,255,0.12)"/%3E%3C/svg%3E',
-      features: [
-        "Stilwelten & Looks",
-        "Material- & Pflegehinweise",
-        "Maßangaben sauber erklärt",
-        "Roomset Storytelling",
-        "Cross-Selling Sets",
-      ],
-    },
+    },    
   ]);
 
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
@@ -1150,6 +1107,9 @@ const Settings = () => {
   const _purchaseSpecialization = (spec: Specialization) => {
     alert(`🛒 Weiterleitung zum Kauf: ${spec.name} (${spec.price}€)`);
   };
+
+  const getShopProductUrl = (spec: Specialization) =>
+    `https://kaufe-es.eu/?post_type=product&p=${encodeURIComponent(spec.id)}`;
 
   return (
     <div
@@ -2483,6 +2443,23 @@ const Settings = () => {
                       onChange={handleImportConfig}
                     />
                   </label>
+
+                  <button
+                    onClick={handleDownloadConfig}
+                    style={{
+                      display: "inline-block",
+                      background: "rgba(16, 185, 129, 0.15)",
+                      color: "#10b981",
+                      padding: "12px 24px",
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                      fontWeight: 600,
+                      border: "2px solid #10b981",
+                      fontSize: "16px",
+                    }}
+                  >
+                    {t("settings.connection.downloadConfig")}
+                  </button>
                 </div>
               </>
             )}
@@ -2519,6 +2496,7 @@ const Settings = () => {
                       borderRadius: "14px",
                       transformStyle: "preserve-3d",
                       transition: "transform 0.6s ease",
+                      cursor: "pointer",
                       boxShadow:
                         hoveredCard === spec.id
                           ? "0 18px 40px rgba(0,0,0,0.45)"
@@ -2528,6 +2506,13 @@ const Settings = () => {
                           ? "rotateY(180deg)"
                           : "rotateY(0deg)",
                     }}
+                    onClick={() =>
+                      window.open(
+                        getShopProductUrl(spec),
+                        "_blank",
+                        "noopener,noreferrer"
+                      )
+                    }
                   >
                     {spec.isActive && (
                       <div
@@ -2650,7 +2635,7 @@ const Settings = () => {
                         </span>
                         {!spec.isActive && (
                           <a
-                            href="https://kaufe-es.eu/index.php/shop/"
+                            href={getShopProductUrl(spec)}
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{

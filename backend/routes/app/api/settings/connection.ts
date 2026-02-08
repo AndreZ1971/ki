@@ -5,6 +5,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { configValidator } from '../../../../services/configValidator.js';
 import { getConfig } from '@config';
+import { authMiddleware } from '../auth/index.js';
 
 interface ShopCredentials {
   // WordPress
@@ -83,6 +84,119 @@ interface ShopCredentials {
 type ErrorCategory = 'network' | 'auth' | 'validation' | 'timeout' | 'unknown';
 
 const connectionRoutes: FastifyPluginAsync = async (fastify) => {
+  const sanitizeConnectionForDownload = (raw: any) => {
+    const socialMedia = raw?.socialMedia || {};
+
+    return {
+      wordpress: {
+        url: raw?.wordpress?.url || '',
+        username: raw?.wordpress?.username || '',
+        appPassword: raw?.wordpress?.appPassword || '',
+      },
+      woocommerce: {
+        url: raw?.woocommerce?.url || '',
+        consumerKey: raw?.woocommerce?.consumerKey || '',
+        consumerSecret: raw?.woocommerce?.consumerSecret || '',
+        authMode: raw?.woocommerce?.authMode || 'basic',
+        timeoutMs: raw?.woocommerce?.timeoutMs || 30000,
+      },
+      openAI: {
+        apiKey: raw?.openAI?.apiKey || '',
+        model: raw?.openAI?.model || 'gpt-4o-mini',
+      },
+      smtp: {
+        host: raw?.smtp?.host || '',
+        port: raw?.smtp?.port ?? 465,
+        secure: raw?.smtp?.secure ?? true,
+        user: raw?.smtp?.user || '',
+        password: raw?.smtp?.password || '',
+        from: raw?.smtp?.from || '',
+      },
+      job: {
+        mode: raw?.job?.mode || 'once',
+        intervalMs: raw?.job?.intervalMs || 900000,
+      },
+      features: {
+        enableAnalytics: raw?.features?.enableAnalytics ?? true,
+        enableAutoProducts: raw?.features?.enableAutoProducts ?? true,
+        enableEmailMarketing: raw?.features?.enableEmailMarketing ?? true,
+      },
+      reddit: {
+        clientId: raw?.reddit?.clientId || '',
+        clientSecret: raw?.reddit?.clientSecret || '',
+      },
+      support: {
+        ticketsEndpoint:
+          raw?.support?.ticketsEndpoint ||
+          '/wp-json/awesome-support/v1/tickets',
+        perPage: raw?.support?.perPage ?? 20,
+        provider: raw?.support?.provider || 'auto',
+        cptSlug: raw?.support?.cptSlug || 'wpas_ticket',
+      },
+      ml: {
+        enabled: raw?.ml?.enabled ?? true,
+        productRecommendations: raw?.ml?.productRecommendations ?? true,
+        trendForecasting: raw?.ml?.trendForecasting ?? true,
+        dynamicPricing: raw?.ml?.dynamicPricing ?? false,
+        emailOptimization: raw?.ml?.emailOptimization ?? true,
+        churnPrediction: raw?.ml?.churnPrediction ?? false,
+        sentimentAnalysis: raw?.ml?.sentimentAnalysis ?? false,
+        fraudDetection: raw?.ml?.fraudDetection ?? false,
+        productRecMinConfidence: raw?.ml?.productRecMinConfidence ?? 0.7,
+        productRecFallback: raw?.ml?.productRecFallback ?? true,
+        trendMinConfidence: raw?.ml?.trendMinConfidence ?? 0.6,
+        trendFallback: raw?.ml?.trendFallback ?? true,
+        emailMinConfidence: raw?.ml?.emailMinConfidence ?? 0.65,
+        emailFallback: raw?.ml?.emailFallback ?? true,
+        emailDefaultTime: raw?.ml?.emailDefaultTime || '09:00',
+        maxInferenceTime: raw?.ml?.maxInferenceTime ?? 5000,
+        cacheResults: raw?.ml?.cacheResults ?? true,
+        cacheTtl: raw?.ml?.cacheTtl ?? 3600,
+      },
+      socialMedia: {
+        linkedin: {
+          enabled: socialMedia?.linkedin?.enabled ?? false,
+          clientId: socialMedia?.linkedin?.clientId || '',
+          clientSecret: socialMedia?.linkedin?.clientSecret || '',
+          accessToken: socialMedia?.linkedin?.accessToken || '',
+          refreshToken: socialMedia?.linkedin?.refreshToken || '',
+          urn: socialMedia?.linkedin?.urn || '',
+        },
+        facebook: {
+          enabled: socialMedia?.facebook?.enabled ?? false,
+          accessToken: socialMedia?.facebook?.accessToken || '',
+          pageId: socialMedia?.facebook?.pageId || '',
+        },
+        instagram: {
+          enabled: socialMedia?.instagram?.enabled ?? false,
+          accessToken: socialMedia?.instagram?.accessToken || '',
+          businessAccountId: socialMedia?.instagram?.businessAccountId || '',
+        },
+        twitter: {
+          enabled: socialMedia?.twitter?.enabled ?? false,
+          apiKey: socialMedia?.twitter?.apiKey || '',
+          apiSecret: socialMedia?.twitter?.apiSecret || '',
+          accessToken: socialMedia?.twitter?.accessToken || '',
+          accessTokenSecret: socialMedia?.twitter?.accessTokenSecret || '',
+        },
+        tiktok: {
+          enabled: socialMedia?.tiktok?.enabled ?? false,
+          accessToken: socialMedia?.tiktok?.accessToken || '',
+          refreshToken: socialMedia?.tiktok?.refreshToken || '',
+        },
+        youtube: {
+          enabled: socialMedia?.youtube?.enabled ?? false,
+          clientId: socialMedia?.youtube?.clientId || '',
+          clientSecret: socialMedia?.youtube?.clientSecret || '',
+          redirectUri: socialMedia?.youtube?.redirectUri || '',
+          accessToken: socialMedia?.youtube?.accessToken || '',
+          refreshToken: socialMedia?.youtube?.refreshToken || '',
+          channelId: socialMedia?.youtube?.channelId || '',
+        },
+      },
+    };
+  };
+
   // Helper: Categorize errors and provide helpful hints
   const categorizeError = (
     error: Error | string | unknown
@@ -334,6 +448,35 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
       reply.status(500).send({ error: 'Failed to get connection settings' });
     }
   });
+
+  // GET /api/settings/connection/download - Download sanitized connection.json
+  fastify.get(
+    '/connection/download',
+    { preHandler: authMiddleware },
+    async (_request, reply) => {
+      try {
+        logger.info('📥 Settings: Download sanitized connection.json');
+        const jsonPath = path.resolve(process.cwd(), 'connection.json');
+        const json = await fs.readFile(jsonPath, 'utf-8');
+        const fileData = JSON.parse(json);
+
+        const sanitized = sanitizeConnectionForDownload(fileData);
+        const payload = JSON.stringify(sanitized, null, 2);
+
+        reply.header('Content-Type', 'application/json; charset=utf-8');
+        reply.header(
+          'Content-Disposition',
+          'attachment; filename="ari-export.json"'
+        );
+        return reply.send(payload);
+      } catch (error) {
+        logger.error({ error }, '❌ Settings: Download connection.json failed');
+        return reply
+          .status(500)
+          .send({ success: false, error: 'Failed to download connection.json' });
+      }
+    }
+  );
 
   // POST /api/settings/connection - Update credentials and save to .env
   fastify.post('/connection', async (request, reply) => {

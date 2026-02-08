@@ -2,6 +2,21 @@
 
 All notable changes to A.R.I. (Artificial Retail Intelligence) will be documented in this file.
 
+## [7.3.0] - 2026-02-09
+
+### ✨ Added
+- **Config Export Download**: Sanitized `ari-export.json` download after onboarding
+- **Onboarding Download Button**: One-click export for customers after setup
+- **Specialization Cards**: Product links now open shop product pages
+
+### 🖼️ UI
+- **Specialization Images**: Switched tiles to use PNGs from `frontend/public/images`
+
+### 📝 Documentation
+- **v7.3.0 Docs**: Updated README badges and added v7.3.0 release docs
+
+---
+
 ## [7.2.0] - 2026-02-03
 
 ### 🔒 Security

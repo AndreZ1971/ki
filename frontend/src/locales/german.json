@@ -192,8 +192,11 @@
       "saveConfiguration": "💾 Konfiguration speichern",
       "saving": "💾 Speichert...",
       "importConfig": "📂 Konfiguration laden",
+      "downloadConfig": "📥 Konfiguration herunterladen",
       "importSuccess": "✅ Konfiguration geladen. Jetzt speichern, um sie zu übernehmen.",
-      "importError": "❌ Fehler beim Laden der Datei. Bitte gültige connection.json wählen."
+      "importError": "❌ Fehler beim Laden der Datei. Bitte gültige connection.json wählen.",
+      "downloadSuccess": "✅ Konfiguration heruntergeladen",
+      "downloadError": "❌ Download fehlgeschlagen. Bitte erneut versuchen."
     },
     "specialization": {
       "title": "🎯 Agent-Spezialisierung wählen",

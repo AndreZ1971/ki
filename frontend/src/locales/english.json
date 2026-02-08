@@ -192,8 +192,11 @@
       "saveConfiguration": "💾 Save Configuration",
       "saving": "💾 Saving...",
       "importConfig": "📂 Load Configuration",
+      "downloadConfig": "📥 Download Configuration",
       "importSuccess": "✅ Configuration loaded. Save to apply.",
-      "importError": "❌ Failed to load file. Please choose a valid connection.json."
+      "importError": "❌ Failed to load file. Please choose a valid connection.json.",
+      "downloadSuccess": "✅ Configuration downloaded",
+      "downloadError": "❌ Download failed. Please try again."
     },
     "specialization": {
       "title": "🎯 Choose agent specialization",
