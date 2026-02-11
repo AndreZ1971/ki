@@ -485,10 +485,6 @@ const Settings = () => {
     reader.readAsText(file);
   };
 
-  // Subscription-Daten (Platzhalter, wird von Automattic aktualisiert)
-  const [subscriptionEndDate, _setSubscriptionEndDate] = useState<Date | null>(null);
-  const [renewalUrl, _setRenewalUrl] = useState<string | null>(null);
-
   // Verfügbare Spezialisierungen
   const [specializations] = useState<Specialization[]>([
     {
@@ -1093,14 +1089,6 @@ const Settings = () => {
       setConnectionMessage("❌ Fehler beim Speichern der Konfiguration");
     } finally {
       setSaving(false);
-    }
-  };
-
-  const handleRenewSubscription = () => {
-    if (renewalUrl) {
-      window.open(renewalUrl, "_blank");
-    } else {
-      setConnectionMessage(t("settings.subscription.renewalUnavailable"));
     }
   };
 
@@ -2721,82 +2709,32 @@ const Settings = () => {
                 maxWidth: "600px",
               }}
             >
-              {/* Subscription Runtime Display */}
-              <div
+              {/* Profile Link */}
+              <p style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px", marginBottom: "20px" }}>
+                {t("settings.subscription.profileLink") || "Verwalte deine Subscription in deinem Kundenprofil"}
+              </p>
+              <a
+                href="https://kaufe-es.eu/index.php/mein-konto/wps_subscriptions/"
+                target="_blank"
+                rel="noopener noreferrer"
                 style={{
-                  background: "rgba(59, 130, 246, 0.1)",
-                  border: "2px solid #3b82f6",
-                  padding: "20px",
-                  borderRadius: "10px",
-                  marginBottom: "20px",
-                }}
-              >
-                <div style={{ marginBottom: "15px" }}>
-                  <label
-                    style={{
-                      display: "block",
-                      marginBottom: "8px",
-                      color: "rgba(255,255,255,0.8)",
-                      fontSize: "14px",
-                      fontWeight: "600",
-                    }}
-                  >
-                    {t("settings.subscription.validUntil")}
-                  </label>
-                  <div
-                    style={{
-                      fontSize: "18px",
-                      fontWeight: "bold",
-                      color: "#3b82f6",
-                      fontFamily: "monospace",
-                    }}
-                  >
-                    {subscriptionEndDate
-                      ? subscriptionEndDate.toLocaleDateString("de-DE", {
-                          weekday: "long",
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })
-                      : t("settings.subscription.placeholder")}
-                  </div>
-                </div>
-
-                <small
-                  style={{
-                    color: "rgba(255,255,255,0.6)",
-                    fontSize: "12px",
-                    display: "block",
-                  }}
-                >
-                  {t("settings.subscription.containerExpiration")}
-                </small>
-              </div>
-
-              {/* Renew Button */}
-              <button
-                onClick={handleRenewSubscription}
-                disabled={!renewalUrl}
-                style={{
+                  display: "inline-block",
                   width: "100%",
                   padding: "15px",
-                  background: renewalUrl
-                    ? "linear-gradient(135deg, #22c55e, #16a34a)"
-                    : "rgba(100,100,100,0.3)",
-                  border: "none",
-                  borderRadius: "8px",
+                  textAlign: "center",
+                  background: "linear-gradient(135deg, #3b82f6, #2563eb)",
                   color: "white",
-                  cursor: renewalUrl ? "pointer" : "not-allowed",
+                  textDecoration: "none",
+                  borderRadius: "8px",
                   fontSize: "16px",
                   fontWeight: "bold",
                   marginBottom: "10px",
+                  cursor: "pointer",
+                  border: "none",
                 }}
               >
-                {renewalUrl
-                  ? t("settings.subscription.renewButton")
-                  : t("settings.subscription.renewPending")}
-              </button>
-
+                {t("settings.subscription.openProfile") || "Profil öffnen"}
+              </a>
               <small
                 style={{
                   color: "rgba(255,255,255,0.6)",
@@ -2805,7 +2743,7 @@ const Settings = () => {
                   textAlign: "center",
                 }}
               >
-                {t("settings.subscription.renewalInfo")}
+                {t("settings.subscription.profileInfo") || "Dort siehst du alle deine Subscriptions und deren Laufzeit"}
               </small>
             </div>
 

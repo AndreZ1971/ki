@@ -375,7 +375,6 @@ export default function MLSettings() {
         <div className="metric-card full-width" style={{ background: 'rgba(59, 130, 246, 0.1)', border: '2px solid #3b82f6' }}>
           <h3 style={{ marginBottom: '15px' }}>Zero-Risk ML Integration</h3>
           <ul style={{ fontSize: '14px', color: 'rgba(255,255,255,0.9)', paddingLeft: '20px', margin: 0, lineHeight: '1.8' }}>
-            <li>Automatischer Fallback zu regelbasierten Systemen</li>
             <li>A/B Testing ohne Code-Änderungen möglich</li>
             <li>Alle Features funktionieren mit und ohne ML</li>
             <li>Performance-Monitoring inklusive</li>

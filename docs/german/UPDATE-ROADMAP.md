@@ -101,5 +101,10 @@ Deine Marketing-Texte automatisch in hochwertige Videos umwandeln.
 
 ---
 
+- subscription hinweis ( ablauf und restzeit ) eingabe der subsciption nummer um die daten aus WooCommerce zu bekommen ( muss jeder kunde selber machen damit es funktioniert
+  renew knopf ist sehr kompliziert weil A.R.I. die daten nicht hat , 
+
+---
+
 **Autor:** André Zabel  
 **Status:** ✅ Aktualisiert – 18. Januar 2026

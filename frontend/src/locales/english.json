@@ -122,6 +122,7 @@
     "tabs": {
       "connection": "🔌 Shop Connection",
       "specialization": "🎯 Specialization",
+      "subscription": "⏱️ Subscription",
       "license": "🔑 License",
       "social": "📱 Social Media",
       "agentic": "🤖 Agentic Loops"
@@ -220,20 +221,16 @@
       "activeLicenses": "📋 Active Licenses"
     },
     "subscription": {
-      "title": "⏱️ Subscription & Runtime",
-      "subtitle": "Manage your container runtime and specializations",
-      "validUntil": "📅 Valid until:",
-      "placeholder": "Placeholder: Will be updated by Automattic",
-      "containerExpiration": "After expiration, your container will automatically be terminated by Kubernetes.",
-      "renewButton": "🔄 Renew Subscription",
-      "renewPending": "⏳ Renewal link will be provided by Automattic",
-      "renewalInfo": "Automattic will automatically update the renewal URL and runtime data",
+      "title": "⏱️ Your Runtime",
+      "subtitle": "Manage your subscription on ari-cloud.de",
+      "profileLink": "Manage your subscription in your customer profile on ari-cloud.de",
+      "openProfile": "📖 Open Profile",
+      "profileInfo": "There you can see all your subscriptions and their runtime",
       "purchasedTitle": "🎯 Purchased Specializations",
       "active": "✓ ACTIVE",
       "activate": "Activate",
       "delete": "Delete",
       "confirmDelete": "Do you really want to delete this specialization? It can be re-uploaded at any time.",
-      "renewalUnavailable": "❌ Renewal link not available. Please contact support.",
       "subscriptionSuccessful": "✅ Subscription renewed successfully",
       "renewalFailed": "❌ Renewal failed"
     },

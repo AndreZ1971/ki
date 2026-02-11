@@ -122,6 +122,7 @@
     "tabs": {
       "connection": "🔌 Shop-Verbindung",
       "specialization": "🎯 Spezialisierung",
+      "subscription": "⏱️ Subscription",
       "license": "🔑 Lizenz",
       "social": "📱 Social Media",
       "agentic": "🤖 Agentic Loops"
@@ -220,20 +221,16 @@
       "activeLicenses": "📋 Aktive Lizenzen"
     },
     "subscription": {
-      "title": "⏱️ Subscription & Laufzeit",
-      "subtitle": "Verwalte deine Container-Laufzeit und Spezialisierungen",
-      "validUntil": "📅 Gültig bis:",
-      "placeholder": "Platzhalter: Wird von Automattic aktualisiert",
-      "containerExpiration": "Nach Ablauf wird dein Container automatisch von Kubernetes beendet.",
-      "renewButton": "🔄 Subscription erneuern",
-      "renewPending": "⏳ Erneuerungslink wird von Automattic bereitgestellt",
-      "renewalInfo": "Automattic wird die Erneuerungs-URL und Laufzeit-Daten automatisch aktualisieren",
+      "title": "⏱️ Deine Laufzeit",
+      "subtitle": "Verwalte deine Subscription auf ari-cloud.de",
+      "profileLink": "Verwalte deine Subscription in deinem Kundenprofil auf ari-cloud.de",
+      "openProfile": "📖 Profil öffnen",
+      "profileInfo": "Dort siehst du alle deine Subscriptions und deren Laufzeit",
       "purchasedTitle": "🎯 Gekaufte Spezialisierungen",
       "active": "✓ AKTIV",
       "activate": "Aktivieren",
       "delete": "Löschen",
       "confirmDelete": "Möchtest du diese Spezialisierung wirklich löschen? Sie kann jederzeit neu hochgeladen werden.",
-      "renewalUnavailable": "❌ Erneuerungslink nicht verfügbar. Kontaktieren Sie den Support.",
       "subscriptionSuccessful": "✅ Subscription erfolgreich erneuert",
       "renewalFailed": "❌ Erneuerung fehlgeschlagen"
     },

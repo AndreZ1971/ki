@@ -18,26 +18,5 @@
     "installedAt": 1769223531252,
     "filePath": "C:\\Entwicklung\\neuer-git-ordner\\ki\\backend\\data\\specializations\\default\\ari-selbstbeschreibung.enc",
     "isActive": true
-  },
-  {
-    "id": "fitness-ernaehrung",
-    "name": "Nahrungsergänzung & Fitness - Der Coach",
-    "description": "Spezialisiert auf Fitness-Ziele, Supplements, Ernährung und motivierte Beratung",
-    "category": "Gesundheit & Fitness",
-    "icon": "💊",
-    "version": "1.0.0",
-    "features": [
-      "Fitness-Ziel basierte Empfehlungen",
-      "Supplement-Wirkstoff Erklärungen",
-      "Dosierungs- & Timing-Ratschläge",
-      "Ernährungs-Makro Beratung",
-      "Compliance & rechtlich sichere Aussagen",
-      "Motivation & Mindset-Hacks",
-      "Trainingsplan Integration",
-      "Budget-optimierte Supplement-Stacks"
-    ],
-    "installedAt": 1770156495988,
-    "filePath": "C:\\Entwicklung\\neuer-git-ordner\\ki\\backend\\data\\specializations\\default\\fitness-ernaehrung.enc",
-    "isActive": false
   }
 ]

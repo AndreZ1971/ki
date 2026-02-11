@@ -347,7 +347,9 @@ export const productApi = {
   /**
    * Vollständige Bildanalyse mit Orchestration Status
    */
-  fullImageAnalysis: async (file: File): Promise<ApiResponse<{
+  fullImageAnalysis: async (file: File): Promise<{
+    success: boolean;
+    error?: string;
     mode: 'real' | 'partial' | 'failed' | 'error';
     completeness: number;
     steps: Array<{
@@ -362,7 +364,7 @@ export const productApi = {
       conversionImpact: any;
       audience: any;
     };
-  }>> => {
+  }> => {
     const formData = new FormData();
     formData.append('image', file);
     

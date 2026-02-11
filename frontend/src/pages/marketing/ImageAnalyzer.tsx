@@ -79,19 +79,19 @@ const ImageAnalyzer: React.FC = () => {
       
       if (response.success && response.data) {
         setOrchestrationStatus({
-          mode: response.data.mode,
-          dataCompleteness: response.data.completeness,
-          steps: response.data.steps
+          mode: response.mode,
+          dataCompleteness: response.completeness,
+          steps: response.steps
         });
-        setFullResults(response.data.data);
+        setFullResults(response.data);
         
         // Legacy result für alte UI-Teile
-        if (response.data.data.basicAnalysis) {
-          setResult({ ...response.data.data.basicAnalysis, success: true });
+        if (response.data.basicAnalysis) {
+          setResult({ ...response.data.basicAnalysis, success: true });
         }
         
-        const successCount = response.data.steps.filter((s: any) => s.status === 'success').length;
-        showToast(`✅ Analyse abgeschlossen! ${successCount}/${response.data.steps.length} Schritte erfolgreich`, 'success');
+        const successCount = response.steps.filter((s: any) => s.status === 'success').length;
+        showToast(`✅ Analyse abgeschlossen! ${successCount}/${response.steps.length} Schritte erfolgreich`, 'success');
       } else {
         throw new Error(response.error || 'Analyse fehlgeschlagen');
       }

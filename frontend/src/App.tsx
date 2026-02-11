@@ -5,6 +5,7 @@ import { SessionProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/auth/Login";
 import Onboarding from "./pages/Onboarding/Onboarding";
+import { TermsOfService } from "./pages/TermsOfService";
 
 // Pages
 import AIDashboard from "./pages/AIDashboard";
@@ -89,6 +90,7 @@ function App() {
             {/* Public Routes - Login & Onboarding */}
             <Route path="/login" element={<Login />} />
             <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
 
             {/* Protected Routes */}
             <Route path="/" element={<ProtectedRoute><AIDashboard /></ProtectedRoute>} />

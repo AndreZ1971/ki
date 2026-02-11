@@ -1203,6 +1203,7 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
       reply.status(500).send({ error: 'Failed to test connection' });
     }
   });
+
 };
 
 // updateEnvFile entfernt, da jetzt connection.json verwendet wird

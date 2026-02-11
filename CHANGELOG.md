@@ -2,6 +2,34 @@
 
 All notable changes to A.R.I. (Artificial Retail Intelligence) will be documented in this file.
 
+## [7.4.0] - 2026-02-12
+
+### 🔐 Security & Architecture
+- **Simplified Subscription Management**: Removed API-based integration, replaced with direct profile link
+- **Removed API Secrets**: wpSwingsSecret and subscriptionId no longer in client code
+- **Eliminated Attack Surface**: Removed 1200+ lines of subscription API endpoint code
+- **Improved Security Model**: Admin-only configuration, no customer-facing secrets
+
+### ✨ Changes
+- **Profile Link Feature**: Simple button to https://kaufe-es.eu/index.php/mein-konto/wps_subscriptions/
+- **Removed Components**: /api/subscription/status endpoint, subscription config interface
+- **Simplified Frontend**: ShopCredentials no longer has subscription fields
+- **Updated Translations**: i18n keys updated to reflect link-based approach
+
+### 🛡️ Benefits
+- **No Configuration Required**: Works out of the box
+- **Better Security**: No secrets in client configuration
+- **Easier Maintenance**: Simpler codebase with fewer dependencies
+- **Drop-in Compatible**: Fully compatible with v7.3.0, no breaking changes
+
+### 📝 Documentation
+- **RELEASE_NOTES_v7.4.0.md**: Complete release documentation
+- **DEPLOYMENT_GUIDE_v7.4.0.md**: Updated deployment guide
+- **v7.4.0_QUICK_REF.md**: Quick reference with changes
+- **Version Consistency**: All documentation updated for 7.4.0
+
+---
+
 ## [7.3.0] - 2026-02-09
 
 ### ✨ Added
