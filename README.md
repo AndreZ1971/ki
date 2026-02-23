@@ -317,7 +317,7 @@ Dem Nutzer wird ein exklusives Nutzungsrecht an der bereitgestellten Infrastrukt
 Die Infrastruktur ist für professionelles Wachstum ausgelegt und ermöglicht eine kurzfristige Skalierung der Server-Instanzen bei steigender Last. Der Nutzer hat Anspruch auf die vereinbarte Rechenleistung innerhalb der gesicherten 1.0.0-Produktionsumgebung.
 
 #### 5. Gewährleistung und Haftung
-A.R.I. wird als „Software as a Service" (SaaS) bereitgestellt. Trotz einer Testabdeckung von über 365 automatisierten Tests und einer Fehlerquote von 0 % im Release-Zustand erfolgt die Bereitstellung ohne Mängelgewähr für spezifische wirtschaftliche Erfolge.
+A.R.I. wird als „Infrastructure as a Service" (IaaS) bereitgestellt. Trotz einer Testabdeckung von über 365 automatisierten Tests und einer Fehlerquote von 0 % im Release-Zustand erfolgt die Bereitstellung ohne Mängelgewähr für spezifische wirtschaftliche Erfolge.
 
 Die finale Kontrolle über die Veröffentlichung von KI-generierten Inhalten (z. B. via Copy & Paste) obliegt allein dem Nutzer.
 
