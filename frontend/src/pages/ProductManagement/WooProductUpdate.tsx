@@ -81,6 +81,11 @@ const WooProductUpdate = () => {
   const [maxPriceIncrease, setMaxPriceIncrease] = useState<number>(20);
   const [maxPriceDecrease, setMaxPriceDecrease] = useState<number>(15);
 
+  // Modal State für Preis-Bearbeitung
+  const [editingProduct, setEditingProduct] = useState<ProductItem | null>(null);
+  const [editingPrice, setEditingPrice] = useState<string>('');
+  const [isSavingPrice, setIsSavingPrice] = useState(false);
+
   // Lade echte Produkte aus WooCommerce
     const loadProducts = React.useCallback(async () => {
       try {
@@ -1098,9 +1103,25 @@ const WooProductUpdate = () => {
                     </button>
                     
                     {product.permalink && (
-                      <a href={product.permalink} target="_blank" rel="noopener noreferrer" className="product-link">
-                        🔗
-                      </a>
+                      <button
+                        onClick={() => {
+                          setEditingProduct(product);
+                          setEditingPrice(product.price.toString());
+                        }}
+                        style={{
+                          background: '#3b82f6',
+                          color: 'white',
+                          border: 'none',
+                          padding: '6px 12px',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontSize: '12px',
+                          fontWeight: 'bold'
+                        }}
+                        title="Preis bearbeiten"
+                      >
+                        ✏️ Preis
+                      </button>
                     )}
                   </div>
                 );
@@ -1109,6 +1130,145 @@ const WooProductUpdate = () => {
           </>
         )}
       </div>
+
+      {/* Modal für Preis-Bearbeitung */}
+      {editingProduct && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: '400px' }}>
+            <div className="modal-header">
+              <h2>💰 Preis bearbeiten</h2>
+              <button
+                className="close-btn"
+                onClick={() => {
+                  setEditingProduct(null);
+                  setEditingPrice('');
+                }}
+                title="Schließen"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <div style={{ marginBottom: '16px' }}>
+                <p style={{ 
+                  margin: '0 0 12px 0',
+                  color: '#9ca3af',
+                  fontSize: '13px'
+                }}>
+                  <strong style={{ color: '#e5e7eb' }}>Produkt:</strong> {editingProduct.name}
+                </p>
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontWeight: '600',
+                  color: '#e5e7eb',
+                  fontSize: '14px'
+                }}>
+                  Neuer Preis (€)
+                </label>
+                <input
+                  type="number"
+                  value={editingPrice}
+                  onChange={(e) => setEditingPrice(e.target.value)}
+                  step="0.01"
+                  min="0"
+                  autoFocus
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #3f4652',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box',
+                    backgroundColor: '#252d38',
+                    color: '#e5e7eb',
+                    fontWeight: '500'
+                  }}
+                  placeholder="z.B. 49.99"
+                />
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                onClick={() => {
+                  setEditingProduct(null);
+                  setEditingPrice('');
+                }}
+                disabled={isSavingPrice}
+                style={{
+                  padding: '8px 16px',
+                  border: '1px solid #3f4652',
+                  borderRadius: '6px',
+                  backgroundColor: 'transparent',
+                  color: '#9ca3af',
+                  cursor: isSavingPrice ? 'not-allowed' : 'pointer',
+                  fontWeight: '500',
+                  fontSize: '13px',
+                  opacity: isSavingPrice ? 0.5 : 1,
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                Abbrechen
+              </button>
+              <button
+                onClick={async () => {
+                  const newPrice = parseFloat(editingPrice);
+                  if (isNaN(newPrice) || newPrice < 0) {
+                    toast.error('Bitte geben Sie einen gültigen Preis ein');
+                    return;
+                  }
+
+                  setIsSavingPrice(true);
+                  try {
+                    const result = await apiClient.put(
+                      `/api/products/woo/update-single/${editingProduct.id}`,
+                      { regular_price: newPrice.toString() }
+                    );
+
+                    if (result.success) {
+                      toast.success(`✅ Preis für "${editingProduct.name}" auf €${newPrice.toFixed(2)} geändert!`);
+                      // Update local state
+                      setProducts(prev => prev.map(p => 
+                        p.id === editingProduct.id
+                          ? { ...p, price: newPrice }
+                          : p
+                      ));
+                      setEditingProduct(null);
+                      setEditingPrice('');
+                    } else {
+                      toast.error(result.error || 'Fehler beim Speichern');
+                    }
+                  } catch (err) {
+                    toast.error(err instanceof Error ? err.message : 'Fehler beim Speichern');
+                  } finally {
+                    setIsSavingPrice(false);
+                  }
+                }}
+                disabled={isSavingPrice}
+                style={{
+                  padding: '8px 16px',
+                  border: 'none',
+                  borderRadius: '6px',
+                  backgroundColor: '#10b981',
+                  color: 'white',
+                  cursor: isSavingPrice ? 'not-allowed' : 'pointer',
+                  fontWeight: '600',
+                  fontSize: '13px',
+                  opacity: isSavingPrice ? 0.7 : 1,
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                {isSavingPrice ? '⏳ Speichern...' : '✓ Speichern'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -259,6 +259,30 @@
   box-shadow: var(--shadow-lg);
 }
 
+.social-poster-btn-secondary {
+  background: rgba(107, 114, 128, 0.3);
+  color: #e5e7eb;
+  border: 1px solid rgba(107, 114, 128, 0.5);
+}
+
+.social-poster-btn-secondary:hover {
+  background: rgba(107, 114, 128, 0.5);
+  border-color: rgba(107, 114, 128, 0.8);
+  transform: translateY(-2px);
+}
+
+.social-poster-btn-cancel {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.social-poster-btn-cancel:hover {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.6);
+  transform: translateY(-2px);
+}
+
 /* ============================================
    GHOST BUTTON (Advanced/AutoFramplementator)
    ============================================ */

@@ -1,6 +1,6 @@
-# A.R.I. Deployment Guide v7.4.0
+# A.R.I. Deployment Guide v7.5.0
 
-**Version**: 7.4.0 | **Last Updated**: February 12, 2026  
+**Version**: 7.5.0 | **Last Updated**: February 12, 2026  
 **Status**: Production Ready | **Environment**: Docker, Node.js, PostgreSQL
 
 ---
@@ -119,14 +119,14 @@ docker-compose -f docker-compose.production.yml up -d
 
 ```bash
 # Build frontend image
-docker build -t ari-frontend:7.4.0 -f frontend/Dockerfile.prod .
+docker build -t ari-frontend:7.5.0 -f frontend/Dockerfile.prod .
 
 # Build backend image
-docker build -t ari-backend:7.4.0 -f backend/Dockerfile.prod .
+docker build -t ari-backend:7.5.0 -f backend/Dockerfile.prod .
 
 # Run containers
-docker run -d -p 3000:3000 --name ari-frontend ari-frontend:7.4.0
-docker run -d -p 3001:3001 --name ari-backend ari-backend:7.4.0
+docker run -d -p 3000:3000 --name ari-frontend ari-frontend:7.5.0
+docker run -d -p 3001:3001 --name ari-backend ari-backend:7.5.0
 ```
 
 ### Docker Environment Variables
@@ -209,7 +209,7 @@ LOG_LEVEL=info
 ```
 VITE_API_URL=https://api.yourshop.com
 VITE_APP_NAME=A.R.I.
-VITE_VERSION=7.4.0
+VITE_VERSION=7.5.0
 ```
 
 ### SSL/TLS Configuration
@@ -413,13 +413,13 @@ docker-compose up -d
 
 ## Version-Specific Notes
 
-### v7.4.0 Changes
+### v7.5.0 Changes
 - Simplified subscription management via profile link
 - Removed API-based subscription integration
 - Improved security by eliminating client-side secrets
 - Enhanced documentation consistency
 
-### Upgrading from v7.3.0
+### Upgrading from v7.5.0
 - No breaking changes
 - Database migration not required
 - Configuration files compatible
@@ -449,6 +449,6 @@ docker-compose up -d
 ---
 
 **Last Updated**: February 12, 2026  
-**Version**: 7.4.0  
+**Version**: 7.5.0  
 **Maintained by**: A.R.I. Development Team  
 **License**: MIT

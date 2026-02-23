@@ -116,13 +116,10 @@ const newRequest: SocialPostRequest = {
   - imageUrl Parameter optional
   - Nur-Text-Posting funktioniert wie zuvor
 
-- **InstagramPublisher.ts** (68 Zeilen)
-  - Behält Bild-Anforderung bei
-  - Verarbeitet Asset-URLs und Legacy mediaUrl
-
-- **TikTokPublisher.ts** (96 Zeilen)
-  - Video-Anforderung erzwungen
-  - Bild-Erweiterungs-Validierung in Kraft
+- **Instagram & TikTok** (v7.5.0)
+  - Entfernt aus Backend API Publishing
+  - Text-Generierung nur (Frontend Copy-to-Clipboard)
+  - Grund: API Review zu komplex für Endkunden
 
 - **AssetStorageService.ts** (165 Zeilen)
   - Neue Funktion, beeinflusst existierenden Code nicht
@@ -239,8 +236,8 @@ Status:       ✅ ALLE BESTANDEN
 ```
 backend/services/social/SocialPostOrchestrator.ts
 backend/services/social/publishers/FacebookPublisher.ts
-backend/services/social/publishers/InstagramPublisher.ts
-backend/services/social/publishers/TikTokPublisher.ts
+backend/services/social/publishers/TwitterPublisher.ts
+backend/services/social/publishers/LinkedInPublisher.ts
 backend/services/social/publishers/YouTubePublisher.ts
 backend/services/social/AssetStorageService.ts
 backend/services/social/MediaComposerService.ts
@@ -248,6 +245,7 @@ backend/routes/app/api/social/assets-routes.ts
 backend/types/social.ts (erweitert)
 frontend/src/pages/MarketingContent/SocialMediaPoster.tsx (erweitert)
 tests/integration/social-media-regression.test.ts (NEU)
+# Instagram & TikTok: Text-Generierung nur (Frontend)
 ```
 
 ---

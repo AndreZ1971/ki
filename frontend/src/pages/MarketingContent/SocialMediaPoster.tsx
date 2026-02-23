@@ -83,7 +83,7 @@ const SocialMediaPoster: React.FC = () => {
   const [editingContent, setEditingContent] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [postStats, setPostStats] = useState({ scheduled: 0, published: 0, engagement: 0 });
-  const [webhookConfig, setWebhookConfig] = useState<Record<string, boolean>>({ linkedin: false, facebook: false, tiktok: false });
+  const [webhookConfig, setWebhookConfig] = useState<Record<string, boolean>>({ linkedin: false, facebook: false });
   const [aiTransformOnPublish, setAiTransformOnPublish] = useState(true);
   
   // YouTube Video Upload
@@ -99,9 +99,7 @@ const SocialMediaPoster: React.FC = () => {
   const [connectedAccounts, setConnectedAccounts] = useState({
     linkedin: false,
     facebook: false,
-    instagram: false,
     twitter: false,
-    tiktok: false,
     youtube: false
   });
 
@@ -139,9 +137,7 @@ const SocialMediaPoster: React.FC = () => {
           setConnectedAccounts({
             linkedin: data.socialMedia.linkedin?.enabled || false,
             facebook: data.socialMedia.facebook?.enabled || false,
-            instagram: data.socialMedia.instagram?.enabled || false,
             twitter: data.socialMedia.twitter?.enabled || false,
-            tiktok: data.socialMedia.tiktok?.enabled || false,
             youtube: data.socialMedia.youtube?.enabled || false
           });
         }
@@ -299,6 +295,19 @@ const SocialMediaPoster: React.FC = () => {
   };
 
   const handlePublishPost = async (platform: string, content: string) => {
+    // TikTok & Instagram: Copy to clipboard instead of direct publishing
+    if (platform === 'tiktok' || platform === 'instagram') {
+      try {
+        await navigator.clipboard.writeText(content);
+        const platformName = platform === 'tiktok' ? 'TikTok' : 'Instagram';
+        showToast(`${platformName}-Text in die Zwischenablage kopiert! 📋`, 'success');
+        return;
+      } catch (_err) {
+        showToast('Fehler beim Kopieren', 'error');
+        return;
+      }
+    }
+
     try {
       // YouTube special handling
       if (platform === 'youtube') {
@@ -335,7 +344,7 @@ const SocialMediaPoster: React.FC = () => {
       }));
 
       const webhookAvailable = webhookConfig[platform];
-      const directApiAvailable = ['facebook', 'instagram', 'tiktok', 'twitter', 'linkedin', 'youtube'].includes(platform) && connectedAccounts[platform as keyof typeof connectedAccounts];
+      const directApiAvailable = ['facebook', 'twitter', 'linkedin', 'youtube'].includes(platform) && connectedAccounts[platform as keyof typeof connectedAccounts];
 
       // Prefer webhook if configured, otherwise fall back to direct API publisher
       if (webhookAvailable) {
@@ -565,7 +574,6 @@ const SocialMediaPoster: React.FC = () => {
               >
                 <span className="social-poster-platform-icon">{p.icon()}</span>
                 <div className="social-poster-platform-name">{p.label}</div>
-                <div className="social-poster-platform-followers">{p.followers}</div>
                 {selectedPlatforms.has(p.value) && (
                   <div className="social-poster-platform-check">✓</div>
                 )}
@@ -582,7 +590,7 @@ const SocialMediaPoster: React.FC = () => {
           <div className="social-poster-info-box" style={{ marginTop: '10px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                🔌 <strong>Verbundene Plattformen:</strong> {Object.values(connectedAccounts).filter(Boolean).length}/6
+                🔌 <strong>Verbundene Plattformen:</strong> {Object.values(connectedAccounts).filter(Boolean).length}/4
               </div>
               <label className="social-poster-checkbox-label" title="AI-Optimierung beim Versand aktivieren (Backend transformiert den Text je Plattform)">
                 <input
@@ -594,7 +602,7 @@ const SocialMediaPoster: React.FC = () => {
               </label>
             </div>
             <div style={{ marginTop: 6, fontSize: 12, opacity: 0.8 }}>
-              LinkedIn: {connectedAccounts.linkedin ? '✅' : '❌'} · Facebook: {connectedAccounts.facebook ? '✅' : '❌'} · Instagram: {connectedAccounts.instagram ? '✅' : '❌'} · Twitter: {connectedAccounts.twitter ? '✅' : '❌'} · TikTok: {connectedAccounts.tiktok ? '✅' : '❌'} · YouTube: {connectedAccounts.youtube ? '✅' : '❌'}
+              LinkedIn: {connectedAccounts.linkedin ? '✅' : '❌'} · Facebook: {connectedAccounts.facebook ? '✅' : '❌'} · Twitter: {connectedAccounts.twitter ? '✅' : '❌'} · YouTube: {connectedAccounts.youtube ? '✅' : '❌'}
             </div>
           </div>
         </motion.div>
@@ -708,7 +716,7 @@ const SocialMediaPoster: React.FC = () => {
                       </div>
                     )}
                   </div>
-                ) : (
+                ) : post.platform !== 'tiktok' && post.platform !== 'instagram' ? (
                   <div style={{ marginTop: '12px', padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
                     <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', color: 'rgba(255,255,255,0.9)' }}>
                       📎 Media ({uploadedAssets.length} {uploadedAssets.length === 1 ? 'Datei' : 'Dateien'})
@@ -753,7 +761,7 @@ const SocialMediaPoster: React.FC = () => {
                       </div>
                     )}
                   </div>
-                )}
+                ) : null}
 
                 {/* Action Buttons */}
                 <div className="social-poster-actions">
@@ -791,6 +799,20 @@ const SocialMediaPoster: React.FC = () => {
                               title={!youtubeVideoFile ? 'Bitte Video auswählen' : 'Video auf YouTube hochladen'}
                             >
                               📤 Upload Video
+                            </button>
+                          );
+                        }
+
+                        // TikTok & Instagram: Copy button instead of publish
+                        if (post.platform === 'tiktok' || post.platform === 'instagram') {
+                          const platformName = post.platform === 'tiktok' ? 'TikTok' : 'Instagram';
+                          return (
+                            <button
+                              onClick={() => handlePublishPost(post.platform, post.content)}
+                              className="social-poster-btn social-poster-btn-primary"
+                              title={`${platformName}-Text in Zwischenablage kopieren`}
+                            >
+                              📋 Copy
                             </button>
                           );
                         }

@@ -2,7 +2,7 @@
 
 All notable changes to A.R.I. (Artificial Retail Intelligence) will be documented in this file.
 
-## [7.4.0] - 2026-02-12
+## [7.5.0] - 2026-02-12
 
 ### 🔐 Security & Architecture
 - **Simplified Subscription Management**: Removed API-based integration, replaced with direct profile link
@@ -20,17 +20,17 @@ All notable changes to A.R.I. (Artificial Retail Intelligence) will be documente
 - **No Configuration Required**: Works out of the box
 - **Better Security**: No secrets in client configuration
 - **Easier Maintenance**: Simpler codebase with fewer dependencies
-- **Drop-in Compatible**: Fully compatible with v7.3.0, no breaking changes
+- **Drop-in Compatible**: Fully compatible with v7.5.0, no breaking changes
 
 ### 📝 Documentation
-- **RELEASE_NOTES_v7.4.0.md**: Complete release documentation
-- **DEPLOYMENT_GUIDE_v7.4.0.md**: Updated deployment guide
-- **v7.4.0_QUICK_REF.md**: Quick reference with changes
-- **Version Consistency**: All documentation updated for 7.4.0
+- **RELEASE_NOTES_v7.5.0.md**: Complete release documentation
+- **DEPLOYMENT_GUIDE_v7.5.0.md**: Updated deployment guide
+- **v7.5.0_QUICK_REF.md**: Quick reference with changes
+- **Version Consistency**: All documentation updated for 7.5.0
 
 ---
 
-## [7.3.0] - 2026-02-09
+## [7.5.0] - 2026-02-09
 
 ### ✨ Added
 - **Config Export Download**: Sanitized `ari-export.json` download after onboarding
@@ -41,11 +41,11 @@ All notable changes to A.R.I. (Artificial Retail Intelligence) will be documente
 - **Specialization Images**: Switched tiles to use PNGs from `frontend/public/images`
 
 ### 📝 Documentation
-- **v7.3.0 Docs**: Updated README badges and added v7.3.0 release docs
+- **v7.5.0 Docs**: Updated README badges and added v7.5.0 release docs
 
 ---
 
-## [7.2.0] - 2026-02-03
+## [7.5.0] - 2026-02-03
 
 ### 🔒 Security
 - **RSA-4096 Digital Signatures**: All specializations are now cryptographically signed with RSA-4096 + SHA-256
@@ -81,7 +81,7 @@ All notable changes to A.R.I. (Artificial Retail Intelligence) will be documente
 
 ---
 
-## [7.1.0] - 2026-01-24
+## [7.5.0] - 2026-01-24
 
 ### ✨ Added
 - Core improvements and documentation housekeeping
@@ -95,7 +95,7 @@ All notable changes to A.R.I. (Artificial Retail Intelligence) will be documente
 
 ---
 
-## [7.0.4] - 2026-01-23
+## [7.5.0] - 2026-01-23
 
 ### 🐛 Fixed
 - Session summary generation
@@ -104,7 +104,7 @@ All notable changes to A.R.I. (Artificial Retail Intelligence) will be documente
 
 ---
 
-## [7.0.1] - 2026-01-20
+## [7.5.0] - 2026-01-20
 
 ### ✨ Features
 - Quick reference guides
@@ -112,7 +112,7 @@ All notable changes to A.R.I. (Artificial Retail Intelligence) will be documente
 
 ---
 
-## [7.0.0] - 2026-01-15
+## [7.5.0] - 2026-01-15
 
 ### 🎉 Major Release
 - Production-ready A.R.I. system

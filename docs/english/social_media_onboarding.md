@@ -19,32 +19,38 @@ This document serves as a technical guide for setting up API interfaces to publi
 
 ---
 
-## 🎵 2. TikTok (Short-form Video)
-**Goal:** Direct publishing of videos to user feed.
+## 🎵 2. TikTok (Text Generation)
 
-### Procedure:
-1.  **Portal:** Register at [TikTok for Developers Portal](https://developers.tiktok.com/).
-2.  **App Creation:** Create a new app and add the **"Content Posting API"**.
-3.  **Review Process:** Fill out required information and submit the app for review.
-4.  **Scopes:** Ensure `video.publish` is enabled.
-5.  **Obtain Token:**
-    * Execute the OAuth flow: Redirect user to TikTok auth page.
-    * Exchange the `Authorization Code` for an `Access Token` and `Refresh Token`.
+**Status:** TikTok is currently only used for AI text generation. Videos can be exported via copy-to-clipboard.
+
+### How it works:
+1. **Text Generation:** A.R.I. automatically generates viral-optimized TikTok captions
+2. **Export Button:** "📋 Copy" copies the text to clipboard
+3. **Manual Publishing:** User opens TikTok app and publishes manually
+4. **No API Limits:** No OAuth configuration required
+
+### Why Copy-to-Clipboard?
+- TikTok API requires separate subdomain registration per shop (unscalable)
+- Copy-to-Clipboard is reliable and without limitations
+- User maintains full control over publishing
 
 ---
 
-## 📸 3. Instagram (Visual Media)
-**Goal:** Automated posting of images, Reels, and carousels.
+## 📸 3. Instagram (Text Generation)
 
-### Procedure:
-1.  **Prerequisite:** Instagram Business/Creator Account + link to Facebook Page.
-2.  **Portal:** Use the [Meta Developer Portal](https://developers.facebook.com/).
-3.  **App Type:** Select "Business" and add **"Instagram Graph API"**.
-4.  **Scopes:** You need `instagram_basic` and `instagram_content_publish`.
-5.  **Obtain Token:**
-    * Generate a User Token in the **Graph API Explorer**.
-    * Select your Instagram ID.
-    * Extend the token via the Access Token Tool to a **Long-lived Token** (60 days).
+**Status:** Instagram is currently only used for AI text generation. Content can be exported via copy-to-clipboard.
+
+### How it works:
+1. **Text Generation:** A.R.I. automatically generates engagement-optimized Instagram captions with hashtags
+2. **Export Button:** "📋 Copy" copies the text to clipboard
+3. **Manual Publishing:** User opens Instagram app and publishes manually
+4. **No API Limits:** No OAuth configuration required
+
+### Why Copy-to-Clipboard?
+- Instagram API requires Business Account + Facebook Page linking + App Review (3-6 months)
+- Meta App Review process is complex and time-consuming for end customers
+- Copy-to-Clipboard is reliable and available without waiting
+- User maintains full control over publishing
 
 ---
 

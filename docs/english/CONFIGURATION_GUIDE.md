@@ -2,7 +2,7 @@
 
 ## � Authentication & Data Access
 
-### Current Implementation (7.0.7)
+### Current Implementation (7.5.0)
 
 **Authentication:**
 - Temporary in-memory authentication via ENV variables

@@ -34,9 +34,10 @@ Siehe auch:
 - Erstellt `SocialPostOrchestrator.ts` (93 Zeilen) - Zentraler Koordinator
 - 4 Plattform-Publisher extrahiert:
   - `FacebookPublisher.ts` (69 Zeilen)
-  - `InstagramPublisher.ts` (68 Zeilen)
-  - `TikTokPublisher.ts` (96 Zeilen)
+  - `TwitterPublisher.ts`
+  - `LinkedInPublisher.ts`
   - `YouTubePublisher.ts` (existierend, beibehalten)
+- Text-Generierung für Instagram & TikTok (Copy-to-Clipboard)
 - 1:1-Funktionalität mit Legacy-Code beibehalten
 
 **Ergebnis:** ✅ Modulare Architektur, leichter zu warten und zu erweitern
@@ -81,8 +82,8 @@ Siehe auch:
 
 ---
 
-### Issue 4: Facebook & Instagram Bild-Publishing ✅
-**Ziel:** URL-basiertes Bild-Posting für Soziale Netzwerke implementieren
+### Issue 4: Facebook Bild-Publishing ✅
+**Ziel:** URL-basiertes Bild-Posting für Facebook implementieren
 
 **Facebook-Implementierung:**
 - Nur Text: POST zu `/me/feed` Endpoint
@@ -90,25 +91,26 @@ Siehe auch:
 - Endpoint-Entscheidung: `endpoint = imageUrl ? 'photos' : 'feed'`
 - Behält Caption für Bilder, Nachricht für Text
 
-**Instagram-Implementierung:**
-- Erfordert Bild für alle Posts
-- Nutzt `image_url` im Media-Container
-- Fehler geworfen: "Instagram benötigt ein Bild"
-- Media-Publish-Endpoint: `/ig/v18.0/{user_id}/media_publish`
+**Instagram & TikTok:**
+- Entfernt aus API-Publishing (v7.5.0)
+- Nur noch KI-Text-Generierung + Copy-to-Clipboard
+- Grund: API Review zu komplex für Endkunden (3-6 Monate Wartezeit)
 
 **Ergebnis:** ✅ Plattformspezifisches Publishing mit ordnungsgemäßer Fehlerbehandlung
 
 ---
 
-### Issue 5: TikTok Video-Publishing ✅
-**Ziel:** Video-only Posting mit Bildvalidierung implementieren
+### Issue 5: Instagram & TikTok Text-Generierung ✅ (v7.5.0)
+**Ziel:** API Limitations überwinden - Shift zu Copy-to-Clipboard
 
 **Implementierung:**
-- Endpoint: TikTok v2 API `/v1/video/publish/` mit PULL_FROM_URL
-- Video-only Anforderung erzwungen
-- Bildablehnung mit Validierung
+- **Instagram:** API Publishing entfernt (App Review zu komplex, 3-6 Monate)
+- **TikTok:** API Publishing entfernt (Subdomain-Anforderungen pro Shop)
+- Text-Generierung bleibt aktiv (KI erzeugt optimierte Captions)
+- Copy-to-Clipboard-Button im UI ("📋 Copy")
+- Nutzer veröffentlicht manuell in jeweiliger App
 
-**Ergebnis:** ✅ Strikte Plattformanforderungen erzwungen
+**Ergebnis:** ✅ Zuverlässige Text-Generierung ohne API-Constraints
 
 ---
 
@@ -159,9 +161,11 @@ Siehe auch:
 ```
 SocialPostOrchestrator (Koordinator)
 ├── FacebookPublisher (Bild/Text)
-├── InstagramPublisher (Bild erforderlich)
-├── TikTokPublisher (Nur Video)
+├── TwitterPublisher (Text/Media)
+├── LinkedInPublisher (Text/Media)
 ├── YouTubePublisher (Video mit Metadaten)
+├── Instagram (Text-Generierung nur, Copy-to-Clipboard)
+├── TikTok (Text-Generierung nur, Copy-to-Clipboard)
 ├── AssetStorageService (Upload/Speicherung)
 └── MediaComposerService (ffmpeg Komposition)
 ```
@@ -182,10 +186,12 @@ GET /social/assets/:filename       # Statisches Serving
 ### Backend-Services
 - `backend/services/social/SocialPostOrchestrator.ts` (93 Zeilen)
 - `backend/services/social/publishers/FacebookPublisher.ts` (69 Zeilen)
-- `backend/services/social/publishers/InstagramPublisher.ts` (68 Zeilen)
-- `backend/services/social/publishers/TikTokPublisher.ts` (96 Zeilen)
+- `backend/services/social/publishers/TwitterPublisher.ts`
+- `backend/services/social/publishers/LinkedInPublisher.ts`
+- `backend/services/social/publishers/YouTubePublisher.ts`
 - `backend/services/social/AssetStorageService.ts` (165 Zeilen)
 - `backend/services/social/MediaComposerService.ts` (183 Zeilen)
+- **Instagram & TikTok:** Text-Generierung nur (via KI), Copy-to-Clipboard in Frontend
 
 ### API Routes
 - `backend/routes/app/api/social/assets-routes.ts` (162 Zeilen)
@@ -236,8 +242,8 @@ GET /social/assets/:filename       # Statisches Serving
 ### Sicherheit
 - ✅ **MIME-Validierung:** Strikte Typ-Überprüfung
 - ✅ **Dateigröße:** 100 MB Max. erzwungen
-- ✅ **Erweiterungs-Validierung:** Für TikTok
 - ✅ **Statisches Serving:** Sichere Pfadbehandlung
+- ✅ **TikTok Textgenerierung:** Sichere Clipboard-Datentypen
 
 ---
 

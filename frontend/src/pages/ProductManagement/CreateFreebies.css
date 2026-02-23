@@ -486,6 +486,7 @@
   padding: 24px;
   max-height: 60vh;
   overflow-y: auto;
+  background: #1a1d23;
 }
 
 /* ========== Form Groups ========== */
@@ -500,7 +501,7 @@
 
 .form-group label {
   display: block;
-  color: #1e3c72;
+  color: #e5e7eb;
   font-weight: 600;
   font-size: 14px;
   margin-bottom: 8px;
@@ -510,11 +511,12 @@
 .form-group textarea {
   width: 100%;
   padding: 10px 12px;
-  border: 2px solid #e0e7ff;
+  border: 2px solid #3f4652;
   border-radius: 6px;
   font-family: inherit;
   font-size: 14px;
-  color: #333;
+  color: #e5e7eb;
+  background: #252d38;
   transition: all 0.2s ease;
   box-sizing: border-box;
 }
@@ -523,7 +525,7 @@
 .form-group textarea:focus {
   outline: none;
   border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
 }
 
 .disabled-input {
@@ -555,8 +557,9 @@
   display: flex;
   gap: 12px;
   padding: 16px 24px;
-  background: #f9fafb;
-  border-top: 1px solid #e0e7ff;
+  background: #252d38;
+  border-top: 1px solid #3f4652;
+  justify-content: flex-end;
 }
 
 .cancel-btn,

@@ -38,7 +38,7 @@ Diese Mock-Visualisierungen werden schrittweise durch echte WooCommerce-Datenint
 3. Caching-Mechanismen für Echtzeit-Metriken verfügbar sind
 
 ---
- v7.0.9 (Januar 2026)
+ v7.5.0 (Januar 2026)
 
 **Status:** Production Ready mit erweiterten Trend-Analysen und Preisoptimierungen
 
@@ -61,7 +61,7 @@ A.R.I. liest deine Daten (Produkte, Bestellungen, Trends) und erstellt **Hinweis
 ## 🎥 Social Media & Marketing
 
 ### 🆕 Social Media Poster (mit YouTube Video Upload)
-**Was es tut:** Veröffentliche Marketing-Content auf mehreren Plattformen (LinkedIn, TikTok, Instagram, X/Twitter, Facebook, **YouTube**).
+**Was es tut:** Veröffentliche Marketing-Content auf mehreren Plattformen (LinkedIn, X/Twitter, Facebook, **YouTube**) + KI-Text-Generierung für Instagram & TikTok.
 
 **Neu in v6.4:**
 - **YouTube Video Upload**: Lade Videos direkt hoch mit Auto-Metadaten

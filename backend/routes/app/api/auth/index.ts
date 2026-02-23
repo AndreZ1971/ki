@@ -239,14 +239,14 @@ export default async function authRoutes(fastify: FastifyInstance) {
   /**
    * GET /api/auth/session
    * Prüfe aktuelle Session
-   * Geschützte Route - erfordert aktive Session
+   * NICHT geschützt - kann ohne aktive Session abgerufen werden
    */
-  fastify.get('/session', { preHandler: authMiddleware }, async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.get('/session', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const sessionData = (request.session as any).auth;
 
       return reply.send({
-        authenticated: !!sessionData,
+        authenticated: !!sessionData?.authenticated,
         session: sessionData || null,
       });
     } catch (error) {

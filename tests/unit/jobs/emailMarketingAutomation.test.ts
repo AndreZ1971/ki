@@ -1,9 +1,56 @@
 // tests/unit/jobs/emailMarketingAutomation.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock woo tools before importing the module
+// Mock woo tools and config before importing the module
 vi.mock('../../../backend/tools/woo', () => ({
   wooGet: vi.fn()
+}));
+
+function configMockFactory() {
+  return {
+  __esModule: true,
+  getConfig: vi.fn(() => ({
+    smtp: {
+      host: 'smtp.test.local',
+      user: 'test-user',
+      password: 'test-password',
+      port: 465,
+      secure: true,
+      from: 'noreply@test.local'
+    }
+  })),
+  default: {
+    smtp: {
+      host: 'smtp.test.local',
+      user: 'test-user',
+      password: 'test-password',
+      port: 465,
+      secure: true,
+      from: 'noreply@test.local'
+    }
+  }
+  };
+}
+
+vi.mock('../../../backend/config', configMockFactory);
+vi.mock('../../../backend/config.ts', configMockFactory);
+
+vi.mock('../../../backend/woocommerce/config', () => ({
+  getWooConfig: () => ({
+    url: 'https://example.com'
+  })
+}));
+
+vi.mock('nodemailer', () => ({
+  __esModule: true,
+  default: {
+    createTransport: () => ({
+      sendMail: vi.fn().mockResolvedValue({ messageId: 'test-message-id' })
+    })
+  },
+  createTransport: () => ({
+    sendMail: vi.fn().mockResolvedValue({ messageId: 'test-message-id' })
+  })
 }));
 
 // Import after mocking
@@ -30,15 +77,80 @@ const mockProducts = [
   }
 ];
 
+const welcomeSubscribers = [
+  { email: 'max.mustermann@example.com' },
+  { email: 'sarah.berger@example.com' },
+  { email: 'thomas.schmidt@example.com' }
+];
+
+const newsletterSubscribers = [
+  { email: 'newsletter@example.com' },
+  { email: 'abonnent@example.com' },
+  { email: 'kunde@example.com' }
+];
+
+const recommendationCustomers = [
+  { email: 'interessent@example.com' },
+  { email: 'lead@example.com' },
+  { email: 'potential@example.com' }
+];
+
+const defaultCustomerFixtures = [
+  welcomeSubscribers,
+  newsletterSubscribers,
+  recommendationCustomers
+];
+
+let customerFixtures = [...defaultCustomerFixtures];
+let productFixtures: any[] = [...mockProducts];
+let customerCallIndex = 0;
+const queuedWooErrors: Array<{ endpoint: string; error: Error }> = [];
+
+const queueWooError = (endpoint: string, error: Error) => {
+  queuedWooErrors.push({ endpoint, error });
+};
+
 describe('Email Marketing Automation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Mock console methods to avoid test output clutter
     vi.spyOn(console, 'log').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(global, 'setTimeout').mockImplementation((callback: any) => {
+      if (typeof callback === 'function') {
+        callback();
+      }
+      return 0 as unknown as ReturnType<typeof setTimeout>;
+    });
+
+    customerCallIndex = 0;
+    customerFixtures = [...defaultCustomerFixtures];
+    productFixtures = [...mockProducts];
+    queuedWooErrors.length = 0;
     
     // Default mock implementation for wooGet
-    (wooGet as any).mockResolvedValue(mockProducts);
+    (wooGet as any).mockImplementation(async (endpoint: string) => {
+      const queuedIndex = queuedWooErrors.findIndex(entry => entry.endpoint === endpoint);
+      if (queuedIndex >= 0) {
+        const [entry] = queuedWooErrors.splice(queuedIndex, 1);
+        throw entry.error;
+      }
+
+      if (endpoint === '/customers') {
+        const response = customerFixtures[customerCallIndex]
+          ?? customerFixtures[customerFixtures.length - 1]
+          ?? [];
+        customerCallIndex += 1;
+        return response;
+      }
+
+      if (endpoint === '/products') {
+        return productFixtures;
+      }
+
+      return [];
+    });
   });
 
   describe('Campaign Execution', () => {
@@ -133,14 +245,14 @@ describe('Email Marketing Automation', () => {
     it('should include product information from WooCommerce', async () => {
       const results = await runEmailMarketingAutomation();
       
-      expect(wooGet).toHaveBeenCalledWith('/products');
+      expect(wooGet).toHaveBeenCalledWith('/products', { per_page: 10 });
       
       const newsletterResult = results.find(r => r.campaign === 'newsletter');
       expect(newsletterResult).toBeDefined();
     });
 
     it('should handle empty product list gracefully', async () => {
-      (wooGet as any).mockResolvedValueOnce([]);
+      productFixtures = [];
       
       const results = await runEmailMarketingAutomation();
       const newsletterResult = results.find(r => r.campaign === 'newsletter');
@@ -182,7 +294,7 @@ describe('Email Marketing Automation', () => {
     it('should fetch products from WooCommerce', async () => {
       await runEmailMarketingAutomation();
       
-      expect(wooGet).toHaveBeenCalledWith('/products');
+      expect(wooGet).toHaveBeenCalledWith('/products', { per_page: 10 });
     });
 
     it('should recommend first available product', async () => {
@@ -196,7 +308,7 @@ describe('Email Marketing Automation', () => {
 
     it('should handle no products available', async () => {
       // Mock empty products for both newsletter and product recommendation
-      (wooGet as any).mockResolvedValue([]);
+      productFixtures = [];
       
       const results = await runEmailMarketingAutomation();
       const recommendationResult = results.find(r => r.campaign === 'product_recommendation');
@@ -229,7 +341,7 @@ describe('Email Marketing Automation', () => {
 
   describe('Error Handling', () => {
     it('should handle WooCommerce API errors gracefully', async () => {
-      (wooGet as any).mockRejectedValueOnce(new Error('WooCommerce API Error'));
+      queueWooError('/customers', new Error('WooCommerce API Error'));
       
       const results = await runEmailMarketingAutomation();
       
@@ -240,7 +352,7 @@ describe('Email Marketing Automation', () => {
 
     it('should continue after email send failures', async () => {
       // Newsletter will fail to get products, but should still return result
-      (wooGet as any).mockRejectedValueOnce(new Error('Network error'));
+      queueWooError('/products', new Error('Network error'));
       
       const results = await runEmailMarketingAutomation();
       
@@ -262,7 +374,7 @@ describe('Email Marketing Automation', () => {
 
     it('should log errors without crashing', async () => {
       const _consoleErrorSpy = vi.spyOn(console, 'error');
-      (wooGet as any).mockRejectedValueOnce(new Error('Test error'));
+      queueWooError('/customers', new Error('Test error'));
       
       const results = await runEmailMarketingAutomation();
       
@@ -388,7 +500,7 @@ describe('Email Marketing Automation', () => {
       const recommendationResult = results.find(r => r.campaign === 'product_recommendation');
       
       expect(recommendationResult).toBeDefined();
-      expect(wooGet).toHaveBeenCalledWith('/products');
+      expect(wooGet).toHaveBeenCalledWith('/products', { per_page: 10 });
     });
   });
 });

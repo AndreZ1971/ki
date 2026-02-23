@@ -33,9 +33,10 @@ See also:
 - Created `SocialPostOrchestrator.ts` (93 lines) - Central coordinator
 - Extracted 4 platform publishers:
   - `FacebookPublisher.ts` (69 lines)
-  - `InstagramPublisher.ts` (68 lines)
-  - `TikTokPublisher.ts` (96 lines)
+  - `TwitterPublisher.ts`
+  - `LinkedInPublisher.ts`
   - `YouTubePublisher.ts` (existing, preserved)
+- Text generation for Instagram & TikTok (Copy-to-Clipboard)
 - Maintained 1:1 functionality with legacy code
 
 **Result:** ✅ Modular architecture, easier to maintain and extend
@@ -80,8 +81,8 @@ See also:
 
 ---
 
-### Issue 4: Facebook & Instagram Image Publishing ✅
-**Goal:** Implement URL-based image posting for social networks
+### Issue 4: Facebook Image Publishing ✅
+**Goal:** Implement URL-based image posting for Facebook
 
 **Facebook Implementation:**
 - Text only: POST to `/me/feed` endpoint
@@ -89,25 +90,26 @@ See also:
 - Endpoint decision: `endpoint = imageUrl ? 'photos' : 'feed'`
 - Preserves caption for images, message for text
 
-**Instagram Implementation:**
-- Image required for all posts
-- Uses `image_url` in media container
-- Error thrown: "Instagram requires an image"
-- Media publish endpoint: `/ig/v18.0/{user_id}/media_publish`
+**Instagram & TikTok:**
+- Removed from API publishing (v7.5.0)
+- AI text generation only + Copy-to-Clipboard
+- Reason: API review too complex for end customers (3-6 months wait)
 
 **Result:** ✅ Platform-specific publishing with proper error handling
 
 ---
 
-### Issue 5: TikTok Video Publishing ✅
-**Goal:** Implement video-only posting with image validation
+### Issue 5: Instagram & TikTok Text Generation ✅ (v7.5.0)
+**Goal:** Overcome API limitations - Shift to Copy-to-Clipboard
 
 **Implementation:**
-- Endpoint: TikTok v2 API `/v1/video/publish/` with PULL_FROM_URL
-- Video-only requirement enforced
-- Image rejection with validation
+- **Instagram:** API publishing removed (App Review too complex, 3-6 months)
+- **TikTok:** API publishing removed (subdomain requirements per shop)
+- Text generation remains active (AI generates optimized captions)
+- Copy-to-Clipboard button in UI ("📋 Copy")
+- User publishes manually in respective app
 
-**Result:** ✅ Strict platform requirements enforced
+**Result:** ✅ Reliable text generation without API constraints
 
 ---
 
@@ -158,9 +160,11 @@ See also:
 ```
 SocialPostOrchestrator (Coordinator)
 ├── FacebookPublisher (Image/Text)
-├── InstagramPublisher (Image required)
-├── TikTokPublisher (Video only)
+├── TwitterPublisher (Text/Media)
+├── LinkedInPublisher (Text/Media)
 ├── YouTubePublisher (Video with metadata)
+├── Instagram (Text generation only, Copy-to-Clipboard)
+├── TikTok (Text generation only, Copy-to-Clipboard)
 ├── AssetStorageService (Upload/Storage)
 └── MediaComposerService (ffmpeg Composition)
 ```
@@ -181,10 +185,12 @@ GET /social/assets/:filename       # Static serving
 ### Backend Services
 - `backend/services/social/SocialPostOrchestrator.ts` (93 lines)
 - `backend/services/social/publishers/FacebookPublisher.ts` (69 lines)
-- `backend/services/social/publishers/InstagramPublisher.ts` (68 lines)
-- `backend/services/social/publishers/TikTokPublisher.ts` (96 lines)
+- `backend/services/social/publishers/TwitterPublisher.ts`
+- `backend/services/social/publishers/LinkedInPublisher.ts`
+- `backend/services/social/publishers/YouTubePublisher.ts`
 - `backend/services/social/AssetStorageService.ts` (165 lines)
 - `backend/services/social/MediaComposerService.ts` (183 lines)
+- **Instagram & TikTok:** Text generation only (via AI), Copy-to-Clipboard in Frontend
 
 ### API Routes
 - `backend/routes/app/api/social/assets-routes.ts` (162 lines)

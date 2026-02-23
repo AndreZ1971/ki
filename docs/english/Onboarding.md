@@ -152,4 +152,4 @@ We know how important your shop is. That's why A.R.I. was built with this princi
 **Enjoy A.R.I.! 🚀**  
 The kaufe-es Team
 
-Version: 7.0.7 | January 2026
+Version: 7.5.0 | January 2026

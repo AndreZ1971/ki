@@ -1,6 +1,6 @@
 # 🤖 A.R.I. - Artificial Retail Intelligence
 
-![Version](https://img.shields.io/badge/version-7.4.0-blue.svg)
+![Version](https://img.shields.io/badge/version-7.5.0-blue.svg)
 ![Tests](https://img.shields.io/badge/tests-350%2F350-success.svg)
 ![ML Integration](https://img.shields.io/badge/ML%20Integration-100%25-green.svg)
 ![Design System](https://img.shields.io/badge/Design_Tokens-100%25-purple.svg)
@@ -126,17 +126,17 @@ Abandoned Carts? Kunden, die lange nichts gekauft haben? A.R.I. kennt sie und er
 - ✅ KI-generierte Produktbilder (DALL-E Integration)
 - ✅ Echtzeit-Analytics mit echten WooCommerce-Daten (keine Mock-Daten)
 - ✅ Email-Automation (Carts, Willkommensserie, Reaktivierung)
-- ✅ Social-Media-Posts (Facebook ✅, YouTube ✅, LinkedIn ready, weitere in Review)
-- ✅ **NEU v7.0.9:** Globales Design Token System mit Dark Mode
-- ✅ **NEU v7.0.9:** 8-Sprachen Support (DE, EN, FR, ES, IT, PT, NL, PL)
-- ✅ **NEU v7.0.9:** Vollständig dunkles Chatbot-Design mit perfekter Lesbarkeit
-- ✅ **NEU v7.0.9:** Spezialisierungs-aware KI-Personalisierung
+- ✅ Social-Media-Posts (LinkedIn, Facebook, Twitter, YouTube mit API-Publishing; Instagram & TikTok mit KI-Text-Generierung via Copy-to-Clipboard)
+- ✅ **NEU v7.5.0:** Globales Design Token System mit Dark Mode
+- ✅ **NEU v7.5.0:** 8-Sprachen Support (DE, EN, FR, ES, IT, PT, NL, PL)
+- ✅ **NEU v7.5.0:** Vollständig dunkles Chatbot-Design mit perfekter Lesbarkeit
+- ✅ **NEU v7.5.0:** Spezialisierungs-aware KI-Personalisierung
 - ✅ Multi-Source Trend-Analyse (Google Trends + Reddit OAuth)
 - ✅ Prozentuale Preissuggestionen mit deterministischer Berechnung
 - ✅ Manuelle Validierung von AI-Vorschlägen vor Übernahme
-- ✅ **NEU v7.0.9:** Vollständige WooCommerce-Integration ohne Platzhalter
-- ✅ **NEU v7.0.9:** Support-Tickets mit HTML-Bereinigung
-- ✅ **NEU v7.0.9:** Produktideen-Scoring ohne Zufallswerte
+- ✅ **NEU v7.5.0:** Vollständige WooCommerce-Integration ohne Platzhalter
+- ✅ **NEU v7.5.0:** Support-Tickets mit HTML-Bereinigung
+- ✅ **NEU v7.5.0:** Produktideen-Scoring ohne Zufallswerte
 
 ## ⚙️ Technologie
 

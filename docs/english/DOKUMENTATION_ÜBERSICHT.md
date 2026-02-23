@@ -89,9 +89,10 @@ backend/services/social/
 ├── SocialPostOrchestrator.ts (93 lines)
 ├── publishers/
 │   ├── FacebookPublisher.ts (69 lines)
-│   ├── InstagramPublisher.ts (68 lines)
-│   ├── TikTokPublisher.ts (96 lines)
+│   ├── TwitterPublisher.ts
+│   ├── LinkedInPublisher.ts
 │   └── YouTubePublisher.ts (preserved)
+│   # Instagram & TikTok: Text generation only (Frontend)
 ├── AssetStorageService.ts (165 lines)
 └── MediaComposerService.ts (182 lines)
 

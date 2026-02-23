@@ -1,6 +1,6 @@
 # 🎯 A.R.I. Spezialisierungen - Dokumentation
 
-**Version:** 7.0.7  
+**Version:** 7.5.0  
 **Stand:** Januar 2026  
 **Status:** ✅ Vollständig implementiert
 
@@ -377,6 +377,6 @@ A.R.I. Spezialisierungen bieten:
 **Technische Integration:** Web-basiertes Upload-System  
 **Skalierbarkeit:** Unbegrenzte Anzahl Spezialisierungen pro User
 
-**Version:** 7.0.7  
+**Version:** 7.5.0  
 **Stand:** Januar 2026  
 **Autor:** André Zabel (AndreZ1971)

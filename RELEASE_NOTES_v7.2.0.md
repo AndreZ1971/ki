@@ -1,14 +1,14 @@
-# Release Notes v7.2.0
+# Release Notes v7.5.0
 
 **Release Date**: February 3, 2026  
 **Status**: Production Ready  
-**Migration Required**: No (fully compatible with v7.1.0)
+**Migration Required**: No (fully compatible with v7.5.0)
 
 ---
 
 ## 🎯 Overview
 
-Version 7.2.0 introduces **commercial-grade security** for A.R.I. specializations with **RSA-4096 digital signatures** and a complete **session-based authentication system**. This release focuses on **revenue protection** and **tamper detection**, ensuring that only officially signed specializations can be uploaded to customer containers.
+Version 7.5.0 introduces **commercial-grade security** for A.R.I. specializations with **RSA-4096 digital signatures** and a complete **session-based authentication system**. This release focuses on **revenue protection** and **tamper detection**, ensuring that only officially signed specializations can be uploaded to customer containers.
 
 ---
 
@@ -220,7 +220,7 @@ backend/connection.json
 
 ## 🚀 Migration Guide
 
-### From v7.1.0 to v7.2.0
+### From v7.5.0 to v7.5.0
 
 **No breaking changes!** All existing configurations remain compatible.
 
@@ -294,12 +294,12 @@ npm run lint
 
 ### Revenue Protection
 
-**Before v7.2.0**:
+**Before v7.5.0**:
 - ❌ Anyone could upload custom specializations
 - ❌ No verification of authenticity
 - ❌ Risk of free-riders bypassing purchase
 
-**After v7.2.0**:
+**After v7.5.0**:
 - ✅ Only signed specializations accepted
 - ✅ Automatic rejection of manipulated files
 - ✅ Customers MUST purchase to get valid .ari-spec
@@ -320,7 +320,7 @@ npm run lint
 **Mitigation**:
 - Download restricted to paying customers only (WooCommerce integration)
 - Legal protection via AGB (IP ownership, reverse engineering prohibition)
-- Future consideration: AES-256 encryption for systemPrompts (v7.3.0?)
+- Future consideration: AES-256 encryption for systemPrompts (v7.5.0?)
 
 ---
 
@@ -328,22 +328,22 @@ npm run lint
 
 ### Updated Files
 
-- `README.md` → v7.2.0 badge
-- `README_EN.md` → v7.2.0 badge
-- `package.json` → v7.2.0 version
-- `CHANGELOG.md` → v7.2.0 entry with all changes
+- `README.md` → v7.5.0 badge
+- `README_EN.md` → v7.5.0 badge
+- `package.json` → v7.5.0 version
+- `CHANGELOG.md` → v7.5.0 entry with all changes
 - `.gitignore` → wp-config*.php protection
 
 ### New Files
 
-- `RELEASE_NOTES_v7.2.0.md` (this file)
+- `RELEASE_NOTES_v7.5.0.md` (this file)
 - `README_EINFACH.md` - Simple deployment guide
 - `backend/security/signatureVerifier.ts`
 - `backend/security/signatureTypes.ts`
 
 ---
 
-## 🔮 Next Steps (v7.3.0 Preview)
+## 🔮 Next Steps (v7.5.0 Preview)
 
 **Planned Features**:
 - 🔐 AES-256 encryption for systemPrompts (optional IP protection)
@@ -355,7 +355,7 @@ npm run lint
 
 ## 📞 Support
 
-For questions or issues related to v7.2.0:
+For questions or issues related to v7.5.0:
 - 📧 Email: support@kaufe-es.eu
 - 📖 Documentation: `README_EINFACH.md`
 - 🐛 Bug Reports: GitHub Issues
@@ -364,7 +364,7 @@ For questions or issues related to v7.2.0:
 
 ## ✅ Summary
 
-Version 7.2.0 delivers **commercial-grade security** for A.R.I. specializations:
+Version 7.5.0 delivers **commercial-grade security** for A.R.I. specializations:
 
 ✅ **RSA-4096 Digital Signatures** - Tamper-proof specializations  
 ✅ **Session-based Authentication** - Secure container access  
@@ -373,10 +373,10 @@ Version 7.2.0 delivers **commercial-grade security** for A.R.I. specializations:
 ✅ **Delete Management** - Safe removal of inactive specs  
 ✅ **Legal Framework** - Comprehensive AGB template  
 
-**Migration**: Drop-in compatible with v7.1.0, no breaking changes.
+**Migration**: Drop-in compatible with v7.5.0, no breaking changes.
 
 ---
 
 **Release Team**: André Zabel, kaufe-es.eu  
 **Release Date**: February 3, 2026  
-**Version**: 7.2.0 🚀
+**Version**: 7.5.0 🚀

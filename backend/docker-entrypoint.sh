@@ -121,7 +121,7 @@ if [ ! -f /app/connection.json ]; then
   },
 
   "socialMedia": {
-    "_comment": "Social Media Credentials (YouTube, TikTok, Instagram, Facebook, Twitter, LinkedIn)",
+    "_comment": "Social Media Credentials (YouTube, Facebook, Twitter, LinkedIn)",
     "linkedin": {
       "enabled": false,
       "accessToken": "",
@@ -132,22 +132,12 @@ if [ ! -f /app/connection.json ]; then
       "accessToken": "",
       "pageId": ""
     },
-    "instagram": {
-      "enabled": false,
-      "accessToken": "",
-      "businessAccountId": ""
-    },
     "twitter": {
       "enabled": false,
       "apiKey": "",
       "apiSecret": "",
       "accessToken": "",
       "accessTokenSecret": ""
-    },
-    "tiktok": {
-      "enabled": false,
-      "accessToken": "",
-      "refreshToken": ""
     },
     "youtube": {
       "enabled": false,
@@ -166,9 +156,7 @@ if [ ! -f /app/connection.json ]; then
       "reddit",
       "socialMedia.linkedin",
       "socialMedia.facebook",
-      "socialMedia.instagram",
       "socialMedia.twitter",
-      "socialMedia.tiktok",
       "socialMedia.youtube"
     ]
   },

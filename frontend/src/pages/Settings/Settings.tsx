@@ -76,17 +76,11 @@ type ShopCredentials = {
   facebookEnabled: boolean;
   facebookAccessToken: string;
   facebookPageId: string;
-  instagramEnabled: boolean;
-  instagramAccessToken: string;
-  instagramBusinessAccountId: string;
   twitterEnabled: boolean;
   twitterApiKey: string;
   twitterApiSecret: string;
   twitterAccessToken: string;
   twitterAccessTokenSecret: string;
-  tiktokEnabled: boolean;
-  tiktokAccessToken: string;
-  tiktokRefreshToken: string;
   youtubeEnabled: boolean;
   youtubeClientId: string;
   youtubeClientSecret: string;
@@ -122,11 +116,6 @@ const brandIcons: Record<string, JSX.Element> = {
   twitter: (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="#1DA1F2">
       <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-    </svg>
-  ),
-  tiktok: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="#000000">
-      <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
     </svg>
   ),
   youtube: (
@@ -191,17 +180,11 @@ const defaultCredentials: ShopCredentials = {
   facebookEnabled: false,
   facebookAccessToken: "",
   facebookPageId: "",
-  instagramEnabled: false,
-  instagramAccessToken: "",
-  instagramBusinessAccountId: "",
   twitterEnabled: false,
   twitterApiKey: "",
   twitterApiSecret: "",
   twitterAccessToken: "",
   twitterAccessTokenSecret: "",
-  tiktokEnabled: false,
-  tiktokAccessToken: "",
-  tiktokRefreshToken: "",
   youtubeEnabled: false,
   youtubeClientId: "",
   youtubeClientSecret: "",
@@ -455,19 +438,12 @@ const Settings = () => {
           facebookEnabled: data.socialMedia?.facebook?.enabled ?? false,
           facebookAccessToken: data.socialMedia?.facebook?.accessToken || "",
           facebookPageId: data.socialMedia?.facebook?.pageId || "",
-          instagramEnabled: data.socialMedia?.instagram?.enabled ?? false,
-          instagramAccessToken: data.socialMedia?.instagram?.accessToken || "",
-          instagramBusinessAccountId:
-            data.socialMedia?.instagram?.businessAccountId || "",
           twitterEnabled: data.socialMedia?.twitter?.enabled ?? false,
           twitterApiKey: data.socialMedia?.twitter?.apiKey || "",
           twitterApiSecret: data.socialMedia?.twitter?.apiSecret || "",
           twitterAccessToken: data.socialMedia?.twitter?.accessToken || "",
           twitterAccessTokenSecret:
             data.socialMedia?.twitter?.accessTokenSecret || "",
-          tiktokEnabled: data.socialMedia?.tiktok?.enabled ?? false,
-          tiktokAccessToken: data.socialMedia?.tiktok?.accessToken || "",
-          tiktokRefreshToken: data.socialMedia?.tiktok?.refreshToken || "",
           youtubeEnabled: data.socialMedia?.youtube?.enabled ?? false,
           youtubeClientId: data.socialMedia?.youtube?.clientId || '',
           youtubeClientSecret: data.socialMedia?.youtube?.clientSecret || '',
@@ -889,8 +865,11 @@ const Settings = () => {
           // Refresh specializations list
           const listResponse = await fetch('/api/specializations/list');
           if (listResponse.ok) {
-            const _listData = await listResponse.json();
+            const listData = await listResponse.json();
             // Update UI with new specializations (trigger re-render)
+            if (listData.success && listData.specializations) {
+              setPurchasedSpecializations(listData.specializations);
+            }
             setConnectionMessage(`✅ ${file.name} erfolgreich aktiviert!`);
             
             // Optional: Navigate to specializations tab or refresh that section
@@ -1036,22 +1015,12 @@ const Settings = () => {
             accessToken: credentials.facebookAccessToken,
             pageId: credentials.facebookPageId,
           },
-          instagram: {
-            enabled: credentials.instagramEnabled,
-            accessToken: credentials.instagramAccessToken,
-            businessAccountId: credentials.instagramBusinessAccountId,
-          },
           twitter: {
             enabled: credentials.twitterEnabled,
             apiKey: credentials.twitterApiKey,
             apiSecret: credentials.twitterApiSecret,
             accessToken: credentials.twitterAccessToken,
             accessTokenSecret: credentials.twitterAccessTokenSecret,
-          },
-          tiktok: {
-            enabled: credentials.tiktokEnabled,
-            accessToken: credentials.tiktokAccessToken,
-            refreshToken: credentials.tiktokRefreshToken,
           },
           youtube: {
             enabled: credentials.youtubeEnabled,
@@ -3365,124 +3334,6 @@ const Settings = () => {
                 </label>
               </div>
 
-              {/* Instagram */}
-              <div
-                style={{
-                  background: "rgba(217, 45, 143, 0.1)",
-                  border: "2px solid rgba(217, 45, 143, 0.3)",
-                  borderRadius: "12px",
-                  padding: "20px",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: "15px",
-                  }}
-                >
-                  <span style={{ marginRight: "15px", color: "#E4405F" }}>
-                    {brandIcons.instagram}
-                  </span>
-                  <div>
-                    <h4 style={{ margin: "0 0 5px 0", color: "white" }}>
-                      Instagram
-                    </h4>
-                    <small style={{ color: "rgba(255,255,255,0.6)" }}>
-                      {credentials.instagramEnabled
-                        ? t("settings.social.connected")
-                        : t("settings.social.notConnected")}
-                    </small>
-                  </div>
-                </div>
-                <div style={{ marginBottom: "10px" }}>
-                  <label
-                    style={{
-                      display: "block",
-                      marginBottom: "8px",
-                      color: "rgba(255,255,255,0.8)",
-                      fontSize: "12px",
-                    }}
-                  >
-                    {t("settings.social.accessToken")}
-                  </label>
-                  <input
-                    type="password"
-                    placeholder="Instagram Access Token"
-                    value={credentials.instagramAccessToken}
-                    onChange={(e) =>
-                      handleCredentialChange(
-                        "instagramAccessToken",
-                        e.target.value
-                      )
-                    }
-                    style={{
-                      width: "100%",
-                      padding: "10px",
-                      background: "rgba(0,0,0,0.3)",
-                      border: "1px solid rgba(255,255,255,0.2)",
-                      borderRadius: "6px",
-                      color: "white",
-                      fontSize: "13px",
-                      marginBottom: "10px",
-                    }}
-                  />
-                  <label
-                    style={{
-                      display: "block",
-                      marginBottom: "8px",
-                      color: "rgba(255,255,255,0.8)",
-                      fontSize: "12px",
-                    }}
-                  >
-                    {t("settings.social.instagramBusinessId")}
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Instagram Business Account ID"
-                    value={credentials.instagramBusinessAccountId}
-                    onChange={(e) =>
-                      handleCredentialChange(
-                        "instagramBusinessAccountId",
-                        e.target.value
-                      )
-                    }
-                    style={{
-                      width: "100%",
-                      padding: "10px",
-                      background: "rgba(0,0,0,0.3)",
-                      border: "1px solid rgba(255,255,255,0.2)",
-                      borderRadius: "6px",
-                      color: "white",
-                      fontSize: "13px",
-                    }}
-                  />
-                </div>
-                <label
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    cursor: "pointer",
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={credentials.instagramEnabled}
-                    onChange={(e) =>
-                      handleCredentialChange(
-                        "instagramEnabled",
-                        e.target.checked
-                      )
-                    }
-                    style={{ cursor: "pointer" }}
-                  />
-                  <span style={{ color: "rgba(255,255,255,0.8)" }}>
-                    {t("settings.social.enabled")}
-                  </span>
-                </label>
-              </div>
-
               {/* Twitter */}
               <div
                 style={{
@@ -3639,90 +3490,6 @@ const Settings = () => {
                     checked={credentials.twitterEnabled}
                     onChange={(e) =>
                       handleCredentialChange("twitterEnabled", e.target.checked)
-                    }
-                    style={{ cursor: "pointer" }}
-                  />
-                  <span style={{ color: "rgba(255,255,255,0.8)" }}>
-                    {t("settings.social.enabled")}
-                  </span>
-                </label>
-              </div>
-
-              {/* TikTok */}
-              <div
-                style={{
-                  background: "rgba(0, 0, 0, 0.2)",
-                  border: "2px solid rgba(255,255,255,0.2)",
-                  borderRadius: "12px",
-                  padding: "20px",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: "15px",
-                  }}
-                >
-                  <span style={{ marginRight: "15px", color: "#000000" }}>
-                    {brandIcons.tiktok}
-                  </span>
-                  <div>
-                    <h4 style={{ margin: "0 0 5px 0", color: "white" }}>
-                      TikTok
-                    </h4>
-                    <small style={{ color: "rgba(255,255,255,0.6)" }}>
-                      {credentials.tiktokEnabled
-                        ? t("settings.social.connected")
-                        : t("settings.social.notConnected")}
-                    </small>
-                  </div>
-                </div>
-                <div style={{ marginBottom: "15px" }}>
-                  <label
-                    style={{
-                      display: "block",
-                      marginBottom: "8px",
-                      color: "rgba(255,255,255,0.8)",
-                      fontSize: "12px",
-                    }}
-                  >
-                    {t("settings.social.accessToken")}
-                  </label>
-                  <input
-                    type="password"
-                    placeholder="TikTok Access Token"
-                    value={credentials.tiktokAccessToken}
-                    onChange={(e) =>
-                      handleCredentialChange(
-                        "tiktokAccessToken",
-                        e.target.value
-                      )
-                    }
-                    style={{
-                      width: "100%",
-                      padding: "10px",
-                      background: "rgba(0,0,0,0.3)",
-                      border: "1px solid rgba(255,255,255,0.2)",
-                      borderRadius: "6px",
-                      color: "white",
-                      fontSize: "13px",
-                    }}
-                  />
-                </div>
-                <label
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    cursor: "pointer",
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={credentials.tiktokEnabled}
-                    onChange={(e) =>
-                      handleCredentialChange("tiktokEnabled", e.target.checked)
                     }
                     style={{ cursor: "pointer" }}
                   />

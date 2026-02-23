@@ -38,7 +38,7 @@ These mock visualizations will be gradually replaced with real WooCommerce data 
 3. Caching mechanisms for real-time metrics are available
 
 ---
- v7.0.9 (January 2026)
+ v7.5.0 (January 2026)
 
 **Status:** Production Ready with advanced trend analysis and price optimization
 
@@ -61,9 +61,11 @@ A.R.I. reads your data (products, orders, trends) and creates **hints, drafts, a
 ## 🎥 Social Media & Marketing
 
 ### 🆕 Social Media Poster (with YouTube Video Upload)
-**What it does:** Publish marketing content across multiple platforms (LinkedIn, TikTok, Instagram, X/Twitter, Facebook, **YouTube**).
+**What it does:** Generate and publish marketing content across 4+ platforms (LinkedIn, Facebook, X/Twitter, YouTube) plus Instagram & TikTok text generation.
 
-**New in v6.4:**
+**Features:**
+- **4 Direct Publishing Platforms**: LinkedIn, Facebook, X/Twitter, YouTube
+- **Instagram & TikTok Text Generation**: AI-generated captions exported via copy-to-clipboard
 - **YouTube Video Upload**: Upload videos directly with auto-generated metadata
 - **Metadata Auto-Generation**: Title, tags, description generated from your text
 - **Cross-Platform**: Write once, publish to multiple channels

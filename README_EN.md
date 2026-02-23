@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-7.4.0-blue.svg)
+![Version](https://img.shields.io/badge/version-7.5.0-blue.svg)
 ![Tests](https://img.shields.io/badge/tests-350%2F350-success.svg)
 ![ML Integration](https://img.shields.io/badge/ML%20Integration-100%25-green.svg)
 ![Design System](https://img.shields.io/badge/Design_Tokens-100%25-purple.svg)
@@ -69,7 +69,7 @@ No more dashboard paralysis. A.R.I. tells you concretely: *"Your top product has
 Abandoned carts? Customers who haven't bought anything in a long time? A.R.I. knows them and creates personalized message drafts – you review and approve. That simple.
 
 ### 📱 Visible Everywhere
-Your shop is on Facebook, Instagram, LinkedIn, TikTok, email. A.R.I. posts smartly, at the right time, with images and texts that work.
+Your shop is on Facebook, Instagram, LinkedIn, email, and more. A.R.I. generates smart content for 5+ platforms, scheduling posts at the right time with images and texts that work.
 
 ### 🔄 Constantly Getting Better
 **44 specialized processes** run in the background. Your shop gets better every day – without your intervention.
@@ -89,11 +89,11 @@ Your shop is on Facebook, Instagram, LinkedIn, TikTok, email. A.R.I. posts smart
 - ✅ AI-generated product images (DALL-E integration)
 - ✅ Real-time analytics with real recommendations
 - ✅ Email automation (carts, welcome series, reactivation)
-- ✅ Social media posts (6 platforms)
-- ✅ **NEW v7.0.9:** Global Design Token System with Dark Mode
-- ✅ **NEW v7.0.9:** 8-language support (DE, EN, FR, ES, IT, PT, NL, PL)
-- ✅ **NEW v7.0.9:** Fully dark chatbot design with perfect readability
-- ✅ **NEW v7.0.9:** Specialization-aware AI personalization
+- ✅ Social media posts (4 platforms with API + Instagram/TikTok text generation)
+- ✅ **NEW v7.5.0:** Global Design Token System with Dark Mode
+- ✅ **NEW v7.5.0:** 8-language support (DE, EN, FR, ES, IT, PT, NL, PL)
+- ✅ **NEW v7.5.0:** Fully dark chatbot design with perfect readability
+- ✅ **NEW v7.5.0:** Specialization-aware AI personalization
 - ✅ Multi-source trend analysis (Google Trends + Reddit OAuth)
 - ✅ Percentage-based price suggestions with intelligent fallback logic
 - ✅ Manual validation of AI suggestions before adoption
@@ -157,16 +157,16 @@ Your shop is on Facebook, Instagram, LinkedIn, TikTok, email. A.R.I. posts smart
 - ✅ Real-time analytics with authentic WooCommerce data (no mock data)
 - ✅ Email automation (carts, welcome series, reactivation)
 - ✅ Social media posts (6 platforms)
-- ✅ **NEW v7.0.9:** Global design token system with dark mode
-- ✅ **NEW v7.0.9:** 8-language support (DE, EN, FR, ES, IT, PT, NL, PL)
-- ✅ **NEW v7.0.9:** Fully dark chatbot design with perfect readability
-- ✅ **NEW v7.0.9:** Specialization-aware AI personalization
+- ✅ **NEW v7.5.0:** Global design token system with dark mode
+- ✅ **NEW v7.5.0:** 8-language support (DE, EN, FR, ES, IT, PT, NL, PL)
+- ✅ **NEW v7.5.0:** Fully dark chatbot design with perfect readability
+- ✅ **NEW v7.5.0:** Specialization-aware AI personalization
 - ✅ Multi-source trend analysis (Google Trends + Reddit OAuth)
 - ✅ Percentage-based price suggestions with deterministic calculation
 - ✅ Manual validation of AI suggestions before adoption
-- ✅ **NEW v7.0.9:** Complete WooCommerce integration without placeholders
-- ✅ **NEW v7.0.9:** Support tickets with HTML sanitization
-- ✅ **NEW v7.0.9:** Product idea scoring without random values
+- ✅ **NEW v7.5.0:** Complete WooCommerce integration without placeholders
+- ✅ **NEW v7.5.0:** Support tickets with HTML sanitization
+- ✅ **NEW v7.5.0:** Product idea scoring without random values
 | 🚀 **Scaling** | You can scale – without hiring more people |
 
 ### Concretely Implemented Through:

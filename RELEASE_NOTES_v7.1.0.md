@@ -1,4 +1,4 @@
-# Release Notes v7.1.0
+# Release Notes v7.5.0
 
 **Release Date**: January 24, 2026  
 **Status**: Production Ready  
@@ -16,7 +16,7 @@
 
 | Component | Version |
 |-----------|---------|
-| A.R.I. Core | 7.1.0 |
+| A.R.I. Core | 7.5.0 |
 | Frontend | Compatible with all v7.x releases |
 | Backend | Compatible with all v7.x releases |
 
@@ -38,13 +38,14 @@
   - YouTube: 6 videos/day limit (resets 9 AM German time)
   - Twitter/X: Requires paid API tier
   - Instagram: Requires Meta Business Review approval
-  - TikTok: Requires Developer Portal account (currently unstable)
+  - Instagram: AI text generation (copy-to-clipboard, API review too complex)
+  - TikTok: AI text generation (copy-to-clipboard, no API publishing)
 
 ---
 
 ## 📚 Documentation Updates
 
-- README.md, CHANGELOG.md und Release Notes bereinigt und auf 7.1.0 konsolidiert
+- README.md, CHANGELOG.md und Release Notes bereinigt und auf 7.5.0 konsolidiert
 - Spezialisierungs-Tool-Dokumentation entfernt (separate Anwendung)
 
 ---
@@ -70,20 +71,20 @@ npm run build        # Build all components
 ## ⚠️ Important Notes
 
 1. Spezialisierungs-Tool wird nicht mehr im Repo ausgeliefert (separate Anwendung).
-2. Keine Breaking Changes gegenüber 7.0.4; bestehende Deployments bleiben kompatibel.
+2. Keine Breaking Changes gegenüber 7.5.0; bestehende Deployments bleiben kompatibel.
 
 ---
 
 ## 🔍 Migration Notes
 
-No migration required from v7.0.4 to v7.1.0. All existing configurations, databases, and deployments remain fully functional.
+No migration required from v7.5.0 to v7.5.0. All existing configurations, databases, and deployments remain fully functional.
 
 ---
 
 ## 🎯 Next Steps
 
-- ✅ v7.1.0 release complete
-- 📋 Planned: v7.2.0 with additional specialization templates
+- ✅ v7.5.0 release complete
+- 📋 Planned: v7.5.0 with additional specialization templates
 - 🔮 Planned: Cloud integration features
 
 ---

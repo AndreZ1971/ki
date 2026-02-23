@@ -258,7 +258,7 @@ describe('Bug #8: OpenAI JSON Parsing Fallbacks', () => {
       });
     });
 
-    it('should never return 502 error to user', () => {
+    it('should never return 502 error to user', async () => {
       // Simulated endpoint behavior
       async function suggestCategories(_productName: string) {
         const openaiResponse = '{"broken json'; // Simulated broken response
@@ -279,10 +279,10 @@ describe('Bug #8: OpenAI JSON Parsing Fallbacks', () => {
         }
       }
 
-      const result = suggestCategories('Test Product');
+      const result = await suggestCategories('Test Product');
       
       // Should always succeed
-      expect(result).resolves.toHaveProperty('success', true);
+      expect(result).toHaveProperty('success', true);
     });
   });
 

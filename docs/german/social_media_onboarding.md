@@ -19,31 +19,38 @@ Dieses Dokument dient als technischer Leitfaden für die Einrichtung von API-Sch
 
 ---
 
-## 🎵 2. TikTok (Short-form Video)
-**Ziel:** Direktes Veröffentlichen von Videos im Nutzer-Feed.
+## 🎵 2. TikTok (Text-Generierung)
 
-### Vorgehensweise:
-1.  **Portal:** Registriere dich im [TikTok for Developers Portal](https://developers.tiktok.com/).
-2.  **App-Erstellung:** Erstelle eine neue App und füge die **"Content Posting API"** hinzu.
-3.  **Review-Prozess:** Fülle die erforderlichen Informationen aus und reiche die App zur Prüfung ein.
-4.  **Scopes:** Stelle sicher, dass `video.publish` aktiviert ist.
-5.  **Token-Erhalt:** * Führe den OAuth-Flow durch: Leite den User zur TikTok-Auth-Seite.
-    * Tausche den `Authorization Code` gegen einen `Access Token` und `Refresh Token`.
+**Status:** TikTok wird aktuell nur für KI-Text-Generierung verwendet. Videos können per Copy-to-Clipboard exportiert werden.
+
+### Funktionsweise:
+1. **Text-Generierung:** A.R.I. generiert automatisch viral-optimierte TikTok-Captions
+2. **Export-Button:** "📋 Copy" kopiert den Text in die Zwischenablage
+3. **Manuelle Veröffentlichung:** Nutzer öffnet TikTok-App und veröffentlicht manuell
+4. **Keine API-Limits:** Keine OAuth-Konfiguration erforderlich
+
+### Warum Copy-to-Clipboard?
+- TikTok API erfordert separate Subdomain-Registrierung pro Shop (unscalable)
+- Copy-to-Clipboard ist zuverlässig und limitierungslos
+- Nutzer behält volle Kontrolle über Veröffentlichung
 
 ---
 
-## 📸 3. Instagram (Visual Media)
-**Ziel:** Automatisches Posten von Bildern, Reels und Karussells.
+## 📸 3. Instagram (Text-Generierung)
 
-### Vorgehensweise:
-1.  **Voraussetzung:** Instagram Business/Creator Account + Verknüpfung mit Facebook-Seite.
-2.  **Portal:** Nutze das [Meta Developer Portal](https://developers.facebook.com/).
-3.  **App-Typ:** Wähle "Business" und füge **"Instagram Graph API"** hinzu.
-4.  **Scopes:** Du benötigst `instagram_basic` und `instagram_content_publish`.
-5.  **Token-Erhalt:**
-    * Generiere einen User-Token im **Graph API Explorer**.
-    * Wähle deine Instagram-ID aus.
-    * Verlängere den Token über das Access Token Tool auf einen **Long-lived Token** (60 Tage).
+**Status:** Instagram wird aktuell nur für KI-Text-Generierung verwendet. Inhalte können per Copy-to-Clipboard exportiert werden.
+
+### Funktionsweise:
+1. **Text-Generierung:** A.R.I. generiert automatisch engagement-optimierte Instagram-Captions mit Hashtags
+2. **Export-Button:** "📋 Copy" kopiert den Text in die Zwischenablage
+3. **Manuelle Veröffentlichung:** Nutzer öffnet Instagram-App und veröffentlicht manuell
+4. **Keine API-Limits:** Keine OAuth-Konfiguration erforderlich
+
+### Warum Copy-to-Clipboard?
+- Instagram API erfordert Business Account + Facebook Page Verknüpfung + App Review (3-6 Monate)
+- Meta App Review Prozess ist komplex und zeitaufwändig für Endkunden
+- Copy-to-Clipboard ist zuverlässig und ohne Wartezeit verfügbar
+- Nutzer behält volle Kontrolle über Veröffentlichung
 
 ---
 
@@ -92,7 +99,7 @@ Dieses Dokument dient als technischer Leitfaden für die Einrichtung von API-Sch
     * Klicke auf "Authorize" und tausche den Code gegen den `Access Token` und den **`Refresh Token`** aus.
 
 ### 🆕 YouTube Video Upload (Phase 1 - Phase 2 folgt)
-**Neu in 7.0.7:**
+**Neu in 7.5.0:**
 - **Video Upload**: Lade Videos direkt aus der Social Media Poster UI hoch
 - **Auto-Metadaten**: Titel, Tags und Beschreibung werden automatisch aus deinem Content generiert
 - **Video-Validierung**: Unterstützte Formate (MP4, MOV, AVI, etc.)

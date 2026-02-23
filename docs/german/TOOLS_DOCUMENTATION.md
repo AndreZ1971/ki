@@ -3,7 +3,7 @@
 > **Fokus dieser Dokumentation**: Technische Details der ML/KI-Integration für alle Dashboard-Tools. Die User-Dokumentation mit Screenshots und Bedienanleitung befindet sich in `Bedienungsanleitung.md`.
 
 **Zuletzt aktualisiert**: 22. Januar 2026  
-**Version**: 7.0.7  
+**Version**: 7.5.0  
 **Status**: ✅ Production Ready ([siehe Glossar](#-glossar)) - Keine Frontend-generierten Mock-Daten, vollständige WooCommerce-Integration, Support-Ticket HTML-Bereinigung, deterministische Scoring-Algorithmen
 
 ---
@@ -82,7 +82,7 @@ Ohne konfiguriertes und funktionierendes Payment-Gateway erfolgt keine echte Zah
 
 ---
 
-## 🆕 Januar 2026 Updates (7.0.7)
+## 🆕 Januar 2026 Updates (7.5.0)
 
 ### ✅ Entfernung Frontend-generierter Mock-Daten
 **Implementierung**: Alle Frontend-Ergebnisse stammen jetzt von Backend-APIs (WooCommerce, OpenAI oder deterministische Heuristiken)  
@@ -354,7 +354,7 @@ const aggregatedScore =
   - `GET /api/products/adviser/analyze/:id` (Produkt-Details)
 - **UI**: Prozentuale Input-Felder, Live-Preisvorschau, Dark Glass Theme
 
-**Implementation** (neu in 7.0.7):
+**Implementation** (neu in 7.5.0):
 - Prozentuale Limits mit dynamischem Fallback
 - Multi-Source Aggregation (Google + Reddit + Wiki + News)
 - Manual Override vor Speicherung
@@ -370,7 +370,7 @@ const aggregatedScore =
 ### Analytics (13/13 Tools)
 
 #### 🔄 **Trend Analysis** (Multi-Source)
-**Neue Features 7.0.7**:
+**Neue Features 7.5.0**:
 - Google Trends mit 7-Tage-Durchschnitt
 - Reddit OAuth mit Upvote-Gewichtung
 - Confidence % basierend auf Quellen-Verfügbarkeit
@@ -781,7 +781,7 @@ Die folgenden Module geben detailliertes Debug-Logging aus:
 #### 🎵 **Social Media Audio**
 
 **Übersicht:**
-- **Zweck**: KI-Skript + TTS-Audio für Social Clips (Instagram, TikTok, YouTube Shorts, Facebook)
+- **Zweck**: KI-Skript + TTS-Audio für Social Clips (YouTube Shorts, Facebook, Instagram-Text, TikTok-Text)
 - **Use Cases**: Kurzvideos/Reels/Shorts vertonen
 - **Kategorie**: Marketing & Content
 
@@ -795,7 +795,7 @@ Die folgenden Module geben detailliertes Debug-Logging aus:
 **Implementation Notes:**
 - Auto-Voice-Auswahl basierend auf KI-Empfehlung (voiceRecommendations)
 - Speichert Audio als Base64-Data-URL im State (Download/Play im UI)
-- Plattform-Preconfigs für Dauer (z.B. TikTok 3min, Reels 60s)
+- Plattform-Preconfigs für Dauer (z.B. Reels 60s, YouTube Shorts 90s)
 
 **Besonderheiten/Limitationen:**
 - Kein direkter Upload zu Plattformen; Audio muss manuell genutzt werden
@@ -806,7 +806,7 @@ Die folgenden Module geben detailliertes Debug-Logging aus:
 
 **Übersicht:**
 - **Zweck**: Generiert plattform-optimierte Social Media Posts mit KI
-- **Use Cases**: LinkedIn, Facebook, Instagram, Twitter/X, TikTok, YouTube Content-Erstellung
+- **Use Cases**: LinkedIn, Facebook, Twitter/X, YouTube Content-Erstellung (+ Instagram & TikTok Text-Generierung)
 - **Kategorie**: Marketing & Content
 
 **Technische Details:**
@@ -818,7 +818,7 @@ Die folgenden Module geben detailliertes Debug-Logging aus:
 - **Dependencies**: 
   - OAuth Access Tokens (Settings → Social Media)
   - OpenAI API (optional für AI-Transform)
-  - 6 Plattform-APIs (LinkedIn, Facebook, Instagram, Twitter, TikTok, YouTube)
+  - 5 Plattform-APIs (LinkedIn, Facebook, Instagram, Twitter, YouTube) + TikTok KI-Textgenerierung
 
 **Request/Response Examples:**
 ```typescript

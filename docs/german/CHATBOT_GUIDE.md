@@ -1,6 +1,6 @@
 # 🤖 A.R.I. Chatbot Guide – Deutsch
 
-**Version:** 7.0.7  
+**Version:** 7.5.0  
 **Datum:** Januar 2026  
 **Status:** Production Ready
 

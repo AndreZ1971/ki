@@ -595,7 +595,7 @@ Scheduler (Cron) → Job Trigger → executeWithFullProtection()
 | **Build Tool** | Vite         | 6.0.5   | Fast Build Tool     |
 | **UI Library** | Shadcn/ui    | Latest  | Component Library   |
 | **CSS**        | Tailwind CSS | 3.4.17  | Utility-First CSS   |
-| **Routing**    | React Router | 7.1.1   | Client-Side Routing |
+| **Routing**    | React Router | 7.5.0   | Client-Side Routing |
 | **Icons**      | Lucide React | 0.468.0 | Icon Library        |
 | **Animation**  | Framer Motion| Latest  | UI Animations       |
 
@@ -902,6 +902,6 @@ A.R.I. (Artificial Retail Intelligence) ist eine **production-ready**, **resilie
 - Marketing & Content: 10 Tools
 - Advanced AI: 12 Tools
 
-**Version**: 7.0.7  
+**Version**: 7.5.0  
 **Stand**: Januar 2026  
 **Autor**: André Zabel (AndreZ1971)
