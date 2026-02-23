@@ -92,7 +92,7 @@ Siehe auch:
 - Behält Caption für Bilder, Nachricht für Text
 
 **Instagram & TikTok:**
-- Entfernt aus API-Publishing (v7.5.0)
+- Entfernt aus API-Publishing (v1.0.0)
 - Nur noch KI-Text-Generierung + Copy-to-Clipboard
 - Grund: API Review zu komplex für Endkunden (3-6 Monate Wartezeit)
 
@@ -100,7 +100,7 @@ Siehe auch:
 
 ---
 
-### Issue 5: Instagram & TikTok Text-Generierung ✅ (v7.5.0)
+### Issue 5: Instagram & TikTok Text-Generierung ✅ (v1.0.0)
 **Ziel:** API Limitations überwinden - Shift zu Copy-to-Clipboard
 
 **Implementierung:**

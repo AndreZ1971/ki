@@ -116,7 +116,7 @@ const newRequest: SocialPostRequest = {
   - imageUrl Parameter optional
   - Nur-Text-Posting funktioniert wie zuvor
 
-- **Instagram & TikTok** (v7.5.0)
+- **Instagram & TikTok** (v1.0.0)
   - Entfernt aus Backend API Publishing
   - Text-Generierung nur (Frontend Copy-to-Clipboard)
   - Grund: API Review zu komplex für Endkunden

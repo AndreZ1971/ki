@@ -1,6 +1,6 @@
 # 🚀 A.R.I. - Kubernetes & Deployment Architecture
 
-**Version:** 7.5.0  
+**Version:** 1.0.0  
 **Date:** January 2026  
 **Target Audience:** Automattic Engineering Team, DevOps, Kubernetes Administrators
 
@@ -184,7 +184,7 @@
      "customer_id": "cust_12345",
      "subscription_id": "sub_67890",
      "active_until": "2026-02-05",
-     "container_version": "7.5.0"
+     "container_version": "1.0.0"
    }
    ⚠️ IMPORTANT: shop_url is NOT passed here!
       → Shop URL comes later from customer during Onboarding
@@ -852,5 +852,5 @@ No surprises!
 ---
 
 **Last Updated:** January 2026  
-**Version:** 7.5.0  
+**Version:** 1.0.0  
 **For:** Automattic Engineering Team

@@ -1,4 +1,4 @@
-# 🔐 Auth Security Hardening - 7.5.0+
+# 🔐 Auth Security Hardening - 1.0.0+
 
 ## Übersicht
 
@@ -375,7 +375,7 @@ Falls Probleme auftreten:
 
 ```bash
 # 1. Alte Version auschecken
-git checkout 7.5.0
+git checkout 1.0.0
 
 # 2. Dependencies neu installieren
 npm install
@@ -403,6 +403,6 @@ Bei Problemen:
 
 ---
 
-**Version:** 7.5.0+  
+**Version:** 1.0.0+  
 **Datum:** 20. Januar 2026  
 **Status:** ✅ Production Ready

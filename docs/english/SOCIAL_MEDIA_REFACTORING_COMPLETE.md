@@ -91,7 +91,7 @@ See also:
 - Preserves caption for images, message for text
 
 **Instagram & TikTok:**
-- Removed from API publishing (v7.5.0)
+- Removed from API publishing (v1.0.0)
 - AI text generation only + Copy-to-Clipboard
 - Reason: API review too complex for end customers (3-6 months wait)
 
@@ -99,7 +99,7 @@ See also:
 
 ---
 
-### Issue 5: Instagram & TikTok Text Generation ✅ (v7.5.0)
+### Issue 5: Instagram & TikTok Text Generation ✅ (v1.0.0)
 **Goal:** Overcome API limitations - Shift to Copy-to-Clipboard
 
 **Implementation:**

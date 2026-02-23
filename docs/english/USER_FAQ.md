@@ -1,6 +1,6 @@
 # ⚙️ A.R.I. - Settings & Backend Handbook
 
-**Version:** 7.5.0  
+**Version:** 1.0.0  
 **Date:** January 2026  
 **Target Audience:** Shop Owners who want to configure A.R.I.
 
@@ -465,5 +465,5 @@ If you see **✅ success** and **~5 seconds** = **everything is running perfectl
 ---
 
 **Last Updated:** January 2026  
-**Version:** 7.5.0  
+**Version:** 1.0.0  
 **For:** All A.R.I. Shop Owners

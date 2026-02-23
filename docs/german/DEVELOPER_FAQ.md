@@ -1,6 +1,6 @@
 # 🛠️ A.R.I. - Developer FAQ
 
-**Version:** 7.5.0  
+**Version:** 1.0.0  
 **Datum:** Januar 2026  
 **Zielgruppe:** DevOps, Entwickler, System-Administratoren
 
@@ -2523,7 +2523,7 @@ function App() {
 ---
 
 **Letzte Aktualisierung:** Januar 5, 2026  
-**Version:** 7.5.0  
+**Version:** 1.0.0  
 **Erstellt für:** Entwickler & System-Administratoren
 
 ---

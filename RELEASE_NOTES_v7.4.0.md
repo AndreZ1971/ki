@@ -1,14 +1,14 @@
-# Release Notes v7.5.0
+# Release Notes v1.0.0
 
 **Release Date**: February 12, 2026  
 **Status**: Production Ready  
-**Migration Required**: No (fully compatible with v7.5.0)
+**Migration Required**: No (fully compatible with v1.0.0)
 
 ---
 
 ## 🎯 Overview
 
-Version 7.5.0 introduces **simplified subscription management** by removing complex API integration in favor of a **streamlined link-based approach**. This release focuses on **security hardening** and **user experience improvement**, ensuring that subscription management is secure, user-friendly, and maintainable.
+Version 1.0.0 introduces **simplified subscription management** by removing complex API integration in favor of a **streamlined link-based approach**. This release focuses on **security hardening** and **user experience improvement**, ensuring that subscription management is secure, user-friendly, and maintainable.
 
 ---
 
@@ -122,14 +122,14 @@ Version 7.5.0 introduces **simplified subscription management** by removing comp
 ### Updated Files
 
 - All documentation updated regarding subscription feature
-- Version references updated to 7.5.0
+- Version references updated to 1.0.0
 - Links updated to point to profile management page
 
 ---
 
 ## 🚀 Migration Guide
 
-### From v7.5.0 to v7.5.0
+### From v1.0.0 to v1.0.0
 
 **Benefits**:
 - ✅ **Simpler Architecture**: No API integration needed
@@ -210,12 +210,12 @@ npm run lint
 
 ### Operational Benefits
 
-**Before v7.5.0**:
+**Before v1.0.0**:
 - ⚠️ Complex API integration for subscription status
 - ⚠️ Admin secrets exposed in client configuration
 - ⚠️ Maintenance overhead for API compatibility
 
-**After v7.5.0**:
+**After v1.0.0**:
 - ✅ Simple link-based subscription management
 - ✅ No API secrets in client code
 - ✅ Reduced maintenance burden
@@ -239,7 +239,7 @@ This release removes limitations of the previous API-based approach while mainta
 
 ---
 
-## 🔮 Future Considerations (v7.5.0+)
+## 🔮 Future Considerations (v1.0.0+)
 
 **Potential Features**:
 - 📊 Enhanced subscription analytics in admin panel
@@ -251,7 +251,7 @@ This release removes limitations of the previous API-based approach while mainta
 
 ## 📞 Support
 
-For questions or issues related to v7.5.0:
+For questions or issues related to v1.0.0:
 - 📧 Email: support@kaufe-es.eu
 - 📖 Documentation: `README_EINFACH.md`
 - 🐛 Bug Reports: GitHub Issues
@@ -260,18 +260,18 @@ For questions or issues related to v7.5.0:
 
 ## ✅ Summary
 
-Version 7.5.0 delivers **simplified and secure subscription management**:
+Version 1.0.0 delivers **simplified and secure subscription management**:
 
 ✅ **Removed API Integration** - Eliminated 1200+ lines of code  
 ✅ **Improved Security** - No secrets exposed in client code  
 ✅ **Better UX** - Simple link-based profile access  
 ✅ **Simpler Architecture** - Reduced complexity and maintenance  
-✅ **Full Compatibility** - Drop-in replacement for v7.5.0  
+✅ **Full Compatibility** - Drop-in replacement for v1.0.0  
 
-**Migration**: Drop-in compatible with v7.5.0, no breaking changes.
+**Migration**: Drop-in compatible with v1.0.0, no breaking changes.
 
 ---
 
 **Release Team**: André Zabel, kaufe-es.eu  
 **Release Date**: February 12, 2026  
-**Version**: 7.5.0 🚀
+**Version**: 1.0.0 🚀

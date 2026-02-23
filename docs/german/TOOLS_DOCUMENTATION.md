@@ -3,7 +3,7 @@
 > **Fokus dieser Dokumentation**: Technische Details der ML/KI-Integration für alle Dashboard-Tools. Die User-Dokumentation mit Screenshots und Bedienanleitung befindet sich in `Bedienungsanleitung.md`.
 
 **Zuletzt aktualisiert**: 22. Januar 2026  
-**Version**: 7.5.0  
+**Version**: 1.0.0  
 **Status**: ✅ Production Ready ([siehe Glossar](#-glossar)) - Keine Frontend-generierten Mock-Daten, vollständige WooCommerce-Integration, Support-Ticket HTML-Bereinigung, deterministische Scoring-Algorithmen
 
 ---
@@ -82,7 +82,7 @@ Ohne konfiguriertes und funktionierendes Payment-Gateway erfolgt keine echte Zah
 
 ---
 
-## 🆕 Januar 2026 Updates (7.5.0)
+## 🆕 Januar 2026 Updates (1.0.0)
 
 ### ✅ Entfernung Frontend-generierter Mock-Daten
 **Implementierung**: Alle Frontend-Ergebnisse stammen jetzt von Backend-APIs (WooCommerce, OpenAI oder deterministische Heuristiken)  
@@ -354,7 +354,7 @@ const aggregatedScore =
   - `GET /api/products/adviser/analyze/:id` (Produkt-Details)
 - **UI**: Prozentuale Input-Felder, Live-Preisvorschau, Dark Glass Theme
 
-**Implementation** (neu in 7.5.0):
+**Implementation** (neu in 1.0.0):
 - Prozentuale Limits mit dynamischem Fallback
 - Multi-Source Aggregation (Google + Reddit + Wiki + News)
 - Manual Override vor Speicherung
@@ -370,7 +370,7 @@ const aggregatedScore =
 ### Analytics (13/13 Tools)
 
 #### 🔄 **Trend Analysis** (Multi-Source)
-**Neue Features 7.5.0**:
+**Neue Features 1.0.0**:
 - Google Trends mit 7-Tage-Durchschnitt
 - Reddit OAuth mit Upvote-Gewichtung
 - Confidence % basierend auf Quellen-Verfügbarkeit

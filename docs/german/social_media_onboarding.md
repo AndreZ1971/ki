@@ -99,7 +99,7 @@ Dieses Dokument dient als technischer Leitfaden für die Einrichtung von API-Sch
     * Klicke auf "Authorize" und tausche den Code gegen den `Access Token` und den **`Refresh Token`** aus.
 
 ### 🆕 YouTube Video Upload (Phase 1 - Phase 2 folgt)
-**Neu in 7.5.0:**
+**Neu in 1.0.0:**
 - **Video Upload**: Lade Videos direkt aus der Social Media Poster UI hoch
 - **Auto-Metadaten**: Titel, Tags und Beschreibung werden automatisch aus deinem Content generiert
 - **Video-Validierung**: Unterstützte Formate (MP4, MOV, AVI, etc.)
