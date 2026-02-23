@@ -373,8 +373,17 @@ The user is granted exclusive usage rights to the provided infrastructure for op
 
 **Fact-Based Control:** Since A.R.I., as a digital employee, provides the infrastructure for content and analytics, the final review and execution (e.g., copy & paste of marketing texts) remains the user's sole responsibility.
 
+**Prohibited Uses:**
+- Reproducing, leasing, or sublicensing the software or parts thereof to third parties.
+- Using A.R.I. to create competing products or for automated data extraction (scraping).
+
 #### 4. Scalability and Performance
 The infrastructure is designed for professional growth and enables quick scaling of server instances with increasing load. The user is entitled to the contractually agreed computing power within the secured 1.0.0 production environment.
+
+#### 5. Warranty and Liability
+A.R.I. is provided as "Software as a Service" (SaaS). Despite test coverage of over 365 automated tests and a 0% error rate in the release state, the software is provided without warranty for specific economic success.
+
+The final control over the publication of AI-generated content (e.g., via copy & paste) remains solely with the user.
 
 ---
 
