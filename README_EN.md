@@ -154,19 +154,19 @@ Your shop is on Facebook, Instagram, LinkedIn, email, and more. A.R.I. generates
 
 - ✅ Optimized product texts (SEO-optimized, sales-promoting)
 - ✅ AI-generated product images (DALL-E integration)
-- ✅ Real-time analytics with authentic WooCommerce data (no mock data)
+- ✅ Real-time analytics with real WooCommerce data (no mock data)
 - ✅ Email automation (carts, welcome series, reactivation)
-- ✅ Social media posts (6 platforms)
-- ✅ **NEW v1.0.0:** Global design token system with dark mode
-- ✅ **NEW v1.0.0:** 8-language support (DE, EN, FR, ES, IT, PT, NL, PL)
-- ✅ **NEW v1.0.0:** Fully dark chatbot design with perfect readability
-- ✅ **NEW v1.0.0:** Specialization-aware AI personalization
-- ✅ Multi-source trend analysis (Google Trends + Reddit OAuth)
-- ✅ Percentage-based price suggestions with deterministic calculation
-- ✅ Manual validation of AI suggestions before adoption
-- ✅ **NEW v1.0.0:** Complete WooCommerce integration without placeholders
-- ✅ **NEW v1.0.0:** Support tickets with HTML sanitization
-- ✅ **NEW v1.0.0:** Product idea scoring without random values
+- ✅ Social media posts (LinkedIn, Facebook, Twitter, YouTube with API publishing; Instagram & TikTok with AI text generation via copy-to-clipboard)
+- ✅ **NEW v1.0.0:** Global Design Token System with Dark Mode
+- ✅ **NEW v1.0.0:** 8-Language Support (DE, EN, FR, ES, IT, PT, NL, PL)
+- ✅ **NEW v1.0.0:** Fully Dark Chatbot Design with Perfect Readability
+- ✅ **NEW v1.0.0:** Specialization-Aware AI Personalization
+- ✅ Multi-Source Trend Analysis (Google Trends + Reddit OAuth)
+- ✅ Percentage-Based Price Suggestions with Deterministic Calculation
+- ✅ Manual Validation of AI Suggestions Before Adoption
+- ✅ **NEW v1.0.0:** Complete WooCommerce Integration Without Placeholders
+- ✅ **NEW v1.0.0:** Support Tickets with HTML Sanitization
+- ✅ **NEW v1.0.0:** Product Idea Scoring Without Random Values
 | 🚀 **Scaling** | You can scale – without hiring more people |
 
 ### Concretely Implemented Through:
@@ -257,7 +257,13 @@ Your shop is on Facebook, Instagram, LinkedIn, email, and more. A.R.I. generates
 ### 📧 Marketing & Content (10 Tools)
 
 - **AI Email Generator:** Personalized email drafts
-- **Social Media Poster:** 6 platforms (LinkedIn, Facebook, Instagram, TikTok, X, YouTube)
+- **Social Media Poster:** Multi-platform upload
+  - ✅ **Facebook:** Fully functional
+  - ✅ **YouTube:** Functional (Daily upload limit: 6 videos/day)
+  - ✅ **LinkedIn:** API integration ready (requires valid credentials)
+  - ⚠️ **Twitter/X:** Requires paid API credit
+  - ⚠️ **Instagram:** Requires Meta Business Review
+  - ⚠️ **TikTok:** Requires TikTok Developer Account
 - **Blogpost Generator:** SEO-optimized blog posts
 - **Image Analyzer:** AI image quality check
 - **German Content Generator:** German marketing texts
@@ -276,15 +282,15 @@ Your shop is on Facebook, Instagram, LinkedIn, email, and more. A.R.I. generates
 
 ## 📊 Status & Roadmap
 
-### ✅ Current Status (January 8, 2026)
+### ✅ Current Status
 
 | Metric | Status |
 |--------|--------|
-| **Version** | 6.3.0 – Production-Ready |
-| **Tests** | 350/350 ✅ |
+| **Version** | 1.0.0 – Production-Ready |
+| **Tests** | 365/365 ✅ |
 | **Workflows** | 44 automated jobs |
-| **Languages** | German & English |
-| **Stable since** | January 2026 |
+| **Languages** | German & English (+ 6 more) |
+| **Stable since** | February 2026 |
 
 ### 🤖 ML/AI Integration Status
 
@@ -343,12 +349,32 @@ Your shop is on Facebook, Instagram, LinkedIn, email, and more. A.R.I. generates
 | **WordPress** | Basic Auth with Application Passwords |
 | **OpenAI** | API Key Authentication |
 
-### 🔒 Privacy
+### 🔒 Privacy & Data Protection
 
 - ✅ **GDPR-compliant:** All tools with privacy notices
 - ✅ **OpenAI:** 30-day retention, RAM-only processing
 - ✅ **No cookies:** Session-based authentication
 - ✅ **Encryption:** AES-256-GCM for sensitive data
+
+---
+
+## ⚖️ License & Infrastructure Usage Rights
+
+### ari-cloud.de
+
+#### 1. Deployment Model: Infrastructure as a Service (IaaS)
+A.R.I. is provided as Infrastructure as a Service (IaaS). This includes access to dedicated compute infrastructure, specialized AI server instances, and proprietary algorithms (Agentic Loops).
+
+#### 2. Copyright and Intellectual Property
+All code, the architecture of Agentic Loops, and infrastructure logic are not open source. They remain as exclusive intellectual property owned by the operator of ari-cloud.de. Any form of reverse engineering, decompilation, or unauthorized reproduction of infrastructure components is strictly prohibited.
+
+#### 3. Usage Rights and Responsibility
+The user is granted exclusive usage rights to the provided infrastructure for operating their WooCommerce store.
+
+**Fact-Based Control:** Since A.R.I., as a digital employee, provides the infrastructure for content and analytics, the final review and execution (e.g., copy & paste of marketing texts) remains the user's sole responsibility.
+
+#### 4. Scalability and Performance
+The infrastructure is designed for professional growth and enables quick scaling of server instances with increasing load. The user is entitled to the contractually agreed computing power within the secured 1.0.0 production environment.
 
 ---
 
@@ -368,8 +394,8 @@ Your shop is on Facebook, Instagram, LinkedIn, email, and more. A.R.I. generates
 
 ## 💬 Support
 
-- **Email:** info@example.com
-- **Website:** [example.com](https://example.com)
+- **Email:** info@ari-cloud.de
+- **Website:** [ari-cloud.de](https://ari-cloud.de)
 
 ---
 

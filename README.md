@@ -296,10 +296,27 @@ Weitere 8 Payment-Tools mit ML-Integration
 
 ---
 
+### ⚖️ Lizenz & Infrastruktur-Nutzungsrechte ari-cloud.de
+## 1. Bereitstellungsmodell: Infrastructure as a Service (IaaS)
+A.R.I. wird als Infrastructure as a Service (IaaS) bereitgestellt. Dies umfasst den Zugang zur dedizierten Recheninfrastruktur, den spezialisierten KI-Server-Instanzen sowie den proprietären Algorithmen (Agentic Loops).
+
+## 2. Urheberrecht und Geistiges Eigentum
+Der gesamte Code, die Architektur der Agentic Loops sowie die Infrastruktur-Logik sind kein Open Source. Sie verbleiben als exklusives geistiges Eigentum beim Betreiber von ari-cloud.de. Jegliche Form des Reverse Engineering, der Dekompilierung oder der unautorisierten Vervielfältigung der Infrastruktur-Komponenten ist streng untersagt.
+
+## 3. Nutzungsrecht und Verantwortung
+Dem Nutzer wird ein exklusives Nutzungsrecht an der bereitgestellten Infrastruktur für den Betrieb seines WooCommerce-Shops eingeräumt.
+
+Faktenbasierte Kontrolle: Da A.R.I. als digitaler Mitarbeiter die Infrastruktur für Content und Analysen stellt, obliegt die finale Prüfung und Ausführung (z. B. Copy & Paste von Marketing-Texten) der Eigenverantwortung des Nutzers.
+
+## 4. Skalierbarkeit und Performance
+Die Infrastruktur ist für professionelles Wachstum ausgelegt und ermöglicht eine kurzfristige Skalierung der Server-Instanzen bei steigender Last [cite: 2026-01-22]. Der Nutzer hat Anspruch auf die vereinbarte Rechenleistung innerhalb der gesicherten 1.0.0-Produktionsumgebung.
+
+---
+
 ## 💬 Support
 
-- **E-Mail:** info@example.com
-- **Website:** [example.com](https://example.com)
+- **E-Mail:** info@ari-cloud.de
+- **Website:** [ari-cloud.de](https://ari-cloud.de)
 
 ---
 
