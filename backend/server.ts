@@ -423,14 +423,24 @@ async function buildServer() {
       console.log(`📁 Serving static files from: ${staticPath}`);
 
       try {
-        // Dynamic import for @fastify/static - Use only once for public folder
+        // Dynamic import for @fastify/static
         const fastifyStatic = await import('@fastify/static');
+        
+        // Register /assets/* route for compiled assets (JS/CSS with hash)
+        await server.register(fastifyStatic.default, {
+          root: staticPath,
+          prefix: '/assets/',
+        });
+        console.log('✅ Assets (/assets/*) registriert');
+
+        // Register root route for index.html and other static files
+        // This serves as a fallback for SPA routing
         await server.register(fastifyStatic.default, {
           root: staticPath,
           prefix: '/',
+          constraints: {},
         });
-
-        console.log('✅ Frontend wird als Static Files geserved');
+        console.log('✅ Root static files (/) registriert');
       } catch (err) {
         console.error('❌ Fehler beim Registrieren von Static Files:', err);
         console.log('⚠️  Fahre ohne Static Files Serving fort');
