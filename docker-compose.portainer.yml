@@ -1,0 +1,73 @@
+version: '3.8'
+
+# A.R.I. Production Stack für Portainer
+# Automatische Image-Updates mit pull_policy: always
+
+services:
+  ari-app:
+    # 🔄 Nutzt immer das aktuellste Image von GHCR
+    image: ghcr.io/andrez1971/ari:latest
+    
+    # 🎯 KRITISCH: Erzwingt frischen Image-Pull bei jedem Stack-Redeploy
+    pull_policy: always
+    
+    # Dynamischer Container-Name pro Slot
+    container_name: ari-${SLOT_NAME}
+    
+    # ✅ Root-Privileg notwendig für Entrypoint (chown/chmod)
+    user: "root"
+    
+    # Automatischer Restart
+    restart: always
+    
+    # Port-Mapping pro Slot
+    ports:
+      - "${HOST_PORT}:3000"
+    
+    # Isolierter Daten-Mount pro Slot
+    volumes:
+      - /opt/ari/${SLOT_NAME}:/app/data:rw
+    
+    # Capabilities für permission fixing im Entrypoint
+    cap_add:
+      - SETGID   # User-Wechsel su-exec
+      - SETUID   # User-Wechsel su-exec
+      - CHOWN    # Automatische Rechtekorrektur
+    
+    # Production Environment
+    environment:
+      - HUSKY=0
+      - NODE_ENV=production
+    
+    # Resource Limits - faire Verteilung
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+    
+    # Health Check
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.js"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+# Hinweise für Portainer:
+# 1. Stack-Variablen (.env oder Stack-Settings):
+#    - SLOT_NAME: Eindeutiger Slot-Name (z.B. "shop-production", "shop-staging")
+#    - HOST_PORT: Host-Port (z.B. 8010, 8011, 8012)
+#
+# 2. Beim Erstellen des Stacks:
+#    - Image-Registry hinterlegen: ghcr.io
+#    - Authentifizierung bei Bedarf (GitHub Token für GHCR Access)
+#
+# 3. Beim Updaten des Stacks:
+#    - "Re-pull image and redeploy" ✅ aktivieren
+#    - Das Image wird dann frisch gepullt
+#
+# 4. Docker-Verzeichnis auf Host:
+#    - /opt/ari/ari-shop-production (beispiel)
+#    - Besitzer: root:root
+#    - Berechtigungen: 755 (wird vom Entrypoint auf 777 harmonisiert)
