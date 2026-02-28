@@ -424,19 +424,20 @@ async function buildServer() {
 
       // Dynamic import for @fastify/static
       const fastifyStatic = await import('@fastify/static');
-      await server.register(fastifyStatic.default, {
-        root: staticPath,
-        prefix: '/',
-        decorateReply: false,
-        wildcard: false, // Disable automatic wildcard to allow custom 404 handler
-        setHeaders: (res: any, path: string) => {
-          if (path.endsWith('.html')) {
-            res.setHeader('Cache-Control', 'no-cache');
-          }
-        },
-      });
+      try {
+        await server.register(fastifyStatic.default, {
+          root: staticPath,
+          prefix: '/',
+          decorateReply: false,
+          wildcard: false, // Disable automatic wildcard to allow custom 404 handler
+          constraints: {},
+        });
 
-      console.log('✅ Frontend wird als Static Files geserved');
+        console.log('✅ Frontend wird als Static Files geserved');
+      } catch (err) {
+        console.error('❌ Fehler beim Registrieren von Static Files:', err);
+        console.log('⚠️  Fahre ohne Static Files Serving fort');
+      }
     }
 
     // 🤖 INITIALIZE AGENT SERVICES
