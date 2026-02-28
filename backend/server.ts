@@ -393,24 +393,40 @@ async function buildServer() {
     // CORS als erstes Plugin registrieren
     await server.register(cors, {
       origin: (origin, cb) => {
-        // Erlaube alle Subdomains und die Hauptdomain von my-working-space.de
-        if (
-          process.env.NODE_ENV === 'production' &&
-          origin &&
-          (/\.my-working-space\.de$/.test(origin) || origin === 'https://my-working-space.de')
-        ) {
-          cb(null, true);
-        } else if (
-          !origin || // z.B. für Server-zu-Server oder lokale Tests
+        const isLocalOrigin =
+          !origin ||
           origin === 'http://localhost:5173' ||
           origin === 'http://localhost:5174' ||
           origin === 'http://localhost:5175' ||
-          origin === 'http://localhost:3000'
-        ) {
+          origin === 'http://localhost:3000';
+
+        if (isLocalOrigin) {
           cb(null, true);
-        } else {
-          cb(new Error('Nicht erlaubter Origin: ' + origin), false);
+          return;
         }
+
+        if (process.env.NODE_ENV === 'production' && origin) {
+          try {
+            const originUrl = new URL(origin);
+            const originHost = originUrl.hostname;
+
+            const isAllowedProdHost =
+              originHost === 'my-working-space.de' ||
+              originHost.endsWith('.my-working-space.de') ||
+              originHost === 'ari-system.de' ||
+              originHost.endsWith('.ari-system.de');
+
+            if (isAllowedProdHost) {
+              cb(null, true);
+              return;
+            }
+          } catch (_err) {
+            cb(new Error('Ungültiger Origin Header: ' + origin), false);
+            return;
+          }
+        }
+
+        cb(new Error('Nicht erlaubter Origin: ' + origin), false);
       },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
