@@ -422,15 +422,12 @@ async function buildServer() {
     if (process.env.NODE_ENV === 'production') {
       console.log(`📁 Serving static files from: ${staticPath}`);
 
-      // Dynamic import for @fastify/static
-      const fastifyStatic = await import('@fastify/static');
       try {
+        // Dynamic import for @fastify/static - Use only once for public folder
+        const fastifyStatic = await import('@fastify/static');
         await server.register(fastifyStatic.default, {
           root: staticPath,
           prefix: '/',
-          decorateReply: false,
-          wildcard: false, // Disable automatic wildcard to allow custom 404 handler
-          constraints: {},
         });
 
         console.log('✅ Frontend wird als Static Files geserved');
@@ -612,15 +609,8 @@ async function buildServer() {
     await server.register(youtubeRoutes, { prefix: '/api' }); // YouTube upload endpoint
     console.log('✅ YouTube Upload Routes erfolgreich registriert');
 
-    // Serve uploaded assets statically
-    const assetsStoragePath = path.join(__dirname, '../data/social-assets');
-    const fastifyStatic = await import('@fastify/static');
-    await server.register(fastifyStatic.default, {
-      root: assetsStoragePath,
-      prefix: '/social/assets/',
-      decorateReply: false
-    });
-    console.log('✅ Social Media Assets Static Serving konfiguriert');
+    // Serve uploaded assets statically via API routes (not needed here - handled in routes)
+    // Social assets are served through dedicated API endpoints
 
     await server.register(bufferRoutes, { prefix: '/api' }); // Buffer API (einfacher als direktes OAuth!)
     console.log('✅ Buffer Routes erfolgreich registriert');
