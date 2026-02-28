@@ -51,6 +51,21 @@ COPY --from=frontend-builder /app/frontend/dist ./public
 # Copy health check
 COPY healthcheck.js ./
 
+# Security Note: Container MUST start as root to allow entrypoint to fix permissions
+# on host-mounted volumes (/app/data, /app/logs). Entrypoint downgrades to nodeuser
+# after initialization using su-exec.
+#
+# Required Docker Capabilities for permission handling:
+# - SETUID: Allow su-exec to switch from root to nodeuser
+# - SETGID: Allow group switching
+# - CHOWN: Allow ownership changes on mounted volumes
+#
+# In docker-compose.yml, add:
+#   cap_add:
+#     - SETUID
+#     - SETGID
+#     - CHOWN
+
 USER root
 EXPOSE 3000
 

@@ -24,8 +24,10 @@ mkdir -p /app/data/dlq /app/data/backups /app/logs /app/data/specializations 2>/
 
 # 2. BERECHTIGUNGEN SETZEN (läuft als root, daher kann chown auf Mounts greifen)
 echo "[Entrypoint] 🔐 Setze korrekte Berechtigungen..."
-chown -R nodeuser:nodejs /app/data /app/logs 2>/dev/null || echo "[Entrypoint] ℹ️  Berechtigungen bereits korrekt"
-chmod -R 755 /app/data 2>/dev/null || true
+# Rechte-Harmonisierung für alle App-Verzeichnisse
+chown -R 1001:1001 /app/public /app/dist /app/data /app/logs 2>/dev/null || true
+chmod -R 755 /app/public /app/dist /app/data /app/logs 2>/dev/null || true
+echo "[Entrypoint] ✅ Berechtigungen für public, dist, data, logs harmonisiert"
 
 # 3. CONNECTION.JSON INITIALISIEREN (NUR WENN NICHT VORHANDEN)
 if [ ! -f /app/connection.json ]; then
