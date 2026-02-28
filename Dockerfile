@@ -2,15 +2,7 @@
 # Multi-Stage Build für Production
 # ===========================
 
-# Stage 1: Build Frontend
-FROM node:20-alpine AS frontend-builder
-WORKDIR /app/frontend
-COPY frontend/package*.json ./
-RUN npm ci
-COPY frontend/ ./
-RUN npm run build
-
-# Stage 2: Build Backend
+# Stage 1: Build Backend
 FROM node:20-alpine AS backend-builder
 WORKDIR /app/backend
 # No build dependencies needed - using pure JS session libraries (@fastify/session + @fastify/cookie)
@@ -45,8 +37,8 @@ COPY --from=backend-builder /app/backend/dist ./dist
 # Copy module-alias.js explizit ins dist-Verzeichnis
 COPY backend/module-alias.js ./dist/module-alias.js
 
-# Copy built frontend (wird vom Backend als static files geserved)
-COPY --from=frontend-builder /app/frontend/dist ./public
+# Copy pre-built frontend from repository (frontend/dist → public/)
+COPY public ./public
 
 # Copy health check
 COPY healthcheck.js ./
