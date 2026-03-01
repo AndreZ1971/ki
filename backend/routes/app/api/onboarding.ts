@@ -20,6 +20,36 @@ interface ConfigResponse {
 }
 
 const onboardingRoutes: FastifyPluginAsync = async (fastify) => {
+  const upsertEnvVar = (envContent: string, key: string, value: string): string => {
+    const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const pattern = new RegExp(`^${escapedKey}=.*$`, 'm');
+    const line = `${key}=${value}`;
+
+    if (pattern.test(envContent)) {
+      return envContent.replace(pattern, line);
+    }
+
+    const normalized = envContent.trimEnd();
+    return normalized.length > 0 ? `${normalized}\n${line}\n` : `${line}\n`;
+  };
+
+  const writeShopUrlToEnvProduction = async (shopUrl: string): Promise<void> => {
+    const envPath = getEnvProductionPath();
+    const envDir = path.dirname(envPath);
+
+    await fs.mkdir(envDir, { recursive: true });
+
+    let currentContent = '';
+    try {
+      currentContent = await fs.readFile(envPath, 'utf-8');
+    } catch (_error) {
+      currentContent = '# A.R.I. Production Configuration\n';
+    }
+
+    const updated = upsertEnvVar(currentContent, 'SHOP_URL', shopUrl);
+    await fs.writeFile(envPath, updated, 'utf-8');
+  };
+
   /**
    * Hilfsfunktion: Pfad zu .env.production ermitteln
    */
@@ -82,19 +112,7 @@ const onboardingRoutes: FastifyPluginAsync = async (fastify) => {
           });
         }
 
-        const envPath = getEnvProductionPath();
-        const envContent = `SHOP_URL=${shopUrl}\n`;
-
-        // Stelle sicher, dass das Verzeichnis existiert
-        const envDir = path.dirname(envPath);
-        try {
-          await fs.mkdir(envDir, { recursive: true });
-        } catch (_err) {
-          logger.warn(`[onboarding] Konnte Verzeichnis nicht erstellen: ${envDir}`);
-        }
-
-        // Schreibe .env.production
-        await fs.writeFile(envPath, envContent, 'utf-8');
+        await writeShopUrlToEnvProduction(shopUrl);
 
         logger.info(`✅ [onboarding] SHOP_URL gespeichert: ${shopUrl}`);
 

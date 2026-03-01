@@ -84,6 +84,40 @@ interface ShopCredentials {
 type ErrorCategory = 'network' | 'auth' | 'validation' | 'timeout' | 'unknown';
 
 const connectionRoutes: FastifyPluginAsync = async (fastify) => {
+  const getEnvProductionPath = (): string => {
+    return path.join('/app/data', '.env.production');
+  };
+
+  const upsertEnvVar = (envContent: string, key: string, value: string): string => {
+    const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const pattern = new RegExp(`^${escapedKey}=.*$`, 'm');
+    const line = `${key}=${value}`;
+
+    if (pattern.test(envContent)) {
+      return envContent.replace(pattern, line);
+    }
+
+    const normalized = envContent.trimEnd();
+    return normalized.length > 0 ? `${normalized}\n${line}\n` : `${line}\n`;
+  };
+
+  const syncShopUrlToEnvProduction = async (shopUrl: string): Promise<void> => {
+    const envPath = getEnvProductionPath();
+    const envDir = path.dirname(envPath);
+
+    await fs.mkdir(envDir, { recursive: true });
+
+    let currentContent = '';
+    try {
+      currentContent = await fs.readFile(envPath, 'utf-8');
+    } catch (_error) {
+      currentContent = '# A.R.I. Production Configuration\n';
+    }
+
+    const updatedContent = upsertEnvVar(currentContent, 'SHOP_URL', shopUrl);
+    await fs.writeFile(envPath, updatedContent, 'utf-8');
+  };
+
   const sanitizeConnectionForDownload = (raw: any) => {
     const socialMedia = raw?.socialMedia || {};
 
@@ -826,6 +860,21 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         'utf-8'
       );
       logger.info('✅ Settings: connection.json updated successfully');
+
+      const normalizedShopUrl = String(cleanedCredentials.wcApiUrl || '').trim();
+      if (normalizedShopUrl) {
+        try {
+          await syncShopUrlToEnvProduction(normalizedShopUrl);
+          logger.info(`✅ Settings: SHOP_URL in .env.production aktualisiert (${normalizedShopUrl})`);
+        } catch (envSyncError) {
+          logger.warn(
+            `⚠️ Settings: connection.json gespeichert, aber SHOP_URL konnte nicht nach .env.production synchronisiert werden: ${envSyncError}`
+          );
+        }
+      } else {
+        logger.warn('⚠️ Settings: wcApiUrl leer - SHOP_URL in .env.production wurde nicht aktualisiert');
+      }
+
       logger.info(
         `✅ Social Media section saved: ${Object.keys(socialMediaStructured).filter((k) => socialMediaStructured[k].enabled).length} channels enabled`
       );
