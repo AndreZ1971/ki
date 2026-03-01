@@ -145,6 +145,7 @@ const PremiumAudit = () => {
       const response = await fetch('/api/audit/premium/apply-recommendation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           recommendationId: recommendationId,
           category: categoryOverride || selectedRecommendation?.category || 'general',

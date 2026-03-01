@@ -231,7 +231,9 @@ const Settings = () => {
     setConnectionMessage("");
 
     try {
-      const response = await fetch('/api/settings/connection/download');
+      const response = await fetch('/api/settings/connection/download', {
+        credentials: 'include'
+      });
       if (!response.ok) {
         throw new Error('Download fehlgeschlagen');
       }
@@ -863,7 +865,9 @@ const Settings = () => {
       setTimeout(async () => {
         try {
           // Refresh specializations list
-          const listResponse = await fetch('/api/specializations/list');
+          const listResponse = await fetch('/api/specializations/list', {
+            credentials: 'include'
+          });
           if (listResponse.ok) {
             const listData = await listResponse.json();
             // Update UI with new specializations (trigger re-render)

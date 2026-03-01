@@ -47,12 +47,16 @@ const MLDashboard: React.FC = () => {
 
   const fetchMLData = async () => {
     try {
-      const statusResponse = await fetch('/api/ml/status');
+      const statusResponse = await fetch('/api/ml/status', {
+        credentials: 'include'
+      });
       if (!statusResponse.ok) throw new Error(`Status API Error: ${statusResponse.status}`);
       const statusData = await statusResponse.json();
       setMlStatus(statusData);
 
-      const statsResponse = await fetch('/api/ml/stats');
+      const statsResponse = await fetch('/api/ml/stats', {
+        credentials: 'include'
+      });
       if (!statsResponse.ok) throw new Error(`Stats API Error: ${statsResponse.status}`);
       const statsData = await statsResponse.json();
       if (!statsData?.success || !statsData?.data) throw new Error(statsData?.error || 'Ungültige ML-Stats');

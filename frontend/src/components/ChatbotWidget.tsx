@@ -30,6 +30,7 @@ export const ChatbotWidget: React.FC<ChatbotWidgetProps> = ({ userRole = 'admin'
       const res = await fetch('/api/chatbot/message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           message: input,
           history: messages,

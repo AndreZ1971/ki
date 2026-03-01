@@ -39,7 +39,9 @@ const RunCreateFreebies = () => {
 
   const loadFreebies = async () => {
     try {
-      const response = await fetch("/api/freebies");
+      const response = await fetch("/api/freebies", {
+        credentials: 'include'
+      });
       const data = await response.json();
       if (data.success && data.data) {
         setRecentFreebies(data.data.slice(0, 5)); // Nur die letzten 5

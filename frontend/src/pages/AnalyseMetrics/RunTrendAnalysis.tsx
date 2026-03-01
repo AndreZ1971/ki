@@ -52,7 +52,9 @@ const RunTrendAnalysis = () => {
     // Lade Analyse-Historie vom Backend
     const loadHistory = async () => {
       try {
-        const response = await fetch("/api/trends/history");
+        const response = await fetch("/api/trends/history", {
+          credentials: 'include'
+        });
         const data = await response.json();
 
         if (data.history) {

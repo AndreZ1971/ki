@@ -79,7 +79,9 @@ export const Onboarding: React.FC = () => {
     setError(null);
     try {
       setDownloading(true);
-      const response = await fetch('/api/settings/connection/download');
+      const response = await fetch('/api/settings/connection/download', {
+        credentials: 'include'
+      });
       if (!response.ok) throw new Error('Download fehlgeschlagen');
 
       const blob = await response.blob();

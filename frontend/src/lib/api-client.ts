@@ -51,6 +51,7 @@ export const apiFetch = async (
   return fetch(url, {
     ...options,
     headers,
+    credentials: 'include', // Send cookies for session auth
   });
 };
 

@@ -46,7 +46,9 @@ const SystemHealth: React.FC = () => {
 
     try {
       // ✅ Hole ECHTE System-Metriken vom Backend
-      const response = await fetch("/api/monitoring/system/metrics");
+      const response = await fetch("/api/monitoring/system/metrics", {
+        credentials: 'include'
+      });
 
       if (!response.ok) {
         throw new Error("Konnte System-Metriken nicht laden");

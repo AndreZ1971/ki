@@ -165,6 +165,7 @@ const MiniAudit = () => {
       const response = await fetch('/api/audit/mini/apply-action', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           actionId,
           productIds: [1, 2, 3], // TODO: Echte Produkt-IDs vom Shop

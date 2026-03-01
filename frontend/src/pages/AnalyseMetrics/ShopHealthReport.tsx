@@ -50,25 +50,38 @@ export interface PerformanceReportResponse {
 // API Service für Shop Health - REAL DATA
 const shopHealthService = {
   async clearCache(): Promise<CacheClearResponse> {
-    const res = await fetch("/api/health/clear-cache", { method: "POST" });
+    const res = await fetch("/api/health/clear-cache", { 
+      method: "POST",
+      credentials: 'include'
+    });
     return await res.json();
   },
   async generatePerformanceReport(): Promise<PerformanceReportResponse> {
     const res = await fetch("/api/health/performance-report", {
       method: "POST",
+      credentials: 'include',
     });
     return await res.json();
   },
   async runSecurityScan(): Promise<SecurityScanResponse> {
-    const res = await fetch("/api/health/security-scan", { method: "POST" });
+    const res = await fetch("/api/health/security-scan", { 
+      method: "POST",
+      credentials: 'include'
+    });
     return await res.json();
   },
   async analyzeSEO(): Promise<SEOAnalysisResponse> {
-    const res = await fetch("/api/health/seo-analysis", { method: "POST" });
+    const res = await fetch("/api/health/seo-analysis", { 
+      method: "POST",
+      credentials: 'include'
+    });
     return await res.json();
   },
   async getInventoryMetrics() {
-    const res = await fetch("/api/health/inventory-metrics", { method: "GET" });
+    const res = await fetch("/api/health/inventory-metrics", { 
+      method: "GET",
+      credentials: 'include'
+    });
     return await res.json();
   },
 };

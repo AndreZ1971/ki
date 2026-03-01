@@ -46,7 +46,9 @@ export default function MLSettings() {
   const loadConfig = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/ml/config');
+      const response = await fetch('/api/ml/config', {
+        credentials: 'include'
+      });
       if (!response.ok) throw new Error('Fehler');
       const data = await response.json();
       setConfig(data);
@@ -65,6 +67,7 @@ export default function MLSettings() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(config),
+        credentials: 'include',
       });
       if (!response.ok) throw new Error('Fehler');
       setMessage({ type: 'success', text: 'ML-Konfiguration erfolgreich gespeichert!' });

@@ -210,6 +210,7 @@ const StandardAudit = () => {
       const response = await fetch('/api/audit/standard/apply-fix', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           fixId: checkId,
           checkId: checkId,
