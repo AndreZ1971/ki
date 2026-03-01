@@ -850,6 +850,7 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         // Preserve existing if payload did not provide them
         ...(!payload.support && oldFileData.support ? { support: oldFileData.support } : {}),
         ...(!payload.ml && oldFileData.ml ? { ml: oldFileData.ml } : {}),
+        ...(oldFileData.auth ? { auth: oldFileData.auth } : {}),
         ...(oldFileData.onboarding && { onboarding: oldFileData.onboarding }),
         ...(oldFileData.metadata && { metadata: oldFileData.metadata }),
       };

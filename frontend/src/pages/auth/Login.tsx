@@ -1,6 +1,6 @@
 // src/pages/auth/Login.tsx
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSession } from '../../context/AuthContext';
 import {
@@ -20,7 +20,11 @@ import { Visibility, VisibilityOff, Lock } from '@mui/icons-material';
 const Login: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const { login, setPassword, needsPasswordSetup, isLoading, error: sessionError } = useSession();
+
+  const fromPath = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname;
+  const redirectTarget = fromPath && fromPath !== '/login' ? fromPath : '/';
 
   // Setup Form State
   const [setupPassword, setSetupPassword] = useState('');
@@ -72,7 +76,7 @@ const Login: React.FC = () => {
       }
 
       await setPassword(trimmedPassword, trimmedConfirm);
-      navigate('/');
+      navigate(redirectTarget, { replace: true });
     } catch (err: any) {
       setError(err.message || t('auth.setupError', 'Failed to set password'));
     } finally {
@@ -94,7 +98,7 @@ const Login: React.FC = () => {
       }
 
       await login(loginPassword);
-      navigate('/');
+      navigate(redirectTarget, { replace: true });
     } catch (err: any) {
       setError(err.message || t('auth.loginError', 'Login failed'));
     } finally {
