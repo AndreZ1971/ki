@@ -29,15 +29,26 @@ chown -R 1001:1001 /app/public /app/dist /app/data /app/logs 2>/dev/null || true
 chmod -R 755 /app/public /app/dist /app/data /app/logs 2>/dev/null || true
 echo "[Entrypoint] ✅ Berechtigungen für public, dist, data, logs harmonisiert"
 
-# 3. CONNECTION.JSON INITIALISIEREN (NUR WENN NICHT VORHANDEN)
-if [ ! -f /app/connection.json ]; then
-  echo "[Entrypoint] 📝 Erstelle connection.json mit ALLEN erforderlichen Feldern..."
+# 3. CONNECTION.JSON PERSISTENT VERWALTEN (ÜBER /app/data)
+# Ziel: Kill/Replacement darf Konfiguration + Auth nicht verlieren.
+PERSISTENT_CONNECTION_JSON="/app/data/connection.json"
+RUNTIME_CONNECTION_JSON="/app/connection.json"
+
+# Migration: Falls alte Datei in /app existiert, nach /app/data verschieben
+if [ -f "$RUNTIME_CONNECTION_JSON" ] && [ ! -f "$PERSISTENT_CONNECTION_JSON" ]; then
+  echo "[Entrypoint] 🔁 Migriere bestehende /app/connection.json nach /app/data/connection.json..."
+  cp "$RUNTIME_CONNECTION_JSON" "$PERSISTENT_CONNECTION_JSON" 2>/dev/null || true
+fi
+
+# Nur wenn persistent noch nicht vorhanden, initialisieren wir Template
+if [ ! -f "$PERSISTENT_CONNECTION_JSON" ]; then
+  echo "[Entrypoint] 📝 Erstelle persistente connection.json mit ALLEN erforderlichen Feldern..."
 
   # 🔐 Generiere sicheren Encryption Key für Spezialisierungen (32 Bytes = 64 Hex Chars)
   SPEC_ENCRYPTION_KEY=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
   echo "[Entrypoint] 🔐 Generiere Verschlüsselungs-Key für Spezialisierungen..."
 
-  cat <<'CONNECTION_JSON' > /app/connection.json
+  cat <<'CONNECTION_JSON' > "$PERSISTENT_CONNECTION_JSON"
 {
   "_description": "A.R.I. Configuration File - ALLE Felder müssen in UI gefüllt werden",
   
@@ -187,13 +198,20 @@ if [ ! -f /app/connection.json ]; then
 }
 CONNECTION_JSON
   # 🔐 Ersetze Placeholder mit echtem Key
-  sed -i "s/SPEC_KEY_PLACEHOLDER/$SPEC_ENCRYPTION_KEY/g" /app/connection.json
+  sed -i "s/SPEC_KEY_PLACEHOLDER/$SPEC_ENCRYPTION_KEY/g" "$PERSISTENT_CONNECTION_JSON"
 
-  echo "[Entrypoint] ✅ connection.json erfolgreich erstellt"
+  echo "[Entrypoint] ✅ Persistente connection.json erfolgreich erstellt"
   echo "[Entrypoint] 🔐 Verschlüsselungs-Key für Spezialisierungen generiert"
 else
-  echo "[Entrypoint] 📄 Bestehende connection.json gefunden – Überschreiben wird übersprungen"
+  echo "[Entrypoint] 📄 Persistente connection.json gefunden – Überschreiben wird übersprungen"
 fi
+
+# Runtime-Pfad immer auf persistente Datei zeigen lassen
+if [ -e "$RUNTIME_CONNECTION_JSON" ] && [ ! -L "$RUNTIME_CONNECTION_JSON" ]; then
+  rm -f "$RUNTIME_CONNECTION_JSON" 2>/dev/null || true
+fi
+ln -sf "$PERSISTENT_CONNECTION_JSON" "$RUNTIME_CONNECTION_JSON"
+echo "[Entrypoint] 🔗 /app/connection.json -> /app/data/connection.json verlinkt"
 
 # 4. .ENV.PRODUCTION INITIALISIEREN (FÜR SHOP_URL)
 if [ ! -f /app/data/.env.production ]; then
@@ -216,14 +234,16 @@ fi
 
 # 5. BERECHTIGUNGEN FÜR CONNECTION.JSON
 echo "[Entrypoint] 🔒 Setze Berechtigungen für connection.json und .env.production..."
-chown nodeuser:nodejs /app/connection.json 2>/dev/null || true
-chmod 600 /app/connection.json 2>/dev/null || true
+chown nodeuser:nodejs "$PERSISTENT_CONNECTION_JSON" 2>/dev/null || true
+chmod 600 "$PERSISTENT_CONNECTION_JSON" 2>/dev/null || true
+chown -h nodeuser:nodejs "$RUNTIME_CONNECTION_JSON" 2>/dev/null || true
 chown nodeuser:nodejs /app/data/.env.production 2>/dev/null || true
 chmod 600 /app/data/.env.production 2>/dev/null || true
 
 # 6. VERIFIZIERUNG
 echo "[Entrypoint] 📋 Final Setup Verification:"
-echo "[Entrypoint]    ✓ connection.json size: $(stat -f%z /app/connection.json 2>/dev/null || stat -c%s /app/connection.json 2>/dev/null || echo 'unknown') bytes"
+echo "[Entrypoint]    ✓ connection.json (persistent) size: $(stat -f%z $PERSISTENT_CONNECTION_JSON 2>/dev/null || stat -c%s $PERSISTENT_CONNECTION_JSON 2>/dev/null || echo 'unknown') bytes"
+echo "[Entrypoint]    ✓ connection.json link: $(ls -l $RUNTIME_CONNECTION_JSON 2>/dev/null || echo 'nicht gefunden')"
 echo "[Entrypoint]    ✓ .env.production: $([ -f /app/data/.env.production ] && echo 'vorhanden' || echo 'nicht gefunden')"
 echo "[Entrypoint]    ✓ Data directory: /app/data (backups, dlq)"
 echo "[Entrypoint]    ✓ NODE_ENV: ${NODE_ENV:-production}"
