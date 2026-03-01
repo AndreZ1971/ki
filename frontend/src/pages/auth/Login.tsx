@@ -23,8 +23,12 @@ const Login: React.FC = () => {
   const location = useLocation();
   const { login, setPassword, needsPasswordSetup, isLoading, error: sessionError } = useSession();
 
+  const searchParams = new URLSearchParams(location.search);
+  const redirectParam = searchParams.get('redirect');
   const fromPath = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname;
-  const redirectTarget = fromPath && fromPath !== '/login' ? fromPath : '/';
+  const redirectTarget =
+    (redirectParam && redirectParam.startsWith('/') ? redirectParam : null) ||
+    (fromPath && fromPath !== '/login' ? fromPath : '/');
 
   // Setup Form State
   const [setupPassword, setSetupPassword] = useState('');

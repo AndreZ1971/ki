@@ -28,7 +28,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    const redirect = encodeURIComponent(`${location.pathname}${location.search}${location.hash}`);
+    return <Navigate to={`/login?redirect=${redirect}`} state={{ from: location }} replace />;
   }
 
   return <>{children}</>;
