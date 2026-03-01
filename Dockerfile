@@ -11,6 +11,17 @@ RUN npm ci
 COPY backend/ ./
 RUN npm run build
 
+# Stage 2: Build Frontend
+FROM node:20-alpine AS frontend-builder
+WORKDIR /app/frontend
+ENV HUSKY=0
+# Set empty VITE_API_URL for relative paths (/api/...) - works across all subdomains
+ENV VITE_API_URL=
+COPY frontend/package*.json ./
+RUN npm ci
+COPY frontend/ ./
+RUN npm run build
+
 # Stage 3: Production Image
 FROM node:20-alpine
 WORKDIR /app
@@ -37,8 +48,8 @@ COPY --from=backend-builder /app/backend/dist ./dist
 # Copy module-alias.js explizit ins dist-Verzeichnis
 COPY backend/module-alias.js ./dist/module-alias.js
 
-# Copy pre-built frontend from repository (frontend/dist → public/)
-COPY public ./public
+# Copy built frontend from frontend-builder stage
+COPY --from=frontend-builder /app/frontend/dist ./public
 
 # Copy health check
 COPY healthcheck.js ./
