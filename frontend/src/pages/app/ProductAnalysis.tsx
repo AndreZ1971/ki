@@ -60,7 +60,7 @@ export const ProductAnalysis: React.FC<ProductAnalysisProps> = ({
 }) => {
   const navigate = useNavigate();
   const apiBase = useMemo(() => {
-    const raw = (import.meta.env.VITE_API_URL || "http://localhost:3000")
+    const raw = (import.meta.env.VITE_API_URL || "")
       .trim()
       .replace(/\/$/, "");
     return raw;
