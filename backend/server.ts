@@ -218,6 +218,8 @@ async function buildServer() {
     bodyLimit: 1048576 * 100, // 100MB
     requestTimeout: 300000, // 5 Minuten Timeout für lange Requests
     ignoreTrailingSlash: true,
+    // Trust reverse proxy headers (X-Forwarded-Proto, X-Forwarded-Host)
+    trustProxy: true,
     ajv: {
       customOptions: {
         removeAdditional: 'all',
