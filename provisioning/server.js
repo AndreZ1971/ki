@@ -86,7 +86,14 @@ function slugify(input) {
 }
 
 function makeTenantSlug(payload) {
-  const source = payload.tenantSlug || payload.customerName || payload.company || payload.email || payload.orderId || `tenant-${Date.now()}`;
+  const source = payload.tenantSlug
+    || payload.customerName
+    || payload.company
+    || payload.email
+    || payload.orderId
+    || payload.id
+    || payload.number
+    || `tenant-${Date.now()}`;
   const slug = slugify(source);
   return slug || `tenant-${Date.now()}`;
 }
@@ -224,6 +231,54 @@ function buildMailer() {
 
 const mailer = buildMailer();
 
+function maskedValue(value) {
+  if (!value) {
+    return '(missing)';
+  }
+  const str = String(value);
+  if (str.length <= 6) {
+    return '***';
+  }
+  return `${str.slice(0, 3)}***${str.slice(-2)}`;
+}
+
+function logStartupConfig() {
+  const summary = {
+    portainerUrl: config.portainerUrl || '(missing)',
+    workerEndpointId: config.workerEndpointId || '(missing)',
+    portainerToken: config.portainerApiToken ? '(set)' : '(missing)',
+    workerSshHost: config.workerSshHost || '(missing)',
+    workerSshUser: config.workerSshUser || '(missing)',
+    workerSshKey: config.workerSshPrivateKey ? '(set)' : '(missing)',
+    smtpHost: config.smtpHost || '(missing)',
+    smtpUser: config.smtpUser || '(missing)',
+    smtpFrom: config.smtpFrom || '(missing)',
+    webhookSecret: maskedValue(config.webhookSecret),
+    baseDomain: config.baseDomain
+  };
+
+  console.log('[STARTUP] Provisioning config summary:', summary);
+
+  const missingProvisioning = [];
+  if (!config.portainerUrl) missingProvisioning.push('PORTAINER_URL');
+  if (!config.portainerApiToken) missingProvisioning.push('PORTAINER_API_TOKEN');
+  if (!config.workerEndpointId) missingProvisioning.push('PORTAINER_WORKER_ENDPOINT_ID');
+
+  if (missingProvisioning.length > 0) {
+    console.warn('[STARTUP] Missing required Portainer config:', missingProvisioning.join(', '));
+  }
+
+  const missingSmtp = [];
+  if (!config.smtpHost) missingSmtp.push('SMTP_HOST');
+  if (!config.smtpUser) missingSmtp.push('SMTP_USER');
+  if (!config.smtpPass) missingSmtp.push('SMTP_PASS');
+  if (!config.smtpFrom) missingSmtp.push('SMTP_FROM');
+
+  if (missingSmtp.length > 0) {
+    console.warn('[STARTUP] Missing SMTP config (mail disabled):', missingSmtp.join(', '));
+  }
+}
+
 async function sendProvisioningMail({ email, tenantSlug, orderId }) {
   if (!mailer || !email) {
     return { sent: false, reason: 'SMTP or recipient missing' };
@@ -247,11 +302,27 @@ app.get('/health', async (_req, res) => {
 
 app.post('/api/provision/order', async (req, res) => {
   try {
+    const webhookTopic = req.header('x-wc-webhook-topic') || '';
+    const webhookEvent = req.header('x-wc-webhook-event') || '';
+
     if (config.webhookSecret && !isValidWooSignature(req) && !isValidManualSecret(req)) {
+      console.warn('[PROVISION] Validation failed:', { webhookTopic, webhookEvent });
       return res.status(401).json({ ok: false, error: 'invalid webhook signature/secret' });
     }
 
     const payload = req.body || {};
+    const orderStatus = String(payload?.status || '').toLowerCase();
+
+    if (webhookTopic && webhookTopic !== 'order.created' && webhookTopic !== 'order.updated') {
+      console.log('[PROVISION] Skipping webhook topic:', webhookTopic);
+      return res.status(202).json({ ok: true, skipped: true, reason: `topic ${webhookTopic} not handled` });
+    }
+
+    if (orderStatus && !['processing', 'completed'].includes(orderStatus)) {
+      console.log('[PROVISION] Skipping order status:', orderStatus);
+      return res.status(202).json({ ok: true, skipped: true, reason: `status ${orderStatus} not provisioned` });
+    }
+
     const customerName = payload.customerName
       || payload.company
       || [payload?.billing?.first_name, payload?.billing?.last_name].filter(Boolean).join(' ')
@@ -268,13 +339,31 @@ app.post('/api/provision/order', async (req, res) => {
     const composeContent = buildTenantCompose(tenantSlug);
     const routeContent = buildTraefikDynamicFile(tenantSlug);
 
+    console.log('[PROVISION] Start:', {
+      webhookTopic,
+      webhookEvent,
+      orderId,
+      orderStatus,
+      tenantSlug,
+      stackName,
+      customerEmail
+    });
+
+    console.log('[PROVISION] Creating Portainer stack:', stackName);
     const stackResult = await createPortainerStack({ stackName, composeContent });
+    console.log('[PROVISION] Portainer stack created');
+
+    console.log('[PROVISION] Writing Traefik route file for:', tenantSlug);
     const routeResult = await writeTraefikRouteFile({ tenantSlug, fileContent: routeContent });
+    console.log('[PROVISION] Traefik route result:', routeResult);
+
+    console.log('[PROVISION] Sending mail to:', customerEmail || '(missing)');
     const emailResult = await sendProvisioningMail({
       email: customerEmail,
       tenantSlug,
       orderId
     });
+    console.log('[PROVISION] Mail result:', emailResult);
 
     return res.json({
       ok: true,
@@ -289,6 +378,11 @@ app.post('/api/provision/order', async (req, res) => {
       email: emailResult
     });
   } catch (error) {
+    console.error('[PROVISION] Failed:', {
+      message: error?.message,
+      responseStatus: error?.response?.status,
+      responseData: error?.response?.data
+    });
     const message = error?.response?.data || error?.message || 'unknown error';
     return res.status(500).json({ ok: false, error: message });
   }
@@ -314,5 +408,6 @@ app.post('/api/provision/test-mail', async (req, res) => {
 });
 
 app.listen(config.port, () => {
+  logStartupConfig();
   console.log(`ari-provisioning listening on :${config.port}`);
 });
