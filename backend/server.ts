@@ -400,42 +400,20 @@ async function buildServer() {
 
     // CORS
     // CORS als erstes Plugin registrieren
+    // CORS-Konfiguration aus ENV (Komma-separierte Liste)
+    const allowedOrigins = env.CORS_ORIGIN.split(',').map(o => o.trim()).filter(Boolean);
     await server.register(cors, {
       origin: (origin, cb) => {
-        const isLocalOrigin =
-          !origin ||
-          origin === 'http://localhost:5173' ||
-          origin === 'http://localhost:5174' ||
-          origin === 'http://localhost:5175' ||
-          origin === 'http://localhost:3000';
-
-        if (isLocalOrigin) {
+        if (!origin) {
+          // z.B. bei Server-zu-Server-Requests
           cb(null, true);
           return;
         }
-
-        if (process.env.NODE_ENV === 'production' && origin) {
-          try {
-            const originUrl = new URL(origin);
-            const originHost = originUrl.hostname;
-
-            const isAllowedProdHost =
-              originHost === 'my-working-space.de' ||
-              originHost.endsWith('.my-working-space.de') ||
-              originHost === 'ari-system.de' ||
-              originHost.endsWith('.ari-system.de');
-
-            if (isAllowedProdHost) {
-              cb(null, true);
-              return;
-            }
-          } catch (_err) {
-            cb(new Error('Ungültiger Origin Header: ' + origin), false);
-            return;
-          }
+        if (allowedOrigins.includes(origin)) {
+          cb(null, true);
+        } else {
+          cb(new Error('Nicht erlaubter Origin: ' + origin), false);
         }
-
-        cb(new Error('Nicht erlaubter Origin: ' + origin), false);
       },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

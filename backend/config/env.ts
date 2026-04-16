@@ -11,6 +11,7 @@ const envSchema = z.object({
     .string()
     .min(32, 'SESSION_SECRET muss mindestens 32 Zeichen lang sein.'),
   SKIP_SIGNATURE_VERIFICATION: z.coerce.boolean().default(false),
+  CORS_ORIGIN: z.string().min(1, 'CORS_ORIGIN muss gesetzt sein (Komma-separierte Liste)'),
 });
 
 export type Env = z.infer<typeof envSchema>;
