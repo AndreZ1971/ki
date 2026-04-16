@@ -8,7 +8,9 @@ import swaggerUi from '@fastify/swagger-ui';
 import fastifyMultipart from '@fastify/multipart';
 import rateLimit from '@fastify/rate-limit';
 import fastifySession from '@fastify/session';
+import { RedisStore } from 'connect-redis';
 import fastifyCookie from '@fastify/cookie';
+import { env } from './config/env';
 import dotenv from 'dotenv';
 import Fastify from 'fastify';
 import fs from 'fs';
@@ -253,6 +255,12 @@ async function buildServer() {
     ? new Redis(redisUrl, { lazyConnect: true })
     : null;
 
+  // Setup RedisStore for session persistence if redisClient is available
+  let redisSessionStore = undefined;
+  if (redisClient) {
+    redisSessionStore = new RedisStore({ client: redisClient });
+  }
+
   if (redisClient) {
     redisClient.on('error', (err) =>
       logger.warn({ err }, '[rate-limit] Redis connection issue')
@@ -286,14 +294,13 @@ async function buildServer() {
 
   // Register session plugin with @fastify/session (pure JS, no native modules)
   // Secret must be 32+ chars or an array - generate secure random key in production
-  const sessionSecret = process.env.SESSION_SECRET || 'ThisIsASecureDefaultSessionSecretKeyWith32PlusCharacters!2026';
-  
   await server.register(fastifySession, {
-    secret: sessionSecret,
+    secret: env.SESSION_SECRET,
     saveUninitialized: false, // Only save sessions when modified
+    store: redisSessionStore,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // Nur HTTPS in Production
+      secure: env.NODE_ENV === 'production', // Nur HTTPS in Production
       sameSite: 'lax', // CSRF-Schutz, aber erlaubt top-level navigation (Reload funktioniert)
       maxAge: 24 * 60 * 60 * 1000, // 24 Stunden statt 0 (Session überlebt Reload)
       path: '/',

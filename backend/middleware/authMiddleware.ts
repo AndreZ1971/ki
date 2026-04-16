@@ -2,8 +2,9 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import jwt from 'jsonwebtoken';
 import { logger } from '../logger';
+import { env } from '../config/env';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'ari-secret-key-change-in-production';
+const JWT_SECRET = env.JWT_SECRET;
 
 interface JWTPayload {
   id: string;
