@@ -3,7 +3,6 @@ import Fastify from 'fastify';
 import fastifyCookie from '@fastify/cookie';
 import fastifySession from '@fastify/session';
 import { doubleCsrf } from 'csrf-csrf';
-import cookieParser from 'cookie-parser';
 
 // Minimal Fastify-Server mit CSRF
 function buildTestServer(csrfSecret: string) {
@@ -23,11 +22,11 @@ function buildTestServer(csrfSecret: string) {
     ignoredMethods: ['GET', 'HEAD', 'OPTIONS'],
   });
   // Dummy-Login-Route initialisiert Session
-    server.get('/login', async (request, reply) => {
+    server.get('/login', async (request) => {
       // @ts-expect-error Fastify-Test: session property is not typed on request, but present at runtime
-    request.session.user = 'test';
-    return { login: 'ok' };
-  });
+      request.session.user = 'test';
+      return { login: 'ok' };
+    });
   server.get('/api/csrf-token', async (request, reply) => {
     // Patch: create minimal Express-like req/res for csrf-csrf
     const fakeReq = {
@@ -37,11 +36,8 @@ function buildTestServer(csrfSecret: string) {
       session: request.session,
     };
     // Minimal fake res with .cookie()
-    let tokenValue = '';
     const fakeRes = {
-      cookie: (name: string, value: string) => {
-        tokenValue = value;
-      }
+      cookie: () => {}
     };
     const token = generateCsrfToken(fakeReq, fakeRes);
     // Set cookie via Fastify
@@ -53,7 +49,6 @@ function buildTestServer(csrfSecret: string) {
   });
   // Globaler Error-Handler für Debug-Ausgabe
   server.setErrorHandler((error, request, reply) => {
-    // eslint-disable-next-line no-console
     console.error('Testserver-Fehler:', error);
     if (error && error.code === 'EBADCSRFTOKEN') {
       reply.status(403).send({ error: error.message || 'Forbidden' });
