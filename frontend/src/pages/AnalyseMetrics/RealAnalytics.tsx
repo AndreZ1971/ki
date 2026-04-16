@@ -41,10 +41,6 @@ const RealAnalytics = () => {
       const response = await fetch(apiUrl, {
         method: "GET",
         headers: {
-          "x-woocommerce-key":
-            import.meta.env.VITE_WOOCOMMERCE_CONSUMER_KEY || "",
-          "x-woocommerce-secret":
-            import.meta.env.VITE_WOOCOMMERCE_CONSUMER_SECRET || "",
           "Content-Type": "application/json",
         },
       });

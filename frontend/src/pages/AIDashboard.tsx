@@ -58,10 +58,6 @@ const AIDashboard: React.FC = () => {
         const response = await fetch(fullUrl, {
           method: "GET",
           headers: {
-            "x-woocommerce-key":
-              import.meta.env.VITE_WOOCOMMERCE_CONSUMER_KEY || "",
-            "x-woocommerce-secret":
-              import.meta.env.VITE_WOOCOMMERCE_CONSUMER_SECRET || "",
             "Content-Type": "application/json",
           },
         });
@@ -145,10 +141,6 @@ const AIDashboard: React.FC = () => {
       const response = await fetch(`${apiUrl}/${endpoint}`, {
         method: "POST",
         headers: {
-          "x-woocommerce-key":
-            import.meta.env.VITE_WOOCOMMERCE_CONSUMER_KEY || "",
-          "x-woocommerce-secret":
-            import.meta.env.VITE_WOOCOMMERCE_CONSUMER_SECRET || "",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
