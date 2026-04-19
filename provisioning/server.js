@@ -1,4 +1,5 @@
 const express = require('express');
+const https = require('https');
 const axios = require('axios');
 const nodemailer = require('nodemailer');
 const { execFile } = require('node:child_process');
@@ -154,6 +155,20 @@ async function createPortainerStack({ stackName, composeContent }) {
     throw new Error('Portainer config missing: PORTAINER_URL, PORTAINER_API_TOKEN, PORTAINER_WORKER_ENDPOINT_ID');
   }
 
+  // Validate token format
+  const tokenMasked = maskedValue(config.portainerApiToken);
+  const tokenLength = config.portainerApiToken.length;
+  const tokenStart = config.portainerApiToken.slice(0, 5);
+  const tokenEnd = config.portainerApiToken.slice(-5);
+  
+  console.log(`[PROVISION] Token validation: length=${tokenLength}, start=${tokenStart}, end=${tokenEnd}, masked=${tokenMasked}`);
+  console.log(`[PROVISION] Token trimmed length: ${config.portainerApiToken.trim().length} (original: ${tokenLength})`);
+  
+  // Check for whitespace issues
+  if (config.portainerApiToken !== config.portainerApiToken.trim()) {
+    console.warn(`[PROVISION] ⚠️  Token has leading/trailing whitespace!`);
+  }
+
   const url = `${config.portainerUrl}/api/stacks/create/standalone/string?endpointId=${encodeURIComponent(config.workerEndpointId)}`;
 
   const payload = {
@@ -162,11 +177,21 @@ async function createPortainerStack({ stackName, composeContent }) {
     FromAppTemplate: false
   };
 
+  // Use https.Agent to ignore self-signed certificate
+  const httpsAgent = new https.Agent({
+    rejectUnauthorized: false
+  });
+
+  const authHeader = `Bearer ${config.portainerApiToken}`;
+  console.log(`[PROVISION] Authorization header: Bearer ${maskedValue(config.portainerApiToken)}`);
+  console.log(`[PROVISION] Posting to: ${url}`);
+
   const response = await axios.post(url, payload, {
     headers: {
-      Authorization: `Bearer ${config.portainerApiToken}`,
+      Authorization: authHeader,
       'Content-Type': 'application/json'
     },
+    httpsAgent,
     timeout: 30000
   });
 
@@ -246,7 +271,8 @@ function logStartupConfig() {
   const summary = {
     portainerUrl: config.portainerUrl || '(missing)',
     workerEndpointId: config.workerEndpointId || '(missing)',
-    portainerToken: config.portainerApiToken ? '(set)' : '(missing)',
+    portainerToken: config.portainerApiToken ? `(set, length=${config.portainerApiToken.length})` : '(missing)',
+    portainerTokenMasked: maskedValue(config.portainerApiToken),
     workerSshHost: config.workerSshHost || '(missing)',
     workerSshUser: config.workerSshUser || '(missing)',
     workerSshKey: config.workerSshPrivateKey ? '(set)' : '(missing)',
@@ -258,6 +284,16 @@ function logStartupConfig() {
   };
 
   console.log('[STARTUP] Provisioning config summary:', summary);
+
+  // Detailed token check
+  if (config.portainerApiToken) {
+    if (config.portainerApiToken !== config.portainerApiToken.trim()) {
+      console.warn('[STARTUP] ⚠️  PORTAINER_API_TOKEN has leading/trailing whitespace!');
+    }
+    if (!config.portainerApiToken.startsWith('ptr_')) {
+      console.warn('[STARTUP] ⚠️  PORTAINER_API_TOKEN does not start with "ptr_"');
+    }
+  }
 
   const missingProvisioning = [];
   if (!config.portainerUrl) missingProvisioning.push('PORTAINER_URL');

@@ -26,8 +26,9 @@ export const Onboarding: React.FC = () => {
         const config: OnboardingConfig = await response.json();
         if (config.isConfigured && config.shopUrl) {
           setShopUrl(config.shopUrl);
-          // Wenn bereits konfiguriert, zur Dashboard weiterleiten
-          navigate('/dashboard', { replace: true });
+          // Wenn bereits konfiguriert, zur Dashboard weiterleiten (harte Weiterleitung, verhindert Back)
+          window.location.replace('/dashboard');
+          return;
         }
         setLoading(false);
       } catch (err) {

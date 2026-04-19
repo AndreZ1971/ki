@@ -80,7 +80,8 @@ const Login: React.FC = () => {
       }
 
       await setPassword(trimmedPassword, trimmedConfirm);
-      navigate(redirectTarget, { replace: true });
+      // Harte Weiterleitung, verhindert Back zur Setup-Seite
+      window.location.replace(redirectTarget || '/dashboard');
     } catch (err: any) {
       setError(err.message || t('auth.setupError', 'Failed to set password'));
     } finally {

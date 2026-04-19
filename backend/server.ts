@@ -3,8 +3,7 @@ import './consoleProxy';
 require('./module-alias');
 import 'module-alias/register';
 import cors from '@fastify/cors';
-import { doubleCsrf } from 'csrf-csrf';
-import cookieParser from 'cookie-parser';
+import fastifyCsrf from '@fastify/csrf-protection';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import fastifyMultipart from '@fastify/multipart';
@@ -294,11 +293,8 @@ async function buildServer() {
   // Register cookie plugin first (required by session plugin)
   await server.register(fastifyCookie);
 
-  // Express-kompatiblen Cookie-Parser für csrf-csrf nutzen
-  server.addHook('onRequest', async (request, reply) => {
-    // @ts-expect-error Fastify request.raw/response.raw sind Express-kompatibel, aber Typen stimmen nicht
-    cookieParser()(request.raw, reply.raw, () => {});
-  });
+  // Entfernt: Express-kompatibler Cookie-Parser (nicht Fastify-kompatibel)
+  // Fastify-Cookie übernimmt das Cookie-Handling vollständig
 
   // Register session plugin with @fastify/session (pure JS, no native modules)
   // Secret must be 32+ chars or an array - generate secure random key in production
@@ -328,53 +324,8 @@ async function buildServer() {
     },
   });
 
-  // CSRF-Schutz (Double Submit Cookie Pattern)
-  const {
-    doubleCsrfProtection: csrfProtection,
-    generateCsrfToken
-  } = doubleCsrf({
-    getSecret: () => process.env.CSRF_SECRET as string,
-    getSessionIdentifier: (req: any) => req.session?.id || '',
-    cookieName: 'x-csrf-token',
-    cookieOptions: {
-      sameSite: 'lax',
-      path: '/',
-      secure: env.NODE_ENV === 'production',
-      httpOnly: false,
-    },
-    size: 64,
-    ignoredMethods: ['GET', 'HEAD', 'OPTIONS'],
-  });
-
-  // CSRF-Token-Route (Frontend holt Token per GET)
-  server.get('/api/csrf-token', async (request, reply) => {
-    const token = generateCsrfToken(request.raw, reply.raw);
-    reply.setCookie('x-csrf-token', token, {
-      httpOnly: false,
-      sameSite: 'lax',
-      secure: env.NODE_ENV === 'production',
-      path: '/',
-    });
-    return { csrfToken: token };
-  });
-
-  // CSRF-Prüfung für alle mutierenden API-Routen
-  server.addHook('onRequest', async (request, reply) => {
-    const method = request.raw.method as string | undefined;
-    if (method && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
-      try {
-        await new Promise((resolve, reject) => {
-          csrfProtection(request.raw, reply.raw, (err: any) => {
-            if (err) reject(err);
-            else resolve(null);
-          });
-        });
-      } catch (err) {
-        reply.status(403).send({ error: 'CSRF token invalid or missing' });
-        throw err;
-      }
-    }
-  });
+  // CSRF-Schutz mit @fastify/csrf-protection
+  await server.register(fastifyCsrf);
 
   // Debug-Route: Gibt alle registrierten Routen als Text zurück
   server.get('/api/debug/routes', async (_request, reply) => {
