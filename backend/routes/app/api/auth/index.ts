@@ -141,11 +141,13 @@ export default async function authRoutes(fastify: FastifyInstance) {
           });
         }
 
-        // Erstelle Session
+        // Erstelle frische Session und speichere sie explizit, damit der Cookie sicher gesetzt wird
+        await request.session.regenerate();
         (request.session as any).auth = {
           authenticated: true,
           setupCompletedAt: new Date().toISOString(),
         };
+        await request.session.save();
 
         logger.info('Initial password set successfully');
 
@@ -196,11 +198,13 @@ export default async function authRoutes(fastify: FastifyInstance) {
           });
         }
 
-        // Erstelle Session
+        // Erstelle frische Session und speichere sie explizit, damit der Cookie sicher gesetzt wird
+        await request.session.regenerate();
         (request.session as any).auth = {
           authenticated: true,
           loginTime: new Date().toISOString(),
         };
+        await request.session.save();
 
         logger.info('User logged in successfully');
 
@@ -222,8 +226,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
    */
   fastify.post('/logout', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      // @fastify/secure-session: Session automatisch auf null setzen
-      (request.session as any).auth = null;
+      await request.session.destroy();
       
       logger.info('User logged out, session cleared');
       return reply.send({

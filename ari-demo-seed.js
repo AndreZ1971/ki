@@ -1,14 +1,50 @@
 require('dotenv').config();
 const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
 
 // Configuration
-const WC_URL = process.env.WOOCOMMERCE_URL;
-const WC_KEY = process.env.WOOCOMMERCE_CONSUMER_KEY;
-const WC_SECRET = process.env.WOOCOMMERCE_CONSUMER_SECRET;
+function loadWooConfigFromConnectionJson() {
+  const candidates = [
+    path.resolve(process.cwd(), 'backend', 'connection.json'),
+    path.resolve(process.cwd(), 'connection.json'),
+  ];
+
+  for (const filePath of candidates) {
+    try {
+      if (!fs.existsSync(filePath)) continue;
+      const parsed = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      const woo = parsed?.woocommerce || {};
+
+      if (woo.url && woo.consumerKey && woo.consumerSecret) {
+        return {
+          url: woo.url,
+          key: woo.consumerKey,
+          secret: woo.consumerSecret,
+          source: filePath,
+        };
+      }
+    } catch (_error) {
+      // Try next candidate
+    }
+  }
+
+  return null;
+}
+
+const fileConfig = loadWooConfigFromConnectionJson();
+
+const WC_URL = process.env.WOOCOMMERCE_URL || fileConfig?.url;
+const WC_KEY = process.env.WOOCOMMERCE_CONSUMER_KEY || fileConfig?.key;
+const WC_SECRET = process.env.WOOCOMMERCE_CONSUMER_SECRET || fileConfig?.secret;
 
 if (!WC_URL || !WC_KEY || !WC_SECRET) {
-  console.error('❌ Fehlende Umgebungsvariablen. Bitte .env pruefen.');
+  console.error('❌ Fehlende WooCommerce-Zugangsdaten. Setze .env oder backend/connection.json.');
   process.exit(1);
+}
+
+if (!process.env.WOOCOMMERCE_URL && fileConfig?.source) {
+  console.log(`ℹ️  WooCommerce-Credentials aus ${path.relative(process.cwd(), fileConfig.source)} geladen`);
 }
 
 const AUTH_HEADER = 'Basic ' + Buffer.from(`${WC_KEY}:${WC_SECRET}`).toString('base64');
@@ -219,6 +255,13 @@ const DEMO_CUSTOMERS = [
   { first_name: 'Brigitte', last_name: 'Klein', email: 'brigitte.klein@demo-wein.de', city: 'Stuttgart', postcode: '70176', state: 'BW' },
 ];
 
+const DEMO_CUSTOMER_EMAILS = new Set(DEMO_CUSTOMERS.map((customer) => customer.email.toLowerCase()));
+
+function isDemoCustomer(customer) {
+  const email = String(customer?.email || '').toLowerCase();
+  return DEMO_CUSTOMER_EMAILS.has(email) || email.endsWith('@demo-wein.de');
+}
+
 function randomBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -425,7 +468,7 @@ async function runStatus() {
 
   const hasDemoMeta = (x) => x.meta_data?.some((m) => m.key === '_ari_demo' && m.value === 'true');
   const demoProducts = (products || []).filter(hasDemoMeta);
-  const demoCustomers = (customers || []).filter(hasDemoMeta);
+  const demoCustomers = (customers || []).filter(isDemoCustomer);
   const demoOrders = (orders || []).filter(hasDemoMeta);
 
   const orderStatusCounts = demoOrders.reduce((acc, o) => {
@@ -465,7 +508,7 @@ async function runCleanup() {
   console.log('👥 Loesche Kunden...');
   let deletedCustomers = 0;
   const allCustomers = (await wcGet('/customers', { per_page: 100 })) || [];
-  for (const customer of allCustomers.filter(hasDemoMeta)) {
+  for (const customer of allCustomers.filter(isDemoCustomer)) {
     await sleep(200);
     const result = await wcDelete(`/customers/${customer.id}`, true);
     if (result) {
