@@ -810,7 +810,16 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         },
       };
 
-      // Store in connection.json with structured format
+      // CRITICAL: Auth-Sektion muss IMMER erhalten bleiben, da sie passwordHash enthält.
+      // Ohne auth.passwordHash wird der Nutzer zum initialen Setup-Screen geschickt.
+      if (!oldFileData.auth) {
+        logger.error('CRITICAL: oldFileData.auth is missing — connection.json may be corrupted. Aborting settings save to prevent auth data loss.');
+        return reply.status(500).send({
+          success: false,
+          error: 'Konfiguration konnte nicht gespeichert werden: Auth-Daten konnten nicht gelesen werden. Bitte Seite neu laden und erneut versuchen.',
+        });
+      }
+
       const dataToStore = {
         // Core Services
         wordpress: {
@@ -850,9 +859,11 @@ const connectionRoutes: FastifyPluginAsync = async (fastify) => {
         // Preserve existing if payload did not provide them
         ...(!payload.support && oldFileData.support ? { support: oldFileData.support } : {}),
         ...(!payload.ml && oldFileData.ml ? { ml: oldFileData.ml } : {}),
-        ...(oldFileData.auth ? { auth: oldFileData.auth } : {}),
+        // Auth-Sektion IMMER erhalten (Guard oben verhindert, dass wir hier ohne auth sind)
+        auth: oldFileData.auth,
         ...(oldFileData.onboarding && { onboarding: oldFileData.onboarding }),
         ...(oldFileData.metadata && { metadata: oldFileData.metadata }),
+        ...(oldFileData.specialization && { specialization: oldFileData.specialization }),
       };
 
       await fs.writeFile(
