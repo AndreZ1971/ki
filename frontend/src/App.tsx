@@ -85,7 +85,7 @@ function App() {
   return (
     <div className="App">
       <SessionProvider>
-        <Router>
+        <Router basename="/ki">
           <Routes>
             {/* Public Routes - Login & Onboarding */}
             <Route path="/login" element={<Login />} />
