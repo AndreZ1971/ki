@@ -25,9 +25,21 @@ const Login: React.FC = () => {
 
   const searchParams = new URLSearchParams(location.search);
   const redirectParam = searchParams.get('redirect');
-  const fromPath = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname;
+  const fromState = (location.state as { from?: { pathname?: string; search?: string; hash?: string } } | null)?.from;
+  const fromPath = fromState
+    ? `${fromState.pathname || ''}${fromState.search || ''}${fromState.hash || ''}`
+    : null;
+
+  let storedRedirect: string | null = null;
+  try {
+    storedRedirect = sessionStorage.getItem('postLoginRedirect');
+  } catch {
+    storedRedirect = null;
+  }
+
   const redirectTarget =
     (redirectParam && redirectParam.startsWith('/') ? redirectParam : null) ||
+    (storedRedirect && storedRedirect.startsWith('/') ? storedRedirect : null) ||
     (fromPath && fromPath !== '/login' ? fromPath : '/');
 
   // Setup Form State
@@ -103,6 +115,11 @@ const Login: React.FC = () => {
       }
 
       await login(loginPassword);
+      try {
+        sessionStorage.removeItem('postLoginRedirect');
+      } catch {
+        // Ignore storage errors
+      }
       navigate(redirectTarget, { replace: true });
     } catch (err: any) {
       setError(err.message || t('auth.loginError', 'Login failed'));

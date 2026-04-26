@@ -28,6 +28,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!isAuthenticated) {
+    const intendedPath = `${location.pathname}${location.search}${location.hash}`;
+    try {
+      sessionStorage.setItem('postLoginRedirect', intendedPath);
+    } catch {
+      // Ignore storage errors (private mode / blocked storage)
+    }
     const redirect = encodeURIComponent(`${location.pathname}${location.search}${location.hash}`);
     return <Navigate to={`/login?redirect=${redirect}`} state={{ from: location }} replace />;
   }
