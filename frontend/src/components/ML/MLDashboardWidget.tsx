@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 interface MLStatus {
   enabled: boolean;
@@ -24,6 +25,7 @@ interface MLStats {
 }
 
 export const MLDashboardWidget: React.FC = () => {
+    const navigate = useNavigate();
     const apiUrl = import.meta.env.VITE_API_URL;
     const baseApi = (apiUrl || '').trim();
 
@@ -123,7 +125,7 @@ export const MLDashboardWidget: React.FC = () => {
           ML ist derzeit deaktiviert
         </p>
         <button
-          onClick={() => window.location.href = '/settings/ml'}
+          onClick={() => navigate('/settings/ml')}
           style={{
             marginTop: '16px',
             padding: '8px 16px',
@@ -299,7 +301,7 @@ export const MLDashboardWidget: React.FC = () => {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => window.location.href = '/ml/dashboard'}
+          onClick={() => navigate('/ml/dashboard')}
           style={{
             flex: 1,
             padding: '10px',
@@ -318,7 +320,7 @@ export const MLDashboardWidget: React.FC = () => {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => window.location.href = '/settings/ml'}
+          onClick={() => navigate('/settings/ml')}
           style={{
             flex: 1,
             padding: '10px',
