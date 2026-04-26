@@ -153,6 +153,33 @@ export default async function shopMetricsRoutes(server: FastifyInstance) {
       const productsTyped: WooCommerceProduct[] =
         products as WooCommerceProduct[];
 
+      // Umsatz-Zeitreihe fuer das Dashboard (letzte 30 Tage)
+      const salesByDay = new Map<string, number>();
+      const now = new Date();
+      const dayKeys: string[] = [];
+
+      for (let i = 29; i >= 0; i -= 1) {
+        const d = new Date(now);
+        d.setDate(now.getDate() - i);
+        const key = d.toISOString().split('T')[0];
+        dayKeys.push(key);
+        salesByDay.set(key, 0);
+      }
+
+      for (const order of ordersTyped) {
+        if (!order?.date_created) continue;
+        const key = order.date_created.split('T')[0];
+        if (!salesByDay.has(key)) continue;
+        const total = Number.parseFloat(order.total || '0');
+        if (!Number.isFinite(total)) continue;
+        salesByDay.set(key, (salesByDay.get(key) || 0) + total);
+      }
+
+      const salesData = dayKeys.map((key) => ({
+        day: key.slice(5),
+        sales: Number((salesByDay.get(key) || 0).toFixed(2)),
+      }));
+
       logger.debug({ customersCount: customersTyped.length, ordersCount: ordersTyped.length, productsCount: productsTyped.length }, 'Shop metrics data loaded');
 
       logger.debug({ customersCount: customers.length, ordersCount: orders.length, productsCount: products.length }, 'Shop metrics raw data');
@@ -192,6 +219,8 @@ export default async function shopMetricsRoutes(server: FastifyInstance) {
         todayCustomers: todayCustomers.length,
         totalProducts: productsTyped.length,
         conversionRate: parseFloat(conversionRate.toFixed(1)),
+        salesData,
+        chartData: salesData,
         lastUpdated: new Date().toISOString(),
       };
 
@@ -246,6 +275,8 @@ export default async function shopMetricsRoutes(server: FastifyInstance) {
               todayCustomers: todayCustomers.length,
               totalProducts: productsTyped.length,
               conversionRate: parseFloat(conversionRate.toFixed(1)),
+              salesData: [],
+              chartData: [],
               lastUpdated: new Date().toISOString(),
               cached: true,
             },
