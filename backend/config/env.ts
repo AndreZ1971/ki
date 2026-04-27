@@ -1,6 +1,15 @@
 // env.ts
 import { z } from 'zod';
 
+const booleanFromEnv = z.preprocess((value) => {
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (['true', '1', 'yes', 'on'].includes(normalized)) return true;
+    if (['false', '0', 'no', 'off', ''].includes(normalized)) return false;
+  }
+  return value;
+}, z.boolean());
+
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().default(3000),
@@ -10,7 +19,7 @@ const envSchema = z.object({
   SESSION_SECRET: z
     .string()
     .min(32, 'SESSION_SECRET muss mindestens 32 Zeichen lang sein.'),
-  SKIP_SIGNATURE_VERIFICATION: z.coerce.boolean().default(false),
+  SKIP_SIGNATURE_VERIFICATION: booleanFromEnv.default(false),
   CORS_ORIGIN: z.string().min(1, 'CORS_ORIGIN muss gesetzt sein (Komma-separierte Liste)'),
   CSRF_SECRET: z.string().min(32, 'CSRF_SECRET muss mindestens 32 Zeichen lang sein.'),
 });
