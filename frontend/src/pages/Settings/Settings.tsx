@@ -474,7 +474,7 @@ const Settings = () => {
       icon: "",
       isActive: false,
       image:
-        '/images/dermentor.png',
+        `${import.meta.env.BASE_URL}images/dermentor.png`,
       shopUrl:
         "https://kaufe-es.eu/index.php/product/digitale-produkte-kurse-der-mentor/",
       features: [
@@ -493,7 +493,7 @@ const Settings = () => {
       icon: "",
       isActive: false,
       image:
-        '/images/Globetrotter.png',
+        `${import.meta.env.BASE_URL}images/Globetrotter.png`,
       features: [
         "Reisebeschreibungen",
         "Hotel & Unterkunft Marketing",
@@ -510,7 +510,7 @@ const Settings = () => {
       icon: "",
       isActive: false,
       image:
-        '/images/Makler.png',
+        `${import.meta.env.BASE_URL}images/Makler.png`,
       features: [
         "Technische Spezifikationen",
         "Material-Beschreibungen",
@@ -527,7 +527,7 @@ const Settings = () => {
       icon: "",
       isActive: false,
       image:
-        '/images/Stylist.png',
+        `${import.meta.env.BASE_URL}images/Stylist.png`,
       features: [
         "Produkt-Styling Texte",
         "Größentabellen",
@@ -544,7 +544,7 @@ const Settings = () => {
       icon: "",
       isActive: false,
       image:
-        '/images/Experte.png',
+        `${import.meta.env.BASE_URL}images/Experte.png`,
       features: [
         "INCI-konforme Beschreibungen",
         "Hauttyp-Empfehlungen",
@@ -561,7 +561,7 @@ const Settings = () => {
       icon: "",
       isActive: false,
       image:
-        '/images/Der%20Coach.png',
+        `${import.meta.env.BASE_URL}images/Der%20Coach.png`,
       features: [
         "Workout-Beschreibungen",
         "Material- und Größenberatung",
@@ -578,7 +578,7 @@ const Settings = () => {
       icon: "",
       isActive: false,
       image:
-        '/images/Guide.png',
+        `${import.meta.env.BASE_URL}images/Guide.png`,
       features: [
         "Technische Specs",
         "Vergleichstabellen",
@@ -595,7 +595,7 @@ const Settings = () => {
       icon: "",
       isActive: false,
       image:
-        '/images/Tierfreund.png',
+        `${import.meta.env.BASE_URL}images/Tierfreund.png`,
       features: [
         "Fütterungsempfehlungen",
         "Rasse-spezifische Hinweise",
@@ -612,7 +612,7 @@ const Settings = () => {
       icon: "",
       isActive: false,
       image:
-        '/images/Der%20Sommelier.png',
+        `${import.meta.env.BASE_URL}images/Der%20Sommelier.png`,
       features: [
         "Geschmacksprofile",
         "Pairing-Empfehlungen",
@@ -629,7 +629,7 @@ const Settings = () => {
       icon: "",
       isActive: false,
       image:
-        '/images/Der%20Innenarchitekt.png',
+        `${import.meta.env.BASE_URL}images/Der%20Innenarchitekt.png`,
       features: [
         "Stilwelten & Looks",
         "Material- & Pflegehinweise",
@@ -646,7 +646,7 @@ const Settings = () => {
       icon: "",
       isActive: false,
       image:
-        '/images/spaeter.png',
+        `${import.meta.env.BASE_URL}images/spaeter.png`,
       features: [      
       ],
     },
@@ -658,7 +658,7 @@ const Settings = () => {
       icon: "",
       isActive: false,
       image:
-        '/images/spaeter.png',
+        `${import.meta.env.BASE_URL}images/spaeter.png`,
       features: [
       ],
     },    
