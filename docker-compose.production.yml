@@ -1,6 +1,6 @@
 services:
   app:
-    image: "${IMAGE_NAME:-app-agent}:${TAG:-latest}"
+    image: "${IMAGE_NAME:-ghcr.io/andrez1971/ari}:${TAG:-latest}"
     container_name: "${CONTAINER_NAME:-app-agent}"
     restart: unless-stopped
 
