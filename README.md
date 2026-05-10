@@ -8,6 +8,12 @@
 
 > **Status**: Production Ready → Runtime stable, no frontend mock data, all results from backend. External integrations (e.g. payment gateways) require configuration. [Full definition](docs/english/TOOLS_DOCUMENTATION.md#-glossary).
 
+## Security Notice
+
+- `connection.json` and `backend/connection.json` are runtime-generated local configuration files and must never be committed.
+- The repository history was rewritten on 2026-05-10 to remove previously tracked credential files.
+- If you cloned the repository before that date, create a fresh clone before contributing.
+
 ## Der digitale Mitarbeiter für deinen Online-Shop
 
 Ein System, das deinen WooCommerce-Shop analysiert, optimiert und wächst –  
@@ -172,7 +178,7 @@ Abandoned Carts? Kunden, die lange nichts gekauft haben? A.R.I. kennt sie und er
 
 - **Aktuell:** Temporäre In-Memory-Authentifizierung (ENV-konfiguriert)
 - **Geplant:** Automattic-Integration für Produktiv-Umgebung
-- **WooCommerce-Daten:** Direkt von WooCommerce API (connection.json)
+- **WooCommerce-Daten:** Direkt von WooCommerce API, lokal gespeichert in einer runtime-generierten `connection.json`
 - **Support-Tickets:** Awesome Support Plugin Integration mit HTML-Bereinigung
 
 ## 🔧 Tool-Übersicht

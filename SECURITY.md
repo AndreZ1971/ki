@@ -49,6 +49,12 @@ These controls are part of the project's core trust model and license conditions
 - Public disclosure should happen after a fix or mitigation is available.
 - Credit is given where requested and appropriate.
 
+## Repository History Remediation
+
+- On 2026-05-10, the git history was rewritten to remove previously tracked `connection.json` credential files.
+- Local runtime configuration files such as `connection.json` and `backend/connection.json` must remain untracked.
+- Contributors with older clones should delete them and clone the repository again before pushing changes.
+
 ## Hardening Guidance
 
 - Keep dependencies updated.
