@@ -27,6 +27,8 @@ Important specialization rules (see LICENSE for binding text):
 
 ## Development Setup
 
+If you cloned this repository before 2026-05-10, delete the old clone and create a fresh clone before contributing. The git history was rewritten to remove previously tracked credential files.
+
 1. Install dependencies:
    - Root: npm install
    - Backend: npm --prefix backend install
