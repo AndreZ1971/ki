@@ -1,0 +1,103 @@
+{
+  "meta": {
+    "description": "A.R.I. Spezialisierungen - Bild-URLs aus WooCommerce Media Library",
+    "source": "https://kaufe-es.eu/wp-admin/upload.php",
+    "instructions": "Trage die vollständigen URLs zu den Bildern ein, wie sie in der WordPress Media Library gehostet sind",
+    "format": "https://kaufe-es.eu/wp-content/uploads/YYYY/MM/filename.extension"
+  },
+  "specializations": [
+    {
+      "id": "109026",
+      "name": "Digitale Produkte & Kurse - Der Mentor",
+      "price": "99€",
+      "local_filename": "dermentor.png",
+      "media_url": "https://kaufe-es.eu/wp-content/uploads/2026/03/dermentor.png",
+      "status": "pending"
+    },
+    {
+      "id": "109078",
+      "name": "Reisebüro - Der Globetrotter",
+      "price": "149€",
+      "local_filename": "Globetrotter.png",
+      "media_url": "https://kaufe-es.eu/wp-content/uploads/2026/03/Globetrotter.png",
+      "status": "pending"
+    },
+    {
+      "id": "109091",
+      "name": "Immobilien - Der Makler",
+      "price": "129€",
+      "local_filename": "Makler.png",
+      "media_url": "https://kaufe-es.eu/wp-content/uploads/2026/03/Makler.png",
+      "status": "pending"
+    },
+    {
+      "id": "109038",
+      "name": "Fashion & Mode - Der Stylist",
+      "price": "119€",
+      "local_filename": "Stylist.png",
+      "media_url": "https://kaufe-es.eu/wp-content/uploads/2026/03/Stylist.png",
+      "status": "pending"
+    },
+    {
+      "id": "109008",
+      "name": "Beauty & Kosmetik - Der Haut-Experte",
+      "price": "109€",
+      "local_filename": "Experte.png",
+      "media_url": "https://kaufe-es.eu/wp-content/uploads/2026/03/Experte.png",
+      "status": "pending"
+    },
+    {
+      "id": "109052",
+      "name": "Nahrungsergänzung & Fitness - Der Coach",
+      "price": "119€",
+      "local_filename": "Der Coach.png",
+      "media_url": "https://kaufe-es.eu/wp-content/uploads/2026/03/Der%20Coach.png",
+      "status": "pending"
+    },
+    {
+      "id": "109104",
+      "name": "Technik & Elektronik - Der Tech-Guide",
+      "price": "139€",
+      "local_filename": "Guide.png",
+      "media_url": "https://kaufe-es.eu/wp-content/uploads/2026/03/Guide.png",
+      "status": "pending"
+    },
+    {
+      "id": "109117",
+      "name": "Tierbedarf - Der Tierfreund",
+      "price": "99€",
+      "local_filename": "Tierfreund.png",
+      "media_url": "https://kaufe-es.eu/wp-content/uploads/2026/03/Tierfreund.png",
+      "status": "pending"
+    },
+    {
+      "id": "109130",
+      "name": "Wein & Feinkost - Der Sommelier",
+      "price": "99€",
+      "local_filename": "Der Sommelier.png",
+      "media_url": "https://kaufe-es.eu/wp-content/uploads/2026/03/Der%20Sommelier.png",
+      "status": "pending"
+    },
+    {
+      "id": "109065",
+      "name": "Home & Living - Der Innenarchitekt",
+      "price": "119€",
+      "local_filename": "Der Innenarchitekt.png",
+      "media_url": "https://kaufe-es.eu/wp-content/uploads/2026/03/Der%20Innenarchitekt.png",
+      "status": "pending"
+    }
+  ],
+  "landing_page_carousel": {
+    "file": "product-template---ecommerce (3).html",
+    "structure": "20-slide carousel (auto-advance 5s)",
+    "image_section": "Spezialisierungen - Bildgalerie",
+    "required_urls": "Complete URLs für alle 10 Spezialisierungen"
+  },
+  "checklist": {
+    "images_uploaded_to_media_library": false,
+    "urls_verified": false,
+    "landing_page_updated": false,
+    "frontend_settings_updated": false,
+    "git_committed": false
+  }
+}
