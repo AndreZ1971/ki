@@ -1,37 +1,83 @@
 
-node_modules/
-.env
-.DS_Store
-.vscode/
-*.log
-
-# Playwright
-playwright-report/
-test-results/
-screenshots/
-
-# SENSITIVE & LOCAL CONFIG FILES
-# Erlaube explizit die production-Umgebungen für Backend und Frontend
-!backend/.env.production
-!frontend/.env.production
-.env.production
-backend/connection.json  # Niemals ins Repo!
-specialization-key.pem
-wp-config*.php  # WordPress config mit Private Key - nur lokal/Server!
-# Root-level connection.json (nur lokal)
+# ============================================================================
+# CRITICAL: SENSITIVE FILES - NEVER COMMIT THESE
+# ============================================================================
+# Configuration & Credentials
 connection.json
-# Backup snapshots of connection settings (contain secrets)
-backend/data/backups/connection*.json
+backend/connection.json
+*.env
+.env*
+!.env.example
+!.env.production.example
 
-# BUILD & DIST
+# API Keys & Secrets
+*.secret
+*.secret.*
+*-secret*.json
+*-secrets*.json
+credentials*.json
+
+# Private Keys & Certificates
+*.pem
+*.key
+*.private
+*-private.key
+*-secret.key
+
+# WordPress & WooCommerce Config
+wp-config*.php
+wp-config.*.php
+wp-config-*
+
+# Backup snapshots with secrets
+backend/data/backups/connection*.json
+backend/data/backups/*secret*.json
+data/backups/*secret*.json
+
+# ============================================================================
+# NODE & BUILD
+# ============================================================================
+node_modules/
+node_modules.old/
+*.tsbuildinfo
+dist/
 frontend/dist/
 backend/dist/
 tests/dist/
+build/
 
-# LOGS & TEMP
+# ============================================================================
+# IDE & EDITOR
+# ============================================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*~
+.DS_Store
+
+# ============================================================================
+# TESTING & DEBUGGING
+# ============================================================================
+playwright-report/
+test-results/
+screenshots/
+coverage/
 *.log
 *.tmp
 testfile.txt
-node_modules.old/
 
+# ============================================================================
+# LOCAL & DEVELOPMENT
+# ============================================================================
 /local-sichern/
+.git-rewrite/
+*.bak
+
+# ============================================================================
+# PRODUCTION EXCEPTIONS (EXPLICITLY ALLOWED - must come LAST)
+# ============================================================================
+# Production environment templates ONLY - never with real secrets!
+!backend/.env.production.example
+!frontend/.env.production.example
