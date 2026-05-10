@@ -310,7 +310,7 @@ backend/data/specializations/
   └── active-specialization.json       # Aktive Config
 ```
 
-**Signatur-Validierung:** RSA-2048, Public Key im Backend
+**Signatur-Validierung:** RSA-4096, Public Key im Backend
 
 ### Wie aktiviere ich Debug-Logging?
 

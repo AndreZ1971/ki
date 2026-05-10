@@ -28,7 +28,7 @@
 A.R.I. implements a **multi-layered security architecture** combining:
 
 - ✅ JWT-based authentication
-- ✅ RSA-2048 digital signatures
+- ✅ RSA-4096 digital signatures
 - ✅ AES-256-GCM encryption
 - ✅ SHA-256 integrity hashing
 - ✅ Mutex-based concurrency control
@@ -39,6 +39,15 @@ A.R.I. implements a **multi-layered security architecture** combining:
 - ✅ GDPR compliance
 
 **Security Principle:** Defense in Depth - Multiple security layers prevent single points of failure.
+
+### Lizenzkritische Vorgaben
+
+Die verbindlichen Rechtsbedingungen sind in [LICENSE](../../LICENSE) definiert. Für Konsistenz von Sicherheit und Lizenz gilt:
+
+- Die Signaturprüfung für Spezialisierungen darf nicht entfernt, deaktiviert, umgangen oder ausgehebelt werden.
+- Der im Verifier eingebettete öffentliche Schlüssel darf nicht durch einen anderen Schlüssel ersetzt werden.
+- `SKIP_SIGNATURE_VERIFICATION=true` darf in Produktionsumgebungen nicht verwendet werden.
+- Signierte `.ari-spec` Dateien sind proprietär und dürfen nicht weiterverbreitet, weiterverkauft oder zurückentwickelt werden.
 
 ---
 
@@ -382,7 +391,7 @@ redis.setex(`trend:${keyword}`, 21600, JSON.stringify(data));
 
 ## Cryptography & Encryption
 
-### Specialization Signature System (RSA-2048)
+### Specialization Signature System (RSA-4096)
 
 **Purpose:** Verify authenticity of specializations from Marktplatz
 
@@ -399,12 +408,12 @@ const signature = crypto.sign('sha256', Buffer.from(payload), {
 
 **Validation (in A.R.I.):**
 ```typescript
-const KAUFE_ES_PUBLIC_KEY = process.env.SPEC_PUBLIC_KEY;
+const PUBLIC_KEY = '...'; // Defined in backend/security/signatureVerifier.ts
 
 const isValid = crypto.verify(
   'sha256',
   Buffer.from(specData),
-  KAUFE_ES_PUBLIC_KEY,
+  PUBLIC_KEY,
   signature
 );
 
@@ -771,7 +780,6 @@ JWT_SECRET=your-super-secret-key-change-me
 OPENAI_API_KEY=sk-proj-xxx...
 WOOCOMMERCE_CONSUMER_KEY=ck_xxx
 WOOCOMMERCE_CONSUMER_SECRET=cs_xxx
-SPEC_PUBLIC_KEY=-----BEGIN PUBLIC KEY-----...
 SPEC_ENCRYPTION_KEY=32-byte-hex-key
 ```
 

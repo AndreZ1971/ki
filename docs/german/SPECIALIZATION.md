@@ -11,11 +11,21 @@
 Spezialisierungen sind branchenspezifische KI-Konfigurationen, die A.R.I. für verschiedene Geschäftsbereiche anpassen. Sie werden auf **dein-shop.com** verkauft, signiert geliefert und lokal installiert.
 
 **Features:**
-- ✅ RSA-2048 Signatur-Validierung
+- ✅ RSA-4096 Signatur-Validierung
 - ✅ AES-256-GCM Verschlüsselung
 - ✅ Lokale Persistierung mit Auto-Load
 - ✅ Race-Condition Schutz (Mutex-Locking)
 - ✅ SHA-256 Integritätschecks
+
+### Lizenz- und Nutzungsgrenzen (verbindlich)
+
+Die verbindlichen Rechtsbedingungen sind in [LICENSE](../../LICENSE) definiert.
+
+- Die Signaturprüfung für Spezialisierungen darf nicht entfernt, deaktiviert, umgangen oder ausgehebelt werden.
+- Der im Verifier eingebettete öffentliche Schlüssel darf nicht durch einen anderen Schlüssel ersetzt werden.
+- `SKIP_SIGNATURE_VERIFICATION=true` darf in Produktionsumgebungen nicht verwendet werden.
+- Signierte `.ari-spec` Dateien sind proprietär und dürfen nicht weiterverbreitet, weiterverkauft oder zurückentwickelt werden.
+- Kommerzielle und nicht-kommerzielle Nutzung des Grundmodells ist unter AGPL zulässig, sofern alle AGPL-Pflichten eingehalten werden.
 
 ---
 
@@ -140,7 +150,7 @@ Löscht eine Spezialisierung.
 
 ## Sicherheit
 
-### Signatur-System (RSA-2048)
+### Signatur-System (RSA-4096)
 
 **Generierung (Marketplace):**
 ```typescript
@@ -152,8 +162,9 @@ const signature = crypto.sign('sha256', Buffer.from(payload), {
 
 **Validierung (in A.R.I.):**
 ```typescript
-const KAUFE_ES_PUBLIC_KEY = process.env.SPEC_PUBLIC_KEY;
-// Validiert RSA-Signatur vor Installation
+// Public Key liegt im Backend-Code und wird dort für die
+// Verifikation signierter .ari-spec Dateien verwendet.
+// Siehe: backend/security/signatureVerifier.ts
 ```
 
 ### Verschlüsselung (AES-256-GCM)
@@ -334,7 +345,7 @@ const handleSpecializationUpload = async (file: File) => {
 ## Troubleshooting
 
 ### Problem: Upload schlägt mit "Ungültige Signatur" fehl
-**Lösung:** Public Key in Backend überprüfen (`SPEC_PUBLIC_KEY`)
+**Lösung:** Public Key in `backend/security/signatureVerifier.ts` und Datei-Signatur prüfen
 
 ### Problem: Spezialisierung wird nicht angezeigt
 **Lösung:** `GET /api/specializations/list` aufrufen und Response prüfen
@@ -366,7 +377,7 @@ const handleSpecializationUpload = async (file: File) => {
 
 A.R.I. Spezialisierungen bieten:
 
-✅ **Sichere Verteilung:** RSA-2048 Signatur-Validierung  
+✅ **Sichere Verteilung:** RSA-4096 Signatur-Validierung  
 ✅ **Sichere Speicherung:** AES-256-GCM Verschlüsselung  
 ✅ **Zuverlässige Operationen:** Mutex-Locking gegen Race Conditions  
 ✅ **Schnelle Integration:** AI-Prompt-Injection  

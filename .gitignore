@@ -33,3 +33,5 @@ tests/dist/
 *.tmp
 testfile.txt
 node_modules.old/
+
+/local-sichern/

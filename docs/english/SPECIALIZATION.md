@@ -11,11 +11,21 @@
 Specializations are industry-specific AI configurations that adapt A.R.I. for different business sectors. They are sold on **marketplace.example.com**, signed digitally, and installed locally.
 
 **Features:**
-- ✅ RSA-2048 signature validation
+- ✅ RSA-4096 signature validation
 - ✅ AES-256-GCM encryption
 - ✅ Local persistence with auto-load
 - ✅ Race-condition protection (Mutex locking)
 - ✅ SHA-256 integrity checks
+
+### License and Usage Constraints (binding)
+
+The binding legal terms are defined in [LICENSE](../../LICENSE).
+
+- Specialization signature verification must not be removed, disabled, bypassed, or circumvented.
+- The public key embedded in the verifier must not be replaced with a different key.
+- `SKIP_SIGNATURE_VERIFICATION=true` must not be used in production environments.
+- Signed `.ari-spec` files are proprietary and must not be redistributed, resold, or reverse-engineered.
+- Commercial and non-commercial use of the base model is permitted under the AGPL, provided all AGPL obligations are met.
 
 ---
 
@@ -140,7 +150,7 @@ Deletes a specialization.
 
 ## Security
 
-### Signature System (RSA-2048)
+### Signature System (RSA-4096)
 
 **Generation (on marketplace):
 ```typescript
@@ -152,8 +162,9 @@ const signature = crypto.sign('sha256', Buffer.from(payload), {
 
 **Validation (in A.R.I.):**
 ```typescript
-const KAUFE_ES_PUBLIC_KEY = process.env.SPEC_PUBLIC_KEY;
-// Validates RSA signature before installation
+// Public key is managed in backend code and used there to
+// verify signed .ari-spec files.
+// See: backend/security/signatureVerifier.ts
 ```
 
 ### Encryption (AES-256-GCM)
@@ -334,7 +345,7 @@ const handleSpecializationUpload = async (file: File) => {
 ## Deployment Checklist
 
 ### Backend
-- [ ] Set `SPEC_PUBLIC_KEY` in ENV (marketplace public key)
+- [ ] Verify public key in `backend/security/signatureVerifier.ts`
 - [ ] Set `SPEC_ENCRYPTION_KEY` in ENV (32-byte key)
 - [ ] Create `/data/specializations/` directory
 - [ ] Enable API routes
@@ -353,7 +364,7 @@ const handleSpecializationUpload = async (file: File) => {
 ## Troubleshooting
 
 ### Problem: Upload fails with "Invalid signature"
-**Solution:** Check public key in backend (`SPEC_PUBLIC_KEY`)
+**Solution:** Check public key in `backend/security/signatureVerifier.ts` and file signature
 
 ### Problem: Specialization not displayed
 **Solution:** Call `GET /api/specializations/list` and check response
@@ -385,7 +396,7 @@ const handleSpecializationUpload = async (file: File) => {
 
 A.R.I. Specializations provide:
 
-✅ **Secure Distribution:** RSA-2048 signature validation  
+✅ **Secure Distribution:** RSA-4096 signature validation  
 ✅ **Secure Storage:** AES-256-GCM encryption  
 ✅ **Reliable Operations:** Mutex locking against race conditions  
 ✅ **Fast Integration:** AI prompt injection  

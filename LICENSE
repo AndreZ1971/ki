@@ -1,0 +1,85 @@
+A.R.I. – Artificial Retail Intelligence
+Copyright (C) 2024-2026 Andre Zabel
+
+==============================================================================
+PART 1 – OPEN SOURCE LICENSE (GNU AGPL v3)
+==============================================================================
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+The full text of the GNU AGPL v3 is available at:
+https://www.gnu.org/licenses/agpl-3.0.html
+
+==============================================================================
+PART 2 – ADDITIONAL TERMS (permitted under AGPL v3, Section 7)
+==============================================================================
+
+The following additional terms apply to all use, modification, and
+distribution of this software:
+
+1. SPECIALIZATION SIGNATURE VERIFICATION
+
+   The signature verification mechanism located in
+   `backend/security/signatureVerifier.ts` (and any successor files)
+   is a core integrity feature of this software.
+
+   You MAY NOT:
+   - Remove, disable, bypass, or circumvent the signature verification
+   - Modify the public key embedded in the verifier to accept
+     signatures from any key other than the original author's
+   - Set SKIP_SIGNATURE_VERIFICATION=true in any production environment
+
+   Any such modification voids your right to use this software under
+   this license and constitutes copyright infringement.
+
+2. SPECIALIZATION FILES (.ari-spec)
+
+   Specialization files distributed by the original author are
+   proprietary content, separately licensed, and NOT covered by
+   the AGPL. You may NOT redistribute, resell, or reverse-engineer
+   signed specialization files.
+
+3. COMMERCIAL USE
+
+   Commercial and non-commercial use of the software is permitted
+   under the AGPL, including self-hosting for paying customers,
+   provided all AGPL obligations are met.
+
+   This does not grant any right to redistribute, resell, or
+   reverse-engineer signed specialization files (.ari-spec), which
+   remain proprietary under Section 2.
+
+4. ATTRIBUTION
+
+   All distributions, forks, or hosted instances must retain visible
+   attribution: "Powered by A.R.I. © Andre Zabel".
+
+==============================================================================
+CONTACT
+==============================================================================
+
+For specialization licensing or questions:
+https://github.com/AndreZ1971/ki
+
+==============================================================================
+GERMAN SUMMARY (nicht rechtsverbindlich / non-binding summary)
+==============================================================================
+
+Der Quellcode von A.R.I. ist unter der GNU AGPL v3 veröffentlicht.
+Das bedeutet:
+- Du kannst den Code nutzen, lesen, anpassen und weitergeben.
+- Wenn du eine eigene Version hostest oder verteilst, muss dein
+  abgeleiteter Code ebenfalls open source sein (Copyleft).
+- Die Signaturprüfung darf nicht entfernt oder umgangen werden.
+- Spezialisierungsdateien (.ari-spec) sind proprietär und nicht
+  im Rahmen der AGPL lizenziert.
+- Kommerzielle Nutzung des Grundmodells ist unter AGPL möglich,
+  sofern alle AGPL-Pflichten eingehalten werden.

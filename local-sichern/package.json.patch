@@ -1,9 +1,0 @@
-{
-  "scripts": {
-    "test:ui-health": "npx tsx scripts/check-ui-health.ts",
-    "test:ui-e2e": "playwright test tests/e2e/tools-ui-health.spec.ts",
-    "test:ui-full": "npm run test:ui-health && npm run test:ui-e2e",
-    "ui:check": "npm run test:ui-health",
-    "ui:report": "playwright show-report"
-  }
-}

@@ -533,7 +533,7 @@ tests/
 
 ### Encryption Security (4 Tests)
 - [ ] AES-256 encryption
-- [ ] RSA-2048 signatures
+- [ ] RSA-4096 signatures
 - [ ] SHA-256 hashing
 - [ ] Key rotation
 

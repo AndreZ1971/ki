@@ -6,7 +6,7 @@
 ![Tests](https://img.shields.io/badge/tests-350%2F350-success.svg)
 ![ML Integration](https://img.shields.io/badge/ML%20Integration-100%25-green.svg)
 ![Design System](https://img.shields.io/badge/Design_Tokens-100%25-purple.svg)
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![License](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)
 
 **The Digital Employee for Your Online Store**
 
@@ -366,16 +366,27 @@ Your shop is on Facebook, Instagram, LinkedIn, email, and more. A.R.I. generates
 A.R.I. is provided as Infrastructure as a Service (IaaS). This includes access to dedicated compute infrastructure, specialized AI server instances, and proprietary algorithms (Agentic Loops).
 
 #### 2. Copyright and Intellectual Property
-All code, the architecture of Agentic Loops, and infrastructure logic are not open source. They remain as exclusive intellectual property owned by the operator of ari-cloud.de. Any form of reverse engineering, decompilation, or unauthorized reproduction of infrastructure components is strictly prohibited.
+The source code is available under an AGPL-based open-source model. The binding terms are defined in [LICENSE](LICENSE), including additional terms regarding signature verification and proprietary specialization files (.ari-spec).
+
+**Strict additional terms per LICENSE:**
+- Specialization signature verification must not be removed, disabled, or bypassed.
+- The public key embedded in the verifier must not be replaced.
+- `SKIP_SIGNATURE_VERIFICATION=true` is not permitted in production environments.
+- Violations void the right to use the software under the license.
 
 #### 3. Usage Rights and Responsibility
 The user is granted exclusive usage rights to the provided infrastructure for operating their WooCommerce store.
+
+**Commercial use:**
+- Commercial and non-commercial use of the base model is permitted under the AGPL, provided all AGPL obligations are met.
+- Strict restrictions on signature verification, embedded key integrity, and proprietary signed `.ari-spec` files remain fully in force.
 
 **Fact-Based Control:** Since A.R.I., as a digital employee, provides the infrastructure for content and analytics, the final review and execution (e.g., copy & paste of marketing texts) remains the user's sole responsibility.
 
 **Prohibited Uses:**
 - Reproducing, leasing, or sublicensing the software or parts thereof to third parties.
 - Using A.R.I. to create competing products or for automated data extraction (scraping).
+- Redistributing, reselling, or reverse-engineering signed specialization files (.ari-spec).
 
 #### 4. Scalability and Performance
 The infrastructure is designed for professional growth and enables quick scaling of server instances with increasing load. The user is entitled to the contractually agreed computing power within the secured 1.0.0 production environment.
@@ -410,7 +421,7 @@ The final control over the publication of AI-generated content (e.g., via copy &
 
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE) for details.
+GNU AGPL v3 with additional terms - see [LICENSE](LICENSE) for details.
 
 ---
 

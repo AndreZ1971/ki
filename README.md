@@ -4,7 +4,7 @@
 ![Tests](https://img.shields.io/badge/tests-350%2F350-success.svg)
 ![ML Integration](https://img.shields.io/badge/ML%20Integration-100%25-green.svg)
 ![Design System](https://img.shields.io/badge/Design_Tokens-100%25-purple.svg)
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![License](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)
 
 > **Status**: Production Ready → Runtime stable, no frontend mock data, all results from backend. External integrations (e.g. payment gateways) require configuration. [Full definition](docs/english/TOOLS_DOCUMENTATION.md#-glossary).
 
@@ -302,16 +302,27 @@ Weitere 8 Payment-Tools mit ML-Integration
 A.R.I. wird als Infrastructure as a Service (IaaS) bereitgestellt. Dies umfasst den Zugang zur dedizierten Recheninfrastruktur, den spezialisierten KI-Server-Instanzen sowie den proprietären Algorithmen (Agentic Loops).
 
 #### 2. Urheberrecht und Geistiges Eigentum
-Der gesamte Code, die Architektur der Agentic Loops sowie die Infrastruktur-Logik sind kein Open Source. Sie verbleiben als exklusives geistiges Eigentum beim Betreiber von ari-cloud.de. Jegliche Form des Reverse Engineering, der Dekompilierung oder der unautorisierten Vervielfältigung der Infrastruktur-Komponenten ist streng untersagt.
+Der Quellcode ist unter AGPL-lizenzierter Open-Source-Basis verfügbar. Maßgeblich sind die Bedingungen in [LICENSE](LICENSE), inklusive der dort definierten Zusatzbedingungen zur Signaturprüfung und zur Nutzung proprietärer Spezialisierungsdateien (.ari-spec).
+
+**Strikte Zusatzbedingungen gemäß LICENSE:**
+- Die Signaturprüfung für Spezialisierungen darf nicht entfernt, deaktiviert oder umgangen werden.
+- Der im Verifier eingebettete öffentliche Schlüssel darf nicht ausgetauscht werden.
+- `SKIP_SIGNATURE_VERIFICATION=true` ist in Produktionsumgebungen unzulässig.
+- Verstöße führen zum Verlust des Nutzungsrechts unter der Lizenz.
 
 #### 3. Nutzungsrecht und Verantwortung
 Dem Nutzer wird ein exklusives Nutzungsrecht an der bereitgestellten Infrastruktur für den Betrieb seines WooCommerce-Shops eingeräumt.
+
+**Kommerzielle Nutzung:**
+- Kommerzielle und nicht-kommerzielle Nutzung des Grundmodells ist unter der AGPL zulässig, sofern alle AGPL-Pflichten eingehalten werden.
+- Unberührt davon bleiben die strikten Vorgaben zu Signaturprüfung, eingebettetem Schlüssel und proprietären signierten `.ari-spec` Dateien.
 
 **Faktenbasierte Kontrolle:** Da A.R.I. als digitaler Mitarbeiter die Infrastruktur für Content und Analysen stellt, obliegt die finale Prüfung und Ausführung (z. B. Copy & Paste von Marketing-Texten) der Eigenverantwortung des Nutzers.
 
 **Untersagte Nutzungen:**
 - Die Software oder Teile davon zu vervielfältigen, zu vermieten oder an Dritte unterzulizenzieren.
 - A.R.I. zur Erstellung von Konkurrenzprodukten oder zur automatisierten Datenextraktion (Scraping) zu verwenden.
+- Signierte Spezialisierungsdateien (.ari-spec) weiterzuverbreiten, weiterzuverkaufen oder zurückzuentwickeln.
 
 #### 4. Skalierbarkeit und Performance
 Die Infrastruktur ist für professionelles Wachstum ausgelegt und ermöglicht eine kurzfristige Skalierung der Server-Instanzen bei steigender Last. Der Nutzer hat Anspruch auf die vereinbarte Rechenleistung innerhalb der gesicherten 1.0.0-Produktionsumgebung.
