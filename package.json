@@ -53,7 +53,7 @@
     "api"
   ],
   "author": "Your Name",
-  "license": "ISC",
+  "license": "SEE LICENSE IN LICENSE",
   "_moduleAliases": {
     "@config": "backend/dist/config.js"
   },

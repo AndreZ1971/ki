@@ -268,6 +268,27 @@ Weitere 8 Payment-Tools mit ML-Integration
 - Tests & Observability: Golden-Chat-Tests (Vitest/Playwright), einfache Request-/Fallback-Logs mit Rotation; Kennzahlen aus Logs parsbar.
 - Feature Flags ohne DB: Env-Variablen oder kleine Config-Dateien für neue Intents/Prompts; Umschalten per Deploy.
 
+## ⚖️ Open-Source-Hinweis & Spezialisierungsmodell
+
+Dieser Abschnitt ist eine Kurzfassung. Verbindlich sind ausschließlich die Regelungen in [LICENSE](LICENSE).
+
+### Open-Source-Basis
+
+- Der Quellcode steht unter GNU AGPL v3 (mit zusätzlichen Bedingungen nach AGPL Section 7).
+- Kommerzielle und nicht-kommerzielle Nutzung des Grundmodells ist erlaubt, sofern alle AGPL-Pflichten eingehalten werden.
+
+### Spezialisierungsmodell
+
+- Signierte Spezialisierungsdateien (`.ari-spec`) sind proprietäre Inhalte und nicht Teil der AGPL-Codefreigabe.
+- Die Signaturprüfung ist ein integraler Sicherheitsmechanismus und darf nicht entfernt, deaktiviert oder umgangen werden.
+- Der eingebettete öffentliche Schlüssel im Verifier darf nicht ausgetauscht werden.
+- `SKIP_SIGNATURE_VERIFICATION=true` ist in Produktionsumgebungen nicht zulässig.
+
+### Kurz gesagt
+
+- Du darfst den Open-Source-Code unter AGPL nutzen, anpassen und weitergeben.
+- Du darfst keine proprietären signierten Spezialisierungen weiterverteilen, weiterverkaufen oder zurückentwickeln.
+
 ---
 
 ## 🛡️ Sicherheit & Compliance
@@ -320,9 +341,10 @@ Dem Nutzer wird ein exklusives Nutzungsrecht an der bereitgestellten Infrastrukt
 **Faktenbasierte Kontrolle:** Da A.R.I. als digitaler Mitarbeiter die Infrastruktur für Content und Analysen stellt, obliegt die finale Prüfung und Ausführung (z. B. Copy & Paste von Marketing-Texten) der Eigenverantwortung des Nutzers.
 
 **Untersagte Nutzungen:**
-- Die Software oder Teile davon zu vervielfältigen, zu vermieten oder an Dritte unterzulizenzieren.
-- A.R.I. zur Erstellung von Konkurrenzprodukten oder zur automatisierten Datenextraktion (Scraping) zu verwenden.
-- Signierte Spezialisierungsdateien (.ari-spec) weiterzuverbreiten, weiterzuverkaufen oder zurückzuentwickeln.
+- Signierte Spezialisierungsdateien (`.ari-spec`) weiterzuverbreiten, weiterzuverkaufen oder zurückzuentwickeln.
+- Die Signaturprüfung für Spezialisierungen zu entfernen, zu deaktivieren oder zu umgehen.
+- Den im Verifier eingebetteten öffentlichen Schlüssel auszutauschen oder `SKIP_SIGNATURE_VERIFICATION=true` in Produktion einzusetzen.
+- Erforderliche Attribution („Powered by A.R.I. © Andre Zabel") in Distributionen/Forks/Hosted-Instanzen zu entfernen.
 
 #### 4. Skalierbarkeit und Performance
 Die Infrastruktur ist für professionelles Wachstum ausgelegt und ermöglicht eine kurzfristige Skalierung der Server-Instanzen bei steigender Last. Der Nutzer hat Anspruch auf die vereinbarte Rechenleistung innerhalb der gesicherten 1.0.0-Produktionsumgebung.

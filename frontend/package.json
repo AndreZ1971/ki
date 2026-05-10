@@ -3,6 +3,7 @@
   "private": true,
   "version": "7.4.0",
   "description": "Frontend for A.R.I. Artificial Retail Intelligence System",
+  "license": "SEE LICENSE IN LICENSE",
   "type": "module",
   "scripts": {
     "dev": "vite",

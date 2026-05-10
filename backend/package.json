@@ -96,7 +96,7 @@
     "conversion"
   ],
   "author": "Your Name",
-  "license": "ISC",
+  "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
     "@fastify/cookie": "^10.0.0",
     "@fastify/cors": "^11.1.0",

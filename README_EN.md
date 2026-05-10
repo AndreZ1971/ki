@@ -337,6 +337,27 @@ Your shop is on Facebook, Instagram, LinkedIn, email, and more. A.R.I. generates
 - Manual validation of AI suggestions
 - Better accessibility (WCAG 2.1 AA)
 
+## ⚖️ Open-Source Notice & Specialization Model
+
+This section is a short summary. The legally binding terms are defined in [LICENSE](LICENSE).
+
+### Open-source base
+
+- The source code is licensed under GNU AGPL v3 (with additional terms under AGPL Section 7).
+- Commercial and non-commercial use of the base model is allowed if all AGPL obligations are fulfilled.
+
+### Specialization model
+
+- Signed specialization files (`.ari-spec`) are proprietary content and are not part of the AGPL code grant.
+- Signature verification is a core integrity mechanism and must not be removed, disabled, or bypassed.
+- The embedded public key in the verifier must not be replaced.
+- `SKIP_SIGNATURE_VERIFICATION=true` is not allowed in production environments.
+
+### In short
+
+- You may use, modify, and redistribute the open-source code under AGPL obligations.
+- You may not redistribute, resell, or reverse-engineer proprietary signed specializations.
+
 ---
 
 ## 🛡️ Security & Compliance
@@ -384,9 +405,10 @@ The user is granted exclusive usage rights to the provided infrastructure for op
 **Fact-Based Control:** Since A.R.I., as a digital employee, provides the infrastructure for content and analytics, the final review and execution (e.g., copy & paste of marketing texts) remains the user's sole responsibility.
 
 **Prohibited Uses:**
-- Reproducing, leasing, or sublicensing the software or parts thereof to third parties.
-- Using A.R.I. to create competing products or for automated data extraction (scraping).
-- Redistributing, reselling, or reverse-engineering signed specialization files (.ari-spec).
+- Redistributing, reselling, or reverse-engineering signed specialization files (`.ari-spec`).
+- Removing, disabling, or bypassing specialization signature verification.
+- Replacing the embedded verifier public key or using `SKIP_SIGNATURE_VERIFICATION=true` in production.
+- Removing required attribution ("Powered by A.R.I. © Andre Zabel") from distributions/forks/hosted instances.
 
 #### 4. Scalability and Performance
 The infrastructure is designed for professional growth and enables quick scaling of server instances with increasing load. The user is entitled to the contractually agreed computing power within the secured 1.0.0 production environment.
