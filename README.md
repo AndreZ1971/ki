@@ -1,155 +1,163 @@
 # 🤖 A.R.I. - Artificial Retail Intelligence
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![Tests](https://img.shields.io/badge/tests-350%2F350-success.svg)
+[🇩🇪 Deutsche Version](README_DE.md)
+
+<div align="center">
+
+![Version](https://img.shields.io/badge/version-7.4.0-blue.svg)
+![Tests](https://img.shields.io/badge/tests-350%2B-success.svg)
 ![ML Integration](https://img.shields.io/badge/ML%20Integration-100%25-green.svg)
 ![Design System](https://img.shields.io/badge/Design_Tokens-100%25-purple.svg)
 ![License](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)
 
-> **Status**: Production Ready → Runtime stable, no frontend mock data, all results from backend. External integrations (e.g. payment gateways) require configuration. [Full definition](docs/english/TOOLS_DOCUMENTATION.md#-glossary).
+**The Digital Employee for Your Online Store**
 
-## Security Notice
+A system that analyzes, optimizes, and grows your WooCommerce shop –  
+without you having to deal with technology, servers, or configuration.
 
-- `connection.json` and `backend/connection.json` are runtime-generated local configuration files and must never be committed.
-- The repository history was rewritten on 2026-05-10 to remove previously tracked credential files.
-- If you cloned the repository before that date, create a fresh clone before contributing.
+[🚀 Installation](#installation) • [📚 Documentation](#documentation) • [💬 Support](#support) • [🔧 Features](#features)
 
-## Der digitale Mitarbeiter für deinen Online-Shop
-
-Ein System, das deinen WooCommerce-Shop analysiert, optimiert und wächst –  
-ohne dass du dich mit Technik, Servern oder Konfiguration auseinandersetzen musst.
-
-[🚀 Installation](#installation) • [📚 Dokumentation](#dokumentation) • [💬 Support](#support) • [🔧 Features](#features)
+</div>
 
 ---
 
-## 📋 Inhaltsverzeichnis
+## 📋 Table of Contents
 
-- [Die Vision](#-die-vision)
-- [Das Problem](#-das-problem)
-- [Die Lösung](#-die-lösung)
-- [Features](#-features)
-- [Was ändert sich für dich?](#-was-ändert-sich-für-dich)
-- [Technologie](#⚙️-technologie)
-- [Tool-Übersicht](#-tool-übersicht)
-- [Status & Roadmap](#-status--roadmap)
-- [Dokumentation](#-dokumentation)
-- [Support](#-support)
+- [The Vision](#the-vision)
+- [The Problem](#the-problem)
+- [The Solution](#the-solution)
+- [Features](#features)
+- [What Changes for You?](#what-changes-for-you)
+- [Technology](#technology)
+- [Tool Overview](#tool-overview)
+- [Status & Roadmap](#status--roadmap)
+- [Documentation](#documentation)
+- [Support](#support)
 
 ---
 
+## 🎯 The Vision
 
-## 🎯 Die Vision
+Shop owners spend most of their time on tasks that are repetitive and bring little joy:
 
-Shop-Betreiber verbringen den Großteil ihrer Zeit mit Aufgaben, die repetitiv sind und wenig Freude bringen:
+- ✍️ Writing product descriptions
+- 📱 Creating social media posts
+- 📊 Analyzing data (which product is really performing well?)
+- 📧 Writing emails (follow-ups, upsells, welcome series)
+- 📈 Planning and implementing campaigns
+- 🔍 Recognizing trends before the competition does
 
-- ✍️ Produktbeschreibungen schreiben
-- 📱 Social-Media-Posts erstellen
-- 📊 Daten analysieren (welches Produkt läuft wirklich gut?)
-- 📧 E-Mails schreiben (Follow-ups, Upsells, Willkommensserien)
-- 📈 Kampagnen planen und umsetzen
-- 🔍 Trends erkennen, bevor die Konkurrenz es tut
+**A.R.I. gives you this time back.**
 
-**A.R.I. gibt dir diese Zeit zurück.**
+## ⚠️ The Problem
 
-## ⚠️ Das Problem
+### Do You Know This Situation?
 
-### Kennst du diese Situation?
+Your shop is thriving, but you're stuck. Conversion could be better. Customer communication is chaotic. Your bestseller products don't know they're bestsellers. And somehow you lack the capacity to reach the next growth level.
 
-Dein Shop brummt, aber du sitzt fest. Die Konversion könnte besser sein. Die Kundenkommunikation ist chaotisch. Deine Best-Seller-Produkte wissen nicht, dass sie Bestseller sind. Und irgendwie fehlt dir die Kapazität, um die nächste Wachstumsstufe zu erreichen.
+**All the work is on you. You are the bottleneck.**
 
-**Die ganze Arbeit liegt bei dir. Du bist der Flaschenhals.**
+## ✅ The Solution
 
-## ✅ Die Lösung
+**A.R.I. helps you with the operational work of your shop. Simple. Intelligent. Around the clock.**
 
-**A.R.I. hilft dir bei der operativen Arbeit deines Shops. Einfach. Intelligent. Rund um die Uhr.**
+### 📦 Product Management
+New products? A.R.I. analyzes trends, writes SEO texts, generates images, organizes everything – **ready to sell**. You approve, done.
 
-### 📦 Produktmanagement
-Neue Produkte? A.R.I. analysiert Trends, schreibt SEO-Texte, generiert Bilder, organisiert alles – **ready to sell**. Du genehmigst, fertig.
+### 📊 Real Insights
+No more dashboard paralysis. A.R.I. tells you concretely: *"Your top product has an image problem – here are 3 concrete measures."* You make the decision, A.R.I. implements it.
 
-### 📊 Echte Insights
-Keine Dashboard-Paralyse mehr. A.R.I. sagt dir konkret: *"Dein Top-Produkt hat ein Imageproblem – hier sind 3 konkrete Maßnahmen."* Du triffst die Entscheidung, A.R.I. setzt um.
+### 📧 Intelligent Customer Relationships
+Abandoned carts? Customers who haven't bought anything in a long time? A.R.I. knows them and creates personalized message drafts – you review and approve. That simple.
 
-### 📧 Intelligente Kundenbeziehung
-Abandoned Carts? Kunden, die lange nichts gekauft haben? A.R.I. kennt sie und erstellt personalisierte Nachrichtenentwürfe – du prüfst und gibst frei. So einfach.
+### 📱 Visible Everywhere
+Your shop is on Facebook, Instagram, LinkedIn, email, and more. A.R.I. generates smart content for 5+ platforms, scheduling posts at the right time with images and texts that work.
+
+### 🔄 Constantly Getting Better
+**44 specialized processes** run in the background. Your shop gets better every day – without your intervention.
+
+## 🎁 What Changes for You?
+
+| Area | Improvement |
+|------|-------------|
+| ⏰ **Time** | You get your time back – **5–10 hours per week** less admin work |
+| 💰 **Numbers** | Conversion increases, customers are better served, repeat purchases rise |
+| 📊 **Insights** | You understand your business better – clear, actionable insights instead of data garbage |
+| 🚀 **Scaling** | You can scale – without hiring more people |
+
+### Concretely Implemented Through
+
+- ✅ Optimized product texts (SEO-optimized, sales-promoting)
+- ✅ AI-generated product images (DALL-E integration)
+- ✅ Real-time analytics with real WooCommerce data (no mock data)
+- ✅ Email automation (carts, welcome series, reactivation)
+- ✅ Social media posts (LinkedIn, Facebook, Twitter, YouTube with API publishing; Instagram & TikTok with AI text generation via copy-to-clipboard)
+- ✅ Global Design Token System with Dark Mode
+- ✅ 8-language support (DE, EN, FR, ES, IT, PT, NL, PL)
+- ✅ Specialization-aware AI personalization
+- ✅ Multi-source trend analysis (Google Trends + Reddit OAuth)
+- ✅ Percentage-based price suggestions with deterministic calculation
+- ✅ Manual validation of AI suggestions before adoption
+- ✅ Complete WooCommerce integration without placeholders
+- ✅ Support tickets with HTML sanitization
+- ✅ Product idea scoring without random values
 
 ## 🚀 Features
 
 ### 🤖 Agentic Loop Framework
 
-4 spezialisierte Loop-Typen arbeiten autonom im Hintergrund:
+4 specialized loop types work autonomously in the background:
 
 #### 1. Anomaly Detection Loop 🚨
-- Erkennt Payment-Anomalien automatisch
-- **Typen:** `failed_payment`, `unusual_amount`, `repeated_attempts`, `high_risk`
-- Real-time Monitoring & Alerting
+- Automatically detects payment anomalies
+- **Types:** `failed_payment`, `unusual_amount`, `repeated_attempts`, `high_risk`
+- Real-time monitoring & alerting
 
 #### 2. Product Performance Loop 📈
-- A/B testet Produktattribute automatisch
-- **Verbessert:** Preis (-10%), Titel (+Bestseller), Beschreibung (+Benefits)
-- Kontinuierliche Conversion-Verbesserung
+- Automatically A/B tests product attributes
+- **Enhances:** Price (-10%), title (+Bestseller), description (+Benefits)
+- Continuous conversion improvement
 
 #### 3. Payment Recovery Loop 💳
-- Versucht Failed Orders mit verschiedenen Strategien
-- **Strategien:** Retry, Discount, Alternative Payment, Contact
-- **Success Rate:** bis zu 60% bei Contact-Strategie
+- Attempts failed orders with different strategies
+- **Strategies:** Retry, Discount, Alternative Payment, Contact
+- **Success Rate:** up to 60% with contact strategy
 
 #### 4. Analytics Insights Loop 📊
-
-- Generiert automatisch Dashboard-Insights
-- Erkennt Anomalien und Trends
-- Liefert Empfehlungen für Maßnahmen
+- Automatically generates dashboard insights
+- Detects anomalies and trends
+- Delivers recommendations for actions
 
 ---
 
 ### 🛡️ Enterprise-Grade Error Handling
 
-| Feature | Beschreibung |
-|---------|--------------|
-| **Circuit Breaker** | Schutz vor Kaskadenfehlern (`CLOSED` → `OPEN` → `HALF_OPEN`) |
-| **Retry Strategies** | Exponential Backoff mit Jitter |
-| **Dead Letter Queue** | Automatisches Recovery fehlgeschlagener Jobs |
+| Feature | Description |
+|---------|-------------|
+| **Circuit Breaker** | Protection against cascade failures (`CLOSED` → `OPEN` → `HALF_OPEN`) |
+| **Retry Strategies** | Exponential backoff with jitter |
+| **Dead Letter Queue** | Automatic recovery of failed jobs |
 | **Multi-Channel Alerting** | Email, Slack, Webhooks |
 
 ---
 
-### 🔧 51+ Intelligente Tools
+### 🔧 51+ Intelligent Tools
 
-> **Wichtig:** Alle Tools arbeiten assistierend – Entwürfe, Analysen und Hinweise werden erzeugt; Freigaben und Live-Änderungen bleiben immer bei dir.
+> **Important:** All tools work assistively – drafts, analyses, and hints are generated; approvals and live changes remain always with you.
 
-## 🎁 Was ändert sich für dich?
+- ✅ Optimized product texts (SEO-optimized, sales-promoting)
+- ✅ AI-generated product images (DALL-E integration)
+- ✅ Real-time analytics with real recommendations
+- ✅ Email automation (carts, welcome series, reactivation)
+- ✅ Social media posts (6 platforms)
+- ✅ Anomaly detection (problems are reported to you before they become critical)
 
-| Bereich | Verbesserung |
-|---------|--------------|
-| ⏰ **Zeit** | Du bekommst deine Zeit zurück – **5–10 Stunden pro Woche** weniger Admin-Arbeit |
-| 💰 **Zahlen** | Conversion steigt, Kunden werden besser betreut, Repeat-Purchases nehmen zu |
-| 📊 **Insights** | Du verstehst dein Business besser – klare, verwertbare Insights statt Datenmüll |
-| 🚀 **Skalierung** | Du kannst skalieren – ohne mehr Leute einzustellen |
-
-### Konkret umgesetzt durch
-
-- ✅ Optimierte Produkttexte (SEO-optimiert, verkaufsfördernd)
-- ✅ KI-generierte Produktbilder (DALL-E Integration)
-- ✅ Echtzeit-Analytics mit echten WooCommerce-Daten (keine Mock-Daten)
-- ✅ Email-Automation (Carts, Willkommensserie, Reaktivierung)
-- ✅ Social-Media-Posts (LinkedIn, Facebook, Twitter, YouTube mit API-Publishing; Instagram & TikTok mit KI-Text-Generierung via Copy-to-Clipboard)
-- ✅ **NEU v1.0.0:** Globales Design Token System mit Dark Mode
-- ✅ **NEU v1.0.0:** 8-Sprachen Support (DE, EN, FR, ES, IT, PT, NL, PL)
-- ✅ **NEU v1.0.0:** Vollständig dunkles Chatbot-Design mit perfekter Lesbarkeit
-- ✅ **NEU v1.0.0:** Spezialisierungs-aware KI-Personalisierung
-- ✅ Multi-Source Trend-Analyse (Google Trends + Reddit OAuth)
-- ✅ Prozentuale Preissuggestionen mit deterministischer Berechnung
-- ✅ Manuelle Validierung von AI-Vorschlägen vor Übernahme
-- ✅ **NEU v1.0.0:** Vollständige WooCommerce-Integration ohne Platzhalter
-- ✅ **NEU v1.0.0:** Support-Tickets mit HTML-Bereinigung
-- ✅ **NEU v1.0.0:** Produktideen-Scoring ohne Zufallswerte
-
-## ⚙️ Technologie
+## ⚙️ Technology
 
 ### Backend Stack
 
-| Technologie | Version | Verwendung |
-|-------------|---------|------------|
+| Technology | Version | Usage |
+|------------|---------|-------|
 | Node.js | 18+ | Server Runtime |
 | Fastify | 5.2.1 | REST API Framework |
 | TypeScript | 5.8.3 | Type-Safe Development |
@@ -158,220 +166,227 @@ Abandoned Carts? Kunden, die lange nichts gekauft haben? A.R.I. kennt sie und er
 
 ### Frontend Stack
 
-| Technologie | Version | Verwendung |
-|-------------|---------|------------|
+| Technology | Version | Usage |
+|------------|---------|-------|
 | React | 18.3.1 | UI Framework |
 | Vite | 6.0.5 | Build Tool |
 | Shadcn/ui | Latest | Component Library |
 | Tailwind CSS | 3.4.17 | Styling |
 | Framer Motion | Latest | Animations |
 
-### 🤖 KI & ML Integration
+### 🤖 AI & ML Integration
 
 - **GPT-4:** Planning Engine, Content Generation
-- **GPT-4o-mini:** Schnelle Analysen, User-Favor-Detection
-- **DALL-E:** Automatische Bild-Generierung
-- **Embeddings:** Semantic Search & Matching
-- **Custom ML:** Trend-Analyse, Sentiment Detection, Pattern Recognition
+- **GPT-4o-mini:** Fast analyses, user-favor detection
+- **DALL-E:** Automatic image generation
+- **Embeddings:** Semantic search & matching
+- **Custom ML:** Trend analysis, sentiment detection, pattern recognition
 
-### 🔐 Authentifizierung
+### 🧠 AI Agent System
 
-- **Aktuell:** Temporäre In-Memory-Authentifizierung (ENV-konfiguriert)
-- **Geplant:** Automattic-Integration für Produktiv-Umgebung
-- **WooCommerce-Daten:** Direkt von WooCommerce API, lokal gespeichert in einer runtime-generierten `connection.json`
-- **Support-Tickets:** Awesome Support Plugin Integration mit HTML-Bereinigung
+| Component | Description |
+|-----------|-------------|
+| **Planner** | GPT-4 planning engine for multi-step action plans |
+| **Memory** | Conversation context management (128k token window) |
+| **Tools** | 51+ specialized tools for WooCommerce, WordPress, OpenAI |
+| **Scheduler** | Cron-based automation for 44 job types |
 
-## 🔧 Tool-Übersicht
+### 🛡️ Error Handling & Resilience
+
+- **Circuit Breaker:** `Failure` → `OPEN` → `HALF_OPEN` → `Recovery Flow`
+- **Retry Logic:** Exponential backoff with jitter
+- **Dead Letter Queue:** Disk-based persistence of failed jobs
+- **Alerting:** Email/Slack/Webhook multi-channel notifications
+
+## 🔧 Tool Overview
 
 ### 📊 Analytics (13 Tools)
 
-- **Shop Metrics:** Live-KPIs (Umsatz, Bestellungen, Conversion)
-- **Conversion Analysis:** Funnel-Analyse mit Drop-Off-Detection
-- **Feedback Analysis:** Review & Ticket Sentiment-Analyse
-- **Trend Analysis:** KI-gestützte Trend-Erkennung
-- **Real Analytics:** Echtzeit-Dashboard
-- **Shop Health Report:** 360° Shop-Audit
-- **Premium/Standard/Mini Audit:** Verschiedene Audit-Tiefen
+- **Shop Metrics:** Live KPIs (revenue, orders, conversion)
+- **Conversion Analysis:** Funnel analysis with drop-off detection
+- **Feedback Analysis:** Review & ticket sentiment analysis
+- **Trend Analysis:** AI-powered trend detection
+- **Real Analytics:** Real-time dashboard
+- **Shop Health Report:** 360° shop audit
+- **Premium/Standard/Mini Audit:** Various audit depths
 
 ### 📦 Product Management (8 Tools)
 
-- **Product Analyzer:** ML-basierte Produkt-Optimierung
-- **Auto Product Creator:** KI-Content-Generierung
-- **Categories Manager:** Intelligente Kategorie-Verwaltung
-- **Product Bundles:** Bundle-Erstellung mit KI-Vorschlägen
-- **Freebies Creator:** Automatische Gratis-Produkte
-- **Notes Feature:** Lagerort-Tracking mit Autosave
+- **Product Analyzer:** ML-based product optimization
+- **Auto Product Creator:** AI content generation
+- **Categories Manager:** Intelligent category management
+- **Product Bundles:** Bundle creation with AI suggestions
+- **Freebies Creator:** Automatic free products
+- **Notes Feature:** Storage location tracking with autosave
 
 ### 💳 Payment & Finances (13 Tools)
 
-- **Payment Verifier:** ML-basierte Transaction Verification
-- **Payment Tester:** Automatisierte Payment-Flow-Tests
-- **Payment Emergency:** KI-Notfall-Analyse mit GPT-4o-mini
-- **Payment Expansion:** KI-Expansionsplanung
-- **Payment Success:** Success-Rate-Tracking
-- **+8 weitere Payment-Tools** mit ML-Integration
+- **Payment Verifier:** ML-based transaction verification
+- **Payment Tester:** Automated payment flow tests
+- **Payment Emergency:** AI emergency analysis with GPT-4o-mini
+- **Payment Expansion:** AI expansion planning
+- **Payment Success:** Success rate tracking
+- **+8 more payment tools** with ML integration
 
 ### 📧 Marketing & Content (10 Tools)
 
-- **AI Email Generator:** Personalisierte Email-Entwürfe
-- **Social Media Poster:** Multi-Plattform-Upload
-  - ✅ **Facebook:** Vollständig funktional
-  - ✅ **YouTube:** Funktional (Daily Upload Limit: 6 Videos/Tag)
-  - ✅ **LinkedIn:** API-Integration bereit (erfordert gültige Credentials)
-  - ⚠️ **Twitter/X:** Erfordert kostenpflichtiges API-Guthaben
-  - ⚠️ **Instagram:** Erfordert Meta Business Review
-  - ⚠️ **TikTok:** Erfordert TikTok Developer Account
-- **Blogpost Generator:** SEO-optimierte Blogposts
-- **Image Analyzer:** KI-Bild-Qualitätsprüfung
-- **German Content Generator:** Deutsche Marketing-Texte
-- **+5 weitere Content-Tools**
+- **AI Email Generator:** Personalized email drafts
+- **Social Media Poster:** Multi-platform upload
+  - ✅ **Facebook:** Fully functional
+  - ✅ **YouTube:** Functional (Daily upload limit: 6 videos/day)
+  - ✅ **LinkedIn:** API integration ready (requires valid credentials)
+  - ⚠️ **Twitter/X:** Requires paid API credit
+  - ⚠️ **Instagram:** Requires Meta Business Review
+  - ⚠️ **TikTok:** Requires TikTok Developer Account
+- **Blogpost Generator:** SEO-optimized blog posts
+- **Image Analyzer:** AI image quality check
+- **German Content Generator:** German marketing texts
+- **+5 more content tools**
 
 ### 🧠 Advanced AI (9 Tools)
 
-- **Context Generator:** KI-Prompt-Optimierung
-- **Memory System:** Persistent AI Context
-- **System Health:** Real-time Monitoring
-- **User Management:** Customer Intelligence mit ML-Personalization
-- **Real Web Analytics:** Multi-Source Trend Analysis
-- **+4 weitere Advanced-Tools**
+- **Context Generator:** AI prompt optimization
+- **Memory System:** Persistent AI context
+- **System Health:** Real-time monitoring
+- **User Management:** Customer intelligence with ML personalization
+- **Real Web Analytics:** Multi-source trend analysis
+- **+4 more advanced tools**
 
-> **💡 Wichtig:**
-Payment Verifier: ML-basierte Transaction Verification
-Payment Tester: Automatisierte Payment-Flow-Tests
-Payment Emergency: KI-Notfall-Analyse mit GPT-4o-mini
-Payment Expansion: KI-Expansionsplanung
-Payment Success: Success-Rate-Tracking
-Weitere 8 Payment-Tools mit ML-Integration
+> **💡 Important:** All tools work assistively – approvals always require your click!
 
 ## 📊 Status & Roadmap
 
-### ✅ Aktueller Status
+### ✅ Current Status
 
-| Metrik | Status |
+| Metric | Status |
 |--------|--------|
-| **Version** | 6.0.0 – Production-Ready |
-| **Tests** | 350/350 ✅ |
-| **Workflows** | 44 automatisierte Jobs |
-| **Sprachen** | Deutsch & Englisch |
-| **Stabil seit** | Dezember 2025 |
+| **Version** | 7.4.0 – Production-Ready |
+| **Tests** | 350+ ✅ |
+| **Workflows** | 50+ automated jobs |
+| **Languages** | German & English (+ 6 more) |
+| **Stable since** | February 2026 |
 
-### 🤖 ML/KI Integration Status
+### 🤖 ML/AI Integration Status
 
-| Kategorie | Tools | ML/KI | Status |
-|-----------|-------|-------|--------|
+| Category | Tools | ML/AI | Status |
+|----------|-------|-------|--------|
 | Analytics | 13 | 🟢 13/13 | **100%** |
 | Products | 8 | 🟢 8/8 | **100%** |
 | Payments | 13 | 🟢 13/13 | **100%** |
 | Marketing | 10 | 🟢 10/10 | **100%** |
 | Advanced | 9 | 🟢 9/9 | **100%** |
-| **GESAMT** | **53** | **🟢 53/53** | **100%** |
+| **TOTAL** | **53** | **🟢 53/53** | **100%** |
 
-### 🔭 Roadmap (ohne Datenbankpflicht)
+### 🔭 Roadmap (no database required)
 
-- Leichtgewichtiger Wissensspeicher: FAQs/Antwort-Snippets als JSON/YAML im Repo (git-versioniert); Vektor-Store nur als optionale, spätere Erweiterung.
-- Feedback-Loop light: Thumbs-Up/Down im Frontend, Speicherung in kleinen JSON-/CSV-Logs mit Rotation; Auswertung bei Bedarf offline.
-- Mehr Live-Daten-Intents: Umsatz heute, Top-Seller, Low-Stock direkt über bestehende WooCommerce-APIs, keine Persistenz.
-- Tests & Observability: Golden-Chat-Tests (Vitest/Playwright), einfache Request-/Fallback-Logs mit Rotation; Kennzahlen aus Logs parsbar.
-- Feature Flags ohne DB: Env-Variablen oder kleine Config-Dateien für neue Intents/Prompts; Umschalten per Deploy.
+- Lightweight knowledge base: FAQs/answer snippets as JSON/YAML in-repo (git versioned); vector store only as an optional, later extension.
+- Light feedback loop: thumbs up/down in the frontend, stored as small JSON/CSV logs with rotation; analyze offline when needed.
+- More live-data intents: revenue today, top sellers, low stock via existing WooCommerce APIs, no persistence.
+- Tests & observability: golden chat tests (Vitest/Playwright), simple request/fallback logs with rotation; metrics derivable from logs.
+- Feature flags without DB: env vars or small config files for new intents/prompts; toggled per deploy.
 
-## ⚖️ Open-Source-Hinweis & Spezialisierungsmodell
+### 🆕 Recent Updates (January 8, 2026)
 
-Dieser Abschnitt ist eine Kurzfassung. Verbindlich sind ausschließlich die Regelungen in [LICENSE](LICENSE).
+#### ✅ Configuration System:
+- Multi-path fallback loader for `connection.json`
+- Centralized credentials management (no .env API keys)
+- Support for dev, production, and CI/CD environments
+- Detailed fallback logging for debugging
 
-### Open-Source-Basis
+#### ✅ Reddit Integration:
+- Genuine OAuth 2.0 with Client Credentials Flow
+- Real customer discussions and sentiment
+- Async with caching to prevent rate limits
+- Fallback support in trend aggregation
 
-- Der Quellcode steht unter GNU AGPL v3 (mit zusätzlichen Bedingungen nach AGPL Section 7).
-- Kommerzielle und nicht-kommerzielle Nutzung des Grundmodells ist erlaubt, sofern alle AGPL-Pflichten eingehalten werden.
+#### ✅ Price Intelligence:
+- Percentage-based limits (+20% / -15% default)
+- Dynamic fallback scaling (30-70% range)
+- Double validation (frontend + backend)
+- Real-time price preview in UI
 
-### Spezialisierungsmodell
+#### ✅ UI/UX Improvements:
+- Dark glass theme with high contrast
+- Improved error messages and logging
+- Manual validation of AI suggestions
+- Better accessibility (WCAG 2.1 AA)
 
-- Signierte Spezialisierungsdateien (`.ari-spec`) sind proprietäre Inhalte und nicht Teil der AGPL-Codefreigabe.
-- Die Signaturprüfung ist ein integraler Sicherheitsmechanismus und darf nicht entfernt, deaktiviert oder umgangen werden.
-- Der eingebettete öffentliche Schlüssel im Verifier darf nicht ausgetauscht werden.
-- `SKIP_SIGNATURE_VERIFICATION=true` ist in Produktionsumgebungen nicht zulässig.
+## ⚖️ Open-Source Notice & Specialization Model
 
-### Kurz gesagt
+This section is a short summary. The legally binding terms are defined in [LICENSE](LICENSE).
 
-- Du darfst den Open-Source-Code unter AGPL nutzen, anpassen und weitergeben.
-- Du darfst keine proprietären signierten Spezialisierungen weiterverteilen, weiterverkaufen oder zurückentwickeln.
+### Open-source base
+
+- The source code is licensed under GNU AGPL v3 (with additional terms under AGPL Section 7).
+- Commercial and non-commercial use of the base model is allowed if all AGPL obligations are fulfilled.
+
+### Specialization model
+
+- Signed specialization files (`.ari-spec`) are proprietary content and are not part of the AGPL code grant.
+- Signature verification is a core integrity mechanism and must not be removed, disabled, or bypassed.
+- The embedded public key in the verifier must not be replaced.
+- `SKIP_SIGNATURE_VERIFICATION=true` is not allowed in production environments.
+
+### In short
+
+- You may use, modify, and redistribute the open-source code under AGPL obligations.
+- You may not redistribute, resell, or reverse-engineer proprietary signed specializations.
 
 ---
 
-## 🛡️ Sicherheit & Compliance
+## 🛡️ Security & Compliance
 
-### 🔐 Authentifizierung
+### 🔐 Authentication
 
-| Service | Methode |
-|---------|---------|
+| Service | Method |
+|---------|--------|
 | **WooCommerce** | OAuth 1.0a |
-| **WordPress** | Basic Auth mit Application Passwords |
+| **WordPress** | Basic Auth with Application Passwords |
 | **OpenAI** | API Key Authentication |
 
-### 🔒 Datenschutz
+### 🔒 Privacy & Data Protection
 
-## 📚 Dokumentation
-
-| Dokument | Beschreibung | Link |
-|----------|--------------|------|
-| 📖 **Bedienungsanleitung** | Vollständige User-Anleitung | [docs/german/Bedienungsanleitung.md](docs/german/Bedienungsanleitung.md) |
-| 🔧 **Tool-Dokumentation** | Alle 53 Tools im Detail | [docs/german/TOOLS_DOCUMENTATION.md](docs/german/TOOLS_DOCUMENTATION.md) |
-| 💡 **User FAQ** | Häufige Fragen für Shop-Betreiber | [docs/german/USER_FAQ.md](docs/german/USER_FAQ.md) |
-| 🛠️ **Developer FAQ** | Technische FAQ für Entwickler | [docs/german/DEVELOPER_FAQ.md](docs/german/DEVELOPER_FAQ.md) |
-| 🛡️ **Security** | Sicherheit & Best Practices | [docs/german/SECURITY.md](docs/german/SECURITY.md) |
-| 🧪 **Testing** | Test-Coverage & Qualität | [docs/german/TESTING.md](docs/german/TESTING.md) |
-| 🚀 **Deployment** | Server-Setup & Installation | [docs/german/DEPLOYMENT_GUIDE.md](docs/german/DEPLOYMENT_GUIDE.md) |
+- ✅ **GDPR-compliant:** All tools with privacy notices
+- ✅ **OpenAI:** 30-day retention, RAM-only processing
+- ✅ **No cookies:** Session-based authentication
+- ✅ **Encryption:** AES-256-GCM for sensitive data
 
 ---
 
-### ⚖️ Lizenz & Infrastruktur-Nutzungsrechte ari-cloud.de
+---
 
-#### 1. Bereitstellungsmodell: Infrastructure as a Service (IaaS)
-A.R.I. wird als Infrastructure as a Service (IaaS) bereitgestellt. Dies umfasst den Zugang zur dedizierten Recheninfrastruktur, den spezialisierten KI-Server-Instanzen sowie den proprietären Algorithmen (Agentic Loops).
+## 📚 Documentation
 
-#### 2. Urheberrecht und Geistiges Eigentum
-Der Quellcode ist unter AGPL-lizenzierter Open-Source-Basis verfügbar. Maßgeblich sind die Bedingungen in [LICENSE](LICENSE), inklusive der dort definierten Zusatzbedingungen zur Signaturprüfung und zur Nutzung proprietärer Spezialisierungsdateien (.ari-spec).
-
-**Strikte Zusatzbedingungen gemäß LICENSE:**
-- Die Signaturprüfung für Spezialisierungen darf nicht entfernt, deaktiviert oder umgangen werden.
-- Der im Verifier eingebettete öffentliche Schlüssel darf nicht ausgetauscht werden.
-- `SKIP_SIGNATURE_VERIFICATION=true` ist in Produktionsumgebungen unzulässig.
-- Verstöße führen zum Verlust des Nutzungsrechts unter der Lizenz.
-
-#### 3. Nutzungsrecht und Verantwortung
-Dem Nutzer wird ein exklusives Nutzungsrecht an der bereitgestellten Infrastruktur für den Betrieb seines WooCommerce-Shops eingeräumt.
-
-**Kommerzielle Nutzung:**
-- Kommerzielle und nicht-kommerzielle Nutzung des Grundmodells ist unter der AGPL zulässig, sofern alle AGPL-Pflichten eingehalten werden.
-- Unberührt davon bleiben die strikten Vorgaben zu Signaturprüfung, eingebettetem Schlüssel und proprietären signierten `.ari-spec` Dateien.
-
-**Faktenbasierte Kontrolle:** Da A.R.I. als digitaler Mitarbeiter die Infrastruktur für Content und Analysen stellt, obliegt die finale Prüfung und Ausführung (z. B. Copy & Paste von Marketing-Texten) der Eigenverantwortung des Nutzers.
-
-**Untersagte Nutzungen:**
-- Signierte Spezialisierungsdateien (`.ari-spec`) weiterzuverbreiten, weiterzuverkaufen oder zurückzuentwickeln.
-- Die Signaturprüfung für Spezialisierungen zu entfernen, zu deaktivieren oder zu umgehen.
-- Den im Verifier eingebetteten öffentlichen Schlüssel auszutauschen oder `SKIP_SIGNATURE_VERIFICATION=true` in Produktion einzusetzen.
-- Erforderliche Attribution („Powered by A.R.I. © Andre Zabel") in Distributionen/Forks/Hosted-Instanzen zu entfernen.
-
-#### 4. Skalierbarkeit und Performance
-Die Infrastruktur ist für professionelles Wachstum ausgelegt und ermöglicht eine kurzfristige Skalierung der Server-Instanzen bei steigender Last. Der Nutzer hat Anspruch auf die vereinbarte Rechenleistung innerhalb der gesicherten 1.0.0-Produktionsumgebung.
-
-#### 5. Gewährleistung und Haftung
-A.R.I. wird als „Infrastructure as a Service" (IaaS) bereitgestellt. Trotz einer Testabdeckung von über 365 automatisierten Tests und einer Fehlerquote von 0 % im Release-Zustand erfolgt die Bereitstellung ohne Mängelgewähr für spezifische wirtschaftliche Erfolge.
-
-Die finale Kontrolle über die Veröffentlichung von KI-generierten Inhalten (z. B. via Copy & Paste) obliegt allein dem Nutzer.
+| Document | Description | Link |
+|----------|-------------|------|
+| 📖 **User Manual** | Complete user guide | [docs/english/USER_MANUAL.md](docs/english/USER_MANUAL.md) |
+| 🔧 **Tool Documentation** | All 53 tools in detail | [docs/english/TOOLS_DOCUMENTATION.md](docs/english/TOOLS_DOCUMENTATION.md) |
+| 💡 **User FAQ** | Frequently asked questions for shop owners | [docs/english/USER_FAQ.md](docs/english/USER_FAQ.md) |
+| 🛠️ **Developer FAQ** | Technical FAQ for developers | [docs/english/DEVELOPER_FAQ.md](docs/english/DEVELOPER_FAQ.md) |
+| 🛡️ **Security** | Security & best practices | [docs/english/SECURITY.md](docs/english/SECURITY.md) |
+| 🧪 **Testing** | Test coverage & quality | [docs/english/TESTING.md](docs/english/TESTING.md) |
+| 🚀 **Deployment** | Server setup & installation | [docs/english/DEPLOYMENT_GUIDE.md](docs/english/DEPLOYMENT_GUIDE.md) |
 
 ---
 
 ## 💬 Support
 
-- **E-Mail:** info@ari-cloud.de
+- **Email:** info@ari-cloud.de
 - **Website:** [ari-cloud.de](https://ari-cloud.de)
+
+---
+
+## 📄 License
+
+GNU AGPL v3 with additional terms - see [LICENSE](LICENSE) for details.
 
 ---
 
 ## 🙏 Credits
 
-**Entwickelt mit ❤️ von André Zabel ([@AndreZ1971](https://github.com/AndreZ1971))**
+<div align="center">
+
+**Developed with ❤️ by André Zabel ([@AndreZ1971](https://github.com/AndreZ1971))**
 
 ### Powered by:
 
@@ -383,11 +398,15 @@ Die finale Kontrolle über die Veröffentlichung von KI-generierten Inhalten (z.
 ![Fastify](https://img.shields.io/badge/Fastify-000000?style=for-the-badge&logo=fastify&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
+</div>
+
 ---
 
 <div align="center">
 
-### 🎯 Gebaut für Shop-Betreiber, die ihre Zeit für die wichtigen Entscheidungen nutzen wollen.
+### 🎯 Built for shop owners who want to use their time for the important decisions.
 
-[🚀 Installation](docs/german/DEPLOYMENT_GUIDE.md) • [📚 Dokumentation](docs/german/Bedienungsanleitung.md) • [💬 Support](#support)
+[🚀 Installation](docs/english/DEPLOYMENT_GUIDE.md) • [📚 Documentation](docs/english/USER_MANUAL.md) • [💬 Support](#support)
 
+
+</div>
